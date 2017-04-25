@@ -89,9 +89,6 @@ class _DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
-        self._masters = masters
-        self._agents = agents
-        self._public_agents = public_agents
         self._path = dcos_docker_path
 
         # If we run tests concurrently, we want unique container names.
@@ -190,7 +187,7 @@ class _DCOS_Docker:
         """
         return self._nodes(
             container_base_name=self._variables['MASTER_CTR'],
-            num_nodes=self._masters,
+            num_nodes=int(self._variables['MASTERS']),
         )
 
 
