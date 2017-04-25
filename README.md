@@ -33,13 +33,15 @@ vagrant/resize-disk.sh 102400
 vagrant ssh -c 'sudo yum update -y kernel'
 vagrant reload
 vagrant provision
+# Wait until the VM has presumably booted
+sleep 30
 vagrant ssh
 ```
 
 Then when in the environment, install dependencies and enter a `virtualenv`:
 
 ```sh
-source bootstrap.sh
+source vagrant_bootstrap.sh
 ```
 
 Then set the test options.

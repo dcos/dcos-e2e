@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# Source this file to give an environment for running end to end tests
+# Source this file to give an environment for running end to end tests.
+# This modifies the calling environment.
+# Therefore it is recommended that this is used within a VM.
 set -o
 set -e
 
