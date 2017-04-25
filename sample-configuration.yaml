@@ -1,3 +1,2 @@
-dcos_generate_config_url: null
-dcos_generate_config_path: null
+dcos_generate_config_path: "/path/to/build/artifact"
 dcos_docker_path: "/path/to/dcos_docker"

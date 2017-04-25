@@ -73,7 +73,6 @@ class _DCOS_Docker:
         agents: int,
         public_agents: int,
         extra_config: Dict,
-        generate_config_url: Optional[str],
         generate_config_path: Optional[Path],
         dcos_docker_path: Path,
     ) -> None:
@@ -87,7 +86,6 @@ class _DCOS_Docker:
             extra_config: DC/OS Docker comes with a "base" configuration.
                 This dictionary can contain extra installation configuration
                 variables.
-            generate_config_url: The URL to a build artifact to install.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
@@ -107,12 +105,10 @@ class _DCOS_Docker:
             'dcos-docker-public-agent-test-{random}-'.format(random=random)
         )
 
+        config_dir = TemporaryDirectory(dir='/tmp')
+        config_path = Path(config_dir.name) / 'dcos_generate_config.sh'
+        copyfile(src=str(generate_config_path), dst=str(config_path))
         self._ssh_dir = Path(mkdtemp(dir='/tmp'))
-
-        # If there is an existing build artifact, a new one is not downloaded.
-        existing_artifact_path = dcos_docker_path / 'dcos_generate_config.sh'
-        if existing_artifact_path.exists():
-            existing_artifact_path.unlink()
 
         self._variables = {
             'MASTERS': str(masters),
@@ -130,9 +126,6 @@ class _DCOS_Docker:
                 default_flow_style=False,
             )
 
-        config_dir = TemporaryDirectory(dir='/tmp')
-        config_path = Path(config_dir.name) / 'dcos_generate_config.sh'
-        copyfile(src=str(generate_config_path), dst=str(config_path))
         self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(config_path)
 
         self._make(variables=self._variables, target='all')
@@ -227,25 +220,17 @@ class Cluster(ContextDecorator):
             agents: The number of master nodes to create.
             public_agents: The number of master nodes to create.
         """
-
         # See README.md for information on the required configuration.
         with open('configuration.yaml') as configuration:
             tests_config = yaml.load(configuration)
-
-        generate_config_path = None
-
-        if tests_config['dcos_generate_config_path'] is not None:
-            generate_config_path = Path(
-                tests_config['dcos_generate_config_path']
-            )
 
         self._backend = _DCOS_Docker(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             extra_config=extra_config,
-            generate_config_url=tests_config['dcos_generate_config_url'],
-            generate_config_path=generate_config_path,
+            generate_config_path=Path(
+                tests_config['dcos_generate_config_path']),
             dcos_docker_path=Path(tests_config['dcos_docker_path']),
         )
         self._backend.postflight()
