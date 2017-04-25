@@ -93,6 +93,11 @@ class _DCOS_Docker:
         self._agents = agents
         self._public_agents = public_agents
         self._path = dcos_docker_path
+
+        # If we run tests concurrently, we want unique container names.
+        # However, it may be useful for debugging to group these names.
+        # Therefore, we use the same random string in each container in a
+        # cluster.
         random = uuid.uuid4()
 
         master_container_name = (
