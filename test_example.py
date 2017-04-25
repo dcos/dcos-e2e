@@ -61,7 +61,6 @@ class TestHarness:
 
 
 class TestConcurrent:
-
     def test_one(self) -> None:
         with Cluster(extra_config={}):
             pass

@@ -3,6 +3,8 @@ import uuid
 import yaml
 from contextlib import ContextDecorator
 from pathlib import Path
+from shutil import copyfile
+from tempfile import TemporaryDirectory, mkdtemp
 from typing import Dict, List, Optional, Set, Tuple
 
 from docker import Client
@@ -89,22 +91,20 @@ class _DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
-        from tempfile import TemporaryDirectory, mkdtemp
         self._masters = masters
         self._agents = agents
         self._public_agents = public_agents
         self._path = dcos_docker_path
+        random = uuid.uuid4()
 
         master_container_name = (
-            'dcos-docker-master-test-{random}'.format(random=uuid.uuid4())
+            'dcos-docker-master-test-{random}-'.format(random=random)
         )
         agent_container_name = (
-            'dcos-docker-agent-test-{random}'.format(random=uuid.uuid4())
+            'dcos-docker-agent-test-{random}-'.format(random=random)
         )
         public_agent_container_name = (
-            'dcos-docker-public-agent-test-{random}'.format(
-                random=uuid.uuid4()
-            )
+            'dcos-docker-public-agent-test-{random}-'.format(random=random)
         )
 
         self._ssh_dir = Path(mkdtemp(dir='/tmp'))
@@ -130,16 +130,11 @@ class _DCOS_Docker:
                 default_flow_style=False,
             )
 
-        # if generate_config_url:
-        #     variables['DCOS_GENERATE_CONFIG_URL'] = generate_config_url
-        foo = TemporaryDirectory(dir='/tmp')
-        foo_path = Path(foo.name)
-        foo_c_path = foo_path / 'dcos_config_thing.sh'
-        from shutil import copyfile
-        copyfile(src=str(generate_config_path), dst=str(foo_c_path))
-        self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(foo_c_path)
+        config_dir = TemporaryDirectory(dir='/tmp')
+        config_path = Path(config_dir.name) / 'dcos_generate_config.sh'
+        copyfile(src=str(generate_config_path), dst=str(config_path))
+        self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(config_path)
 
-        # self._make(variables={}, target='clean')
         self._make(variables=self._variables, target='all')
 
     def _make(self, variables: Dict[str, str], target: str) -> None:
