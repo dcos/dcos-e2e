@@ -1,4 +1,5 @@
 import subprocess
+import uuid
 import yaml
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -93,6 +94,18 @@ class _DCOS_Docker:
         self._public_agents = public_agents
         self._path = dcos_docker_path
 
+        self._master_container_name = (
+            'dcos-docker-master-test-{random}'.format(random=uuid.uuid4())
+        )
+        self._agent_container_name = (
+            'dcos-docker-agent-test-{random}'.format(random=uuid.uuid4())
+        )
+        self._public_agent_container_name = (
+            'dcos-docker-public_-gent-test-{random}'.format(
+                random=uuid.uuid4()
+            )
+        )
+
         # If there is an existing build artifact, a new one is not downloaded.
         existing_artifact_path = dcos_docker_path / 'dcos_generate_config.sh'
         if existing_artifact_path.exists():
@@ -104,6 +117,9 @@ class _DCOS_Docker:
             'MASTERS': str(masters),
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
+            'MASTER_CTR': self._master_container_name,
+            'AGENT_CTR': self._agent_container_name,
+            'PUBLIC_AGENT_CTR': self._public_agent_container_name,
         }  # type: Dict[str, str]
 
         if extra_config:
@@ -183,7 +199,7 @@ class _DCOS_Docker:
         Return all DC/OS master ``_Node``s.
         """
         return self._nodes(
-            container_base_name='dcos-docker-master',
+            container_base_name=self._master_container_name,
             num_nodes=self._masters,
         )
 

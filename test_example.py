@@ -58,3 +58,8 @@ class TestHarness:
         config = {'security': security}
         with Cluster(extra_config=config):
             pass
+
+    def test_concurrent(self) -> None:
+        with Cluster(extra_config={}):
+            with Cluster(extra_config={}):
+                pass
