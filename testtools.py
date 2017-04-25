@@ -89,52 +89,58 @@ class _DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
+        from tempfile import TemporaryDirectory, mkdtemp
         self._masters = masters
         self._agents = agents
         self._public_agents = public_agents
         self._path = dcos_docker_path
 
-        self._master_container_name = (
+        master_container_name = (
             'dcos-docker-master-test-{random}'.format(random=uuid.uuid4())
         )
-        self._agent_container_name = (
+        agent_container_name = (
             'dcos-docker-agent-test-{random}'.format(random=uuid.uuid4())
         )
-        self._public_agent_container_name = (
-            'dcos-docker-public_-gent-test-{random}'.format(
+        public_agent_container_name = (
+            'dcos-docker-public-agent-test-{random}'.format(
                 random=uuid.uuid4()
             )
         )
+
+        self._ssh_dir = Path(mkdtemp(dir='/tmp'))
 
         # If there is an existing build artifact, a new one is not downloaded.
         existing_artifact_path = dcos_docker_path / 'dcos_generate_config.sh'
         if existing_artifact_path.exists():
             existing_artifact_path.unlink()
 
-        self._make(variables={}, target='clean')
-
-        variables = {
+        self._variables = {
             'MASTERS': str(masters),
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
-            'MASTER_CTR': self._master_container_name,
-            'AGENT_CTR': self._agent_container_name,
-            'PUBLIC_AGENT_CTR': self._public_agent_container_name,
+            'MASTER_CTR': master_container_name,
+            'AGENT_CTR': agent_container_name,
+            'PUBLIC_AGENT_CTR': public_agent_container_name,
+            'SSH_DIR': str(self._ssh_dir),
         }  # type: Dict[str, str]
 
         if extra_config:
-            variables['EXTRA_GENCONF_CONFIG'] = yaml.dump(
+            self._variables['EXTRA_GENCONF_CONFIG'] = yaml.dump(
                 data=extra_config,
                 default_flow_style=False,
             )
 
-        if generate_config_url:
-            variables['DCOS_GENERATE_CONFIG_URL'] = generate_config_url
+        # if generate_config_url:
+        #     variables['DCOS_GENERATE_CONFIG_URL'] = generate_config_url
+        foo = TemporaryDirectory(dir='/tmp')
+        foo_path = Path(foo.name)
+        foo_c_path = foo_path / 'dcos_config_thing.sh'
+        from shutil import copyfile
+        copyfile(src=str(generate_config_path), dst=str(foo_c_path))
+        self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(foo_c_path)
 
-        if generate_config_path:
-            variables['DCOS_GENERATE_CONFIG_PATH'] = str(generate_config_path)
-
-        self._make(variables=variables, target='all')
+        # self._make(variables={}, target='clean')
+        self._make(variables=self._variables, target='all')
 
     def _make(self, variables: Dict[str, str], target: str) -> None:
         """
@@ -149,7 +155,7 @@ class _DCOS_Docker:
         """
         args = ['make'] + [
             '{key}={value}'.format(key=key, value=value)
-            for key, value in variables.items()
+            for key, value in self._variables.items()
         ] + [target]
 
         subprocess.check_output(args=args, cwd=str(self._path))
@@ -187,7 +193,7 @@ class _DCOS_Docker:
             ip_address = details['NetworkSettings']['IPAddress']
             node = _Node(
                 ip_address=ip_address,
-                ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
+                ssh_key_path=self._ssh_dir / 'id_rsa',
             )
             nodes.add(node)
 
@@ -199,7 +205,7 @@ class _DCOS_Docker:
         Return all DC/OS master ``_Node``s.
         """
         return self._nodes(
-            container_base_name=self._master_container_name,
+            container_base_name=self._variables['MASTER_CTR'],
             num_nodes=self._masters,
         )
 
