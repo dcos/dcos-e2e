@@ -1,3 +1,0 @@
-dcos_generate_config_url: null # "https://downloads.mesosphere.com/dcos-enterprise/testing/master/dcos_generate_config.ee.sh"
-dcos_generate_config_path: /vagrant/dcos_generate_config.sh 
-dcos_docker_path: "/tmp/dcos-docker"
