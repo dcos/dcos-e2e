@@ -1,0 +1,4 @@
+dcos_generate_config_url: null
+dcos_generate_config_path: null
+enterprise_cluster: true
+dcos_docker_path: "/path/to/dcos_docker"
