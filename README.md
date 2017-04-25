@@ -19,7 +19,6 @@ The tests must be run on a host which is supported by DC/OS Docker.
 One way to guarantee this support is to create a Vagrant VM which supports DC/OS Docker.
 
 ```sh
-cd tests/end_to_end/
 mkdir -p vagrant
 cd vagrant
 curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/resize-disk.sh
