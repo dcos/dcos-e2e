@@ -3,7 +3,7 @@ import uuid
 import yaml
 from contextlib import ContextDecorator
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, rmtree
 from tempfile import TemporaryDirectory, mkdtemp
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -100,29 +100,20 @@ class _DCOS_Docker:
         # cluster.
         random = uuid.uuid4()
 
-        master_container_name = (
-            'dcos-docker-master-test-{random}-'.format(random=random)
-        )
-        agent_container_name = (
-            'dcos-docker-agent-test-{random}-'.format(random=random)
-        )
-        public_agent_container_name = (
-            'dcos-docker-public-agent-test-{random}-'.format(random=random)
-        )
-
         config_dir = TemporaryDirectory(dir='/tmp')
         config_path = Path(config_dir.name) / 'dcos_generate_config.sh'
         copyfile(src=str(generate_config_path), dst=str(config_path))
-        self._ssh_dir = Path(mkdtemp(dir='/tmp'))
 
         self._variables = {
             'MASTERS': str(masters),
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
-            'MASTER_CTR': master_container_name,
-            'AGENT_CTR': agent_container_name,
-            'PUBLIC_AGENT_CTR': public_agent_container_name,
-            'SSH_DIR': str(self._ssh_dir),
+            'MASTER_CTR': 'dcos-master-test-{random}-'.format(random=random),
+            'AGENT_CTR': 'dcos-agent-test-{random}-'.format(random=random),
+            'PUBLIC_AGENT_CTR': 'dcos-public-agent-{random}-'.format(
+                random=random),
+            'SSH_DIR': mkdtemp(dir='/tmp'),
+            'DCOS_GENERATE_CONFIG_PATH': str(config_path),
         }  # type: Dict[str, str]
 
         if extra_config:
@@ -131,16 +122,14 @@ class _DCOS_Docker:
                 default_flow_style=False,
             )
 
-        self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(config_path)
+        self._make(target='all')
 
-        self._make(variables=self._variables, target='all')
-
-    def _make(self, variables: Dict[str, str], target: str) -> None:
+    def _make(self, target: str) -> None:
         """
-        Run `make` in the DC/OS Docker directory.
+        Run `make` in the DC/OS Docker directory using the variables used to
+        create the cluster.
 
         Args:
-            variables: Variables to pass to `make`.
             target: `make` target to run.
 
         Raises:
@@ -157,13 +146,14 @@ class _DCOS_Docker:
         """
         Wait for nodes to be ready to run tests against.
         """
-        self._make(variables={}, target='postflight')
+        self._make(target='postflight')
 
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
-        self._make(variables={}, target='clean')
+        rmtree(path=self._variables['SSH_DIR'])
+        self._make(target='clean')
 
     def _nodes(self, container_base_name: str, num_nodes: int) -> Set[_Node]:
         """
@@ -176,6 +166,7 @@ class _DCOS_Docker:
         """
         client = Client()
         nodes = set([])  # type: Set[_Node]
+        ssh_dir = Path(self._variables['SSH_DIR'])
 
         while len(nodes) < num_nodes:
             container_name = '{container_base_name}{number}'.format(
@@ -186,7 +177,7 @@ class _DCOS_Docker:
             ip_address = details['NetworkSettings']['IPAddress']
             node = _Node(
                 ip_address=ip_address,
-                ssh_key_path=self._ssh_dir / 'id_rsa',
+                ssh_key_path=ssh_dir / 'id_rsa',
             )
             nodes.add(node)
 
