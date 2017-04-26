@@ -88,9 +88,6 @@ class _DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
-        self._masters = masters
-        self._agents = agents
-        self._public_agents = public_agents
         self._path = dcos_docker_path
 
         # If there is an existing build artifact, a new one is not downloaded.
@@ -98,27 +95,27 @@ class _DCOS_Docker:
         if existing_artifact_path.exists():
             existing_artifact_path.unlink()
 
-
-        variables = {
+        self._variables = {
             'MASTERS': str(masters),
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
         }  # type: Dict[str, str]
 
         if extra_config:
-            variables['EXTRA_GENCONF_CONFIG'] = yaml.dump(
+            self._variables['EXTRA_GENCONF_CONFIG'] = yaml.dump(
                 data=extra_config,
                 default_flow_style=False,
             )
 
         if generate_config_url:
-            variables['DCOS_GENERATE_CONFIG_URL'] = generate_config_url
+            self._variables['DCOS_GENERATE_CONFIG_URL'] = generate_config_url
 
         if generate_config_path:
-            variables['DCOS_GENERATE_CONFIG_PATH'] = str(generate_config_path)
+            self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(
+                generate_config_path)
 
         self._make(variables={}, target='clean')
-        self._make(variables=variables, target='all')
+        self._make(variables=self._variables, target='all')
 
     def _make(self, variables: Dict[str, str], target: str) -> None:
         """
@@ -184,7 +181,7 @@ class _DCOS_Docker:
         """
         return self._nodes(
             container_base_name='dcos-docker-master',
-            num_nodes=self._masters,
+            num_nodes=int(self._variables['MASTERS']),
         )
 
 
