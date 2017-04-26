@@ -46,15 +46,3 @@ class TestHarness:
             (master, ) = cluster.masters
             with pytest.raises(CalledProcessError):
                 master.run_as_root(args=['test', '-f', path])
-
-    @pytest.mark.parametrize('security', ['disabled', 'permissive', 'strict'])
-    def test_security(self, security: str) -> None:
-        """
-        Clusters can be created with any security setting.
-        For DC/OS Enterprise, this requires
-        https://github.com/dcos/dcos-docker/pull/34.
-        For DC/OS OSS, this is not relevant.
-        """
-        config = {'security': security}
-        with Cluster(extra_config=config):
-            pass
