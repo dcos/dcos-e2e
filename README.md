@@ -18,40 +18,40 @@ With that experience, we will choose where to put the test suite and whether it 
 The tests must be run on a host which is supported by DC/OS Docker.
 One way to guarantee this support is to create a Vagrant VM which supports DC/OS Docker.
 
-```sh
-mkdir -p vagrant
-cd vagrant
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/resize-disk.sh
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/vbox-network.sh
-chmod +x resize-disk.sh
-chmod +x vbox-network.sh
-cd ..
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
-vagrant/resize-disk.sh 102400
-# Update the kernel and re-provision to work around
-# https://github.com/moby/moby/issues/5618
-vagrant ssh -c 'sudo yum update -y kernel'
-vagrant reload
-vagrant provision
-# Wait until the VM has presumably booted
-sleep 30
-vagrant ssh
-```
+	```sh
+	mkdir -p vagrant
+	cd vagrant
+	curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/resize-disk.sh
+	curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/vbox-network.sh
+	chmod +x resize-disk.sh
+	chmod +x vbox-network.sh
+	cd ..
+	curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
+	vagrant/resize-disk.sh 102400
+	# Update the kernel and re-provision to work around
+	# https://github.com/moby/moby/issues/5618
+	vagrant ssh -c 'sudo yum update -y kernel'
+	vagrant reload
+	vagrant provision
+	# Wait until the VM has presumably booted
+	sleep 30
+	vagrant ssh
+	```
 
 Then when in the environment, install dependencies and enter a `virtualenv`:
 
-```sh
-source vagrant_bootstrap.sh
-```
+	```sh
+	source vagrant_bootstrap.sh
+	```
 
 Then set the test options.
 See "Options".
 
 Then run the tests:
 
-```sh
-pytest
-```
+	```sh
+	pytest
+	```
 
 ### Options
 

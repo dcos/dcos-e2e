@@ -119,6 +119,13 @@ class _DCOS_Docker:
                 default_flow_style=False,
             )
 
+        if generate_config_url:
+            self._variables['DCOS_GENERATE_CONFIG_URL'] = generate_config_url
+
+        if generate_config_path:
+            self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(
+                generate_config_path)
+
         self._make(target='all')
 
     def _make(self, target: str) -> None:
