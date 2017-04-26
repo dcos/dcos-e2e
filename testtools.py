@@ -70,7 +70,6 @@ class _DCOS_Docker:
         agents: int,
         public_agents: int,
         extra_config: Dict,
-        generate_config_url: Optional[str],
         generate_config_path: Optional[Path],
         dcos_docker_path: Path,
     ) -> None:
@@ -84,13 +83,12 @@ class _DCOS_Docker:
             extra_config: DC/OS Docker comes with a "base" configuration.
                 This dictionary can contain extra installation configuration
                 variables.
-            generate_config_url: The URL to a build artifact to install.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
         self._path = dcos_docker_path
 
-        # If there is an existing build artifact, a new one is not downloaded.
+        # If there is an existing build artifact, a new one is not used.
         existing_artifact_path = dcos_docker_path / 'dcos_generate_config.sh'
         if existing_artifact_path.exists():
             existing_artifact_path.unlink()
@@ -106,9 +104,6 @@ class _DCOS_Docker:
                 data=extra_config,
                 default_flow_style=False,
             )
-
-        if generate_config_url:
-            self._variables['DCOS_GENERATE_CONFIG_URL'] = generate_config_url
 
         if generate_config_path:
             self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(
@@ -223,7 +218,6 @@ class Cluster(ContextDecorator):
             agents=agents,
             public_agents=public_agents,
             extra_config=extra_config,
-            generate_config_url=tests_config['dcos_generate_config_url'],
             generate_config_path=generate_config_path,
             dcos_docker_path=Path(tests_config['dcos_docker_path']),
         )
