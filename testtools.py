@@ -98,7 +98,6 @@ class _DCOS_Docker:
         if existing_artifact_path.exists():
             existing_artifact_path.unlink()
 
-        self._make(variables={}, target='clean')
 
         variables = {
             'MASTERS': str(masters),
@@ -118,6 +117,7 @@ class _DCOS_Docker:
         if generate_config_path:
             variables['DCOS_GENERATE_CONFIG_PATH'] = str(generate_config_path)
 
+        self._make(variables={}, target='clean')
         self._make(variables=variables, target='all')
 
     def _make(self, variables: Dict[str, str], target: str) -> None:
