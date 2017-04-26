@@ -12,6 +12,10 @@ class TestHarness:
 
     @pytest.fixture
     def path(self) -> str:
+        """
+        Return the path to a file which will exist on a cluster only if a
+        particular config variable is given.
+        """
         return '/opt/mesosphere/etc/docker_credentials'
 
     def test_extend_config(self, path: str) -> None:
