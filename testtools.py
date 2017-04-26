@@ -91,6 +91,7 @@ class _DCOS_Docker:
         """
         self._path = dcos_docker_path
 
+<<<<<<< HEAD
         # If we run tests concurrently, we want unique container names.
         # However, it may be useful for debugging to group these names.
         # Therefore, we use the same random string in each container in a
@@ -100,6 +101,12 @@ class _DCOS_Docker:
         config_dir = TemporaryDirectory(dir='/tmp')
         config_path = Path(config_dir.name) / 'dcos_generate_config.sh'
         copyfile(src=str(generate_config_path), dst=str(config_path))
+=======
+        # If there is an existing build artifact, a new one is not used.
+        existing_artifact_path = dcos_docker_path / 'dcos_generate_config.sh'
+        if existing_artifact_path.exists():
+            existing_artifact_path.unlink()
+>>>>>>> origin/master
 
         self._variables = {
             'MASTERS': str(masters),
@@ -119,6 +126,14 @@ class _DCOS_Docker:
                 default_flow_style=False,
             )
 
+<<<<<<< HEAD
+=======
+        if generate_config_path:
+            self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(
+                generate_config_path)
+
+        self._make(target='clean')
+>>>>>>> origin/master
         self._make(target='all')
 
     def _make(self, target: str) -> None:
@@ -222,8 +237,12 @@ class Cluster(ContextDecorator):
             agents=agents,
             public_agents=public_agents,
             extra_config=extra_config,
+<<<<<<< HEAD
             generate_config_path=Path(
                 tests_config['dcos_generate_config_path']),
+=======
+            generate_config_path=generate_config_path,
+>>>>>>> origin/master
             dcos_docker_path=Path(tests_config['dcos_docker_path']),
         )
         self._backend.postflight()
