@@ -114,15 +114,14 @@ class _DCOS_Docker:
             self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(
                 generate_config_path)
 
-        self._make(variables={}, target='clean')
-        self._make(variables=self._variables, target='all')
+        self._make(target='clean')
+        self._make(target='all')
 
-    def _make(self, variables: Dict[str, str], target: str) -> None:
+    def _make(self, target: str) -> None:
         """
         Run `make` in the DC/OS Docker directory.
 
         Args:
-            variables: Variables to pass to `make`.
             target: `make` target to run.
 
         Raises:
@@ -130,7 +129,7 @@ class _DCOS_Docker:
         """
         args = ['make'] + [
             '{key}={value}'.format(key=key, value=value)
-            for key, value in variables.items()
+            for key, value in self._variables.items()
         ] + [target]
 
         subprocess.check_output(args=args, cwd=str(self._path))
@@ -139,13 +138,13 @@ class _DCOS_Docker:
         """
         Wait for nodes to be ready to run tests against.
         """
-        self._make(variables={}, target='postflight')
+        self._make(target='postflight')
 
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
-        self._make(variables={}, target='clean')
+        self._make(target='clean')
 
     def _nodes(self, container_base_name: str, num_nodes: int) -> Set[_Node]:
         """
