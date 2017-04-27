@@ -135,12 +135,11 @@ class _DCOS_Docker:
             client = Client()
             for container in client.containers():
                 image = container['Image']
-                image = container['Names'][0]
                 if image.startswith('mesosphere/dcos-genconf'):
                     return True
             return False
 
-        while genconf_container_running:
+        while genconf_container_running():
             from time import sleep
             sleep(1)
 
