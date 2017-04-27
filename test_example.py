@@ -51,12 +51,11 @@ class TestHarness:
             with pytest.raises(CalledProcessError):
                 master.run_as_root(args=['test', '-f', path])
 
-
-class TestConcurrent:
-    def test_one(self) -> None:
-        with Cluster(extra_config={}):
-            pass
-
-    def test_two(self) -> None:
+    @pytest.mark.parametrize('run', [1, 2])
+    def test_concurrency(self, run: int) -> None:
+        """
+        This example can be run with `-n 2` to show that clusters can be
+        created concurrently.
+        """
         with Cluster(extra_config={}):
             pass
