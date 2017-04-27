@@ -88,17 +88,17 @@ class _DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
+        # To avoid conflicts, we use random container names.
+        # We use the same random string for each container in a cluster so
+        # that they can be associated easily.
+        random = uuid.uuid4()
+
         self._path = dcos_docker_path
 
         copyfile(
             src=str(generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
-
-        # To avoid conflicts, we use random container names.
-        # We use the same random string for each container in a cluster so
-        # that they can be associated easily.
-        random = uuid.uuid4()
 
         self._variables = {
             # Number of nodes.
@@ -217,7 +217,6 @@ class Cluster(ContextDecorator):
             agents: The number of master nodes to create.
             public_agents: The number of master nodes to create.
         """
-
         # See README.md for information on the required configuration.
         with open('configuration.yaml') as configuration:
             tests_config = yaml.load(configuration)
