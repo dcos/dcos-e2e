@@ -1,9 +1,10 @@
 import subprocess
-import yaml
 from contextlib import ContextDecorator
 from pathlib import Path
+from shutil import copyfile
 from typing import Dict, List, Optional, Set, Tuple
 
+import yaml
 from docker import Client
 
 
@@ -70,7 +71,7 @@ class _DCOS_Docker:
         agents: int,
         public_agents: int,
         extra_config: Dict,
-        generate_config_path: Optional[Path],
+        generate_config_path: Path,
         dcos_docker_path: Path,
     ) -> None:
         """
@@ -88,10 +89,10 @@ class _DCOS_Docker:
         """
         self._path = dcos_docker_path
 
-        # If there is an existing build artifact, a new one is not used.
-        existing_artifact_path = dcos_docker_path / 'dcos_generate_config.sh'
-        if existing_artifact_path.exists():
-            existing_artifact_path.unlink()
+        copyfile(
+            src=str(generate_config_path),
+            dst=str(self._path / 'dcos_generate_config.sh'),
+        )
 
         self._variables = {
             'MASTERS': str(masters),
@@ -104,10 +105,6 @@ class _DCOS_Docker:
                 data=extra_config,
                 default_flow_style=False,
             )
-
-        if generate_config_path:
-            self._variables['DCOS_GENERATE_CONFIG_PATH'] = str(
-                generate_config_path)
 
         self._make(target='clean')
         self._make(target='all')
@@ -206,19 +203,13 @@ class Cluster(ContextDecorator):
         with open('configuration.yaml') as configuration:
             tests_config = yaml.load(configuration)
 
-        generate_config_path = None
-
-        if tests_config['dcos_generate_config_path'] is not None:
-            generate_config_path = Path(
-                tests_config['dcos_generate_config_path']
-            )
-
         self._backend = _DCOS_Docker(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             extra_config=extra_config,
-            generate_config_path=generate_config_path,
+            generate_config_path=Path(
+                tests_config['dcos_generate_config_path']),
             dcos_docker_path=Path(tests_config['dcos_docker_path']),
         )
         self._backend.postflight()
