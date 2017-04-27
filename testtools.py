@@ -111,7 +111,8 @@ class _DCOS_Docker:
 
     def _make(self, target: str) -> None:
         """
-        Run `make` in the DC/OS Docker directory.
+        Run `make` in the DC/OS Docker directory using variables associated
+        with this instance.
 
         Args:
             target: `make` target to run.
@@ -124,7 +125,13 @@ class _DCOS_Docker:
             for key, value in self._variables.items()
         ] + [target]
 
-        subprocess.check_output(args=args, cwd=str(self._path))
+        subprocess.run(
+            args=args,
+            cwd=str(self._path),
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
     def postflight(self) -> None:
         """
