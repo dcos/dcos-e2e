@@ -88,10 +88,9 @@ class _DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
-        # If we run tests concurrently, we want unique container names.
-        # However, it may be useful for debugging to group these names.
-        # Therefore, we use the same random string in each container in a
-        # cluster.
+        # To avoid conflicts, we use random container names.
+        # We use the same random string for each container in a cluster so
+        # that they can be associated easily.
         random = uuid.uuid4()
 
         # We create a new instance of DC/OS Docker and we work in this
@@ -107,11 +106,6 @@ class _DCOS_Docker:
             src=str(generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
-
-        # To avoid conflicts, we use random container names.
-        # We use the same random string for each container in a cluster so
-        # that they can be associated easily.
-        random = uuid.uuid4()
 
         self._variables = {
             # Number of nodes.
