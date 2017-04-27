@@ -108,12 +108,19 @@ class _DCOS_Docker:
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
+        # To avoid conflicts, we use random container names.
+        # We use the same random string for each container in a cluster so
+        # that they can be associated easily.
+        random = uuid.uuid4()
+
         self._variables = {
+            # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
-            'MASTER_CTR': 'dcos-master-test-{random}-'.format(random=random),
-            'AGENT_CTR': 'dcos-agent-test-{random}-'.format(random=random),
+            # Container names.
+            'MASTER_CTR': 'dcos-master-{random}-'.format(random=random),
+            'AGENT_CTR': 'dcos-agent-{random}-'.format(random=random),
             'PUBLIC_AGENT_CTR': 'dcos-public-agent-{random}-'.format(
                 random=random),
         }  # type: Dict[str, str]
@@ -130,7 +137,7 @@ class _DCOS_Docker:
     # @retry()
     def _wait_for_installers(self) -> None:
 
-        def genconf_container_running():
+        def genconf_container_running() -> bool:
             client = Client()
             for container in client.containers():
                 image = container['Image']
