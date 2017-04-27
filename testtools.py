@@ -3,11 +3,11 @@ import uuid
 import yaml
 from contextlib import ContextDecorator
 from pathlib import Path
-from shutil import copyfile, rmtree
-from tempfile import TemporaryDirectory, mkdtemp
+from shutil import copyfile, copytree, rmtree
 from typing import Dict, List, Optional, Set, Tuple
 
 from docker import Client
+from retry import retry
 
 
 class _Node:
@@ -89,17 +89,25 @@ class _DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
         """
-        self._path = dcos_docker_path
-
         # If we run tests concurrently, we want unique container names.
         # However, it may be useful for debugging to group these names.
         # Therefore, we use the same random string in each container in a
         # cluster.
         random = uuid.uuid4()
 
-        config_dir = TemporaryDirectory(dir='/tmp')
-        config_path = Path(config_dir.name) / 'dcos_generate_config.sh'
-        copyfile(src=str(generate_config_path), dst=str(config_path))
+        # We create a new instance of DC/OS Docker and we work in this
+        # directory.
+        # This reduces the chance of conflicts.
+        # We put this in the `/tmp` directory because that is writeable on
+        # the Vagrant VM.
+        self._path = Path('/tmp') / 'dcos-docker-{random}'.format(
+            random=random)
+        copytree(src=str(dcos_docker_path), dst=str(self._path))
+
+        copyfile(
+            src=str(generate_config_path),
+            dst=str(self._path / 'dcos_generate_config.sh'),
+        )
 
         self._variables = {
             'MASTERS': str(masters),
@@ -109,8 +117,6 @@ class _DCOS_Docker:
             'AGENT_CTR': 'dcos-agent-test-{random}-'.format(random=random),
             'PUBLIC_AGENT_CTR': 'dcos-public-agent-{random}-'.format(
                 random=random),
-            'SSH_DIR': mkdtemp(dir='/tmp'),
-            'DCOS_GENERATE_CONFIG_PATH': str(config_path),
         }  # type: Dict[str, str]
 
         if extra_config:
@@ -119,7 +125,24 @@ class _DCOS_Docker:
                 default_flow_style=False,
             )
 
+        self._wait_for_installers()
         self._make(target='all')
+
+    # @retry()
+    def _wait_for_installers(self) -> None:
+
+        def genconf_container_running():
+            client = Client()
+            for container in client.containers():
+                image = container['Image']
+                image = container['Names'][0]
+                if image.startswith('mesosphere/dcos-genconf'):
+                    return True
+            return False
+
+        while genconf_container_running:
+            from time import sleep
+            sleep(1)
 
     def _make(self, target: str) -> None:
         """
@@ -137,7 +160,13 @@ class _DCOS_Docker:
             for key, value in self._variables.items()
         ] + [target]
 
-        subprocess.check_output(args=args, cwd=str(self._path))
+        subprocess.run(
+            args=args,
+            cwd=str(self._path),
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
     def postflight(self) -> None:
         """
@@ -149,8 +178,8 @@ class _DCOS_Docker:
         """
         Destroy all nodes in the cluster.
         """
-        rmtree(path=self._variables['SSH_DIR'])
         self._make(target='clean')
+        rmtree(path=str(self._path))
 
     def _nodes(self, container_base_name: str, num_nodes: int) -> Set[_Node]:
         """
