@@ -145,8 +145,8 @@ class _DCOS_Docker:
 
     def _make(self, target: str) -> None:
         """
-        Run `make` in the DC/OS Docker directory using the variables used to
-        create the cluster.
+        Run `make` in the DC/OS Docker directory using variables associated
+        with this instance.
 
         Args:
             target: `make` target to run.
