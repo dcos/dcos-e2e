@@ -1,13 +1,12 @@
 import subprocess
 import uuid
-import yaml
 from contextlib import ContextDecorator
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
+import yaml
 from docker import Client
-from retry import retry
 
 
 class _Node:
@@ -73,7 +72,7 @@ class _DCOS_Docker:
         agents: int,
         public_agents: int,
         extra_config: Dict,
-        generate_config_path: Optional[Path],
+        generate_config_path: Path,
         dcos_docker_path: Path,
     ) -> None:
         """
