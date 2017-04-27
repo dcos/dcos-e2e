@@ -192,7 +192,6 @@ class _DCOS_Docker:
         """
         client = Client()
         nodes = set([])  # type: Set[_Node]
-        ssh_dir = Path(self._variables['SSH_DIR'])
 
         while len(nodes) < num_nodes:
             container_name = '{container_base_name}{number}'.format(
@@ -203,7 +202,7 @@ class _DCOS_Docker:
             ip_address = details['NetworkSettings']['IPAddress']
             node = _Node(
                 ip_address=ip_address,
-                ssh_key_path=ssh_dir / 'id_rsa',
+                ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
             )
             nodes.add(node)
 
