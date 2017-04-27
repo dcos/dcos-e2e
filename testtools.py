@@ -1,8 +1,9 @@
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from shutil import copyfile
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 import yaml
 from docker import Client
@@ -94,10 +95,21 @@ class _DCOS_Docker:
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
+        # To avoid conflicts, we use random container names.
+        # We use the same random string for each container in a cluster so
+        # that they can be associated easily.
+        random = uuid.uuid4()
+
         self._variables = {
+            # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
+            # Container names.
+            'MASTER_CTR': 'dcos-master-{random}-'.format(random=random),
+            'AGENT_CTR': 'dcos-agent-{random}-'.format(random=random),
+            'PUBLIC_AGENT_CTR': 'dcos-public-agent-{random}-'.format(
+                random=random),
         }  # type: Dict[str, str]
 
         if extra_config:
@@ -178,7 +190,7 @@ class _DCOS_Docker:
         Return all DC/OS master ``_Node``s.
         """
         return self._nodes(
-            container_base_name='dcos-docker-master',
+            container_base_name=self._variables['MASTER_CTR'],
             num_nodes=int(self._variables['MASTERS']),
         )
 
