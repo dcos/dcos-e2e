@@ -41,6 +41,7 @@ vagrant ssh
 Then when in the environment, install dependencies and enter a `virtualenv`:
 
 ```sh
+curl -O https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_bootstrap.sh
 source vagrant_bootstrap.sh
 ```
 
@@ -60,6 +61,20 @@ For example:
 
 ```sh
 pytest -n 2
+```
+
+### Lint
+
+Install dependencies:
+
+```sh
+pip install --editable .[dev]
+```
+
+Run lint tools:
+
+```sh
+make lint
 ```
 
 ### Options

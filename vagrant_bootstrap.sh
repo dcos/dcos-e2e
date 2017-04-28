@@ -33,8 +33,18 @@ pyenv install --skip-existing 3.5.2
 pyenv virtualenv 3.5.2 dcos || true
 pyenv activate dcos
 
+# We don't assume that we are in a directory with the setup.py and requirements
+# files so we copy the contents here.
 pip install --upgrade pip
-pip install --editable .[dev]
+pip install \
+	docker-py==1.10.6 \
+	PyYAML==3.12 \
+	retry==0.9.2 \
+	flake8 \
+	isort \
+	pytest \
+	pytest-xdist \
+	yapf
 
 set +o
 set +e
