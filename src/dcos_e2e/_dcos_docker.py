@@ -1,13 +1,18 @@
+"""
+Helpers for interacting with DC/OS Docker.
+"""
+
 import subprocess
 import uuid
-from contextlib import ContextDecorator
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Set
 
 import yaml
-from docker import Client
 from retry import retry
+from docker import Client
+
+from ._common import Node
 
 
 class _ConflictingContainerError(Exception):
@@ -18,59 +23,7 @@ class _ConflictingContainerError(Exception):
     pass
 
 
-class _Node:
-    """
-    A record of a DC/OS cluster node.
-    """
-
-    def __init__(self, ip_address: str, ssh_key_path: Path) -> None:
-        """
-        Args:
-            ip_address: The IP address of the node.
-            ssh_key_path: The path to an SSH key which can be used to SSH to
-                the node as the `root` user.
-        """
-        self._ip_address = ip_address
-        self._ssh_key_path = ssh_key_path
-
-    def run_as_root(self, args: List[str]) -> subprocess.CompletedProcess:
-        """
-        Run a command on this node as ``root``.
-
-        Args:
-            args: The command to run on the node.
-
-        Returns:
-            The representation of the finished process.
-
-        Raises:
-            CalledProcessError: The process exited with a non-zero code.
-        """
-        ssh_args = [
-            'ssh',
-            # Suppress warnings.
-            # In particular, we don't care about remote host identification
-            # changes.
-            "-q",
-            # The node may be an unknown host.
-            "-o",
-            "StrictHostKeyChecking=no",
-            # Use an SSH key which is authorized.
-            "-i",
-            str(self._ssh_key_path),
-            # Run commands as the root user.
-            "-l",
-            "root",
-            # Bypass password checking.
-            "-o",
-            "PreferredAuthentications=publickey",
-            self._ip_address,
-        ] + args
-
-        return subprocess.run(args=ssh_args, check=True)
-
-
-class _DCOS_Docker:
+class DCOS_Docker:
     """
     A record of a DC/OS Docker cluster.
     """
@@ -200,17 +153,17 @@ class _DCOS_Docker:
             ignore_errors=True,
         )
 
-    def _nodes(self, container_base_name: str, num_nodes: int) -> Set[_Node]:
+    def _nodes(self, container_base_name: str, num_nodes: int) -> Set[Node]:
         """
         Args:
             container_base_name: The start of the container names.
             num_nodes: The number of nodes.
 
-        Returns: ``_Node``s corresponding to containers with names starting
+        Returns: ``Node``s corresponding to containers with names starting
             with ``container_base_name``.
         """
         client = Client()
-        nodes = set([])  # type: Set[_Node]
+        nodes = set([])  # type: Set[Node]
 
         while len(nodes) < num_nodes:
             container_name = '{container_base_name}{number}'.format(
@@ -219,7 +172,7 @@ class _DCOS_Docker:
             )
             details = client.inspect_container(container=container_name)
             ip_address = details['NetworkSettings']['IPAddress']
-            node = _Node(
+            node = Node(
                 ip_address=ip_address,
                 ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
             )
@@ -228,69 +181,11 @@ class _DCOS_Docker:
         return nodes
 
     @property
-    def masters(self) -> Set[_Node]:
+    def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``_Node``s.
+        Return all DC/OS master ``Node``s.
         """
         return self._nodes(
             container_base_name=self._variables['MASTER_CTR'],
             num_nodes=int(self._variables['MASTERS']),
         )
-
-
-class Cluster(ContextDecorator):
-    """
-    A record of a DC/OS Cluster.
-
-    This is intended to be used as context manager.
-    """
-
-    def __init__(
-        self,
-        extra_config: Dict,
-        masters: int=1,
-        agents: int=0,
-        public_agents: int=0,
-    ) -> None:
-        """
-        Args:
-            extra_config: This dictionary can contain extra installation
-                configuration variables to add to base configurations.
-            masters: The number of master nodes to create.
-            agents: The number of master nodes to create.
-            public_agents: The number of master nodes to create.
-        """
-        # See README.md for information on the required configuration.
-        with open(str(Path.home() / '.dcos-e2e.yaml')) as configuration:
-            tests_config = yaml.load(configuration)
-
-        generate_config_path = Path(tests_config['dcos_generate_config_path'])
-        self._backend = _DCOS_Docker(
-            masters=masters,
-            agents=agents,
-            public_agents=public_agents,
-            extra_config=extra_config,
-            generate_config_path=generate_config_path,
-            dcos_docker_path=Path(tests_config['dcos_docker_path']),
-        )
-        self._backend.postflight()
-
-    def __enter__(self) -> 'Cluster':
-        """
-        A context manager receives this ``Cluster`` instance.
-        """
-        return self
-
-    @property
-    def masters(self) -> Set[_Node]:
-        """
-        Return all DC/OS master ``_Node``s.
-        """
-        return self._backend.masters
-
-    def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
-        """
-        On exiting, destroy all nodes in the cluster.
-        """
-        self._backend.destroy()
-        return False

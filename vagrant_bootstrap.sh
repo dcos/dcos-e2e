@@ -34,7 +34,7 @@ pyenv virtualenv 3.5.2 dcos || true
 pyenv activate dcos
 
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install --editable .[dev]
 
 set +o
 set +e
