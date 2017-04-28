@@ -101,7 +101,7 @@ class DCOS_Docker:
             )
 
         if custom_ca_key is not None:
-            self._variables['CUSTOM_CA_KEY'] = str(custom_ca_key)
+            self._variables['CUSTOM_CA_KEY_PATH'] = str(custom_ca_key)
 
         self._create_containers()
 
