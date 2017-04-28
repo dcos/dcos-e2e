@@ -35,6 +35,7 @@ pyenv activate dcos
 
 pip install --upgrade pip
 pip install -r requirements.txt
+pip install -r dev-requirements.txt
 
 set +o
 set +e
