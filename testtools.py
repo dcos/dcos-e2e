@@ -2,7 +2,7 @@ import subprocess
 import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, copytree, rmtree
 from typing import Dict, List, Set, Tuple
 
 import yaml
