@@ -55,8 +55,26 @@ pytest
 
 ### Options
 
-Configuration options are specified in `sample-configuration.yaml`.
-Copy this file to `configuration.yaml` and fill it in as appropriate.
+#### tl;dr Vagrant
+
+```sh
+# Download the Vagrant sample config
+curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant-sample-configuration.yaml > ~/.dcos-e2e.yaml
+
+# Download the DC/OS master artifact.
+cd /home/vagrant
+curl -O https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+
+# Clone a specific branch of DC/OS Docker
+cd /tmp
+git clone -b dcos-enterprise-postflight-DCOS-15322 https://github.com/adamtheturtle/dcos-docker.git
+```
+
+#### Details
+
+Configuration options are specified in [`sample-configuration.yaml`](https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml).
+
+Copy this file to `~/.dcos-e2e.yaml` and fill it in as appropriate.
 
 The DC/OS Docker clone should be in a location which the tests can write to.
 In the Vagrant development environment, `/tmp/dcos-docker` is a suitable place.
