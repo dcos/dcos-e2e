@@ -2,7 +2,7 @@ from subprocess import CalledProcessError
 
 import pytest
 
-from .testtools import Cluster
+from dcos_e2e.cluster import Cluster
 
 
 class TestHarness:
