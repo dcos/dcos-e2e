@@ -1,2 +1,5 @@
+flake8
+isort
 pytest
 pytest-xdist
+yapf

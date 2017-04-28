@@ -9,8 +9,8 @@ from shutil import copyfile, copytree, rmtree
 from typing import Dict, Set
 
 import yaml
-from retry import retry
 from docker import Client
+from retry import retry
 
 from ._common import Node
 
