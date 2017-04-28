@@ -12,7 +12,7 @@ import yaml
 from retry import retry
 from docker import Client
 
-from .cluster import _Node
+from ._common import Node
 
 
 class _ConflictingContainerError(Exception):
@@ -153,17 +153,17 @@ class DCOS_Docker:
             ignore_errors=True,
         )
 
-    def _nodes(self, container_base_name: str, num_nodes: int) -> Set[_Node]:
+    def _nodes(self, container_base_name: str, num_nodes: int) -> Set[Node]:
         """
         Args:
             container_base_name: The start of the container names.
             num_nodes: The number of nodes.
 
-        Returns: ``_Node``s corresponding to containers with names starting
+        Returns: ``Node``s corresponding to containers with names starting
             with ``container_base_name``.
         """
         client = Client()
-        nodes = set([])  # type: Set[_Node]
+        nodes = set([])  # type: Set[Node]
 
         while len(nodes) < num_nodes:
             container_name = '{container_base_name}{number}'.format(
@@ -172,7 +172,7 @@ class DCOS_Docker:
             )
             details = client.inspect_container(container=container_name)
             ip_address = details['NetworkSettings']['IPAddress']
-            node = _Node(
+            node = Node(
                 ip_address=ip_address,
                 ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
             )
@@ -181,9 +181,9 @@ class DCOS_Docker:
         return nodes
 
     @property
-    def masters(self) -> Set[_Node]:
+    def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``_Node``s.
+        Return all DC/OS master ``Node``s.
         """
         return self._nodes(
             container_base_name=self._variables['MASTER_CTR'],
