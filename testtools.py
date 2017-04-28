@@ -261,7 +261,7 @@ class Cluster(ContextDecorator):
             public_agents: The number of master nodes to create.
         """
         # See README.md for information on the required configuration.
-        with open('configuration.yaml') as configuration:
+        with open(str(Path.home() / '.dcos-e2e.yaml')) as configuration:
             tests_config = yaml.load(configuration)
 
         generate_config_path = Path(tests_config['dcos_generate_config_path'])
