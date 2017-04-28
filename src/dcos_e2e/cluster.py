@@ -1,6 +1,6 @@
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Dict, Set, Tuple
+from typing import Dict, Optional, Set, Tuple
 
 import yaml
 
@@ -21,6 +21,8 @@ class Cluster(ContextDecorator):
         masters: int=1,
         agents: int=0,
         public_agents: int=0,
+        custom_ca_key: Optional[Path]=None,
+        genconf_extra_dir: Optional[Path]=None,
     ) -> None:
         """
         Args:
@@ -42,6 +44,8 @@ class Cluster(ContextDecorator):
             extra_config=extra_config,
             generate_config_path=generate_config_path,
             dcos_docker_path=Path(tests_config['dcos_docker_path']),
+            custom_ca_key=custom_ca_key,
+            genconf_extra_dir=genconf_extra_dir,
         )
         self._backend.postflight()
 

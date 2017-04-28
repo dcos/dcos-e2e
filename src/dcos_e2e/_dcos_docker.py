@@ -5,10 +5,11 @@ Helpers for interacting with DC/OS Docker.
 import subprocess
 import uuid
 from pathlib import Path
-from shutil import copyfile, copytree, rmtree
-from typing import Dict, Set
+from shutil import copy2, copyfile, copytree, rmtree
+from typing import Dict, Optional, Set
 
 import yaml
+
 from docker import Client
 from retry import retry
 
@@ -36,6 +37,9 @@ class DCOS_Docker:
         extra_config: Dict,
         generate_config_path: Path,
         dcos_docker_path: Path,
+        custom_ca_key: Optional[Path],
+        # Dir containing files which get added to genconf
+        genconf_extra_dir: Optional[Path],
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -64,6 +68,13 @@ class DCOS_Docker:
         self._path = tmp / 'dcos-docker-{random}'.format(random=random)
         copytree(src=str(dcos_docker_path), dst=str(self._path))
 
+        if genconf_extra_dir is not None:
+            for path in genconf_extra_dir.glob('*'):
+                if path.is_dir():
+                    copytree(src=str(path), dst=str(self._path / 'genconf'))
+                else:
+                    copy2(src=str(path), dst=str(self._path / 'genconf'))
+
         copyfile(
             src=str(generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
@@ -88,6 +99,9 @@ class DCOS_Docker:
                 data=extra_config,
                 default_flow_style=False,
             )
+
+        if custom_ca_key is not None:
+            self._variables['CUSTOM_CA_KEY'] = str(custom_ca_key)
 
         self._create_containers()
 
