@@ -63,6 +63,20 @@ For example:
 pytest -n 2
 ```
 
+### Lint
+
+Install dependencies:
+
+```sh
+pip install --editable .[dev]
+```
+
+Run lint tools:
+
+```sh
+make lint
+```
+
 ### Options
 
 #### tl;dr Vagrant
