@@ -1,3 +1,5 @@
 docker-py
 pytest
+pytest-xdist
 PyYAML
+retry

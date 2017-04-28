@@ -7,6 +7,15 @@ from typing import Dict, List, Set, Tuple
 
 import yaml
 from docker import Client
+from retry import retry
+
+
+class _ConflictingContainerError(Exception):
+    """
+    Raised when an existing container conflicts with a container which will be
+    created.
+    """
+    pass
 
 
 class _Node:
@@ -127,8 +136,27 @@ class _DCOS_Docker:
                 default_flow_style=False,
             )
 
-        self._make(target='clean')
-        self._make(target='all')
+        self._create_containers()
+
+    @retry(exceptions=_ConflictingContainerError, delay=10, tries=10)
+    def _create_containers(self) -> None:
+        """
+        Create containers for the cluster.
+
+        Creating clusters involves creating temporary installer containers.
+        These containers can conflict in name.
+        If a conflict occurs, retry.
+        """
+        conflict_error_substring = (
+            'Conflict. The container name "/dcos-genconf.'
+        )
+
+        try:
+            self._make(target='all')
+        except subprocess.CalledProcessError as e:
+            if conflict_error_substring in str(e.stderr):
+                raise _ConflictingContainerError()
+            raise
 
     def _make(self, target: str) -> None:
         """
@@ -165,7 +193,12 @@ class _DCOS_Docker:
         Destroy all nodes in the cluster.
         """
         self._make(target='clean')
-        rmtree(path=str(self._path))
+        rmtree(
+            path=str(self._path),
+            # Some files may be created in the container that we cannot clean
+            # up.
+            ignore_errors=True,
+        )
 
     def _nodes(self, container_base_name: str, num_nodes: int) -> Set[_Node]:
         """
