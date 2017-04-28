@@ -2,7 +2,7 @@ import subprocess
 import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
-from shutil import copyfile
+from shutil import copyfile, copytree, rmtree
 from typing import Dict, List, Set, Tuple
 
 import yaml
@@ -93,23 +93,32 @@ class _DCOS_Docker:
         # that they can be associated easily.
         random = uuid.uuid4()
 
-        self._path = dcos_docker_path
+        # We create a new instance of DC/OS Docker and we work in this
+        # directory.
+        # This reduces the chance of conflicts.
+        # We put this in the `/tmp` directory because that is writeable on
+        # the Vagrant VM.
+        tmp = Path('/tmp')
+        self._path = tmp / 'dcos-docker-{random}'.format(random=random)
+        copytree(src=str(dcos_docker_path), dst=str(self._path))
 
         copyfile(
             src=str(generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
+        master_ctr = 'dcos-master-{random}-'.format(random=random)
+        agent_ctr = 'dcos-agent-{random}-'.format(random=random)
+        public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         self._variables = {
             # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
             # Container names.
-            'MASTER_CTR': 'dcos-master-{random}-'.format(random=random),
-            'AGENT_CTR': 'dcos-agent-{random}-'.format(random=random),
-            'PUBLIC_AGENT_CTR': 'dcos-public-agent-{random}-'.format(
-                random=random),
+            'MASTER_CTR': master_ctr,
+            'AGENT_CTR': agent_ctr,
+            'PUBLIC_AGENT_CTR': public_agent_ctr,
         }  # type: Dict[str, str]
 
         if extra_config:
@@ -156,6 +165,7 @@ class _DCOS_Docker:
         Destroy all nodes in the cluster.
         """
         self._make(target='clean')
+        rmtree(path=str(self._path))
 
     def _nodes(self, container_base_name: str, num_nodes: int) -> Set[_Node]:
         """
@@ -221,13 +231,13 @@ class Cluster(ContextDecorator):
         with open('configuration.yaml') as configuration:
             tests_config = yaml.load(configuration)
 
+        generate_config_path = Path(tests_config['dcos_generate_config_path'])
         self._backend = _DCOS_Docker(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             extra_config=extra_config,
-            generate_config_path=Path(
-                tests_config['dcos_generate_config_path']),
+            generate_config_path=generate_config_path,
             dcos_docker_path=Path(tests_config['dcos_docker_path']),
         )
         self._backend.postflight()
