@@ -13,9 +13,9 @@ However, this is a proof of concept.
 We plan to iterate on this repository and manually run tests.
 With that experience, we will choose where to put the test suite and whether it should be run on CI.
 
-## Running tests
+## Test Environment
 
-The tests must be run on a host which is supported by DC/OS Docker.
+Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
 One way to guarantee this support is to create a Vagrant VM which supports DC/OS Docker.
 
 ```sh
@@ -47,10 +47,19 @@ source vagrant_bootstrap.sh
 Then set the test options.
 See "Options".
 
-Then run the tests:
+### Tests for this package
+
+To run tests for this package, run `pytest`:
 
 ```sh
 pytest
+```
+
+To run the tests concurrently, use [pytest-xdist](https://github.com/pytest-dev/pytest-xdist).
+For example:
+
+```sh
+pytest -n 2
 ```
 
 ### Options
@@ -59,15 +68,20 @@ pytest
 
 ```sh
 # Download the Vagrant sample config
-curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant-sample-configuration.yaml > ~/.dcos-e2e.yaml
+curl \
+    https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant-sample-configuration.yaml \
+    > ~/.dcos-e2e.yaml
 
 # Download the DC/OS master artifact.
-cd /home/vagrant
-curl -O https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+curl \
+    -o /home/vagrant/dcos_generate_config.sh \
+    https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 
 # Clone a specific branch of DC/OS Docker
-cd /tmp
-git clone -b dcos-enterprise-postflight-DCOS-15322 https://github.com/adamtheturtle/dcos-docker.git
+git clone \
+    -b dcos-enterprise-postflight-DCOS-15322 \
+    https://github.com/adamtheturtle/dcos-docker.git \
+    /tmp/dcos-docker
 ```
 
 #### Details
@@ -88,10 +102,3 @@ until <https://github.com/dcos/dcos-docker/pull/34> is merged:
 ```sh
 git clone -b dcos-enterprise-postflight-DCOS-15322 https://github.com/adamtheturtle/dcos-docker.git
 ```
-
-## Parallelisation
-
-These tests are very slow and they should be very parallelisable,
-perhaps with [pytest-xdist](https://github.com/pytest-dev/pytest-xdist).
-However, that may require some changes as currently DC/OS Docker names containers in a deterministic manner.
-That is, you can't spin up two DC/OS Docker clusters simultaneously right now.
