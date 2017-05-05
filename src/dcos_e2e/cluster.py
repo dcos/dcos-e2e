@@ -58,6 +58,20 @@ class Cluster(ContextDecorator):
         """
         return self._backend.masters
 
+    @property
+    def agents(self) -> Set[Node]:
+        """
+        Return all DC/OS agent ``Node``s.
+        """
+        return self._backend.agents
+
+    @property
+    def public_agents(self) -> Set[Node]:
+        """
+        Return all DC/OS public_agent ``Node``s.
+        """
+        return self._backend.public_agents
+
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
         """
         On exiting, destroy all nodes in the cluster.

@@ -91,7 +91,29 @@ class TestClusterSize:
         """
         By default, a cluster with one master and zero agents is created.
         """
-        pass
+        with Cluster(extra_config={}) as cluster:
+            assert len(cluster.masters) == 1
+            assert len(cluster.agents) == 0
+            assert len(cluster.public_agents) == 0
 
     def test_custom(self) -> None:
-        pass
+        """
+        It is possible to create a cluster with a custom number of nodes.
+        """
+        # These are chosen be low numbers which are not the defaults.
+        # They are also different to one another to make sure that they are not
+        # mixed up.
+        # Low numbers are chosen to keep the resource usage low.
+        masters = 3
+        agents = 1
+        public_agents = 2
+
+        with Cluster(
+            extra_config={},
+            masters=masters,
+            agents=agents,
+            public_agents=public_agents,
+        ) as cluster:
+            assert len(cluster.masters) == masters
+            assert len(cluster.agents) == agents
+            assert len(cluster.public_agents) == public_agents
