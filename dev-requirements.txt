@@ -1,5 +1,6 @@
 flake8
 isort
+mypy-lang
 pytest
 pytest-xdist
 yapf
