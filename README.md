@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/adamtheturtle/dcos-e2e.svg?branch=master)](https://travis-ci.org/adamtheturtle/dcos-e2e)
+
 # DC/OS End to End tests
 
 End to end tests are tests which require a DC/OS cluster to run against.
