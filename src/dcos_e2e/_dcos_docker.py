@@ -206,6 +206,6 @@ class DCOS_Docker:
         Return all DC/OS public agent ``Node``s.
         """
         return self._nodes(
-            container_base_name=self._variables['PUCLIC_AGENT_CTR'],
+            container_base_name=self._variables['PUBLIC_AGENT_CTR'],
             num_nodes=int(self._variables['PUBLIC_AGENTS']),
         )
