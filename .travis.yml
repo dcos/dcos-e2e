@@ -15,6 +15,6 @@ install:
 
 cache: "pip"
 
-before_script:
+script:
     # Run linters
     - "make lint"
