@@ -189,3 +189,23 @@ class DCOS_Docker:
             container_base_name=self._variables['MASTER_CTR'],
             num_nodes=int(self._variables['MASTERS']),
         )
+
+    @property
+    def agents(self) -> Set[Node]:
+        """
+        Return all DC/OS agent ``Node``s.
+        """
+        return self._nodes(
+            container_base_name=self._variables['AGENT_CTR'],
+            num_nodes=int(self._variables['AGENTS']),
+        )
+
+    @property
+    def public_agents(self) -> Set[Node]:
+        """
+        Return all DC/OS public agent ``Node``s.
+        """
+        return self._nodes(
+            container_base_name=self._variables['PUBLIC_AGENT_CTR'],
+            num_nodes=int(self._variables['PUBLIC_AGENTS']),
+        )

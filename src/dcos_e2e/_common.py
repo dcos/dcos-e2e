@@ -56,4 +56,9 @@ class Node:
             self._ip_address,
         ] + args
 
-        return subprocess.run(args=ssh_args, check=True)
+        return subprocess.run(
+            args=ssh_args,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
