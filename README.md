@@ -10,10 +10,57 @@ The tests should be not be tied to the backend infrastructure.
 That is, they should pass against clusters on all supported infrastructures.
 The current implementation supports only a [DC/OS Docker](https://github.com/dcos/dcos-docker) backend.
 
-Usually tests are kept with the source code.
-However, this is a proof of concept.
+This is a proof of concept.
 We plan to iterate on this repository and manually run tests.
 With that experience, we will choose where to put the test suite and whether it should be run on CI.
+
+## Usage
+
+Tests must be run in a supported environment.
+See "Test Environment".
+
+To create tests using clusters with custom configurations, first install the harness:
+
+```sh
+pip install git+https://github.com/adamtheturtle/dcos-e2e.git@genconf-extra
+```
+
+Then, create a test, such as the following:
+
+```python
+from dcos_e2e.cluster import Cluster
+
+class TestExample:
+
+    def test_example(self):
+        config = {
+            'cluster_docker_credentials': {
+                'auths': {
+                    'https://index.docker.io/v1/': {
+                        'auth': 'redacted'
+                    },
+                },
+            },
+            'cluster_docker_credentials_enabled': True,
+        }
+
+        with Cluster(
+            extra_config=config,
+            # Default 1
+            masters=1,
+            # Default 0
+            agents=1,
+            # Default 0
+            public_agents=1,
+        ) as cluster:
+            (master, ) = cluster.masters
+            result = master.run_as_root(args=['test', '-f', path])
+            print(result.stdout)
+```
+
+## Contributing
+
+See `CONTRIBUTING.md` for details on how to contribute to this repository.
 
 ## Test Environment
 
@@ -50,34 +97,6 @@ source vagrant_bootstrap.sh
 Then set the test options.
 See "Options".
 
-### Tests for this package
-
-To run tests for this package, run `pytest`:
-
-```sh
-pytest
-```
-
-To run the tests concurrently, use [pytest-xdist](https://github.com/pytest-dev/pytest-xdist).
-For example:
-
-```sh
-pytest -n 2
-```
-
-### Lint
-
-Install dependencies:
-
-```sh
-pip install --editable .[dev]
-```
-
-Run lint tools:
-
-```sh
-make lint
-```
 
 ### Options
 
