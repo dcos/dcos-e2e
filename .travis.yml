@@ -1,0 +1,20 @@
+# This makes Travis CI use the container-based infrastructure which starts
+# tests faster.
+sudo: false
+
+language: "python"
+
+python:
+  - "3.5"
+
+before_install:
+  - "pip install --upgrade pip setuptools"
+
+install:
+  - "pip install --upgrade --editable .[dev]"
+
+cache: "pip"
+
+before_script:
+    # Run linters
+    - "make lint"
