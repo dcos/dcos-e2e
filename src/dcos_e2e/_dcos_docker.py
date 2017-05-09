@@ -66,7 +66,11 @@ class DCOS_Docker:
         # the Vagrant VM.
         tmp = Path('/tmp')
         self._path = tmp / 'dcos-docker-{random}'.format(random=random)
-        copytree(src=str(dcos_docker_path), dst=str(self._path))
+        copytree(
+            src=str(dcos_docker_path),
+            dst=str(self._path),
+            symlinks=True,
+        )
 
         if genconf_extra_dir is not None:
             for path in genconf_extra_dir.glob('*'):
@@ -202,4 +206,24 @@ class DCOS_Docker:
         return self._nodes(
             container_base_name=self._variables['MASTER_CTR'],
             num_nodes=int(self._variables['MASTERS']),
+        )
+
+    @property
+    def agents(self) -> Set[Node]:
+        """
+        Return all DC/OS agent ``Node``s.
+        """
+        return self._nodes(
+            container_base_name=self._variables['AGENT_CTR'],
+            num_nodes=int(self._variables['AGENTS']),
+        )
+
+    @property
+    def public_agents(self) -> Set[Node]:
+        """
+        Return all DC/OS public agent ``Node``s.
+        """
+        return self._nodes(
+            container_base_name=self._variables['PUBLIC_AGENT_CTR'],
+            num_nodes=int(self._variables['PUBLIC_AGENTS']),
         )
