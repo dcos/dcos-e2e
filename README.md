@@ -103,9 +103,9 @@ See "Options".
 #### tl;dr Vagrant
 
 ```sh
-# Download the Vagrant sample config
+# Download the sample configuration file
 curl \
-    https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant-sample-configuration.yaml \
+    https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml \
     > ~/.dcos-e2e.yaml
 
 # Download the DC/OS master artifact.
