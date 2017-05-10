@@ -115,7 +115,7 @@ curl \
 
 # Clone a specific branch of DC/OS Docker
 git clone \
-    -b dcos-enterprise-postflight-DCOS-15322 \
+    -b master \
     https://github.com/adamtheturtle/dcos-docker.git \
     /tmp/dcos-docker
 ```
@@ -129,12 +129,3 @@ Copy this file to `~/.dcos-e2e.yaml` and fill it in as appropriate.
 The DC/OS Docker clone should be in a location which the tests can write to.
 In the Vagrant development environment, `/tmp/dcos-docker` is a suitable place.
 This directory may be interfered with by the tests.
-
-Postflight checks to see if DC/OS is ready do not work for DC/OS Enterprise.
-See <https://jira.mesosphere.com/browse/DCOS-15322>.
-As a workaround, use a particular fork of `DC/OS Docker`
-until <https://github.com/dcos/dcos-docker/pull/34> is merged:
-
-```sh
-git clone -b dcos-enterprise-postflight-DCOS-15322 https://github.com/adamtheturtle/dcos-docker.git
-```
