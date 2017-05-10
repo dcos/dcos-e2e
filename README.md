@@ -65,34 +65,13 @@ See `CONTRIBUTING.md` for details on how to contribute to this repository.
 ## Test Environment
 
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
-One way to guarantee this support is to create a Vagrant VM which supports DC/OS Docker.
+See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
 
-```sh
-mkdir -p vagrant
-cd vagrant
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/resize-disk.sh
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/vbox-network.sh
-chmod +x resize-disk.sh
-chmod +x vbox-network.sh
-cd ..
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
-vagrant/resize-disk.sh 102400
-# Update the kernel and re-provision to work around
-# https://github.com/moby/moby/issues/5618
-vagrant ssh -c 'sudo yum update -y kernel'
-vagrant reload
-vagrant provision
-# Wait until the VM has presumably booted
-sleep 30
-vagrant ssh
-```
-
-Then when in the environment, install dependencies and enter a `virtualenv`:
-
-```sh
-curl -O https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_bootstrap.sh
-source vagrant_bootstrap.sh
-```
+On macOS `/tmp` is a symlink to `/private/tmp`.
+`/tmp` is used by the harness.
+Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
+This is the default.
+See Docker > Preferences > File Sharing.
 
 Then set the test options.
 
@@ -104,8 +83,8 @@ Copy this file to `~/.dcos-e2e.yaml` and fill it in as appropriate.
 
 ```sh
 ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-DCOS_DOCKER_REPOSITORY=https://github.com/dcos/dcos-docker.git
-DCOS_DOCKER_BRANCH=master
+DCOS_DOCKER_REPOSITORY=https://github.com/adamtheturtle/dcos-docker.git
+DCOS_DOCKER_BRANCH=macos-DCOS-15645
 SAMPLE_CONFIGURATION_URL=https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml
 
 curl $SAMPLE_CONFIGURATION_URL > ~/.dcos-e2e.yaml
