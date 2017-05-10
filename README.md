@@ -65,76 +65,23 @@ See `CONTRIBUTING.md` for details on how to contribute to this repository.
 ## Test Environment
 
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
-One way to guarantee this support is to create a Vagrant VM which supports DC/OS Docker.
-
-```sh
-mkdir -p vagrant
-cd vagrant
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/resize-disk.sh
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/vbox-network.sh
-chmod +x resize-disk.sh
-chmod +x vbox-network.sh
-cd ..
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
-vagrant/resize-disk.sh 102400
-# Update the kernel and re-provision to work around
-# https://github.com/moby/moby/issues/5618
-vagrant ssh -c 'sudo yum update -y kernel'
-vagrant reload
-vagrant provision
-# Wait until the VM has presumably booted
-sleep 30
-vagrant ssh
-```
-
-Then when in the environment, install dependencies and enter a `virtualenv`:
-
-```sh
-curl -O https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_bootstrap.sh
-source vagrant_bootstrap.sh
-```
+See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
 
 Then set the test options.
-See "Options".
-
-
-### Options
-
-#### tl;dr Vagrant
-
-```sh
-# Download the Vagrant sample config
-curl \
-    https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant-sample-configuration.yaml \
-    > ~/.dcos-e2e.yaml
-
-# Download the DC/OS master artifact.
-curl \
-    -o /home/vagrant/dcos_generate_config.sh \
-    https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-
-# Clone a specific branch of DC/OS Docker
-git clone \
-    -b dcos-enterprise-postflight-DCOS-15322 \
-    https://github.com/adamtheturtle/dcos-docker.git \
-    /tmp/dcos-docker
-```
-
-#### Details
 
 Configuration options are specified in [`sample-configuration.yaml`](https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml).
 
 Copy this file to `~/.dcos-e2e.yaml` and fill it in as appropriate.
 
-The DC/OS Docker clone should be in a location which the tests can write to.
-In the Vagrant development environment, `/tmp/dcos-docker` is a suitable place.
-This directory may be interfered with by the tests.
-
-Postflight checks to see if DC/OS is ready do not work for DC/OS Enterprise.
-See <https://jira.mesosphere.com/browse/DCOS-15322>.
-As a workaround, use a particular fork of `DC/OS Docker`
-until <https://github.com/dcos/dcos-docker/pull/34> is merged:
+### Quick Start Options
 
 ```sh
-git clone -b dcos-enterprise-postflight-DCOS-15322 https://github.com/adamtheturtle/dcos-docker.git
+ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+DCOS_DOCKER_REPOSITORY=https://github.com/dcos/dcos-docker.git
+DCOS_DOCKER_BRANCH=master
+SAMPLE_CONFIGURATION_URL=https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml
+
+curl $SAMPLE_CONFIGURATION_URL > ~/.dcos-e2e.yaml
+curl -o ~/dcos_generate_config.sh $ARTIFACT_URL
+git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
 ```
