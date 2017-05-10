@@ -112,3 +112,16 @@ curl $SAMPLE_CONFIGURATION_URL > ~/.dcos-e2e.yaml
 curl -o ~/dcos_generate_config.sh $ARTIFACT_URL
 git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
 ```
+
+## Cleaning Up
+
+Tests run with this harness clean up after themselves.
+However, if a test is interrupted, it can leave behind containers, volumes and files.
+To remove these, run the following:
+
+```sh
+docker stop $(docker ps -a -q --filter="name=dcos-")
+docker rm --volumes $(docker ps -a -q --filter="name=dcos-")
+docker volume prune
+rm -rf /tmp/dcos-docker-*
+```
