@@ -67,6 +67,12 @@ See `CONTRIBUTING.md` for details on how to contribute to this repository.
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
 See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
 
+On macOS `/tmp` is a symlink to `/private/tmp`.
+`/tmp` is used by the harness.
+Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
+This is the default.
+See Docker > Preferences > File Sharing.
+
 Then set the test options.
 
 Configuration options are specified in [`sample-configuration.yaml`](https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml).
