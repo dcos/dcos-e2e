@@ -95,37 +95,20 @@ source vagrant_bootstrap.sh
 ```
 
 Then set the test options.
-See "Options".
-
-
-### Options
-
-#### tl;dr Vagrant
-
-```sh
-# Download the sample configuration file
-curl \
-    https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml \
-    > ~/.dcos-e2e.yaml
-
-# Download the DC/OS master artifact.
-curl \
-    -o /home/vagrant/dcos_generate_config.sh \
-    https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-
-# Clone a specific branch of DC/OS Docker
-git clone \
-    -b master \
-    https://github.com/adamtheturtle/dcos-docker.git \
-    /tmp/dcos-docker
-```
-
-#### Details
 
 Configuration options are specified in [`sample-configuration.yaml`](https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml).
 
 Copy this file to `~/.dcos-e2e.yaml` and fill it in as appropriate.
 
-The DC/OS Docker clone should be in a location which the tests can write to.
-In the Vagrant development environment, `/tmp/dcos-docker` is a suitable place.
-This directory may be interfered with by the tests.
+### Quick Start Options
+
+```sh
+ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+DCOS_DOCKER_REPOSITORY=https://github.com/dcos/dcos-docker.git
+DCOS_DOCKER_BRANCH=master
+SAMPLE_CONFIGURATION_URL=https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml
+
+curl $SAMPLE_CONFIGURATION_URL > ~/.dcos-e2e.yaml
+curl -o ~/dcos_generate_config.sh $ARTIFACT_URL
+git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
+```
