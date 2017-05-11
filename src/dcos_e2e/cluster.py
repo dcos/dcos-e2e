@@ -72,6 +72,34 @@ class Cluster(ContextDecorator):
         """
         return self._backend.public_agents
 
+    def run_integration_tests(self, pytest_command):
+        test_host = next(iter(self.masters))
+        environment_variables = {
+            'DCOS_DNS_ADDRESS': test_host,
+            'MASTER_HOSTS': ','.join([node._ip_address for node in self.masters]),
+            'PUBLIC_MASTER_HOSTS': ','.join([node._ip_address for node in self.masters]),
+            'SLAVE_HOSTS': ','.join([node._ip_address for node in self.agents]),
+            'PUBLIC_SLAVE_HOSTS': ','.join([node._ip_address for node in self.public_agents]),
+            'DCOS_PROVIDER': 'onprem',
+            'DNS_SEARCH': 'false',
+            'DCOS_LOGIN_PW': 'admin',
+            'PYTHONUNBUFFERED': 'true',
+            'PYTHONDONTWRITEBYTECODE': 'true',
+            'DCOS_LOGIN_UNAME': 'admin',
+            'TEST_DCOS_RESILIENCY': 'false',
+        }
+
+        variable_settings = [
+            '{key}={value}'.format(key=key, value=value)
+            for key, value in environment_variables.items()
+        ]
+
+        test_dir = '/opt/mesosphere/active/dcos-integration-test/util'
+        change_to_test_dir = ['cd', test_dir]
+        source_environment = ['source', '/opt/mesosphere/environment.export']
+        args = change_to_test_dir + source_environment + pytest_command
+        test_host.run_as_root(args=args)
+
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
         """
         On exiting, destroy all nodes in the cluster.
