@@ -1,6 +1,7 @@
+import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Dict, Optional, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
@@ -72,7 +73,8 @@ class Cluster(ContextDecorator):
         """
         return self._backend.public_agents
 
-    def run_integration_tests(self, pytest_command):
+    def run_integration_tests(self, pytest_command: List[str]
+                              ) -> subprocess.CompletedProcess:
         test_host = next(iter(self.masters))
 
         master_hosts = ','.join([node._ip_address for node in self.masters])
@@ -104,8 +106,13 @@ class Cluster(ContextDecorator):
         test_dir = '/opt/mesosphere/active/dcos-integration-test/'
         change_to_test_dir = ['cd', test_dir]
         source_environment = ['source', '/opt/mesosphere/environment.export']
-        args = change_to_test_dir + source_environment + [pytest_command]
-        test_host.run_as_root(args=args)
+
+        args = (
+            change_to_test_dir + source_environment + variable_settings +
+            pytest_command
+        )
+
+        return test_host.run_as_root(args=args)
 
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
         """
