@@ -62,10 +62,14 @@ class DCOS_Docker:
         # the Vagrant VM.
         tmp = Path('/tmp')
         self._path = tmp / 'dcos-docker-{random}'.format(random=random)
+
         copytree(
             src=str(dcos_docker_path),
             dst=str(self._path),
             symlinks=True,
+            # If there is already a config, we do not copy it as it will be
+            # overwritten and therefore copying it is wasteful.
+            ignore=ignore_patterns('dcos_generate_config.sh'),
         )
 
         copyfile(
