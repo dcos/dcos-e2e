@@ -22,7 +22,7 @@ See "Test Environment".
 To create tests using clusters with custom configurations, first install the harness:
 
 ```sh
-pip install git+https://github.com/adamtheturtle/dcos-e2e.git@genconf-extra
+pip install git+https://github.com/adamtheturtle/dcos-e2e.git@master
 ```
 
 Then, create a test, such as the following:
@@ -120,4 +120,4 @@ import sys
 sys.stdout = sys.stderr
 ```
 
-`pdb` will not work when running tests.
+`pdb` will not work when running tests in parallel.
