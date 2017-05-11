@@ -69,20 +69,17 @@ See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/RE
 
 Running tests for or with this package requires:
 
-Configuration options are specified in [`sample-configuration.yaml`](https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml).
+* A DC/OS Docker clone at `/tmp/dcos-docker`
+* DC/OS OSS or Enterprise artifact at `/tmp/dcos_generate_config.sh`.
 
-Copy this file to `~/.dcos-e2e.yaml` and fill it in as appropriate.
-
-### Quick Start Options
+For example:
 
 ```sh
 ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 DCOS_DOCKER_REPOSITORY=https://github.com/adamtheturtle/dcos-docker.git
 DCOS_DOCKER_BRANCH=macos-DCOS-15645
-SAMPLE_CONFIGURATION_URL=https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml
 
-curl $SAMPLE_CONFIGURATION_URL > ~/.dcos-e2e.yaml
-curl -o ~/dcos_generate_config.sh $ARTIFACT_URL
+curl -o /tmp/dcos_generate_config.sh $ARTIFACT_URL
 git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
 ```
 

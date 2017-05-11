@@ -2,8 +2,6 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Dict, Set, Tuple
 
-import yaml
-
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
 
@@ -30,18 +28,13 @@ class Cluster(ContextDecorator):
             agents: The number of master nodes to create.
             public_agents: The number of master nodes to create.
         """
-        # See README.md for information on the required configuration.
-        with open(str(Path.home() / '.dcos-e2e.yaml')) as configuration:
-            tests_config = yaml.load(configuration)
-
-        generate_config_path = Path(tests_config['dcos_generate_config_path'])
         self._backend = DCOS_Docker(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             extra_config=extra_config,
-            generate_config_path=generate_config_path,
-            dcos_docker_path=Path(tests_config['dcos_docker_path']),
+            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+            dcos_docker_path=Path('/tmp/dcos-docker'),
         )
         self._backend.postflight()
 

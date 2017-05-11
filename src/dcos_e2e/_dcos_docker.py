@@ -5,7 +5,7 @@ Helpers for interacting with DC/OS Docker.
 import subprocess
 import uuid
 from pathlib import Path
-from shutil import copyfile, copytree, rmtree
+from shutil import copyfile, copytree, ignore_patterns, rmtree
 from typing import Dict, Set
 
 import yaml
