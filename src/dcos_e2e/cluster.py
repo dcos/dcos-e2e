@@ -35,6 +35,8 @@ class Cluster(ContextDecorator):
             agents=agents,
             public_agents=public_agents,
             extra_config=extra_config,
+            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+            dcos_docker_path=Path('/tmp/dcos-docker'),
             custom_ca_key=custom_ca_key,
             genconf_extra_dir=genconf_extra_dir,
         )
