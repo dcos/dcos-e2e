@@ -120,4 +120,4 @@ import sys
 sys.stdout = sys.stderr
 ```
 
-`pdb` will not work when running tests.
+`pdb` will not work when running tests in parallel.
