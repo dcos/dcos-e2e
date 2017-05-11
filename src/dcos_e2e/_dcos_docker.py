@@ -9,7 +9,6 @@ from shutil import copy2, copyfile, copytree, ignore_patterns, rmtree
 from typing import Dict, Optional, Set
 
 import yaml
-
 from docker import Client
 from retry import retry
 
@@ -38,7 +37,6 @@ class DCOS_Docker:
         generate_config_path: Path,
         dcos_docker_path: Path,
         custom_ca_key: Optional[Path],
-        # Dir containing files which get added to genconf
         genconf_extra_dir: Optional[Path],
     ) -> None:
         """
@@ -53,6 +51,9 @@ class DCOS_Docker:
                 variables.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
+            custom_ca_key: A CA key to use as the cluster's root CA key.
+            genconf_extra_dir: A directory with contents to put in the
+                `genconf` directory in the installer container.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so

@@ -29,6 +29,9 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of master nodes to create.
             public_agents: The number of master nodes to create.
+            custom_ca_key: A CA key to use as the cluster's root CA key.
+            genconf_extra_dir: A directory with contents to put in the
+                `genconf` directory in the installer container.
         """
         self._backend = DCOS_Docker(
             masters=masters,
