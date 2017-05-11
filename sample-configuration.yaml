@@ -1,5 +1,0 @@
-# Download a build artifact such as
-# https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-# to use to create clusters.
-dcos_generate_config_path: "/path/to/build/artifact"
-dcos_docker_path: "/path/to/dcos_docker"

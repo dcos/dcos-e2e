@@ -4,13 +4,15 @@ Contributions to this repository must pass tests and linting.
 Linting is run on Travis CI.
 Tests are currently not run on CI.
 
-## Linting
+## Install Contribution Dependencies
 
-Install dependencies:
+Install dependencies in a virtual environment.
 
 ```sh
 pip install --editable .[dev]
 ```
+
+## Linting
 
 Run lint tools:
 
@@ -23,7 +25,7 @@ make lint
 Tests for this package must be run in a suitable environment.
 See "Test Environment" in the `README`.
 
-To run tests for this package, run `pytest`:
+Run `pytest`:
 
 ```sh
 pytest
