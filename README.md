@@ -92,7 +92,7 @@ To remove these, run the following:
 ```sh
 docker stop $(docker ps -a -q --filter="name=dcos-")
 docker rm --volumes $(docker ps -a -q --filter="name=dcos-")
-docker volume prune
+docker volume prune --force
 rm -rf /tmp/dcos-docker-*
 ```
 
