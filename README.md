@@ -67,28 +67,19 @@ See `CONTRIBUTING.md` for details on how to contribute to this repository.
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
 See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
 
-On macOS `/tmp` is a symlink to `/private/tmp`.
-`/tmp` is used by the harness.
-Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
-This is the default.
-See Docker > Preferences > File Sharing.
+Running tests for or with this package requires:
 
-Then set the test options.
+* A DC/OS Docker clone at `/tmp/dcos-docker`
+* DC/OS OSS or Enterprise artifact at `/tmp/dcos_generate_config.sh`.
 
-Configuration options are specified in [`sample-configuration.yaml`](https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml).
-
-Copy this file to `~/.dcos-e2e.yaml` and fill it in as appropriate.
-
-### Quick Start Options
+For example:
 
 ```sh
 ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 DCOS_DOCKER_REPOSITORY=https://github.com/adamtheturtle/dcos-docker.git
 DCOS_DOCKER_BRANCH=macos-DCOS-15645
-SAMPLE_CONFIGURATION_URL=https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/sample-configuration.yaml
 
-curl $SAMPLE_CONFIGURATION_URL > ~/.dcos-e2e.yaml
-curl -o ~/dcos_generate_config.sh $ARTIFACT_URL
+curl -o /tmp/dcos_generate_config.sh $ARTIFACT_URL
 git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
 ```
 
@@ -104,3 +95,29 @@ docker rm --volumes $(docker ps -a -q --filter="name=dcos-")
 docker volume prune
 rm -rf /tmp/dcos-docker-*
 ```
+
+## Troubleshooting
+
+### macOS File Sharing
+
+On macOS `/tmp` is a symlink to `/private/tmp`.
+`/tmp` is used by the harness.
+Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
+This is the default.
+See Docker > Preferences > File Sharing.
+
+### Out of space errors
+
+See "Cleaning up".
+
+### Parallelization
+
+To see print output while running tests in parallel,
+use the `-s` `pytest` flag and put the following in the code:
+
+```python
+import sys
+sys.stdout = sys.stderr
+```
+
+`pdb` will not work when running tests.
