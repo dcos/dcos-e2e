@@ -84,7 +84,7 @@ class Cluster(ContextDecorator):
         )
 
         environment_variables = {
-            'DCOS_DNS_ADDRESS': test_host,
+            'DCOS_DNS_ADDRESS': test_host._ip_address,
             'MASTER_HOSTS': master_hosts,
             'PUBLIC_MASTER_HOSTS': master_hosts,
             'SLAVE_HOSTS': slave_hosts,
