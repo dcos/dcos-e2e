@@ -105,12 +105,15 @@ class Cluster(ContextDecorator):
             for key, value in environment_variables.items()
         ]
 
+        pytest_command = variable_settings + pytest_command
+
         test_dir = '/opt/mesosphere/active/dcos-integration-test/'
         change_to_test_dir = ['cd', test_dir]
         source_environment = ['source', '/opt/mesosphere/environment.export']
+        and_cmd = ['&&']
 
         args = (
-            change_to_test_dir + source_environment + variable_settings +
+            change_to_test_dir + and_cmd + source_environment + and_cmd +
             pytest_command
         )
 
