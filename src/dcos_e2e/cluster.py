@@ -117,7 +117,12 @@ class Cluster(ContextDecorator):
             pytest_command
         )
 
-        return test_host.run_as_root(args=args)
+        try:
+            return test_host.run_as_root(args=args)
+        except subprocess.CalledProcessError as exc:
+            print(repr(exc.stdout))
+            print(repr(exc.stderr))
+            raise
 
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
         """
