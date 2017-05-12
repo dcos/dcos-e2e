@@ -77,6 +77,8 @@ class Cluster(ContextDecorator):
                               ) -> subprocess.CompletedProcess:
         test_host = next(iter(self.masters))
 
+        dcos_dns_address = 'http://{ip_address}'.format(
+            ip_address=test_host._ip_address)
         master_hosts = ','.join([node._ip_address for node in self.masters])
         slave_hosts = ','.join([node._ip_address for node in self.agents])
         public_slave_hosts = ','.join(
@@ -84,7 +86,7 @@ class Cluster(ContextDecorator):
         )
 
         environment_variables = {
-            'DCOS_DNS_ADDRESS': test_host._ip_address,
+            'DCOS_DNS_ADDRESS': dcos_dns_address,
             'MASTER_HOSTS': master_hosts,
             'PUBLIC_MASTER_HOSTS': master_hosts,
             'SLAVE_HOSTS': slave_hosts,
