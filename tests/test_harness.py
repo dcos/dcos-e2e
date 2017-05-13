@@ -89,12 +89,13 @@ class TestClusterSize:
 
     def test_default(self) -> None:
         """
-        By default, a cluster with one master and zero agents is created.
+        By default, a cluster with one master and one agent and one private
+        agent is created.
         """
         with Cluster(extra_config={}) as cluster:
             assert len(cluster.masters) == 1
-            assert len(cluster.agents) == 0
-            assert len(cluster.public_agents) == 0
+            assert len(cluster.agents) == 1
+            assert len(cluster.public_agents) == 1
 
     def test_custom(self) -> None:
         """
@@ -105,7 +106,7 @@ class TestClusterSize:
         # mixed up.
         # Low numbers are chosen to keep the resource usage low.
         masters = 3
-        agents = 1
+        agents = 0
         public_agents = 2
 
         with Cluster(
