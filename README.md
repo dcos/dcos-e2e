@@ -50,7 +50,7 @@ class TestExample:
             print(result.stdout)
 ```
 
-#### `Cluster`
+#### `Cluster` optional parameters
 
 ##### `extra_config`
 
