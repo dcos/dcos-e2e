@@ -1,3 +1,7 @@
+"""
+DC/OS Cluster management tools. Independent of back ends.
+"""
+
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Dict, Set, Tuple
@@ -40,7 +44,8 @@ class Cluster(ContextDecorator):
 
     def __enter__(self) -> 'Cluster':
         """
-        A context manager receives this ``Cluster`` instance.
+        Enter a context manager.
+        The context manager receives this ``Cluster`` instance.
         """
         return self
 
