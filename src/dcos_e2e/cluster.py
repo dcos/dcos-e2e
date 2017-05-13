@@ -86,6 +86,9 @@ class Cluster(ContextDecorator):
             'DCOS_PYTEST_CMD': ' '.join(pytest_command),
             'DCOS_NUM_MASTERS': len(self.masters),
             'DCOS_NUM_AGENTS': len(self.public_agents) + len(self.agents),
+            # `run_integration_tests.sh` does not provide all necessary
+            # environment variables.
+            'DCOS_LOGIN_UNAME': 'admin',
         }
 
         set_env_variables = [
