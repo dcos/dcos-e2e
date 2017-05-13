@@ -27,11 +27,12 @@ class TestNode:
 
             # Commands which return a non-0 code raise a
             # ``CalledProcessError``.
-            with pytest.raises(CalledProcessError):
-                result = master.run_as_root(args=['unset_command'])
-                assert result.returncode == 127
-                assert result.stdout == b''
-                assert b'command not found' in result.stderr
+            with pytest.raises(CalledProcessError) as excinfo:
+                master.run_as_root(args=['unset_command'])
+
+            assert excinfo.returncode == 127
+            assert result.stdout == b''
+            assert b'command not found' in result.stderr
 
 
 class TestIntegrationTests:
@@ -45,19 +46,22 @@ class TestIntegrationTests:
         Errors are raised from `pytest`.
         """
         with Cluster() as cluster:
+            # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_ca.py']
-            result = cluster.run_integration_tests(
-                pytest_command=pytest_command
-            )
+            cluster.run_integration_tests(pytest_command=pytest_command)
+
+            # An error is raised with an unsuccessful command.
             with pytest.raises(CalledProcessError) as excinfo:
                 pytest_command = ['pytest', 'test_no_file.py']
-                result = cluster.run_integration_tests(
+                cluster.run_integration_tests(
                     pytest_command=pytest_command
                 )
-                # `pytest` results in an exit code of 4 when no tests are
-                # collected.
-                # See https://docs.pytest.org/en/latest/usage.html.
-                assert result.returncode == 4
+
+            # `pytest` results in an exit code of 4 when no tests are
+            # collected.
+            # See https://docs.pytest.org/en/latest/usage.html.
+            import pdb; pdb.set_trace()
+            pass
 
 
 class TestExtendConfig:

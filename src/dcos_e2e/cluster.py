@@ -77,8 +77,13 @@ class Cluster(ContextDecorator):
         Run integration tests on a random master node.
 
         Args:
-            pytest_command: The `pytest` command to run on the node.
+            pytest_command: The ``pytest`` command to run on the node.
 
+        Returns:
+            The result of the ``pytest`` command.
+
+        Raises:
+            ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
         agent_hosts = [node.ip_address for node in self.agents]
         public_agent_hosts = [node.ip_address for node in self.public_agents]
@@ -119,14 +124,7 @@ class Cluster(ContextDecorator):
         # Tests are run on a random master node.
         test_host = next(iter(self.masters))
 
-        try:
-            return test_host.run_as_root(args=args)
-        except subprocess.CalledProcessError as exc:
-            print(repr(exc.stdout))
-            print(repr(exc.stderr))
-            import pdb
-            pdb.set_trace()
-            raise
+        return test_host.run_as_root(args=args)
 
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
         """
