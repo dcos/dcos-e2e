@@ -4,6 +4,7 @@ Helpers for interacting with DC/OS Docker.
 
 import subprocess
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from typing import Any, Dict, Set
@@ -180,7 +181,7 @@ class DCOS_Docker:
             details = client.inspect_container(container=container_name)
             ip_address = details['NetworkSettings']['IPAddress']
             node = Node(
-                ip_address=ip_address,
+                ip_address=IPv4Address(ip_address),
                 ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
             )
             nodes.add(node)
