@@ -20,7 +20,6 @@ class _ConflictingContainerError(Exception):
     Raised when an existing container conflicts with a container which will be
     created.
     """
-    pass
 
 
 class DCOS_Docker:

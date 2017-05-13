@@ -1,3 +1,7 @@
+"""
+DC/OS Cluster management tools. Independent of back ends.
+"""
+
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -48,7 +52,8 @@ class Cluster(ContextDecorator):
 
     def __enter__(self) -> 'Cluster':
         """
-        A context manager receives this ``Cluster`` instance.
+        Enter a context manager.
+        The context manager receives this ``Cluster`` instance.
         """
         return self
 
@@ -78,7 +83,8 @@ class Cluster(ContextDecorator):
         test_host = next(iter(self.masters))
 
         dcos_dns_address = 'http://{ip_address}'.format(
-            ip_address=test_host._ip_address)
+            ip_address=test_host._ip_address
+        )
         master_hosts = ','.join([node._ip_address for node in self.masters])
         slave_hosts = ','.join([node._ip_address for node in self.agents])
         public_slave_hosts = ','.join(
