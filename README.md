@@ -50,12 +50,23 @@ class TestExample:
             print(result.stdout)
 ```
 
-The `Cluster` class can take the following optional parameters:
+#### `Cluster`
 
-*extra_config*: Configuration variables to add to a base configuration.
-*masters*: The number of master nodes.
-*agents*: The number of agent nodes.
-*public_agents*: The number of public agent nodes.
+##### `extra_config`
+
+Configuration variables to add to a base configuration.
+
+##### `masters`
+
+The number of master nodes.
+
+##### `agents`
+
+The number of agent nodes.
+
+##### `public_agents`
+
+The number of public agent nodes.
 
 ## Contributing
 
