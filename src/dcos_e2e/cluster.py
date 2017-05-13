@@ -27,11 +27,11 @@ class Cluster(ContextDecorator):
     ) -> None:
         """
         Args:
-            extra_config: This dictionary can contain extra installation
+            extra_config: This can contain extra installation
                 configuration variables to add to base configurations.
             masters: The number of master nodes to create.
-            agents: The number of master nodes to create.
-            public_agents: The number of master nodes to create.
+            agents: The number of agent nodes to create.
+            public_agents: The number of public agent nodes to create.
         """
         self._backend = DCOS_Docker(
             masters=masters,
