@@ -44,19 +44,18 @@ class TestExample:
             'cluster_docker_credentials_enabled': True,
         }
 
-        with Cluster(
-            extra_config=config,
-            # Default 1
-            masters=1,
-            # Default 0
-            agents=1,
-            # Default 0
-            public_agents=1,
-        ) as cluster:
+        with Cluster(extra_config=config) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
             print(result.stdout)
 ```
+
+The `Cluster` class can take the following optional parameters:
+
+*extra_config*: Configuration variables to add to a base configuration.
+*masters*: The number of master nodes.
+*agents*: The number of agent nodes.
+*public_agents*: The number of public agent nodes.
 
 ## Contributing
 
