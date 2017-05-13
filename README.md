@@ -60,11 +60,11 @@ Configuration variables to add to a base configuration.
 
 The number of master nodes.
 
-##### `agents` (default `0`)
+##### `agents` (default `1`)
 
 The number of agent nodes.
 
-##### `public_agents` (default `0`)
+##### `public_agents` (default `1`)
 
 The number of public agent nodes.
 
