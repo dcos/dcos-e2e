@@ -18,7 +18,7 @@ class TestNode:
         """
         It is possible to run commands as root and see their output.
         """
-        with Cluster(extra_config={}) as cluster:
+        with Cluster(extra_config={}, agents=0, public_agents=0) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
             assert result.returncode == 0
@@ -66,7 +66,7 @@ class TestExtendConfig:
             'cluster_docker_credentials_enabled': True,
         }
 
-        with Cluster(extra_config=config) as cluster:
+        with Cluster(extra_config=config, agents=0, public_agents=0) as cluster:
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
@@ -76,7 +76,7 @@ class TestExtendConfig:
         This demonstrates that ``test_extend_config`` actually changes the
         configuration.
         """
-        with Cluster(extra_config={}) as cluster:
+        with Cluster(extra_config={}, agents=0, public_agents=0) as cluster:
             (master, ) = cluster.masters
             with pytest.raises(CalledProcessError):
                 master.run_as_root(args=['test', '-f', path])
