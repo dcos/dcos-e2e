@@ -3,6 +3,7 @@ Common utilities for end to end tests.
 """
 
 import subprocess
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import List
 
