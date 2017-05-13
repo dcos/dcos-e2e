@@ -54,9 +54,7 @@ class TestIntegrationTests:
             # An error is raised with an unsuccessful command.
             with pytest.raises(CalledProcessError) as excinfo:
                 pytest_command = ['pytest', 'test_no_such_file.py']
-                cluster.run_integration_tests(
-                    pytest_command=pytest_command
-                )
+                cluster.run_integration_tests(pytest_command=pytest_command)
 
             # `pytest` results in an exit code of 4 when no tests are
             # collected.
