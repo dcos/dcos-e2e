@@ -1,5 +1,8 @@
 """
 Tests for the test harness.
+
+Some tests are together when it would be neater otherwise as the tests take a
+long time to run.
 """
 
 from subprocess import CalledProcessError
@@ -59,7 +62,7 @@ class TestIntegrationTests:
             # `pytest` results in an exit code of 4 when no tests are
             # collected.
             # See https://docs.pytest.org/en/latest/usage.html.
-            assert excinfo.exception.returncode == 4
+            assert excinfo.value.returncode == 4
 
 
 class TestExtendConfig:
