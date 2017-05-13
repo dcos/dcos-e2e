@@ -48,6 +48,8 @@ class TestExample:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
             print(result.stdout)
+            pytest_command = ['pytest', '-x', 'test_tls.py']
+            cluster.run_integration_tests(pytest_command=pytest_command)
 ```
 
 #### `Cluster` optional parameters

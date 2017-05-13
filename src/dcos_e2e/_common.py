@@ -18,8 +18,11 @@ class Node:
             ip_address: The IP address of the node.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the `root` user.
+
+        Attributes:
+            ip_address (str): The IP address of the node.
         """
-        self._ip_address = ip_address
+        self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
     def run_as_root(self, args: List[str]) -> subprocess.CompletedProcess:
@@ -55,8 +58,6 @@ class Node:
             "PreferredAuthentications=publickey",
             self._ip_address,
         ] + args
-
-        print(ssh_args)
 
         return subprocess.run(
             args=ssh_args,
