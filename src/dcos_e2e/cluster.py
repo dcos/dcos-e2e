@@ -106,7 +106,7 @@ class Cluster(ContextDecorator):
         #     'TEST_DCOS_RESILIENCY': 'false',
         # }
         environment_variables = {
-            'DCOS_PYTEST'
+            'DCOS_PYTEST_CMD': subprocess.list2cmdline(pytest_command),
         }
 
         variable_settings = [
@@ -128,7 +128,7 @@ class Cluster(ContextDecorator):
         # )
         test_dir = '/opt/mesosphere/active/dcos-integration-test/util'
         change_to_test_dir = ['cd', test_dir]
-        run_test_script = ['/bin/bash'] + variable_settings + ['./run_integration_test.sh']
+        run_test_script = variable_settings + ['./run_integration_test.sh']
         args = (change_to_test_dir + and_cmd + run_test_script)
 
         try:
@@ -136,6 +136,7 @@ class Cluster(ContextDecorator):
         except subprocess.CalledProcessError as exc:
             print(repr(exc.stdout))
             print(repr(exc.stderr))
+            import pdb; pdb.set_trace()
             raise
 
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:

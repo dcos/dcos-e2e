@@ -45,7 +45,7 @@ class TestIntegrationTests:
         Errors are raised from `pytest`.
         """
         with Cluster() as cluster:
-            pytest_command = ['pytest', '-vvv', '-s', 'test_ca.py']
+            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_ca.py']
             result = cluster.run_integration_tests(
                 pytest_command=pytest_command
             )
