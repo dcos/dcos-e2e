@@ -30,9 +30,10 @@ class TestNode:
             with pytest.raises(CalledProcessError) as excinfo:
                 master.run_as_root(args=['unset_command'])
 
-            assert excinfo.returncode == 127
-            assert result.stdout == b''
-            assert b'command not found' in result.stderr
+            exception = excinfo.value
+            assert exception.returncode == 127
+            assert exception.stdout == b''
+            assert b'command not found' in exception.stderr
 
 
 class TestIntegrationTests:
@@ -52,7 +53,7 @@ class TestIntegrationTests:
 
             # An error is raised with an unsuccessful command.
             with pytest.raises(CalledProcessError) as excinfo:
-                pytest_command = ['pytest', 'test_no_file.py']
+                pytest_command = ['pytest', 'test_no_such_file.py']
                 cluster.run_integration_tests(
                     pytest_command=pytest_command
                 )
@@ -60,8 +61,7 @@ class TestIntegrationTests:
             # `pytest` results in an exit code of 4 when no tests are
             # collected.
             # See https://docs.pytest.org/en/latest/usage.html.
-            import pdb; pdb.set_trace()
-            pass
+            assert excinfo.exception.returncode == 4
 
 
 class TestExtendConfig:
@@ -156,7 +156,7 @@ class TestMultipleClusters:
     Tests for working with multiple clusters.
     """
 
-    def test_two_clusters(self):
+    def test_two_clusters(self) -> None:
         """
         It is possible to start two clusters.
         """
