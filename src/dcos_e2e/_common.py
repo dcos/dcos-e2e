@@ -12,7 +12,7 @@ class Node:
     A record of a DC/OS cluster node.
     """
 
-    def __init__(self, ip_address: str, ssh_key_path: Path) -> None:
+    def __init__(self, ip_address: IPv4Address, ssh_key_path: Path) -> None:
         """
         Args:
             ip_address: The IP address of the node.
@@ -53,7 +53,7 @@ class Node:
             # Bypass password checking.
             "-o",
             "PreferredAuthentications=publickey",
-            self._ip_address,
+            str(self._ip_address),
         ] + args
 
         return subprocess.run(
