@@ -28,6 +28,8 @@ pip install git+https://github.com/adamtheturtle/dcos-e2e.git@master
 Then, create a test, such as the following:
 
 ```python
+import subprocess
+
 from dcos_e2e.cluster import Cluster
 
 class TestExample:
@@ -50,6 +52,10 @@ class TestExample:
             print(result.stdout)
             pytest_command = ['pytest', '-x', 'test_tls.py']
             cluster.run_integration_tests(pytest_command=pytest_command)
+            try:
+                master.run_as_root(args=['test', '-f', '/no/file/here'])
+            except subprocess.CalledProcessError:
+                print('No file exists')
 ```
 
 #### `Cluster` parameters
