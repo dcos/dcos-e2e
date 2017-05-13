@@ -22,8 +22,8 @@ class Cluster(ContextDecorator):
         self,
         extra_config: Optional[Dict[str, str]]=None,
         masters: int=1,
-        agents: int=0,
-        public_agents: int=0,
+        agents: int=1,
+        public_agents: int=1,
     ) -> None:
         """
         Args:
