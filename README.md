@@ -52,21 +52,21 @@ class TestExample:
             cluster.run_integration_tests(pytest_command=pytest_command)
 ```
 
-#### `Cluster` optional parameters
+#### `Cluster` parameters
 
-##### `extra_config`
+##### `extra_config` (default `None`)
 
 Configuration variables to add to a base configuration.
 
-##### `masters`
+##### `masters` (default `1`)
 
 The number of master nodes.
 
-##### `agents`
+##### `agents` (default `1`)
 
 The number of agent nodes.
 
-##### `public_agents`
+##### `public_agents` (default `1`)
 
 The number of public agent nodes.
 
@@ -107,6 +107,8 @@ docker rm --volumes $(docker ps -a -q --filter="name=dcos-")
 docker volume prune --force
 rm -rf /tmp/dcos-docker-*
 ```
+
+If this repository is available, run `make clean`.
 
 ## Troubleshooting
 

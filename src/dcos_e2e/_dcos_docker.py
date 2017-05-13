@@ -6,7 +6,7 @@ import subprocess
 import uuid
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from typing import Dict, Set
+from typing import Any, Dict, Set
 
 import yaml
 from docker import Client
@@ -32,7 +32,7 @@ class DCOS_Docker:
         masters: int,
         agents: int,
         public_agents: int,
-        extra_config: Dict,
+        extra_config: Dict[str, Any],
         generate_config_path: Path,
         dcos_docker_path: Path,
     ) -> None:
@@ -41,8 +41,8 @@ class DCOS_Docker:
 
         Args:
             masters: The number of master nodes to create.
-            agents: The number of master nodes to create.
-            public_agents: The number of master nodes to create.
+            agents: The number of agent nodes to create.
+            public_agents: The number of public agent nodes to create.
             extra_config: DC/OS Docker comes with a "base" configuration.
                 This dictionary can contain extra installation configuration
                 variables.

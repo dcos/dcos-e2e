@@ -5,7 +5,7 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
@@ -20,7 +20,7 @@ class Cluster(ContextDecorator):
 
     def __init__(
         self,
-        extra_config: Optional[Dict[str, str]]=None,
+        extra_config: Optional[Dict[str, Any]]=None,
         masters: int=1,
         agents: int=1,
         public_agents: int=1,
@@ -40,7 +40,7 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            extra_config=extra_config,
+            extra_config=dict(extra_config or {}),
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
             dcos_docker_path=Path('/tmp/dcos-docker'),
         )

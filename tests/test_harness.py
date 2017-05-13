@@ -18,7 +18,7 @@ class TestNode:
         """
         It is possible to run commands as root and see their output.
         """
-        with Cluster() as cluster:
+        with Cluster(agents=0, public_agents=0) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
             assert result.returncode == 0
@@ -49,13 +49,15 @@ class TestIntegrationTests:
             result = cluster.run_integration_tests(
                 pytest_command=pytest_command
             )
-            import pdb
-            pdb.set_trace()
-            with pytest.raises(CalledProcessError):
-                result = pytest_command = ['pytest', 'test_no_file.py']
-                import pdb
-                pdb.set_trace()
-                pass
+            with pytest.raises(CalledProcessError) as excinfo:
+                pytest_command = ['pytest', 'test_no_file.py']
+                result = cluster.run_integration_tests(
+                    pytest_command=pytest_command
+                )
+                # `pytest` results in an exit code of 4 when no tests are
+                # collected.
+                # See https://docs.pytest.org/en/latest/usage.html.
+                assert result.returncode == 4
 
 
 class TestExtendConfig:
@@ -76,8 +78,8 @@ class TestExtendConfig:
         This example demonstrates that it is possible to create a cluster
         with an extended configuration file.
 
-        See ``test_default`` for evidence that the custom
-        configuration is used.
+        See ``test_default`` for evidence that the custom configuration is
+        used.
         """
         config = {
             'cluster_docker_credentials': {
@@ -115,7 +117,8 @@ class TestClusterSize:
 
     def test_default(self) -> None:
         """
-        By default, a cluster with one master and zero agents is created.
+        By default, a cluster with one master and one agent and one private
+        agent is created.
         """
         with Cluster() as cluster:
             assert len(cluster.masters) == 1
@@ -142,3 +145,17 @@ class TestClusterSize:
             assert len(cluster.masters) == masters
             assert len(cluster.agents) == agents
             assert len(cluster.public_agents) == public_agents
+
+
+class TestMultipleClusters:
+    """
+    Tests for working with multiple clusters.
+    """
+
+    def test_two_clusters(self):
+        """
+        It is possible to start two clusters.
+        """
+        with Cluster():
+            with Cluster():
+                pass
