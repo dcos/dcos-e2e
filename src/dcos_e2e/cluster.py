@@ -85,8 +85,10 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        agent_hosts = [node.ip_address for node in self.agents]
-        public_agent_hosts = [node.ip_address for node in self.public_agents]
+        agent_hosts = [str(node.ip_address) for node in self.agents]
+        public_agent_hosts = [
+            str(node.ip_address) for node in self.public_agents
+        ]
 
         environment_variables = {
             # Used by `run_integration_tests.sh`.
