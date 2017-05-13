@@ -56,7 +56,7 @@ class Node:
             # Bypass password checking.
             "-o",
             "PreferredAuthentications=publickey",
-            self._ip_address,
+            self.ip_address,
         ] + args
 
         return subprocess.run(
