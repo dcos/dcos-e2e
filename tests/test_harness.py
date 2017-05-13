@@ -18,7 +18,7 @@ class TestNode:
         """
         It is possible to run commands as root and see their output.
         """
-        with Cluster(extra_config={}, agents=0, public_agents=0) as cluster:
+        with Cluster(agents=0, public_agents=0) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
             assert result.returncode == 0
@@ -52,8 +52,8 @@ class TestExtendConfig:
         This example demonstrates that it is possible to create a cluster
         with an extended configuration file.
 
-        See ``test_default`` for evidence that the custom
-        configuration is used.
+        See ``test_default`` for evidence that the custom configuration is
+        used.
         """
         config = {
             'cluster_docker_credentials': {
@@ -66,7 +66,9 @@ class TestExtendConfig:
             'cluster_docker_credentials_enabled': True,
         }
 
-        with Cluster(extra_config=config, agents=0, public_agents=0) as cluster:
+        with Cluster(
+            extra_config=config, agents=0, public_agents=0
+        ) as cluster:
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
@@ -76,7 +78,7 @@ class TestExtendConfig:
         This demonstrates that ``test_extend_config`` actually changes the
         configuration.
         """
-        with Cluster(extra_config={}, agents=0, public_agents=0) as cluster:
+        with Cluster(agents=0, public_agents=0) as cluster:
             (master, ) = cluster.masters
             with pytest.raises(CalledProcessError):
                 master.run_as_root(args=['test', '-f', path])
@@ -92,7 +94,7 @@ class TestClusterSize:
         By default, a cluster with one master and one agent and one private
         agent is created.
         """
-        with Cluster(extra_config={}) as cluster:
+        with Cluster() as cluster:
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
             assert len(cluster.public_agents) == 1
@@ -110,7 +112,6 @@ class TestClusterSize:
         public_agents = 2
 
         with Cluster(
-            extra_config={},
             masters=masters,
             agents=agents,
             public_agents=public_agents,
