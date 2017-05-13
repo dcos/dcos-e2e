@@ -2,9 +2,10 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Dict, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
@@ -69,6 +70,70 @@ class Cluster(ContextDecorator):
         Return all DC/OS public_agent ``Node``s.
         """
         return self._backend.public_agents
+
+    def run_integration_tests(self, pytest_command: List[str]
+                              ) -> subprocess.CompletedProcess:
+        """
+        X
+        """
+        # Tests are run on a random master node
+        test_host = next(iter(self.masters))
+
+        # dcos_dns_address = 'http://{ip_address}'.format(
+        #     ip_address=test_host._ip_address
+        # )
+        # master_hosts = ','.join([node._ip_address for node in self.masters])
+        # slave_hosts = ','.join([node._ip_address for node in self.agents])
+        # public_slave_hosts = ','.join(
+        #     [node._ip_address for node in self.public_agents]
+        # )
+        #
+        # environment_variables = {
+        #     'DCOS_DNS_ADDRESS': dcos_dns_address,
+        #     'MASTER_HOSTS': master_hosts,
+        #     'PUBLIC_MASTER_HOSTS': master_hosts,
+        #     'SLAVE_HOSTS': slave_hosts,
+        #     'PUBLIC_SLAVE_HOSTS': public_slave_hosts,
+        #     'DCOS_PROVIDER': 'onprem',
+        #     'DNS_SEARCH': 'false',
+        #     'DCOS_LOGIN_PW': 'admin',
+        #     'PYTHONUNBUFFERED': 'true',
+        #     'PYTHONDONTWRITEBYTECODE': 'true',
+        #     'DCOS_LOGIN_UNAME': 'admin',
+        #     'TEST_DCOS_RESILIENCY': 'false',
+        # }
+        environment_variables = {
+            'DCOS_PYTEST'
+        }
+
+        variable_settings = [
+            '{key}={value}'.format(key=key, value=value)
+            for key, value in environment_variables.items()
+        ]
+
+        # TODO use /util run_integration_test helper
+        # pytest_command = variable_settings + pytest_command
+        #
+        # test_dir = '/opt/mesosphere/active/dcos-integration-test/'
+        # change_to_test_dir = ['cd', test_dir]
+        # source_environment = ['source', '/opt/mesosphere/environment.export']
+        and_cmd = ['&&']
+        #
+        # args = (
+        #     change_to_test_dir + and_cmd + source_environment + and_cmd +
+        #     pytest_command
+        # )
+        test_dir = '/opt/mesosphere/active/dcos-integration-test/util'
+        change_to_test_dir = ['cd', test_dir]
+        run_test_script = ['/bin/bash'] + variable_settings + ['./run_integration_test.sh']
+        args = (change_to_test_dir + and_cmd + run_test_script)
+
+        try:
+            return test_host.run_as_root(args=args)
+        except subprocess.CalledProcessError as exc:
+            print(repr(exc.stdout))
+            print(repr(exc.stderr))
+            raise
 
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
         """

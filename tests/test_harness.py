@@ -34,6 +34,30 @@ class TestNode:
                 assert b'command not found' in result.stderr
 
 
+class TestIntegrationTests:
+    """
+    Tests for running integration tests on a node.
+    """
+
+    def test_run_pytest(self) -> None:
+        """
+        Integration tests can be run with `pytest`.
+        Errors are raised from `pytest`.
+        """
+        with Cluster(masters=1, agents=1, public_agents=1) as cluster:
+            pytest_command = ['pytest', '-vvv', '-s', '-k', 'test_ca.py']
+            result = cluster.run_integration_tests(
+                pytest_command=pytest_command
+            )
+            import pdb
+            pdb.set_trace()
+
+            with pytest.raises(CalledProcessError):
+                result = pytest_command = ['pytest', '-vvv', '-s', '-k', 'no_file.x']
+                import pdb; pdb.set_trace()
+                pass
+
+
 class TestExtendConfig:
     """
     Tests for extending the configuration file.
