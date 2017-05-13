@@ -52,8 +52,8 @@ class TestExtendConfig:
         This example demonstrates that it is possible to create a cluster
         with an extended configuration file.
 
-        See ``test_default`` for evidence that the custom
-        configuration is used.
+        See ``test_default`` for evidence that the custom configuration is
+        used.
         """
         config = {
             'cluster_docker_credentials': {
@@ -66,7 +66,9 @@ class TestExtendConfig:
             'cluster_docker_credentials_enabled': True,
         }
 
-        with Cluster(extra_config=config, agents=0, public_agents=0) as cluster:
+        with Cluster(
+            extra_config=config, agents=0, public_agents=0
+        ) as cluster:
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
