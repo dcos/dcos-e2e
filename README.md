@@ -106,6 +106,8 @@ docker volume prune --force
 rm -rf /tmp/dcos-docker-*
 ```
 
+If this repository is available, run `make clean`.
+
 ## Troubleshooting
 
 ### macOS File Sharing
