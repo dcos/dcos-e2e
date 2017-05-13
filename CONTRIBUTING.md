@@ -20,6 +20,12 @@ Run lint tools:
 make lint
 ```
 
+To fix some lint errors, run the following:
+
+```sh
+make fix-lint
+```
+
 ## Tests for this package
 
 Tests for this package must be run in a suitable environment.

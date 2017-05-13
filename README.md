@@ -28,6 +28,8 @@ pip install git+https://github.com/adamtheturtle/dcos-e2e.git@master
 Then, create a test, such as the following:
 
 ```python
+import subprocess
+
 from dcos_e2e.cluster import Cluster
 
 class TestExample:
@@ -44,19 +46,35 @@ class TestExample:
             'cluster_docker_credentials_enabled': True,
         }
 
-        with Cluster(
-            extra_config=config,
-            # Default 1
-            masters=1,
-            # Default 0
-            agents=1,
-            # Default 0
-            public_agents=1,
-        ) as cluster:
+        with Cluster(extra_config=config) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
             print(result.stdout)
+            pytest_command = ['pytest', '-x', 'test_tls.py']
+            cluster.run_integration_tests(pytest_command=pytest_command)
+            try:
+                master.run_as_root(args=['test', '-f', '/no/file/here'])
+            except subprocess.CalledProcessError:
+                print('No file exists')
 ```
+
+#### `Cluster` parameters
+
+##### `extra_config` (default `None`)
+
+Configuration variables to add to a base configuration.
+
+##### `masters` (default `1`)
+
+The number of master nodes.
+
+##### `agents` (default `1`)
+
+The number of agent nodes.
+
+##### `public_agents` (default `1`)
+
+The number of public agent nodes.
 
 ## Contributing
 
@@ -95,6 +113,8 @@ docker rm --volumes $(docker ps -a -q --filter="name=dcos-")
 docker volume prune --force
 rm -rf /tmp/dcos-docker-*
 ```
+
+If this repository is available, run `make clean`.
 
 ## Troubleshooting
 

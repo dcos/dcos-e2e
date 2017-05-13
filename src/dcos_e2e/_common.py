@@ -3,6 +3,7 @@ Common utilities for end to end tests.
 """
 
 import subprocess
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import List
 
@@ -12,14 +13,17 @@ class Node:
     A record of a DC/OS cluster node.
     """
 
-    def __init__(self, ip_address: str, ssh_key_path: Path) -> None:
+    def __init__(self, ip_address: IPv4Address, ssh_key_path: Path) -> None:
         """
         Args:
             ip_address: The IP address of the node.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the `root` user.
+
+        Attributes:
+            ip_address (IPv4Address): The IP address of the node.
         """
-        self._ip_address = ip_address
+        self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
     def run_as_root(self, args: List[str]) -> subprocess.CompletedProcess:
@@ -53,7 +57,7 @@ class Node:
             # Bypass password checking.
             "-o",
             "PreferredAuthentications=publickey",
-            self._ip_address,
+            str(self.ip_address),
         ] + args
 
         return subprocess.run(
