@@ -2,9 +2,10 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
@@ -69,6 +70,63 @@ class Cluster(ContextDecorator):
         Return all DC/OS public_agent ``Node``s.
         """
         return self._backend.public_agents
+
+    def run_integration_tests(self, pytest_command: List[str]
+                              ) -> subprocess.CompletedProcess:
+        """
+        Run integration tests on a random master node.
+
+        Args:
+            pytest_command: The ``pytest`` command to run on the node.
+
+        Returns:
+            The result of the ``pytest`` command.
+
+        Raises:
+            ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
+        """
+        agent_hosts = [str(node.ip_address) for node in self.agents]
+        public_agent_hosts = [
+            str(node.ip_address) for node in self.public_agents
+        ]
+
+        environment_variables = {
+            # Used by `run_integration_tests.sh`.
+            'DCOS_PYTEST_CMD': ' '.join(pytest_command),
+            'DCOS_NUM_MASTERS': len(self.masters),
+            'DCOS_NUM_AGENTS': len(self.public_agents) + len(self.agents),
+            # `run_integration_tests.sh` does not provide all necessary
+            # environment variables.
+            # See https://jira.mesosphere.com/browse/DCOS-15759.
+            'DCOS_LOGIN_UNAME': 'admin',
+            'DCOS_LOGIN_PW': 'admin',
+            'TEST_DCOS_RESILIENCY': 'admin',
+            'SLAVE_HOSTS': ','.join(agent_hosts),
+            'PUBLIC_SLAVE_HOSTS': ','.join(public_agent_hosts),
+        }
+
+        set_env_variables = [
+            "{key}='{value}'".format(key=key, value=value)
+            for key, value in environment_variables.items()
+        ]
+
+        test_dir = '/opt/mesosphere/active/dcos-integration-test/util'
+        change_to_test_dir = ['cd', test_dir]
+
+        and_cmd = ['&&']
+
+        # We exit at the first failure in the script, else the return code
+        # would be the return code of the commands after the `pytest` run.
+        run_test_script = ['/bin/bash', '-e', './run_integration_test.sh']
+
+        args = (
+            change_to_test_dir + and_cmd + set_env_variables + run_test_script
+        )
+
+        # Tests are run on a random master node.
+        test_host = next(iter(self.masters))
+
+        return test_host.run_as_root(args=args)
 
     def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
         """
