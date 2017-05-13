@@ -56,6 +56,8 @@ class Node:
             self._ip_address,
         ] + args
 
+        print(ssh_args)
+
         return subprocess.run(
             args=ssh_args,
             check=True,

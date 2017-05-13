@@ -51,10 +51,10 @@ class TestIntegrationTests:
             )
             import pdb
             pdb.set_trace()
-
             with pytest.raises(CalledProcessError):
                 result = pytest_command = ['pytest', 'test_no_file.py']
-                import pdb; pdb.set_trace()
+                import pdb
+                pdb.set_trace()
                 pass
 
 
@@ -90,7 +90,9 @@ class TestExtendConfig:
             'cluster_docker_credentials_enabled': True,
         }
 
-        with Cluster(extra_config=config, agents=0, public_agents=0) as cluster:
+        with Cluster(
+            extra_config=config, agents=0, public_agents=0
+        ) as cluster:
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
