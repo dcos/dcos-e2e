@@ -116,8 +116,6 @@ Run integration tests on the cluster.
 
 Destroy all nodes in the cluster.
 
-#####
-
 #### Nodes
 
 Commands can be run on nodes in clusters.
