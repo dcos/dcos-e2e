@@ -75,9 +75,18 @@ def run_subprocess(args: List[str],
     Returns:
         See `subprocess.run`.
     """
+    if cwd is None:
+        return run(
+            args=args,
+            check=True,
+            stdout=PIPE,
+            stderr=PIPE,
+        )
+
     return run(
         args=args,
         check=True,
+        cwd=str(cwd),
         stdout=PIPE,
         stderr=PIPE,
     )
