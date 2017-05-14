@@ -13,7 +13,7 @@ import yaml
 from docker import Client
 from retry import retry
 
-from ._common import Node
+from ._common import Node, run_subprocess
 
 
 class _ConflictingContainerError(Exception):
@@ -36,6 +36,7 @@ class DCOS_Docker:
         extra_config: Dict[str, Any],
         generate_config_path: Path,
         dcos_docker_path: Path,
+        log_output_live: bool,
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -49,7 +50,11 @@ class DCOS_Docker:
                 variables.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
+            log_output_live: If `True`, log output of subprocesses live.
+                If `True`, stderr is merged into stdout in the return value.
         """
+        self.log_output_live = log_output_live
+
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
@@ -81,6 +86,13 @@ class DCOS_Docker:
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         self._variables = {
+            # Only overlay and aufs storage drivers are supported.
+            # This chooses overlay (arbitrary) so the host's driver is not
+            # used.
+            # This means that the tests will be more consistent across
+            # platforms and that they will run even if the storage driver on
+            # the host is not one of these two.
+            'DOCKER_GRAPHDRIVER': 'overlay',
             # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
@@ -134,12 +146,10 @@ class DCOS_Docker:
             for key, value in self._variables.items()
         ] + [target]
 
-        subprocess.run(
+        run_subprocess(
             args=args,
             cwd=str(self._path),
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            log_output_live=self.log_output_live
         )
 
     def postflight(self) -> None:

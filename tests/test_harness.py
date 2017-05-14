@@ -5,9 +5,11 @@ Some tests are together when it would be neater otherwise as the tests take a
 long time to run.
 """
 
+import logging
 from subprocess import CalledProcessError
 
 import pytest
+from pytest_capturelog import CaptureLogFuncArg
 
 from dcos_e2e.cluster import Cluster
 
@@ -17,7 +19,7 @@ class TestNode:
     Tests for interacting with cluster nodes.
     """
 
-    def test_run_as_root(self) -> None:
+    def test_run_as_root(self, caplog: CaptureLogFuncArg) -> None:
         """
         It is possible to run commands as root and see their output.
         """
@@ -37,6 +39,24 @@ class TestNode:
             assert exception.returncode == 127
             assert exception.stdout == b''
             assert b'command not found' in exception.stderr
+            for record in caplog.records():
+                # The error which caused this exception is not in the log
+                # output.
+                assert b'unset_command' not in record.msg
+
+            # With `log_output_live`, output is logged and stderr is merged
+            # into stdout.
+            with pytest.raises(CalledProcessError) as excinfo:
+                master.run_as_root(
+                    args=['unset_command'], log_output_live=True
+                )
+
+            exception = excinfo.value
+            assert exception.stderr == b''
+            assert b'command not found' in exception.stdout
+            last_record = caplog.records()[-1]
+            assert last_record.levelno == logging.DEBUG
+            assert b'unset_command' in last_record.msg
 
 
 class TestIntegrationTests:
@@ -150,6 +170,58 @@ class TestClusterSize:
             assert len(cluster.masters) == masters
             assert len(cluster.agents) == agents
             assert len(cluster.public_agents) == public_agents
+
+
+class TestClusterLogging:
+    """
+    Tests for logs created by the ``Cluster``.
+    """
+
+    @pytest.fixture()
+    def two_clusters_error(self) -> bytes:
+        """
+        Return part of the error message shown when trying to create a cluster
+        with two masters.
+
+        This is prone to being broken as it is a string in the DC/OS
+        repository.
+        """
+        return b'Must have 1, 3, 5, 7, or 9 masters'
+
+    def test_live_logging(
+        self, two_clusters_error: str, caplog: CaptureLogFuncArg
+    ) -> None:
+        """
+        If `log_output_live` is given as `True`, subprocess output is logged.
+        """
+        with pytest.raises(CalledProcessError):
+            # It is not possible to create a cluster with two master nodes.
+            with Cluster(masters=2, log_output_live=True):
+                pass
+
+        encountered_error = False
+        for record in caplog.records():
+            if two_clusters_error in record.msg:
+                encountered_error = True
+        assert encountered_error
+
+    def test_no_live_logging(
+        self, two_clusters_error: str, caplog: CaptureLogFuncArg
+    ) -> None:
+        """
+        By default, subprocess output is not logged in the creation of a
+        cluster.
+        """
+        with pytest.raises(CalledProcessError):
+            # It is not possible to create a cluster with two master nodes.
+            with Cluster(masters=2):
+                pass
+
+        encountered_error = False
+        for record in caplog.records():
+            if two_clusters_error in record.msg:
+                encountered_error = True
+        assert not encountered_error
 
 
 class TestMultipleClusters:

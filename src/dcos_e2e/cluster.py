@@ -24,6 +24,7 @@ class Cluster(ContextDecorator):
         masters: int=1,
         agents: int=1,
         public_agents: int=1,
+        log_output_live: bool=False,
     ) -> None:
         """
         Args:
@@ -32,6 +33,8 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
+            log_output_live: If `True`, log output of subprocesses live.
+                If `True`, stderr is merged into stdout in the return value.
         """
         self._backend = DCOS_Docker(
             masters=masters,
@@ -40,6 +43,7 @@ class Cluster(ContextDecorator):
             extra_config=dict(extra_config or {}),
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
             dcos_docker_path=Path('/tmp/dcos-docker'),
+            log_output_live=log_output_live,
         )
         self._backend.postflight()
 
