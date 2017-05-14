@@ -39,6 +39,10 @@ class TestNode:
             assert exception.returncode == 127
             assert exception.stdout == b''
             assert b'command not found' in exception.stderr
+            for record in caplog.records():
+                # The error which caused this exception is not in the log
+                # output.
+                assert b'unset_command' not in record.msg
 
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
@@ -178,17 +182,24 @@ class TestClusterLogging:
         """
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
-            with Cluster(masters=2):
+            with Cluster(masters=2, log_output_live=True):
                 pass
+
+        assert caplog.records()
+        import pdb; pdb.set_trace()
+        pass
 
     def test_no_live_logging(self, caplog: CaptureLogFuncArg) -> None:
         """
         XXX
         """
-        caplog.setLevel(logging.DEBUG)
         with pytest.raises(CalledProcessError):
+            # It is not possible to create a cluster with two master nodes.
             with Cluster(masters=2):
                 pass
+        # This is not a good test because if something adds logging elsewhere
+        # it will erroneously fail.
+        assert not caplog.records()
 
 
 class TestMultipleClusters:
