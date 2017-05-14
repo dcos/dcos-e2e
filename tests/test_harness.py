@@ -40,9 +40,10 @@ class TestNode:
             assert exception.stdout == b''
             assert b'command not found' in exception.stderr
             for record in caplog.records():
-                # The error which caused this exception is not in the log
-                # output.
-                assert 'unset_command' not in record.getMessage()
+                # The error which caused this exception is not in the debug
+                # log output.
+                if record.levelno == logging.DEBUG:
+                    assert 'unset_command' not in record.getMessage()
 
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
@@ -58,8 +59,8 @@ class TestNode:
             found_expected_error = False
             for record in caplog.records():
                 if expected_error_substring in record.getMessage():
-                    assert record.levelno == logging.DEBUG
-                    found_expected_error = True
+                    if record.levelno == logging.DEBUG
+                        found_expected_error = True
             assert found_expected_error
 
 
