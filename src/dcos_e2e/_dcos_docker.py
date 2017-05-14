@@ -87,12 +87,12 @@ class DCOS_Docker:
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         self._variables = {
             # Only overlay and aufs storage drivers are supported.
-            # This chooses overlay (arbitrary) so the host's driver is not
+            # This chooses aufs (arbitrary) so the host's driver is not
             # used.
             # This means that the tests will be more consistent across
             # platforms and that they will run even if the storage driver on
             # the host is not one of these two.
-            'DOCKER_GRAPHDRIVER': 'overlay',
+            'DOCKER_GRAPHDRIVER': 'aufs',
             # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
