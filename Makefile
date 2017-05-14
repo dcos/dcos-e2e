@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 # Run various linting tools.
 lint:
 	flake8 .
@@ -8,8 +10,8 @@ lint:
 
 # Attempt to clean leftovers by the test suite.
 clean:
-	docker stop $(docker ps -a -q --filter="name=dcos-") | :
-	docker rm --volumes $(docker ps -a -q --filter="name=dcos-") | :
+	docker stop $$(docker ps -a -q --filter="name=dcos-") | :
+	docker rm --volumes $$(docker ps -a -q --filter="name=dcos-") | :
 	docker volume prune --force
 	rm -rf /tmp/dcos-docker-*
 
