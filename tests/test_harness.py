@@ -38,7 +38,17 @@ class TestNode:
             assert exception.stdout == b''
             assert b'command not found' in exception.stderr
 
-            # With `log_output_liv
+            # With `log_output_live`, output is logged and stderr is merged
+            # into stdout.
+            with pytest.raises(CalledProcessError) as excinfo:
+                master.run_as_root(
+                    args=['unset_command'], log_output_live=True
+                )
+
+            exception = excinfo.value
+            assert exception.returncode == 127
+            assert exception.stderr == b''
+            assert b'command not found' in exception.stderr
 
 
 class TestIntegrationTests:
@@ -152,6 +162,9 @@ class TestClusterSize:
             assert len(cluster.masters) == masters
             assert len(cluster.agents) == agents
             assert len(cluster.public_agents) == public_agents
+
+    def test_two_masters(self) -> None:
+        pass
 
 
 class TestMultipleClusters:
