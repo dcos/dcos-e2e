@@ -242,9 +242,9 @@ class TestMultipleClusters:
                 pass
 
 
-class TestDestroyOnFailure:
+class TestDestroyOnError:
     """
-    Tests for `destroy_on_failure`.
+    Tests for `destroy_on_error`.
     """
 
     def test_default_exception_raised(self) -> None:
@@ -261,12 +261,12 @@ class TestDestroyOnFailure:
 
     def test_set_false_exception_raised(self) -> None:
         """
-        If `destroy_on_failure` is set to `False` and an exception is raised,
+        If `destroy_on_error` is set to `False` and an exception is raised,
         the cluster is not destroyed.
         """
         with pytest.raises(Exception):
             with Cluster(
-                agents=0, public_agents=0, destroy_on_failure=False
+                agents=0, public_agents=0, destroy_on_error=False
             ) as cluster:
                 (master, ) = cluster.masters
                 raise Exception()
@@ -276,11 +276,11 @@ class TestDestroyOnFailure:
 
     def test_set_false_no_exception(self) -> None:
         """
-        If `destroy_on_failure` is set to `False` and no exception is raised,
+        If `destroy_on_error` is set to `False` and no exception is raised,
         the cluster is not destroyed.
         """
         with Cluster(
-            agents=0, public_agents=0, destroy_on_failure=False
+            agents=0, public_agents=0, destroy_on_error=False
         ) as cluster:
             (master, ) = cluster.masters
 
