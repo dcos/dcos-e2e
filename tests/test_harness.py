@@ -42,7 +42,7 @@ class TestNode:
             for record in caplog.records():
                 # The error which caused this exception is not in the log
                 # output.
-                assert b'unset_command' not in record.msg
+                assert 'unset_command' not in record.getMessage()
 
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
@@ -54,9 +54,13 @@ class TestNode:
             exception = excinfo.value
             assert exception.stderr == b''
             assert b'command not found' in exception.stdout
-            last_record = caplog.records()[-1]
-            assert last_record.levelno == logging.DEBUG
-            assert b'unset_command' in last_record.msg
+            expected_error_substring = 'unset_command'
+            found_expected_error = False
+            for record in caplog.records():
+                if expected_error_substring in record.getMessage():
+                    assert record.levelno == logging.DEBUG
+                    found_expected_error = True
+            assert found_expected_error
 
 
 class TestIntegrationTests:
@@ -236,3 +240,49 @@ class TestMultipleClusters:
         with Cluster():
             with Cluster():
                 pass
+
+
+class TestDestroyOnError:
+    """
+    Tests for `destroy_on_error`.
+    """
+
+    def test_default_exception_raised(self) -> None:
+        """
+        By default, if an exception is raised, the cluster is destroyed.
+        """
+        with pytest.raises(Exception):
+            with Cluster(agents=0, public_agents=0) as cluster:
+                (master, ) = cluster.masters
+                raise Exception()
+
+        with pytest.raises(CalledProcessError):
+            master.run_as_root(args=['echo', 'hello'])
+
+    def test_set_false_exception_raised(self) -> None:
+        """
+        If `destroy_on_error` is set to `False` and an exception is raised,
+        the cluster is not destroyed.
+        """
+        with pytest.raises(Exception):
+            with Cluster(
+                agents=0, public_agents=0, destroy_on_error=False
+            ) as cluster:
+                (master, ) = cluster.masters
+                raise Exception()
+        # No exception is raised. The node still exists.
+        master.run_as_root(args=['echo', 'hello'])
+        cluster.destroy()
+
+    def test_set_false_no_exception(self) -> None:
+        """
+        If `destroy_on_error` is set to `False` and no exception is raised,
+        the cluster is not destroyed.
+        """
+        with Cluster(
+            agents=0, public_agents=0, destroy_on_error=False
+        ) as cluster:
+            (master, ) = cluster.masters
+
+        with pytest.raises(CalledProcessError):
+            master.run_as_root(args=['echo', 'hello'])

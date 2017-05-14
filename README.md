@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/adamtheturtle/dcos-e2e.svg?branch=master)](https://travis-ci.org/adamtheturtle/dcos-e2e)
 
+[![Requirements Status](https://requires.io/github/adamtheturtle/dcos-e2e/requirements.svg?branch=master)](https://requires.io/github/adamtheturtle/dcos-e2e/requirements/?branch=master)
+
 # DC/OS End to End tests
 
 End to end tests are tests which require a DC/OS cluster to run against.
@@ -58,7 +60,7 @@ class TestExample:
                 print('No file exists')
 ```
 
-#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False)`
+#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False, destroy_on_error=True)`
 
 This is a context manager which spins up a cluster.
 At the time of writing, this uses DC/OS Docker.
@@ -87,6 +89,11 @@ If set to `True`, the output of processes run on the host to create and manage c
 
 To see these logs in `pytest` tests, use the `-s` flag.
 
+###### `destroy_on_error`
+
+If set to `True`, the cluster is destroyed on exit in all cases.
+If set to `False`, the cluster is preserved if there is an error.
+
 ##### Attributes
 
 ###### `masters`
@@ -101,10 +108,13 @@ The agent nodes in the cluster.
 
 The public agent nodes in the cluster.
 
-###### `run_integration_tests`
+###### `run_integration_tests(pytest_command)`
 
-This takes a `pytest_command` and allows integration tests to be run on the
-cluster.
+Run integration tests on the cluster.
+
+###### `destroy()`
+
+Destroy all nodes in the cluster.
 
 #### Nodes
 
