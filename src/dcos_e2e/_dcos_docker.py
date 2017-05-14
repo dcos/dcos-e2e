@@ -135,7 +135,7 @@ class DCOS_Docker:
             for key, value in self._variables.items()
         ] + [target]
 
-        run_subprocess(args=args, cwd=str(self._path))
+        run_subprocess(args=args, cwd=str(self._path), log_output_live=False)
 
     def postflight(self) -> None:
         """

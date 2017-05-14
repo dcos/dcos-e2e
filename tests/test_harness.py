@@ -5,9 +5,11 @@ Some tests are together when it would be neater otherwise as the tests take a
 long time to run.
 """
 
+import logging
 from subprocess import CalledProcessError
 
 import pytest
+from pytest_capturelog import CaptureLogFuncArg
 
 from dcos_e2e.cluster import Cluster
 
@@ -17,7 +19,7 @@ class TestNode:
     Tests for interacting with cluster nodes.
     """
 
-    def test_run_as_root(self) -> None:
+    def test_run_as_root(self, caplog: CaptureLogFuncArg) -> None:
         """
         It is possible to run commands as root and see their output.
         """
@@ -40,15 +42,18 @@ class TestNode:
 
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
+            caplog.setLevel(logging.DEBUG)
             with pytest.raises(CalledProcessError) as excinfo:
                 master.run_as_root(
                     args=['unset_command'], log_output_live=True
                 )
 
             exception = excinfo.value
-            assert exception.returncode == 127
             assert exception.stderr == b''
-            assert b'command not found' in exception.stderr
+            assert b'command not found' in exception.stdout
+            for record in caplog.records():
+                # import pdb; pdb.set_trace()
+                pass
 
 
 class TestIntegrationTests:
