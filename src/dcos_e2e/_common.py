@@ -4,7 +4,7 @@ Common utilities for end to end tests.
 
 from ipaddress import IPv4Address
 from pathlib import Path
-from subprocess import CalledProcessError, CompletedProcess, PIPE, Popen, STDOUT
+from subprocess import PIPE, CompletedProcess, run
 from typing import List, Optional, Union
 
 
@@ -61,38 +61,23 @@ class Node:
         ] + args
 
         return run_subprocess(args=ssh_args)
-        # return subprocess.run(
-        #     args=ssh_args,
-        #     check=True,
-        #     stdout=subprocess.PIPE,
-        #     stderr=subprocess.PIPE,
-        # )
 
 
 def run_subprocess(args: List[str],
                    cwd: Optional[Union[bytes, str]]=None) -> CompletedProcess:
     """
-    XXX
-    """
+    Run a command in a subprocess.
 
-    with Popen(
+    Args:
+        args: See `subprocess.run`.
+        cwd: See `subprocess.run`.
+
+    Returns:
+        See `subprocess.run`.
+    """
+    return run(
         args=args,
-        cwd=cwd,
+        check=True,
         stdout=PIPE,
-        stderr=STDOUT,
-    ) as process:
-        try:
-            # Show live is an option
-            for line in process.stdout:
-                print(line)
-            stdout, stderr = process.communicate()
-        except:
-            process.kill()
-            process.wait()
-            raise
-        retcode = process.poll()
-        if retcode:
-            raise CalledProcessError(
-                retcode, args, output=stdout, stderr=stderr
-            )
-    return CompletedProcess(args, retcode, stdout, stderr)
+        stderr=PIPE,
+    )
