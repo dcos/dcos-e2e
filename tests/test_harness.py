@@ -24,7 +24,6 @@ class TestNode:
         It is possible to run commands as root and see their output.
         """
         with Cluster(agents=0, public_agents=0) as cluster:
-            caplog.setLevel(logging.DEBUG)
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
             assert result.returncode == 0
@@ -53,7 +52,7 @@ class TestNode:
             assert b'command not found' in exception.stdout
             last_record = caplog.records()[-1]
             assert last_record.levelno == logging.DEBUG
-            assert last_record.getMessage() == str(b'command not found')
+            assert b'unset_command' in last_record.msg
 
 
 class TestIntegrationTests:
