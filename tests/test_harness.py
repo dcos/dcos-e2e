@@ -38,6 +38,8 @@ class TestNode:
             assert exception.stdout == b''
             assert b'command not found' in exception.stderr
 
+            # With `log_output_liv
+
 
 class TestIntegrationTests:
     """

@@ -2,7 +2,7 @@
 Common utilities for end to end tests.
 """
 
-import sys
+import logging
 from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import (
@@ -13,6 +13,9 @@ from subprocess import (
     Popen,
 )
 from typing import List, Optional, Union
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class Node:
@@ -33,12 +36,15 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(self, args: List[str]) -> CompletedProcess:
+    def run_as_root(self, args: List[str],
+                    log_output_live: bool=False) -> CompletedProcess:
         """
         Run a command on this node as ``root``.
 
         Args:
             args: The command to run on the node.
+            log_output_live: If `True`, log output live. If `True`, stderr is
+                merged into stdout in the return value.
 
         Returns:
             The representation of the finished process.
@@ -67,25 +73,26 @@ class Node:
             str(self.ip_address),
         ] + args
 
-        return run_subprocess(args=ssh_args)
+        return run_subprocess(args=ssh_args, log_output_live=log_output_live)
 
-import logging
- 
-logging.basicConfig(level=logging.DEBUG)
 
-def run_subprocess(args: List[str],
-                   cwd: Optional[Union[bytes, str]]=None) -> CompletedProcess:
+def run_subprocess(
+    args: List[str],
+    log_output_live: bool,
+    cwd: Optional[Union[bytes, str]]=None
+) -> CompletedProcess:
     """
     Run a command in a subprocess.
 
     Args:
         args: See `subprocess.run`.
+        log_output_live: If `True`, log output live. If `True`, stderr is
+            merged into stdout in the return value.
         cwd: See `subprocess.run`.
 
     Returns:
         See `subprocess.run`.
     """
-    log = logging.getLogger('test_2')
     stdout = b''
     stderr = b''
     with Popen(
@@ -95,12 +102,12 @@ def run_subprocess(args: List[str],
         stderr=STDOUT,
     ) as process:
         try:
-            # Show live is an option
-            for line in process.stdout:
-                # print(line)
-                log.debug(str(line))
-                stdout += line
-            # stdout, stderr = process.communicate()
+            if log_output_live:
+                for line in process.stdout:
+                    logger.debug(str(line))
+                    stdout += line
+            else:
+                stdout, stderr = process.communicate()
         except:
             process.kill()
             process.wait()
