@@ -42,7 +42,7 @@ class TestNode:
             for record in caplog.records():
                 # The error which caused this exception is not in the log
                 # output.
-                assert 'unset_command' not in record.msg
+                assert 'unset_command' not in record.getMessage()
 
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
@@ -54,9 +54,13 @@ class TestNode:
             exception = excinfo.value
             assert exception.stderr == b''
             assert b'command not found' in exception.stdout
-            last_record = caplog.records()[-1]
-            assert last_record.levelno == logging.DEBUG
-            assert 'unset_command' in last_record.msg
+            expected_error_substring = 'unset_command'
+            found_expected_error = False
+            for record in caplog.records():
+                if expected_error_substring in record.getMessage():
+                    assert record.levelno == logging.DEBUG
+                    found_expected_error = True
+            assert found_expected_error
 
 
 class TestIntegrationTests:
@@ -244,7 +248,9 @@ class TestDestroyOnFailure:
     """
 
     def test_default(self) -> None:
-        pass
+        with Cluster(agents=0, public_agents=0) as cluster:
+            (master, ) = cluster.masters
 
     def test_set_false(self) -> None:
-        pass
+        with Cluster(agents=0, public_agents=0, destroy_on_failure=True):
+            (master, ) = cluster.masters
