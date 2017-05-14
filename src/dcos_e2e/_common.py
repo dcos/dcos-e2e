@@ -93,18 +93,26 @@ def run_subprocess(
     Returns:
         See `subprocess.run`.
     """
-    stdout = b''
-    stderr = b''
+    # It is hard to log output of both stdout and stderr live unless we
+    # combine them.
+    # See http://stackoverflow.com/a/18423003.
+    if log_output_live:
+        process_stderr = STDOUT
+    else:
+        process_stderr = PIPE
+
     with Popen(
         args=args,
         cwd=cwd,
         stdout=PIPE,
-        stderr=STDOUT,
+        stderr=process_stderr,
     ) as process:
         try:
             if log_output_live:
+                stdout = b''
+                stderr = b''
                 for line in process.stdout:
-                    logger.debug(str(line))
+                    logger.debug(line)
                     stdout += line
             else:
                 stdout, stderr = process.communicate()

@@ -24,6 +24,7 @@ class TestNode:
         It is possible to run commands as root and see their output.
         """
         with Cluster(agents=0, public_agents=0) as cluster:
+            caplog.setLevel(logging.DEBUG)
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
             assert result.returncode == 0
@@ -42,7 +43,6 @@ class TestNode:
 
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
-            caplog.setLevel(logging.DEBUG)
             with pytest.raises(CalledProcessError) as excinfo:
                 master.run_as_root(
                     args=['unset_command'], log_output_live=True
@@ -51,9 +51,9 @@ class TestNode:
             exception = excinfo.value
             assert exception.stderr == b''
             assert b'command not found' in exception.stdout
-            for record in caplog.records():
-                # import pdb; pdb.set_trace()
-                pass
+            last_record = caplog.records()[-1]
+            assert last_record.levelno == logging.DEBUG
+            assert last_record.getMessage() == str(b'command not found')
 
 
 class TestIntegrationTests:
@@ -168,8 +168,28 @@ class TestClusterSize:
             assert len(cluster.agents) == agents
             assert len(cluster.public_agents) == public_agents
 
-    def test_two_masters(self) -> None:
-        pass
+
+class TestClusterLogging:
+    """
+    Tests for logging done by the cluster.
+    """
+
+    def test_live_logging(self, caplog: CaptureLogFuncArg) -> None:
+        """
+        """
+        with pytest.raises(CalledProcessError):
+            # It is not possible to create a cluster with two master nodes.
+            with Cluster(masters=2):
+                pass
+
+    def test_no_live_logging(self, caplog: CaptureLogFuncArg) -> None:
+        """
+        XXX
+        """
+        caplog.setLevel(logging.DEBUG)
+        with pytest.raises(CalledProcessError):
+            with Cluster(masters=2):
+                pass
 
 
 class TestMultipleClusters:
