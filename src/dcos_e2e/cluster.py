@@ -5,7 +5,7 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
@@ -132,7 +132,12 @@ class Cluster(ContextDecorator):
 
         return test_host.run_as_root(args=args)
 
-    def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
+    def __exit__(
+        self,
+        exc_type: Optional[type],
+        exc_value: Optional[Exception],
+        traceback: Any,
+    ) -> bool:
         """
         On exiting, destroy all nodes in the cluster.
         """
