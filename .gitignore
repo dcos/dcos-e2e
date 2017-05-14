@@ -95,3 +95,6 @@ configuration.yaml
 Vagrantfile
 vagrant/
 .vagrant/
+
+.mypy_cache/
+*.DS_Store
