@@ -60,7 +60,7 @@ class TestExample:
                 print('No file exists')
 ```
 
-#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False, destroy_on_exit=True)`
+#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False, destroy_on_failure=True)`
 
 This is a context manager which spins up a cluster.
 At the time of writing, this uses DC/OS Docker.
