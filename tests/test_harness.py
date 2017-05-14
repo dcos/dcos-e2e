@@ -51,7 +51,7 @@ class TestIntegrationTests:
         """
         with Cluster() as cluster:
             # No error is raised with a successful command.
-            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_ca.py']
+            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
             cluster.run_integration_tests(pytest_command=pytest_command)
 
             # An error is raised with an unsuccessful command.
