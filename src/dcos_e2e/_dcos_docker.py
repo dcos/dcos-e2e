@@ -36,6 +36,7 @@ class DCOS_Docker:
         extra_config: Dict[str, Any],
         generate_config_path: Path,
         dcos_docker_path: Path,
+        log_output_live: bool,
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -49,7 +50,11 @@ class DCOS_Docker:
                 variables.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
+            log_output_live: If `True`, log output of subprocesses live.
+                If `True`, stderr is merged into stdout in the return value.
         """
+        self.log_output_live = log_output_live
+
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
@@ -135,7 +140,11 @@ class DCOS_Docker:
             for key, value in self._variables.items()
         ] + [target]
 
-        run_subprocess(args=args, cwd=str(self._path), log_output_live=False)
+        run_subprocess(
+            args=args,
+            cwd=str(self._path),
+            log_output_live=self.log_output_live
+        )
 
     def postflight(self) -> None:
         """

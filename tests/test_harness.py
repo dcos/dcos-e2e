@@ -174,32 +174,54 @@ class TestClusterSize:
 
 class TestClusterLogging:
     """
-    Tests for logging done by the cluster.
+    Tests for logs created by the ``Cluster``.
     """
 
-    def test_live_logging(self, caplog: CaptureLogFuncArg) -> None:
+    @pytest.fixture()
+    def two_clusters_error(self) -> bytes:
         """
+        Return part of the error message shown when trying to create a cluster
+        with two masters.
+
+        This is prone to being broken as it is a string in the DC/OS
+        repository.
+        """
+        return b'Must have 1, 3, 5, 7, or 9 masters'
+
+    def test_live_logging(
+        self, two_clusters_error: str, caplog: CaptureLogFuncArg
+    ) -> None:
+        """
+        If `log_output_live` is given as `True`, subprocess output is logged.
         """
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
             with Cluster(masters=2, log_output_live=True):
                 pass
 
-        assert caplog.records()
-        import pdb; pdb.set_trace()
-        pass
+        encountered_error = False
+        for record in caplog.records():
+            if two_clusters_error in record.msg:
+                encountered_error = True
+        assert encountered_error
 
-    def test_no_live_logging(self, caplog: CaptureLogFuncArg) -> None:
+    def test_no_live_logging(
+        self, two_clusters_error: str, caplog: CaptureLogFuncArg
+    ) -> None:
         """
-        XXX
+        By default, subprocess output is not logged in the creation of a
+        cluster.
         """
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
             with Cluster(masters=2):
                 pass
-        # This is not a good test because if something adds logging elsewhere
-        # it will erroneously fail.
-        assert not caplog.records()
+
+        encountered_error = False
+        for record in caplog.records():
+            if two_clusters_error in record.msg:
+                encountered_error = True
+        assert not encountered_error
 
 
 class TestMultipleClusters:
