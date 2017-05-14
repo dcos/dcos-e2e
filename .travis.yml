@@ -28,6 +28,6 @@ script:
 
           curl -o /tmp/dcos_generate_config.sh $ARTIFACT_URL ;
           git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker ;
-          pytest -vvv -s -x -n 2;
+          travis_wait 30 pytest -vvv -s -x -n 2;
       fi
     '
