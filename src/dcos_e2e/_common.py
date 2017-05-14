@@ -2,9 +2,16 @@
 Common utilities for end to end tests.
 """
 
+import sys
 from ipaddress import IPv4Address
 from pathlib import Path
-from subprocess import PIPE, CompletedProcess, run
+from subprocess import (
+    PIPE,
+    STDOUT,
+    CalledProcessError,
+    CompletedProcess,
+    Popen,
+)
 from typing import List, Optional, Union
 
 
@@ -62,6 +69,9 @@ class Node:
 
         return run_subprocess(args=ssh_args)
 
+import logging
+ 
+logging.basicConfig(level=logging.DEBUG)
 
 def run_subprocess(args: List[str],
                    cwd: Optional[Union[bytes, str]]=None) -> CompletedProcess:
@@ -75,18 +85,29 @@ def run_subprocess(args: List[str],
     Returns:
         See `subprocess.run`.
     """
-    if cwd is None:
-        return run(
-            args=args,
-            check=True,
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-
-    return run(
+    log = logging.getLogger('test_2')
+    stdout = b''
+    stderr = b''
+    with Popen(
         args=args,
-        check=True,
-        cwd=str(cwd),
+        cwd=cwd,
         stdout=PIPE,
-        stderr=PIPE,
-    )
+        stderr=STDOUT,
+    ) as process:
+        try:
+            # Show live is an option
+            for line in process.stdout:
+                # print(line)
+                log.debug(str(line))
+                stdout += line
+            # stdout, stderr = process.communicate()
+        except:
+            process.kill()
+            process.wait()
+            raise
+        retcode = process.poll()
+        if retcode:
+            raise CalledProcessError(
+                retcode, args, output=stdout, stderr=stderr
+            )
+    return CompletedProcess(args, retcode, stdout, stderr)

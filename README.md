@@ -76,6 +76,12 @@ The number of agent nodes.
 
 The number of public agent nodes.
 
+#### `write_host_output` (default `False`)
+
+If set to `True`, the output of processes run on the host will be written
+
+#### `print_node_output` (default `False`)
+
 ## Contributing
 
 See `CONTRIBUTING.md` for details on how to contribute to this repository.
