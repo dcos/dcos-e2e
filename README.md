@@ -89,9 +89,10 @@ If set to `True`, the output of processes run on the host to create and manage c
 
 To see these logs in `pytest` tests, use the `-s` flag.
 
-###### `destroy_on_exit`
+###### `destroy_on_failure`
 
-If set to `True`, the cluster is destroyed on exitting
+If set to `True`, the cluster is destroyed on exit in all cases.
+If set to `False`, the cluster is preserved if there is an error.
 
 ##### Attributes
 

@@ -141,5 +141,6 @@ class Cluster(ContextDecorator):
         """
         On exiting, destroy all nodes in the cluster.
         """
-        self._backend.destroy()
+        if exc_type is not None:
+            self._backend.destroy()
         return False
