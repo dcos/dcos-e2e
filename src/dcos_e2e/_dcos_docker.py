@@ -99,7 +99,7 @@ class DCOS_Docker:
 
         self._create_containers()
 
-    @retry(exceptions=_ConflictingContainerError, delay=10, tries=10)
+    @retry(exceptions=_ConflictingContainerError, delay=10, tries=30)
     def _create_containers(self) -> None:
         """
         Create containers for the cluster.
@@ -109,13 +109,14 @@ class DCOS_Docker:
         If a conflict occurs, retry.
         """
         conflict_error_substring = (
-            'Conflict. The container name "/dcos-genconf.'
+            'Conflict. The container name'
         )
 
         try:
             self._make(target='all')
-        except subprocess.CalledProcessError as e:
-            if conflict_error_substring in str(e.stderr):
+        except subprocess.CalledProcessError as exc:
+            if conflict_error_substring in str(exc.stderr):
+                print(exc.stderr)
                 raise _ConflictingContainerError()
             raise
 
