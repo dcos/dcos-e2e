@@ -13,7 +13,7 @@ import yaml
 from docker import Client
 from retry import retry
 
-from ._common import Node
+from ._common import Node, run_subprocess
 
 
 class _ConflictingContainerError(Exception):
@@ -38,6 +38,7 @@ class DCOS_Docker:
         dcos_docker_path: Path,
         custom_ca_key: Optional[Path],
         genconf_extra_dir: Optional[Path],
+        log_output_live: bool,
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -54,7 +55,11 @@ class DCOS_Docker:
             custom_ca_key: A CA key to use as the cluster's root CA key.
             genconf_extra_dir: A directory with contents to put in the
                 `genconf` directory in the installer container.
+            log_output_live: If `True`, log output of subprocesses live.
+                If `True`, stderr is merged into stdout in the return value.
         """
+        self.log_output_live = log_output_live
+
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
@@ -150,12 +155,10 @@ class DCOS_Docker:
             for key, value in self._variables.items()
         ] + [target]
 
-        subprocess.run(
+        run_subprocess(
             args=args,
             cwd=str(self._path),
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            log_output_live=self.log_output_live
         )
 
     def postflight(self) -> None:

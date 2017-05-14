@@ -26,6 +26,7 @@ class Cluster(ContextDecorator):
         public_agents: int=1,
         custom_ca_key: Optional[Path]=None,
         genconf_extra_dir: Optional[Path]=None,
+        log_output_live: bool=False,
     ) -> None:
         """
         Args:
@@ -37,6 +38,8 @@ class Cluster(ContextDecorator):
             custom_ca_key: A CA key to use as the cluster's root CA key.
             genconf_extra_dir: A directory with contents to put in the
                 `genconf` directory in the installer container.
+            log_output_live: If `True`, log output of subprocesses live.
+                If `True`, stderr is merged into stdout in the return value.
         """
         self._backend = DCOS_Docker(
             masters=masters,
@@ -47,6 +50,7 @@ class Cluster(ContextDecorator):
             dcos_docker_path=Path('/tmp/dcos-docker'),
             custom_ca_key=custom_ca_key,
             genconf_extra_dir=genconf_extra_dir,
+            log_output_live=log_output_live,
         )
         self._backend.postflight()
 

@@ -58,23 +58,63 @@ class TestExample:
                 print('No file exists')
 ```
 
-#### `Cluster` parameters
+#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False)`
 
-##### `extra_config` (default `None`)
+This is a context manager which spins up a cluster.
+At the time of writing, this uses DC/OS Docker.
+
+##### Parameters
+
+###### `extra_config`
 
 Configuration variables to add to a base configuration.
 
-##### `masters` (default `1`)
+###### `masters`
 
 The number of master nodes.
 
-##### `agents` (default `1`)
+###### `agents`
 
 The number of agent nodes.
 
-##### `public_agents` (default `1`)
+###### `public_agents`
 
 The number of public agent nodes.
+
+###### `log_output_live`
+
+If set to `True`, the output of processes run on the host to create and manage clusters will be logged.
+
+To see these logs in `pytest` tests, use the `-s` flag.
+
+##### Attributes
+
+###### `masters`
+
+The `master` nodes in the cluster.
+
+###### `agents`
+
+The agent nodes in the cluster.
+
+###### `public_agents`
+
+The public agent nodes in the cluster.
+
+###### `run_integration_tests`
+
+This takes a `pytest_command` and allows integration tests to be run on the
+cluster.
+
+#### Nodes
+
+Commands can be run on nodes in clusters.
+
+###### `node.run_as_root(log_output_live=False)`
+
+If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
+
+To see these logs in `pytest` tests, use the `-s` flag.
 
 ## Contributing
 

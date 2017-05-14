@@ -1,6 +1,8 @@
 flake8
 isort
 mypy
+pydocstyle
 pytest
+pytest-capturelog
 pytest-xdist
 yapf
