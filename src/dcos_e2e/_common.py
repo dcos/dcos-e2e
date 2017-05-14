@@ -122,6 +122,7 @@ def run_subprocess(
             raise
         retcode = process.poll()
         if retcode:
+            logger.info(str(stderr))
             raise CalledProcessError(
                 retcode, args, output=stdout, stderr=stderr
             )
