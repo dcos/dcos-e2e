@@ -96,7 +96,5 @@ Vagrantfile
 vagrant/
 .vagrant/
 
-*.DS_Store
-
-# mypy
 .mypy_cache/
+*.DS_Store
