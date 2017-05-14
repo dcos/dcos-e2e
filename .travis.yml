@@ -17,11 +17,12 @@ install:
 cache: "pip"
 
 before_script:
+    - "make clean"
     - "make lint"
-
-script:
     - 'docker ps'
     - 'docker -v'
+
+script:
     - '
       if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
           ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh ;
