@@ -13,7 +13,7 @@ import yaml
 from docker import Client
 from retry import retry
 
-from ._common import Node
+from ._common import Node, run_subprocess
 
 
 class _ConflictingContainerError(Exception):
@@ -135,13 +135,7 @@ class DCOS_Docker:
             for key, value in self._variables.items()
         ] + [target]
 
-        subprocess.run(
-            args=args,
-            cwd=str(self._path),
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        run_subprocess(args=args, cwd=str(self._path))
 
     def postflight(self) -> None:
         """

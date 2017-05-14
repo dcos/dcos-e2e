@@ -2,10 +2,10 @@
 Common utilities for end to end tests.
 """
 
-import subprocess
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import List
+from subprocess import PIPE, CompletedProcess, run
+from typing import List, Optional, Union
 
 
 class Node:
@@ -26,7 +26,7 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(self, args: List[str]) -> subprocess.CompletedProcess:
+    def run_as_root(self, args: List[str]) -> CompletedProcess:
         """
         Run a command on this node as ``root``.
 
@@ -60,9 +60,33 @@ class Node:
             str(self.ip_address),
         ] + args
 
-        return subprocess.run(
-            args=ssh_args,
+        return run_subprocess(args=ssh_args)
+
+
+def run_subprocess(args: List[str],
+                   cwd: Optional[Union[bytes, str]]=None) -> CompletedProcess:
+    """
+    Run a command in a subprocess.
+
+    Args:
+        args: See `subprocess.run`.
+        cwd: See `subprocess.run`.
+
+    Returns:
+        See `subprocess.run`.
+    """
+    if cwd is None:
+        return run(
+            args=args,
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stdout=PIPE,
+            stderr=PIPE,
         )
+
+    return run(
+        args=args,
+        check=True,
+        cwd=str(cwd),
+        stdout=PIPE,
+        stderr=PIPE,
+    )
