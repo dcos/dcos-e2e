@@ -108,9 +108,7 @@ class DCOS_Docker:
         These containers can conflict in name.
         If a conflict occurs, retry.
         """
-        conflict_error_substring = (
-            'Conflict. The container name'
-        )
+        conflict_error_substring = 'Conflict. The container name'
 
         try:
             self._make(target='all')
