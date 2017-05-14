@@ -59,7 +59,7 @@ class TestNode:
             found_expected_error = False
             for record in caplog.records():
                 if expected_error_substring in record.getMessage():
-                    if record.levelno == logging.DEBUG
+                    if record.levelno == logging.DEBUG:
                         found_expected_error = True
             assert found_expected_error
 
