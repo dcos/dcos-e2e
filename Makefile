@@ -1,5 +1,3 @@
-SHELL := /bin/bash
-
 # Run various linting tools.
 lint:
 	flake8 .
