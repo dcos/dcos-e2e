@@ -2,10 +2,20 @@
 Common utilities for end to end tests.
 """
 
+import logging
 from ipaddress import IPv4Address
 from pathlib import Path
-from subprocess import PIPE, CompletedProcess, run
+from subprocess import (
+    PIPE,
+    STDOUT,
+    CalledProcessError,
+    CompletedProcess,
+    Popen,
+)
 from typing import List, Optional, Union
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 class Node:
@@ -26,12 +36,15 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(self, args: List[str]) -> CompletedProcess:
+    def run_as_root(self, args: List[str],
+                    log_output_live: bool=False) -> CompletedProcess:
         """
         Run a command on this node as ``root``.
 
         Args:
             args: The command to run on the node.
+            log_output_live: If `True`, log output live. If `True`, stderr is
+                merged into stdout in the return value.
 
         Returns:
             The representation of the finished process.
@@ -60,33 +73,56 @@ class Node:
             str(self.ip_address),
         ] + args
 
-        return run_subprocess(args=ssh_args)
+        return run_subprocess(args=ssh_args, log_output_live=log_output_live)
 
 
-def run_subprocess(args: List[str],
-                   cwd: Optional[Union[bytes, str]]=None) -> CompletedProcess:
+def run_subprocess(
+    args: List[str],
+    log_output_live: bool,
+    cwd: Optional[Union[bytes, str]]=None
+) -> CompletedProcess:
     """
     Run a command in a subprocess.
 
     Args:
         args: See `subprocess.run`.
+        log_output_live: If `True`, log output live. If `True`, stderr is
+            merged into stdout in the return value.
         cwd: See `subprocess.run`.
 
     Returns:
         See `subprocess.run`.
     """
-    if cwd is None:
-        return run(
-            args=args,
-            check=True,
-            stdout=PIPE,
-            stderr=PIPE,
-        )
+    # It is hard to log output of both stdout and stderr live unless we
+    # combine them.
+    # See http://stackoverflow.com/a/18423003.
+    if log_output_live:
+        process_stderr = STDOUT
+    else:
+        process_stderr = PIPE
 
-    return run(
+    with Popen(
         args=args,
-        check=True,
-        cwd=str(cwd),
+        cwd=cwd,
         stdout=PIPE,
-        stderr=PIPE,
-    )
+        stderr=process_stderr,
+    ) as process:
+        try:
+            if log_output_live:
+                stdout = b''
+                stderr = b''
+                for line in process.stdout:
+                    logger.debug(line)
+                    stdout += line
+            else:
+                stdout, stderr = process.communicate()
+        except:
+            process.kill()
+            process.wait()
+            raise
+        retcode = process.poll()
+        if retcode:
+            raise CalledProcessError(
+                retcode, args, output=stdout, stderr=stderr
+            )
+    return CompletedProcess(args, retcode, stdout, stderr)
