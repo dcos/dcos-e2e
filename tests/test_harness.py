@@ -42,7 +42,7 @@ class TestNode:
             for record in caplog.records():
                 # The error which caused this exception is not in the log
                 # output.
-                assert b'unset_command' not in bytes(record.msg)
+                assert 'unset_command' not in record.msg
 
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
@@ -56,7 +56,7 @@ class TestNode:
             assert b'command not found' in exception.stdout
             last_record = caplog.records()[-1]
             assert last_record.levelno == logging.DEBUG
-            assert b'unset_command' in bytes(last_record.msg)
+            assert 'unset_command' in last_record.msg
 
 
 class TestIntegrationTests:
@@ -236,3 +236,15 @@ class TestMultipleClusters:
         with Cluster():
             with Cluster():
                 pass
+
+
+class TestDestroyOnFailure:
+    """
+    XXX
+    """
+
+    def test_default(self) -> None:
+        pass
+
+    def test_set_false(self) -> None:
+        pass

@@ -25,6 +25,7 @@ class Cluster(ContextDecorator):
         agents: int=1,
         public_agents: int=1,
         log_output_live: bool=False,
+        destroy_on_failure: bool=True,
     ) -> None:
         """
         Args:
@@ -35,7 +36,11 @@ class Cluster(ContextDecorator):
             public_agents: The number of public agent nodes to create.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
+            destroy_on_failure: If `False`, the cluster will not be destroyed
+                if there is an exception raised in the context of this object.
         """
+        self.destroy_on_failure = destroy_on_failure
+
         self._backend = DCOS_Docker(
             masters=masters,
             agents=agents,
@@ -141,6 +146,6 @@ class Cluster(ContextDecorator):
         """
         On exiting, destroy all nodes in the cluster.
         """
-        if exc_type is not None:
+        if exc_type is None or self.destroy_on_failure:
             self._backend.destroy()
         return False
