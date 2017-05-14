@@ -17,7 +17,7 @@ install:
 cache: "pip"
 
 before_script:
-    - "make clean"
+    - "make --ignore-errors clean"
     - "make lint"
     - 'docker ps'
     - 'docker -v'
