@@ -66,3 +66,15 @@ class Node:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
+
+
+def run(args, cwd):
+    """
+    XXX
+    """
+    return subprocess.run(
+        args=ssh_args,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
