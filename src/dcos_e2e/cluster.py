@@ -5,7 +5,7 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set
 
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
@@ -25,6 +25,7 @@ class Cluster(ContextDecorator):
         agents: int=1,
         public_agents: int=1,
         log_output_live: bool=False,
+        destroy_on_error: bool=True,
     ) -> None:
         """
         Args:
@@ -35,7 +36,11 @@ class Cluster(ContextDecorator):
             public_agents: The number of public agent nodes to create.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
+            destroy_on_error: If `False`, the cluster will not be destroyed
+                if there is an exception raised in the context of this object.
         """
+        self._destroy_on_error = destroy_on_error
+
         self._backend = DCOS_Docker(
             masters=masters,
             agents=agents,
@@ -132,9 +137,21 @@ class Cluster(ContextDecorator):
 
         return test_host.run_as_root(args=args)
 
-    def __exit__(self, *exc: Tuple[None, None, None]) -> bool:
+    def destroy(self) -> None:
+        """
+        Destroy all nodes in the cluster.
+        """
+        self._backend.destroy()
+
+    def __exit__(
+        self,
+        exc_type: Optional[type],
+        exc_value: Optional[Exception],
+        traceback: Any,
+    ) -> bool:
         """
         On exiting, destroy all nodes in the cluster.
         """
-        self._backend.destroy()
+        if exc_type is None or self._destroy_on_error:
+            self.destroy()
         return False
