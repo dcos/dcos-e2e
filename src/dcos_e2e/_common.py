@@ -2,10 +2,10 @@
 Common utilities for end to end tests.
 """
 
-import subprocess
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import List
+from subprocess import CalledProcessError, CompletedProcess, PIPE, Popen, STDOUT
+from typing import List, Optional, Union
 
 
 class Node:
@@ -26,7 +26,7 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(self, args: List[str]) -> subprocess.CompletedProcess:
+    def run_as_root(self, args: List[str]) -> CompletedProcess:
         """
         Run a command on this node as ``root``.
 
@@ -60,21 +60,39 @@ class Node:
             str(self.ip_address),
         ] + args
 
-        return subprocess.run(
-            args=ssh_args,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        return run_subprocess(args=ssh_args)
+        # return subprocess.run(
+        #     args=ssh_args,
+        #     check=True,
+        #     stdout=subprocess.PIPE,
+        #     stderr=subprocess.PIPE,
+        # )
 
 
-def run(args, cwd):
+def run_subprocess(args: List[str],
+                   cwd: Optional[Union[bytes, str]]=None) -> CompletedProcess:
     """
     XXX
     """
-    return subprocess.run(
-        args=ssh_args,
-        check=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
+
+    with Popen(
+        args=args,
+        cwd=cwd,
+        stdout=PIPE,
+        stderr=STDOUT,
+    ) as process:
+        try:
+            # Show live is an option
+            for line in process.stdout:
+                print(line)
+            stdout, stderr = process.communicate()
+        except:
+            process.kill()
+            process.wait()
+            raise
+        retcode = process.poll()
+        if retcode:
+            raise CalledProcessError(
+                retcode, args, output=stdout, stderr=stderr
+            )
+    return CompletedProcess(args, retcode, stdout, stderr)
