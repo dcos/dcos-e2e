@@ -244,13 +244,45 @@ class TestMultipleClusters:
 
 class TestDestroyOnFailure:
     """
-    XXX
+    Tests for `destroy_on_failure`.
     """
 
-    def test_default(self) -> None:
-        with Cluster(agents=0, public_agents=0) as cluster:
+    def test_default_exception_raised(self) -> None:
+        """
+        By default, if an exception is raised, the cluster is destroyed.
+        """
+        with pytest.raises(Exception):
+            with Cluster(agents=0, public_agents=0) as cluster:
+                (master, ) = cluster.masters
+                raise Exception()
+
+        with pytest.raises(CalledProcessError):
+            master.run_as_root(args=['echo', 'hello'])
+
+    def test_set_false_exception_raised(self) -> None:
+        """
+        If `destroy_on_failure` is set to `False` and an exception is raised,
+        the cluster is not destroyed.
+        """
+        with pytest.raises(Exception):
+            with Cluster(
+                agents=0, public_agents=0, destroy_on_failure=False
+            ) as cluster:
+                (master, ) = cluster.masters
+                raise Exception()
+        # No exception is raised. The node still exists.
+        master.run_as_root(args=['echo', 'hello'])
+        cluster.destroy()
+
+    def test_set_false_no_exception(self) -> None:
+        """
+        If `destroy_on_failure` is set to `False` and no exception is raised,
+        the cluster is not destroyed.
+        """
+        with Cluster(
+            agents=0, public_agents=0, destroy_on_failure=False
+        ) as cluster:
             (master, ) = cluster.masters
 
-    def test_set_false(self) -> None:
-        with Cluster(agents=0, public_agents=0, destroy_on_failure=True):
-            (master, ) = cluster.masters
+        with pytest.raises(CalledProcessError):
+            master.run_as_root(args=['echo', 'hello'])

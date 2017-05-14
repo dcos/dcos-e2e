@@ -108,10 +108,15 @@ The agent nodes in the cluster.
 
 The public agent nodes in the cluster.
 
-###### `run_integration_tests`
+###### `run_integration_tests(pytest_command)`
 
-This takes a `pytest_command` and allows integration tests to be run on the
-cluster.
+Run integration tests on the cluster.
+
+###### `destroy()`
+
+Destroy all nodes in the cluster.
+
+#####
 
 #### Nodes
 

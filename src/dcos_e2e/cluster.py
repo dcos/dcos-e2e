@@ -39,7 +39,7 @@ class Cluster(ContextDecorator):
             destroy_on_failure: If `False`, the cluster will not be destroyed
                 if there is an exception raised in the context of this object.
         """
-        self.destroy_on_failure = destroy_on_failure
+        self._destroy_on_failure = destroy_on_failure
 
         self._backend = DCOS_Docker(
             masters=masters,
@@ -137,6 +137,12 @@ class Cluster(ContextDecorator):
 
         return test_host.run_as_root(args=args)
 
+    def destroy(self) -> None:
+        """
+        Destroy all nodes in the cluster.
+        """
+        self._backend.destroy()
+
     def __exit__(
         self,
         exc_type: Optional[type],
@@ -146,6 +152,6 @@ class Cluster(ContextDecorator):
         """
         On exiting, destroy all nodes in the cluster.
         """
-        if exc_type is None or self.destroy_on_failure:
-            self._backend.destroy()
+        if exc_type is None or self._destroy_on_failure:
+            self.destroy()
         return False
