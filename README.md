@@ -112,9 +112,7 @@ Commands can be run on nodes in clusters.
 
 ###### `node.run_as_root(log_output_live=False)`
 
-###### `log_output_live`
-
-If set to `True`, the output of processes run on the host to create and manage clusters will be logged.
+If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 
 To see these logs in `pytest` tests, use the `-s` flag.
 
