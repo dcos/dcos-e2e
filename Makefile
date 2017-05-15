@@ -17,8 +17,8 @@ lint:
 clean:
 	docker stop $$(docker ps -a -q --filter="name=dcos-") | :
 	docker rm --volumes $$(docker ps -a -q --filter="name=dcos-") | :
-	# We use `y | ` instead of `--force` to support old versions of Docker
-	y | docker volume prune
+	# We use `echo y | ` instead of `--force` to support old versions of Docker
+	echo y | docker volume prune
 	rm -rf /tmp/dcos-docker-*
 
 # Fix some linting errors.
