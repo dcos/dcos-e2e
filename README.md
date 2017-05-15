@@ -153,6 +153,47 @@ git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
 
 or `make download-dependencies`.
 
+## Vagrant Quick Start
+
+With [Vagrant](https://www.vagrantup.com) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads), it is possible to quickly get a test environment running.
+
+Run the following commands to create an environment.
+These commands will create a Vagrant VM with access to the files in the
+directory from which they are launched.
+These files will be at `/vagrant` in the VM.
+
+```sh
+# Download files from the DC/OS Docker repository to create a VM.
+mkdir -p vagrant
+cd vagrant
+curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/resize-disk.sh
+curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/vbox-network.sh
+chmod +x resize-disk.sh
+chmod +x vbox-network.sh
+cd ..
+curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
+vagrant/resize-disk.sh 102400
+# Update the kernel and re-provision to work around
+# https://github.com/moby/moby/issues/5618.
+vagrant ssh -c 'sudo yum update -y kernel'  &
+wait
+vagrant reload
+vagrant provision
+# Wait until the VM has presumably booted.
+sleep 30
+# Create a virtual envrionment.
+vagrant ssh -c 'curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_create_env.sh | /bin/bash'
+```
+
+Then, to enter the environment, run the following:
+
+```sh
+laptop$ vagrant ssh
+[root@vagrant]$ pyenv activate dcos
+```
+
+Then install the dependencies of the package you want to test.
+
 ## Cleaning Up
 
 Tests run with this harness clean up after themselves.
