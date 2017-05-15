@@ -24,4 +24,4 @@ before_script:
 
 script:
     - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make download-dependencies; fi'
-    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -x -n 2 ; fi'
+    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -x ; fi'
