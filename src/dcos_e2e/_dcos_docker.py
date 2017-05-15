@@ -126,12 +126,17 @@ class DCOS_Docker:
         These containers can conflict in name.
         If a conflict occurs, retry.
         """
+        # The error substring differs on different versions of Docker.
         conflict_error_substring = 'Conflict. The container name'
+        other_conflict_error_substring = 'Conflict. The name'
 
         try:
             self._make(target='all')
         except subprocess.CalledProcessError as exc:
-            if conflict_error_substring in str(exc.stderr):
+            stderr = str(exc.stderr)
+            conflict = conflict_error_substring in stderr
+            conflict = conflict or other_conflict_error_substring in stderr
+            if conflict:
                 print(exc.stderr)
                 raise _ConflictingContainerError()
             raise
