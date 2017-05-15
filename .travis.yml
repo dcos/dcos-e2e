@@ -23,14 +23,5 @@ before_script:
     - 'docker -v'
 
 script:
-    - '
-      if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-          ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh ;
-          DCOS_DOCKER_REPOSITORY=https://github.com/adamtheturtle/dcos-docker.git ;
-          DCOS_DOCKER_BRANCH=macos-DCOS-15645 ;
-
-          curl -o /tmp/dcos_generate_config.sh $ARTIFACT_URL ;
-          git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker ;
-          travis_wait 30 pytest -vvv -s -x -n 2 ;
-      fi
-    '
+    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make download-dependencies; fi'
+    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -x -n 2 ; fi'
