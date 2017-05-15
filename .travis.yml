@@ -1,6 +1,7 @@
-# This makes Travis CI use the container-based infrastructure which starts
-# tests faster.
-sudo: false
+sudo: "required"
+
+services:
+  - "docker"
 
 language: "python"
 
@@ -15,6 +16,20 @@ install:
 
 cache: "pip"
 
-script:
-    # Run linters
+before_script:
+    - "make clean"
     - "make lint"
+    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make download-dependencies; fi'
+
+# Unfortunately Travis has a time out for total test run (50 minutes) and total time without
+# output (10 minutes).
+#
+# We avoid the former by running only a small part of our test suite.
+#
+# We get around the latter by using `travis_wait` which hides all output
+# until the tests are finished.
+#
+# We do not run tests in parallel as this uses too much space for Travis CI.
+# The main use of space is the copying of the config file to each directory.
+script:
+    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -k TestIntegrationTests; fi'
