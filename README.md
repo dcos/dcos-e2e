@@ -173,14 +173,6 @@ chmod +x vbox-network.sh
 cd ..
 curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
 vagrant/resize-disk.sh 102400
-# Update the kernel and re-provision to work around
-# https://github.com/moby/moby/issues/5618.
-vagrant ssh -c 'sudo yum update -y kernel'  &
-wait
-vagrant reload
-vagrant provision
-# Wait until the VM has presumably booted.
-sleep 30
 # Create a virtual envrionment.
 vagrant ssh -c 'curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_create_env.sh | /bin/bash'
 ```
@@ -193,6 +185,15 @@ laptop$ vagrant ssh
 ```
 
 Then install the dependencies of the package you want to test.
+
+There is a common issue which causes error messages on old kernels.
+See  https://github.com/moby/moby/issues/5618.
+Optionally on the VM run the following commands to update the kernel:
+
+```sh
+sudo yum update -y kernel
+reboot
+```
 
 ## Cleaning Up
 
