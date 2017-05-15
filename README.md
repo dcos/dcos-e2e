@@ -151,6 +151,8 @@ curl -o /tmp/dcos_generate_config.sh $ARTIFACT_URL
 git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
 ```
 
+or `make download-dependencies`.
+
 ## Cleaning Up
 
 Tests run with this harness clean up after themselves.
