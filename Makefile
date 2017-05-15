@@ -19,7 +19,7 @@ clean:
 	docker rm --volumes $$(docker ps -a -q --filter="name=dcos-") | :
 	# We skip errors because this does not exist in legacy versions of
 	# Docker
-	- docker volume --prune
+	- docker volume prune --force
 	rm -rf /tmp/dcos-docker-*
 
 # Fix some linting errors.
