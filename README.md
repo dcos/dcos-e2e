@@ -182,7 +182,7 @@ vagrant provision
 # Wait until the VM has presumably booted.
 sleep 30
 # Create a virtual envrionment.
-vagrant ssh -c 'curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/vagrant-quick-start/vagrant_create_env.sh | /bin/bash'
+vagrant ssh -c 'curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_create_env.sh | /bin/bash'
 ```
 
 Then, to enter the environment, run the following:
@@ -193,6 +193,7 @@ laptop$ vagrant ssh
 ```
 
 Then install the dependencies of the package you want to test.
+
 ## Cleaning Up
 
 Tests run with this harness clean up after themselves.
