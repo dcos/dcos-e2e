@@ -96,6 +96,9 @@ class DCOS_Docker:
             # aufs was chosen as it is supported on the version of Docker on
             # Travis CI.
             'DOCKER_GRAPHDRIVER': 'aufs',
+            # Some platforms support systemd and some do not.
+            # Disabling support makes all platforms consistent in this aspect.
+            'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',
             # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
