@@ -47,3 +47,9 @@ pytest -n 2
 ## Reviews
 
 Ask Adam Dangoor if you are unsure who to ask for help from.
+
+## CI
+
+Linting and some tests are run on Travis CI.
+See `.travis.yml` for details on the limitations.
+To check if a new change works on CI, unfortunately it is necessary to change `.travis.yml` to run the desired tests.

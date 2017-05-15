@@ -99,12 +99,18 @@ class DCOS_Docker:
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         self._variables = {
             # Only overlay and aufs storage drivers are supported.
-            # This chooses overlay (arbitrary) so the host's driver is not
-            # used.
+            # This chooses aufs so the host's driver is not used.
+            #
             # This means that the tests will be more consistent across
             # platforms and that they will run even if the storage driver on
             # the host is not one of these two.
-            'DOCKER_GRAPHDRIVER': 'overlay',
+            #
+            # aufs was chosen as it is supported on the version of Docker on
+            # Travis CI.
+            'DOCKER_GRAPHDRIVER': 'aufs',
+            # Some platforms support systemd and some do not.
+            # Disabling support makes all platforms consistent in this aspect.
+            'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',
             # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
@@ -126,7 +132,7 @@ class DCOS_Docker:
 
         self._create_containers()
 
-    @retry(exceptions=_ConflictingContainerError, delay=10, tries=10)
+    @retry(exceptions=_ConflictingContainerError, delay=10, tries=30)
     def _create_containers(self) -> None:
         """
         Create containers for the cluster.
@@ -135,14 +141,18 @@ class DCOS_Docker:
         These containers can conflict in name.
         If a conflict occurs, retry.
         """
-        conflict_error_substring = (
-            'Conflict. The container name "/dcos-genconf.'
-        )
+        # The error substring differs on different versions of Docker.
+        conflict_error_substring = 'Conflict. The container name'
+        other_conflict_error_substring = 'Conflict. The name'
 
         try:
             self._make(target='all')
-        except subprocess.CalledProcessError as e:
-            if conflict_error_substring in str(e.stderr):
+        except subprocess.CalledProcessError as exc:
+            stderr = str(exc.stderr)
+            conflict = conflict_error_substring in stderr
+            conflict = conflict or other_conflict_error_substring in stderr
+            if conflict:
+                print(exc.stderr)
                 raise _ConflictingContainerError()
             raise
 
