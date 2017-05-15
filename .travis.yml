@@ -17,11 +17,19 @@ install:
 cache: "pip"
 
 before_script:
-    - "make --ignore-errors clean"
+    - "make clean"
     - "make lint"
-    - 'docker ps'
-    - 'docker -v'
-
-script:
     - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make download-dependencies; fi'
-    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -x ; fi'
+
+# Unfortunately Travis has a time out for total test run (50 minutes) and total time without
+# output (10 minutes).
+#
+# We avoid the former by running only a small part of our test suite.
+#
+# We get around the latter by using `travis_wait` which hides all output
+# until the tests are finished.
+#
+# We do not run tests in parallel as this uses too much space for Travis CI.
+# The main use of space is the copying of the config file to each directory.
+script:
+    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -k TestIntegrationTests; fi'
