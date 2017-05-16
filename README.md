@@ -173,7 +173,11 @@ chmod +x vbox-network.sh
 cd ..
 curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
 vagrant/resize-disk.sh 102400
-# Create a virtual envrionment.
+```
+
+Then create a virtual environment:
+
+```
 vagrant ssh -c 'curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_create_env.sh | /bin/bash'
 ```
 
