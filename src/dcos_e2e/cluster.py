@@ -40,6 +40,7 @@ class Cluster(ContextDecorator):
                 if there is an exception raised in the context of this object.
         """
         self._destroy_on_error = destroy_on_error
+        self._log_output_live = log_output_live
 
         self._backend = DCOS_Docker(
             masters=masters,
@@ -48,7 +49,7 @@ class Cluster(ContextDecorator):
             extra_config=dict(extra_config or {}),
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
             dcos_docker_path=Path('/tmp/dcos-docker'),
-            log_output_live=log_output_live,
+            log_output_live=self._log_output_live,
         )
         self._backend.postflight()
 
@@ -135,7 +136,9 @@ class Cluster(ContextDecorator):
         # Tests are run on a random master node.
         test_host = next(iter(self.masters))
 
-        return test_host.run_as_root(args=args)
+        return test_host.run_as_root(
+            args=args, log_output_live=self._log_output_live
+        )
 
     def destroy(self) -> None:
         """
