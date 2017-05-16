@@ -20,7 +20,7 @@ clean:
 	# We skip errors because this does not exist in legacy versions of
 	# Docker
 	- docker volume prune --force
-	rm -rf /tmp/dcos-docker-*
+	sudo rm -rf /tmp/dcos-docker-*
 
 # Fix some linting errors.
 fix-lint:
