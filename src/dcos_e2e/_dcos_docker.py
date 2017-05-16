@@ -73,7 +73,7 @@ class DCOS_Docker:
             dst=str(self._path),
             # If there is already a config, we do not copy it as it will be
             # overwritten and therefore copying it is wasteful.
-            # ignore=ignore_patterns('dcos_generate_config.sh'),
+            ignore=ignore_patterns('dcos_generate_config.sh'),
         )
 
         copyfile(
