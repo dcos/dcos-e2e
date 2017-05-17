@@ -7,10 +7,12 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from constantly import NamedConstant
+
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
 
-
+class Backends()
 class Cluster(ContextDecorator):
     """
     A record of a DC/OS cluster.
