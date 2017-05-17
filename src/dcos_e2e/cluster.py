@@ -68,7 +68,7 @@ class Cluster(ContextDecorator):
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
 
-        supported_backends = (Backends.DCOS_DOCKER)
+        supported_backends = (Backends.DCOS_DOCKER, )
         if backend not in supported_backends:
             raise UnsupportedClusterBackend()
 
