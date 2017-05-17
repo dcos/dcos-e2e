@@ -37,6 +37,7 @@ class DCOS_Docker:
         generate_config_path: Path,
         dcos_docker_path: Path,
         log_output_live: bool,
+        files_to_copy_to_installer: Dict[Path, Path],
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -52,6 +53,11 @@ class DCOS_Docker:
             dcos_docker_path: The path to a clone of DC/OS Docker.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
+            files_to_copy_to_installer: A mapping of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS. Currently on DC/OS
+                Docker the only supported paths on the installer are in the
+                `/genconf` directory.
         """
         self.log_output_live = log_output_live
 
