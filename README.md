@@ -60,7 +60,9 @@ class TestExample:
                 print('No file exists')
 ```
 
-#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False, destroy_on_error=True)`
+#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1,
+              log_output_live=False, destroy_on_error=True, custom_ca_key=None,
+              backend=Backends.DCOS_DOCKER, files_to_copy_to_installer=None)`
 
 This is a context manager which spins up a cluster.
 At the time of writing, this uses DC/OS Docker.
@@ -89,10 +91,26 @@ If set to `True`, the output of processes run on the host to create and manage c
 
 To see these logs in `pytest` tests, use the `-s` flag.
 
+
+###### `files_to_copy_to_installer`
+
+A mapping of host paths to paths on the installer node.
+These are files to copy from the host to the installer node before installing DC/OS.
+Currently on DC/OS Docker the only supported paths on the installer are in the `/genconf` directory.
+
 ###### `destroy_on_error`
 
 If set to `True`, the cluster is destroyed on exit in all cases.
 If set to `False`, the cluster is preserved if there is an error.
+
+###### `backend`
+
+The backend to use for creating a cluster.
+Currently available backends are `dcos_e2e.Backends.DCOS_DOCKER`.
+
+###### `custom_ca_key`
+
+A CA key to use as the cluster's root CA key.
 
 ##### Attributes
 
