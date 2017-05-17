@@ -24,6 +24,7 @@ class Cluster(ContextDecorator):
         masters: int=1,
         agents: int=1,
         public_agents: int=1,
+        custom_ca_key: Optional[Path]=None,
         log_output_live: bool=False,
         destroy_on_error: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
@@ -37,6 +38,7 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
+            custom_ca_key: A CA key to use as the cluster's root CA key.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
             destroy_on_error: If `False`, the cluster will not be destroyed
@@ -55,6 +57,7 @@ class Cluster(ContextDecorator):
             extra_config=dict(extra_config or {}),
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
             dcos_docker_path=Path('/tmp/dcos-docker'),
+            custom_ca_key=custom_ca_key,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
         )

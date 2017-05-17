@@ -7,7 +7,7 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from typing import Any, Dict, Set
+from typing import Any, Dict, Optional, Set
 
 import docker
 import yaml
@@ -36,6 +36,7 @@ class DCOS_Docker:
         extra_config: Dict[str, Any],
         generate_config_path: Path,
         dcos_docker_path: Path,
+        custom_ca_key: Optional[Path],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
     ) -> None:
@@ -51,6 +52,7 @@ class DCOS_Docker:
                 variables.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
+            custom_ca_key: A CA key to use as the cluster's root CA key.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
             files_to_copy_to_installer: A mapping of host paths to paths on
@@ -134,6 +136,9 @@ class DCOS_Docker:
                 data=extra_config,
                 default_flow_style=False,
             )
+
+        if custom_ca_key is not None:
+            self._variables['CUSTOM_CA_KEY_PATH'] = str(custom_ca_key)
 
         self._create_containers()
 
