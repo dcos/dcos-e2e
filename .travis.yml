@@ -12,6 +12,7 @@ before_install:
   - "pip install --upgrade pip setuptools"
   - "sudo apt-get update"
   - "sudo apt-get install docker-engine"
+  - "gem install travis --no-rdoc --no-ri"
 
 install:
   - "pip install --upgrade --editable .[dev]"
