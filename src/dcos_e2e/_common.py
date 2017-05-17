@@ -15,7 +15,7 @@ from subprocess import (
 from typing import List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class Node:
@@ -92,6 +92,9 @@ def run_subprocess(
 
     Returns:
         See `subprocess.run`.
+
+    Raises:
+        CalledProcessError: See `subprocess.run`.
     """
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
@@ -112,7 +115,7 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    logger.debug(line)
+                    LOGGER.debug(line)
                     stdout += line
             else:
                 stdout, stderr = process.communicate()
@@ -122,7 +125,7 @@ def run_subprocess(
             raise
         retcode = process.poll()
         if retcode:
-            logger.info(str(stderr))
+            LOGGER.info(str(stderr))
             raise CalledProcessError(
                 retcode, args, output=stdout, stderr=stderr
             )

@@ -12,6 +12,7 @@ lint:
 	yapf --diff --parallel --recursive . | python -c 'import sys; result = sys.stdin.read(); assert not result, result;'
 	mypy src/ tests/
 	pydocstyle
+	pylint src/dcos_e2e/ tests/
 
 # Attempt to clean leftovers by the test suite.
 clean:

@@ -23,7 +23,7 @@ class _ConflictingContainerError(Exception):
     """
 
 
-class DCOS_Docker:
+class DCOS_Docker:  # pylint: disable=invalid-name
     """
     A record of a DC/OS Docker cluster.
     """
