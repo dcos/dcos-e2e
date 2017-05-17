@@ -206,8 +206,8 @@ class DCOS_Docker:
                 container_base_name=container_base_name,
                 number=len(nodes) + 1,
             )
-            details = client.containers.get(container_name)
-            ip_address = details['NetworkSettings']['IPAddress']
+            container = client.containers.get(container_name)
+            ip_address = container.attrs['NetworkSettings']['IPAddress']
             node = Node(
                 ip_address=IPv4Address(ip_address),
                 ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
