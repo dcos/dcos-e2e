@@ -6,6 +6,7 @@ ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 DCOS_DOCKER_CLONE_PATH := /tmp/dcos-docker
 
 # Run various linting tools.
+# Don't lint travis.yml on Travis.
 lint:
 	flake8 .
 	isort --recursive --check-only
@@ -13,7 +14,7 @@ lint:
 	mypy src/ tests/
 	pydocstyle
 	pylint src/dcos_e2e/ tests/
-	travis lint .travis.yml
+	if [ "${TRAVIS}" != "true" ] ; then travis lint .travis.yml; fi
 
 # Attempt to clean leftovers by the test suite.
 clean:
