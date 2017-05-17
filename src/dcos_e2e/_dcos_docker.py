@@ -9,8 +9,8 @@ from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from typing import Any, Dict, Set
 
+import docker
 import yaml
-from docker import Client
 from retry import retry
 
 from ._common import Node, run_subprocess
@@ -92,7 +92,7 @@ class DCOS_Docker:
         #
         # aufs was chosen as it is supported on the version of Docker on
         # Travis CI.
-        client = Client()
+        client = docker.from_env()
         host_storage_driver = client.info()['Driver']
         supported_storage_drivers = ('overlay', 'aufs')
         if host_storage_driver in supported_storage_drivers:
@@ -138,7 +138,10 @@ class DCOS_Docker:
         try:
             self._make(target='all')
         except subprocess.CalledProcessError as exc:
-            stderr = str(exc.stderr)
+            # Handle error in stderr or stdout.
+            # This is because if we log output live, stderr is redirected to
+            # stdout.
+            stderr = str(exc.stderr) + str(exc.stdout)
             conflict = conflict_error_substring in stderr
             conflict = conflict or other_conflict_error_substring in stderr
             if conflict:
@@ -195,7 +198,7 @@ class DCOS_Docker:
         Returns: ``Node``s corresponding to containers with names starting
             with ``container_base_name``.
         """
-        client = Client()
+        client = docker.from_env()
         nodes = set([])  # type: Set[Node]
 
         while len(nodes) < num_nodes:
@@ -203,8 +206,8 @@ class DCOS_Docker:
                 container_base_name=container_base_name,
                 number=len(nodes) + 1,
             )
-            details = client.inspect_container(container=container_name)
-            ip_address = details['NetworkSettings']['IPAddress']
+            container = client.containers.get(container_name)
+            ip_address = container.attrs['NetworkSettings']['IPAddress']
             node = Node(
                 ip_address=IPv4Address(ip_address),
                 ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
