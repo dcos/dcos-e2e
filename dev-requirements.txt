@@ -2,6 +2,7 @@ flake8
 isort
 mypy
 pydocstyle
+pylint
 pytest
 pytest-capturelog
 pytest-xdist
