@@ -76,7 +76,6 @@ class DCOS_Docker:
         copytree(
             src=str(dcos_docker_path),
             dst=str(self._path),
-            symlinks=True,
             # If there is already a config, we do not copy it as it will be
             # overwritten and therefore copying it is wasteful.
             ignore=ignore_patterns('dcos_generate_config.sh'),
@@ -97,17 +96,23 @@ class DCOS_Docker:
         master_ctr = 'dcos-master-{random}-'.format(random=random)
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
+        # Only overlay and aufs storage drivers are supported.
+        # This chooses the aufs so the host's driver is not used.
+        #
+        # This means that the tests will run even if the storage driver on
+        # the host is not one of these two.
+        #
+        # aufs was chosen as it is supported on the version of Docker on
+        # Travis CI.
+        client = Client()
+        host_storage_driver = client.info()['Driver']
+        supported_storage_drivers = ('overlay', 'aufs')
+        if host_storage_driver in supported_storage_drivers:
+            docker_storage_driver = host_storage_driver
+        else:
+            docker_storage_driver = 'aufs'
         self._variables = {
-            # Only overlay and aufs storage drivers are supported.
-            # This chooses aufs so the host's driver is not used.
-            #
-            # This means that the tests will be more consistent across
-            # platforms and that they will run even if the storage driver on
-            # the host is not one of these two.
-            #
-            # aufs was chosen as it is supported on the version of Docker on
-            # Travis CI.
-            'DOCKER_GRAPHDRIVER': 'aufs',
+            'DOCKER_GRAPHDRIVER': docker_storage_driver,
             # Some platforms support systemd and some do not.
             # Disabling support makes all platforms consistent in this aspect.
             'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',

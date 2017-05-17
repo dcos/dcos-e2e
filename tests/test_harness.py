@@ -23,7 +23,9 @@ class TestNode:
         """
         It is possible to run commands as root and see their output.
         """
-        with Cluster(agents=0, public_agents=0) as cluster:
+        with Cluster(
+            agents=0, public_agents=0, log_output_live=True
+        ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
             assert result.returncode == 0
@@ -134,10 +136,14 @@ class TestExtendConfig:
         This demonstrates that ``test_extend_config`` actually changes the
         configuration.
         """
-        with Cluster(agents=0, public_agents=0) as cluster:
+        with Cluster(
+            agents=0, public_agents=0, log_output_live=True
+        ) as cluster:
             (master, ) = cluster.masters
             with pytest.raises(CalledProcessError):
-                master.run_as_root(args=['test', '-f', path])
+                master.run_as_root(
+                    args=['test', '-f', path], log_output_live=True
+                )
 
 
 class TestClusterSize:
