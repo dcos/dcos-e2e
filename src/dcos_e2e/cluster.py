@@ -64,6 +64,9 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
             backend: The backend to use for creating a cluster.
+
+        Raises:
+            UnsupportedClusterBackend: An unsupported `backend` was chosen.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
