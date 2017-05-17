@@ -13,7 +13,7 @@ from ._dcos_docker import DCOS_Docker
 
 class Cluster(ContextDecorator):
     """
-    A record of a DC/OS Cluster.
+    A record of a DC/OS cluster.
 
     This is intended to be used as context manager.
     """
@@ -29,6 +29,8 @@ class Cluster(ContextDecorator):
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
     ) -> None:
         """
+        Create a DC/OS cluser.
+
         Args:
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.

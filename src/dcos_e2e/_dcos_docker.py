@@ -87,6 +87,15 @@ class DCOS_Docker:
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
+        # Files in the DC/OS Docker directory's genconf directory are mounted
+        # to the installer at `/genconf`.
+        # Therefore, every file which we want to copy to `/genconf` on the
+        # installer is put into the genconf directory in DC/OS Docker.
+        for host_path, installer_path in files_to_copy_to_installer.items():
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = self._path / relative_installer_path
+            copyfile(src=str(host_path), dst=str(destination_path))
+
         master_ctr = 'dcos-master-{random}-'.format(random=random)
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
