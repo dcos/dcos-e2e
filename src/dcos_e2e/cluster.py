@@ -25,7 +25,6 @@ class Cluster(ContextDecorator):
         agents: int=1,
         public_agents: int=1,
         custom_ca_key: Optional[Path]=None,
-        genconf_extra_dir: Optional[Path]=None,
         log_output_live: bool=False,
         destroy_on_error: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
@@ -40,8 +39,6 @@ class Cluster(ContextDecorator):
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
             custom_ca_key: A CA key to use as the cluster's root CA key.
-            genconf_extra_dir: A directory with contents to put in the
-                `genconf` directory in the installer container.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
             destroy_on_error: If `False`, the cluster will not be destroyed
@@ -61,7 +58,6 @@ class Cluster(ContextDecorator):
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
             dcos_docker_path=Path('/tmp/dcos-docker'),
             custom_ca_key=custom_ca_key,
-            genconf_extra_dir=genconf_extra_dir,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
         )

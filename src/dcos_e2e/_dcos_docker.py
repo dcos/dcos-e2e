@@ -37,7 +37,6 @@ class DCOS_Docker:
         generate_config_path: Path,
         dcos_docker_path: Path,
         custom_ca_key: Optional[Path],
-        genconf_extra_dir: Optional[Path],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
     ) -> None:
@@ -54,8 +53,6 @@ class DCOS_Docker:
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
             custom_ca_key: A CA key to use as the cluster's root CA key.
-            genconf_extra_dir: A directory with contents to put in the
-                `genconf` directory in the installer container.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
             files_to_copy_to_installer: A mapping of host paths to paths on
@@ -86,13 +83,6 @@ class DCOS_Docker:
             # overwritten and therefore copying it is wasteful.
             ignore=ignore_patterns('dcos_generate_config.sh'),
         )
-
-        if genconf_extra_dir is not None:
-            for path in genconf_extra_dir.glob('*'):
-                if path.is_dir():
-                    copytree(src=str(path), dst=str(self._path / 'genconf'))
-                else:
-                    copy2(src=str(path), dst=str(self._path / 'genconf'))
 
         copyfile(
             src=str(generate_config_path),
