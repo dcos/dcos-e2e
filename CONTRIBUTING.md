@@ -12,6 +12,10 @@ Install dependencies in a virtual environment.
 pip install --editable .[dev]
 ```
 
+```sh
+gem install travis --no-rdoc --no-ri
+```
+
 ## Linting
 
 Run lint tools:
