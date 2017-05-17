@@ -7,12 +7,26 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from constantly import NamedConstant
+from constantly import NamedConstant, Names
 
 from ._common import Node
 from ._dcos_docker import DCOS_Docker
 
-class Backends()
+
+class UnsupportedClusterBackend(Exception):
+    """
+    Raised if an unsupported cluster backend is given.
+    """
+
+
+class Backends(Names):
+    """
+    Constants representing various ``Cluster`` backends.
+    """
+
+    DCOS_DOCKER = NamedConstant()
+
+
 class Cluster(ContextDecorator):
     """
     A record of a DC/OS cluster.
@@ -30,6 +44,7 @@ class Cluster(ContextDecorator):
         log_output_live: bool=False,
         destroy_on_error: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
+        backend: Backends=Backends.DCOS_DOCKER,
     ) -> None:
         """
         Create a DC/OS cluser.
@@ -51,6 +66,10 @@ class Cluster(ContextDecorator):
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
+
+        supported_backends = (Backends.DCOS_DOCKER)
+        if backend not in supported_backends:
+            raise UnsupportedClusterBackend()
 
         self._backend = DCOS_Docker(
             masters=masters,
