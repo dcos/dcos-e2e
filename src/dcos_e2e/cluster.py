@@ -13,7 +13,7 @@ from ._dcos_docker import DCOS_Docker
 
 class Cluster(ContextDecorator):
     """
-    A record of a DC/OS Cluster.
+    A record of a DC/OS cluster.
 
     This is intended to be used as context manager.
     """
@@ -28,8 +28,11 @@ class Cluster(ContextDecorator):
         genconf_extra_dir: Optional[Path]=None,
         log_output_live: bool=False,
         destroy_on_error: bool=True,
+        files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
     ) -> None:
         """
+        Create a DC/OS cluser.
+
         Args:
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
@@ -43,6 +46,9 @@ class Cluster(ContextDecorator):
                 If `True`, stderr is merged into stdout in the return value.
             destroy_on_error: If `False`, the cluster will not be destroyed
                 if there is an exception raised in the context of this object.
+            files_to_copy_to_installer: A mapping of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
@@ -57,6 +63,7 @@ class Cluster(ContextDecorator):
             custom_ca_key=custom_ca_key,
             genconf_extra_dir=genconf_extra_dir,
             log_output_live=self._log_output_live,
+            files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
         )
         self._backend.postflight()
 
