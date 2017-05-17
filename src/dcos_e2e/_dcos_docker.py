@@ -6,7 +6,7 @@ import subprocess
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from shutil import copy2, copyfile, copytree, ignore_patterns, rmtree
+from shutil import copyfile, copytree, ignore_patterns, rmtree
 from typing import Any, Dict, Optional, Set
 
 import docker
