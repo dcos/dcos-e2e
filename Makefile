@@ -13,6 +13,7 @@ lint:
 	mypy src/ tests/
 	pydocstyle
 	pylint src/dcos_e2e/ tests/
+	travis lint .travis.yml
 
 # Attempt to clean leftovers by the test suite.
 clean:
