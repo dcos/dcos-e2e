@@ -153,8 +153,8 @@ See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/RE
 
 Running tests for or with this package requires:
 
-* A DC/OS Docker clone at `/tmp/dcos-docker`
-* DC/OS OSS or Enterprise artifact at `/tmp/dcos_generate_config.sh`.
+*   A DC/OS Docker clone at `/tmp/dcos-docker`, and
+*   DC/OS OSS or Enterprise artifact at `/tmp/dcos_generate_config.sh`.
 
 For example:
 
@@ -207,7 +207,7 @@ laptop$ vagrant ssh
 Then install the dependencies of the package you want to test.
 
 There is a common issue which causes error messages on old kernels.
-See  https://github.com/moby/moby/issues/5618.
+See  <https://github.com/moby/moby/issues/5618>.
 Optionally on the VM run the following commands to update the kernel:
 
 ```sh

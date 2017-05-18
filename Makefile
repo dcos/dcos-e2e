@@ -17,6 +17,7 @@ lint-python-only:
 lint: lint-python-only
 	# Don't lint travis.yml on Travis.
 	if [ "${TRAVIS}" != "true" ] ; then travis lint .travis.yml; fi
+	npm run lint-md
 
 
 # Attempt to clean leftovers by the test suite.
