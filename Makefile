@@ -14,11 +14,13 @@ lint-python-only:
 	pydocstyle
 	pylint src/dcos_e2e/ tests/
 
+lint-docs:
+	npm run lint-md
+
 # Run various linting tools.
-lint: lint-python-only
+lint: lint-python-only lint-docs
 	# Don't lint travis.yml on Travis.
 	if [ "${TRAVIS}" != "true" ] ; then travis lint --exit-code .travis.yml; fi
-	npm run lint-md
 
 
 # Attempt to clean leftovers by the test suite.
@@ -54,3 +56,6 @@ download-artifact:
 clean-dependencies: clean-dcos-docker clean-artifact
 
 download-dependencies: download-artifact download-dcos-docker
+
+toc:
+	doctoc . --title "**Table of Contents**"
