@@ -13,7 +13,6 @@ Tests are currently not run on CI.
 - [Install Contribution Dependencies](#install-contribution-dependencies)
 - [Linting](#linting)
 - [Tests for this package](#tests-for-this-package)
-- [Documentation](#documentation)
 - [Reviews](#reviews)
 - [CI](#ci)
 - [Goals](#goals)
