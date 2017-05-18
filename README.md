@@ -144,7 +144,7 @@ To see these logs in `pytest` tests, use the `-s` flag.
 
 ## Contributing
 
-See `CONTRIBUTING.md` for details on how to contribute to this repository.
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to this repository.
 
 ## Test Environment
 
