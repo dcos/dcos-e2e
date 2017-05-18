@@ -12,9 +12,11 @@ before_install:
   - "pip install --upgrade pip setuptools"
   - "sudo apt-get update"
   - "sudo apt-get install docker-engine"
+  - "npm install"
 
 install:
   - "pip install --upgrade --editable .[dev]"
+  - "npm install --save remark-cli remark-preset-lint-recommended"
 
 cache: "pip"
 

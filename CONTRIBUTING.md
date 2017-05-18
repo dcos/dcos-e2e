@@ -12,8 +12,14 @@ Install dependencies in a virtual environment.
 pip install --editable .[dev]
 ```
 
+Optionally install the following lint tools:
+
 ```sh
 gem install travis --no-rdoc --no-ri
+```
+
+```sh
+npm install
 ```
 
 ## Linting
@@ -28,6 +34,12 @@ To fix some lint errors, run the following:
 
 ```sh
 make fix-lint
+```
+
+To run only the lint tools which require Python, run the following:
+
+```sh
+make lint-python-only
 ```
 
 ## Tests for this package
