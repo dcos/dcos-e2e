@@ -8,7 +8,8 @@ DCOS_DOCKER_CLONE_PATH := /tmp/dcos-docker
 lint-python-only:
 	flake8 .
 	isort --recursive --check-only
-	yapf --diff --parallel --recursive . | python -c 'import sys; result = sys.stdin.read(); assert not result, result;'
+	yapf --diff --parallel --recursive src/ tests/ | \
+	    python -c 'import sys; result = sys.stdin.read(); assert not result, result;'
 	mypy src/ tests/
 	pydocstyle
 	pylint src/dcos_e2e/ tests/
@@ -16,7 +17,7 @@ lint-python-only:
 # Run various linting tools.
 lint: lint-python-only
 	# Don't lint travis.yml on Travis.
-	if [ "${TRAVIS}" != "true" ] ; then travis lint .travis.yml; fi
+	if [ "${TRAVIS}" != "true" ] ; then travis lint --exit-code .travis.yml; fi
 	npm run lint-md
 
 

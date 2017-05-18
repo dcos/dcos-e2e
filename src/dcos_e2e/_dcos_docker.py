@@ -71,7 +71,7 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         # We create a new instance of DC/OS Docker and we work in this
         # directory.
         # This reduces the chance of conflicts.
-        # We put this in the `/tmp` directory because that is writeable on
+        # We put this in the `/tmp` directory because that is writable on
         # the Vagrant VM.
         tmp = Path('/tmp')
         self._path = tmp / 'dcos-docker-{random}'.format(random=random)
@@ -102,7 +102,7 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         # Only overlay and aufs storage drivers are supported.
-        # This chooses the aufs so the host's driver is not used.
+        # This chooses the aufs driver so the host's driver is not used.
         #
         # This means that the tests will run even if the storage driver on
         # the host is not one of these two.
