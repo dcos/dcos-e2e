@@ -16,6 +16,8 @@ This is a proof of concept.
 We plan to iterate on this repository and manually run tests.
 With that experience, we will choose where to put the test suite and whether it should be run on CI.
 
+<!--lint disable list-item-indent-->
+<!--lint disable list-item-bullet-indent-->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
@@ -50,6 +52,8 @@ With that experience, we will choose where to put the test suite and whether it 
   - [Parallelization](#parallelization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!--lint enable list-item-indent-->
+<!--lint enable list-item-bullet-indent-->
 
 ## Usage
 

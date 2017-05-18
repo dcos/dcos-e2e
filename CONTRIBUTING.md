@@ -4,6 +4,8 @@ Contributions to this repository must pass tests and linting.
 Linting is run on Travis CI.
 Tests are currently not run on CI.
 
+<!--lint disable list-item-indent-->
+<!--lint disable list-item-bullet-indent-->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
@@ -21,6 +23,8 @@ Tests are currently not run on CI.
   - [Robustness](#robustness)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!--lint enable list-item-indent-->
+<!--lint enable list-item-bullet-indent-->
 
 ## Install Contribution Dependencies
 
