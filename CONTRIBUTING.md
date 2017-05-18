@@ -19,6 +19,20 @@ gem install travis --no-rdoc --no-ri
 ```
 
 ```sh
+npm install
+```
+
+Spell checking requires `enchant`.
+This can be installed on macOS, for example, with [Homebrew](http://brew.sh):
+
+```sh
+brew install enchant
+```
+
+and on Ubuntu with `apt`:
+
+```sh
+apt-get install -y enchant
 ```
 
 ## Linting
