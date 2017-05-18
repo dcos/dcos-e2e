@@ -47,7 +47,7 @@ class Cluster(ContextDecorator):
         backend: Backends=Backends.DCOS_DOCKER,
     ) -> None:
         """
-        Create a DC/OS cluser.
+        Create a DC/OS cluster.
 
         Args:
             extra_config: This dictionary can contain extra installation
