@@ -14,9 +14,10 @@ lint-python-only:
 	pylint src/dcos_e2e/ tests/
 
 # Run various linting tools.
-# Don't lint travis.yml on Travis.
 lint: lint-python-only
+	# Don't lint travis.yml on Travis.
 	if [ "${TRAVIS}" != "true" ] ; then travis lint .travis.yml; fi
+
 
 # Attempt to clean leftovers by the test suite.
 clean:

@@ -15,6 +15,7 @@ before_install:
 
 install:
   - "pip install --upgrade --editable .[dev]"
+  - "npm install --save remark-cli remark-preset-lint-recommended"
 
 cache: "pip"
 
