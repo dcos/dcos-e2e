@@ -50,10 +50,10 @@ fix-lint:
 	isort --recursive --apply
 
 clean-dcos-docker:
-	- rm -rf $(DCOS_DOCKER_CLONE_PATH)
+	rm -rf $(DCOS_DOCKER_CLONE_PATH)
 
 clean-artifact:
-	- rm -rf $(ARTIFACT_PATH)
+	rm -rf $(ARTIFACT_PATH)
 
 download-dcos-docker:
 	git clone -b $(DCOS_DOCKER_BRANCH) $(DCOS_DOCKER_REPOSITORY) $(DCOS_DOCKER_CLONE_PATH)

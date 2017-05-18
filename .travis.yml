@@ -42,7 +42,6 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - "set -e"
-    - "make lint"
-    - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make download-dependencies; fi'
+    - "set -e; make lint; set +e"
+    - 'set -e; if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make download-dependencies; fi; set +e'
     - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -k TestIntegrationTests; fi'
