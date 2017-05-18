@@ -106,7 +106,7 @@ pytest -n 2
 Run the following command to update the tables of contents:
 
 ```sh
-doctoc README.md CONTRIBUTING.md --github --title "**Table of Contents**"
+make toc
 ```
 
 ## Reviews
