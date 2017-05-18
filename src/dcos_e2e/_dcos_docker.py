@@ -138,7 +138,11 @@ class DCOS_Docker:  # pylint: disable=invalid-name
             )
 
         if custom_ca_key is not None:
-            self._variables['CUSTOM_CA_KEY_PATH'] = str(custom_ca_key)
+            master_mount = '-v {custom_ca_key}:{path}'.format(
+                custom_ca_key=custom_ca_key,
+                path=Path('/var/lib/dcos/pki/tls/CA/private/custom_ca.key'),
+            )
+            self._variables['MASTER_MOUNTS'] = master_mount
 
         self._create_containers()
 
