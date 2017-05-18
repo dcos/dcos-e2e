@@ -19,6 +19,7 @@ gem install travis --no-rdoc --no-ri
 ```
 
 ```sh
+npm install
 ```
 
 ## Linting
