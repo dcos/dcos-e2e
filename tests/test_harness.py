@@ -101,7 +101,7 @@ class TestExtendConfig:
     def path(self) -> str:
         """
         Return the path to a file which will exist on a cluster only if a
-        particular config variable is given.
+        particular configuration variable is given.
         """
         return '/opt/mesosphere/etc/docker_credentials'
 
