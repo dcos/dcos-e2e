@@ -23,6 +23,13 @@ cache: "pip"
 before_script:
     - "make clean"
     - "make lint"
+    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
+            echo 'Only the documentation was updated.';
+            echo 'No tests will be run'.;
+            echo 'No artifacts will be downloaded.';
+            exit ;
+       }
+       "
     - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make download-dependencies; fi'
 
 # Unfortunately Travis has a time out for total test run (50 minutes) and total time without
@@ -36,10 +43,4 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
-            echo 'Only the documentation was updated.';
-            echo 'No tests will be run'.;
-            exit ;
-       }
-       "
     - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then travis_wait 30 pytest -vvv -s -k TestIntegrationTests; fi'
