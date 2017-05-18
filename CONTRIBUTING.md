@@ -1,27 +1,26 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
-
-- [Contributing to DC/OS End to End tests](#contributing-to-dcos-end-to-end-tests)
-  - [Install Contribution Dependencies](#install-contribution-dependencies)
-  - [Linting](#linting)
-  - [Tests for this package](#tests-for-this-package)
-  - [Documentation](#documentation)
-  - [Reviews](#reviews)
-  - [CI](#ci)
-  - [Goals](#goals)
-    - [Avoid flakiness](#avoid-flakiness)
-    - [Parrallelisable Tests](#parrallelisable-tests)
-    - [Logging](#logging)
-    - [Robustness](#robustness)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # Contributing to DC/OS End to End tests
 
 Contributions to this repository must pass tests and linting.
 Linting is run on Travis CI.
 Tests are currently not run on CI.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Install Contribution Dependencies](#install-contribution-dependencies)
+- [Linting](#linting)
+- [Tests for this package](#tests-for-this-package)
+- [Documentation](#documentation)
+- [Reviews](#reviews)
+- [CI](#ci)
+- [Goals](#goals)
+  - [Avoid flakiness](#avoid-flakiness)
+  - [Parrallelisable Tests](#parrallelisable-tests)
+  - [Logging](#logging)
+  - [Robustness](#robustness)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Install Contribution Dependencies
 
