@@ -111,7 +111,8 @@ Cluster(
     destroy_on_error=True,
     custom_ca_key=None,
     backend=Backends.DCOS_DOCKER,
-    files_to_copy_to_installer=None)
+    files_to_copy_to_installer=None,
+)
 ```
 
 This is a context manager which spins up a cluster.
