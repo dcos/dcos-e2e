@@ -20,7 +20,7 @@ With that experience, we will choose where to put the test suite and whether it 
 <!--lint disable list-item-bullet-indent-->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+
 
 - [Usage](#usage)
     - [`Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False, destroy_on_error=True, custom_ca_key=None, backend=Backends.DCOS_DOCKER, files_to_copy_to_installer=None)`](#clusterextra_confignone-masters1-agents1-public_agents1-log_output_livefalse-destroy_on_errortrue-custom_ca_keynone-backendbackendsdcos_docker-files_to_copy_to_installernone)

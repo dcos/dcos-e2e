@@ -8,7 +8,7 @@ Tests are currently not run on CI.
 <!--lint disable list-item-bullet-indent-->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
+
 
 - [Install Contribution Dependencies](#install-contribution-dependencies)
 - [Linting](#linting)

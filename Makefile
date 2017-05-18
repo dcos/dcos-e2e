@@ -19,7 +19,7 @@ lint-docs:
 	# Add ToCs and if there is a diff on Travis, error because we don't
 	# want to ship docs without an up to date ToC
 	if [ "${TRAVIS}" == "true" ] ; then
-	    doctoc README.md CONTRIBUTING.md --github --title "**Table of Contents**";
+	    doctoc README.md CONTRIBUTING.md --github --notitle;
 	    git diff --exit-code ;
 	fi
 
@@ -64,4 +64,4 @@ clean-dependencies: clean-dcos-docker clean-artifact
 download-dependencies: download-artifact download-dcos-docker
 
 toc:
-	doctoc README.md CONTRIBUTING.md --github --title "**Table of Contents**"
+	doctoc README.md CONTRIBUTING.md --github --notitle;
