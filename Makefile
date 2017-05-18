@@ -16,6 +16,12 @@ lint-python-only:
 
 lint-docs:
 	npm run lint-md
+	# Add ToCs and if there is a diff on Travis, error because we don't
+	# want to ship docs without an up to date ToC
+	if [ "${TRAVIS}" == "true" ] ; then
+	    doctoc README.md CONTRIBUTING.md --github --title "**Table of Contents**";
+	    git diff --exit-code ;
+	fi
 
 # Run various linting tools.
 lint: lint-python-only lint-docs
@@ -58,4 +64,4 @@ clean-dependencies: clean-dcos-docker clean-artifact
 download-dependencies: download-artifact download-dcos-docker
 
 toc:
-	doctoc . --title "**Table of Contents**"
+	doctoc README.md CONTRIBUTING.md --github --title "**Table of Contents**"
