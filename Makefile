@@ -20,7 +20,7 @@ lint-docs:
 	npm run lint-md
 	# Add ToCs and if there is a diff on Travis, error because we don't
 	# want to ship docs without an up to date ToC
-	if [ "${TRAVIS}" == "true" ] ; then \
+	if [ "${TRAVIS}" = "true" ] ; then \
 	    $(MAKE) toc; \
 	    git diff --exit-code ; \
 	fi
