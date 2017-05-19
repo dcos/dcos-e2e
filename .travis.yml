@@ -40,7 +40,7 @@ script:
     # We therefore check for the word "Error" and exit 1 if it occurs.
     # We run it first to see output.
     - "make lint"
-    - "if make lint 2>&1 | grep Error ; exit 1; fi"
+    - "if make lint 2>&1 | grep Error ; then exit 1; fi"
     # - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
     #         echo 'Only the documentation was updated.';
     #         echo 'No tests will be run'.;
