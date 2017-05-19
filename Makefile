@@ -1,4 +1,4 @@
-SHELL := /bin/sh
+SHELL := /bin/bash
 
 ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 DCOS_DOCKER_REPOSITORY := https://github.com/adamtheturtle/dcos-docker.git
