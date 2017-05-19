@@ -38,7 +38,9 @@ script:
     # For an unknown reason, `make` is shown to exit 0 in Travis CI even on
     # some errors.
     # We therefore check for the word "Error" and exit 1 if it occurs.
-    - "if make lint 2>&1 | grep Error ; then make lint && exit 1; fi"
+    # We run it first to see output.
+    - "make lint"
+    - "if make lint 2>&1 | grep Error ; exit 1; fi"
     # - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
     #         echo 'Only the documentation was updated.';
     #         echo 'No tests will be run'.;
