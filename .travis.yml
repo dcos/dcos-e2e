@@ -8,21 +8,21 @@ language: "python"
 python:
   - "3.5"
 
-# before_install:
-#   - "pip install --upgrade pip setuptools"
-#   - "sudo apt-get update"
-#   # Ideally we would use `addons.apt.packages` for enchant but this is not
-#   # supported by the linter.
-#   - "sudo apt-get install docker-engine enchant build-essential"
-#
-# install:
-#   - "pip install --upgrade --editable .[dev]"
-#   - "npm install remark-cli remark-preset-lint-recommended doctoc"
+before_install:
+  - "pip install --upgrade pip setuptools"
+  - "sudo apt-get update"
+  # Ideally we would use `addons.apt.packages` for enchant but this is not
+  # supported by the linter.
+  - "sudo apt-get install docker-engine enchant build-essential"
+
+install:
+  - "pip install --upgrade --editable .[dev]"
+  - "npm install remark-cli remark-preset-lint-recommended doctoc"
 
 cache: "pip"
 
 before_script:
-    - "make --no-keep-going clean"
+    - "make clean"
 
 # Unfortunately Travis has a time out for total test run (50 minutes) and total time without
 # output (10 minutes).
@@ -35,7 +35,7 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - "make --no-keep-going lint-docs && echo hello"
+    - "make lint"
     # - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
     #         echo 'Only the documentation was updated.';
     #         echo 'No tests will be run'.;
