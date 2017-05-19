@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+SHELL := /bin/bash -euxo pipefail
 
 ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 DCOS_DOCKER_REPOSITORY := https://github.com/adamtheturtle/dcos-docker.git
@@ -33,16 +33,17 @@ lint: lint-python-only lint-docs
 
 # Attempt to clean leftovers by the test suite.
 clean:
-	docker stop $$(docker ps -a -q --filter="name=dcos-") | :
-	docker rm --volumes $$(docker ps -a -q --filter="name=dcos-") | :
+	# Ignore errors in case there are no containers to remove.
+	- docker stop $$(docker ps -a -q --filter="name=dcos-") | :
+	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-") | :
 	# We skip errors because this does not exist in legacy versions of
 	# Docker
-	docker volume prune --force | :
+	- docker volume prune --force | :
 	# On some platforms this requires `sudo`, e.g. Vagrant.
 	# One some platforms, sudo requires a password.
 	# Therefore try `sudo` and we try without `sudo`.
-	sudo -n rm -rf /tmp/dcos-docker-* | :
-	rm -rf /tmp/dcos-docker-* | :
+	- sudo -n rm -rf /tmp/dcos-docker-* | :
+	- rm -rf /tmp/dcos-docker-* | :
 
 # Fix some linting errors.
 fix-lint:
