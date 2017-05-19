@@ -130,42 +130,13 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        agent_hosts = [str(node.ip_address) for node in self.agents]
-        public_agent_hosts = [
-            str(node.ip_address) for node in self.public_agents
-        ]
-
-        environment_variables = {
-            # Used by `run_integration_tests.sh`.
-            'DCOS_PYTEST_CMD': ' '.join(pytest_command),
-            'DCOS_NUM_MASTERS': len(self.masters),
-            'DCOS_NUM_AGENTS': len(self.public_agents) + len(self.agents),
-            # `run_integration_tests.sh` does not provide all necessary
-            # environment variables.
-            # See https://jira.mesosphere.com/browse/DCOS-15759.
-            'DCOS_LOGIN_UNAME': 'admin',
-            'DCOS_LOGIN_PW': 'admin',
-            'TEST_DCOS_RESILIENCY': 'admin',
-            'SLAVE_HOSTS': ','.join(agent_hosts),
-            'PUBLIC_SLAVE_HOSTS': ','.join(public_agent_hosts),
-        }
-
-        set_env_variables = [
-            "{key}='{value}'".format(key=key, value=value)
-            for key, value in environment_variables.items()
-        ]
-
-        test_dir = '/opt/mesosphere/active/dcos-integration-test/util'
+        set_env_variables = ['source', '/opt/mesosphere/environment.export']
+        test_dir = '/opt/mesosphere/active/dcos-integration-test/'
         change_to_test_dir = ['cd', test_dir]
-
         and_cmd = ['&&']
-
-        # We exit at the first failure in the script, else the return code
-        # would be the return code of the commands after the `pytest` run.
-        run_test_script = ['/bin/bash', '-e', './run_integration_test.sh']
-
         args = (
-            change_to_test_dir + and_cmd + set_env_variables + run_test_script
+            change_to_test_dir + and_cmd + set_env_variables + and_cmd +
+            pytest_command
         )
 
         # Tests are run on a random master node.
