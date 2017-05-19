@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "doctoc": "doctoc .",
     "lint-md": "remark ."
   },
   "remarkConfig": {
@@ -8,6 +9,7 @@
     ]
   },
   "dependencies": {
+    "doctoc": "^1.3.0",
     "remark-cli": "^3.0.1",
     "remark-preset-lint-recommended": "^2.0.0"
   }

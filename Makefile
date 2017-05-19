@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 DCOS_DOCKER_REPOSITORY := https://github.com/adamtheturtle/dcos-docker.git
 DCOS_DOCKER_BRANCH := macos-DCOS-15645
@@ -14,11 +16,19 @@ lint-python-only:
 	pydocstyle
 	pylint src/dcos_e2e/ tests/
 
+lint-docs:
+	npm run lint-md
+	# Add ToCs and if there is a diff on Travis, error because we don't
+	# want to ship docs without an up to date ToC
+	if [ "${TRAVIS}" = "true" ] ; then \
+	    npm run doctoc --github --notitle; \
+	    git diff --exit-code ; \
+	fi
+
 # Run various linting tools.
-lint: lint-python-only
+lint: lint-python-only lint-docs
 	# Don't lint travis.yml on Travis.
 	if [ "${TRAVIS}" != "true" ] ; then travis lint --exit-code .travis.yml; fi
-	npm run lint-md
 
 
 # Attempt to clean leftovers by the test suite.
@@ -40,10 +50,10 @@ fix-lint:
 	isort --recursive --apply
 
 clean-dcos-docker:
-	- rm -rf $(DCOS_DOCKER_CLONE_PATH)
+	rm -rf $(DCOS_DOCKER_CLONE_PATH)
 
 clean-artifact:
-	- rm -rf $(ARTIFACT_PATH)
+	rm -rf $(ARTIFACT_PATH)
 
 download-dcos-docker:
 	git clone -b $(DCOS_DOCKER_BRANCH) $(DCOS_DOCKER_REPOSITORY) $(DCOS_DOCKER_CLONE_PATH)
@@ -53,4 +63,7 @@ download-artifact:
 
 clean-dependencies: clean-dcos-docker clean-artifact
 
-download-dependencies: download-artifact download-dcos-docker
+download-dependencies: clean-dependencies download-artifact download-dcos-docker
+
+toc:
+	npm run doctoc --github --notitle

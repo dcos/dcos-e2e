@@ -4,6 +4,28 @@ Contributions to this repository must pass tests and linting.
 Linting is run on Travis CI.
 Tests are currently not run on CI.
 
+<!--lint disable list-item-indent-->
+<!--lint disable list-item-bullet-indent-->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Install Contribution Dependencies](#install-contribution-dependencies)
+- [Linting](#linting)
+- [Tests for this package](#tests-for-this-package)
+- [Documentation](#documentation)
+- [Reviews](#reviews)
+- [CI](#ci)
+- [Goals](#goals)
+  - [Avoid flakiness](#avoid-flakiness)
+  - [Parrallelisable Tests](#parrallelisable-tests)
+  - [Logging](#logging)
+  - [Robustness](#robustness)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!--lint enable list-item-indent-->
+<!--lint enable list-item-bullet-indent-->
+
 ## Install Contribution Dependencies
 
 Install dependencies in a virtual environment.
@@ -71,6 +93,14 @@ For example:
 
 ```sh
 pytest -n 2
+```
+
+## Documentation
+
+Run the following command to update the tables of contents:
+
+```sh
+make toc
 ```
 
 ## Reviews

@@ -16,6 +16,45 @@ This is a proof of concept.
 We plan to iterate on this repository and manually run tests.
 With that experience, we will choose where to put the test suite and whether it should be run on CI.
 
+<!--lint disable list-item-indent-->
+<!--lint disable list-item-bullet-indent-->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Usage](#usage)
+    - [`Cluster()`](#cluster)
+      - [Parameters](#parameters)
+        - [`extra_config`](#extra_config)
+        - [`masters`](#masters)
+        - [`agents`](#agents)
+        - [`public_agents`](#public_agents)
+        - [`log_output_live`](#log_output_live)
+        - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
+        - [`destroy_on_error`](#destroy_on_error)
+        - [`backend`](#backend)
+        - [`custom_ca_key`](#custom_ca_key)
+      - [Attributes](#attributes)
+        - [`masters`](#masters-1)
+        - [`agents`](#agents-1)
+        - [`public_agents`](#public_agents-1)
+        - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
+        - [`destroy()`](#destroy)
+    - [Nodes](#nodes)
+        - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
+- [Contributing](#contributing)
+- [Test Environment](#test-environment)
+- [Vagrant Quick Start](#vagrant-quick-start)
+- [Cleaning Up](#cleaning-up)
+- [Troubleshooting](#troubleshooting)
+  - [macOS File Sharing](#macos-file-sharing)
+  - [Out of space errors](#out-of-space-errors)
+  - [Parallelization](#parallelization)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<!--lint enable list-item-indent-->
+<!--lint enable list-item-bullet-indent-->
+
 ## Usage
 
 Tests must be run in a supported environment.
@@ -60,7 +99,21 @@ class TestExample:
                 print('No file exists')
 ```
 
-#### `Cluster(extra_config=None, masters=1, agents=1, public_agents=1, log_output_live=False, destroy_on_error=True, custom_ca_key=None, backend=Backends.DCOS_DOCKER, files_to_copy_to_installer=None)`
+#### `Cluster()`
+
+```python
+Cluster(
+    extra_config=None,
+    masters=1,
+    agents=1,
+    public_agents=1,
+    log_output_live=False,
+    destroy_on_error=True,
+    custom_ca_key=None,
+    backend=Backends.DCOS_DOCKER,
+    files_to_copy_to_installer=None,
+)
+```
 
 This is a context manager which spins up a cluster.
 At the time of writing, this uses DC/OS Docker.
