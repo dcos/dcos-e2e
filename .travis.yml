@@ -35,7 +35,7 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - "\make --no-keep-going lint-docs"
+    - "\\make --no-keep-going lint-docs"
     # - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
     #         echo 'Only the documentation was updated.';
     #         echo 'No tests will be run'.;
