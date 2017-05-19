@@ -35,7 +35,10 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - "if [ make lint | grep Error ] ; then exit 1; fi"
+    # For an unknown reason, `make` is shown to exit 0 in Travis CI even on
+    # some errors.
+    # We therefore check for the word "Error" and exit 1 if it occurs.
+    - "if make lint 2>&1 | grep Error ; then exit 1; fi"
     # - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
     #         echo 'Only the documentation was updated.';
     #         echo 'No tests will be run'.;
