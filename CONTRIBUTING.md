@@ -15,7 +15,6 @@ Tests are currently not run on CI.
 - [Tests for this package](#tests-for-this-package)
 - [Reviews](#reviews)
 - [CI](#ci)
-- [Goals](#goals)
   - [Avoid flakiness](#avoid-flakiness)
   - [Parrallelisable Tests](#parrallelisable-tests)
   - [Logging](#logging)
