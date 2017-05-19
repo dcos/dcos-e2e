@@ -13,7 +13,7 @@ before_install:
   - "sudo apt-get update"
   # Ideally we would use `addons.apt.packages` for enchant but this is not
   # supported by the linter.
-  - "sudo apt-get install docker-engine enchant"
+  - "sudo apt-get install docker-engine enchant build-essential"
 
 install:
   - "pip install --upgrade --editable .[dev]"
