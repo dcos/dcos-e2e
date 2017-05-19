@@ -57,12 +57,6 @@ and on Ubuntu with `apt`:
 apt-get install -y enchant
 ```
 
-To contribute documentation, install the following tool to create tables of content.
-
-```sh
-npm install -g doctoc
-```
-
 ## Linting
 
 Run lint tools:
