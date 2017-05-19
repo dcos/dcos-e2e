@@ -43,12 +43,12 @@ script:
     - "make lint"
     - "if make lint 2>&1 | grep Error ; then exit 1; fi"
     - "if make lint 2>&1 | grep 'not found' ; then exit 1; fi"
-    # - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
-    #         echo 'Only the documentation was updated.';
-    #         echo 'No tests will be run'.;
-    #         echo 'No artifacts will be downloaded.';
-    #         exit ;
-    #    }
-    #    "
-    # - 'make download-dependencies'
-    # - 'travis_wait 30 pytest -vvv -s -k TestIntegrationTests'
+    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
+            echo 'Only the documentation was updated.';
+            echo 'No tests will be run'.;
+            echo 'No artifacts will be downloaded.';
+            exit ;
+       }
+       "
+    - 'make download-dependencies'
+    - 'travis_wait 30 pytest -vvv -s -k TestIntegrationTests'
