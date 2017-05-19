@@ -33,7 +33,6 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
         - [`destroy_on_error`](#destroy_on_error)
         - [`backend`](#backend)
-        - [`custom_ca_key`](#custom_ca_key)
       - [Attributes](#attributes)
         - [`masters`](#masters-1)
         - [`agents`](#agents-1)
