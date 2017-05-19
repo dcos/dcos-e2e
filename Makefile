@@ -63,7 +63,7 @@ download-artifact:
 
 clean-dependencies: clean-dcos-docker clean-artifact
 
-download-dependencies: download-artifact download-dcos-docker
+download-dependencies: clean-dependencies download-artifact download-dcos-docker
 
 toc:
 	npm run doctoc --github --notitle
