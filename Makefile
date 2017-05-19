@@ -21,7 +21,7 @@ lint-docs:
 	# Add ToCs and if there is a diff on Travis, error because we don't
 	# want to ship docs without an up to date ToC
 	if [ "${TRAVIS}" = "true" ] ; then \
-	    doctoc README.md CONTRIBUTING.md --github --notitle; \
+	    npm run doctoc --github --notitle; \
 	    git diff --exit-code ; \
 	fi
 
