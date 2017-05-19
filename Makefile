@@ -66,4 +66,4 @@ clean-dependencies: clean-dcos-docker clean-artifact
 download-dependencies: download-artifact download-dcos-docker
 
 toc:
-	doctoc README.md CONTRIBUTING.md --github --notitle;
+	npm run doctoc --github --notitle
