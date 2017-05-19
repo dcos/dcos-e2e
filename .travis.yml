@@ -23,6 +23,15 @@ cache: "pip"
 
 before_script:
     - "make clean"
+    - "make lint"
+    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
+            echo 'Only the documentation was updated.';
+            echo 'No tests will be run'.;
+            echo 'No artifacts will be downloaded.';
+            exit ;
+       }
+       "
+    - 'make download-dependencies'
 
 # Unfortunately Travis has a time out for total test run (50 minutes) and total time without
 # output (10 minutes).
@@ -35,20 +44,4 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    # For an unknown reason, `make` is shown to exit 0 in Travis CI even on
-    # some errors.
-    # We therefore check for error messages and exit 1 if one occurs.
-    # This is not sustainable or robust.
-    # We run it first to see output.
-    - "make lint"
-    - "if make lint 2>&1 | grep Error ; then exit 1; fi"
-    - "if make lint 2>&1 | grep 'not found' ; then exit 1; fi"
-    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
-            echo 'Only the documentation was updated.';
-            echo 'No tests will be run'.;
-            echo 'No artifacts will be downloaded.';
-            exit ;
-       }
-       "
-    - 'make download-dependencies'
     - 'travis_wait 30 pytest -vvv -s -k TestIntegrationTests'
