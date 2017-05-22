@@ -130,7 +130,15 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        set_env_variables = ['source', '/opt/mesosphere/environment.export']
+        environment_variables = {
+            'DCOS_LOGIN_UNAME': 'admin',
+            'DCOS_LOGIN_PW': 'admin',
+        }
+        set_env_variables = [
+            "{key}='{value}'".format(key=key, value=value)
+            for key, value in environment_variables.items()
+        ] + ['source', '/opt/mesosphere/environment.export']
+
         test_dir = '/opt/mesosphere/active/dcos-integration-test/'
         change_to_test_dir = ['cd', test_dir]
         and_cmd = ['&&']
