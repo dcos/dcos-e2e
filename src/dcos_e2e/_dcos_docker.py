@@ -117,7 +117,7 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         else:
             docker_storage_driver = 'aufs'
         self._variables = {
-            'DOCKER_GRAPHDRIVER': docker_storage_driver,
+            'DOCKER_STORAGEDRIVER': docker_storage_driver,
             # Some platforms support systemd and some do not.
             # Disabling support makes all platforms consistent in this aspect.
             'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',
