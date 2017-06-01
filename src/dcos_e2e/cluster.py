@@ -75,7 +75,7 @@ class Cluster(ContextDecorator):
         if backend not in supported_backends:
             raise UnsupportedClusterBackend()
 
-        self._backend = DCOS_Docker(
+        self._cluster = DCOS_Docker(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
@@ -86,7 +86,7 @@ class Cluster(ContextDecorator):
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
         )
-        self._backend.postflight()
+        self._cluster.postflight()
 
     def __enter__(self) -> 'Cluster':
         """
@@ -100,21 +100,21 @@ class Cluster(ContextDecorator):
         """
         Return all DC/OS master ``Node``s.
         """
-        return self._backend.masters
+        return self._cluster.masters
 
     @property
     def agents(self) -> Set[Node]:
         """
         Return all DC/OS agent ``Node``s.
         """
-        return self._backend.agents
+        return self._cluster.agents
 
     @property
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public_agent ``Node``s.
         """
-        return self._backend.public_agents
+        return self._cluster.public_agents
 
     def run_integration_tests(self, pytest_command: List[str]
                               ) -> subprocess.CompletedProcess:
@@ -158,7 +158,7 @@ class Cluster(ContextDecorator):
         """
         Destroy all nodes in the cluster.
         """
-        self._backend.destroy()
+        self._cluster.destroy()
 
     def __exit__(
         self,
