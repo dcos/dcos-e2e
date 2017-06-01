@@ -84,7 +84,7 @@ class DCOS_Docker_Cluster:  # pylint: disable=invalid-name
                 `/genconf` directory.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
-            """
+        """
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
