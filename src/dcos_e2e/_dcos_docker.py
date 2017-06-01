@@ -53,7 +53,7 @@ class DCOS_Docker:  # pylint: disable=invalid-name
                 variables.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
-            workspace: The direcory to create large temporary files in. These
+            workspace: The directory to create large temporary files in. These
                 files are cleaned up when the cluster is destroyed.
             custom_ca_key: A CA key to use as the cluster's root CA key.
             log_output_live: If `True`, log output of subprocesses live.
