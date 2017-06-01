@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from ._common import Node
-from .cluster_backend_configurations import DCOS_Docker_Configuration
+from .cluster_backend_configurations import DCOS_Docker
 
 
 class Cluster(ContextDecorator):
@@ -50,9 +50,9 @@ class Cluster(ContextDecorator):
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
 
-        cluster_backend_configuration = DCOS_Docker_Configuration()
+        cluster_backend = DCOS_Docker()
 
-        self._cluster = cluster_backend_configuration.cluster_backend_cls(
+        self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
@@ -60,7 +60,7 @@ class Cluster(ContextDecorator):
             custom_ca_key=custom_ca_key,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
-            cluster_backend_configuration=cluster_backend_configuration,
+            cluster_backend=cluster_backend,
         )
         self._cluster.postflight()
 
