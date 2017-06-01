@@ -36,6 +36,7 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         extra_config: Dict[str, Any],
         generate_config_path: Path,
         dcos_docker_path: Path,
+        workspace: Path,
         custom_ca_key: Optional[Path],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
@@ -52,6 +53,8 @@ class DCOS_Docker:  # pylint: disable=invalid-name
                 variables.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
+            workspace: The directory to create large temporary files in. These
+                files are cleaned up when the cluster is destroyed.
             custom_ca_key: A CA key to use as the cluster's root CA key.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
@@ -70,11 +73,9 @@ class DCOS_Docker:  # pylint: disable=invalid-name
 
         # We create a new instance of DC/OS Docker and we work in this
         # directory.
-        # This reduces the chance of conflicts.
-        # We put this in the `/tmp` directory because that is writable on
-        # the Vagrant VM.
-        tmp = Path('/tmp')
-        self._path = tmp / 'dcos-docker-{random}'.format(random=random)
+        # This helps running tests in parallel without conflicts and it
+        # reduces the chance of side-effects affecting sequential tests.
+        self._path = workspace / 'dcos-docker-{random}'.format(random=random)
 
         copytree(
             src=str(dcos_docker_path),
