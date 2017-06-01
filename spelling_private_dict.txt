@@ -6,11 +6,11 @@ calledprocesserror
 ci
 config
 cwd
-# From DC/OS
 dc
 dict
 genconf
 ip
+noqa
 os
 pytest
 stderr

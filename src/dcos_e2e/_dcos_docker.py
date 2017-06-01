@@ -23,7 +23,7 @@ class _ConflictingContainerError(Exception):
     """
 
 
-class DCOS_Docker:  # pylint: disable=invalid-name
+class DCOS_Docker_Cluster:  # pylint: disable=invalid-name
     """
     A record of a DC/OS Docker cluster.
     """
@@ -34,12 +34,10 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         agents: int,
         public_agents: int,
         extra_config: Dict[str, Any],
-        generate_config_path: Path,
-        dcos_docker_path: Path,
-        workspace: Path,
         custom_ca_key: Optional[Path],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
+        cluster_backend_configuration: Any,
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -51,10 +49,6 @@ class DCOS_Docker:  # pylint: disable=invalid-name
             extra_config: DC/OS Docker comes with a "base" configuration.
                 This dictionary can contain extra installation configuration
                 variables.
-            generate_config_path: The path to a build artifact to install.
-            dcos_docker_path: The path to a clone of DC/OS Docker.
-            workspace: The directory to create large temporary files in. These
-                files are cleaned up when the cluster is destroyed.
             custom_ca_key: A CA key to use as the cluster's root CA key.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
@@ -63,6 +57,8 @@ class DCOS_Docker:  # pylint: disable=invalid-name
                 the installer node before installing DC/OS. Currently on DC/OS
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
+            cluster_backend_configuration: Configuration which is specific to
+                this cluster backend (DC/OS Docker).
         """
         self.log_output_live = log_output_live
 
@@ -75,10 +71,11 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         # directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
+        workspace = cluster_backend_configuration.workspace_path
         self._path = workspace / 'dcos-docker-{random}'.format(random=random)
 
         copytree(
-            src=str(dcos_docker_path),
+            src=str(cluster_backend_configuration.dcos_docker_path),
             dst=str(self._path),
             # If there is already a config, we do not copy it as it will be
             # overwritten and therefore copying it is wasteful.
@@ -86,7 +83,7 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         )
 
         copyfile(
-            src=str(generate_config_path),
+            src=str(cluster_backend_configuration.generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 

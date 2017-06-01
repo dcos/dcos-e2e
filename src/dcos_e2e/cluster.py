@@ -7,24 +7,8 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from constantly import NamedConstant, Names
-
 from ._common import Node
-from ._dcos_docker import DCOS_Docker
-
-
-class UnsupportedClusterBackend(Exception):
-    """
-    Raised if an unsupported cluster backend is given.
-    """
-
-
-class Backends(Names):
-    """
-    Constants representing various ``Cluster`` backends.
-    """
-
-    DCOS_DOCKER = NamedConstant()
+from .cluster_backend_configurations import DCOS_Docker_Configuration
 
 
 class Cluster(ContextDecorator):
@@ -44,7 +28,6 @@ class Cluster(ContextDecorator):
         log_output_live: bool=False,
         destroy_on_error: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
-        backend: Backends=Backends.DCOS_DOCKER,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -63,31 +46,21 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            backend: The backend to use for creating a cluster.
-
-        Raises:
-            UnsupportedClusterBackend: An unsupported `backend` was chosen.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
 
-        supported_backends = (Backends.DCOS_DOCKER, )
-        if backend not in supported_backends:
-            raise UnsupportedClusterBackend()
+        cluster_backend_configuration = DCOS_Docker_Configuration()
 
-        self._cluster = DCOS_Docker(
+        self._cluster = cluster_backend_configuration.cluster_backend_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             extra_config=dict(extra_config or {}),
-            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
-            dcos_docker_path=Path('/tmp/dcos-docker'),
-            # We put this in the `/tmp` directory because that is writable on
-            # the Vagrant VM.
-            workspace=Path('/tmp'),
             custom_ca_key=custom_ca_key,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
+            cluster_backend_configuration=cluster_backend_configuration,
         )
         self._cluster.postflight()
 
