@@ -12,12 +12,20 @@ import pytest
 from pytest_capturelog import CaptureLogFuncArg
 
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.cluster_backend_configurations import DCOS_Docker_Configuration
 
 
 class TestNode:
     """
     Tests for interacting with cluster nodes.
     """
+
+    def test_example(self) -> None:
+        """
+        Hello Adam.
+        """
+        foo = DCOS_Docker_Configuration()
+        print(foo)
 
     def test_run_as_root(self, caplog: CaptureLogFuncArg) -> None:
         """
