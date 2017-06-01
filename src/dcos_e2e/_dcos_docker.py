@@ -28,7 +28,12 @@ class DCOS_Docker:  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        workspace_path: Path,
+        generate_config_path: Path,
+        dcos_docker_path: Path
+    ) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
@@ -41,11 +46,9 @@ class DCOS_Docker:  # pylint: disable=invalid-name
                 The files are cleaned up when the cluster is destroyed.
         """
         self.cluster_cls = DCOS_Docker_Cluster
-        # We put this files in the `/tmp` directory because that is writable on
-        # the Vagrant VM.
-        self.workspace_path = Path('/tmp')
-        self.generate_config_path = Path('/tmp/dcos_generate_config.sh')
-        self.dcos_docker_path = Path('/tmp/dcos-docker')
+        self.workspace_path = workspace_path
+        self.generate_config_path = generate_config_path
+        self.dcos_docker_path = dcos_docker_path
 
 
 class DCOS_Docker_Cluster:  # pylint: disable=invalid-name

@@ -50,7 +50,13 @@ class Cluster(ContextDecorator):
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
 
-        cluster_backend = DCOS_Docker()
+        cluster_backend = DCOS_Docker(
+            # We put this files in the `/tmp` directory because that is
+            # writable on the Vagrant VM.
+            workspace_path=Path('/tmp'),
+            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+            dcos_docker_path=Path('/tmp/dcos-docker'),
+        )
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
