@@ -82,6 +82,9 @@ class Cluster(ContextDecorator):
             extra_config=dict(extra_config or {}),
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
             dcos_docker_path=Path('/tmp/dcos-docker'),
+            # We put this in the `/tmp` directory because that is writable on
+            # the Vagrant VM.
+            workspace=Path('/tmp'),
             custom_ca_key=custom_ca_key,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
