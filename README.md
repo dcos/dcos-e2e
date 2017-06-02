@@ -32,7 +32,6 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`log_output_live`](#log_output_live)
         - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
         - [`destroy_on_error`](#destroy_on_error)
-        - [`backend`](#backend)
         - [`custom_ca_key`](#custom_ca_key)
       - [Attributes](#attributes)
         - [`masters`](#masters-1)
@@ -110,7 +109,6 @@ Cluster(
     log_output_live=False,
     destroy_on_error=True,
     custom_ca_key=None,
-    backend=Backends.DCOS_DOCKER,
     files_to_copy_to_installer=None,
 )
 ```
@@ -153,11 +151,6 @@ Currently on DC/OS Docker the only supported paths on the installer are in the `
 
 If set to `True`, the cluster is destroyed on exit in all cases.
 If set to `False`, the cluster is preserved if there is an error.
-
-###### `backend`
-
-The backend to use for creating a cluster.
-Currently available backends are `dcos_e2e.Backends.DCOS_DOCKER`.
 
 ###### `custom_ca_key`
 
