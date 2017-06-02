@@ -9,9 +9,9 @@ from typing import Any, Dict, Optional, Set, Type
 from .._common import Node
 
 
-class ClusterImplementor(abc.ABC):
+class ClusterManager(abc.ABC):
     """
-    Cluster implementor base class.
+    Cluster manager base class.
     """
 
     @abc.abstractmethod
@@ -71,8 +71,8 @@ class ClusterBackend(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def cluster_cls(self) -> Type[ClusterImplementor]:
+    def cluster_cls(self) -> Type[ClusterManager]:
         """
-        Return the `ClusterImplementor` class to use to create and manage a
+        Return the `ClusterManager` class to use to create and manage a
         cluster.
         """
