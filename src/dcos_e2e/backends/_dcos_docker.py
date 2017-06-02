@@ -7,7 +7,7 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from typing import Any, Dict, Optional, Set, Type
+from typing import Any, Dict, Set, Type
 
 import docker
 import yaml
@@ -91,7 +91,6 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
             extra_config: DC/OS Docker comes with a "base" configuration.
                 This dictionary can contain extra installation configuration
                 variables.
-            custom_ca_key: A CA key to use as the cluster's root CA key.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
             files_to_copy_to_installer: A mapping of host paths to paths on
@@ -164,6 +163,7 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
             'MASTER_CTR': master_ctr,
             'AGENT_CTR': agent_ctr,
             'PUBLIC_AGENT_CTR': public_agent_ctr,
+            'MASTER_MOUNTS': '',
             # This is a workaround for an error which occurs with DC/OS Docker
             # when "$HOME" is not set.
             # See https://jira.mesosphere.com/browse/DCOS_OSS-1193.
@@ -185,18 +185,15 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
             destination_path = self._path / 'genconf' / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        for host_path, installer_path in files_to_copy_to_masters.items():
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = self._path / 'genconf' / relative_installer_path
-            copyfile(src=str(host_path), dst=str(destination_path))
-
-        if custom_ca_key is not None:
-            master_mount = '-v {custom_ca_key}:{path}'.format(
-                custom_ca_key=custom_ca_key,
-                path=Path('/var/lib/dcos/pki/tls/CA/private/custom_ca.key'),
+        master_mounts = []
+        for host_path, master_path in files_to_copy_to_masters.items():
+            mount = '-v {host_path}:{master_path}:ro'.format(
+                host_path=host_path,
+                master_path=master_path,
             )
-            self._variables['MASTER_MOUNTS'] = master_mount
+            master_mounts.append(mount)
 
+        self._variables['MASTER_MOUNTS'] = ' '.join(master_mounts)
         self._create_containers()
 
     @retry(exceptions=_ConflictingContainerError, delay=10, tries=30)
