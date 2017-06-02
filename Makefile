@@ -46,7 +46,7 @@ clean:
 	- rm -rf /tmp/dcos-docker-* | :
 
 # Fix some linting errors.
-fix-lint:
+fix-lint: toc
 	yapf --in-place --parallel --recursive .
 	isort --recursive --apply
 
