@@ -9,9 +9,9 @@ from typing import Any, Dict, Optional, Set, Type
 from .._common import Node
 
 
-class ClusterImplementor(abc.ABC):
+class ClusterManager(abc.ABC):
     """
-    Cluster implementor base class.
+    Cluster manager base class.
     """
 
     @abc.abstractmethod
@@ -63,6 +63,24 @@ class ClusterImplementor(abc.ABC):
         Return all DC/OS public agent ``Node``s.
         """
 
+    @property
+    @abc.abstractmethod
+    def superuser_username(self) -> str:
+        """
+        Return the original username of the superuser on the cluster.
+        This may be outdated in that the username can change without this
+        property changing.
+        """
+
+    @property
+    @abc.abstractmethod
+    def superuser_password(self) -> str:
+        """
+        Return the original password of the superuser on the cluster.
+        This may be outdated in that the password can change without this
+        property changing.
+        """
+
 
 class ClusterBackend(abc.ABC):
     """
@@ -71,8 +89,8 @@ class ClusterBackend(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def cluster_cls(self) -> Type[ClusterImplementor]:
+    def cluster_cls(self) -> Type[ClusterManager]:
         """
-        Return the `ClusterImplementor` class to use to create and manage a
+        Return the `ClusterManager` class to use to create and manage a
         cluster.
         """

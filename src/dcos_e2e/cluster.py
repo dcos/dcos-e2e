@@ -107,9 +107,10 @@ class Cluster(ContextDecorator):
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
         environment_variables = {
-            'DCOS_LOGIN_UNAME': 'admin',
-            'DCOS_LOGIN_PW': 'admin',
+            'DCOS_LOGIN_UNAME': self._cluster.superuser_username,
+            'DCOS_LOGIN_PW': self._cluster.superuser_password,
         }
+
         exports = [
             "export {key}='{value}'".format(key=key, value=value)
             for key, value in environment_variables.items()

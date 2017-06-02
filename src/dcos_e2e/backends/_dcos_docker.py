@@ -14,7 +14,7 @@ import yaml
 from retry import retry
 
 from .._common import Node, run_subprocess
-from ._base_classes import ClusterBackend, ClusterImplementor
+from ._base_classes import ClusterBackend, ClusterManager
 
 
 class _ConflictingContainerError(Exception):
@@ -59,13 +59,13 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
         """
-        Return the `ClusterImplementor` class to use to create and manage a
+        Return the `ClusterManager` class to use to create and manage a
         cluster.
         """
         return DCOS_Docker_Cluster
 
 
-class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
+class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
     """
     A record of a DC/OS Docker cluster.
     """
@@ -217,6 +217,26 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
                 print(exc.stderr)
                 raise _ConflictingContainerError()
             raise
+
+    @property
+    def superuser_username(self) -> str:
+        """
+        Return the original username of the superuser on the cluster.
+        This may be outdated in that the username can change without this
+        property changing.
+        """
+        # By default, the DC/OS Docker Makefile uses this username.
+        return 'admin'
+
+    @property
+    def superuser_password(self) -> str:
+        """
+        Return the original password of the superuser on the cluster.
+        This may be outdated in that the password can change without this
+        property changing.
+        """
+        # By default, the DC/OS Docker Makefile uses this username.
+        return 'admin'
 
     def _make(self, target: str) -> None:
         """
