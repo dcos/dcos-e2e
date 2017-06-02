@@ -66,7 +66,7 @@ class ClusterImplementor(abc.ABC):
 
 class ClusterBackend(abc.ABC):
     """
-    Cluster Backend base class.
+    Cluster backend base class.
     """
 
     @property
@@ -76,4 +76,3 @@ class ClusterBackend(abc.ABC):
         Return the `ClusterImplementor` class to use to create and manage a
         cluster.
         """
-        pass
