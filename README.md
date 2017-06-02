@@ -23,8 +23,14 @@ With that experience, we will choose where to put the test suite and whether it 
 
 
 - [Usage](#usage)
-    - [`Cluster()`](#cluster)
+    - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
       - [Parameters](#parameters)
+        - [`generate_config_path`](#generate_config_path)
+        - [`dcos_docker_path`](#dcos_docker_path)
+        - [`workspace_path`](#workspace_path)
+    - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
+      - [Parameters](#parameters-1)
+        - [`cluster_backend`](#cluster_backend)
         - [`extra_config`](#extra_config)
         - [`masters`](#masters)
         - [`agents`](#agents)
