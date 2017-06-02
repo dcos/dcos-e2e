@@ -63,6 +63,24 @@ class ClusterManager(abc.ABC):
         Return all DC/OS public agent ``Node``s.
         """
 
+    @property
+    @abc.abstractmethod
+    def superuser_username(self) -> str:
+        """
+        Return the original username of the superuser on the cluster.
+        This may be outdated in that the username can change without this
+        property changing.
+        """
+
+    @property
+    @abc.abstractmethod
+    def superuser_password(self) -> str:
+        """
+        Return the original password of the superuser on the cluster.
+        This may be outdated in that the password can change without this
+        property changing.
+        """
+
 
 class ClusterBackend(abc.ABC):
     """
