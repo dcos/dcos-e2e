@@ -42,22 +42,19 @@ class ClusterImplementor(abc.ABC):
         Destroy all nodes in the cluster.
         """
 
-    @abc.abstractmethod
-    @property
+    @abc.abstractproperty
     def masters(self) -> Set[Node]:
         """
         Return all DC/OS master ``Node``s.
         """
 
-    @abc.abstractmethod
-    @property
+    @abc.abstractproperty
     def agents(self) -> Set[Node]:
         """
         Return all DC/OS agent ``Node``s.
         """
 
-    @abc.abstractmethod
-    @property
+    @abc.abstractproperty
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public agent ``Node``s.
@@ -69,8 +66,7 @@ class ClusterBackend(abc.ABC):
     Cluster Backend base class.
     """
 
-    @abc.abstractmethod
-    @property
+    @abc.abstractproperty
     def cluster_cls(self) -> Type[ClusterImplementor]:
         """
         Return the `ClusterImplementor` class to use to create and manage a
