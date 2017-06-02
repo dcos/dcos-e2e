@@ -13,8 +13,8 @@ import docker
 import yaml
 from retry import retry
 
+from .._common import Node, run_subprocess
 from ._base_classes import ClusterBackend, ClusterImplementor
-from ._common import Node, run_subprocess
 
 
 class _ConflictingContainerError(Exception):
