@@ -38,10 +38,6 @@ before_script:
 #
 # We avoid the former by running only a small part of our test suite.
 #
-# We get around the latter by using `travis_wait` which hides all output
-# until the tests are finished.
-#
-# We do not run tests in parallel as this uses too much space for Travis CI.
-# The main use of space is the copying of the config file to each directory.
+# We get around the latter by logging a lot out output in the tests.
 script:
-    - 'pytest -vvv -s -k TestIntegrationTests'
+    - 'pytest -vvv -n 2 -s -k "TestIntegrationTests or TestNode"'
