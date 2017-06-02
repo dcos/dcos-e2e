@@ -11,6 +11,7 @@ from subprocess import CalledProcessError
 import pytest
 from pytest_capturelog import CaptureLogFuncArg
 
+from dcos_e2e.backends import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
 
@@ -19,12 +20,17 @@ class TestNode:
     Tests for interacting with cluster nodes.
     """
 
-    def test_run_as_root(self, caplog: CaptureLogFuncArg) -> None:
+    def test_run_as_root(
+        self, caplog: CaptureLogFuncArg, cluster_backend: DCOS_Docker
+    ) -> None:
         """
         It is possible to run commands as root and see their output.
         """
         with Cluster(
-            agents=0, public_agents=0, log_output_live=True
+            agents=0,
+            public_agents=0,
+            log_output_live=True,
+            cluster_backend=cluster_backend,
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
@@ -71,12 +77,12 @@ class TestIntegrationTests:
     Tests for running integration tests on a node.
     """
 
-    def test_run_pytest(self) -> None:
+    def test_run_pytest(self, cluster_backend: DCOS_Docker) -> None:
         """
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        with Cluster(log_output_live=True) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
             cluster.run_integration_tests(pytest_command=pytest_command)
@@ -84,7 +90,12 @@ class TestIntegrationTests:
             # An error is raised with an unsuccessful command.
             with pytest.raises(CalledProcessError) as excinfo:
                 pytest_command = ['pytest', 'test_no_such_file.py']
-                cluster.run_integration_tests(pytest_command=pytest_command)
+                result = cluster.run_integration_tests(
+                    pytest_command=pytest_command
+                )
+                # This result will not be printed if the test passes, but it
+                # may provide useful debugging information.
+                print(result)
 
             # `pytest` results in an exit code of 4 when no tests are
             # collected.
@@ -105,7 +116,9 @@ class TestExtendConfig:
         """
         return '/opt/mesosphere/etc/docker_credentials'
 
-    def test_extend_config(self, path: str) -> None:
+    def test_extend_config(
+        self, path: str, cluster_backend: DCOS_Docker
+    ) -> None:
         """
         This example demonstrates that it is possible to create a cluster
         with an extended configuration file.
@@ -125,19 +138,25 @@ class TestExtendConfig:
         }
 
         with Cluster(
-            extra_config=config, agents=0, public_agents=0
+            extra_config=config,
+            agents=0,
+            public_agents=0,
+            cluster_backend=cluster_backend,
         ) as cluster:
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
-    def test_default(self, path: str) -> None:
+    def test_default(self, path: str, cluster_backend: DCOS_Docker) -> None:
         """
         The example file does not exist with the standard configuration.
         This demonstrates that ``test_extend_config`` actually changes the
         configuration.
         """
         with Cluster(
-            agents=0, public_agents=0, log_output_live=True
+            agents=0,
+            public_agents=0,
+            log_output_live=True,
+            cluster_backend=cluster_backend,
         ) as cluster:
             (master, ) = cluster.masters
             with pytest.raises(CalledProcessError):
@@ -151,17 +170,17 @@ class TestClusterSize:
     Tests for setting the cluster size.
     """
 
-    def test_default(self) -> None:
+    def test_default(self, cluster_backend: DCOS_Docker) -> None:
         """
         By default, a cluster with one master and one agent and one private
         agent is created.
         """
-        with Cluster() as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
             assert len(cluster.public_agents) == 1
 
-    def test_custom(self) -> None:
+    def test_custom(self, cluster_backend: DCOS_Docker) -> None:
         """
         It is possible to create a cluster with a custom number of nodes.
         """
@@ -177,6 +196,7 @@ class TestClusterSize:
             masters=masters,
             agents=agents,
             public_agents=public_agents,
+            cluster_backend=cluster_backend,
         ) as cluster:
             assert len(cluster.masters) == masters
             assert len(cluster.agents) == agents
@@ -200,14 +220,21 @@ class TestClusterLogging:
         return b'Must have 1, 3, 5, 7, or 9 masters'
 
     def test_live_logging(
-        self, two_clusters_error: str, caplog: CaptureLogFuncArg
+        self,
+        two_clusters_error: str,
+        caplog: CaptureLogFuncArg,
+        cluster_backend: DCOS_Docker,
     ) -> None:
         """
         If `log_output_live` is given as `True`, subprocess output is logged.
         """
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
-            with Cluster(masters=2, log_output_live=True):
+            with Cluster(
+                masters=2,
+                log_output_live=True,
+                cluster_backend=cluster_backend
+            ):
                 pass
 
         encountered_error = False
@@ -217,7 +244,10 @@ class TestClusterLogging:
         assert encountered_error
 
     def test_no_live_logging(
-        self, two_clusters_error: str, caplog: CaptureLogFuncArg
+        self,
+        two_clusters_error: str,
+        caplog: CaptureLogFuncArg,
+        cluster_backend: DCOS_Docker,
     ) -> None:
         """
         By default, subprocess output is not logged in the creation of a
@@ -225,7 +255,7 @@ class TestClusterLogging:
         """
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
-            with Cluster(masters=2):
+            with Cluster(masters=2, cluster_backend=cluster_backend):
                 pass
 
         encountered_error = False
@@ -240,12 +270,12 @@ class TestMultipleClusters:
     Tests for working with multiple clusters.
     """
 
-    def test_two_clusters(self) -> None:
+    def test_two_clusters(self, cluster_backend: DCOS_Docker) -> None:
         """
         It is possible to start two clusters.
         """
-        with Cluster():
-            with Cluster():
+        with Cluster(cluster_backend=cluster_backend):
+            with Cluster(cluster_backend=cluster_backend):
                 pass
 
 
@@ -254,26 +284,38 @@ class TestDestroyOnError:
     Tests for `destroy_on_error`.
     """
 
-    def test_default_exception_raised(self) -> None:
+    def test_default_exception_raised(
+        self, cluster_backend: DCOS_Docker
+    ) -> None:
         """
         By default, if an exception is raised, the cluster is destroyed.
         """
         with pytest.raises(Exception):
-            with Cluster(agents=0, public_agents=0) as cluster:
+            with Cluster(
+                agents=0,
+                public_agents=0,
+                cluster_backend=cluster_backend,
+            ) as cluster:
                 (master, ) = cluster.masters
                 raise Exception()
 
         with pytest.raises(CalledProcessError):
             master.run_as_root(args=['echo', 'hello'])
 
-    def test_set_false_exception_raised(self) -> None:
+    def test_set_false_exception_raised(
+        self,
+        cluster_backend: DCOS_Docker,
+    ) -> None:
         """
         If `destroy_on_error` is set to `False` and an exception is raised,
         the cluster is not destroyed.
         """
         with pytest.raises(Exception):
             with Cluster(
-                agents=0, public_agents=0, destroy_on_error=False
+                agents=0,
+                public_agents=0,
+                destroy_on_error=False,
+                cluster_backend=cluster_backend,
             ) as cluster:
                 (master, ) = cluster.masters
                 raise Exception()
@@ -281,13 +323,19 @@ class TestDestroyOnError:
         master.run_as_root(args=['echo', 'hello'])
         cluster.destroy()
 
-    def test_set_false_no_exception(self) -> None:
+    def test_set_false_no_exception(
+        self,
+        cluster_backend: DCOS_Docker,
+    ) -> None:
         """
         If `destroy_on_error` is set to `False` and no exception is raised,
         the cluster is not destroyed.
         """
         with Cluster(
-            agents=0, public_agents=0, destroy_on_error=False
+            agents=0,
+            public_agents=0,
+            destroy_on_error=False,
+            cluster_backend=cluster_backend,
         ) as cluster:
             (master, ) = cluster.masters
 
