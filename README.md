@@ -37,6 +37,7 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`public_agents`](#public_agents)
         - [`log_output_live`](#log_output_live)
         - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
+        - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
         - [`custom_ca_key`](#custom_ca_key)
       - [Attributes](#attributes)
@@ -151,8 +152,8 @@ Cluster(
     public_agents=1,
     log_output_live=False,
     destroy_on_error=True,
-    custom_ca_key=None,
     files_to_copy_to_installer=None,
+    files_to_copy_to_masters=None,
 )
 ```
 
@@ -194,6 +195,12 @@ To see these logs in `pytest` tests, use the `-s` flag.
 A mapping of host paths to paths on the installer node.
 These are files to copy from the host to the installer node before installing DC/OS.
 Currently on DC/OS Docker the only supported paths on the installer are in the `/genconf` directory.
+
+###### `files_to_copy_to_masters`
+
+A mapping of host paths to paths on the master nodes.
+These are files to copy from the host to the master nodes before installing DC/OS.
+On DC/OS Docker the files are mounted, read only, to the masters.
 
 ###### `destroy_on_error`
 

@@ -25,10 +25,10 @@ class Cluster(ContextDecorator):
         masters: int=1,
         agents: int=1,
         public_agents: int=1,
-        custom_ca_key: Optional[Path]=None,
         log_output_live: bool=False,
         destroy_on_error: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
+        files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -40,7 +40,6 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            custom_ca_key: A CA key to use as the cluster's root CA key.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
             destroy_on_error: If `False`, the cluster will not be destroyed
@@ -48,6 +47,9 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
+            files_to_copy_to_masters: A mapping of host paths to paths on the
+                master nodes. These are files to copy from the host to
+                the master nodes before installing DC/OS.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
@@ -57,9 +59,9 @@ class Cluster(ContextDecorator):
             agents=agents,
             public_agents=public_agents,
             extra_config=dict(extra_config or {}),
-            custom_ca_key=custom_ca_key,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
+            files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
         )
         self._cluster.postflight()
