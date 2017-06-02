@@ -7,13 +7,13 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional, Set, Type
 
 import docker
 import yaml
 from retry import retry
 
-from ._base_classes import ClusterBackend
+from ._base_classes import ClusterBackend, ClusterImplementor
 from ._common import Node, run_subprocess
 
 
@@ -58,19 +58,19 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         self.dcos_docker_path = dcos_docker_path
 
     @property
-    def cluster_cls(self) -> Any:
+    def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
         """
-        Some class.
+        Maybe a class.
         """
         return DCOS_Docker_Cluster
 
 
-class DCOS_Docker_Cluster:  # pylint: disable=invalid-name
+class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
     """
     A record of a DC/OS Docker cluster.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         masters: int,
         agents: int,

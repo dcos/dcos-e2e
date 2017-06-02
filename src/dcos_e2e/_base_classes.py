@@ -1,11 +1,67 @@
+"""
+Maybe put something here.
+"""
+
 import abc
-from typing import Type
+from pathlib import Path
+from typing import Any, Dict, Optional, Set, Type
+
+from ._common import Node
 
 
 class ClusterImplementor(abc.ABC):
     """
     Cluster implementor base class.
     """
+
+    @abc.abstractmethod
+    def __init__(
+        self,
+        masters: int,
+        agents: int,
+        public_agents: int,
+        extra_config: Dict[str, Any],
+        custom_ca_key: Optional[Path],
+        log_output_live: bool,
+        files_to_copy_to_installer: Dict[Path, Path],
+        cluster_backend: 'ClusterBackend',
+    ) -> None:
+        """
+        Maybe an explanation.
+        """
+
+    @abc.abstractmethod
+    def postflight(self) -> None:
+        """
+        Wait for nodes to be ready to run tests against.
+        """
+
+    @abc.abstractmethod
+    def destroy(self) -> None:
+        """
+        Destroy all nodes in the cluster.
+        """
+
+    @abc.abstractmethod
+    @property
+    def masters(self) -> Set[Node]:
+        """
+        Return all DC/OS master ``Node``s.
+        """
+
+    @abc.abstractmethod
+    @property
+    def agents(self) -> Set[Node]:
+        """
+        Return all DC/OS agent ``Node``s.
+        """
+
+    @abc.abstractmethod
+    @property
+    def public_agents(self) -> Set[Node]:
+        """
+        Return all DC/OS public agent ``Node``s.
+        """
 
 
 class ClusterBackend(abc.ABC):
@@ -16,4 +72,7 @@ class ClusterBackend(abc.ABC):
     @abc.abstractmethod
     @property
     def cluster_cls(self) -> Type[ClusterImplementor]:
+        """
+        Maybe an explanation.
+        """
         pass
