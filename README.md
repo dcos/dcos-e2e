@@ -39,7 +39,6 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
         - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
-        - [`custom_ca_key`](#custom_ca_key)
       - [Attributes](#attributes)
         - [`masters`](#masters-1)
         - [`agents`](#agents-1)
@@ -206,10 +205,6 @@ On DC/OS Docker the files are mounted, read only, to the masters.
 
 If set to `True`, the cluster is destroyed on exit in all cases.
 If set to `False`, the cluster is preserved if there is an error.
-
-###### `custom_ca_key`
-
-A CA key to use as the cluster's root CA key.
 
 ##### Attributes
 
