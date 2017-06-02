@@ -344,17 +344,3 @@ class TestDestroyOnError:
 
         with pytest.raises(CalledProcessError):
             master.run_as_root(args=['echo', 'hello'])
-
-
-class TestURL:
-    """
-    Tests for getting the cluster URL.
-    """
-
-    def test_url(self, cluster_backend: ClusterBackend):
-        """
-        Tests for getting the URL of a cluster.
-        """
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            import pdb; pdb.set_trace()
-            pass
