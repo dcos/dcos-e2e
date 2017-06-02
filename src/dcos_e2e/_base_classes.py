@@ -1,5 +1,5 @@
 """
-Maybe put something here.
+Abstract base classes.
 """
 
 import abc

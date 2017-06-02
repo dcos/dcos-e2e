@@ -46,7 +46,6 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
                 The files are cleaned up when the cluster is destroyed.
 
         Attributes:
-            cluster_cls: The class to use to create and manage a cluster.
             generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
@@ -60,7 +59,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
         """
-        Maybe a class.
+        The class to use to create and manage a cluster.
         """
         return DCOS_Docker_Cluster
 
