@@ -11,7 +11,7 @@ from subprocess import CalledProcessError
 import pytest
 from pytest_capturelog import CaptureLogFuncArg
 
-from dcos_e2e.backends import DCOS_Docker
+from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
 
@@ -21,7 +21,9 @@ class TestNode:
     """
 
     def test_run_as_root(
-        self, caplog: CaptureLogFuncArg, cluster_backend: DCOS_Docker
+        self,
+        caplog: CaptureLogFuncArg,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         It is possible to run commands as root and see their output.
@@ -77,7 +79,7 @@ class TestIntegrationTests:
     Tests for running integration tests on a node.
     """
 
-    def test_run_pytest(self, cluster_backend: DCOS_Docker) -> None:
+    def test_run_pytest(self, cluster_backend: ClusterBackend) -> None:
         """
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
@@ -117,7 +119,7 @@ class TestExtendConfig:
         return '/opt/mesosphere/etc/docker_credentials'
 
     def test_extend_config(
-        self, path: str, cluster_backend: DCOS_Docker
+        self, path: str, cluster_backend: ClusterBackend
     ) -> None:
         """
         This example demonstrates that it is possible to create a cluster
@@ -146,7 +148,7 @@ class TestExtendConfig:
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
-    def test_default(self, path: str, cluster_backend: DCOS_Docker) -> None:
+    def test_default(self, path: str, cluster_backend: ClusterBackend) -> None:
         """
         The example file does not exist with the standard configuration.
         This demonstrates that ``test_extend_config`` actually changes the
@@ -170,7 +172,7 @@ class TestClusterSize:
     Tests for setting the cluster size.
     """
 
-    def test_default(self, cluster_backend: DCOS_Docker) -> None:
+    def test_default(self, cluster_backend: ClusterBackend) -> None:
         """
         By default, a cluster with one master and one agent and one private
         agent is created.
@@ -180,7 +182,7 @@ class TestClusterSize:
             assert len(cluster.agents) == 1
             assert len(cluster.public_agents) == 1
 
-    def test_custom(self, cluster_backend: DCOS_Docker) -> None:
+    def test_custom(self, cluster_backend: ClusterBackend) -> None:
         """
         It is possible to create a cluster with a custom number of nodes.
         """
@@ -223,7 +225,7 @@ class TestClusterLogging:
         self,
         two_clusters_error: str,
         caplog: CaptureLogFuncArg,
-        cluster_backend: DCOS_Docker,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         If `log_output_live` is given as `True`, subprocess output is logged.
@@ -247,7 +249,7 @@ class TestClusterLogging:
         self,
         two_clusters_error: str,
         caplog: CaptureLogFuncArg,
-        cluster_backend: DCOS_Docker,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         By default, subprocess output is not logged in the creation of a
@@ -270,7 +272,7 @@ class TestMultipleClusters:
     Tests for working with multiple clusters.
     """
 
-    def test_two_clusters(self, cluster_backend: DCOS_Docker) -> None:
+    def test_two_clusters(self, cluster_backend: ClusterBackend) -> None:
         """
         It is possible to start two clusters.
         """
@@ -285,7 +287,8 @@ class TestDestroyOnError:
     """
 
     def test_default_exception_raised(
-        self, cluster_backend: DCOS_Docker
+        self,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         By default, if an exception is raised, the cluster is destroyed.
@@ -304,7 +307,7 @@ class TestDestroyOnError:
 
     def test_set_false_exception_raised(
         self,
-        cluster_backend: DCOS_Docker,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         If `destroy_on_error` is set to `False` and an exception is raised,
@@ -325,7 +328,7 @@ class TestDestroyOnError:
 
     def test_set_false_no_exception(
         self,
-        cluster_backend: DCOS_Docker,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         If `destroy_on_error` is set to `False` and no exception is raised,

@@ -13,6 +13,7 @@ import docker
 import yaml
 from retry import retry
 
+from ._base_classes import ClusterBackend
 from ._common import Node, run_subprocess
 
 
@@ -23,7 +24,7 @@ class _ConflictingContainerError(Exception):
     """
 
 
-class DCOS_Docker:  # pylint: disable=invalid-name
+class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     """
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
@@ -52,10 +53,16 @@ class DCOS_Docker:  # pylint: disable=invalid-name
             workspace_path: The directory to create large temporary files in.
                 The files are cleaned up when the cluster is destroyed.
         """
-        self.cluster_cls = DCOS_Docker_Cluster
         self.workspace_path = workspace_path
         self.generate_config_path = generate_config_path
         self.dcos_docker_path = dcos_docker_path
+
+    @property
+    def cluster_cls(self) -> Any:
+        """
+        Some class.
+        """
+        return DCOS_Docker_Cluster
 
 
 class DCOS_Docker_Cluster:  # pylint: disable=invalid-name

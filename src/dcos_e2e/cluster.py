@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from ._common import Node
-from .backends import DCOS_Docker
+from .backends import ClusterBackend
 
 
 class Cluster(ContextDecorator):
@@ -20,12 +20,7 @@ class Cluster(ContextDecorator):
 
     def __init__(
         self,
-        # There is currently only one available backend.
-        # If there are more in the future, then this should support all of
-        # them.
-        # That may be through an abstract base class, or a `Union` of various
-        # configuration classes.
-        cluster_backend: DCOS_Docker,
+        cluster_backend: ClusterBackend,
         extra_config: Optional[Dict[str, Any]]=None,
         masters: int=1,
         agents: int=1,
