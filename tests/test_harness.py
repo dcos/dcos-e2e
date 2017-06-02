@@ -82,10 +82,7 @@ class TestIntegrationTests:
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        with Cluster(
-            log_output_live=True,
-            cluster_backend=cluster_backend,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
             cluster.run_integration_tests(pytest_command=pytest_command)
