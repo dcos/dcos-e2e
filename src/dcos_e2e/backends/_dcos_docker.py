@@ -149,7 +149,7 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
         #
         # aufs was chosen as it is supported on the version of Docker on
         # Travis CI.
-        client = docker.from_env()
+        client = docker.from_env(version='auto')
         host_storage_driver = client.info()['Driver']
         supported_storage_drivers = ('overlay', 'aufs')
         if host_storage_driver in supported_storage_drivers:
@@ -263,7 +263,7 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
         Returns: ``Node``s corresponding to containers with names starting
             with ``container_base_name``.
         """
-        client = docker.from_env()
+        client = docker.from_env(version='auto')
         nodes = set([])  # type: Set[Node]
 
         while len(nodes) < num_nodes:
