@@ -70,11 +70,18 @@ Then, create a test, such as the following:
 ```python
 import subprocess
 
+from dcos_e2e.backend import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
 class TestExample:
 
     def test_example(self):
+        backend = DCOS_Docker(
+            workspace_path=Path('/tmp'),
+            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+            dcos_docker_path=Path('/tmp/dcos-docker'),
+        )
+
         config = {
             'cluster_docker_credentials': {
                 'auths': {
@@ -86,7 +93,7 @@ class TestExample:
             'cluster_docker_credentials_enabled': True,
         }
 
-        with Cluster(extra_config=config) as cluster:
+        with Cluster(extra_config=config, cluster_backend=backend) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
             print(result.stdout)
@@ -98,10 +105,39 @@ class TestExample:
                 print('No file exists')
 ```
 
-#### `Cluster()`
+#### `dcos_e2e.backend.DCOS_Docker`
+
+This is a backend which can be used to run a `Cluster`.
+
+```python
+DCOS_Docker(
+    generate_config_path,
+    dcos_docker_path,
+    workspace_path,
+)
+```
+
+##### Parameters
+
+###### `generate_config_path`
+
+The path to a build artifact to install.
+
+###### `dcos_docker_path`
+
+The path to a clone of DC/OS Docker.
+This clone will be used to create the cluster.
+
+###### `workspace_path`
+
+The directory to create large temporary files in.
+The files are cleaned up when the cluster is destroyed.
+
+#### `dcos_e2e.cluster.Cluster`
 
 ```python
 Cluster(
+    cluster_backend,
     extra_config=None,
     masters=1,
     agents=1,
@@ -117,6 +153,11 @@ This is a context manager which spins up a cluster.
 At the time of writing, this uses DC/OS Docker.
 
 ##### Parameters
+
+###### `cluster_backend`
+
+The backend to use for the cluster.
+Currently, the only supported backend is an instance of `dcos_e2e.backend.DCOS_Docker`.
 
 ###### `extra_config`
 
