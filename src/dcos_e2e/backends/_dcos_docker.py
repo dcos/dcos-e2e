@@ -76,9 +76,9 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
         agents: int,
         public_agents: int,
         extra_config: Dict[str, Any],
-        custom_ca_key: Optional[Path],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
+        files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: DCOS_Docker,
     ) -> None:
         """
@@ -99,6 +99,10 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
                 the installer node before installing DC/OS. Currently on DC/OS
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
+            files_to_copy_to_masters: A mapping of host paths to paths on the
+                master nodes. These are files to copy from the host to
+                the master nodes before installing DC/OS. On DC/OS Docker the
+                files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
         """
@@ -128,15 +132,6 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
             src=str(cluster_backend.generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
-
-        # Files in the DC/OS Docker directory's genconf directory are mounted
-        # to the installer at `/genconf`.
-        # Therefore, every file which we want to copy to `/genconf` on the
-        # installer is put into the genconf directory in DC/OS Docker.
-        for host_path, installer_path in files_to_copy_to_installer.items():
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = self._path / 'genconf' / relative_installer_path
-            copyfile(src=str(host_path), dst=str(destination_path))
 
         master_ctr = 'dcos-master-{random}-'.format(random=random)
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
@@ -180,6 +175,20 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
                 data=extra_config,
                 default_flow_style=False,
             )
+
+        # Files in the DC/OS Docker directory's genconf directory are mounted
+        # to the installer at `/genconf`.
+        # Therefore, every file which we want to copy to `/genconf` on the
+        # installer is put into the genconf directory in DC/OS Docker.
+        for host_path, installer_path in files_to_copy_to_installer.items():
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = self._path / 'genconf' / relative_installer_path
+            copyfile(src=str(host_path), dst=str(destination_path))
+
+        for host_path, installer_path in files_to_copy_to_masters.items():
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = self._path / 'genconf' / relative_installer_path
+            copyfile(src=str(host_path), dst=str(destination_path))
 
         if custom_ca_key is not None:
             master_mount = '-v {custom_ca_key}:{path}'.format(
