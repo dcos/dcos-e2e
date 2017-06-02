@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from ._common import Node
-from .cluster_backend_configurations import DCOS_Docker
+from .backends import DCOS_Docker
 
 
 class Cluster(ContextDecorator):
@@ -20,6 +20,12 @@ class Cluster(ContextDecorator):
 
     def __init__(
         self,
+        # There is currently only one available backend.
+        # If there are more in the future, then this should support all of
+        # them.
+        # That may be through an abstract base class, or a `Union` of various
+        # configuration classes.
+        cluster_backend: DCOS_Docker,
         extra_config: Optional[Dict[str, Any]]=None,
         masters: int=1,
         agents: int=1,
@@ -33,6 +39,7 @@ class Cluster(ContextDecorator):
         Create a DC/OS cluster.
 
         Args:
+            cluster_backend: The backend to use for the cluster.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
             masters: The number of master nodes to create.
@@ -49,14 +56,6 @@ class Cluster(ContextDecorator):
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-
-        cluster_backend = DCOS_Docker(
-            # We put this files in the `/tmp` directory because that is
-            # writable on the Vagrant VM.
-            workspace_path=Path('/tmp'),
-            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
-            dcos_docker_path=Path('/tmp/dcos-docker'),
-        )
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
