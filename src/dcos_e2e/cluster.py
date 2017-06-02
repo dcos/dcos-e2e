@@ -110,10 +110,17 @@ class Cluster(ContextDecorator):
             'DCOS_LOGIN_UNAME': 'admin',
             'DCOS_LOGIN_PW': 'admin',
         }
-        set_env_variables = [
-            "{key}='{value}'".format(key=key, value=value)
+        exports = [
+            "export {key}='{value}'".format(key=key, value=value)
             for key, value in environment_variables.items()
-        ] + ['source', '/opt/mesosphere/environment.export']
+        ]
+
+        set_env_variables = []
+        for export in exports:
+            set_env_variables.append(export)
+            set_env_variables.append('&&')
+
+        set_env_variables += ['source', '/opt/mesosphere/environment.export']
 
         test_dir = '/opt/mesosphere/active/dcos-integration-test/'
         change_to_test_dir = ['cd', test_dir]

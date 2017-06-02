@@ -14,6 +14,7 @@ before_install:
   # Ideally we would use `addons.apt.packages` for enchant but this is not
   # supported by the linter.
   - "sudo apt-get install docker-engine enchant"
+  - "npm -g install npm@latest"
 
 install:
   - "pip install --upgrade --editable .[dev]"
