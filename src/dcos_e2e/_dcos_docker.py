@@ -37,6 +37,13 @@ class DCOS_Docker:  # pylint: disable=invalid-name
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
+        Args:
+            generate_config_path: The path to a build artifact to install.
+            dcos_docker_path: The path to a clone of DC/OS Docker.
+                This clone will be used to create the cluster.
+            workspace_path: The directory to create large temporary files in.
+                The files are cleaned up when the cluster is destroyed.
+
         Attributes:
             cluster_cls: The class to use to create and manage a cluster.
             generate_config_path: The path to a build artifact to install.
