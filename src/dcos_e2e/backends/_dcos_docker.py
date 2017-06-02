@@ -169,6 +169,10 @@ class DCOS_Docker_Cluster(ClusterImplementor):  # pylint: disable=invalid-name
             'MASTER_CTR': master_ctr,
             'AGENT_CTR': agent_ctr,
             'PUBLIC_AGENT_CTR': public_agent_ctr,
+            # This is a workaround for an error which occurs with DC/OS Docker
+            # when "$HOME" is not set.
+            # See https://jira.mesosphere.com/browse/DCOS_OSS-1193.
+            'HOME_MOUNTS': '',
         }  # type: Dict[str, str]
 
         if extra_config:
