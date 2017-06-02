@@ -73,6 +73,7 @@ class ClusterBackend(abc.ABC):
     @property
     def cluster_cls(self) -> Type[ClusterImplementor]:
         """
-        Maybe an explanation.
+        Return the `ClusterImplementor` class to use to create and manage a
+        cluster.
         """
         pass

@@ -59,7 +59,8 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
         """
-        The class to use to create and manage a cluster.
+        Return the `ClusterImplementor` class to use to create and manage a
+        cluster.
         """
         return DCOS_Docker_Cluster
 
