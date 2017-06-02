@@ -187,6 +187,7 @@ class DCOS_Docker_Cluster:  # pylint: disable=invalid-name
         Creating clusters involves creating temporary installer containers.
         These containers can conflict in name.
         If a conflict occurs, retry.
+        This works around https://jira.mesosphere.com/browse/DCOS_OSS-1192.
         """
         # The error substring differs on different versions of Docker.
         conflict_error_substring = 'Conflict. The container name'
