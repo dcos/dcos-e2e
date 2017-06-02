@@ -27,7 +27,7 @@ class ClusterImplementor(abc.ABC):
         cluster_backend: 'ClusterBackend',
     ) -> None:
         """
-        Maybe an explanation.
+        Create a DC/OS cluster with the given `cluster_backend`.
         """
 
     @abc.abstractmethod
