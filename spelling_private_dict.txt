@@ -20,4 +20,5 @@ systemd
 tmp
 travis
 url
+username
 vm
