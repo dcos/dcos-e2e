@@ -67,7 +67,7 @@ class Cluster(ContextDecorator):
         )
 
         # Wait for all nodes to start and join cluster.
-        # For now we wait three minutes as this is done in dcos-test-utils.
+        # For now we wait six minutes as this is done in dcos-test-utils.
         #
         # This has the downside that it will either wait too long or not long
         # enough.
@@ -77,7 +77,7 @@ class Cluster(ContextDecorator):
         #
         # For the former, see `make postflight` in DC/OS Docker.
         # For the latter, see `run_integration_test.sh` in DC/OS.
-        sleep(180)
+        sleep(60 * 6)
 
     def __enter__(self) -> 'Cluster':
         """
