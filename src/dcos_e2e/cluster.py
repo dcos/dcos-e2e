@@ -109,17 +109,15 @@ class Cluster(ContextDecorator):
             master.run_as_root(args=component_status_args)
 
         # Wait for nodes to join cluster
-        agents_joined_cluster_args = ['dig', 'slave.mesos', '+short']
-        dig_resp = master.run_as_root(args=agents_joined_cluster_args)
-        num_agents = len(dig_resp.stdout.split('\n'))
+        slave_dig = master.run_as_root(args=['dig', 'slave.mesos', '+short'])
+        num_agents = len(slave_dig.stdout.split('\n'))
         if num_agents > len(self.agents) + len(self.public_agents):
             raise Exception()
         if num_agents < len(self.agents) + len(self.public_agents):
             raise ValueError()
 
-        masters_joined_cluster_args = ['dig', 'master.mesos', '+short']
-        dig_resp = master.run_as_root(args=masters_joined_cluster_args)
-        num_masters = len(dig_resp.stdout.split('\n'))
+        agent_dig = master.run_as_root(args=['dig', 'agent.mesos', '+short'])
+        num_masters = len(agent_dig.stdout.split('\n'))
         if num_masters > len(self.masters):
             raise Exception()
         if num_agents < len(self.masters):
