@@ -81,6 +81,7 @@ class Cluster(ContextDecorator):
         # Wait for each master
         # TODO do this for each master
         master = next(iter(self.masters))
+        # TODO Maybe you need to just check with requests from the host?
         poll_web_server_args = [
             'curl',
             '--insecure',
@@ -92,6 +93,7 @@ class Cluster(ContextDecorator):
         while True:
             try:
                 master.run_as_root(args=poll_web_server_args)
+                break
             except subprocess.CalledProcessError:
                 sleep(5)
 
@@ -103,6 +105,7 @@ class Cluster(ContextDecorator):
         while True:
             try:
                 ls_output = master.run_as_root(args=config_3dt_ls_args)
+                break
             except subprocess.CalledProcessError:
                 sleep(5)
 
@@ -118,8 +121,28 @@ class Cluster(ContextDecorator):
             while True:
                 try:
                     master.run_as_root(args=component_status_args)
+                    break
                 except subprocess.CalledProcessError:
                     sleep(5)
+
+        # Wait for nodes to join cluster
+        agents_joined_cluster_args = ['dig', 'slave.mesos', '+short']
+        while True:
+            dig_resp = master.run_as_root(args=agents_joined_cluster_args)
+            num_agents = len(dig_resp.stdout.split('\n'))
+            if num_agents > agents + public_agents:
+                raise Exception()
+            if num_agents == agents + public_agents:
+                break
+
+        masters_joined_cluster_args = ['dig', 'master.mesos', '+short']
+        while True:
+            dig_resp = master.run_as_root(args=masters_joined_cluster_args)
+            num_masters = len(dig_resp.stdout.split('\n'))
+            if num_agents > masters:
+                raise Exception()
+            if num_agents == masters:
+                break
 
     def __enter__(self) -> 'Cluster':
         """
