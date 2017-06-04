@@ -1,8 +1,8 @@
 SHELL := /bin/bash -euxo pipefail
 
 ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-DCOS_DOCKER_REPOSITORY := https://github.com/adamtheturtle/dcos-docker.git
-DCOS_DOCKER_BRANCH := bump-docker-version
+DCOS_DOCKER_REPOSITORY := https://github.com/dcos/dcos-docker.git
+DCOS_DOCKER_BRANCH := master
 
 ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 DCOS_DOCKER_CLONE_PATH := /tmp/dcos-docker
