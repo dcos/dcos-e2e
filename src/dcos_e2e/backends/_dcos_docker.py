@@ -149,15 +149,15 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         master_ctr = 'dcos-master-{random}-'.format(random=random)
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
+
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
-        # supported. This was chosen for speed reasons.
+        # supported for speed reasons.
         client = docker.from_env(version='auto')
         host_driver = client.info()['Driver']
-        supported_storage_drivers = ('overlay', 'overlay2', 'aufs')
-        driver_supported = host_driver in supported_storage_drivers
-        storage_driver = host_driver if driver_supported else 'overlay2'
-
+        storage_driver = host_driver if host_driver in (
+            'overlay', 'overlay2', 'aufs'
+        ) else 'overlay2'
         self._variables = {
             'DOCKER_STORAGEDRIVER': storage_driver,
             # Some platforms support systemd and some do not.
@@ -233,26 +233,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 print(exc.stderr)
                 raise _ConflictingContainerError()
             raise
-
-    @property
-    def superuser_username(self) -> str:
-        """
-        Return the original username of the superuser on the cluster.
-        This may be outdated in that the username can change without this
-        property changing.
-        """
-        # By default, the DC/OS Docker Makefile uses this username.
-        return 'admin'
-
-    @property
-    def superuser_password(self) -> str:
-        """
-        Return the original password of the superuser on the cluster.
-        This may be outdated in that the password can change without this
-        property changing.
-        """
-        # By default, the DC/OS Docker Makefile uses this username.
-        return 'admin'
 
     def _make(self, target: str) -> None:
         """
