@@ -66,20 +66,12 @@ class Cluster(ContextDecorator):
             cluster_backend=cluster_backend,
         )
 
-        # Wait for all nodes to start and join cluster.
-        # For now we wait six minutes as this is done in dcos-test-utils.
-        #
-        # This has the downside that it will either wait too long or not long
-        # enough.
-        #
-        # A potential improvement to this will wait until each master is ready,
-        # and then for each agent to join the cluster.
-        #
-        # For the former, see `make postflight` in DC/OS Docker.
-        # For the latter, see `run_integration_test.sh` in DC/OS.
+        self._wait()
 
-        # Wait for each master
-        # TODO do this for each master
+    def _wait(self) -> None:
+        """
+        XXX
+        """
         master = next(iter(self.masters))
         # TODO Maybe you need to just check with requests from the host?
         poll_web_server_args = [
@@ -130,18 +122,18 @@ class Cluster(ContextDecorator):
         while True:
             dig_resp = master.run_as_root(args=agents_joined_cluster_args)
             num_agents = len(dig_resp.stdout.split('\n'))
-            if num_agents > agents + public_agents:
+            if num_agents > len(self.agents) + len(self.public_agents):
                 raise Exception()
-            if num_agents == agents + public_agents:
+            if num_agents == len(self.agents) + len(self.public_agents):
                 break
 
         masters_joined_cluster_args = ['dig', 'master.mesos', '+short']
         while True:
             dig_resp = master.run_as_root(args=masters_joined_cluster_args)
             num_masters = len(dig_resp.stdout.split('\n'))
-            if num_agents > masters:
+            if num_masters > len(self.masters):
                 raise Exception()
-            if num_agents == masters:
+            if num_agents == len(self.masters):
                 break
 
     def __enter__(self) -> 'Cluster':
