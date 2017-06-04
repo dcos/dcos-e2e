@@ -5,6 +5,7 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
+from time import sleep
 from typing import Any, Dict, List, Optional, Set
 
 from ._common import Node
@@ -64,7 +65,19 @@ class Cluster(ContextDecorator):
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
         )
-        self._cluster.postflight()
+
+        # Wait for all nodes to start and join cluster.
+        # For now we wait three minutes as this is done in dcos-test-utils.
+        #
+        # This has the downside that it will either wait too long or not long
+        # enough.
+        #
+        # A potential improvement to this will wait until each master is ready,
+        # and then for each agent to join the cluster.
+        #
+        # For the former, see `make postflight` in DC/OS Docker.
+        # For the latter, see `run_integration_test.sh` in DC/OS.
+        sleep(180)
 
     def __enter__(self) -> 'Cluster':
         """
