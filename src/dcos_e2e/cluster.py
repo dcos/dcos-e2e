@@ -77,7 +77,49 @@ class Cluster(ContextDecorator):
         #
         # For the former, see `make postflight` in DC/OS Docker.
         # For the latter, see `run_integration_test.sh` in DC/OS.
-        sleep(60 * 6)
+
+        # Wait for each master
+        # TODO do this for each master
+        master = next(iter(self.masters))
+        poll_web_server_args = [
+            'curl',
+            '--insecure',
+            '--fail',
+            '--location',
+            '--silent',
+            'http://127.0.0.1/',
+        ]
+        while True:
+            try:
+                master.run_as_root(args=poll_web_server_args)
+            except subprocess.CalledProcessError:
+                sleep(5)
+
+        config_3dt_ls_args = [
+            'ls',
+            '/opt/mesosphere/packages/3dt*/endpoints_config.json',
+        ]
+
+        while True:
+            try:
+                ls_output = master.run_as_root(args=config_3dt_ls_args)
+            except subprocess.CalledProcessError:
+                sleep(5)
+
+        config_files = ls_output.stdout.split('\n')
+        for config_file in config_files:
+            component_status_args = [
+                '/opt/mesosphere/bin/3dt',
+                '-diag',
+                '-endpoint-config={config_file}'.format(
+                    config_file=config_file,
+                ),
+            ]
+            while True:
+                try:
+                    master.run_as_root(args=component_status_args)
+                except subprocess.CalledProcessError:
+                    sleep(5)
 
     def __enter__(self) -> 'Cluster':
         """
