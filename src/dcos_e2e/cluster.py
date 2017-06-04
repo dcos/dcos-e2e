@@ -72,7 +72,7 @@ class Cluster(ContextDecorator):
     @retry(
         exceptions=(subprocess.CalledProcessError, ValueError),
         delay=10,
-        tries=60,
+        tries=200,
     )
     def _wait(self) -> None:
         """
