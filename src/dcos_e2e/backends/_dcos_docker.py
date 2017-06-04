@@ -151,10 +151,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         # Only overlay and aufs storage drivers are supported.
         # This chooses the aufs driver if the host's driver is not supported.
-        #
-        # This means that the tests will run even if the storage driver on
-        # the host is not one of these two.
-        #
         # aufs was chosen as it is supported on the version of Docker on
         # Travis CI.
         client = docker.from_env(version='auto')
