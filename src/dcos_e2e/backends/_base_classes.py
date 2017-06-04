@@ -49,12 +49,6 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def postflight(self) -> None:
-        """
-        Wait for nodes to be ready to run tests against.
-        """
-
-    @abc.abstractmethod
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.

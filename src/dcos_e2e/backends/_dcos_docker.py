@@ -266,12 +266,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             log_output_live=self.log_output_live
         )
 
-    def postflight(self) -> None:
-        """
-        Wait for nodes to be ready to run tests against.
-        """
-        self._make(target='postflight')
-
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.

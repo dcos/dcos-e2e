@@ -7,11 +7,13 @@ ci
 config
 cwd
 dc
+dcos
 dict
 genconf
 ip
 noqa
 os
+postflight
 pytest
 stderr
 stdout
@@ -20,5 +22,6 @@ systemd
 tmp
 travis
 url
+utils
 username
 vm
