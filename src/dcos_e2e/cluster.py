@@ -5,6 +5,7 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
+from retry import retry
 from time import sleep
 from typing import Any, Dict, List, Optional, Set
 
@@ -68,6 +69,11 @@ class Cluster(ContextDecorator):
 
         self._wait()
 
+    @retry(
+        exceptions=(subprocess.CalledProcessError, ValueError),
+        delay=10,
+        tries=60,
+    )
     def _wait(self) -> None:
         """
         XXX
@@ -82,26 +88,16 @@ class Cluster(ContextDecorator):
             '--silent',
             'http://127.0.0.1/',
         ]
-        while True:
-            try:
-                master.run_as_root(args=poll_web_server_args)
-                break
-            except subprocess.CalledProcessError:
-                sleep(5)
+        master.run_as_root(args=poll_web_server_args)
 
         config_3dt_ls_args = [
             'ls',
             '/opt/mesosphere/packages/3dt*/endpoints_config.json',
         ]
 
-        while True:
-            try:
-                ls_output = master.run_as_root(args=config_3dt_ls_args)
-                break
-            except subprocess.CalledProcessError:
-                sleep(5)
-
+        ls_output = master.run_as_root(args=config_3dt_ls_args)
         config_files = ls_output.stdout.split('\n')
+
         for config_file in config_files:
             component_status_args = [
                 '/opt/mesosphere/bin/3dt',
@@ -110,31 +106,24 @@ class Cluster(ContextDecorator):
                     config_file=config_file,
                 ),
             ]
-            while True:
-                try:
-                    master.run_as_root(args=component_status_args)
-                    break
-                except subprocess.CalledProcessError:
-                    sleep(5)
+            master.run_as_root(args=component_status_args)
 
         # Wait for nodes to join cluster
         agents_joined_cluster_args = ['dig', 'slave.mesos', '+short']
-        while True:
-            dig_resp = master.run_as_root(args=agents_joined_cluster_args)
-            num_agents = len(dig_resp.stdout.split('\n'))
-            if num_agents > len(self.agents) + len(self.public_agents):
-                raise Exception()
-            if num_agents == len(self.agents) + len(self.public_agents):
-                break
+        dig_resp = master.run_as_root(args=agents_joined_cluster_args)
+        num_agents = len(dig_resp.stdout.split('\n'))
+        if num_agents > len(self.agents) + len(self.public_agents):
+            raise Exception()
+        if num_agents < len(self.agents) + len(self.public_agents):
+            raise ValueError()
 
         masters_joined_cluster_args = ['dig', 'master.mesos', '+short']
-        while True:
-            dig_resp = master.run_as_root(args=masters_joined_cluster_args)
-            num_masters = len(dig_resp.stdout.split('\n'))
-            if num_masters > len(self.masters):
-                raise Exception()
-            if num_agents == len(self.masters):
-                break
+        dig_resp = master.run_as_root(args=masters_joined_cluster_args)
+        num_masters = len(dig_resp.stdout.split('\n'))
+        if num_masters > len(self.masters):
+            raise Exception()
+        if num_agents < len(self.masters):
+            raise ValueError()
 
     def __enter__(self) -> 'Cluster':
         """
