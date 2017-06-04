@@ -151,21 +151,15 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         # Only overlay and aufs storage drivers are supported.
         # This chooses the aufs driver if the host's driver is not supported.
-        #
-        # This means that the tests will run even if the storage driver on
-        # the host is not one of these two.
-        #
         # aufs was chosen as it is supported on the version of Docker on
         # Travis CI.
         client = docker.from_env(version='auto')
-        host_storage_driver = client.info()['Driver']
-        supported_storage_drivers = ('overlay', 'aufs')
-        if host_storage_driver in supported_storage_drivers:
-            docker_storage_driver = host_storage_driver
-        else:
-            docker_storage_driver = 'aufs'
+        host_driver = client.info()['Driver']
+        storage_driver = host_driver if host_driver in (
+            'overlay', 'aufs'
+        ) else 'aufs'
         self._variables = {
-            'DOCKER_STORAGEDRIVER': docker_storage_driver,
+            'DOCKER_STORAGEDRIVER': storage_driver,
             # Some platforms support systemd and some do not.
             # Disabling support makes all platforms consistent in this aspect.
             'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',
