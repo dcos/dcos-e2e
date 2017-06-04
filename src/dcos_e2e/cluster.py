@@ -5,8 +5,9 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from time import sleep
 from typing import Any, Dict, List, Optional, Set
+
+from retry import retry
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -71,18 +72,65 @@ class Cluster(ContextDecorator):
             superuser_password=self._superuser_password,
         )
 
-        # Wait for all nodes to start and join cluster.
-        # For now we wait six minutes as this is done in dcos-test-utils.
-        #
-        # This has the downside that it will either wait too long or not long
-        # enough.
-        #
-        # A potential improvement to this will wait until each master is ready,
-        # and then for each agent to join the cluster.
-        #
-        # For the former, see `make postflight` in DC/OS Docker.
-        # For the latter, see `run_integration_test.sh` in DC/OS.
-        sleep(60 * 6)
+        self._wait()
+
+    @retry(
+        exceptions=(subprocess.CalledProcessError, ValueError),
+        delay=10,
+        tries=200,
+    )
+    def _wait(self) -> None:
+        """
+        Wait for the cluster to be running and for all nodes to have joined the
+        cluster.
+        """
+        poll_web_server_args = [
+            'curl',
+            '--insecure',
+            '--fail',
+            '--location',
+            '--silent',
+            'http://127.0.0.1/',
+        ]
+
+        config_3dt_ls_args = [
+            'ls',
+            '/opt/mesosphere/packages/3dt*/endpoints_config.json',
+        ]
+
+        for master in self.masters:
+            master.run_as_root(args=poll_web_server_args)
+            ls_output = master.run_as_root(args=config_3dt_ls_args)
+            config_files = ls_output.stdout.split('\n')
+
+            for config_file in config_files:
+                component_status_args = [
+                    '/opt/mesosphere/bin/3dt',
+                    '-diag',
+                    '-endpoint-config={config_file}'.format(
+                        config_file=config_file,
+                    ),
+                ]
+                master.run_as_root(args=component_status_args)
+
+            # Wait for nodes to join cluster
+            slave_dig = master.run_as_root(
+                args=['dig', 'slave.mesos', '+short']
+            )
+            num_agents = len(slave_dig.stdout.split('\n'))
+            if num_agents > len(self.agents) + len(self.public_agents):
+                raise Exception()
+            if num_agents < len(self.agents) + len(self.public_agents):
+                raise ValueError()
+
+            agent_dig = master.run_as_root(
+                args=['dig', 'agent.mesos', '+short']
+            )
+            num_masters = len(agent_dig.stdout.split('\n'))
+            if num_masters > len(self.masters):
+                raise Exception()
+            if num_agents < len(self.masters):
+                raise ValueError()
 
     def __enter__(self) -> 'Cluster':
         """
