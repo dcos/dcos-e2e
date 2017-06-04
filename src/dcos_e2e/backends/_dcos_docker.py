@@ -109,6 +109,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             superuser_username: The username of the cluster superuser.
             superuser_password: The password of the cluster superuser.
                 Currently DC/OS Docker only supports "admin".
+
+        Raises:
+            ValueError: The given superuser password is not "admin".
         """
         if superuser_password != 'admin':
             raise ValueError(
