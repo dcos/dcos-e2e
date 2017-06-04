@@ -55,6 +55,9 @@ class Cluster(ContextDecorator):
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
 
+        self._superuser_username = 'admin'
+        self._superuser_password = 'admin'
+
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
@@ -64,6 +67,8 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
+            superuser_username=self._superuser_username,
+            superuser_password=self._superuser_password,
         )
 
         # Wait for all nodes to start and join cluster.
@@ -122,8 +127,8 @@ class Cluster(ContextDecorator):
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
         environment_variables = {
-            'DCOS_LOGIN_UNAME': self._cluster.superuser_username,
-            'DCOS_LOGIN_PW': self._cluster.superuser_password,
+            'DCOS_LOGIN_UNAME': self._superuser_username,
+            'DCOS_LOGIN_PW': self._superuser_password,
         }
 
         exports = [

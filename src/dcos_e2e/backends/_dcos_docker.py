@@ -80,6 +80,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: DCOS_Docker,
+        superuser_username: str,
+        superuser_password: str,
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -104,7 +106,16 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+            superuser_username: The username of the cluster superuser.
+            superuser_password: The password of the cluster superuser.
+                Currently DC/OS Docker only supports "admin".
         """
+        if superuser_password != 'admin':
+            raise ValueError(
+                "The only superuser password which is supported by DC/OS "
+                "Docker is 'admin'. "
+                "See https://jira.mesosphere.com/browse/DCOS-16035."
+            )
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
@@ -168,6 +179,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # when "$HOME" is not set.
             # See https://jira.mesosphere.com/browse/DCOS_OSS-1193.
             'HOME_MOUNTS': '',
+            'SUPERUSER_USERNAME': superuser_username,
+            'SUPERUSER_PASSWORD': superuser_password,
         }  # type: Dict[str, str]
 
         if extra_config:
