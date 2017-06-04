@@ -150,8 +150,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         # Only overlay, overlay2, and aufs storage drivers are supported.
-        # This chooses the overlay2 driver if the host's driver is not supported.
-        # This was chosen for speed reasons.
+        # This chooses the overlay2 driver if the host's driver is not
+        # supported. This was chosen for speed reasons.
         client = docker.from_env(version='auto')
         host_driver = client.info()['Driver']
         supported_storage_drivers = ('overlay', 'overlay2', 'aufs')
