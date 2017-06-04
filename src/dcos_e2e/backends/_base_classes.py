@@ -25,6 +25,8 @@ class ClusterManager(abc.ABC):
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
+        superuser_username: str,
+        superuser_password: str,
     ) -> None:
         """
         Create a DC/OS cluster with the given `cluster_backend`.
@@ -46,6 +48,8 @@ class ClusterManager(abc.ABC):
                 the master nodes before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+            superuser_username: The username of the cluster superuser.
+            superuser_password: The password of the cluster superuser.
         """
 
     @abc.abstractmethod
@@ -73,24 +77,6 @@ class ClusterManager(abc.ABC):
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public agent ``Node``s.
-        """
-
-    @property
-    @abc.abstractmethod
-    def superuser_username(self) -> str:
-        """
-        Return the original username of the superuser on the cluster.
-        This may be outdated in that the username can change without this
-        property changing.
-        """
-
-    @property
-    @abc.abstractmethod
-    def superuser_password(self) -> str:
-        """
-        Return the original password of the superuser on the cluster.
-        This may be outdated in that the password can change without this
-        property changing.
         """
 
 

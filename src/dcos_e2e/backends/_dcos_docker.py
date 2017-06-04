@@ -80,6 +80,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: DCOS_Docker,
+        superuser_username: str,
+        superuser_password: str,
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -104,7 +106,19 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+            superuser_username: The username of the cluster superuser.
+            superuser_password: The password of the cluster superuser.
+                Currently DC/OS Docker only supports "admin".
+
+        Raises:
+            ValueError: The given superuser password is not "admin".
         """
+        if superuser_password != 'admin':
+            raise ValueError(
+                "The only superuser password which is supported by DC/OS "
+                "Docker is 'admin'. "
+                "See https://jira.mesosphere.com/browse/DCOS-16035."
+            )
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
@@ -137,21 +151,15 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         # Only overlay and aufs storage drivers are supported.
         # This chooses the aufs driver if the host's driver is not supported.
-        #
-        # This means that the tests will run even if the storage driver on
-        # the host is not one of these two.
-        #
         # aufs was chosen as it is supported on the version of Docker on
         # Travis CI.
         client = docker.from_env(version='auto')
-        host_storage_driver = client.info()['Driver']
-        supported_storage_drivers = ('overlay', 'aufs')
-        if host_storage_driver in supported_storage_drivers:
-            docker_storage_driver = host_storage_driver
-        else:
-            docker_storage_driver = 'aufs'
+        host_driver = client.info()['Driver']
+        storage_driver = host_driver if host_driver in (
+            'overlay', 'aufs'
+        ) else 'aufs'
         self._variables = {
-            'DOCKER_STORAGEDRIVER': docker_storage_driver,
+            'DOCKER_STORAGEDRIVER': storage_driver,
             # Some platforms support systemd and some do not.
             # Disabling support makes all platforms consistent in this aspect.
             'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',
@@ -168,6 +176,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # when "$HOME" is not set.
             # See https://jira.mesosphere.com/browse/DCOS_OSS-1193.
             'HOME_MOUNTS': '',
+            'SUPERUSER_USERNAME': superuser_username,
+            'SUPERUSER_PASSWORD': superuser_password,
         }  # type: Dict[str, str]
 
         if extra_config:
@@ -223,26 +233,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 print(exc.stderr)
                 raise _ConflictingContainerError()
             raise
-
-    @property
-    def superuser_username(self) -> str:
-        """
-        Return the original username of the superuser on the cluster.
-        This may be outdated in that the username can change without this
-        property changing.
-        """
-        # By default, the DC/OS Docker Makefile uses this username.
-        return 'admin'
-
-    @property
-    def superuser_password(self) -> str:
-        """
-        Return the original password of the superuser on the cluster.
-        This may be outdated in that the password can change without this
-        property changing.
-        """
-        # By default, the DC/OS Docker Makefile uses this username.
-        return 'admin'
 
     def _make(self, target: str) -> None:
         """
