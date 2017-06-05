@@ -210,26 +210,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         self._variables['MASTER_MOUNTS'] = ' '.join(master_mounts)
         self._make(target='all')
 
-    @property
-    def superuser_username(self) -> str:
-        """
-        Return the original username of the superuser on the cluster.
-        This may be outdated in that the username can change without this
-        property changing.
-        """
-        # By default, the DC/OS Docker Makefile uses this username.
-        return 'admin'
-
-    @property
-    def superuser_password(self) -> str:
-        """
-        Return the original password of the superuser on the cluster.
-        This may be outdated in that the password can change without this
-        property changing.
-        """
-        # By default, the DC/OS Docker Makefile uses this username.
-        return 'admin'
-
     def _make(self, target: str) -> None:
         """
         Run `make` in the DC/OS Docker directory using variables associated
