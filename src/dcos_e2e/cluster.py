@@ -82,7 +82,11 @@ class Cluster(ContextDecorator):
         #
         # For the former, see `make postflight` in DC/OS Docker.
         # For the latter, see `run_integration_test.sh` in DC/OS.
-        sleep(60 * 20)
+        #
+        # Another option is to run 0 integration tests using the integration
+        # test suite.
+        self._cluster._make(target='postflight')
+        sleep(60 * 5)
 
     def __enter__(self) -> 'Cluster':
         """
