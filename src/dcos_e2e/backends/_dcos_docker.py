@@ -21,7 +21,7 @@ def _get_open_port() -> int:
     Return a free port.
     """
     host = ''
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as new_socket:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as new_socket:  # noqa
         new_socket.bind((host, 0))
         new_socket.listen(1)
         return new_socket.getsockname()[1]
