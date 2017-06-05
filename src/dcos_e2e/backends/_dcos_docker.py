@@ -156,6 +156,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         master_ctr = 'dcos-master-{random}-'.format(random=random)
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
+        installer_ctr = 'dcos-installer-{random}-'.format(random=random)
         # Only overlay and aufs storage drivers are supported.
         # This chooses the aufs driver if the host's driver is not supported.
         # aufs was chosen as it is supported on the version of Docker on
@@ -178,14 +179,14 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'MASTER_CTR': master_ctr,
             'AGENT_CTR': agent_ctr,
             'PUBLIC_AGENT_CTR': public_agent_ctr,
-            'MASTER_MOUNTS': '',
+            'INSTALLER_CTR': installer_ctr,
+            'INSTALLER_PORT': str(_get_open_port()),
             # This is a workaround for an error which occurs with DC/OS Docker
             # when "$HOME" is not set.
             # See https://jira.mesosphere.com/browse/DCOS_OSS-1193.
             'HOME_MOUNTS': '',
             'SUPERUSER_USERNAME': superuser_username,
             'SUPERUSER_PASSWORD': superuser_password,
-            'INSTALLER_PORT': str(_get_open_port()),
         }  # type: Dict[str, str]
 
         if extra_config:
