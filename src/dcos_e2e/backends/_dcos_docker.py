@@ -181,10 +181,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'PUBLIC_AGENT_CTR': public_agent_ctr,
             'INSTALLER_CTR': installer_ctr,
             'INSTALLER_PORT': str(_get_open_port()),
-            # This is a workaround for an error which occurs with DC/OS Docker
-            # when "$HOME" is not set.
-            # See https://jira.mesosphere.com/browse/DCOS_OSS-1193.
-            'HOME_MOUNTS': '',
             'SUPERUSER_USERNAME': superuser_username,
             'SUPERUSER_PASSWORD': superuser_password,
         }  # type: Dict[str, str]
