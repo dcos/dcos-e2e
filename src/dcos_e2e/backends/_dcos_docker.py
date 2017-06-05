@@ -2,6 +2,7 @@
 Helpers for interacting with DC/OS Docker.
 """
 
+import socket
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -13,6 +14,17 @@ import yaml
 
 from .._common import Node, run_subprocess
 from ._base_classes import ClusterBackend, ClusterManager
+
+
+def _get_open_port() -> int:
+    """
+    Return a free port.
+    """
+    host = ''
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as new_socket:
+        new_socket.bind((host, 0))
+        new_socket.listen(1)
+        return new_socket.getsockname()[1]
 
 
 class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
@@ -169,6 +181,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'HOME_MOUNTS': '',
             'SUPERUSER_USERNAME': superuser_username,
             'SUPERUSER_PASSWORD': superuser_password,
+            'INSTALLER_PORT': str(_get_open_port()),
         }  # type: Dict[str, str]
 
         if extra_config:
