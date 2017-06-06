@@ -175,6 +175,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'overlay', 'overlay2', 'aufs'
         ) else 'overlay2'
         self._variables = {
+            # This version of Docker supports `overlay2`.
+            'DOCKER_VERSION': '1.13.1',
             'DOCKER_STORAGEDRIVER': storage_driver,
             # Some platforms support systemd and some do not.
             # Disabling support makes all platforms consistent in this aspect.
