@@ -144,7 +144,7 @@ class TestExtendConfig:
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
-            cluster.wait()
+            cluster.wait_for_dcos()
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
@@ -160,7 +160,7 @@ class TestExtendConfig:
             cluster_backend=cluster_backend,
         ) as cluster:
             (master, ) = cluster.masters
-            cluster.wait()
+            cluster.wait_for_dcos()
             with pytest.raises(CalledProcessError):
                 master.run_as_root(args=['test', '-f', path])
 

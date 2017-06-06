@@ -30,4 +30,8 @@ setup(
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
     ],
+    dependency_links=[
+        # TODO Version in link
+        'git+https://github.com/mesosphere/dcos-test-utils.git#egg=dcos-test-utils-0.1'  # noqa: E501
+    ]
 )

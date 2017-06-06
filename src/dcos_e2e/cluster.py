@@ -5,8 +5,10 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from time import sleep
 from typing import Any, Dict, List, Optional, Set
+
+from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
+from dcos_test_utils.helpers import CI_CREDENTIALS
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -71,7 +73,7 @@ class Cluster(ContextDecorator):
             superuser_password=self._superuser_password,
         )
 
-    def wait(self) -> None:
+    def wait_for_dcos(self) -> None:
         """
         Wait until the cluster is ready and all nodes have joined.
 
@@ -81,7 +83,26 @@ class Cluster(ContextDecorator):
         See https://github.com/dcos/dcos/pull/1609/files for a probably more
         suitable approach.
         """
-        sleep(60 * 12)
+        web_host = next(iter(self.masters))
+        masters_ip_addresses = [
+            str(master.ip_address) for master in self.masters
+        ]
+        agents_ip_addresses = [str(agent.ip_address) for agent in self.agents]
+        public_agent_ip_addresses = [
+            str(public_agent.ip_address) for public_agent in self.public_agents
+        ]
+
+        dcos_url = 'http://' + str(web_host.ip_address)
+        auth_user = DcosUser(credentials=CI_CREDENTIALS)
+        api_session = DcosApiSession(
+            dcos_url=dcos_url,
+            masters=masters_ip_addresses,
+            slaves=agents_ip_addresses,
+            public_slaves=public_agent_ip_addresses,
+            default_os_user=self._superuser_username,
+            auth_user=auth_user,
+        )
+        api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
         """
@@ -125,7 +146,7 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        self.wait()
+        self.wait_for_dcos()
         environment_variables = {
             'DCOS_LOGIN_UNAME': self._superuser_username,
             'DCOS_LOGIN_PW': self._superuser_password,
