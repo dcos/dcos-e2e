@@ -7,8 +7,16 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
+from retry import retry
+
 from ._common import Node
 from .backends import ClusterBackend
+
+
+class _ClusterNotReady(Exception):
+    """
+    Raised when a cluster is not ready.
+    """
 
 
 class Cluster(ContextDecorator):
@@ -70,22 +78,27 @@ class Cluster(ContextDecorator):
             superuser_password=self._superuser_password,
         )
 
-        # Wait for all nodes to start and join cluster.
-        # For now we wait twenty minutes as this is done in dcos-test-utils.
-        #
-        # This has the downside that it will either wait too long or not long
-        # enough.
-        #
-        # A potential improvement to this will wait until each master is ready,
-        # and then for each agent to join the cluster.
-        #
-        # For the former, see `make postflight` in DC/OS Docker.
-        # For the latter, see `run_integration_test.sh` in DC/OS.
-        #
-        # Another option is to run 0 integration tests using the integration
-        # test suite.
-        self._cluster._make(target='postflight')
-        # sleep(60 * 5)
+    @retry(
+        exceptions=(subprocess.CalledProcessError),
+        delay=10,
+        tries=60,
+    )
+    def wait(self) -> None:
+        """
+        Wait for the cluster to be ready.
+        """
+        pytest_command = ['pytest', 'test_no_such_file.py']
+        try:
+            self.run_integration_tests(pytest_command=pytest_command)
+        except subprocess.CalledProcessError as exc:
+            # The command results in an exit code of 127 if the test file is
+            # not available.
+            if exc.returncode == 127:
+                raise _ClusterNotReady()
+            # `pytest` results in an exit code of 4 when no tests are
+            # collected.
+            # See https://docs.pytest.org/en/latest/usage.html.
+            assert exc.returncode == 4
 
     def __enter__(self) -> 'Cluster':
         """
@@ -115,8 +128,10 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
-    def run_integration_tests(self, pytest_command: List[str]
-                              ) -> subprocess.CompletedProcess:
+    def run_integration_tests(
+        self,
+        pytest_command: List[str],
+    ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
 
