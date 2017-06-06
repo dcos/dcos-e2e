@@ -2,14 +2,36 @@
 
 from setuptools import find_packages, setup
 
+dependency_links = []
+
 with open("requirements.txt") as requirements:
-    install_requires = requirements.readlines()
+    install_requires_lines = requirements.readlines()
+    install_requires = []
+    for line in install_requires_lines:
+        if line.startswith('#'):
+            continue
+        if line.startswith('--find-links '):
+            _, link = line.split('--find-links ')
+            dependency_links.append(link)
+        else:
+            install_requires.append(line)
 
 with open("dev-requirements.txt") as dev_requirements:
-    dev_requires = dev_requirements.readlines()
+    dev_requires_lines = dev_requirements.readlines()
+    dev_requires = []
+    for line in dev_requires_lines:
+        if line.startswith('#'):
+            continue
+        if line.startswith('--find-links '):
+            _, link = line.split('--find-links ')
+            dependency_links.append(link)
+        else:
+            dev_requires.append(line)
 
 with open('README.md') as f:
     long_description = f.read()
+
+test_utils_sha = '97131812adb6f2bfe33ba89c71eae6a868e1f6de'
 
 setup(
     name="DC/OS E2E",
@@ -30,8 +52,5 @@ setup(
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
     ],
-    dependency_links=[
-        # TODO Version in link
-        'git+https://github.com/mesosphere/dcos-test-utils.git#egg=dcos-test-utils-0.1'  # noqa: E501
-    ]
+    dependency_links=dependency_links,
 )
