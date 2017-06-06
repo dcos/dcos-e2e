@@ -86,7 +86,7 @@ class Cluster(ContextDecorator):
         # Another option is to run 0 integration tests using the integration
         # test suite.
         self._cluster._make(target='postflight')
-        # sleep(60 * 5)
+        sleep(60 * 5)
 
     def __enter__(self) -> 'Cluster':
         """
@@ -130,24 +130,30 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        agents = len(self._cluster.agents) + len(self._cluster.public_agents)
         environment_variables = {
             'DCOS_LOGIN_UNAME': self._superuser_username,
             'DCOS_LOGIN_PW': self._superuser_password,
-            'DCOS_NUM_AGENTS': agents,
-            'DCOS_PYTEST_CMD': ' '.join(pytest_command),
         }
 
-        args = []
-        for key, value in environment_variables:
-            export = "export {key}='{value}'".format(key=key, value=value)
-            args.append(export)
-            args.append('&&')
-
-        args += [
-            '/bin/bash',
-            '/opt/mesosphere/active/dcos-integration-test/util',
+        exports = [
+            "export {key}='{value}'".format(key=key, value=value)
+            for key, value in environment_variables.items()
         ]
+
+        set_env_variables = []
+        for export in exports:
+            set_env_variables.append(export)
+            set_env_variables.append('&&')
+
+        set_env_variables += ['source', '/opt/mesosphere/environment.export']
+
+        test_dir = '/opt/mesosphere/active/dcos-integration-test/'
+        change_to_test_dir = ['cd', test_dir]
+        and_cmd = ['&&']
+        args = (
+            change_to_test_dir + and_cmd + set_env_variables + and_cmd +
+            pytest_command
+        )
 
         # Tests are run on a random master node.
         test_host = next(iter(self.masters))
