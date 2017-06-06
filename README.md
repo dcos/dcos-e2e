@@ -39,13 +39,13 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
         - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
-        - [`wait()`](#wait)
       - [Attributes](#attributes)
         - [`masters`](#masters-1)
         - [`agents`](#agents-1)
         - [`public_agents`](#public_agents-1)
         - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
         - [`destroy()`](#destroy)
+        - [`wait()`](#wait)
     - [Nodes](#nodes)
         - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
 - [Contributing](#contributing)
@@ -106,7 +106,6 @@ class TestExample:
             result = master.run_as_root(args=['test', '-f', path])
             print(result.stdout)
             pytest_command = ['pytest', '-x', 'test_tls.py']
-            cluster.wait()
             cluster.run_integration_tests(pytest_command=pytest_command)
             try:
                 master.run_as_root(args=['test', '-f', '/no/file/here'])
@@ -208,10 +207,6 @@ On DC/OS Docker the files are mounted, read only, to the masters.
 If set to `True`, the cluster is destroyed on exit in all cases.
 If set to `False`, the cluster is preserved if there is an error.
 
-###### `wait()`
-
-Wait for the cluster to be ready, for example to run integration tests.
-
 ##### Attributes
 
 ###### `masters`
@@ -233,6 +228,10 @@ Run integration tests on the cluster.
 ###### `destroy()`
 
 Destroy all nodes in the cluster.
+
+###### `wait()`
+
+Wait for the cluster set up to be complete.
 
 #### Nodes
 
