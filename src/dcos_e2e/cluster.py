@@ -81,7 +81,7 @@ class Cluster(ContextDecorator):
         See https://github.com/dcos/dcos/pull/1609/files for a probably more
         suitable approach.
         """
-        sleep(60 * 15)
+        sleep(60 * 12)
 
     def __enter__(self) -> 'Cluster':
         """
