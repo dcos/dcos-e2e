@@ -5,7 +5,6 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from time import sleep
 from typing import Any, Dict, List, Optional, Set
 
 from ._common import Node
