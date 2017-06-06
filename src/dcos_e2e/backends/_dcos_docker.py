@@ -2,6 +2,7 @@
 Helpers for interacting with DC/OS Docker.
 """
 
+import socket
 import subprocess
 import uuid
 from ipaddress import IPv4Address
@@ -22,6 +23,21 @@ class _ConflictingContainerError(Exception):
     Raised when an existing container conflicts with a container which will be
     created.
     """
+
+
+def _get_open_port() -> int:
+    """
+    Return a free port.
+    """
+    host = ''
+    # We ignore type hinting to avoid a bug in `typeshed`.
+    # See https://github.com/python/typeshed/issues/1391.
+    with socket.socket(  # type: ignore
+        socket.AF_INET, socket.SOCK_STREAM
+    ) as new_socket:
+        new_socket.bind((host, 0))
+        new_socket.listen(1)
+        return new_socket.getsockname()[1]
 
 
 class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
@@ -149,6 +165,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         master_ctr = 'dcos-master-{random}-'.format(random=random)
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
+        installer_ctr = 'dcos-installer-{random}-'.format(random=random)
         # Only overlay and aufs storage drivers are supported.
         # This chooses the aufs driver if the host's driver is not supported.
         # aufs was chosen as it is supported on the version of Docker on
@@ -171,7 +188,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'MASTER_CTR': master_ctr,
             'AGENT_CTR': agent_ctr,
             'PUBLIC_AGENT_CTR': public_agent_ctr,
-            'MASTER_MOUNTS': '',
+            'INSTALLER_CTR': installer_ctr,
+            'INSTALLER_PORT': str(_get_open_port()),
             'SUPERUSER_USERNAME': superuser_username,
             'SUPERUSER_PASSWORD': superuser_password,
         }  # type: Dict[str, str]
