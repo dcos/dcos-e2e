@@ -31,21 +31,6 @@ def _get_open_port() -> int:
         return new_socket.getsockname()[1]
 
 
-def _get_open_port() -> int:
-    """
-    Return a free port.
-    """
-    host = ''
-    # We ignore type hinting to avoid a bug in `typeshed`.
-    # See https://github.com/python/typeshed/issues/1391.
-    with socket.socket(  # type: ignore
-        socket.AF_INET, socket.SOCK_STREAM
-    ) as new_socket:
-        new_socket.bind((host, 0))
-        new_socket.listen(1)
-        return new_socket.getsockname()[1]
-
-
 class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     """
     A record of a DC/OS Docker backend which can be used to create clusters.
