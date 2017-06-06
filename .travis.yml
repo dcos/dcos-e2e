@@ -46,3 +46,4 @@ before_script:
 # The main use of space is the copying of the config file to each directory.
 script:
     - 'travis_wait pytest -vvv -s -k "TestIntegrationTests"'
+    - 'travis_wait pytest -vvv -s -k "TestExtendConfig"'
