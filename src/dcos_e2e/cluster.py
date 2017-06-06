@@ -88,18 +88,38 @@ class Cluster(ContextDecorator):
         Wait for the cluster to be ready.
         """
         pytest_command = ['pytest', 'test_no_such_file.py']
+        environment_variables = {
+            'DCOS_LOGIN_UNAME': self._superuser_username,
+            'DCOS_LOGIN_PW': self._superuser_password,
+            'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
+            'DCOS_NUM_MASTERS': len(self.masters),
+            'DCOS_PYTEST_CMD': ' '.join(pytest_command),
+        }
+
+        args = []
+        for key, value in environment_variables.items():
+            export = "export {key}='{value}'".format(key=key, value=value)
+            args.append(export)
+            args.append('&&')
+
+        args += [
+            '/bin/bash',
+            '/opt/mesosphere/active/dcos-integration-test/util/run_integration_test.sh',  # noqa E501
+        ]
+        # Tests are run on a random master node.
+        test_host = next(iter(self.masters))
+
         try:
-            self.run_integration_tests(pytest_command=pytest_command)
+            test_host.run_as_root(
+                args=args,
+                log_output_live=self._log_output_live,
+            )
         except subprocess.CalledProcessError as exc:
             # The command results in an exit code of 127 if the test file is
             # not available.
             if exc.returncode == 127:
                 raise _ClusterNotReady()
-            # `pytest` results in an exit code of 4 when no tests are
-            # collected.
-            # See https://docs.pytest.org/en/latest/usage.html.
-            if exc.returncode != 4:
-                raise
+            raise
 
     def __enter__(self) -> 'Cluster':
         """
@@ -145,24 +165,31 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
+        self.wait()
         environment_variables = {
             'DCOS_LOGIN_UNAME': self._superuser_username,
             'DCOS_LOGIN_PW': self._superuser_password,
-            'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
-            'DCOS_NUM_MASTERS': len(self.masters),
-            'DCOS_PYTEST_CMD': ' '.join(pytest_command),
         }
 
-        args = []
-        for key, value in environment_variables.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
-            args.append(export)
-            args.append('&&')
-
-        args += [
-            '/bin/bash',
-            '/opt/mesosphere/active/dcos-integration-test/util/run_integration_test.sh',  # noqa E501
+        exports = [
+            "export {key}='{value}'".format(key=key, value=value)
+            for key, value in environment_variables.items()
         ]
+
+        set_env_variables = []
+        for export in exports:
+            set_env_variables.append(export)
+            set_env_variables.append('&&')
+
+        set_env_variables += ['source', '/opt/mesosphere/environment.export']
+
+        test_dir = '/opt/mesosphere/active/dcos-integration-test/'
+        change_to_test_dir = ['cd', test_dir]
+        and_cmd = ['&&']
+        args = (
+            change_to_test_dir + and_cmd + set_env_variables + and_cmd +
+            pytest_command
+        )
 
         # Tests are run on a random master node.
         test_host = next(iter(self.masters))
