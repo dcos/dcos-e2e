@@ -79,7 +79,7 @@ class Cluster(ContextDecorator):
         )
 
     @retry(
-        exceptions=(subprocess.CalledProcessError),
+        exceptions=(_ClusterNotReady),
         delay=10,
         tries=60,
     )
@@ -98,7 +98,8 @@ class Cluster(ContextDecorator):
             # `pytest` results in an exit code of 4 when no tests are
             # collected.
             # See https://docs.pytest.org/en/latest/usage.html.
-            assert exc.returncode == 4
+            if exc.returncode != 4:
+                raise
 
     def __enter__(self) -> 'Cluster':
         """
