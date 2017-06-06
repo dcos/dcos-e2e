@@ -31,7 +31,6 @@ class TestNode:
         with Cluster(
             agents=0,
             public_agents=0,
-            log_output_live=True,
             cluster_backend=cluster_backend,
         ) as cluster:
             (master, ) = cluster.masters
@@ -159,15 +158,12 @@ class TestExtendConfig:
         with Cluster(
             agents=0,
             public_agents=0,
-            log_output_live=True,
             cluster_backend=cluster_backend,
         ) as cluster:
             cluster.wait()
             (master, ) = cluster.masters
             with pytest.raises(CalledProcessError):
-                master.run_as_root(
-                    args=['test', '-f', path], log_output_live=True
-                )
+                master.run_as_root(args=['test', '-f', path])
 
 
 class TestClusterSize:
