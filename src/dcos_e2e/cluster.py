@@ -81,7 +81,8 @@ class Cluster(ContextDecorator):
         See https://github.com/dcos/dcos/pull/1609/files for a probably more
         suitable approach.
         """
-        sleep(60 * 12)
+        self._cluster._make(target='postflight')
+        sleep(60 * 5)
 
     def __enter__(self) -> 'Cluster':
         """
