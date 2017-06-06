@@ -3,7 +3,6 @@ Helpers for interacting with DC/OS Docker.
 """
 
 import socket
-import subprocess
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -12,17 +11,9 @@ from typing import Any, Dict, Set, Type
 
 import docker
 import yaml
-from retry import retry
 
 from .._common import Node, run_subprocess
 from ._base_classes import ClusterBackend, ClusterManager
-
-
-class _ConflictingContainerError(Exception):
-    """
-    Raised when an existing container conflicts with a container which will be
-    created.
-    """
 
 
 def _get_open_port() -> int:
@@ -218,35 +209,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             master_mounts.append(mount)
 
         self._variables['MASTER_MOUNTS'] = ' '.join(master_mounts)
-        self._create_containers()
-
-    @retry(exceptions=_ConflictingContainerError, delay=10, tries=30)
-    def _create_containers(self) -> None:
-        """
-        Create containers for the cluster.
-
-        Creating clusters involves creating temporary installer containers.
-        These containers can conflict in name.
-        If a conflict occurs, retry.
-        This works around https://jira.mesosphere.com/browse/DCOS_OSS-1203.
-        """
-        # The error substring differs on different versions of Docker.
-        conflict_error_substring = 'Conflict. The container name'
-        other_conflict_error_substring = 'Conflict. The name'
-
-        try:
-            self._make(target='all')
-        except subprocess.CalledProcessError as exc:
-            # Handle error in stderr or stdout.
-            # This is because if we log output live, stderr is redirected to
-            # stdout.
-            stderr = str(exc.stderr) + str(exc.stdout)
-            conflict = conflict_error_substring in stderr
-            conflict = conflict or other_conflict_error_substring in stderr
-            if conflict:
-                print(exc.stderr)
-                raise _ConflictingContainerError()
-            raise
+        self._make(target='all')
 
     def _make(self, target: str) -> None:
         """
