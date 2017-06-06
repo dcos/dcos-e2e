@@ -157,16 +157,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
         installer_ctr = 'dcos-installer-{random}-'.format(random=random)
-        # Only overlay and aufs storage drivers are supported.
-        # This chooses the aufs driver if the host's driver is not supported.
-        # aufs was chosen as it is supported on the version of Docker on
-        # Travis CI.
+        # Only overlay, overlay2, and aufs storage drivers are supported.
+        # This chooses the overlay2 driver if the host's driver is not
+        # supported for speed reasons.
         client = docker.from_env(version='auto')
         host_driver = client.info()['Driver']
         storage_driver = host_driver if host_driver in (
-            'overlay', 'aufs'
-        ) else 'aufs'
+            'overlay', 'overlay2', 'aufs'
+        ) else 'overlay2'
         self._variables = {
+            # This version of Docker supports `overlay2`.
+            'DOCKER_VERSION': '1.13.1',
             'DOCKER_STORAGEDRIVER': storage_driver,
             # Some platforms support systemd and some do not.
             # Disabling support makes all platforms consistent in this aspect.
