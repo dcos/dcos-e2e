@@ -138,7 +138,7 @@ class Cluster(ContextDecorator):
         }
 
         args = []
-        for key, value in environment_variables:
+        for key, value in environment_variables.items():
             export = "export {key}='{value}'".format(key=key, value=value)
             args.append(export)
             args.append('&&')
