@@ -45,6 +45,7 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`public_agents`](#public_agents-1)
         - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
         - [`destroy()`](#destroy)
+        - [`wait()`](#wait)
     - [Nodes](#nodes)
         - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
 - [Contributing](#contributing)
@@ -227,6 +228,10 @@ Run integration tests on the cluster.
 ###### `destroy()`
 
 Destroy all nodes in the cluster.
+
+###### `wait()`
+
+Wait for the cluster set up to be complete.
 
 #### Nodes
 

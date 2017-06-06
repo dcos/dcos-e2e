@@ -71,22 +71,17 @@ class Cluster(ContextDecorator):
             superuser_password=self._superuser_password,
         )
 
-        # Wait for all nodes to start and join cluster.
-        # For now we wait twenty minutes as this is done in dcos-test-utils.
-        #
-        # This has the downside that it will either wait too long or not long
-        # enough.
-        #
-        # A potential improvement to this will wait until each master is ready,
-        # and then for each agent to join the cluster.
-        #
-        # For the former, see `make postflight` in DC/OS Docker.
-        # For the latter, see `run_integration_test.sh` in DC/OS.
-        #
-        # Another option is to run 0 integration tests using the integration
-        # test suite.
-        self._cluster._make(target='postflight')
-        sleep(60 * 5)
+    def wait(self) -> None:
+        """
+        Wait until the cluster is ready and all nodes have joined.
+
+        Temporarily, this is a sleep which waits longer than DC/OS Docker has
+        shown to require.
+
+        See https://github.com/dcos/dcos/pull/1609/files for a probably more
+        suitable approach.
+        """
+        sleep(60 * 12)
 
     def __enter__(self) -> 'Cluster':
         """
@@ -130,6 +125,7 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
+        self.wait()
         environment_variables = {
             'DCOS_LOGIN_UNAME': self._superuser_username,
             'DCOS_LOGIN_PW': self._superuser_password,
