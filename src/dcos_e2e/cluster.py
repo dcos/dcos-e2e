@@ -145,7 +145,7 @@ class Cluster(ContextDecorator):
 
         args += [
             '/bin/bash',
-            '/opt/mesosphere/active/dcos-integration-test/util',
+            '/opt/mesosphere/active/dcos-integration-test/util/run_integration_test.sh',  # noqa E501
         ]
 
         # Tests are run on a random master node.
