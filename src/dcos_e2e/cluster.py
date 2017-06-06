@@ -145,11 +145,11 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        agents = len(self._cluster.agents) + len(self._cluster.public_agents)
         environment_variables = {
             'DCOS_LOGIN_UNAME': self._superuser_username,
             'DCOS_LOGIN_PW': self._superuser_password,
-            'DCOS_NUM_AGENTS': agents,
+            'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
+            'DCOS_NUM_MASTERS': len(self.masters),
             'DCOS_PYTEST_CMD': ' '.join(pytest_command),
         }
 
