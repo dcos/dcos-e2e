@@ -84,6 +84,7 @@ class TestIntegrationTests:
         Errors are raised from `pytest`.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
+            cluster.wait()
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
             cluster.run_integration_tests(pytest_command=pytest_command)
@@ -144,6 +145,7 @@ class TestExtendConfig:
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
+            cluster.wait()
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
@@ -158,6 +160,7 @@ class TestExtendConfig:
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
+            cluster.wait()
             (master, ) = cluster.masters
             with pytest.raises(CalledProcessError):
                 master.run_as_root(args=['test', '-f', path])

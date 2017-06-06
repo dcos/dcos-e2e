@@ -5,11 +5,18 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from time import sleep
 from typing import Any, Dict, List, Optional, Set
+
+from retry import retry
 
 from ._common import Node
 from .backends import ClusterBackend
+
+
+class _ClusterNotReady(Exception):
+    """
+    Raised when a cluster is not ready.
+    """
 
 
 class Cluster(ContextDecorator):
@@ -71,22 +78,48 @@ class Cluster(ContextDecorator):
             superuser_password=self._superuser_password,
         )
 
-        # Wait for all nodes to start and join cluster.
-        # For now we wait twenty minutes as this is done in dcos-test-utils.
-        #
-        # This has the downside that it will either wait too long or not long
-        # enough.
-        #
-        # A potential improvement to this will wait until each master is ready,
-        # and then for each agent to join the cluster.
-        #
-        # For the former, see `make postflight` in DC/OS Docker.
-        # For the latter, see `run_integration_test.sh` in DC/OS.
-        #
-        # Another option is to run 0 integration tests using the integration
-        # test suite.
-        self._cluster._make(target='postflight')
-        sleep(60 * 5)
+    @retry(
+        exceptions=(_ClusterNotReady),
+        delay=10,
+        tries=60,
+    )
+    def wait(self) -> None:
+        """
+        Wait for the cluster to be ready.
+        """
+        pytest_command = ['pytest', 'test_no_such_file.py']
+        environment_variables = {
+            'DCOS_LOGIN_UNAME': self._superuser_username,
+            'DCOS_LOGIN_PW': self._superuser_password,
+            'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
+            'DCOS_NUM_MASTERS': len(self.masters),
+            'DCOS_PYTEST_CMD': ' '.join(pytest_command),
+        }
+
+        args = []
+        for key, value in environment_variables.items():
+            export = "export {key}='{value}'".format(key=key, value=value)
+            args.append(export)
+            args.append('&&')
+
+        args += [
+            '/bin/bash',
+            '/opt/mesosphere/active/dcos-integration-test/util/run_integration_test.sh',  # noqa E501
+        ]
+        # Tests are run on a random master node.
+        test_host = next(iter(self.masters))
+
+        try:
+            test_host.run_as_root(
+                args=args,
+                log_output_live=self._log_output_live,
+            )
+        except subprocess.CalledProcessError as exc:
+            # The command results in an exit code of 127 if the test file is
+            # not available.
+            if exc.returncode == 127:
+                raise _ClusterNotReady()
+            raise
 
     def __enter__(self) -> 'Cluster':
         """
@@ -116,8 +149,10 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
-    def run_integration_tests(self, pytest_command: List[str]
-                              ) -> subprocess.CompletedProcess:
+    def run_integration_tests(
+        self,
+        pytest_command: List[str],
+    ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
 
@@ -130,6 +165,7 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
+        self.wait()
         environment_variables = {
             'DCOS_LOGIN_UNAME': self._superuser_username,
             'DCOS_LOGIN_PW': self._superuser_password,
