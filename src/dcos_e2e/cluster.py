@@ -171,25 +171,23 @@ class Cluster(ContextDecorator):
             'DCOS_LOGIN_PW': self._superuser_password,
         }
 
-        exports = [
-            "export {key}='{value}'".format(key=key, value=value)
-            for key, value in environment_variables.items()
+        args = []
+
+        for key, value in environment_variables.items():
+            export = "export {key}='{value}'".format(key=key, value=value)
+            args.append(export)
+            args.append('&&')
+
+        args += [
+            'source',
+            '/opt/mesosphere/environment.export',
+            '&&',
+            'cd',
+            '/opt/mesosphere/active/dcos-integration-test/',
+            '&&',
         ]
 
-        set_env_variables = []
-        for export in exports:
-            set_env_variables.append(export)
-            set_env_variables.append('&&')
-
-        set_env_variables += ['source', '/opt/mesosphere/environment.export']
-
-        test_dir = '/opt/mesosphere/active/dcos-integration-test/'
-        change_to_test_dir = ['cd', test_dir]
-        and_cmd = ['&&']
-        args = (
-            change_to_test_dir + and_cmd + set_env_variables + and_cmd +
-            pytest_command
-        )
+        args += pytest_command
 
         # Tests are run on a random master node.
         test_host = next(iter(self.masters))
