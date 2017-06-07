@@ -94,14 +94,22 @@ class Cluster(ContextDecorator):
 
         dcos_url = 'http://' + str(web_host.ip_address)
         auth_user = DcosUser(credentials=CI_CREDENTIALS)
+        default_os_user = 'root'
         api_session = DcosApiSession(
             dcos_url=dcos_url,
             masters=masters_ip_addresses,
             slaves=agents_ip_addresses,
             public_slaves=public_agent_ip_addresses,
-            default_os_user=self._superuser_username,
+            default_os_user=default_os_user,
             auth_user=auth_user,
         )
+        # Without the following line, if we use a CA certificate, e.g. in a
+        # permissive or strict security mode, requests made by `wait_for_dcos`
+        # will fail.
+        #
+        # A proper fix would be to download and use the root CA certificate.
+        # See: https://github.com/mesosphere/dcos-enterprise/blob/master/packages/dcos-integration-test/extra/api_session_fixture.py#L54-L91  # noqa: E501
+        api_session.session.verify = False
         api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
