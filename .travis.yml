@@ -8,6 +8,10 @@ language: "python"
 python:
   - "3.5"
 
+env:
+  - "TEST_PATTERN=TestIntegrationTests"
+  - "TEST_PATTERN=TestNode"
+
 before_install:
   - "pip install --upgrade pip setuptools"
   - "sudo apt-get update"
@@ -45,5 +49,4 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - 'travis_wait 30 pytest -x -vvv -s -k "TestIntegrationTests"'
-    - 'travis_wait 30 pytest -x -vvv -s -k "TestNode"'
+    - 'travis_wait 30 pytest -x -vvv -s -k "$TEST_PATTERN"'
