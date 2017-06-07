@@ -129,7 +129,7 @@ def run_subprocess(
         print(args)
         print("RETCODE:")
         print(retcode)
-        if retcode:
+        if retcode is None or retcode > 0:
             print("HERE 2")
             print(args)
             LOGGER.info(str(stderr))
