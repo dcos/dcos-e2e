@@ -22,6 +22,7 @@ class TestNode:
 
     def test_example_adam(self) -> None:
         from dcos_e2e._common import run_subprocess
+        run_subprocess(args=['test', '-d', '.'], log_output_live=False)
         run_subprocess(args=['test', '-d', '.'], log_output_live=True)
         run_subprocess(args=['test', '-d', '/etc/does_not_exist/'], log_output_live=True)
         run_subprocess(args=['test', '-d', '.'], log_output_live=True)
