@@ -31,7 +31,7 @@ Tests are currently not run on CI.
 Install dependencies in a virtual environment.
 
 ```sh
-pip install --editable .[dev]
+pip install --process-dependency-links --editable .[dev]
 ```
 
 Optionally install the following lint tools:
