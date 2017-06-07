@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import CI_CREDENTIALS
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -93,13 +92,18 @@ class Cluster(ContextDecorator):
         ]
 
         dcos_url = 'http://' + str(web_host.ip_address)
-        auth_user = DcosUser(credentials=CI_CREDENTIALS)
+        credentials = {
+            'uid': self._superuser_username,
+            'password': self._superuser_password,
+        }
+        auth_user = DcosUser(credentials=credentials)
+        default_os_user = 'root'
         api_session = DcosApiSession(
             dcos_url=dcos_url,
             masters=masters_ip_addresses,
             slaves=agents_ip_addresses,
             public_slaves=public_agent_ip_addresses,
-            default_os_user=self._superuser_username,
+            default_os_user=default_os_user,
             auth_user=auth_user,
         )
         # Without the following line, if we use a CA certificate, e.g. in a
