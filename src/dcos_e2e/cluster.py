@@ -93,8 +93,7 @@ class Cluster(ContextDecorator):
 
         dcos_url = 'http://' + str(web_host.ip_address)
         credentials = {
-            'uid': self._superuser_username,
-            'password': self._superuser_password,
+            self._superuser_username: self._superuser_password,
         }
         auth_user = DcosUser(credentials=credentials)
         default_os_user = 'root'
