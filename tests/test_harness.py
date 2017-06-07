@@ -239,7 +239,7 @@ class TestClusterLogging:
 
         encountered_error = False
         for record in caplog.records():
-            if two_clusters_error in record.msg:
+            if str(two_clusters_error) in str(record.msg):
                 encountered_error = True
         assert encountered_error
 
@@ -260,7 +260,7 @@ class TestClusterLogging:
 
         encountered_error = False
         for record in caplog.records():
-            if two_clusters_error in record.msg:
+            if str(two_clusters_error) in str(record.msg):
                 encountered_error = True
         assert not encountered_error
 
