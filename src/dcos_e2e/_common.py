@@ -117,6 +117,10 @@ def run_subprocess(
                 for line in process.stdout:
                     LOGGER.debug(line)
                     stdout += line
+                    # Without this, `.poll()` will return None on some
+                    # systems.
+                    # See https://stackoverflow.com/a/33563376.
+                process.communicate()
             else:
                 stdout, stderr = process.communicate()
         except:
