@@ -120,11 +120,18 @@ def run_subprocess(
             else:
                 stdout, stderr = process.communicate()
         except:
+            print("HERE 1")
+            print(args)
             process.kill()
             process.wait()
             raise
         retcode = process.poll()
+        print(args)
+        print("RETCODE:")
+        print(retcode)
         if retcode:
+            print("HERE 2")
+            print(args)
             LOGGER.info(str(stderr))
             raise CalledProcessError(
                 retcode, args, output=stdout, stderr=stderr
