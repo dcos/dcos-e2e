@@ -14,7 +14,7 @@ lint-python-only:
 	    python -c 'import sys; result = sys.stdin.read(); assert not result, result;'
 	mypy src/ tests/
 	pydocstyle
-	pylint src/dcos_e2e/ tests/
+	pylint *.py src/dcos_e2e/ tests/
 
 lint-docs:
 	npm run lint-md
