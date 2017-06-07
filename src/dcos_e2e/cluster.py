@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
+from dcos_test_utils.helpers import session_tempfile
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -74,6 +74,10 @@ class Cluster(ContextDecorator):
             superuser_password=self._superuser_password,
         )
 
+    @property
+    def superuser_token():
+        api_session.post()
+
     def wait_for_dcos(self) -> None:
         """
         Wait until the cluster is ready and all nodes have joined.
@@ -106,8 +110,12 @@ class Cluster(ContextDecorator):
             default_os_user = 'nobody'
             protocol = 'https://'
 
+        credentials = {
+            'uid': self._superuser_username,
+            'password': self._superuser_password,
+        }
         dcos_url = protocol + str(web_host.ip_address)
-        auth_user = DcosUser(credentials=CI_CREDENTIALS)
+        auth_user = DcosUser(credentials=credentials)
         api_session = DcosApiSession(
             dcos_url=dcos_url,
             masters=masters_ip_addresses,
@@ -118,9 +126,11 @@ class Cluster(ContextDecorator):
         )
 
         if security_mode in ('strict', 'permissive'):
-            ca_cert = api_session.get('/ca/dcos-ca.crt', verify=False)
+            ca_cert = api_session.get(
+                '/ca/dcos-ca.crt', retry_timeout=60 * 10, verify=False
+            )
             ca_cert.raise_for_status()
-            api_session.session = session_tempfile(ca_cert.content)
+            api_session.session.verify = session_tempfile(ca_cert.content)
         api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
