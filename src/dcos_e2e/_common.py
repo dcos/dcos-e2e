@@ -117,25 +117,18 @@ def run_subprocess(
                 for line in process.stdout:
                     LOGGER.debug(line)
                     stdout += line
-                    # Without this, `.poll()` will return None on some
-                    # systems.
-                    # See https://stackoverflow.com/a/33563376.
+                # Without this, `.poll()` will return None on some
+                # systems.
+                # See https://stackoverflow.com/a/33563376.
                 process.communicate()
             else:
                 stdout, stderr = process.communicate()
         except:
-            print("HERE 1")
-            print(args)
             process.kill()
             process.wait()
             raise
         retcode = process.poll()
-        print(args)
-        print("RETCODE:")
-        print(retcode)
-        if retcode is None or retcode > 0:
-            print("HERE 2")
-            print(args)
+        if retcode > 0:
             LOGGER.info(str(stderr))
             raise CalledProcessError(
                 retcode, args, output=stdout, stderr=stderr
