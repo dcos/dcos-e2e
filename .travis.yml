@@ -14,25 +14,25 @@ before_install:
   # Ideally we would use `addons.apt.packages` for enchant but this is not
   # supported by the linter.
   - "sudo apt-get install docker-engine enchant"
-  - "npm -g install npm@latest"
+  # - "npm -g install npm@latest"
 
 install:
   - "pip install --process-dependency-links --upgrade --editable .[dev]"
-  - "npm install"
+  # - "npm install"
 
 cache: "pip"
 
 before_script:
     - "make clean"
-    - "make lint"
-    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
-            echo 'Only the documentation was updated.';
-            echo 'No tests will be run'.;
-            echo 'No artifacts will be downloaded.';
-            exit ;
-       }
-       "
-    - 'make download-dependencies'
+    # - "make lint"
+    # - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
+    #         echo 'Only the documentation was updated.';
+    #         echo 'No tests will be run'.;
+    #         echo 'No artifacts will be downloaded.';
+    #         exit ;
+    #    }
+    #    "
+    # - 'make download-dependencies'
 
 # Unfortunately Travis has a time out for total test run (50 minutes) and total time without
 # output (10 minutes).
@@ -45,5 +45,6 @@ before_script:
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - 'travis_wait 30 pytest -x -vvv -s -k "TestIntegrationTests"'
-    - 'travis_wait 30 pytest -x -vvv -s -k "TestNode"'
+    - 'pytest -x -vvv -s -k test_example_adam'
+    # - 'travis_wait 30 pytest -x -vvv -s -k "TestIntegrationTests"'
+    # - 'travis_wait 30 pytest -x -vvv -s -k "TestNode"'
