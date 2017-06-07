@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
+from dcos_test_utils.helpers import CI_CREDENTIALS
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -56,7 +56,6 @@ class Cluster(ContextDecorator):
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        self._extra_config = dict(extra_config or {})
 
         self._superuser_username = 'admin'
         self._superuser_password = 'admin'
@@ -65,7 +64,7 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            extra_config=self._extra_config,
+            extra_config=dict(extra_config or {}),
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
@@ -93,34 +92,23 @@ class Cluster(ContextDecorator):
             str(public_agent.ip_address) for public_agent in self.public_agents
         ]
 
-        # We assume that `ssl_enabled` and `security` are not set in the base
-        # configuration.
-        # In the future we should not have a base configuration which we
-        # cannot read here.
-        security_mode = self._extra_config.get('security')
-        default_os_user = 'root'
-        protocol = 'http://'
-        if security_mode in ('strict', 'permissive'):
-            # This is not relevant for DC/OS OSS. This assumes that 'security'
-            # will not be set for DC/OS OSS.
-            default_os_user = 'nobody'
-            protocol = 'https://'
-
-        dcos_url = protocol + str(web_host.ip_address)
+        dcos_url = 'http://' + str(web_host.ip_address)
         auth_user = DcosUser(credentials=CI_CREDENTIALS)
         api_session = DcosApiSession(
             dcos_url=dcos_url,
             masters=masters_ip_addresses,
             slaves=agents_ip_addresses,
             public_slaves=public_agent_ip_addresses,
-            default_os_user=default_os_user,
+            default_os_user=self._superuser_username,
             auth_user=auth_user,
         )
-
-        if security_mode in ('strict', 'permissive'):
-            ca_cert = api_session.get('/ca/dcos-ca.crt', verify=False)
-            ca_cert.raise_for_status()
-            api_session.session = session_tempfile(ca_cert.content)
+        # Without the following line, if we use a CA certificate, e.g. in a
+        # permissive or strict security mode, requests made by `wait_for_dcos`
+        # will fail.
+        #
+        # A proper fix would be to download and use the root CA certificate.
+        # See: https://github.com/mesosphere/dcos-enterprise/blob/master/packages/dcos-integration-test/extra/api_session_fixture.py#L54-L91  # noqa: E501
+        api_session.session.verify = False
         api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
