@@ -21,6 +21,7 @@ env:
   - "TEST_PATTERN=TestExtendConfig"
   - "TEST_PATTERN=TestClusterSize"
   - "TEST_PATTERN=TestClusterLogging"
+  - "TEST_PATTERN=TestDestroyOnError"
 
 before_install:
   - "pip install --upgrade pip setuptools"
