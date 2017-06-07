@@ -209,7 +209,7 @@ class TestClusterLogging:
     """
 
     @pytest.fixture()
-    def two_clusters_error(self) -> bytes:
+    def two_clusters_error(self) -> str:
         """
         Return part of the error message shown when trying to create a cluster
         with two masters.
@@ -217,7 +217,7 @@ class TestClusterLogging:
         This is prone to being broken as it is a string in the DC/OS
         repository.
         """
-        return b'Must have 1, 3, 5, 7, or 9 masters'
+        return 'Must have 1, 3, 5, 7, or 9 masters'
 
     def test_live_logging(
         self,
