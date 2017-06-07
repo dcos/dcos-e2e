@@ -74,10 +74,6 @@ class Cluster(ContextDecorator):
             superuser_password=self._superuser_password,
         )
 
-    @property
-    def superuser_token():
-        api_session.post()
-
     def wait_for_dcos(self) -> None:
         """
         Wait until the cluster is ready and all nodes have joined.
