@@ -107,8 +107,7 @@ class Cluster(ContextDecorator):
             protocol = 'https://'
 
         credentials = {
-            'uid': self._superuser_username,
-            'password': self._superuser_password,
+            self._superuser_username: self._superuser_password,
         }
         dcos_url = protocol + str(web_host.ip_address)
         auth_user = DcosUser(credentials=credentials)
