@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import session_tempfile
+from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -56,7 +56,12 @@ class Cluster(ContextDecorator):
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        self._extra_config = dict(extra_config or {})
+        # We assume that `ssl_enabled` and `security` are not set in the base
+        # configuration.
+        # In the future we should not have a base configuration which we
+        # cannot read here.
+        extra_config = dict(extra_config or {})
+        self._security_mode = extra_config.get('security')
 
         self._superuser_username = 'admin'
         self._superuser_password = 'admin'
@@ -65,7 +70,7 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            extra_config=self._extra_config,
+            extra_config=extra_config,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
@@ -93,22 +98,19 @@ class Cluster(ContextDecorator):
             str(public_agent.ip_address) for public_agent in self.public_agents
         ]
 
-        # We assume that `ssl_enabled` and `security` are not set in the base
-        # configuration.
-        # In the future we should not have a base configuration which we
-        # cannot read here.
-        security_mode = self._extra_config.get('security')
         default_os_user = 'root'
         protocol = 'http://'
-        if security_mode in ('strict', 'permissive'):
+        # TODO get token with requests, use that
+        credentials = CI_CREDENTIALS
+        if self._security_mode in ('strict', 'permissive'):
             # This is not relevant for DC/OS OSS. This assumes that 'security'
             # will not be set for DC/OS OSS.
             default_os_user = 'nobody'
             protocol = 'https://'
-
-        credentials = {
-            self._superuser_username: self._superuser_password,
-        }
+            credentials = {
+                'uid': self._superuser_username,
+                'password': self._superuser_password,
+            }
         dcos_url = protocol + str(web_host.ip_address)
         auth_user = DcosUser(credentials=credentials)
         api_session = DcosApiSession(
@@ -120,8 +122,10 @@ class Cluster(ContextDecorator):
             auth_user=auth_user,
         )
 
-        if security_mode in ('strict', 'permissive'):
+        if self._security_mode in ('strict', 'permissive'):
             ca_cert = api_session.get(
+                # We wait up to 10 minutes which is arbitrary but has worked
+                # in testing at the time of writing.
                 '/ca/dcos-ca.crt', retry_timeout=60 * 10, verify=False
             )
             ca_cert.raise_for_status()
