@@ -93,6 +93,10 @@ class Cluster(ContextDecorator):
         ]
 
         dcos_url = 'http://' + str(web_host.ip_address)
+        credentials = {
+            'uid': 'admin',
+            'token': CI_CREDENTIALS['token'],
+        }
         auth_user = DcosUser(credentials=CI_CREDENTIALS)
         default_os_user = 'root'
         api_session = DcosApiSession(
