@@ -14,6 +14,7 @@ genconf
 ip
 noqa
 os
+oss
 postflight
 pytest
 stderr

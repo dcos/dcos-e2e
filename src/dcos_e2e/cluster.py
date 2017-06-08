@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import CI_CREDENTIALS
+from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -56,6 +56,14 @@ class Cluster(ContextDecorator):
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
+        # We assume that `ssl_enabled` and `security` are not set in the base
+        # configuration.
+        # In the future we should not have a base configuration which we
+        # cannot read here.
+        # This is not relevant for DC/OS OSS. This assumes that 'security'
+        # will not be set for DC/OS OSS.
+        extra_config = dict(extra_config or {})
+        self._security_mode = extra_config.get('security')
 
         self._superuser_username = 'admin'
         self._superuser_password = 'admin'
@@ -64,7 +72,7 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            extra_config=dict(extra_config or {}),
+            extra_config=extra_config,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
@@ -75,15 +83,10 @@ class Cluster(ContextDecorator):
 
     def wait_for_dcos(self) -> None:
         """
-        Wait until the cluster is ready and all nodes have joined.
-
-        Temporarily, this is a sleep which waits longer than DC/OS Docker has
-        shown to require.
-
-        See https://github.com/dcos/dcos/pull/1609/files for a probably more
-        suitable approach.
+        Wait until DC/OS has started and all nodes have joined the cluster.
         """
         web_host = next(iter(self.masters))
+
         masters_ip_addresses = [
             str(master.ip_address) for master in self.masters
         ]
@@ -92,9 +95,20 @@ class Cluster(ContextDecorator):
             str(public_agent.ip_address) for public_agent in self.public_agents
         ]
 
-        dcos_url = 'http://' + str(web_host.ip_address)
-        auth_user = DcosUser(credentials=CI_CREDENTIALS)
         default_os_user = 'root'
+        protocol = 'http://'
+        if self._security_mode in ('strict', 'permissive'):
+            default_os_user = 'nobody'
+            protocol = 'https://'
+            credentials = {
+                'uid': self._superuser_username,
+                'password': self._superuser_password,
+            }
+        else:
+            credentials = CI_CREDENTIALS
+
+        dcos_url = protocol + str(web_host.ip_address)
+        auth_user = DcosUser(credentials=credentials)
         api_session = DcosApiSession(
             dcos_url=dcos_url,
             masters=masters_ip_addresses,
@@ -103,13 +117,18 @@ class Cluster(ContextDecorator):
             default_os_user=default_os_user,
             auth_user=auth_user,
         )
-        # Without the following line, if we use a CA certificate, e.g. in a
-        # permissive or strict security mode, requests made by `wait_for_dcos`
-        # will fail.
-        #
-        # A proper fix would be to download and use the root CA certificate.
-        # See: https://github.com/mesosphere/dcos-enterprise/blob/master/packages/dcos-integration-test/extra/api_session_fixture.py#L54-L91  # noqa: E501
-        api_session.session.verify = False
+
+        if self._security_mode in ('strict', 'permissive'):
+            ca_cert = api_session.get(
+                # We wait up to 10 minutes which is arbitrary but has worked
+                # in testing at the time of writing.
+                '/ca/dcos-ca.crt',
+                retry_timeout=60 * 10,
+                verify=False
+            )
+            ca_cert.raise_for_status()
+            api_session.session.verify = session_tempfile(ca_cert.content)
+
         api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
