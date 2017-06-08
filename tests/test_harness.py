@@ -7,6 +7,7 @@ long time to run.
 
 import logging
 from subprocess import CalledProcessError
+from typing import List
 
 import pytest
 from pytest_capturelog import CaptureLogFuncArg
@@ -208,20 +209,31 @@ class TestClusterLogging:
     Tests for logs created by the ``Cluster``.
     """
 
-    @pytest.fixture()
-    def two_clusters_error(self) -> bytes:
+    def _two_masters_error_logged(
+        self,
+        log_records: List[logging.LogRecord],
+    ) -> bool:
         """
-        Return part of the error message shown when trying to create a cluster
-        with two masters.
+        Return whether a particular error is logged as a DEBUG message.
 
-        This is prone to being broken as it is a string in the DC/OS
+        This is prone to being broken as it checks for a string in the DC/OS
         repository.
+
+        Args:
+            log_records: Messages logged from the logger.
+
+        Returns:
+            Whether a particular error is logged as a DEBUG message.
         """
-        return b'Must have 1, 3, 5, 7, or 9 masters'
+        message = 'Must have 1, 3, 5, 7, or 9 masters'
+        encountered_error = False
+        for record in log_records:
+            if record.levelno == logging.DEBUG and message in str(record.msg):
+                encountered_error = True
+        return encountered_error
 
     def test_live_logging(
         self,
-        two_clusters_error: str,
         caplog: CaptureLogFuncArg,
         cluster_backend: ClusterBackend,
     ) -> None:
@@ -237,15 +249,10 @@ class TestClusterLogging:
             ):
                 pass
 
-        encountered_error = False
-        for record in caplog.records():
-            if two_clusters_error in record.msg:
-                encountered_error = True
-        assert encountered_error
+        assert self._two_masters_error_logged(log_records=caplog.records())
 
     def test_no_live_logging(
         self,
-        two_clusters_error: str,
         caplog: CaptureLogFuncArg,
         cluster_backend: ClusterBackend,
     ) -> None:
@@ -258,11 +265,7 @@ class TestClusterLogging:
             with Cluster(masters=2, cluster_backend=cluster_backend):
                 pass
 
-        encountered_error = False
-        for record in caplog.records():
-            if two_clusters_error in record.msg:
-                encountered_error = True
-        assert not encountered_error
+        assert not self._two_masters_error_logged(log_records=caplog.records())
 
 
 class TestMultipleClusters:
