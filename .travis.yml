@@ -8,6 +8,21 @@ language: "python"
 python:
   - "3.5"
 
+env:
+  # Travis has a maximum test run time of 50 minutes.
+  # In order to avoid this and to see failures faster, we run multiple builds
+  # per commit.
+  #
+  # We do not run tests which use multiple clusters as this uses too much
+  # space for Travis CI.
+  # The main use of space is the copying of the config file to each directory.
+  - "TEST_PATTERN=TestNode"
+  - "TEST_PATTERN=TestIntegrationTests"
+  - "TEST_PATTERN=TestExtendConfig"
+  - "TEST_PATTERN=TestClusterSize"
+  - "TEST_PATTERN=TestClusterLogging"
+  - "TEST_PATTERN=TestDestroyOnError"
+
 before_install:
   - "pip install --upgrade pip setuptools"
   - "sudo apt-get update"
@@ -34,16 +49,11 @@ before_script:
        "
     - 'make download-dependencies'
 
-# Unfortunately Travis has a time out for total test run (50 minutes) and total time without
-# output (10 minutes).
-#
-# We avoid the former by running only a small part of our test suite.
-#
-# We get around the latter by using `travis_wait` which hides all output
-# until the tests are finished.
+# Travis has a time out for total for time without output (10 minutes).
+# We get around this by using `travis_wait` which hides all output until the
+# tests are finished.
 #
 # We do not run tests in parallel as this uses too much space for Travis CI.
 # The main use of space is the copying of the config file to each directory.
 script:
-    - 'travis_wait 30 pytest -x -vvv -s -k "TestIntegrationTests"'
-    - 'travis_wait 30 pytest -x -vvv -s -k "TestNode"'
+    - 'travis_wait 30 pytest -x -vvv -s -k "$TEST_PATTERN"'
