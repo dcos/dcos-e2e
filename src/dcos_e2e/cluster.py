@@ -120,10 +120,10 @@ class Cluster(ContextDecorator):
 
         if self._security_mode in ('strict', 'permissive'):
             ca_cert = api_session.get(
-                # We wait up to 10 minutes which is arbitrary but has worked
+                # We wait up to 20 minutes which is arbitrary but has worked
                 # in testing at the time of writing.
                 '/ca/dcos-ca.crt',
-                retry_timeout=60 * 10,
+                retry_timeout=60 * 20,
                 verify=False
             )
             ca_cert.raise_for_status()
