@@ -83,13 +83,7 @@ class Cluster(ContextDecorator):
 
     def wait_for_dcos(self) -> None:
         """
-        Wait until the cluster is ready and all nodes have joined.
-
-        Temporarily, this is a sleep which waits longer than DC/OS Docker has
-        shown to require.
-
-        See https://github.com/dcos/dcos/pull/1609/files for a probably more
-        suitable approach.
+        Wait until DC/OS has started and all nodes have joined the cluster.
         """
         web_host = next(iter(self.masters))
 
