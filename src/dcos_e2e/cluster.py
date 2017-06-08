@@ -60,6 +60,8 @@ class Cluster(ContextDecorator):
         # configuration.
         # In the future we should not have a base configuration which we
         # cannot read here.
+        # This is not relevant for DC/OS OSS. This assumes that 'security'
+        # will not be set for DC/OS OSS.
         extra_config = dict(extra_config or {})
         self._security_mode = extra_config.get('security')
 
@@ -90,6 +92,7 @@ class Cluster(ContextDecorator):
         suitable approach.
         """
         web_host = next(iter(self.masters))
+
         masters_ip_addresses = [
             str(master.ip_address) for master in self.masters
         ]
@@ -100,17 +103,16 @@ class Cluster(ContextDecorator):
 
         default_os_user = 'root'
         protocol = 'http://'
-        # TODO get token with requests, use that
-        credentials = CI_CREDENTIALS
         if self._security_mode in ('strict', 'permissive'):
-            # This is not relevant for DC/OS OSS. This assumes that 'security'
-            # will not be set for DC/OS OSS.
             default_os_user = 'nobody'
             protocol = 'https://'
             credentials = {
                 'uid': self._superuser_username,
                 'password': self._superuser_password,
             }
+        else:
+            credentials = CI_CREDENTIALS
+
         dcos_url = protocol + str(web_host.ip_address)
         auth_user = DcosUser(credentials=credentials)
         api_session = DcosApiSession(
@@ -126,10 +128,13 @@ class Cluster(ContextDecorator):
             ca_cert = api_session.get(
                 # We wait up to 10 minutes which is arbitrary but has worked
                 # in testing at the time of writing.
-                '/ca/dcos-ca.crt', retry_timeout=60 * 10, verify=False
+                '/ca/dcos-ca.crt',
+                retry_timeout=60 * 10,
+                verify=False
             )
             ca_cert.raise_for_status()
             api_session.session.verify = session_tempfile(ca_cert.content)
+
         api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
