@@ -207,6 +207,20 @@ On DC/OS Docker the files are mounted, read only, to the masters.
 If set to `True`, the cluster is destroyed on exit in all cases.
 If set to `False`, the cluster is preserved if there is an error.
 
+##### Methods
+
+###### `run_integration_tests(pytest_command)`
+
+Run integration tests on the cluster.
+
+###### `destroy()`
+
+Destroy all nodes in the cluster.
+
+###### `wait_for_dcos()`
+
+Wait for the cluster set up to be complete.
+
 ##### Attributes
 
 ###### `masters`
@@ -221,17 +235,13 @@ The agent nodes in the cluster.
 
 The public agent nodes in the cluster.
 
-###### `run_integration_tests(pytest_command)`
+##### `original_superuser_username`
 
-Run integration tests on the cluster.
+The original superuser username of the cluster.
 
-###### `destroy()`
+##### `original_superuser_password`
 
-Destroy all nodes in the cluster.
-
-###### `wait_for_dcos()`
-
-Wait for the cluster set up to be complete.
+The original superuser password of the cluster.
 
 #### Nodes
 
