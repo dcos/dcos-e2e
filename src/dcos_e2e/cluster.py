@@ -3,6 +3,7 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -65,7 +66,7 @@ class Cluster(ContextDecorator):
         extra_config = dict(extra_config or {})
         self._security_mode = extra_config.get('security')
 
-        self.original_superuser_username = 'admin'
+        self.original_superuser_username = uuid.uuid4()
         self.original_superuser_password = 'admin'
 
         self._cluster = cluster_backend.cluster_cls(
