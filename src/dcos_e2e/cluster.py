@@ -3,12 +3,14 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
+from passlib.hash import sha512_crypt
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -32,6 +34,7 @@ class Cluster(ContextDecorator):
         destroy_on_error: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
+        superuser_password: Optional[str]=None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -40,6 +43,8 @@ class Cluster(ContextDecorator):
             cluster_backend: The backend to use for the cluster.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
+                If `superuser_username` or `superuser_password_hash` is not
+                given, random values are used.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -53,6 +58,18 @@ class Cluster(ContextDecorator):
             files_to_copy_to_masters: A mapping of host paths to paths on the
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS.
+            superuser_password: The superuser password to use. This is only
+                relevant to DC/OS Enterprise clusters.
+
+        Attributes:
+            original_superuser_username: The original superuser username of
+                the cluster. This is only useful for DC/OS Enterprise clusters.
+            original_superuser_password: The original superuser password of
+                the cluster. This is only useful for DC/OS Enterprise clusters.
+
+        Raises:
+            ValueError: `extra_config` includes `superuser_password_hash`
+                and this is not a valid hash of `superuser_password`.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
@@ -63,10 +80,30 @@ class Cluster(ContextDecorator):
         # This is not relevant for DC/OS OSS. This assumes that 'security'
         # will not be set for DC/OS OSS.
         extra_config = dict(extra_config or {})
-        self._security_mode = extra_config.get('security')
 
-        self._superuser_username = 'admin'
-        self._superuser_password = 'admin'
+        if 'superuser_password_hash' in extra_config:
+            if not sha512_crypt.verify(
+                superuser_password,
+                extra_config['superuser_password_hash'],
+            ):
+                message = (
+                    '`superuser_password_hash` in the configuration must be a '
+                    'valid SHA512 hash of `superuser_password`.'
+                )
+                raise ValueError(message)
+
+        self._security_mode = extra_config.get('security')
+        self.original_superuser_password = (
+            superuser_password or str(uuid.uuid4())
+        )
+        self.original_superuser_username = extra_config.get(
+            'superuser_username', ''
+        )
+        password_hash = extra_config.get(
+            'superuser_password_hash',
+            sha512_crypt.hash(self.original_superuser_password)
+        )
+        extra_config['superuser_password_hash'] = password_hash
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
@@ -77,13 +114,15 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
-            superuser_username=self._superuser_username,
-            superuser_password=self._superuser_password,
         )
 
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
+
+        This uses the originally given superuser username and password.
+        Therefore, if these are changed during the cluster's lifetime, they
+        may not be valid.
         """
         web_host = next(iter(self.masters))
 
@@ -101,8 +140,8 @@ class Cluster(ContextDecorator):
             default_os_user = 'nobody'
             protocol = 'https://'
             credentials = {
-                'uid': self._superuser_username,
-                'password': self._superuser_password,
+                'uid': self.original_superuser_username,
+                'password': self.original_superuser_password,
             }
         else:
             credentials = CI_CREDENTIALS
@@ -159,10 +198,15 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
-    def run_integration_tests(self, pytest_command: List[str]
-                              ) -> subprocess.CompletedProcess:
+    def run_integration_tests(
+        self,
+        pytest_command: List[str],
+    ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
+        This uses the originally given superuser username and password.
+        Therefore, if these are changed during the cluster's lifetime, they
+        may not be valid.
 
         Args:
             pytest_command: The ``pytest`` command to run on the node.
@@ -175,8 +219,8 @@ class Cluster(ContextDecorator):
         """
         self.wait_for_dcos()
         environment_variables = {
-            'DCOS_LOGIN_UNAME': self._superuser_username,
-            'DCOS_LOGIN_PW': self._superuser_password,
+            'DCOS_LOGIN_UNAME': self.original_superuser_username,
+            'DCOS_LOGIN_PW': self.original_superuser_password,
         }
 
         args = []

@@ -39,13 +39,17 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
         - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
+        - [`superuser_password`](#superuser_password)
+      - [Methods](#methods)
+        - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
+        - [`destroy()`](#destroy)
+        - [`wait_for_dcos()`](#wait_for_dcos)
       - [Attributes](#attributes)
         - [`masters`](#masters-1)
         - [`agents`](#agents-1)
         - [`public_agents`](#public_agents-1)
-        - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
-        - [`destroy()`](#destroy)
-        - [`wait_for_dcos()`](#wait_for_dcos)
+      - [`original_superuser_username`](#original_superuser_username)
+      - [`original_superuser_password`](#original_superuser_password)
     - [Nodes](#nodes)
         - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
 - [Contributing](#contributing)
@@ -207,6 +211,25 @@ On DC/OS Docker the files are mounted, read only, to the masters.
 If set to `True`, the cluster is destroyed on exit in all cases.
 If set to `False`, the cluster is preserved if there is an error.
 
+###### `superuser_password`
+
+The superuser password to use. This is only relevant to DC/OS Enterprise clusters.
+It is assumed that if `extra_config` includes `superuser_password_hash` then that is a hash of this password.
+
+##### Methods
+
+###### `run_integration_tests(pytest_command)`
+
+Run integration tests on the cluster.
+
+###### `destroy()`
+
+Destroy all nodes in the cluster.
+
+###### `wait_for_dcos()`
+
+Wait for the cluster set up to be complete.
+
 ##### Attributes
 
 ###### `masters`
@@ -221,17 +244,17 @@ The agent nodes in the cluster.
 
 The public agent nodes in the cluster.
 
-###### `run_integration_tests(pytest_command)`
+##### `original_superuser_username`
 
-Run integration tests on the cluster.
+The original superuser username of the cluster.
+This is a random string if it is not given in `extra_config`.
+This is only useful for DC/OS Enterprise clusters.
 
-###### `destroy()`
+##### `original_superuser_password`
 
-Destroy all nodes in the cluster.
-
-###### `wait_for_dcos()`
-
-Wait for the cluster set up to be complete.
+The original superuser password of the cluster.
+This is a random string if it is not given in `extra_config`.
+This is only useful for DC/OS Enterprise clusters.
 
 #### Nodes
 
