@@ -93,7 +93,9 @@ class Cluster(ContextDecorator):
                 raise ValueError(message)
 
         self._security_mode = extra_config.get('security')
-        self.original_superuser_password = superuser_password or uuid.uuid4()
+        self.original_superuser_password = (
+            superuser_password or str(uuid.uuid4())
+        )
         self.original_superuser_username = extra_config.get(
             'superuser_username', ''
         )
