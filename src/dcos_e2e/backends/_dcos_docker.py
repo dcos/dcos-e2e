@@ -162,10 +162,12 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             destination_path = self._path / 'genconf' / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        extra_genconf_config = yaml.dump(
-            data=extra_config or None,
-            default_flow_style=False,
-        )
+        extra_genconf_config = ''
+        if extra_config:
+            extra_genconf_config = yaml.dump(
+                data=extra_config,
+                default_flow_style=False,
+            )
 
         master_mounts = []
         for host_path, master_path in files_to_copy_to_masters.items():
