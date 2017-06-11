@@ -142,6 +142,30 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
+        # Files in the DC/OS Docker directory's genconf directory are mounted
+        # to the installer at `/genconf`.
+        # Therefore, every file which we want to copy to `/genconf` on the
+        # installer is put into the genconf directory in DC/OS Docker.
+        for host_path, installer_path in files_to_copy_to_installer.items():
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = self._path / 'genconf' / relative_installer_path
+            copyfile(src=str(host_path), dst=str(destination_path))
+
+        extra_genconf_config = ''
+        if extra_config:
+            extra_genconf_config = yaml.dump(
+                data=extra_config,
+                default_flow_style=False,
+            )
+
+        master_mounts = []
+        for host_path, master_path in files_to_copy_to_masters.items():
+            mount = '-v {host_path}:{master_path}:ro'.format(
+                host_path=host_path,
+                master_path=master_path,
+            )
+            master_mounts.append(mount)
+
         master_ctr = 'dcos-master-{random}-'.format(random=random)
         agent_ctr = 'dcos-agent-{random}-'.format(random=random)
         public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
@@ -171,32 +195,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'PUBLIC_AGENT_CTR': public_agent_ctr,
             'INSTALLER_CTR': installer_ctr,
             'INSTALLER_PORT': str(_get_open_port()),
+            'EXTRA_GENCONF_CONFIG': extra_genconf_config,
+            'MASTER_MOUNTS': ' '.join(master_mounts),
         }  # type: Dict[str, str]
 
-        if extra_config:
-            self._variables['EXTRA_GENCONF_CONFIG'] = yaml.dump(
-                data=extra_config,
-                default_flow_style=False,
-            )
-
-        # Files in the DC/OS Docker directory's genconf directory are mounted
-        # to the installer at `/genconf`.
-        # Therefore, every file which we want to copy to `/genconf` on the
-        # installer is put into the genconf directory in DC/OS Docker.
-        for host_path, installer_path in files_to_copy_to_installer.items():
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = self._path / 'genconf' / relative_installer_path
-            copyfile(src=str(host_path), dst=str(destination_path))
-
-        master_mounts = []
-        for host_path, master_path in files_to_copy_to_masters.items():
-            mount = '-v {host_path}:{master_path}:ro'.format(
-                host_path=host_path,
-                master_path=master_path,
-            )
-            master_mounts.append(mount)
-
-        self._variables['MASTER_MOUNTS'] = ' '.join(master_mounts)
         self._make(target='all')
 
     def _make(self, target: str) -> None:
