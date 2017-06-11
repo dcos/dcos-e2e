@@ -3,7 +3,6 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
-import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -132,8 +131,8 @@ class Cluster(ContextDecorator):
             default_os_user = 'nobody'
             protocol = 'https://'
             credentials = {
-                'uid': self.original_superuser_username,
-                'password': self.original_superuser_password,
+                'uid': self._superuser_username,
+                'password': self._superuser_password,
             }
         else:
             credentials = CI_CREDENTIALS
@@ -211,8 +210,8 @@ class Cluster(ContextDecorator):
         """
         self.wait_for_dcos()
         environment_variables = {
-            'DCOS_LOGIN_UNAME': self.original_superuser_username,
-            'DCOS_LOGIN_PW': self.original_superuser_password,
+            'DCOS_LOGIN_UNAME': self._superuser_username,
+            'DCOS_LOGIN_PW': self._superuser_password,
         }
 
         args = []
