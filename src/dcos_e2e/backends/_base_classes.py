@@ -25,8 +25,6 @@ class ClusterManager(abc.ABC):
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
-        superuser_username: str,
-        superuser_password: str,
     ) -> None:
         """
         Create a DC/OS cluster with the given `cluster_backend`.
@@ -48,8 +46,6 @@ class ClusterManager(abc.ABC):
                 the master nodes before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
-            superuser_username: The username of the cluster superuser.
-            superuser_password: The password of the cluster superuser.
         """
 
     @abc.abstractmethod

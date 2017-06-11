@@ -39,6 +39,7 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
         - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
+        - [`superuser_password`](#superuser_password)
       - [Methods](#methods)
         - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
         - [`destroy()`](#destroy)
@@ -210,6 +211,11 @@ On DC/OS Docker the files are mounted, read only, to the masters.
 If set to `True`, the cluster is destroyed on exit in all cases.
 If set to `False`, the cluster is preserved if there is an error.
 
+###### `superuser_password`
+
+The superuser password to use. This is only relevant to DC/OS Enterprise clusters.
+It is assumed that if `extra_config` includes `superuser_password_hash` then that is a hash of this password.
+
 ##### Methods
 
 ###### `run_integration_tests(pytest_command)`
@@ -241,10 +247,12 @@ The public agent nodes in the cluster.
 ##### `original_superuser_username`
 
 The original superuser username of the cluster.
+This is a random string if it is not given in `extra_config`.
 
 ##### `original_superuser_password`
 
 The original superuser password of the cluster.
+This is a random string if it is not given in `extra_config`.
 
 #### Nodes
 
