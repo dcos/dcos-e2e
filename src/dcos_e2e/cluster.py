@@ -97,7 +97,7 @@ class Cluster(ContextDecorator):
             superuser_password or str(uuid.uuid4())
         )
         self.original_superuser_username = extra_config.get(
-            'superuser_username', ''
+            'superuser_username', str(uuid.uuid4())
         )
         password_hash = extra_config.get(
             'superuser_password_hash',
