@@ -99,7 +99,7 @@ class Cluster(ContextDecorator):
         )
         password_hash = extra_config.get(
             'superuser_password_hash',
-            sha512_crypt(self.original_superuser_password)
+            sha512_crypt.hash(self.original_superuser_password)
         )
         extra_config['superuser_password_hash'] = password_hash
 
