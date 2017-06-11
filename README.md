@@ -248,11 +248,13 @@ The public agent nodes in the cluster.
 
 The original superuser username of the cluster.
 This is a random string if it is not given in `extra_config`.
+This is only useful for DC/OS Enterprise clusters.
 
 ##### `original_superuser_password`
 
 The original superuser password of the cluster.
 This is a random string if it is not given in `extra_config`.
+This is only useful for DC/OS Enterprise clusters.
 
 #### Nodes
 
