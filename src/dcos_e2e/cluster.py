@@ -3,7 +3,6 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
-import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -66,8 +65,8 @@ class Cluster(ContextDecorator):
         extra_config = dict(extra_config or {})
         self._security_mode = extra_config.get('security')
 
-        self.original_superuser_username = uuid.uuid4()
-        self.original_superuser_password = 'admin'
+        self._superuser_username = 'admin'
+        self._superuser_password = 'admin'
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
@@ -78,8 +77,8 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
-            superuser_username=self.original_superuser_username,
-            superuser_password=self.original_superuser_password,
+            superuser_username=self._superuser_username,
+            superuser_password=self._superuser_password,
         )
 
     def wait_for_dcos(self) -> None:
@@ -102,8 +101,8 @@ class Cluster(ContextDecorator):
             default_os_user = 'nobody'
             protocol = 'https://'
             credentials = {
-                'uid': self.original_superuser_username,
-                'password': self.original_superuser_password,
+                'uid': self._superuser_username,
+                'password': self._superuser_password,
             }
         else:
             credentials = CI_CREDENTIALS
@@ -176,8 +175,8 @@ class Cluster(ContextDecorator):
         """
         self.wait_for_dcos()
         environment_variables = {
-            'DCOS_LOGIN_UNAME': self.original_superuser_username,
-            'DCOS_LOGIN_PW': self.original_superuser_password,
+            'DCOS_LOGIN_UNAME': self._superuser_username,
+            'DCOS_LOGIN_PW': self._superuser_password,
         }
 
         args = []
