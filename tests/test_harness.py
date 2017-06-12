@@ -247,7 +247,7 @@ class TestClusterLogging:
                 log_output_live=True,
                 cluster_backend=cluster_backend
             ):
-                pass
+                pass  # pragma: no cover
 
         assert self._two_masters_error_logged(log_records=caplog.records())
 
@@ -263,7 +263,7 @@ class TestClusterLogging:
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
             with Cluster(masters=2, cluster_backend=cluster_backend):
-                pass
+                pass  # pragma: no cover
 
         assert not self._two_masters_error_logged(log_records=caplog.records())
 
