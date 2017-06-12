@@ -123,7 +123,9 @@ def run_subprocess(
                 process.communicate()
             else:
                 stdout, stderr = process.communicate()
-        except:
+        except:  # pragma: no cover
+            # We clean up if there is an error while getting the output.
+            # This may not happen on CI so we do not
             process.kill()
             process.wait()
             raise

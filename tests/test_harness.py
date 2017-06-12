@@ -273,9 +273,16 @@ class TestMultipleClusters:
     Tests for working with multiple clusters.
     """
 
-    def test_two_clusters(self, cluster_backend: ClusterBackend) -> None:
+    def test_two_clusters(
+        self,
+        cluster_backend: ClusterBackend,
+    ) -> None:  # pragma: no cover
         """
         It is possible to start two clusters.
+
+        We ignore this test's coverage because it cannot be run on Travis CI.
+        This is because Travis CI has a space limit which is exceeded if we
+        have multiple installer artifacts.
         """
         with Cluster(cluster_backend=cluster_backend):
             with Cluster(cluster_backend=cluster_backend):
