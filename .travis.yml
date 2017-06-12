@@ -24,10 +24,10 @@ env:
     - "TEST_PATTERN=TestClusterLogging"
     - "TEST_PATTERN=TestDestroyOnError"
   global:
-    - secure:
-      # The encrypted URL for a DC/OS Enterprise artifact.
-      # Generate this by running `travis encrypt EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
-      - ""
+    # The encrypted URL for a DC/OS Enterprise artifact.
+    # Generate this by running:
+    #     travis encrypt --repo adamtheturtle/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
+    secure: "H1P6GG9HmZxEZlt+vwOvmK6RD9OmVYRnh93hBYFUcUqpAoklfIyt5kaex4vh2n4mowmsn101oINjPIXAlbHZ+iN344kPCvbr7vDcvQfo73DbqwfhzN//TLFL4ToYaOqs7ruNhsnFWaDOWakULu/A+Mx6s8sj1khyAqbFMfRjCoMoTkGSk7McjkEvYusRo12rM7fp2JvG+QRspet6V01HFyi5g+JbcNdHkzUyWcOaUOGHdWLAzlR50vnj6F9pMFD3DKIo/oVe3Qnm8YORE6L9rzoHJ7sVdOLYS3sbg9oTANc6OcBN8wofyr6tKCls8oF0GdDtY0j7nYBXiUj0ka7gxQftaoyeNtbyueilU2zq15sy9UcXfEldJXP7MXyU023FhGWL7jApwQWqBmLzPixCje2jWWRX7NjeVr12yH6KDBlHlweo17EyEKYLEPh6qnlgvsE1LLi8xS0gvtt6uMEiupcdalhxNiqGqfHP+FtxlCoKK1/9m9+EP0mXCi60KSN2Xgbm+5ti2y0JjCRm0v3VS9S3ozZD52YFqINF9ICvdL8zyF5FsikXLxNY5yGqRPr2JpoGLC3PmjkSsGTZ2ueOf4yB7IB0cNSMxp7ySjXqXuUG3m8iSns/D9aHLCX9HnE3UnN96TZDllOfCgER/FSk+pvUiS123FNgNgOvJxPNRC8="
 
 before_install:
   - "pip install --upgrade pip setuptools"
