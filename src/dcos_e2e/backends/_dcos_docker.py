@@ -212,10 +212,16 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         Raises:
             CalledProcessError: The process exited with a non-zero code.
         """
-        args = ['make'] + [
-            '{key}={value}'.format(key=key, value=value)
-            for key, value in self._variables.items()
-        ] + [target]
+        args = ['make']
+
+        # See https://stackoverflow.com/a/7860705 for details on escaping Make
+        # variables.
+        for key, value in self._variables.items():
+            escaped_value = value.replace('$', '$$')
+            escaped_value = escaped_value.replace('#', '\#')
+            set_variable = '{key}={value}'.format(key=key, value=escaped_value)
+            args.append(set_variable)
+        args.append(target)
 
         run_subprocess(
             args=args,
