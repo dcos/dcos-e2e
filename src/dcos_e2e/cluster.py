@@ -3,14 +3,12 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
-import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
-from passlib.hash import sha512_crypt
 
 from ._common import Node
 from .backends import ClusterBackend
@@ -44,8 +42,6 @@ class Cluster(ContextDecorator):
             cluster_backend: The backend to use for the cluster.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
-                If `superuser_username` or `superuser_password_hash` is not
-                given, random values are used.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -59,54 +55,19 @@ class Cluster(ContextDecorator):
             files_to_copy_to_masters: A mapping of host paths to paths on the
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS.
-            superuser_password: The superuser password to use. This is only
-                relevant to DC/OS Enterprise clusters.
+            superuser_password: The superuser password to use. This is
+                required for some features if using a DC/OS Enterprise cluster.
+                This is not relevant for DC/OS OSS clusters.
             enterprise_cluster: Whether this is a DC/OS Enterprise cluster.
-
-        Attributes:
-            original_superuser_username: The original superuser username of
-                the cluster. This is `None` for DC/OS OSS clusters.
-            original_superuser_password: The original superuser password of
-                the cluster. This is `None` for DC/OS OSS clusters.
-
-        Raises:
-            ValueError: `extra_config` includes `superuser_password_hash`
-                and this is not a valid hash of `superuser_password`.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
         self._enterprise_cluster = enterprise_cluster
         extra_config = dict(extra_config or {})
-
-        self.original_superuser_username = None
-        self.original_superuser_password = None
-
-        if enterprise_cluster:
-            if 'superuser_password_hash' in extra_config:
-                if not sha512_crypt.verify(
-                    superuser_password,
-                    extra_config['superuser_password_hash'],
-                ):
-                    message = (
-                        '`superuser_password_hash` in the configuration must '
-                        'be a valid SHA512 hash of `superuser_password`.'
-                    )
-                    raise ValueError(message)
-            self.original_superuser_password = (
-                superuser_password or str(uuid.uuid4())
-            )
-
-            self.original_superuser_username = extra_config.get(
-                'superuser_username', str(uuid.uuid4())
-            )
-            password_hash = extra_config.get(
-                'superuser_password_hash',
-                sha512_crypt.hash(self.original_superuser_password)
-            )
-
-            extra_config['superuser_username'
-                         ] = self.original_superuser_username
-            extra_config['superuser_password_hash'] = password_hash
+        self._original_superuser_password = superuser_password or ''
+        self._original_superuser_username = extra_config.get(
+            'superuser_username', ''
+        )
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
@@ -145,8 +106,8 @@ class Cluster(ContextDecorator):
             default_os_user = 'nobody'
             protocol = 'https://'
             credentials = {
-                'uid': self.original_superuser_username,
-                'password': self.original_superuser_password,
+                'uid': self._original_superuser_username,
+                'password': self._original_superuser_password,
             }
         else:
             default_os_user = 'root'
@@ -225,10 +186,14 @@ class Cluster(ContextDecorator):
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
         self.wait_for_dcos()
-        environment_variables = {
-            'DCOS_LOGIN_UNAME': self.original_superuser_username,
-            'DCOS_LOGIN_PW': self.original_superuser_password,
-        }
+
+        if self._enterprise_cluster:
+            environment_variables = {
+                'DCOS_LOGIN_UNAME': self._original_superuser_username,
+                'DCOS_LOGIN_PW': self._original_superuser_password,
+            }
+        else:
+            environment_variables = {}
 
         args = []
 

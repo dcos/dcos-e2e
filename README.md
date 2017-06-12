@@ -49,8 +49,6 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`masters`](#masters-1)
         - [`agents`](#agents-1)
         - [`public_agents`](#public_agents-1)
-      - [`original_superuser_username`](#original_superuser_username)
-      - [`original_superuser_password`](#original_superuser_password)
     - [Nodes](#nodes)
         - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
 - [Contributing](#contributing)
@@ -252,18 +250,6 @@ The agent nodes in the cluster.
 ###### `public_agents`
 
 The public agent nodes in the cluster.
-
-##### `original_superuser_username`
-
-The original superuser username of the cluster.
-This is a random string if it is not given in `extra_config`.
-`None` for DC/OS OSS clusters.
-
-##### `original_superuser_password`
-
-The original superuser password of the cluster.
-This is a random string if it is not given in `extra_config`.
-`None` for DC/OS OSS clusters.
 
 #### Nodes
 
