@@ -284,25 +284,9 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to t
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
 See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
 
-Running tests for or with this package requires:
-
-*   A DC/OS Docker clone at `/tmp/dcos-docker`, and
-*   DC/OS OSS or Enterprise artifact at `/tmp/dcos_generate_config.sh`.
-
-For example:
-
-```sh
-ARTIFACT_URL=https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-DCOS_DOCKER_REPOSITORY=https://github.com/dcos/dcos-docker.git
-DCOS_DOCKER_BRANCH=master
-
-curl -o /tmp/dcos_generate_config.sh $ARTIFACT_URL
-git clone -b $DCOS_DOCKER_BRANCH $DCOS_DOCKER_REPOSITORY /tmp/dcos-docker
-```
-
 or `make download-dependencies`.
 
-## Vagrant Quick Start
+### Vagrant Quick Start
 
 With [Vagrant](https://www.vagrantup.com) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads), it is possible to quickly get a test environment running.
 
