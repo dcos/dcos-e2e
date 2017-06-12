@@ -40,6 +40,7 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
         - [`superuser_password`](#superuser_password)
+        - [`enterprise_cluster`](#enterprise_cluster)
       - [Methods](#methods)
         - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
         - [`destroy()`](#destroy)
@@ -158,6 +159,8 @@ Cluster(
     destroy_on_error=True,
     files_to_copy_to_installer=None,
     files_to_copy_to_masters=None,
+    superuser_password=None,
+    enterprise_cluster=False,
 )
 ```
 
@@ -215,13 +218,12 @@ If set to `False`, the cluster is preserved if there is an error.
 
 The superuser password to use.
 This is only relevant to DC/OS Enterprise clusters.
-It is assumed that if `extra_config` includes `superuser_password_hash` then that is a hash of this password.
+If `extra_config` includes `superuser_password_hash` then that is must be a hash of this password.
 
 
 ###### `enterprise_cluster`
-```
-pass
-``
+
+Whether this is a DC/OS Enterprise cluster.
 
 ##### Methods
 
@@ -255,13 +257,13 @@ The public agent nodes in the cluster.
 
 The original superuser username of the cluster.
 This is a random string if it is not given in `extra_config`.
-This is only useful for DC/OS Enterprise clusters.
+`None` for DC/OS OSS clusters.
 
 ##### `original_superuser_password`
 
 The original superuser password of the cluster.
 This is a random string if it is not given in `extra_config`.
-This is only useful for DC/OS Enterprise clusters.
+`None` for DC/OS OSS clusters.
 
 #### Nodes
 
