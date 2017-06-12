@@ -104,7 +104,7 @@ class Cluster(ContextDecorator):
                 sha512_crypt.hash(self.original_superuser_password)
             )
 
-            extra_config['superuser_password_username'
+            extra_config['superuser_username'
                          ] = self.original_superuser_username
             extra_config['superuser_password_hash'] = password_hash
 
