@@ -61,10 +61,6 @@ class Cluster(ContextDecorator):
                 required for some features if using a DC/OS Enterprise cluster.
                 This is not relevant for DC/OS OSS clusters.
             enterprise_cluster: Whether this is a DC/OS Enterprise cluster.
-
-        Raises:
-            ValueError: `extra_config` includes `superuser_password_hash`
-                and this is not a valid hash of `superuser_password`.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
