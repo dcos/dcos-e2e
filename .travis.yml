@@ -1,59 +1,61 @@
 sudo: "required"
 
-services:
-  - "docker"
+# services:
+#   - "docker"
 
 language: "python"
 
 python:
   - "3.5"
 
-env:
-  # Travis has a maximum test run time of 50 minutes.
-  # In order to avoid this and to see failures faster, we run multiple builds
-  # per commit.
-  #
-  # We do not run tests which use multiple clusters as this uses too much
-  # space for Travis CI.
-  # The main use of space is the copying of the config file to each directory.
-  - "TEST_PATTERN=TestNode"
-  - "TEST_PATTERN=TestIntegrationTests"
-  - "TEST_PATTERN=TestExtendConfig"
-  - "TEST_PATTERN=TestClusterSize"
-  - "TEST_PATTERN=TestClusterLogging"
-  - "TEST_PATTERN=TestDestroyOnError"
-
 before_install:
-  - "pip install --upgrade pip setuptools"
-  - "sudo apt-get update"
-  # Ideally we would use `addons.apt.packages` for enchant but this is not
-  # supported by the linter.
-  - "sudo apt-get install docker-engine enchant"
-  - "npm -g install npm@latest"
-
-install:
-  - "pip install --process-dependency-links --upgrade --editable .[dev]"
-  - "npm install"
-
-cache: "pip"
-
-before_script:
-    - "make clean"
-    - "make lint"
-    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
-            echo 'Only the documentation was updated.';
-            echo 'No tests will be run'.;
-            echo 'No artifacts will be downloaded.';
-            exit ;
-       }
-       "
-    - 'make download-dependencies'
-
-# Travis has a time out for total for time without output (10 minutes).
-# We get around this by using `travis_wait` which hides all output until the
-# tests are finished.
+    make ARTIFACT_URL=$ARTIFACT_URL download-artifact
+# env:
+#   # Travis has a maximum test run time of 50 minutes.
+#   # In order to avoid this and to see failures faster, we run multiple builds
+#   # per commit.
+#   #
+#   # We do not run tests which use multiple clusters as this uses too much
+#   # space for Travis CI.
+#   # The main use of space is the copying of the config file to each directory.
+#   - "TEST_PATTERN=TestNode"
+#   - "TEST_PATTERN=TestIntegrationTests"
+#   - "TEST_PATTERN=TestExtendConfig"
+#   - "TEST_PATTERN=TestClusterSize"
+#   - "TEST_PATTERN=TestClusterLogging"
+#   - "TEST_PATTERN=TestDestroyOnError"
 #
-# We do not run tests in parallel as this uses too much space for Travis CI.
-# The main use of space is the copying of the config file to each directory.
-script:
-    - 'travis_wait 30 pytest -x -vvv -s -k "$TEST_PATTERN"'
+# before_install:
+#   - "pip install --upgrade pip setuptools"
+#   - "sudo apt-get update"
+#   # Ideally we would use `addons.apt.packages` for enchant but this is not
+#   # supported by the linter.
+#   - "sudo apt-get install docker-engine enchant"
+#   - "npm -g install npm@latest"
+#
+# install:
+#   - "pip install --process-dependency-links --upgrade --editable .[dev]"
+#   - "npm install"
+#
+# cache: "pip"
+#
+# before_script:
+#     - "make clean"
+#     - "make lint"
+#     - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
+#             echo 'Only the documentation was updated.';
+#             echo 'No tests will be run'.;
+#             echo 'No artifacts will be downloaded.';
+#             exit ;
+#        }
+#        "
+#     - 'make download-dependencies'
+#
+# # Travis has a time out for total for time without output (10 minutes).
+# # We get around this by using `travis_wait` which hides all output until the
+# # tests are finished.
+# #
+# # We do not run tests in parallel as this uses too much space for Travis CI.
+# # The main use of space is the copying of the config file to each directory.
+# script:
+#     - 'travis_wait 30 pytest -x -vvv -s -k "$TEST_PATTERN"'
