@@ -23,7 +23,7 @@ class TestEnterpriseIntegrationTests:
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        superuser_password = uuid.uuid4()
+        superuser_password = str(uuid.uuid4())
         extra_config = {
             'superuser_username': uuid.uuid4(),
             'superuser_password_hash': sha512_crypt.hash(superuser_password),

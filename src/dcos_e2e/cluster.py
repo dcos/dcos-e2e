@@ -106,8 +106,8 @@ class Cluster(ContextDecorator):
             default_os_user = 'nobody'
             protocol = 'https://'
             credentials = {
-                'uid': self.original_superuser_username,
-                'password': self.original_superuser_password,
+                'uid': self._original_superuser_username,
+                'password': self._original_superuser_password,
             }
         else:
             default_os_user = 'root'
