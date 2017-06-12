@@ -55,7 +55,7 @@ With that experience, we will choose where to put the test suite and whether it 
         - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
 - [Contributing](#contributing)
 - [Test Environment](#test-environment)
-- [Vagrant Quick Start](#vagrant-quick-start)
+  - [Vagrant Quick Start](#vagrant-quick-start)
 - [Cleaning Up](#cleaning-up)
 - [Troubleshooting](#troubleshooting)
   - [macOS File Sharing](#macos-file-sharing)
