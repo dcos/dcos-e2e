@@ -35,6 +35,7 @@ class Cluster(ContextDecorator):
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
         superuser_password: Optional[str]=None,
+        enterprise_cluster: bool=False,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -60,12 +61,13 @@ class Cluster(ContextDecorator):
                 the master nodes before installing DC/OS.
             superuser_password: The superuser password to use. This is only
                 relevant to DC/OS Enterprise clusters.
+            enterprise_cluster: Whether this is a DC/OS Enterprise cluster.
 
         Attributes:
             original_superuser_username: The original superuser username of
-                the cluster. This is only useful for DC/OS Enterprise clusters.
+                the cluster. This is `None` for DC/OS OSS clusters.
             original_superuser_password: The original superuser password of
-                the cluster. This is only useful for DC/OS Enterprise clusters.
+                the cluster. This is `None` for DC/OS OSS clusters.
 
         Raises:
             ValueError: `extra_config` includes `superuser_password_hash`
@@ -73,37 +75,36 @@ class Cluster(ContextDecorator):
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        # We assume that `ssl_enabled` and `security` are not set in the base
-        # configuration.
-        # In the future we should not have a base configuration which we
-        # cannot read here.
-        # This is not relevant for DC/OS OSS. This assumes that 'security'
-        # will not be set for DC/OS OSS.
+        self._enterprise_cluster = enterprise_cluster
         extra_config = dict(extra_config or {})
 
-        if 'superuser_password_hash' in extra_config:
-            if not sha512_crypt.verify(
-                superuser_password,
-                extra_config['superuser_password_hash'],
-            ):
-                message = (
-                    '`superuser_password_hash` in the configuration must be a '
-                    'valid SHA512 hash of `superuser_password`.'
-                )
-                raise ValueError(message)
+        self.original_superuser_username = None
+        self.original_superuser_password = None
 
-        self._security_mode = extra_config.get('security')
-        self.original_superuser_password = (
-            superuser_password or str(uuid.uuid4())
-        )
-        self.original_superuser_username = extra_config.get(
-            'superuser_username', str(uuid.uuid4())
-        )
-        password_hash = extra_config.get(
-            'superuser_password_hash',
-            sha512_crypt.hash(self.original_superuser_password)
-        )
-        extra_config['superuser_password_hash'] = password_hash
+        if enterprise_cluster:
+            if 'superuser_password_hash' in extra_config:
+                if not sha512_crypt.verify(
+                    superuser_password,
+                    extra_config['superuser_password_hash'],
+                ):
+                    message = (
+                        '`superuser_password_hash` in the configuration must '
+                        'be a valid SHA512 hash of `superuser_password`.'
+                    )
+                    raise ValueError(message)
+            self.original_superuser_password = (
+                superuser_password or str(uuid.uuid4())
+            )
+
+            self.original_superuser_username = extra_config.get(
+                'superuser_username', str(uuid.uuid4())
+            )
+            password_hash = extra_config.get(
+                'superuser_password_hash',
+                sha512_crypt.hash(self.original_superuser_password)
+            )
+
+            extra_config['superuser_password_hash'] = password_hash
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
@@ -123,6 +124,10 @@ class Cluster(ContextDecorator):
         This uses the originally given superuser username and password.
         Therefore, if these are changed during the cluster's lifetime, they
         may not be valid.
+
+        When https://github.com/dcos/dcos/pull/1609/ is merged, that can
+        likely be used instead of this function and this might allow us to
+        remove the `enterprise_cluster` parameter.
         """
         web_host = next(iter(self.masters))
 
@@ -134,9 +139,7 @@ class Cluster(ContextDecorator):
             str(public_agent.ip_address) for public_agent in self.public_agents
         ]
 
-        default_os_user = 'root'
-        protocol = 'http://'
-        if self._security_mode in ('strict', 'permissive'):
+        if self._enterprise_cluster:
             default_os_user = 'nobody'
             protocol = 'https://'
             credentials = {
@@ -144,6 +147,8 @@ class Cluster(ContextDecorator):
                 'password': self.original_superuser_password,
             }
         else:
+            default_os_user = 'root'
+            protocol = 'http://'
             credentials = CI_CREDENTIALS
 
         dcos_url = protocol + str(web_host.ip_address)
@@ -157,7 +162,7 @@ class Cluster(ContextDecorator):
             auth_user=auth_user,
         )
 
-        if self._security_mode in ('strict', 'permissive'):
+        if self._enterprise_cluster:
             ca_cert = api_session.get(
                 # We wait up to 20 minutes which is arbitrary but has worked
                 # in testing at the time of writing.

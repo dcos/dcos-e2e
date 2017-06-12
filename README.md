@@ -213,8 +213,15 @@ If set to `False`, the cluster is preserved if there is an error.
 
 ###### `superuser_password`
 
-The superuser password to use. This is only relevant to DC/OS Enterprise clusters.
+The superuser password to use.
+This is only relevant to DC/OS Enterprise clusters.
 It is assumed that if `extra_config` includes `superuser_password_hash` then that is a hash of this password.
+
+
+###### `enterprise_cluster`
+```
+pass
+``
 
 ##### Methods
 
