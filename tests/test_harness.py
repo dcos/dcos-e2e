@@ -34,6 +34,9 @@ class TestNode:
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
+            assert cluster.original_superuser_password is None
+            assert cluster.original_superuser_username is None
+
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
             assert result.returncode == 0
