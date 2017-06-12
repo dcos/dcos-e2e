@@ -66,8 +66,7 @@ class Cluster(ContextDecorator):
         extra_config = dict(extra_config or {})
         self._original_superuser_password = superuser_password or ''
         self._original_superuser_username = extra_config.get(
-            'superuser_username',
-            ''
+            'superuser_username', ''
         )
 
         self._cluster = cluster_backend.cluster_cls(
@@ -190,8 +189,8 @@ class Cluster(ContextDecorator):
 
         if self._enterprise_cluster:
             environment_variables = {
-                'DCOS_LOGIN_UNAME': self.original_superuser_username,
-                'DCOS_LOGIN_PW': self.original_superuser_password,
+                'DCOS_LOGIN_UNAME': self._original_superuser_username,
+                'DCOS_LOGIN_PW': self._original_superuser_password,
             }
         else:
             environment_variables = {}
