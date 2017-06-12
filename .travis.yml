@@ -1,10 +1,65 @@
-sudo: required
-language: python
+sudo: "required"
+
+services:
+  - "docker"
+
+language: "python"
+
 python:
-- '3.5'
+  - "3.5"
+
 env:
+  # Travis has a maximum test run time of 50 minutes.
+  # In order to avoid this and to see failures faster, we run multiple builds
+  # per commit.
+  #
+  # We do not run tests which use multiple clusters as this uses too much
+  # space for Travis CI.
+  # The main use of space is the copying of the config file to each directory.
   matrix:
-  - TEST_PATTERN=TestNode
+    - "TEST_PATTERN=TestNode"
+    - "TEST_PATTERN=TestIntegrationTests"
+    - "TEST_PATTERN=TestExtendConfig"
+    - "TEST_PATTERN=TestClusterSize"
+    - "TEST_PATTERN=TestClusterLogging"
+    - "TEST_PATTERN=TestDestroyOnError"
   global:
-  - secure: QS9nRs8FWromOuGk0zOBNt54nAQzpRSEnW1BN5n013q2lQ50H5cqs0zlwMuILmK+ZXmIwW1cw25TZ583LVcSdrRQV66hTWTsKBuZHLmyOwSMdzAkiWEu+ABq2ORYdrZ9oCFv40aJng5COemRyx8KC9pchJufUBejnt9L0QcximYMFwkGjR9XHWUtjpU7QSurPFtgtE3T8N1XMXPzN0TmkHwahnyC3rkS1aBhU8eh/euVI9wIIvAvNd+yQxQhpHkrsZuLKPLWWkPGgBjuTFSzYlAb4t0uAR5JavshgBfmF28N+iArYjYGRlDNhBg5JRFmRZUxFNgdHbOksrx3yFSMlDhwvF72KXHaioNYPRjXfFYwa2VU2MOpeCK25493ITOaJWv9aPggs4zIZh+w09SRej87uKEF8+kiE5+ZJ8qKGGPqra3fXIhXU08SIvmNkB2h56i5zF0z8Yf1v1dhphSuy+c5bX/XJ5N/ED4lNakPRh7dSa/YUNr08fu9Jm/5fFofNgQM9ybRHkFYcFzxWkgPwAtsTzSz8sITFpnZj06FCmdkZyX3fFzaD0mKRC01e8kVT/TW6UHvN2sbyMJNpRe0+rpZmtdEUjQKZSsSrIF1XbKtdWiJX69ye9gpQ+MAloW2bilbUDu25yDSFr28cOY13wURut4RsJveEVo6JozBkAQ=
-before_install: make ARTIFACT_URL=$ARTIFACT_URL download-artifact
+    - secure:
+      # The encrypted URL for a DC/OS Enterprise artifact.
+      # Generate this by running `travis encrypt EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
+      - ""
+
+before_install:
+  - "pip install --upgrade pip setuptools"
+  - "sudo apt-get update"
+  # Ideally we would use `addons.apt.packages` for enchant but this is not
+  # supported by the linter.
+  - "sudo apt-get install docker-engine enchant"
+  - "npm -g install npm@latest"
+
+install:
+  - "pip install --process-dependency-links --upgrade --editable .[dev]"
+  - "npm install"
+
+cache: "pip"
+
+before_script:
+    - "make clean"
+    - "make lint"
+    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
+            echo 'Only the documentation was updated.';
+            echo 'No tests will be run'.;
+            echo 'No artifacts will be downloaded.';
+            exit ;
+       }
+       "
+    - 'make download-dependencies'
+
+# Travis has a time out for total for time without output (10 minutes).
+# We get around this by using `travis_wait` which hides all output until the
+# tests are finished.
+#
+# We do not run tests in parallel as this uses too much space for Travis CI.
+# The main use of space is the copying of the config file to each directory.
+script:
+    - 'travis_wait 30 pytest -x -vvv -s -k "$TEST_PATTERN"'
