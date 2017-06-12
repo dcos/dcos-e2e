@@ -218,7 +218,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # variables.
         for key, value in self._variables.items():
             escaped_value = value.replace('$', '$$')
-            escaped_value = escaped_value.replace('#', '\#')
+            escaped_value = escaped_value.replace('#', '\\#')
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
             args.append(set_variable)
         args.append(target)
