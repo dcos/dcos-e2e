@@ -2,6 +2,10 @@
 Tests for using the test harness with a DC/OS Enterprise cluster.
 """
 
+import uuid
+
+from passlib.hash import sha512_crypt
+
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
@@ -19,9 +23,17 @@ class TestEnterpriseIntegrationTests:
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
+        superuser_password = uuid.uuid4()
+        extra_config = {
+            'superuser_username': uuid.uuid4(),
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+        }
+
         with Cluster(
             cluster_backend=enterprise_cluster_backend,
             enterprise_cluster=True,
+            extra_config=extra_config,
+            superuser_password=superuser_password,
         ) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']

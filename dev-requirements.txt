@@ -1,6 +1,7 @@
 flake8==3.3.0
 isort==4.2.15
 mypy==0.511
+passlib==1.7.1
 pydocstyle==2.0.0
 pyenchant==1.6.8
 pylint==1.7.1

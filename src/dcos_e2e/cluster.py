@@ -3,14 +3,12 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
-import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
-from passlib.hash import sha512_crypt
 
 from ._common import Node
 from .backends import ClusterBackend
