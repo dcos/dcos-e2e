@@ -79,8 +79,22 @@ make lint-python-only
 
 ## Tests for this package
 
-Tests for this package must be run in a suitable environment.
-See "Test Environment" in the `README`.
+Tests for this package must be run on a host which is supported by DC/OS Docker.
+See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
+
+Download dependencies which are used by the tests:
+
+```
+make download-dependencies
+```
+
+or, to additionally download a DC/OS Enterprise artifact, run the following:
+
+```
+make EE_ARTIFACT_URL=<http://...> download-dependencies
+```
+
+The DC/OS Enterprise artifact is required for some tests.
 
 Run `pytest`:
 
