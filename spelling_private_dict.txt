@@ -16,6 +16,7 @@ noqa
 os
 oss
 postflight
+pragma
 pytest
 stderr
 stdout
