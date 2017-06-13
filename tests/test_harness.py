@@ -12,7 +12,9 @@ from subprocess import CalledProcessError
 from typing import List
 
 import pytest
-from py.path import local
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 from pytest_capturelog import CaptureLogFuncArg
 
 from dcos_e2e.backends import ClusterBackend
@@ -391,5 +393,6 @@ class TestCopyFiles:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            result = master.run_as_root(args=['cat', str(master_destination_path)])
+            args = ['cat', str(master_destination_path)]
+            result = master.run_as_root(args=args)
             assert result.stdout.decode() == content
