@@ -23,6 +23,7 @@ env:
       - "TEST_PATTERN=TestClusterSize"
       - "TEST_PATTERN=TestClusterLogging"
       - "TEST_PATTERN=TestDestroyOnError"
+      - "TEST_PATTERN=TestCopyFiles"
       - "TEST_PATTERN=TestEnterpriseIntegrationTests"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
