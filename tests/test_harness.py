@@ -368,7 +368,11 @@ class TestCopyFiles:
         tmpdir: local,
     ) -> None:
         """
-        Files can be copied from the host to master nodes.
+        Files can be copied from the host to master nodes at creation time.
+
+        Create a file with random content.
+        Put this on the master nodes.
+        Check that this exists on the master nodes.
         """
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
@@ -383,4 +387,4 @@ class TestCopyFiles:
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['cat', str(destination_path)])
-            assert result.stdout == content
+            assert result.stdout.decode() == content
