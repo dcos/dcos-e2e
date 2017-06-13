@@ -6,10 +6,15 @@ long time to run.
 """
 
 import logging
+import uuid
+from pathlib import Path
 from subprocess import CalledProcessError
 from typing import List
 
 import pytest
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 from pytest_capturelog import CaptureLogFuncArg
 
 from dcos_e2e.backends import ClusterBackend
@@ -352,3 +357,42 @@ class TestDestroyOnError:
 
         with pytest.raises(CalledProcessError):
             master.run_as_root(args=['echo', 'hello'])
+
+
+class TestCopyFiles:
+    """
+    Tests for copying files to nodes.
+    """
+
+    def test_copy_files(
+        self,
+        cluster_backend: ClusterBackend,
+        tmpdir: local,
+    ) -> None:
+        """
+        Files can be copied from the host to master nodes and the installer
+        node at creation time.
+        """
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        master_destination_path = Path('/etc/on_master_nodes.txt')
+        files_to_copy_to_masters = {Path(local_file): master_destination_path}
+        # We currently do not have a way of testing that this works without
+        # using custom CA certificates on an enterprise cluster.
+        # We add it to the test to at least exercise the code which uses this,
+        # but this is insufficient.
+        files_to_copy_to_installer = {
+            Path(local_file): Path('/genconf/on_installer.txt'),
+        }
+        with Cluster(
+            cluster_backend=cluster_backend,
+            files_to_copy_to_masters=files_to_copy_to_masters,
+            files_to_copy_to_installer=files_to_copy_to_installer,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            args = ['cat', str(master_destination_path)]
+            result = master.run_as_root(args=args)
+            assert result.stdout.decode() == content

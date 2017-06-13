@@ -111,9 +111,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
-
-        Raises:
-            ValueError: The given superuser password is not "admin".
         """
         self.log_output_live = log_output_live
 
@@ -146,6 +143,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # to the installer at `/genconf`.
         # Therefore, every file which we want to copy to `/genconf` on the
         # installer is put into the genconf directory in DC/OS Docker.
+        # The way to fix this if we want to be able to put files anywhere is
+        # to add an variable to `dcos_generate_config.sh.in` which allows
+        # `-v` mounts.
+        # Then `INSTALLER_MOUNTS` can be added to DC/OS Docker.
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._path / 'genconf' / relative_installer_path
