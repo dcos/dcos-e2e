@@ -127,6 +127,15 @@ Linting and some tests are run on Travis CI.
 See `.travis.yml` for details on the limitations.
 To check if a new change works on CI, unfortunately it is necessary to change `.travis.yml` to run the desired tests.
 
+## New Backends
+
+Currently only DC/OS Docker is supported.
+However, it is intended that a `Cluster` can take a number of backends.
+
+To create a cluster backend to pass as the `cluster_backend` parameter to a `Cluster`, create a `ClusterManager` and `ClusterBackend` in `src/dcos_e2e/backends`.
+
+To run tests against this backend, modify `cluster_backend` in `tests/conftest.py` to provide this backend.
+
 ## Goals
 
 ### Avoid flakiness
@@ -137,13 +146,21 @@ Do not access the web while running tests.
 
 ### Parrallelisable Tests
 
-The tests in this repository and using this harness are slow. This harness must not get in the way of parallelisation efforts.
+The tests in this repository and using this harness are slow.
+This harness must not get in the way of parallelisation efforts.
 
 ### Logging
 
-End to end tests are notoriously difficult to get meaning from. To help with this, an "excessive logging" policy is used here.
+End to end tests are notoriously difficult to get meaning from.
+To help with this, an "excessive logging" policy is used here.
 
 ### Robustness
 
 Narrowing down bugs from end to end tests is hard enough without dealing with the framework's bugs.
 This repository aims to maintain high standards in terms of coding quality and quality enforcement by CI is part of that.
+
+### Untied to a particular backend
+
+Currently only DC/OS Docker is supported.
+However, it is intended that multiple backends can be supported.
+See "New Backends" for details.
