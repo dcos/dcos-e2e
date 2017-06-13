@@ -376,14 +376,15 @@ class TestCopyFiles:
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
+        source_path = Path(str(local_file))
         master_destination_path = Path('/etc/on_master_nodes.txt')
-        files_to_copy_to_masters = {Path(local_file): master_destination_path}
+        files_to_copy_to_masters = {source_path: master_destination_path}
         # We currently do not have a way of testing that this works without
         # using custom CA certificates on an enterprise cluster.
         # We add it to the test to at least exercise the code which uses this,
         # but this is insufficient.
         files_to_copy_to_installer = {
-            Path(local_file): Path('/genconf/on_installer.txt'),
+            source_path: Path('/genconf/on_installer.txt'),
         }
         with Cluster(
             cluster_backend=cluster_backend,
