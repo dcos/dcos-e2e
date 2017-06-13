@@ -6,10 +6,13 @@ long time to run.
 """
 
 import logging
+import uuid
+from pathlib import Path
 from subprocess import CalledProcessError
 from typing import List
 
 import pytest
+from py.path import local
 from pytest_capturelog import CaptureLogFuncArg
 
 from dcos_e2e.backends import ClusterBackend
@@ -352,3 +355,32 @@ class TestDestroyOnError:
 
         with pytest.raises(CalledProcessError):
             master.run_as_root(args=['echo', 'hello'])
+
+
+class TestCopyFiles:
+    """
+    Tests for copying files to nodes.
+    """
+
+    def test_copy_files(
+        self,
+        cluster_backend: ClusterBackend,
+        tmpdir: local,
+    ) -> None:
+        """
+        Files can be copied from the host to master nodes.
+        """
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        destination_path = Path('/etc/on_master_nodes.txt')
+        files_to_copy_to_masters = {Path(local_file): destination_path}
+        with Cluster(
+            cluster_backend=cluster_backend,
+            files_to_copy_to_masters=files_to_copy_to_masters,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            result = master.run_as_root(args=['cat', str(destination_path)])
+            assert result.stdout == content
