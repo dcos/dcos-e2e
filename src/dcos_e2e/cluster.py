@@ -11,6 +11,8 @@ from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
 
 from ._common import Node
+# Ignore a spurious error - this import is used in a type hint.
+from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
 
 
@@ -78,7 +80,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
-        )
+        )  # type: ClusterManager
 
     def wait_for_dcos(self) -> None:
         """
