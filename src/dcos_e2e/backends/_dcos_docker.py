@@ -28,7 +28,7 @@ def _get_open_port() -> int:
     ) as new_socket:
         new_socket.bind((host, 0))
         new_socket.listen(1)
-        return new_socket.getsockname()[1]
+        return int(new_socket.getsockname()[1])
 
 
 class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
