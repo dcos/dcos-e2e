@@ -23,6 +23,7 @@ Tests are currently not run on CI.
   - [Logging](#logging)
   - [Robustness](#robustness)
   - [Untied to a particular backend](#untied-to-a-particular-backend)
+- [Release Process](#release-process)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
