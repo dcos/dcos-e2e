@@ -3,6 +3,7 @@
 from setuptools import find_packages, setup
 
 DEPENDENCY_LINKS = []
+VERSION = '2017.06.15.0'
 
 with open("requirements.txt") as requirements:
     INSTALL_REQUIRES = []
@@ -31,7 +32,7 @@ with open('README.md') as f:
 
 setup(
     name="DC/OS E2E",
-    version="0.1",
+    version=VERSION,
     author="Adam Dangoor",
     author_email='adangoor@mesosphere.com',
     description="Test helpers for testing DC/OS end to end.",

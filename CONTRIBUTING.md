@@ -147,3 +147,47 @@ End to end tests are notoriously difficult to get meaning from. To help with thi
 
 Narrowing down bugs from end to end tests is hard enough without dealing with the framework's bugs.
 This repository aims to maintain high standards in terms of coding quality and quality enforcement by CI is part of that.
+
+## Release Process
+
+This repository aims to work with DC/OS OSS and DC/OS Enterprise `master` branches.
+These are moving targets.
+For this reason, [CalVer](http://calver.org/) is used as a date at which the repository is last known to have worked with DC/OS OSS and DC/OS Enterprise is the main versioning use.
+
+The release process is as follows.
+
+1. Choose a new version.
+
+This should be today's date in the format `YYYY.MM.DD.MICRO`.
+`MICRO` should refer to the number of releases created on this date, starting from `0`.
+
+```sh
+export DCOS_E2E_RELEASE=2017.06.15.0
+```
+
+1. Create a release branch:
+
+```sh
+git fetch origin
+git checkout -b release-$DCOS_E2E_RELEASE origin/master
+```
+
+2. Add changes in the new release to `CHANGELOG.md`.
+
+Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
+If this is the only change, add an empty entry to the changelog.
+
+3. Bump the version of the software.
+
+Change `VERSION` in `setup.py`.
+
+2. Create a Pull Request to merge the `release` branch into `master`.
+
+3. Merge the `release` Pull Request once CI has passed.
+
+4. Tag a release.
+
+Visit <https://github.com/adamtheturtle/dcos-e2e/releases/new>.
+Set the "Tag version" to the new version.
+Choose "master" as the target.
+Add the changes from the changelog to the release description.
