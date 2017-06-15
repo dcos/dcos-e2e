@@ -184,27 +184,27 @@ This should be today's date in the format `YYYY.MM.DD.MICRO`.
 export DCOS_E2E_RELEASE=2017.06.15.0
 ```
 
-1. Create a release branch:
+2. Create a release branch:
 
 ```sh
 git fetch origin
 git checkout -b release-$DCOS_E2E_RELEASE origin/master
 ```
 
-2. Add changes in the new release to `CHANGELOG.md`.
+3. Add changes in the new release to `CHANGELOG.md`.
 
 Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
 If this is the only change, add an empty entry to the changelog.
 
-3. Bump the version of the software.
+4. Bump the version of the software.
 
 Change `VERSION` in `setup.py`.
 
-2. Create a Pull Request to merge the `release` branch into `master`.
+5. Create a Pull Request to merge the `release` branch into `master`.
 
-3. Merge the `release` Pull Request once CI has passed.
+6. Merge the `release` Pull Request once CI has passed.
 
-4. Tag a release.
+7. Tag a release.
 
 Visit <https://github.com/adamtheturtle/dcos-e2e/releases/new>.
 Set the "Tag version" to the new version.
