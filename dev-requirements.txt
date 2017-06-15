@@ -11,3 +11,4 @@ pytest-capturelog==0.7
 pytest-cov==2.5.1  # Measure code coverage
 pytest-xdist==1.17.1
 yapf==0.16.2
+zest.releaser==6.11
