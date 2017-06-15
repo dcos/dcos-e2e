@@ -10,14 +10,6 @@ End to end tests are tests which require a DC/OS cluster to run against.
 Each test spins up at least one cluster, and has the choice of configuring this cluster as appropriate.
 For example, a test may require a cluster with a certain number of agents, or certain configuration options.
 
-The tests should be not be tied to the backend infrastructure.
-That is, they should pass against clusters on all supported infrastructures.
-The current implementation supports only a [DC/OS Docker](https://github.com/dcos/dcos-docker) backend.
-
-This is a proof of concept.
-We plan to iterate on this repository and manually run tests.
-With that experience, we will choose where to put the test suite and whether it should be run on CI.
-
 <!--lint disable list-item-indent-->
 <!--lint disable list-item-bullet-indent-->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -86,32 +78,23 @@ from pathlib import Path
 from dcos_e2e.backend import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
+DCOS_DOCKER_BACKEND = DCOS_Docker(
+    workspace_path=Path('/tmp'),
+    generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+    dcos_docker_path=Path('/tmp/dcos-docker'),
+)
+
 class TestExample:
 
     def test_example(self):
-        backend = DCOS_Docker(
-            workspace_path=Path('/tmp'),
-            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
-            dcos_docker_path=Path('/tmp/dcos-docker'),
-        )
-
-        config = {
-            'cluster_docker_credentials': {
-                'auths': {
-                    'https://index.docker.io/v1/': {
-                        'auth': 'redacted'
-                    },
-                },
-            },
-            'cluster_docker_credentials_enabled': True,
-        }
-
-        with Cluster(extra_config=config, cluster_backend=backend) as cluster:
+        with Cluster(
+            extra_config={'check_time': True},
+            cluster_backend=DCOS_DOCKER_BACKEND,
+        ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
             print(result.stdout)
-            pytest_command = ['pytest', '-x', 'test_tls.py']
-            cluster.run_integration_tests(pytest_command=pytest_command)
+            cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
             try:
                 master.run_as_root(args=['test', '-f', '/no/file/here'])
             except subprocess.CalledProcessError:
@@ -271,8 +254,6 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to t
 
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
 See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
-
-or `make download-dependencies`.
 
 ### Vagrant Quick Start
 
