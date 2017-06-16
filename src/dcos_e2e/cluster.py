@@ -87,7 +87,7 @@ class Cluster(ContextDecorator):
             random=uuid.uuid4()
         )
 
-        os.mkdir(str(self._cluster_workspace))
+        os.makedirs(str(self._cluster_workspace), exist_ok=True)
 
         new_artifact_path = self._cluster_workspace / 'dcos_generate_config.sh'
         copy(src=str(generate_config_path), dst=str(new_artifact_path))
