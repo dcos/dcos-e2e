@@ -70,7 +70,7 @@ class Cluster(ContextDecorator):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        variant = json.loads(version_output.stdout)['variant']
+        variant = json.loads(str(version_output.stdout))['variant']
         self._enterprise_cluster = variant == 'ee'
 
         extra_config = dict(extra_config or {})
