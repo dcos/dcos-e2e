@@ -128,11 +128,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ignore=ignore_patterns('dcos_generate_config.sh'),
         )
 
-        copyfile(
-            src=str(generate_config_path),
-            dst=str(self._path / 'dcos_generate_config.sh'),
-        )
-
         # Files in the DC/OS Docker directory's genconf directory are mounted
         # to the installer at `/genconf`.
         # Therefore, every file which we want to copy to `/genconf` on the
@@ -209,6 +204,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
+            'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
         }  # type: Dict[str, str]
 
         self._make(target='all')
