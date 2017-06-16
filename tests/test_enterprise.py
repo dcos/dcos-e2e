@@ -19,7 +19,7 @@ class TestEnterpriseIntegrationTests:
     def test_run_pytest(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_cluster: Path,
+        enterprise_artifact: Path,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
