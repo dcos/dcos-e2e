@@ -35,8 +35,8 @@ lint: lint-python-only lint-docs
 # Attempt to clean leftovers by the test suite.
 clean:
 	# Ignore errors in case there are no containers to remove.
-	- docker stop $$(docker ps -a -q --filter="name=dcos-") | :
-	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-") | :
+	- docker stop $$(docker ps -a -q --filter="name=dcos-e2e") | :
+	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-e2e") | :
 	# We skip errors because this does not exist in legacy versions of
 	# Docker
 	- docker volume prune --force | :
