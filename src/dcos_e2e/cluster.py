@@ -71,14 +71,6 @@ class Cluster(ContextDecorator):
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        version_output = subprocess.run(
-            args=['bash', str(generate_config_path), '--version'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        version_stdout = version_output.stdout.decode()
-        variant = json.loads(version_stdout)['variant']
-        self._enterprise_cluster = variant == 'ee'
 
         extra_config = dict(extra_config or {})
         self._original_superuser_password = superuser_password or ''
@@ -94,10 +86,17 @@ class Cluster(ContextDecorator):
             random=uuid.uuid4()
         )
 
-        copyfile(
-            src=str(generate_config_path),
-            dst=str(self._cluster_workspace / 'dcos_generate_config.sh'),
+        new_artifact_path = self._cluster_workspace / 'dcos_generate_config.sh'
+        copyfile(src=str(generate_config_path), dst=str(new_artifact_path))
+
+        version_output = subprocess.run(
+            args=['bash', str(new_artifact_path), '--version'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
+        version_stdout = version_output.stdout.decode()
+        variant = json.loads(version_stdout)['variant']
+        self._enterprise_cluster = variant == 'ee'
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
