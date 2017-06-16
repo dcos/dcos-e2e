@@ -78,7 +78,6 @@ from dcos_e2e.backend import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
 DCOS_DOCKER_BACKEND = DCOS_Docker(
-    workspace_path=Path('/tmp'),
     dcos_docker_path=Path('/tmp/dcos-docker'),
 )
 
@@ -89,6 +88,7 @@ class TestExample:
             extra_config={'check_time': True},
             cluster_backend=DCOS_DOCKER_BACKEND,
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+            workspace_path=Path('/tmp'),
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
@@ -107,7 +107,6 @@ This is a backend which can be used to run a `Cluster`.
 ```python
 DCOS_Docker(
     dcos_docker_path,
-    workspace_path,
 )
 ```
 
@@ -118,17 +117,13 @@ DCOS_Docker(
 The path to a clone of DC/OS Docker.
 This clone will be used to create the cluster.
 
-###### `workspace_path`
-
-The directory to create large temporary files in.
-The files are cleaned up when the cluster is destroyed.
-
 #### `dcos_e2e.cluster.Cluster`
 
 ```python
 Cluster(
     cluster_backend,
     generate_config_path,
+    workspace_path,
     extra_config=None,
     masters=1,
     agents=1,
@@ -154,6 +149,11 @@ Currently, the only supported backend is an instance of `dcos_e2e.backend.DCOS_D
 ###### `generate_config_path`
 
 The path to a build artifact to install.
+
+###### `workspace_path`
+
+The directory to create large temporary files in.
+The files are cleaned up when the cluster is destroyed.
 
 ###### `extra_config`
 

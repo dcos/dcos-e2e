@@ -6,7 +6,7 @@ import socket
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from shutil import copyfile, copytree, ignore_patterns, rmtree
+from shutil import copyfile, copytree, ignore_patterns
 from typing import Any, Dict, Set, Type
 
 import docker
@@ -43,16 +43,11 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         Args:
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
-            workspace_path: The directory to create large temporary files in.
-                The files are cleaned up when the cluster is destroyed.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
-            workspace_path: The directory to create large temporary files in.
-                The files are cleaned up when the cluster is destroyed.
         """
-        self.workspace_path = workspace_path
         self.dcos_docker_path = dcos_docker_path
 
     @property
@@ -80,6 +75,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         files_to_copy_to_masters: Dict[Path, Path],
         generate_config_path: Path,
         cluster_backend: DCOS_Docker,
+        workspace_path: Path,
     ) -> None:
         """
         Create a DC/OS Docker cluster.
@@ -105,8 +101,12 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             generate_config_path: The path to a build artifact to install.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+            workspace_path: The directory to create potentially large
+                temporary files in. The files are cleaned up when the cluster
+                is destroyed.
         """
         self.log_output_live = log_output_live
+        self._path = workspace_path
 
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -117,20 +117,12 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        workspace = cluster_backend.workspace_path
-        self._path = workspace / 'dcos-docker-{random}'.format(random=random)
-
         copytree(
             src=str(cluster_backend.dcos_docker_path),
             dst=str(self._path),
             # If there is already a config, we do not copy it as it will be
             # overwritten and therefore copying it is wasteful.
             ignore=ignore_patterns('dcos_generate_config.sh'),
-        )
-
-        copyfile(
-            src=str(generate_config_path),
-            dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
         # Files in the DC/OS Docker directory's genconf directory are mounted
@@ -246,12 +238,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         Destroy all nodes in the cluster.
         """
         self._make(target='clean')
-        rmtree(
-            path=str(self._path),
-            # Some files may be created in the container that we cannot clean
-            # up.
-            ignore_errors=True,
-        )
 
     def _nodes(self, container_base_name: str, num_nodes: int) -> Set[Node]:
         """
