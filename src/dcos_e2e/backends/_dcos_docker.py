@@ -104,7 +104,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 is destroyed.
         """
         self.log_output_live = log_output_live
-        self._path = workspace_path
+        self._path = workspace_path / str(uuid.uuid4())
 
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -172,6 +172,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             random=random,
         )
 
+        generate_config_path = workspace_path / 'dcos_generate_config.sh'
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
@@ -199,6 +200,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
+            'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
         }  # type: Dict[str, str]
 
         self._make(target='all')
