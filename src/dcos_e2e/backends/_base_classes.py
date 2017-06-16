@@ -25,6 +25,7 @@ class ClusterManager(abc.ABC):
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
+        workspace_path: Path,
     ) -> None:
         """
         Create a DC/OS cluster with the given `cluster_backend`.
@@ -46,6 +47,10 @@ class ClusterManager(abc.ABC):
                 the master nodes before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+            workspace_path: The directory to create potentially large
+                temporary files in. The files are cleaned up when the cluster
+                is destroyed. It is expected that the installer will be in
+                this directory at `dcos_generate_config.sh`.
         """
 
     @abc.abstractmethod

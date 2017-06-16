@@ -19,12 +19,12 @@ For example, a test may require a cluster with a certain number of agents, or ce
 - [Usage](#usage)
     - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
       - [Parameters](#parameters)
-        - [`generate_config_path`](#generate_config_path)
         - [`dcos_docker_path`](#dcos_docker_path)
-        - [`workspace_path`](#workspace_path)
     - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
       - [Parameters](#parameters-1)
         - [`cluster_backend`](#cluster_backend)
+        - [`generate_config_path`](#generate_config_path)
+        - [`workspace_path`](#workspace_path)
         - [`extra_config`](#extra_config)
         - [`masters`](#masters)
         - [`agents`](#agents)
@@ -34,7 +34,6 @@ For example, a test may require a cluster with a certain number of agents, or ce
         - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
         - [`superuser_password`](#superuser_password)
-        - [`enterprise_cluster`](#enterprise_cluster)
       - [Methods](#methods)
         - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
         - [`destroy()`](#destroy)
@@ -79,8 +78,6 @@ from dcos_e2e.backend import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
 DCOS_DOCKER_BACKEND = DCOS_Docker(
-    workspace_path=Path('/tmp'),
-    generate_config_path=Path('/tmp/dcos_generate_config.sh'),
     dcos_docker_path=Path('/tmp/dcos-docker'),
 )
 
@@ -90,6 +87,8 @@ class TestExample:
         with Cluster(
             extra_config={'check_time': True},
             cluster_backend=DCOS_DOCKER_BACKEND,
+            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+            workspace_path=Path('/tmp'),
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
@@ -107,33 +106,24 @@ This is a backend which can be used to run a `Cluster`.
 
 ```python
 DCOS_Docker(
-    generate_config_path,
     dcos_docker_path,
-    workspace_path,
 )
 ```
 
 ##### Parameters
-
-###### `generate_config_path`
-
-The path to a build artifact to install.
 
 ###### `dcos_docker_path`
 
 The path to a clone of DC/OS Docker.
 This clone will be used to create the cluster.
 
-###### `workspace_path`
-
-The directory to create large temporary files in.
-The files are cleaned up when the cluster is destroyed.
-
 #### `dcos_e2e.cluster.Cluster`
 
 ```python
 Cluster(
     cluster_backend,
+    generate_config_path,
+    workspace_path,
     extra_config=None,
     masters=1,
     agents=1,
@@ -143,7 +133,6 @@ Cluster(
     files_to_copy_to_installer=None,
     files_to_copy_to_masters=None,
     superuser_password=None,
-    enterprise_cluster=False,
 )
 ```
 
@@ -156,6 +145,15 @@ At the time of writing, this uses DC/OS Docker.
 
 The backend to use for the cluster.
 Currently, the only supported backend is an instance of `dcos_e2e.backend.DCOS_Docker`.
+
+###### `generate_config_path`
+
+The path to a build artifact to install.
+
+###### `workspace_path`
+
+The directory to create large temporary files in.
+The files are cleaned up when the cluster is destroyed.
 
 ###### `extra_config`
 
@@ -202,11 +200,6 @@ If set to `False`, the cluster is preserved if there is an error.
 The superuser password to use.
 This is only relevant to DC/OS Enterprise clusters.
 If `extra_config` includes `superuser_password_hash` then that is must be a hash of this password.
-
-
-###### `enterprise_cluster`
-
-Whether this is a DC/OS Enterprise cluster.
 
 ##### Methods
 
@@ -308,8 +301,8 @@ However, if a test is interrupted, it can leave behind containers, volumes and f
 To remove these, run the following:
 
 ```sh
-docker stop $(docker ps -a -q --filter="name=dcos-")
-docker rm --volumes $(docker ps -a -q --filter="name=dcos-")
+docker stop $(docker ps -a -q --filter="name=dcos-e2e-")
+docker rm --volumes $(docker ps -a -q --filter="name=dcos-e2e-")
 docker volume prune --force
 rm -rf /tmp/dcos-docker-*
 ```

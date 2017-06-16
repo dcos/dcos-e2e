@@ -2,9 +2,13 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import json
+import os
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
+from shutil import copy, rmtree
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
@@ -26,6 +30,8 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
+        generate_config_path: Path,
+        workspace_path: Path,
         extra_config: Optional[Dict[str, Any]]=None,
         masters: int=1,
         agents: int=1,
@@ -35,13 +41,13 @@ class Cluster(ContextDecorator):
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
         superuser_password: Optional[str]=None,
-        enterprise_cluster: bool=False,
     ) -> None:
         """
         Create a DC/OS cluster.
 
         Args:
             cluster_backend: The backend to use for the cluster.
+            generate_config_path: The path to a build artifact to install.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
             masters: The number of master nodes to create.
@@ -60,16 +66,40 @@ class Cluster(ContextDecorator):
             superuser_password: The superuser password to use. This is
                 required for some features if using a DC/OS Enterprise cluster.
                 This is not relevant for DC/OS OSS clusters.
-            enterprise_cluster: Whether this is a DC/OS Enterprise cluster.
+            workspace_path: The directory to create potentially large
+                temporary files in. The files are cleaned up when the cluster
+                is destroyed.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        self._enterprise_cluster = enterprise_cluster
+
         extra_config = dict(extra_config or {})
         self._original_superuser_password = superuser_password or ''
         self._original_superuser_username = extra_config.get(
             'superuser_username', ''
         )
+
+        # We create a new instance of the installer in a new directory and we
+        # work in this directory.
+        # This helps running tests in parallel without conflicts and it
+        # reduces the chance of side-effects affecting sequential tests.
+        self._cluster_workspace = workspace_path / 'dcos-e2e-{random}'.format(
+            random=uuid.uuid4()
+        )
+
+        os.makedirs(str(self._cluster_workspace), exist_ok=True)
+
+        new_artifact_path = self._cluster_workspace / 'dcos_generate_config.sh'
+        copy(src=str(generate_config_path), dst=str(new_artifact_path))
+
+        version_output = subprocess.run(
+            args=['bash', str(new_artifact_path), '--version'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        version_stdout = version_output.stdout.decode()
+        variant = json.loads(version_stdout)['variant']
+        self._enterprise_cluster = variant == 'ee'
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
@@ -80,6 +110,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
+            workspace_path=self._cluster_workspace,
         )  # type: ClusterManager
 
     def wait_for_dcos(self) -> None:
@@ -227,6 +258,11 @@ class Cluster(ContextDecorator):
         Destroy all nodes in the cluster.
         """
         self._cluster.destroy()
+        rmtree(
+            path=str(self._cluster_workspace),
+            # Some files may be created in that we cannot clean up.
+            ignore_errors=True,
+        )
 
     def __exit__(
         self,
