@@ -34,7 +34,6 @@ For example, a test may require a cluster with a certain number of agents, or ce
         - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
         - [`destroy_on_error`](#destroy_on_error)
         - [`superuser_password`](#superuser_password)
-        - [`enterprise_cluster`](#enterprise_cluster)
       - [Methods](#methods)
         - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
         - [`destroy()`](#destroy)
