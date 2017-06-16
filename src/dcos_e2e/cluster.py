@@ -3,11 +3,12 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import json
+import os
 import subprocess
 import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
-from shutil import copyfile, rmtree
+from shutil import copy, rmtree
 from typing import Any, Dict, List, Optional, Set
 
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
@@ -86,8 +87,10 @@ class Cluster(ContextDecorator):
             random=uuid.uuid4()
         )
 
+        os.mkdir(str(self._cluster_workspace))
+
         new_artifact_path = self._cluster_workspace / 'dcos_generate_config.sh'
-        copyfile(src=str(generate_config_path), dst=str(new_artifact_path))
+        copy(src=str(generate_config_path), dst=str(new_artifact_path))
 
         version_output = subprocess.run(
             args=['bash', str(new_artifact_path), '--version'],
@@ -106,7 +109,6 @@ class Cluster(ContextDecorator):
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
-            generate_config_path=generate_config_path,
             cluster_backend=cluster_backend,
             workspace_path=self._cluster_workspace,
         )  # type: ClusterManager
