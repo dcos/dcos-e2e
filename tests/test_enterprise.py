@@ -36,7 +36,7 @@ class TestEnterpriseIntegrationTests:
             enterprise_cluster=True,
             extra_config=extra_config,
             superuser_password=superuser_password,
-            generate_config_path=enterprise_cluster,
+            generate_config_path=enterprise_artifact,
         ) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
