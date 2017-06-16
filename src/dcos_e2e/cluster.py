@@ -2,6 +2,7 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import json
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -36,7 +37,6 @@ class Cluster(ContextDecorator):
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
         superuser_password: Optional[str]=None,
-        enterprise_cluster: bool=False,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -62,11 +62,17 @@ class Cluster(ContextDecorator):
             superuser_password: The superuser password to use. This is
                 required for some features if using a DC/OS Enterprise cluster.
                 This is not relevant for DC/OS OSS clusters.
-            enterprise_cluster: Whether this is a DC/OS Enterprise cluster.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        self._enterprise_cluster = enterprise_cluster
+        version_output = subprocess.run(
+            args=['bash', str(generate_config_path), '--version'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        variant = json.loads(version_output.stdout)['variant']
+        self._enterprise_cluster = variant == 'ee'
+
         extra_config = dict(extra_config or {})
         self._original_superuser_password = superuser_password or ''
         self._original_superuser_username = extra_config.get(

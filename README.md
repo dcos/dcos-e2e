@@ -139,7 +139,6 @@ Cluster(
     files_to_copy_to_installer=None,
     files_to_copy_to_masters=None,
     superuser_password=None,
-    enterprise_cluster=False,
 )
 ```
 
@@ -202,11 +201,6 @@ If set to `False`, the cluster is preserved if there is an error.
 The superuser password to use.
 This is only relevant to DC/OS Enterprise clusters.
 If `extra_config` includes `superuser_password_hash` then that is must be a hash of this password.
-
-
-###### `enterprise_cluster`
-
-Whether this is a DC/OS Enterprise cluster.
 
 ##### Methods
 
