@@ -86,8 +86,8 @@ class Cluster(ContextDecorator):
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
         """
-        master = next(iter(self.masters))
-        master.run_as_root(args=['/opt/mesosphere/bin/./3dt', '--diag'])
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            node.run_as_root(args=['/opt/mesosphere/bin/./3dt', '--diag'])
 
     def __enter__(self) -> 'Cluster':
         """
