@@ -7,6 +7,7 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
+from tempfile import TemporaryDirectory
 from typing import Any, Dict, Set, Type
 
 import docker
@@ -36,23 +37,18 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self, workspace_path: Path, dcos_docker_path: Path) -> None:
+    def __init__(self, dcos_docker_path: Path) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
         Args:
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
-            workspace_path: The directory to create large temporary files in.
-                The files are cleaned up when the cluster is destroyed.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
-            workspace_path: The directory to create large temporary files in.
-                The files are cleaned up when the cluster is destroyed.
         """
-        self.workspace_path = workspace_path
         self.dcos_docker_path = dcos_docker_path
 
     @property
@@ -117,8 +113,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        workspace = cluster_backend.workspace_path
-        self._path = workspace / 'dcos-docker-{random}'.format(random=random)
+        prefix = 'dcos-docker-{random}'.format(random=random)
+        self._path = TemporaryDirectory(prefix=prefix)
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
