@@ -3,6 +3,7 @@ Tests for using the test harness with a DC/OS Enterprise cluster.
 """
 
 import uuid
+from pathlib import Path
 
 from passlib.hash import sha512_crypt
 
@@ -17,7 +18,8 @@ class TestEnterpriseIntegrationTests:
 
     def test_run_pytest(
         self,
-        enterprise_cluster_backend: ClusterBackend,
+        cluster_backend: ClusterBackend,
+        enterprise_artifact: Path,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -30,10 +32,11 @@ class TestEnterpriseIntegrationTests:
         }
 
         with Cluster(
-            cluster_backend=enterprise_cluster_backend,
+            cluster_backend=cluster_backend,
             enterprise_cluster=True,
             extra_config=extra_config,
             superuser_password=superuser_password,
+            generate_config_path=enterprise_artifact,
         ) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']

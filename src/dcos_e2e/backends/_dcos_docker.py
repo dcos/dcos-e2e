@@ -36,31 +36,23 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(
-        self,
-        workspace_path: Path,
-        generate_config_path: Path,
-        dcos_docker_path: Path
-    ) -> None:
+    def __init__(self, workspace_path: Path, dcos_docker_path: Path) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
         Args:
-            generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
             workspace_path: The directory to create large temporary files in.
                 The files are cleaned up when the cluster is destroyed.
 
         Attributes:
-            generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
             workspace_path: The directory to create large temporary files in.
                 The files are cleaned up when the cluster is destroyed.
         """
         self.workspace_path = workspace_path
-        self.generate_config_path = generate_config_path
         self.dcos_docker_path = dcos_docker_path
 
     @property
@@ -86,6 +78,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
+        generate_config_path: Path,
         cluster_backend: DCOS_Docker,
     ) -> None:
         """
@@ -109,6 +102,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS. On DC/OS Docker the
                 files are mounted, read only, to the masters.
+            generate_config_path: The path to a build artifact to install.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
         """
@@ -135,7 +129,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         copyfile(
-            src=str(cluster_backend.generate_config_path),
+            src=str(generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
