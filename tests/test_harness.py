@@ -318,7 +318,7 @@ class TestMultipleClusters:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
-    ) -> None:  # pragma: no cover
+    ) -> None:
         """
         It is possible to start two clusters.
 
