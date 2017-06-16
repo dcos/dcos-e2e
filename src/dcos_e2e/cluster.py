@@ -70,7 +70,8 @@ class Cluster(ContextDecorator):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        variant = json.loads(str(version_output.stdout))['variant']
+        import pdb; pdb.set_trace()
+        variant = json.loads(version_output.stdout.decode())['variant']
         self._enterprise_cluster = variant == 'ee'
 
         extra_config = dict(extra_config or {})
