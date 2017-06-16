@@ -26,6 +26,7 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
+        generate_config_path: Path,
         extra_config: Optional[Dict[str, Any]]=None,
         masters: int=1,
         agents: int=1,
@@ -42,6 +43,7 @@ class Cluster(ContextDecorator):
 
         Args:
             cluster_backend: The backend to use for the cluster.
+            generate_config_path: The path to a build artifact to install.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
             masters: The number of master nodes to create.
@@ -80,6 +82,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
+            generate_config_path=generate_config_path,
         )  # type: ClusterManager
 
     def wait_for_dcos(self) -> None:
