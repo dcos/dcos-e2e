@@ -167,10 +167,27 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             )
             master_mounts.append(mount)
 
-        master_ctr = 'dcos-master-{random}-'.format(random=random)
-        agent_ctr = 'dcos-agent-{random}-'.format(random=random)
-        public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
-        installer_ctr = 'dcos-installer-{random}-'.format(random=random)
+        # All containers are created with this prefix.
+        # This allows `make clean` to remove these and only these containers.
+        common_container_prefix = 'dcos-e2e-'
+
+        master_ctr = '{prefix}-master-{random}-'.format(
+            prefix=common_container_prefix,
+            random=random,
+        )
+        agent_ctr = '{prefix}-agent-{random}-'.format(
+            prefix=common_container_prefix,
+            random=random,
+        )
+        public_agent_ctr = '{prefix}-public-agent-{random}-'.format(
+            prefix=common_container_prefix,
+            random=random,
+        )
+        installer_ctr = '{prefix}-installer-{random}-'.format(
+            prefix=common_container_prefix,
+            random=random,
+        )
+
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
