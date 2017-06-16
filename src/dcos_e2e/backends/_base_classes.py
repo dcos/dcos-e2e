@@ -49,7 +49,8 @@ class ClusterManager(abc.ABC):
                 use.
             workspace_path: The directory to create potentially large
                 temporary files in. The files are cleaned up when the cluster
-                is destroyed.
+                is destroyed. It is expected that the installer will be in
+                this directory at `dcos_generate_config.sh`.
         """
 
     @abc.abstractmethod

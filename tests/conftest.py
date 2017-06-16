@@ -15,9 +15,6 @@ def cluster_backend() -> ClusterBackend:
     Return a cluster backend to use.
     """
     return DCOS_Docker(
-        # We put this files in the `/tmp` directory because that is
-        # writable on the Vagrant VM.
-        workspace_path=Path('/tmp'),
         dcos_docker_path=Path('/tmp/dcos-docker'),
     )
 
@@ -36,3 +33,13 @@ def enterprise_artifact() -> Path:
     Return the path to an artifact for DC/OS Enterprise.
     """
     return Path('/tmp/dcos_generate_config.ee.sh')
+
+
+@pytest.fixture()
+def workspace_path() -> Path:
+    """
+    Return a directory in which we can put large temporary files.
+
+    This uses `/tmp` because it is writable on the Vagrant VM.
+    """
+    return Path('/tmp')

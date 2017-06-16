@@ -31,6 +31,7 @@ class TestNode:
         caplog: CaptureLogFuncArg,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         It is possible to run commands as root and see their output.
@@ -40,6 +41,7 @@ class TestNode:
             public_agents=0,
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['echo', '$USER'])
@@ -90,6 +92,7 @@ class TestIntegrationTests:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -98,6 +101,7 @@ class TestIntegrationTests:
         with Cluster(
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
@@ -137,6 +141,7 @@ class TestExtendConfig:
         path: str,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         This example demonstrates that it is possible to create a cluster
@@ -162,6 +167,7 @@ class TestExtendConfig:
             public_agents=0,
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
@@ -172,6 +178,7 @@ class TestExtendConfig:
         path: str,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         The example file does not exist with the standard configuration.
@@ -183,6 +190,7 @@ class TestExtendConfig:
             public_agents=0,
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             (master, ) = cluster.masters
             cluster.wait_for_dcos()
@@ -199,6 +207,7 @@ class TestClusterSize:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         By default, a cluster with one master and one agent and one private
@@ -207,6 +216,7 @@ class TestClusterSize:
         with Cluster(
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
@@ -216,6 +226,7 @@ class TestClusterSize:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         It is possible to create a cluster with a custom number of nodes.
@@ -234,6 +245,7 @@ class TestClusterSize:
             public_agents=public_agents,
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             assert len(cluster.masters) == masters
             assert len(cluster.agents) == agents
@@ -273,6 +285,7 @@ class TestClusterLogging:
         caplog: CaptureLogFuncArg,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         If `log_output_live` is given as `True`, subprocess output is logged.
@@ -284,6 +297,7 @@ class TestClusterLogging:
                 log_output_live=True,
                 cluster_backend=cluster_backend,
                 generate_config_path=oss_artifact,
+                workspace_path=workspace_path,
             ):
                 pass  # pragma: no cover
 
@@ -294,6 +308,7 @@ class TestClusterLogging:
         caplog: CaptureLogFuncArg,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         By default, subprocess output is not logged in the creation of a
@@ -304,7 +319,8 @@ class TestClusterLogging:
             with Cluster(
                 masters=2,
                 cluster_backend=cluster_backend,
-                generate_config_path=oss_artifact
+                generate_config_path=oss_artifact,
+                workspace_path=workspace_path,
             ):
                 pass  # pragma: no cover
 
@@ -320,6 +336,7 @@ class TestMultipleClusters:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:  # pragma: no cover
         """
         It is possible to start two clusters.
@@ -331,10 +348,12 @@ class TestMultipleClusters:
         with Cluster(
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ):
             with Cluster(
                 cluster_backend=cluster_backend,
                 generate_config_path=oss_artifact,
+                workspace_path=workspace_path,
             ):
                 pass
 
@@ -348,6 +367,7 @@ class TestDestroyOnError:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         By default, if an exception is raised, the cluster is destroyed.
@@ -358,6 +378,7 @@ class TestDestroyOnError:
                 public_agents=0,
                 cluster_backend=cluster_backend,
                 generate_config_path=oss_artifact,
+                workspace_path=workspace_path,
             ) as cluster:
                 (master, ) = cluster.masters
                 raise Exception()
@@ -369,6 +390,7 @@ class TestDestroyOnError:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         If `destroy_on_error` is set to `False` and an exception is raised,
@@ -381,6 +403,7 @@ class TestDestroyOnError:
                 destroy_on_error=False,
                 cluster_backend=cluster_backend,
                 generate_config_path=oss_artifact,
+                workspace_path=workspace_path,
             ) as cluster:
                 (master, ) = cluster.masters
                 raise Exception()
@@ -392,6 +415,7 @@ class TestDestroyOnError:
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         If `destroy_on_error` is set to `False` and no exception is raised,
@@ -403,6 +427,7 @@ class TestDestroyOnError:
             destroy_on_error=False,
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             (master, ) = cluster.masters
 
@@ -420,6 +445,7 @@ class TestCopyFiles:
         cluster_backend: ClusterBackend,
         tmpdir: local,
         oss_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         Files can be copied from the host to master nodes and the installer
@@ -445,6 +471,7 @@ class TestCopyFiles:
             agents=0,
             public_agents=0,
             generate_config_path=oss_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             (master, ) = cluster.masters
             args = ['cat', str(master_destination_path)]

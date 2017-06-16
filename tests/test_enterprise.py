@@ -20,6 +20,7 @@ class TestEnterpriseIntegrationTests:
         self,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
+        workspace_path: Path,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -36,6 +37,7 @@ class TestEnterpriseIntegrationTests:
             extra_config=extra_config,
             superuser_password=superuser_password,
             generate_config_path=enterprise_artifact,
+            workspace_path=workspace_path,
         ) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']

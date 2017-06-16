@@ -36,7 +36,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self, workspace_path: Path, dcos_docker_path: Path) -> None:
+    def __init__(self, dcos_docker_path: Path) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
@@ -73,7 +73,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
-        generate_config_path: Path,
         cluster_backend: DCOS_Docker,
         workspace_path: Path,
     ) -> None:
@@ -98,7 +97,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS. On DC/OS Docker the
                 files are mounted, read only, to the masters.
-            generate_config_path: The path to a build artifact to install.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
             workspace_path: The directory to create potentially large
