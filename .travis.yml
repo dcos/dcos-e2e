@@ -12,10 +12,6 @@ env:
   # Travis has a maximum test run time of 50 minutes.
   # In order to avoid this and to see failures faster, we run multiple builds
   # per commit.
-  #
-  # We do not run tests which use multiple clusters as this uses too much
-  # space for Travis CI.
-  # The main use of space is the copying of the config file to each directory.
   matrix:
       - "TEST_PATTERN=TestNode"
       - "TEST_PATTERN=TestIntegrationTests"
