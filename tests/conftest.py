@@ -18,7 +18,6 @@ def cluster_backend() -> ClusterBackend:
         # We put this files in the `/tmp` directory because that is
         # writable on the Vagrant VM.
         workspace_path=Path('/tmp'),
-        generate_config_path=Path('/tmp/dcos_generate_config.sh'),
         dcos_docker_path=Path('/tmp/dcos-docker'),
     )
 
@@ -32,6 +31,21 @@ def enterprise_cluster_backend() -> ClusterBackend:
         # We put this files in the `/tmp` directory because that is
         # writable on the Vagrant VM.
         workspace_path=Path('/tmp'),
-        generate_config_path=Path('/tmp/dcos_generate_config.ee.sh'),
         dcos_docker_path=Path('/tmp/dcos-docker'),
     )
+
+
+@pytest.fixture()
+def oss_artifact() -> Path:
+    """
+    Return the path to an artifact for DC/OS OSS.
+    """
+    return Path('/tmp/dcos_generate_config.sh')
+
+
+@pytest.fixture()
+def enterprise_artifact() -> Path:
+    """
+    Return the path to an artifact for DC/OS Enterprise.
+    """
+    return Path('/tmp/dcos_generate_config.ee.sh')

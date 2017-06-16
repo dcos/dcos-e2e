@@ -19,12 +19,12 @@ For example, a test may require a cluster with a certain number of agents, or ce
 - [Usage](#usage)
     - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
       - [Parameters](#parameters)
-        - [`generate_config_path`](#generate_config_path)
         - [`dcos_docker_path`](#dcos_docker_path)
         - [`workspace_path`](#workspace_path)
     - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
       - [Parameters](#parameters-1)
         - [`cluster_backend`](#cluster_backend)
+        - [`generate_config_path`](#generate_config_path)
         - [`extra_config`](#extra_config)
         - [`masters`](#masters)
         - [`agents`](#agents)
@@ -80,7 +80,6 @@ from dcos_e2e.cluster import Cluster
 
 DCOS_DOCKER_BACKEND = DCOS_Docker(
     workspace_path=Path('/tmp'),
-    generate_config_path=Path('/tmp/dcos_generate_config.sh'),
     dcos_docker_path=Path('/tmp/dcos-docker'),
 )
 
@@ -90,6 +89,7 @@ class TestExample:
         with Cluster(
             extra_config={'check_time': True},
             cluster_backend=DCOS_DOCKER_BACKEND,
+            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])
@@ -107,17 +107,12 @@ This is a backend which can be used to run a `Cluster`.
 
 ```python
 DCOS_Docker(
-    generate_config_path,
     dcos_docker_path,
     workspace_path,
 )
 ```
 
 ##### Parameters
-
-###### `generate_config_path`
-
-The path to a build artifact to install.
 
 ###### `dcos_docker_path`
 
@@ -134,6 +129,7 @@ The files are cleaned up when the cluster is destroyed.
 ```python
 Cluster(
     cluster_backend,
+    generate_config_path,
     extra_config=None,
     masters=1,
     agents=1,
@@ -156,6 +152,10 @@ At the time of writing, this uses DC/OS Docker.
 
 The backend to use for the cluster.
 Currently, the only supported backend is an instance of `dcos_e2e.backend.DCOS_Docker`.
+
+###### `generate_config_path`
+
+The path to a build artifact to install.
 
 ###### `extra_config`
 

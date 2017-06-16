@@ -17,6 +17,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def __init__(
         self,
+        generate_config_path: Path,
         masters: int,
         agents: int,
         public_agents: int,
@@ -30,6 +31,7 @@ class ClusterManager(abc.ABC):
         Create a DC/OS cluster with the given `cluster_backend`.
 
         Args:
+            generate_config_path: The path to a build artifact to install.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.

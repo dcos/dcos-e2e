@@ -36,31 +36,23 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(
-        self,
-        workspace_path: Path,
-        generate_config_path: Path,
-        dcos_docker_path: Path
-    ) -> None:
+    def __init__(self, workspace_path: Path, dcos_docker_path: Path) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
         Args:
-            generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
             workspace_path: The directory to create large temporary files in.
                 The files are cleaned up when the cluster is destroyed.
 
         Attributes:
-            generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
             workspace_path: The directory to create large temporary files in.
                 The files are cleaned up when the cluster is destroyed.
         """
         self.workspace_path = workspace_path
-        self.generate_config_path = generate_config_path
         self.dcos_docker_path = dcos_docker_path
 
     @property
@@ -79,6 +71,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
+        generate_config_path: Path,
         masters: int,
         agents: int,
         public_agents: int,
@@ -92,6 +85,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         Create a DC/OS Docker cluster.
 
         Args:
+            generate_config_path: The path to a build artifact to install.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -135,7 +129,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         copyfile(
-            src=str(cluster_backend.generate_config_path),
+            src=str(generate_config_path),
             dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
