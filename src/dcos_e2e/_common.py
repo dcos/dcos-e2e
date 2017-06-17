@@ -3,6 +3,7 @@ Common utilities for end to end tests.
 """
 
 import logging
+import socket
 from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import (

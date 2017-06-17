@@ -3,6 +3,7 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -10,7 +11,7 @@ from typing import Any, Dict, List, Optional, Set
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
 
-from ._common import Node
+from ._common import Node, get_open_port
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
@@ -68,22 +69,30 @@ class Cluster(ContextDecorator):
         self._log_output_live = log_output_live
         self._enterprise_cluster = enterprise_cluster
         extra_config = dict(extra_config or {})
-        self._original_superuser_password = superuser_password or ''
-        self._original_superuser_username = extra_config.get(
-            'superuser_username', ''
-        )
+        if enterprise_cluster:
+            self._original_superuser_password = superuser_password
+            self._original_superuser_username = extra_config.get(
+                'superuser_username'
+            )
 
-        version_args = [
+        environment_variables = {
+            'PORT': get_open_port(),
+            'DCOS_INSTALLER_CONTAINER_NAME': uuid.uuid4(),
+        }
+
+        version_args = []
+
+        for key, value in environment_variables.items():
+            export = "export {key}='{value}'".format(key=key, value=value)
+            version_args.append(export)
+            version_args.append('&&')
+
+        version_args += [
             'bash',
             str(generate_config_path),
             '--offline',
             '--version',
         ]
-
-        # INSTALLER_CMD := \
-        # PORT=${INSTALLER_PORT} \
-        # DCOS_INSTALLER_CONTAINER_NAME=${INSTALLER_CTR} \
-        # bash $(DCOS_GENERATE_CONFIG_PATH) --offline -v
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,

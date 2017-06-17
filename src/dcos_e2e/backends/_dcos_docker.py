@@ -2,7 +2,6 @@
 Helpers for interacting with DC/OS Docker.
 """
 
-import socket
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -13,10 +12,8 @@ from typing import Any, Dict, Set, Type
 import docker
 import yaml
 
-from .._common import get_open_port, Node, run_subprocess
+from .._common import Node, get_open_port, run_subprocess
 from ._base_classes import ClusterBackend, ClusterManager
-
-
 
 
 class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
@@ -166,7 +163,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'AGENT_CTR': '{unique}-agent-'.format(unique=unique),
             'PUBLIC_AGENT_CTR': '{unique}-public-agent-'.format(unique=unique),
             'INSTALLER_CTR': '{unique}-installer-'.format(unique=unique),
-            'INSTALLER_PORT': str(_get_open_port()),
+            'INSTALLER_PORT': str(get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
