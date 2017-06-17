@@ -88,7 +88,8 @@ class Cluster(ContextDecorator):
             shell=True,
         )
         version_stdout = version_output.stdout.decode()
-        variant = json.loads(version_stdout)['variant']
+        _, version_data = version_stdout.split(maxsplit=1)
+        variant = json.loads(version_data)['variant']
         self._enterprise_cluster = variant == 'ee'
 
         if self._enterprise_cluster:
