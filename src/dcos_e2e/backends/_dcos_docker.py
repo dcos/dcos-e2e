@@ -114,7 +114,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
         suffix = 'dcos-docker-{random}'.format(random=random)
-        self._path = TemporaryDirectory(suffix=suffix)
+        self._path = Path(TemporaryDirectory(suffix=suffix).name)
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
