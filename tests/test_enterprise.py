@@ -34,7 +34,6 @@ class TestEnterpriseIntegrationTests:
         with Cluster(
             generate_config_path=enterprise_artifact,
             cluster_backend=enterprise_cluster_backend,
-            enterprise_cluster=True,
             extra_config=extra_config,
             superuser_password=superuser_password,
         ) as cluster:

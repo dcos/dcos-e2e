@@ -2,7 +2,11 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import json
+import os
+import stat
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
@@ -10,7 +14,7 @@ from typing import Any, Dict, List, Optional, Set
 from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
 
-from ._common import Node
+from ._common import Node, get_open_port
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
@@ -36,7 +40,6 @@ class Cluster(ContextDecorator):
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
         superuser_password: Optional[str]=None,
-        enterprise_cluster: bool=False,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -62,16 +65,45 @@ class Cluster(ContextDecorator):
             superuser_password: The superuser password to use. This is
                 required for some features if using a DC/OS Enterprise cluster.
                 This is not relevant for DC/OS OSS clusters.
-            enterprise_cluster: Whether this is a DC/OS Enterprise cluster.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        self._enterprise_cluster = enterprise_cluster
         extra_config = dict(extra_config or {})
-        self._original_superuser_password = superuser_password or ''
-        self._original_superuser_username = extra_config.get(
-            'superuser_username', ''
+
+        environment_variables = {
+            'PORT': str(get_open_port()),
+            'DCOS_INSTALLER_CONTAINER_NAME': 'installer-' + str(uuid.uuid4()),
+        }
+
+        existing_permissions = os.stat(str(generate_config_path))
+        new_permissions = existing_permissions.st_mode | stat.S_IEXEC
+        os.chmod(str(generate_config_path), new_permissions)
+
+        version_args = [
+            str(generate_config_path),
+            '--offline',
+            '--version',
+        ]
+
+        version_output = subprocess.run(
+            args=' '.join(version_args),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=environment_variables,
+            shell=True,
         )
+        version_stdout = version_output.stdout.decode()
+        # In some contexts, the name of the container is shown before the
+        # version data.
+        version_data = version_stdout.split('.tar\n', maxsplit=1)[-1]
+        variant = json.loads(version_data)['variant']
+        self._enterprise_cluster = variant == 'ee'
+
+        if self._enterprise_cluster:
+            self._original_superuser_password = superuser_password
+            self._original_superuser_username = extra_config.get(
+                'superuser_username'
+            )
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
