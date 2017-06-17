@@ -2,6 +2,7 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import json
 import subprocess
 import uuid
 from contextlib import ContextDecorator
@@ -37,7 +38,6 @@ class Cluster(ContextDecorator):
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
         superuser_password: Optional[str]=None,
-        enterprise_cluster: bool=False,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -63,17 +63,10 @@ class Cluster(ContextDecorator):
             superuser_password: The superuser password to use. This is
                 required for some features if using a DC/OS Enterprise cluster.
                 This is not relevant for DC/OS OSS clusters.
-            enterprise_cluster: Whether this is a DC/OS Enterprise cluster.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
-        self._enterprise_cluster = enterprise_cluster
         extra_config = dict(extra_config or {})
-        if enterprise_cluster:
-            self._original_superuser_password = superuser_password
-            self._original_superuser_username = extra_config.get(
-                'superuser_username'
-            )
 
         environment_variables = {
             'PORT': get_open_port(),
@@ -93,6 +86,21 @@ class Cluster(ContextDecorator):
             '--offline',
             '--version',
         ]
+
+        version_output = subprocess.run(
+            args=version_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        version_stdout = version_output.stdout.decode()
+        variant = json.loads(version_stdout)['variant']
+        self._enterprise_cluster = variant == 'ee'
+
+        if self._enterprise_cluster:
+            self._original_superuser_password = superuser_password
+            self._original_superuser_username = extra_config.get(
+                'superuser_username'
+            )
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
