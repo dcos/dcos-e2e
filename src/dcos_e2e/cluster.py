@@ -88,7 +88,9 @@ class Cluster(ContextDecorator):
             shell=True,
         )
         version_stdout = version_output.stdout.decode()
-        _, version_data = version_stdout.split(maxsplit=1)
+        # In some contexts, the name of the container is shown before the
+        # version data.
+        version_data = version_stdout.split('.tar\n', maxsplit=1)[-1]
         variant = json.loads(version_data)['variant']
         self._enterprise_cluster = variant == 'ee'
 
