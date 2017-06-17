@@ -20,7 +20,6 @@ For example, a test may require a cluster with a certain number of agents, or ce
     - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
       - [Parameters](#parameters)
         - [`dcos_docker_path`](#dcos_docker_path)
-        - [`workspace_path`](#workspace_path)
     - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
       - [Parameters](#parameters-1)
         - [`cluster_backend`](#cluster_backend)
@@ -79,7 +78,6 @@ from dcos_e2e.backend import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
 DCOS_DOCKER_BACKEND = DCOS_Docker(
-    workspace_path=Path('/tmp'),
     dcos_docker_path=Path('/tmp/dcos-docker'),
 )
 
@@ -108,7 +106,6 @@ This is a backend which can be used to run a `Cluster`.
 ```python
 DCOS_Docker(
     dcos_docker_path,
-    workspace_path,
 )
 ```
 
@@ -118,11 +115,6 @@ DCOS_Docker(
 
 The path to a clone of DC/OS Docker.
 This clone will be used to create the cluster.
-
-###### `workspace_path`
-
-The directory to create large temporary files in.
-The files are cleaned up when the cluster is destroyed.
 
 #### `dcos_e2e.cluster.Cluster`
 
