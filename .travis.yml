@@ -35,7 +35,7 @@ before_script:
     - 'make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-dependencies'
 
 script:
-    - 'pytest -x -vvv -s -n 4 --cov=src --cov=tests'
+    - 'pytest -x -vvv -s -n 2 --cov=src --cov=tests'
 
 after_success:
     - "codecov"
