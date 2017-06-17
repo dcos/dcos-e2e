@@ -158,7 +158,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         # All containers are created with this prefix.
         # This allows `make clean` to remove these and only these containers.
-        common_container_prefix = 'dcos-e2e-'
+        common_container_prefix = 'dcos-e2e'
 
         master_ctr = '{prefix}-master-{random}-'.format(
             prefix=common_container_prefix,
