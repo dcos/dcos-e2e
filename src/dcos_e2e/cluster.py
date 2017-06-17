@@ -3,6 +3,8 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import json
+import os
+import stat
 import subprocess
 import uuid
 from contextlib import ContextDecorator
@@ -73,8 +75,11 @@ class Cluster(ContextDecorator):
             'DCOS_INSTALLER_CONTAINER_NAME': 'installer-' + str(uuid.uuid4()),
         }
 
+        existing_permissions = os.stat(str(generate_config_path))
+        new_permissions = existing_permissions.st_mode | stat.S_IEXEC
+        os.chmod(str(generate_config_path), new_permissions)
+
         version_args = [
-            '/bin/bash',
             str(generate_config_path),
             '--offline',
             '--version',
