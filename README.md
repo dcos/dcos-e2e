@@ -308,10 +308,9 @@ However, if a test is interrupted, it can leave behind containers, volumes and f
 To remove these, run the following:
 
 ```sh
-docker stop $(docker ps -a -q --filter="name=dcos-")
-docker rm --volumes $(docker ps -a -q --filter="name=dcos-")
+docker stop $(docker ps -a -q --filter="name=dcos-e2e")
+docker rm --volumes $(docker ps -a -q --filter="name=dcos-e2e")
 docker volume prune --force
-rm -rf /tmp/dcos-docker-*
 ```
 
 If this repository is available, run `make clean`.

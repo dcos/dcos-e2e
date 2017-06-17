@@ -1,6 +1,8 @@
 # At the time of writing, `dcos-test-utils` has not been tagged.
 # Therefore, the latest `sha` was picked.
---find-links git+https://github.com/mesosphere/dcos-test-utils.git@97131812adb6f2bfe33ba89c71eae6a868e1f6de#egg=dcos-test-utils-0.1
+# Use `sha` from https://github.com/mesosphere/dcos-test-utils/pull/30
+# to work around a bug.
+--find-links git+https://github.com/mesosphere/dcos-test-utils.git@7e9dc0cdae552794c389f6715ad9ee051e7d27b9#egg=dcos-test-utils-0.1
 dcos-test-utils==0.1
 docker==2.3.0
 PyYAML==3.12

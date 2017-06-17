@@ -44,11 +44,6 @@ clean:
 	# We skip errors because this does not exist in legacy versions of
 	# Docker
 	- docker volume prune --force | :
-	# On some platforms this requires `sudo`, e.g. Vagrant.
-	# One some platforms, sudo requires a password.
-	# Therefore try `sudo` and we try without `sudo`.
-	- sudo -n rm -rf /tmp/dcos-docker-* | :
-	- rm -rf /tmp/dcos-docker-* | :
 
 # Fix some linting errors.
 .PHONY: fix-lint
