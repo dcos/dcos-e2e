@@ -107,14 +107,16 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
-        random = uuid.uuid4()
+        #
+        # Starting with "dcos-e2e" allows `make clean` to remove these and
+        # only these containers.
+        unique = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
 
         # We create a new instance of DC/OS Docker and we work in this
         # directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        suffix = 'dcos-docker-{random}'.format(random=random)
-        self._path = Path(TemporaryDirectory(suffix=suffix).name)
+        self._path = Path(TemporaryDirectory(suffix=unique).name)
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
@@ -152,26 +154,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             )
             master_mounts.append(mount)
 
-        # All containers are created with this prefix.
-        # This allows `make clean` to remove these and only these containers.
-        common_container_prefix = 'dcos-e2e'
-
-        master_ctr = '{prefix}-master-{random}-'.format(
-            prefix=common_container_prefix,
-            random=random,
-        )
-        agent_ctr = '{prefix}-agent-{random}-'.format(
-            prefix=common_container_prefix,
-            random=random,
-        )
-        public_agent_ctr = '{prefix}-public-agent-{random}-'.format(
-            prefix=common_container_prefix,
-            random=random,
-        )
-        installer_ctr = '{prefix}-installer-{random}-'.format(
-            prefix=common_container_prefix,
-            random=random,
-        )
+        master_ctr = '{unique}-master-'.format(unique=unique)
+        agent_ctr = '{unique}-agent-'.format(unique=unique)
+        public_agent_ctr = '{unique}-public-agent-'.format(unique=unique)
+        installer_ctr = '{unique}-installer-'.format(unique=unique)
 
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
