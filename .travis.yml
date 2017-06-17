@@ -54,11 +54,8 @@ before_script:
        "
     - 'make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-dependencies'
 
-# Travis has a time out for total for time without output (10 minutes).
-# We get around this by using `travis_wait` which hides all output until the
-# tests are finished.
 script:
-    - 'travis_wait 30 pytest -x -vvv -s -n 4 -k "$TEST_PATTERN" --cov=src --cov=tests'
+    - 'pytest -x -vvv -s -n 4 -k "$TEST_PATTERN" --cov=src --cov=tests'
 
 after_success:
     - "codecov"
