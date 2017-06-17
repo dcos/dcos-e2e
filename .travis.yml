@@ -45,23 +45,10 @@ cache: "pip"
 before_script:
     - "make clean"
     - "make lint"
-    - "git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '*.md$' || {
-            echo 'Only the documentation was updated.';
-            echo 'No tests will be run'.;
-            echo 'No artifacts will be downloaded.';
-            exit ;
-       }
-       "
     - 'make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-dependencies'
 
-# Travis has a time out for total for time without output (10 minutes).
-# We get around this by using `travis_wait` which hides all output until the
-# tests are finished.
-#
-# We do not run tests in parallel as this uses too much space for Travis CI.
-# The main use of space is the copying of the config file to each directory.
 script:
-    - 'travis_wait 30 pytest -x -vvv -s -k "$TEST_PATTERN" --cov=src --cov=tests'
+    - 'pytest -x -vvv -s -n 4 -k "$TEST_PATTERN" --cov=src --cov=tests'
 
 after_success:
     - "codecov"
