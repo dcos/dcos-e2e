@@ -7,8 +7,7 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from dcos_test_utils.dcos_api_session import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
+from retry import retry
 
 from ._common import Node
 # Ignore a spurious error - this import is used in a type hint.
@@ -85,63 +84,13 @@ class Cluster(ContextDecorator):
             generate_config_path=generate_config_path,
         )  # type: ClusterManager
 
+    @retry(exceptions=(subprocess.CalledProcessError), tries=100, delay=5)
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
-
-        This uses the originally given superuser username and password.
-        Therefore, if these are changed during the cluster's lifetime, they
-        may not be valid.
-
-        When https://github.com/dcos/dcos/pull/1609/ is merged, that can
-        likely be used instead of this function and this might allow us to
-        remove the `enterprise_cluster` parameter.
         """
-        web_host = next(iter(self.masters))
-
-        masters_ip_addresses = [
-            str(master.ip_address) for master in self.masters
-        ]
-        agents_ip_addresses = [str(agent.ip_address) for agent in self.agents]
-        public_agent_ip_addresses = [
-            str(public_agent.ip_address) for public_agent in self.public_agents
-        ]
-
-        if self._enterprise_cluster:
-            default_os_user = 'nobody'
-            protocol = 'https://'
-            credentials = {
-                'uid': self._original_superuser_username,
-                'password': self._original_superuser_password,
-            }
-        else:
-            default_os_user = 'root'
-            protocol = 'http://'
-            credentials = CI_CREDENTIALS
-
-        dcos_url = protocol + str(web_host.ip_address)
-        auth_user = DcosUser(credentials=credentials)
-        api_session = DcosApiSession(
-            dcos_url=dcos_url,
-            masters=masters_ip_addresses,
-            slaves=agents_ip_addresses,
-            public_slaves=public_agent_ip_addresses,
-            default_os_user=default_os_user,
-            auth_user=auth_user,
-        )
-
-        if self._enterprise_cluster:
-            ca_cert = api_session.get(
-                # We wait up to 20 minutes which is arbitrary but has worked
-                # in testing at the time of writing.
-                '/ca/dcos-ca.crt',
-                retry_timeout=60 * 20,
-                verify=False
-            )
-            ca_cert.raise_for_status()
-            api_session.session.verify = session_tempfile(ca_cert.content)
-
-        api_session.wait_for_dcos()
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            node.run_as_root(args=['/opt/mesosphere/bin/./3dt', '--diag'])
 
     def __enter__(self) -> 'Cluster':
         """
