@@ -69,17 +69,11 @@ class Cluster(ContextDecorator):
         extra_config = dict(extra_config or {})
 
         environment_variables = {
-            'PORT': get_open_port(),
-            'DCOS_INSTALLER_CONTAINER_NAME': uuid.uuid4(),
+            'PORT': str(get_open_port()),
+            'DCOS_INSTALLER_CONTAINER_NAME': 'installer-' + str(uuid.uuid4()),
         }
 
-        version_args = []
-
-        for key, value in environment_variables.items():
-            version_args.append("{key}='{value}'".format(key=key, value=value))
-            version_args.append('&&')
-
-        version_args += [
+        version_args = [
             'bash',
             str(generate_config_path),
             '--offline',
@@ -87,9 +81,11 @@ class Cluster(ContextDecorator):
         ]
 
         version_output = subprocess.run(
-            args=version_args,
+            args=' '.join(version_args),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            env=environment_variables,
+            shell=True,
         )
         version_stdout = version_output.stdout.decode()
         variant = json.loads(version_stdout)['variant']
