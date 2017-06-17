@@ -73,6 +73,18 @@ class Cluster(ContextDecorator):
             'superuser_username', ''
         )
 
+        version_args = [
+            'bash',
+            str(generate_config_path),
+            '--offline',
+            '--version',
+        ]
+
+        # INSTALLER_CMD := \
+        # PORT=${INSTALLER_PORT} \
+        # DCOS_INSTALLER_CONTAINER_NAME=${INSTALLER_CTR} \
+        # bash $(DCOS_GENERATE_CONFIG_PATH) --offline -v
+
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,

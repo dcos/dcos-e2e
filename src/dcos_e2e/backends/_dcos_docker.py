@@ -13,23 +13,10 @@ from typing import Any, Dict, Set, Type
 import docker
 import yaml
 
-from .._common import Node, run_subprocess
+from .._common import get_open_port, Node, run_subprocess
 from ._base_classes import ClusterBackend, ClusterManager
 
 
-def _get_open_port() -> int:
-    """
-    Return a free port.
-    """
-    host = ''
-    # We ignore type hinting to avoid a bug in `typeshed`.
-    # See https://github.com/python/typeshed/issues/1391.
-    with socket.socket(  # type: ignore
-        socket.AF_INET, socket.SOCK_STREAM
-    ) as new_socket:
-        new_socket.bind((host, 0))
-        new_socket.listen(1)
-        return int(new_socket.getsockname()[1])
 
 
 class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
