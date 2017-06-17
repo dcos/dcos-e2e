@@ -74,7 +74,7 @@ class Cluster(ContextDecorator):
         }
 
         version_args = [
-            'bash',
+            '/bin/bash',
             str(generate_config_path),
             '--offline',
             '--version',
