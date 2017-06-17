@@ -58,7 +58,7 @@ before_script:
 # We get around this by using `travis_wait` which hides all output until the
 # tests are finished.
 script:
-    - 'travis_wait 30 pytest -x -vvv -s -k -n 4 "$TEST_PATTERN" --cov=src --cov=tests'
+    - 'travis_wait 30 pytest -x -vvv -s -n 4 -k "$TEST_PATTERN" --cov=src --cov=tests'
 
 after_success:
     - "codecov"
