@@ -68,10 +68,12 @@ class Cluster(ContextDecorator):
         self._log_output_live = log_output_live
         self._enterprise_cluster = enterprise_cluster
         extra_config = dict(extra_config or {})
-        self._original_superuser_password = superuser_password or ''
-        self._original_superuser_username = extra_config.get(
-            'superuser_username', ''
-        )
+
+        if self._enterprise_cluster:
+            self._original_superuser_password = superuser_password
+            self._original_superuser_username = extra_config.get(
+                'superuser_username'
+            )
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
