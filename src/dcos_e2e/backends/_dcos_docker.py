@@ -154,11 +154,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             )
             master_mounts.append(mount)
 
-        master_ctr = '{unique}-master-'.format(unique=unique)
-        agent_ctr = '{unique}-agent-'.format(unique=unique)
-        public_agent_ctr = '{unique}-public-agent-'.format(unique=unique)
-        installer_ctr = '{unique}-installer-'.format(unique=unique)
-
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
@@ -167,6 +162,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         storage_driver = host_driver if host_driver in (
             'overlay', 'overlay2', 'aufs'
         ) else 'overlay2'
+
         self._variables = {
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
@@ -179,10 +175,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
             # Container names.
-            'MASTER_CTR': master_ctr,
-            'AGENT_CTR': agent_ctr,
-            'PUBLIC_AGENT_CTR': public_agent_ctr,
-            'INSTALLER_CTR': installer_ctr,
+            'MASTER_CTR': '{unique}-master-'.format(unique=unique),
+            'AGENT_CTR': '{unique}-agent-'.format(unique=unique),
+            'PUBLIC_AGENT_CTR': '{unique}-public-agent-'.format(unique=unique),
+            'INSTALLER_CTR': '{unique}-installer-'.format(unique=unique),
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
