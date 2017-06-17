@@ -76,8 +76,7 @@ class Cluster(ContextDecorator):
         version_args = []
 
         for key, value in environment_variables.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
-            version_args.append(export)
+            version_args.append("{key}='{value}'".format(key=key, value=value))
             version_args.append('&&')
 
         version_args += [
