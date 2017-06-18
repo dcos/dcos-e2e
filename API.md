@@ -1,43 +1,42 @@
+# API
+
 <!--lint disable list-item-indent-->
 <!--lint disable list-item-bullet-indent-->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [API](#api)
-  - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
-    - [Parameters](#parameters)
-      - [`dcos_docker_path`](#dcos_docker_path)
-  - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
-    - [Parameters](#parameters-1)
-      - [`cluster_backend`](#cluster_backend)
-      - [`generate_config_path`](#generate_config_path)
-      - [`extra_config`](#extra_config)
-      - [`masters`](#masters)
-      - [`agents`](#agents)
-      - [`public_agents`](#public_agents)
-      - [`log_output_live`](#log_output_live)
-      - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
-      - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
-      - [`destroy_on_error`](#destroy_on_error)
-      - [`superuser_password`](#superuser_password)
-    - [Methods](#methods)
-      - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
-      - [`destroy()`](#destroy)
-      - [`wait_for_dcos()`](#wait_for_dcos)
-    - [Attributes](#attributes)
-      - [`masters`](#masters-1)
-      - [`agents`](#agents-1)
-      - [`public_agents`](#public_agents-1)
-  - [Nodes](#nodes)
-    - [Methods](#methods-1)
-      - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
+- [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
+  - [Parameters](#parameters)
+    - [`dcos_docker_path`](#dcos_docker_path)
+- [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
+  - [Parameters](#parameters-1)
+    - [`cluster_backend`](#cluster_backend)
+    - [`generate_config_path`](#generate_config_path)
+    - [`extra_config`](#extra_config)
+    - [`masters`](#masters)
+    - [`agents`](#agents)
+    - [`public_agents`](#public_agents)
+    - [`log_output_live`](#log_output_live)
+    - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
+    - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
+    - [`destroy_on_error`](#destroy_on_error)
+    - [`superuser_password`](#superuser_password)
+  - [Methods](#methods)
+    - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
+    - [`destroy()`](#destroy)
+    - [`wait_for_dcos()`](#wait_for_dcos)
+  - [Attributes](#attributes)
+    - [`masters`](#masters-1)
+    - [`agents`](#agents-1)
+    - [`public_agents`](#public_agents-1)
+- [Nodes](#nodes)
+  - [Methods](#methods-1)
+    - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
 <!--lint enable list-item-bullet-indent-->
-
-# API
 
 ## `dcos_e2e.backend.DCOS_Docker`
 
