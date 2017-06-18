@@ -53,6 +53,12 @@ DCOS_Docker(dcos_docker_path)
 The path to a clone of DC/OS Docker.
 This clone will be used to create the cluster.
 
+### Attributes
+
+#### `ip_address`
+
+The IP address of the node.
+
 ## `dcos_e2e.cluster.Cluster`
 
 ```python
