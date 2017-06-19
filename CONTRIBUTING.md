@@ -195,15 +195,28 @@ git checkout -b release-$DCOS_E2E_RELEASE origin/master
 Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
 If this is the only change, add an empty entry to the changelog.
 
-4. Bump the version of the software.
+4. Update the changelog Table of Contents.
+
+```sh
+make toc
+```
+
+5. Bump the version of the software.
 
 Change `VERSION` in `setup.py`.
 
-5. Create a Pull Request to merge the `release` branch into `master`.
+6. Commit and push changes.
 
-6. Merge the `release` Pull Request once CI has passed.
+```sh
+git commit -am "Bump version"
+git push
+```
 
-7. Tag a release.
+6. Create a Pull Request to merge the `release` branch into `master`.
+
+7. Merge the `release` Pull Request once CI has passed.
+
+8. Tag a release.
 
 Visit <https://github.com/adamtheturtle/dcos-e2e/releases/new>.
 Set the "Tag version" to the new version.
