@@ -33,6 +33,8 @@
 - [Nodes](#nodes)
   - [Methods](#methods-1)
     - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
+  - [Attributes](#attributes-1)
+    - [`ip_address`](#ip_address)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
@@ -53,11 +55,6 @@ DCOS_Docker(dcos_docker_path)
 The path to a clone of DC/OS Docker.
 This clone will be used to create the cluster.
 
-### Attributes
-
-#### `ip_address`
-
-The IP address of the node.
 
 ## `dcos_e2e.cluster.Cluster`
 
@@ -175,3 +172,9 @@ Commands can be run on nodes in clusters.
 If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 
 To see these logs in `pytest` tests, use the `-s` flag.
+
+### Attributes
+
+#### `ip_address`
+
+The IP address of the node.
