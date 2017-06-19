@@ -232,14 +232,7 @@ class Cluster(ContextDecorator):
         else:
             environment_variables = {}
 
-        args = []
-
-        for key, value in environment_variables.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
-            args.append(export)
-            args.append('&&')
-
-        args += [
+        args = [
             'source',
             '/opt/mesosphere/environment.export',
             '&&',
@@ -254,7 +247,9 @@ class Cluster(ContextDecorator):
         test_host = next(iter(self.masters))
 
         return test_host.run_as_root(
-            args=args, log_output_live=self._log_output_live
+            args=args,
+            log_output_live=self._log_output_live,
+            env=environment_variables,
         )
 
     def destroy(self) -> None:

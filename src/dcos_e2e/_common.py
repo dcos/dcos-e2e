@@ -13,7 +13,7 @@ from subprocess import (
     CompletedProcess,
     Popen,
 )
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
@@ -37,8 +37,12 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(self, args: List[str],
-                    log_output_live: bool=False) -> CompletedProcess:
+    def run_as_root(
+        self,
+        args: List[str],
+        log_output_live: bool=False,
+        env: Optional[Dict]=None,
+    ) -> CompletedProcess:
         """
         Run a command on this node as ``root``.
 
@@ -46,6 +50,7 @@ class Node:
             args: The command to run on the node.
             log_output_live: If `True`, log output live. If `True`, stderr is
                 merged into stdout in the return value.
+            env: Experiment for now.
 
         Returns:
             The representation of the finished process.
@@ -53,6 +58,20 @@ class Node:
         Raises:
             CalledProcessError: The process exited with a non-zero code.
         """
+        env = dict(env or {})
+
+        command = []
+
+        for key, value in env.items():
+            export = "export {key}='EXPERIMENT{value}'".format(
+                key=key,
+                value=value,
+            )
+            command.append(export)
+            command.append('&&')
+
+        command += args
+
         ssh_args = [
             'ssh',
             # Suppress warnings.
