@@ -32,20 +32,6 @@ class TestEnterpriseIntegrationTests:
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
-        pytest_command = [
-            'pytest',
-            '-vvv',
-            '-s',
-            '-x',
-            # This test file requires the `DCOS_LOGIN_UNAME` and
-            # `DCOS_LOGIN_PW` environment variables to be set.
-            'test_dcoscli_enterprise.py',
-        ]
-        environment_variables = {
-            'DCOS_LOGIN_UNAME': superuser_username,
-            'DCOS_LOGIN_PW': superuser_password,
-        }
-
         with Cluster(
             generate_config_path=enterprise_artifact,
             cluster_backend=enterprise_cluster_backend,
@@ -55,6 +41,9 @@ class TestEnterpriseIntegrationTests:
         ) as cluster:
             # No error is raised with a successful command.
             cluster.run_integration_tests(
-                pytest_command=pytest_command,
-                env=environment_variables,
+                pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
+                env={
+                    'DCOS_LOGIN_UNAME': superuser_username,
+                    'DCOS_LOGIN_PW': superuser_password,
+                },
             )
