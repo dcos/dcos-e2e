@@ -2,33 +2,18 @@
 Helpers for interacting with DC/OS Docker.
 """
 
-import socket
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
+from tempfile import TemporaryDirectory
 from typing import Any, Dict, Set, Type
 
 import docker
 import yaml
 
-from .._common import Node, run_subprocess
+from .._common import Node, get_open_port, run_subprocess
 from ._base_classes import ClusterBackend, ClusterManager
-
-
-def _get_open_port() -> int:
-    """
-    Return a free port.
-    """
-    host = ''
-    # We ignore type hinting to avoid a bug in `typeshed`.
-    # See https://github.com/python/typeshed/issues/1391.
-    with socket.socket(  # type: ignore
-        socket.AF_INET, socket.SOCK_STREAM
-    ) as new_socket:
-        new_socket.bind((host, 0))
-        new_socket.listen(1)
-        return int(new_socket.getsockname()[1])
 
 
 class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
@@ -36,31 +21,18 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(
-        self,
-        workspace_path: Path,
-        generate_config_path: Path,
-        dcos_docker_path: Path
-    ) -> None:
+    def __init__(self, dcos_docker_path: Path) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
         Args:
-            generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
-            workspace_path: The directory to create large temporary files in.
-                The files are cleaned up when the cluster is destroyed.
 
         Attributes:
-            generate_config_path: The path to a build artifact to install.
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
-            workspace_path: The directory to create large temporary files in.
-                The files are cleaned up when the cluster is destroyed.
         """
-        self.workspace_path = workspace_path
-        self.generate_config_path = generate_config_path
         self.dcos_docker_path = dcos_docker_path
 
     @property
@@ -79,6 +51,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
+        generate_config_path: Path,
         masters: int,
         agents: int,
         public_agents: int,
@@ -92,6 +65,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         Create a DC/OS Docker cluster.
 
         Args:
+            generate_config_path: The path to a build artifact to install.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -117,14 +91,16 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
-        random = uuid.uuid4()
+        #
+        # Starting with "dcos-e2e" allows `make clean` to remove these and
+        # only these containers.
+        unique = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
 
         # We create a new instance of DC/OS Docker and we work in this
         # directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        workspace = cluster_backend.workspace_path
-        self._path = workspace / 'dcos-docker-{random}'.format(random=random)
+        self._path = Path(TemporaryDirectory(suffix=unique).name)
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
@@ -132,11 +108,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # If there is already a config, we do not copy it as it will be
             # overwritten and therefore copying it is wasteful.
             ignore=ignore_patterns('dcos_generate_config.sh'),
-        )
-
-        copyfile(
-            src=str(cluster_backend.generate_config_path),
-            dst=str(self._path / 'dcos_generate_config.sh'),
         )
 
         # Files in the DC/OS Docker directory's genconf directory are mounted
@@ -167,10 +138,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             )
             master_mounts.append(mount)
 
-        master_ctr = 'dcos-master-{random}-'.format(random=random)
-        agent_ctr = 'dcos-agent-{random}-'.format(random=random)
-        public_agent_ctr = 'dcos-public-agent-{random}-'.format(random=random)
-        installer_ctr = 'dcos-installer-{random}-'.format(random=random)
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
@@ -179,6 +146,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         storage_driver = host_driver if host_driver in (
             'overlay', 'overlay2', 'aufs'
         ) else 'overlay2'
+
         self._variables = {
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
@@ -191,13 +159,14 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
             # Container names.
-            'MASTER_CTR': master_ctr,
-            'AGENT_CTR': agent_ctr,
-            'PUBLIC_AGENT_CTR': public_agent_ctr,
-            'INSTALLER_CTR': installer_ctr,
-            'INSTALLER_PORT': str(_get_open_port()),
+            'MASTER_CTR': '{unique}-master-'.format(unique=unique),
+            'AGENT_CTR': '{unique}-agent-'.format(unique=unique),
+            'PUBLIC_AGENT_CTR': '{unique}-public-agent-'.format(unique=unique),
+            'INSTALLER_CTR': '{unique}-installer-'.format(unique=unique),
+            'INSTALLER_PORT': str(get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
+            'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
         }  # type: Dict[str, str]
 
         self._make(target='all')
