@@ -2,18 +2,14 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
-import json
-import os
-import stat
 import subprocess
-import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from retry import retry
 
-from ._common import Node, get_open_port
+from ._common import Node
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
@@ -38,7 +34,6 @@ class Cluster(ContextDecorator):
         destroy_on_error: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
-        superuser_password: Optional[str]=None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -61,48 +56,10 @@ class Cluster(ContextDecorator):
             files_to_copy_to_masters: A mapping of host paths to paths on the
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS.
-            superuser_password: The superuser password to use. This is
-                required for some features if using a DC/OS Enterprise cluster.
-                This is not relevant for DC/OS OSS clusters.
         """
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
         extra_config = dict(extra_config or {})
-
-        environment_variables = {
-            'PORT': str(get_open_port()),
-            'DCOS_INSTALLER_CONTAINER_NAME': 'installer-' + str(uuid.uuid4()),
-        }
-
-        existing_permissions = os.stat(str(generate_config_path))
-        new_permissions = existing_permissions.st_mode | stat.S_IEXEC
-        os.chmod(str(generate_config_path), new_permissions)
-
-        version_args = [
-            str(generate_config_path),
-            '--offline',
-            '--version',
-        ]
-
-        version_output = subprocess.run(
-            args=' '.join(version_args),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=environment_variables,
-            shell=True,
-        )
-        version_stdout = version_output.stdout.decode()
-        # In some contexts, the name of the container is shown before the
-        # version data.
-        version_data = version_stdout.split('.tar\n', maxsplit=1)[-1]
-        variant = json.loads(version_data)['variant']
-        self._enterprise_cluster = variant == 'ee'
-
-        if self._enterprise_cluster:
-            self._original_superuser_password = superuser_password
-            self._original_superuser_username = extra_config.get(
-                'superuser_username'
-            )
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
@@ -116,7 +73,7 @@ class Cluster(ContextDecorator):
             generate_config_path=generate_config_path,
         )  # type: ClusterManager
 
-    @retry(exceptions=(subprocess.CalledProcessError), tries=100, delay=5)
+    @retry(exceptions=(subprocess.CalledProcessError), tries=200, delay=5)
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
@@ -155,15 +112,16 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
+        env: Optional[Dict]=None,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
-        This uses the originally given superuser username and password.
-        Therefore, if these are changed during the cluster's lifetime, they
-        may not be valid.
 
         Args:
             pytest_command: The ``pytest`` command to run on the node.
+            env: Environment variables to be set on the node before running
+                the `pytest_command`. On enterprise
+                clusters, `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW` must be set.
 
         Returns:
             The result of the ``pytest`` command.
@@ -173,22 +131,7 @@ class Cluster(ContextDecorator):
         """
         self.wait_for_dcos()
 
-        if self._enterprise_cluster:
-            environment_variables = {
-                'DCOS_LOGIN_UNAME': self._original_superuser_username,
-                'DCOS_LOGIN_PW': self._original_superuser_password,
-            }
-        else:
-            environment_variables = {}
-
-        args = []
-
-        for key, value in environment_variables.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
-            args.append(export)
-            args.append('&&')
-
-        args += [
+        args = [
             'source',
             '/opt/mesosphere/environment.export',
             '&&',
@@ -203,7 +146,9 @@ class Cluster(ContextDecorator):
         test_host = next(iter(self.masters))
 
         return test_host.run_as_root(
-            args=args, log_output_live=self._log_output_live
+            args=args,
+            log_output_live=self._log_output_live,
+            env=env,
         )
 
     def destroy(self) -> None:

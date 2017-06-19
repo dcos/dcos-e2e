@@ -3,7 +3,6 @@ Common utilities for end to end tests.
 """
 
 import logging
-import socket
 from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import (
@@ -13,7 +12,7 @@ from subprocess import (
     CompletedProcess,
     Popen,
 )
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
@@ -37,15 +36,22 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(self, args: List[str],
-                    log_output_live: bool=False) -> CompletedProcess:
+    def run_as_root(
+        self,
+        args: List[str],
+        log_output_live: bool=False,
+        env: Optional[Dict]=None,
+    ) -> CompletedProcess:
         """
-        Run a command on this node as ``root``.
+        Run a command on this node as `root`.
 
         Args:
             args: The command to run on the node.
             log_output_live: If `True`, log output live. If `True`, stderr is
                 merged into stdout in the return value.
+            env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
 
         Returns:
             The representation of the finished process.
@@ -53,6 +59,17 @@ class Node:
         Raises:
             CalledProcessError: The process exited with a non-zero code.
         """
+        env = dict(env or {})
+
+        command = []
+
+        for key, value in env.items():
+            export = "export {key}='{value}'".format(key=key, value=value)
+            command.append(export)
+            command.append('&&')
+
+        command += args
+
         ssh_args = [
             'ssh',
             # Suppress warnings.
@@ -72,7 +89,7 @@ class Node:
             "-o",
             "PreferredAuthentications=publickey",
             str(self.ip_address),
-        ] + args
+        ] + command
 
         return run_subprocess(args=ssh_args, log_output_live=log_output_live)
 
@@ -137,18 +154,3 @@ def run_subprocess(
                 retcode, args, output=stdout, stderr=stderr
             )
     return CompletedProcess(args, retcode, stdout, stderr)
-
-
-def get_open_port() -> int:
-    """
-    Return a free port.
-    """
-    host = ''
-    # We ignore type hinting to avoid a bug in `typeshed`.
-    # See https://github.com/python/typeshed/issues/1391.
-    with socket.socket(  # type: ignore
-        socket.AF_INET, socket.SOCK_STREAM
-    ) as new_socket:
-        new_socket.bind((host, 0))
-        new_socket.listen(1)
-        return int(new_socket.getsockname()[1])

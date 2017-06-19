@@ -22,7 +22,7 @@
     - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
     - [`destroy_on_error`](#destroy_on_error)
   - [Methods](#methods)
-    - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
+    - [`run_integration_tests(pytest_command, env=None)`](#run_integration_testspytest_command-envnone)
     - [`destroy()`](#destroy)
     - [`wait_for_dcos()`](#wait_for_dcos)
   - [Attributes](#attributes)
@@ -31,7 +31,7 @@
     - [`public_agents`](#public_agents-1)
 - [Nodes](#nodes)
   - [Methods](#methods-1)
-    - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
+    - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address)
 
@@ -127,9 +127,26 @@ If set to `False`, the cluster is preserved if there is an error.
 
 ### Methods
 
-#### `run_integration_tests(pytest_command)`
+#### `run_integration_tests(pytest_command, env=None)`
 
 Run integration tests on the cluster.
+
+To run integration tests on an enterprise cluster, an administrator's username and password must be set as environment variables.
+For example:
+
+```
+pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
+
+environment_variables = {
+    'DCOS_LOGIN_UNAME': 'alice',
+    'DCOS_LOGIN_PW': 'password123',
+}
+
+cluster.run_integration_tests(
+    pytest_command=pytest_command,
+    env=environment_variables,
+)
+```
 
 #### `destroy()`
 
@@ -159,11 +176,14 @@ Commands can be run on nodes in clusters.
 
 ### Methods
 
-#### `node.run_as_root(log_output_live=False)`
+#### `node.run_as_root(args, log_output_live=False, env=None)`
 
 If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 
 To see these logs in `pytest` tests, use the `-s` flag.
+
+`env` is an optional mapping of environment variable names to values.
+These environment variables will be set on the node before running the command specified in `args`.
 
 ### Attributes
 
