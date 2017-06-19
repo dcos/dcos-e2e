@@ -210,13 +210,12 @@ class Cluster(ContextDecorator):
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
-        This uses the originally given superuser username and password.
-        Therefore, if these are changed during the cluster's lifetime, they
-        may not be valid.
 
         Args:
             pytest_command: The ``pytest`` command to run on the node.
-            env: Experiment for now.
+            env: Environment variables to be set on the node before running
+                the `pytest_command`. On enterprise clusters,
+                `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW` must be set.
 
         Returns:
             The result of the ``pytest`` command.

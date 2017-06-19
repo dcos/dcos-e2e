@@ -139,11 +139,21 @@ If `extra_config` includes `superuser_password_hash` then that is must be a hash
 
 Run integration tests on the cluster.
 
-To run integration tests on an enterprise cluster, an administrator's username and password must be given.
+To run integration tests on an enterprise cluster, an administrator's username and password must be set as environment variables.
 For example:
 
 ```
-XXX
+pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
+
+environment_variables = {
+    'DCOS_LOGIN_UNAME': 'alice',
+    'DCOS_LOGIN_PW': 'password123',
+}
+
+cluster.run_integration_tests(
+    pytest_command=pytest_command,
+    env=environment_variables,
+)
 ```
 
 #### `destroy()`

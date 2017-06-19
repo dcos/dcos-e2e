@@ -32,6 +32,12 @@ class TestEnterpriseIntegrationTests:
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
+        pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
+        environment_variables = {
+            'DCOS_LOGIN_UNAME': superuser_username,
+            'DCOS_LOGIN_PW': superuser_password,
+        }
+
         with Cluster(
             generate_config_path=enterprise_artifact,
             cluster_backend=enterprise_cluster_backend,
@@ -39,13 +45,6 @@ class TestEnterpriseIntegrationTests:
             superuser_password=superuser_password,
         ) as cluster:
             # No error is raised with a successful command.
-            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
-
-            environment_variables = {
-                'DCOS_LOGIN_UNAME': superuser_username,
-                'DCOS_LOGIN_PW': superuser_password,
-            }
-
             cluster.run_integration_tests(
                 pytest_command=pytest_command,
                 env=environment_variables,
