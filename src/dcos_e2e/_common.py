@@ -93,7 +93,7 @@ class Node:
             "-o",
             "PreferredAuthentications=publickey",
             str(self.ip_address),
-        ] + args
+        ] + command
 
         return run_subprocess(args=ssh_args, log_output_live=log_output_live)
 
