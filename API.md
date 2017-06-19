@@ -167,7 +167,7 @@ Commands can be run on nodes in clusters.
 
 ### Methods
 
-#### `node.run_as_root(log_output_live=False)`
+#### `node.run_as_root(args, log_output_live=False)`
 
 If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 
