@@ -32,7 +32,15 @@ class TestEnterpriseIntegrationTests:
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
-        pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
+        pytest_command = [
+            'pytest',
+            '-vvv',
+            '-s',
+            '-x',
+            # This test file requires the `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW`
+            # environment variables to be set.
+            'test_dcoscli_enterprise.py',
+        ]
         environment_variables = {
             'DCOS_LOGIN_UNAME': superuser_username,
             'DCOS_LOGIN_PW': superuser_password,
