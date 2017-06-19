@@ -224,16 +224,7 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        print(env)
         self.wait_for_dcos()
-
-        if self._enterprise_cluster:
-            environment_variables = {
-                'DCOS_LOGIN_UNAME': self._original_superuser_username,
-                'DCOS_LOGIN_PW': self._original_superuser_password,
-            }
-        else:
-            environment_variables = {}
 
         args = [
             'source',
@@ -252,7 +243,7 @@ class Cluster(ContextDecorator):
         return test_host.run_as_root(
             args=args,
             log_output_live=self._log_output_live,
-            env=environment_variables,
+            env=env,
         )
 
     def destroy(self) -> None:
