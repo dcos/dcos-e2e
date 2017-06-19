@@ -13,6 +13,13 @@
 
 # Changelog
 
+## 2017.06.19.0
+
+* More storage efficient.
+* Removed need to tell `Cluster` whether a cluster is an enterprise cluster.
+* Removed need to tell `Cluster` the `superuser_password`.
+* Added ability to set environment variables on remote nodes when running commands.
+
 ## 2017.06.15.0
 
 * Initial release.
