@@ -206,15 +206,16 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
+        env: Optional[Dict]=None,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
-        This uses the originally given superuser username and password.
-        Therefore, if these are changed during the cluster's lifetime, they
-        may not be valid.
 
         Args:
             pytest_command: The ``pytest`` command to run on the node.
+            env: Environment variables to be set on the node before running
+                the `pytest_command`. On enterprise
+                clusters, `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW` must be set.
 
         Returns:
             The result of the ``pytest`` command.
@@ -224,22 +225,7 @@ class Cluster(ContextDecorator):
         """
         self.wait_for_dcos()
 
-        if self._enterprise_cluster:
-            environment_variables = {
-                'DCOS_LOGIN_UNAME': self._original_superuser_username,
-                'DCOS_LOGIN_PW': self._original_superuser_password,
-            }
-        else:
-            environment_variables = {}
-
-        args = []
-
-        for key, value in environment_variables.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
-            args.append(export)
-            args.append('&&')
-
-        args += [
+        args = [
             'source',
             '/opt/mesosphere/environment.export',
             '&&',
@@ -254,7 +240,9 @@ class Cluster(ContextDecorator):
         test_host = next(iter(self.masters))
 
         return test_host.run_as_root(
-            args=args, log_output_live=self._log_output_live
+            args=args,
+            log_output_live=self._log_output_live,
+            env=env,
         )
 
     def destroy(self) -> None:

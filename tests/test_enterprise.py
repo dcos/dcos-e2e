@@ -25,9 +25,10 @@ class TestEnterpriseIntegrationTests:
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
+        superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         extra_config = {
-            'superuser_username': str(uuid.uuid4()),
+            'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
@@ -35,8 +36,14 @@ class TestEnterpriseIntegrationTests:
             generate_config_path=enterprise_artifact,
             cluster_backend=enterprise_cluster_backend,
             extra_config=extra_config,
+            log_output_live=True,
             superuser_password=superuser_password,
         ) as cluster:
             # No error is raised with a successful command.
-            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
-            cluster.run_integration_tests(pytest_command=pytest_command)
+            cluster.run_integration_tests(
+                pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
+                env={
+                    'DCOS_LOGIN_UNAME': superuser_username,
+                    'DCOS_LOGIN_PW': superuser_password,
+                },
+            )
