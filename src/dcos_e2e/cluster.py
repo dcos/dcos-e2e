@@ -206,6 +206,7 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
+        env: Optional[Dict]=None,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -215,6 +216,7 @@ class Cluster(ContextDecorator):
 
         Args:
             pytest_command: The ``pytest`` command to run on the node.
+            env: Experiment for now.
 
         Returns:
             The result of the ``pytest`` command.
@@ -222,6 +224,7 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
+        print(env)
         self.wait_for_dcos()
 
         if self._enterprise_cluster:

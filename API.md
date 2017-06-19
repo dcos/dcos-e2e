@@ -23,7 +23,7 @@
     - [`destroy_on_error`](#destroy_on_error)
     - [`superuser_password`](#superuser_password)
   - [Methods](#methods)
-    - [`run_integration_tests(pytest_command)`](#run_integration_testspytest_command)
+    - [`run_integration_tests(pytest_command, env=None)`](#run_integration_testspytest_command-envnone)
     - [`destroy()`](#destroy)
     - [`wait_for_dcos()`](#wait_for_dcos)
   - [Attributes](#attributes)
@@ -32,7 +32,7 @@
     - [`public_agents`](#public_agents-1)
 - [Nodes](#nodes)
   - [Methods](#methods-1)
-    - [`node.run_as_root(args, log_output_live=False)`](#noderun_as_rootargs-log_output_livefalse)
+    - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address)
 
@@ -135,9 +135,16 @@ If `extra_config` includes `superuser_password_hash` then that is must be a hash
 
 ### Methods
 
-#### `run_integration_tests(pytest_command)`
+#### `run_integration_tests(pytest_command, env=None)`
 
 Run integration tests on the cluster.
+
+To run integration tests on an enterprise cluster, an administrator's username and password must be given.
+For example:
+
+```
+XXX
+```
 
 #### `destroy()`
 
