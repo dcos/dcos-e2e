@@ -13,15 +13,15 @@ env:
   # In order to avoid this and to see failures faster, we run multiple builds
   # per commit.
   matrix:
-      # - "TEST_PATTERN=TestNode"
-      # - "TEST_PATTERN=TestIntegrationTests"
-      # - "TEST_PATTERN=TestExtendConfig"
-      # - "TEST_PATTERN=TestClusterSize"
-      # - "TEST_PATTERN=TestClusterLogging"
-      # - "TEST_PATTERN=TestDestroyOnError"
-      # - "TEST_PATTERN=TestCopyFiles"
+      - "TEST_PATTERN=TestNode"
+      - "TEST_PATTERN=TestIntegrationTests"
+      - "TEST_PATTERN=TestExtendConfig"
+      - "TEST_PATTERN=TestClusterSize"
+      - "TEST_PATTERN=TestClusterLogging"
+      - "TEST_PATTERN=TestDestroyOnError"
+      - "TEST_PATTERN=TestCopyFiles"
       - "TEST_PATTERN=TestEnterpriseIntegrationTests"
-      # - "TEST_PATTERN=TestMultipleClusters"
+      - "TEST_PATTERN=TestMultipleClusters"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
