@@ -358,6 +358,7 @@ class TestDestroyOnError:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 (master, ) = cluster.masters
+                cluster.wait_for_dcos()
                 raise Exception()
 
         with pytest.raises(CalledProcessError):
@@ -381,9 +382,10 @@ class TestDestroyOnError:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 (master, ) = cluster.masters
+                cluster.wait_for_dcos()
                 raise Exception()
         # No exception is raised. The node still exists.
-        master.run_as_root(args=['echo', 'hello'])
+        master.run_as_root(args=['echo', 'hello'], log_output_live=True)
         cluster.destroy()
 
     def test_set_false_no_exception(
@@ -402,6 +404,7 @@ class TestDestroyOnError:
             destroy_on_error=False,
             cluster_backend=cluster_backend,
         ) as cluster:
+            cluster.wait_for_dcos()
             (master, ) = cluster.masters
 
         with pytest.raises(CalledProcessError):
