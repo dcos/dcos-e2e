@@ -1,8 +1,6 @@
 # Contributing to DC/OS End to End tests
 
 Contributions to this repository must pass tests and linting.
-Linting is run on Travis CI.
-Tests are currently not run on CI.
 
 <!--lint disable list-item-indent-->
 <!--lint disable list-item-bullet-indent-->
