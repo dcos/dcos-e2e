@@ -50,7 +50,7 @@ class Node:
             args: The command to run on the node.
             log_output_live: If `True`, log output live. If `True`, stderr is
                 merged into stdout in the return value.
-            env: Experiment for now.
+            env: Environment variables to be set before running the command.
 
         Returns:
             The representation of the finished process.

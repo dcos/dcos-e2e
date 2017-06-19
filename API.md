@@ -32,7 +32,7 @@
     - [`public_agents`](#public_agents-1)
 - [Nodes](#nodes)
   - [Methods](#methods-1)
-    - [`node.run_as_root(log_output_live=False)`](#noderun_as_rootlog_output_livefalse)
+    - [`node.run_as_root(args, log_output_live=False)`](#noderun_as_rootargs-log_output_livefalse)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address)
 
