@@ -2,18 +2,14 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
-import json
-import os
-import stat
 import subprocess
-import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from retry import retry
 
-from ._common import Node, get_open_port
+from ._common import Node
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
