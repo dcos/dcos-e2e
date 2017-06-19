@@ -44,13 +44,15 @@ class Node:
         env: Optional[Dict]=None,
     ) -> CompletedProcess:
         """
-        Run a command on this node as ``root``.
+        Run a command on this node as `root`.
 
         Args:
             args: The command to run on the node.
             log_output_live: If `True`, log output live. If `True`, stderr is
                 merged into stdout in the return value.
-            env: Environment variables to be set before running the command.
+            env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
 
         Returns:
             The representation of the finished process.

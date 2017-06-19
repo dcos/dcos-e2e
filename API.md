@@ -167,11 +167,14 @@ Commands can be run on nodes in clusters.
 
 ### Methods
 
-#### `node.run_as_root(args, log_output_live=False)`
+#### `node.run_as_root(args, log_output_live=False, env=None)`
 
 If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 
 To see these logs in `pytest` tests, use the `-s` flag.
+
+`env` is an optional mapping of environment variable names to values.
+These environment variables will be set on the node before running the command specified in `args`.
 
 ### Attributes
 
