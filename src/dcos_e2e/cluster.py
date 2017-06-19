@@ -73,7 +73,7 @@ class Cluster(ContextDecorator):
             generate_config_path=generate_config_path,
         )  # type: ClusterManager
 
-    @retry(exceptions=(subprocess.CalledProcessError), tries=100, delay=5)
+    @retry(exceptions=(subprocess.CalledProcessError), tries=200, delay=5)
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
