@@ -37,8 +37,8 @@ class TestEnterpriseIntegrationTests:
             '-vvv',
             '-s',
             '-x',
-            # This test file requires the `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW`
-            # environment variables to be set.
+            # This test file requires the `DCOS_LOGIN_UNAME` and
+            # `DCOS_LOGIN_PW` environment variables to be set.
             'test_dcoscli_enterprise.py',
         ]
         environment_variables = {
