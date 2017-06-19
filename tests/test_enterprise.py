@@ -51,7 +51,6 @@ class TestEnterpriseIntegrationTests:
             cluster_backend=enterprise_cluster_backend,
             extra_config=extra_config,
             log_output_live=True,
-            superuser_password=superuser_password,
         ) as cluster:
             # No error is raised with a successful command.
             cluster.run_integration_tests(

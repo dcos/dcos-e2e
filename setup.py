@@ -2,29 +2,18 @@
 
 from setuptools import find_packages, setup
 
-DEPENDENCY_LINKS = []
 VERSION = '2017.06.15.0'
 
 with open("requirements.txt") as requirements:
     INSTALL_REQUIRES = []
     for line in requirements.readlines():
-        if line.startswith('#'):
-            continue
-        if line.startswith('--find-links '):
-            _, link = line.split('--find-links ')
-            DEPENDENCY_LINKS.append(link)
-        else:
+        if not line.startswith('#'):
             INSTALL_REQUIRES.append(line)
 
 with open("dev-requirements.txt") as dev_requirements:
     DEV_REQUIRES = []
     for line in dev_requirements.readlines():
-        if line.startswith('#'):
-            continue
-        if line.startswith('--find-links '):
-            _, link = line.split('--find-links ')
-            DEPENDENCY_LINKS.append(link)
-        else:
+        if not line.startswith('#'):
             DEV_REQUIRES.append(line)
 
 with open('README.md') as f:
@@ -49,5 +38,4 @@ setup(
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
     ],
-    dependency_links=DEPENDENCY_LINKS,
 )

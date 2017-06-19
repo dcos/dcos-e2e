@@ -12,7 +12,7 @@ DCOS_DOCKER_CLONE_PATH := /tmp/dcos-docker
 lint-python-only:
 	flake8 .
 	isort --recursive --check-only
-	yapf --diff --parallel --recursive src/ tests/ | \
+	yapf --diff --recursive src/ tests/ | \
 	    python -c 'import sys; result = sys.stdin.read(); assert not result, result;'
 	mypy src/ tests/
 	pydocstyle
@@ -48,7 +48,7 @@ clean:
 # Fix some linting errors.
 .PHONY: fix-lint
 fix-lint: toc
-	yapf --in-place --parallel --recursive .
+	yapf --in-place --recursive .
 	isort --recursive --apply
 
 .PHONY: clean-dcos-docker
