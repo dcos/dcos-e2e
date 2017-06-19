@@ -205,6 +205,13 @@ make toc
 
 Change `VERSION` in `setup.py`.
 
+6. Commit and push changes.
+
+```sh
+git commit -am "Bump version"
+git push
+```
+
 6. Create a Pull Request to merge the `release` branch into `master`.
 
 7. Merge the `release` Pull Request once CI has passed.

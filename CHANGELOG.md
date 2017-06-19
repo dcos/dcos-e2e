@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [2017.06.19.0](#201706190)
   - [2017.06.15.0](#201706150)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
