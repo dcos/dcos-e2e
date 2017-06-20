@@ -21,10 +21,8 @@ lint-docs:
 	# Add ToCs and if there is a diff on Travis, error because we don't
 	# want to ship docs without an up to date ToC
 	if [ "${TRAVIS}" = "true" ] ; then \
-	    npm run doctoc --github --notitle; \
-	    git diff README.md --exit-code ; \
-	    git diff CONTRIBUTING.md --exit-code ; \
-	    git diff API.md --exit-code ; \
+	    $(MAKE) toc; \
+	    git diff --exit-code ; \
 	fi
 
 # Run various linting tools.
@@ -62,4 +60,4 @@ download-artifacts:
 
 .PHONY: toc
 toc:
-	npm run doctoc --github --notitle
+	npm run doctoc README.md CONTRIBUTING.md API.md --github --notitle
