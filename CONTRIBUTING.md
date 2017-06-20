@@ -230,5 +230,9 @@ Add the changes from the changelog to the release description.
 To update DC/OS Docker, use the following command.
 
 ```sh
-git subtree pull --prefix src/dcos_e2e/backends/_dcos_docker/dcos_docker git@github.com:dcos/dcos-docker.git master
+git subtree pull \
+    --prefix src/dcos_e2e/backends/_dcos_docker/dcos_docker \
+    --squash \
+    git@github.com:dcos/dcos-docker.git \
+    master
 ```
