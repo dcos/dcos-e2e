@@ -44,16 +44,8 @@
 This is a backend which can be used to run a `Cluster`.
 
 ```python
-DCOS_Docker(dcos_docker_path)
+DCOS_Docker()
 ```
-
-### Parameters
-
-#### `dcos_docker_path`
-
-The path to a clone of DC/OS Docker.
-This clone will be used to create the cluster.
-
 
 ## `dcos_e2e.cluster.Cluster`
 
@@ -73,7 +65,6 @@ Cluster(
 ```
 
 This is a context manager which spins up a cluster.
-At the time of writing, this uses DC/OS Docker.
 
 ### Parameters
 
