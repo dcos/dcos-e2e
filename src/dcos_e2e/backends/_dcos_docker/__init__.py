@@ -2,6 +2,8 @@
 Helpers for interacting with DC/OS Docker.
 """
 
+import inspect
+import os
 import socket
 import uuid
 from ipaddress import IPv4Address
@@ -13,8 +15,8 @@ from typing import Any, Dict, Set, Type
 import docker
 import yaml
 
-from .._common import Node, run_subprocess
-from ._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e._common import Node, run_subprocess
+from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 
 
 def _get_open_port() -> int:
@@ -37,19 +39,17 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self, dcos_docker_path: Path) -> None:
+    def __init__(self) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
-
-        Args:
-            dcos_docker_path: The path to a clone of DC/OS Docker.
-                This clone will be used to create the cluster.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
         """
-        self.dcos_docker_path = dcos_docker_path
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        self.dcos_docker_path = current_parent / 'dcos_docker'
 
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:

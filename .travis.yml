@@ -45,7 +45,7 @@ cache: "pip"
 before_script:
     - "make clean"
     - "make lint"
-    - 'make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-dependencies'
+    - 'make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
 
 script:
     - 'pytest -x -vvv -s -n 2 -k "$TEST_PATTERN" --cov=src --cov=tests'
