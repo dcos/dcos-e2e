@@ -1,12 +1,9 @@
 SHELL := /bin/bash -euxo pipefail
 
 ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-DCOS_DOCKER_REPOSITORY := https://github.com/dcos/dcos-docker.git
-DCOS_DOCKER_BRANCH := master
 
 ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
-DCOS_DOCKER_CLONE_PATH := /tmp/dcos-docker
 
 .PHONY: lint-python-only
 lint-python-only:
@@ -24,7 +21,7 @@ lint-docs:
 	# Add ToCs and if there is a diff on Travis, error because we don't
 	# want to ship docs without an up to date ToC
 	if [ "${TRAVIS}" = "true" ] ; then \
-	    npm run doctoc --github --notitle; \
+	    $(MAKE) toc; \
 	    git diff --exit-code ; \
 	fi
 
@@ -51,30 +48,16 @@ fix-lint: toc
 	yapf --in-place --recursive .
 	isort --recursive --apply
 
-.PHONY: clean-dcos-docker
-clean-dcos-docker:
-	rm -rf $(DCOS_DOCKER_CLONE_PATH)
-
 .PHONY: clean-artifacts
 clean-artifacts:
 	rm -rf $(ARTIFACT_PATH)
 	rm -rf $(EE_ARTIFACT_PATH)
-
-.PHONY: download-dcos-docker
-download-dcos-docker:
-	git clone -b $(DCOS_DOCKER_BRANCH) $(DCOS_DOCKER_REPOSITORY) $(DCOS_DOCKER_CLONE_PATH)
 
 .PHONY: download-artifacts
 download-artifacts:
 	curl -o $(ARTIFACT_PATH) $(ARTIFACT_URL)
 	if [ -n "$(EE_ARTIFACT_URL)" ]; then curl -o $(EE_ARTIFACT_PATH) $(EE_ARTIFACT_URL); fi
 
-.PHONY: clean-dependencies
-clean-dependencies: clean-dcos-docker clean-artifacts
-
-.PHONY: download-dependencies
-download-dependencies: clean-dependencies download-artifacts download-dcos-docker
-
 .PHONY: toc
 toc:
-	npm run doctoc --github --notitle
+	npm run doctoc README.md CONTRIBUTING.md API.md --github --notitle

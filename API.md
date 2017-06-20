@@ -7,10 +7,8 @@
 
 
 - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
-  - [Parameters](#parameters)
-    - [`dcos_docker_path`](#dcos_docker_path)
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
-  - [Parameters](#parameters-1)
+  - [Parameters](#parameters)
     - [`cluster_backend`](#cluster_backend)
     - [`generate_config_path`](#generate_config_path)
     - [`extra_config`](#extra_config)
@@ -44,16 +42,8 @@
 This is a backend which can be used to run a `Cluster`.
 
 ```python
-DCOS_Docker(dcos_docker_path)
+DCOS_Docker()
 ```
-
-### Parameters
-
-#### `dcos_docker_path`
-
-The path to a clone of DC/OS Docker.
-This clone will be used to create the cluster.
-
 
 ## `dcos_e2e.cluster.Cluster`
 
@@ -73,7 +63,6 @@ Cluster(
 ```
 
 This is a context manager which spins up a cluster.
-At the time of writing, this uses DC/OS Docker.
 
 ### Parameters
 

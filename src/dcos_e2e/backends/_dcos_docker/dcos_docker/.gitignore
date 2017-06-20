@@ -1,0 +1,14 @@
+dcos_generate_config.ee.sh
+dcos_generate_config*.sh
+genconf/config.yaml
+genconf/ssh_key
+genconf/serve/
+include
+.path
+.vagrant/
+dcos-genconf.*.tar
+genconf/cluster_packages.json
+*.ova
+packer_cache
+output-virtualbox-ovf
+.idea
