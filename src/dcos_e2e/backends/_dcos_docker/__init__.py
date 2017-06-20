@@ -13,8 +13,8 @@ from typing import Any, Dict, Set, Type
 import docker
 import yaml
 
-from .._common import Node, run_subprocess
-from ._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e._common import Node, run_subprocess
+from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 
 
 def _get_open_port() -> int:
