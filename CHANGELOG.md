@@ -14,6 +14,11 @@
 
 # Changelog
 
+## 2017.06.20.0
+
+* Vendor DC/OS Docker so a path is not needed.
+* If `log_output_live` is set to `True` for a `Cluster`, logs are shown in `wait_for_dcos`.
+
 ## 2017.06.19.0
 
 * More storage efficient.
