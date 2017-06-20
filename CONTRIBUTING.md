@@ -222,3 +222,12 @@ Visit <https://github.com/adamtheturtle/dcos-e2e/releases/new>.
 Set the "Tag version" to the new version.
 Choose "master" as the target.
 Add the changes from the changelog to the release description.
+
+## Updating DC/OS Docker
+
+[DC/OS Docker](https://github.com/dcos/dcos-docker.git) is vendored in this repository using `git subtree`.
+To update DC/OS Docker, use the following command.
+
+```sh
+git subtree pull --prefix src/dcos_e2e/backends/_dcos_docker/dcos_docker git@github.com:dcos/dcos-docker.git master
+```
