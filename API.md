@@ -7,10 +7,8 @@
 
 
 - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
-  - [Parameters](#parameters)
-    - [`dcos_docker_path`](#dcos_docker_path)
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
-  - [Parameters](#parameters-1)
+  - [Parameters](#parameters)
     - [`cluster_backend`](#cluster_backend)
     - [`generate_config_path`](#generate_config_path)
     - [`extra_config`](#extra_config)

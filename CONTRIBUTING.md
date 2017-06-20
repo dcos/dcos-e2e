@@ -22,6 +22,7 @@ Contributions to this repository must pass tests and linting.
   - [Robustness](#robustness)
   - [Untied to a particular backend](#untied-to-a-particular-backend)
 - [Release Process](#release-process)
+- [Updating DC/OS Docker](#updating-dcos-docker)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->

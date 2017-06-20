@@ -22,7 +22,9 @@ lint-docs:
 	# want to ship docs without an up to date ToC
 	if [ "${TRAVIS}" = "true" ] ; then \
 	    npm run doctoc --github --notitle; \
-	    git diff --exit-code ; \
+	    git diff README.md --exit-code ; \
+	    git diff CONTRIBUTING.md --exit-code ; \
+	    git diff API.md --exit-code ; \
 	fi
 
 # Run various linting tools.
