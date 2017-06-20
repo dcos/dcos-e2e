@@ -14,23 +14,7 @@ def cluster_backend() -> ClusterBackend:
     """
     Return a cluster backend to use.
     """
-    return DCOS_Docker(
-        # We put this files in the `/tmp` directory because that is
-        # writable on the Vagrant VM.
-        dcos_docker_path=Path('/tmp/dcos-docker'),
-    )
-
-
-@pytest.fixture()
-def enterprise_cluster_backend() -> ClusterBackend:
-    """
-    Return a DC/OS Enterprise cluster backend to use.
-    """
-    return DCOS_Docker(
-        # We put this files in the `/tmp` directory because that is
-        # writable on the Vagrant VM.
-        dcos_docker_path=Path('/tmp/dcos-docker'),
-    )
+    return DCOS_Docker()
 
 
 @pytest.fixture()
