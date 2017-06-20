@@ -18,7 +18,7 @@ class TestEnterpriseIntegrationTests:
 
     def test_run_pytest(
         self,
-        enterprise_cluster_backend: ClusterBackend,
+        cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
     ) -> None:
         """
@@ -34,7 +34,7 @@ class TestEnterpriseIntegrationTests:
 
         with Cluster(
             generate_config_path=enterprise_artifact,
-            cluster_backend=enterprise_cluster_backend,
+            cluster_backend=cluster_backend,
             extra_config=extra_config,
             log_output_live=True,
         ) as cluster:
