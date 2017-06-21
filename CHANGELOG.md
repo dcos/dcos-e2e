@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [2017.06.21.1](#201706211)
   - [2017.06.21.0](#201706210)
   - [2017.06.20.0](#201706200)
   - [2017.06.19.0](#201706190)
@@ -15,6 +16,11 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## 2017.06.21.1
+
+* Support platforms where `$HOME` is set as `/root`.
+* `Cluster.wait_for_dcos` now waits for CA cert to be available.
 
 ## 2017.06.21.0
 
