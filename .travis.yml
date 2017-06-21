@@ -22,6 +22,7 @@ env:
       - "TEST_PATTERN=TestCopyFiles"
       - "TEST_PATTERN=TestEnterpriseIntegrationTests"
       - "TEST_PATTERN=TestMultipleClusters"
+      - "TEST_PATTERN=TestBadParameters"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:

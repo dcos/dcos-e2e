@@ -56,7 +56,13 @@ class Cluster(ContextDecorator):
             files_to_copy_to_masters: A mapping of host paths to paths on the
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS.
+
+        Raises:
+            ValueError: There is no file at `generate_config_path`.
         """
+        if not generate_config_path.exists():
+            raise ValueError()
+
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
         extra_config = dict(extra_config or {})
@@ -73,7 +79,7 @@ class Cluster(ContextDecorator):
             generate_config_path=generate_config_path,
         )  # type: ClusterManager
 
-    @retry(exceptions=(subprocess.CalledProcessError), tries=200, delay=5)
+    @retry(exceptions=(subprocess.CalledProcessError), tries=500, delay=5)
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
