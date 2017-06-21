@@ -82,7 +82,10 @@ class Cluster(ContextDecorator):
         )  # type: ClusterManager
 
     @retry(
-        exceptions=(subprocess.CalledProcessError, ValueError),
+        exceptions=(
+            subprocess.CalledProcessError, ValueError,
+            requests.exceptions.ConnectionError,
+        ),
         tries=500,
         delay=5,
     )
@@ -99,9 +102,7 @@ class Cluster(ContextDecorator):
             url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
                 ip_address=node.ip_address,
             )
-            # We wait up to 20 minutes.
-            # This is arbitrary but it has been shown to work in testing.
-            resp = requests.get(url, verify=False, retry_timeout=60 * 20)
+            resp = requests.get(url, verify=False)
             if resp not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pylint: disable=no-member
                 raise ValueError()
 
