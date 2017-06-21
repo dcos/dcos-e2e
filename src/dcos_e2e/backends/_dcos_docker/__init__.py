@@ -200,6 +200,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
+            # Make sure that there are no home mounts.
+            # If $HOME is set to a directory we use, like `/root`, home mounts
+            # can cause problems.
+            'HOME_MOUNTS': '',
         }  # type: Dict[str, str]
 
         self._make(target='all')
