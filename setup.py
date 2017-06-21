@@ -2,7 +2,7 @@
 
 from setuptools import find_packages, setup
 
-VERSION = '2017.06.20.0'
+VERSION = '2017.06.21.0'
 
 with open("requirements.txt") as requirements:
     INSTALL_REQUIRES = []
