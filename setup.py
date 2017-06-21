@@ -30,6 +30,7 @@ setup(
     zip_safe=False,
     package_dir={'': 'src'},
     install_requires=INSTALL_REQUIRES,
+    include_package_data=True,
     extras_require={
         "dev": DEV_REQUIRES,
     },
