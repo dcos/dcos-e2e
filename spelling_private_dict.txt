@@ -5,6 +5,7 @@ backend
 backends
 calledprocesserror
 ci
+cli
 config
 cwd
 dc
