@@ -451,3 +451,23 @@ class TestCopyFiles:
             args = ['cat', str(master_destination_path)]
             result = master.run_as_root(args=args)
             assert result.stdout.decode() == content
+
+
+class TestBadParameters:
+    """
+    Tests for unexpected parameter values.
+    """
+
+    def test_no_installer_file(self, cluster_backend: ClusterBackend) -> None:
+        """
+        If no file exists at the given `generate_config_path`, a `ValueError`
+        is raised.
+        """
+        with pytest.raises(ValueError):
+            with Cluster(
+                cluster_backend=cluster_backend,
+                generate_config_path=Path(str(uuid.uuid4)),
+                agents=0,
+                public_agents=0,
+            ):
+                pass  # pragma: no cover

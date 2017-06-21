@@ -60,4 +60,4 @@ download-artifacts:
 
 .PHONY: toc
 toc:
-	npm run doctoc README.md CONTRIBUTING.md API.md --github --notitle
+	npm run doctoc *.md --github --notitle
