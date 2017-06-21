@@ -41,7 +41,7 @@ before_install:
     - "npm -g install npm@latest"
 
 install:
-    - "pip install --process-dependency-links --upgrade --editable .[dev]"
+    - "pip install --upgrade --editable .[dev]"
     - "npm install"
 
 cache: "pip"
