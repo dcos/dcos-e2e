@@ -128,7 +128,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         self._path = Path(
             TemporaryDirectory(
                 suffix=unique,
-                dir=str(cluster_backend.workspace_dir),
+                dir=(
+                    str(cluster_backend.workspace_dir)
+                    if cluster_backend.workspace_dir else None
+                ),
             ).name
         )
 
