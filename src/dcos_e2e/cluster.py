@@ -7,8 +7,6 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-import requests
-from requests import codes
 from retry import retry
 
 from ._common import Node
@@ -81,11 +79,7 @@ class Cluster(ContextDecorator):
             generate_config_path=generate_config_path,
         )  # type: ClusterManager
 
-    @retry(
-        exceptions=(subprocess.CalledProcessError, ValueError),
-        tries=500,
-        delay=5,
-    )
+    @retry(exceptions=(subprocess.CalledProcessError), tries=500, delay=5)
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
@@ -95,13 +89,6 @@ class Cluster(ContextDecorator):
                 args=['/opt/mesosphere/bin/./3dt', '--diag'],
                 log_output_live=self._log_output_live,
             )
-
-            url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
-                ip_address=node.ip_address,
-            )
-            resp = requests.get(url, verify=False)
-            if resp not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pylint: disable=no-member
-                raise ValueError()
 
     def __enter__(self) -> 'Cluster':
         """
