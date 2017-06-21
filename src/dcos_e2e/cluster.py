@@ -103,7 +103,7 @@ class Cluster(ContextDecorator):
                 ip_address=node.ip_address,
             )
             resp = requests.get(url, verify=False)
-            if resp not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pylint: disable=no-member
+            if resp.status_code not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pylint: disable=no-member
                 raise ValueError()
 
     def __enter__(self) -> 'Cluster':
