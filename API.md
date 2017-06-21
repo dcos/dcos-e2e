@@ -7,8 +7,10 @@
 
 
 - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
-- [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters)
+    - [`workspace_dir`](#workspace_dir)
+- [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
+  - [Parameters](#parameters-1)
     - [`cluster_backend`](#cluster_backend)
     - [`generate_config_path`](#generate_config_path)
     - [`extra_config`](#extra_config)
@@ -42,8 +44,16 @@
 This is a backend which can be used to run a `Cluster`.
 
 ```python
-DCOS_Docker()
+DCOS_Docker(workspace_dir=None)
 ```
+
+### Parameters
+
+#### `workspace_dir`
+
+The directory in which large temporary files will be created.
+These files will be deleted at the end of a test run.
+This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
 ## `dcos_e2e.cluster.Cluster`
 
