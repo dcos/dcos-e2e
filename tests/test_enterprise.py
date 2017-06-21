@@ -2,6 +2,7 @@
 Tests for using the test harness with a DC/OS Enterprise cluster.
 """
 
+import subprocess
 import uuid
 from pathlib import Path
 
@@ -46,3 +47,52 @@ class TestEnterpriseIntegrationTests:
                     'DCOS_LOGIN_PW': superuser_password,
                 },
             )
+
+
+class TestWaitForDCOS:
+    """
+    Tests for `Cluster.wait_for_dcos`.
+    """
+
+    def test_auth_with_cli(
+        self,
+        cluster_backend: ClusterBackend,
+        enterprise_artifact: Path,
+    ) -> None:
+        """
+        After `Cluster.wait_for_dcos`, the cluster can communicate with the
+        CLI.
+        """
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+        extra_config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+        }
+
+        with Cluster(
+            generate_config_path=enterprise_artifact,
+            cluster_backend=cluster_backend,
+            extra_config=extra_config,
+            log_output_live=True,
+        ) as cluster:
+            (master, ) = cluster.masters
+            cluster.wait_for_dcos()
+            setup_args = [
+                "dcos",
+                "cluster",
+                "setup",
+                'https://' + str(master.ip_address),
+                "--no-check",
+                "--username={username}".format(username=superuser_username),
+                "--password={password}".format(password=superuser_password),
+            ]
+
+            setup = subprocess.run(
+                args=setup_args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            assert setup.returncode == 0
+            assert setup.stderr == b''
