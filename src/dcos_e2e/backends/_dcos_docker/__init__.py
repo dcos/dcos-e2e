@@ -10,7 +10,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Optional, Set, Type
 
 import docker
 import yaml
@@ -39,17 +39,26 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, workspace_dir: Optional[Path]=None) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
+
+        Args:
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
+                This is equivalent to `dir` in
+                https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory  # noqa
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
+        self.workspace_dir = workspace_dir
 
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
@@ -116,7 +125,15 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        self._path = Path(TemporaryDirectory(suffix=unique).name)
+        self._path = Path(
+            TemporaryDirectory(
+                suffix=unique,
+                dir=(
+                    str(cluster_backend.workspace_dir)
+                    if cluster_backend.workspace_dir else None
+                ),
+            ).name
+        )
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),

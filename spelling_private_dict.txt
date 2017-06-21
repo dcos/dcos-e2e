@@ -10,6 +10,7 @@ cwd
 dc
 dcos
 dict
+dir
 env
 genconf
 ip
