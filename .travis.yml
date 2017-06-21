@@ -42,7 +42,7 @@ before_install:
     - "npm -g install npm@latest"
 
 install:
-    - "pip install --process-dependency-links --upgrade --editable .[dev]"
+    - "pip install --upgrade --editable .[dev]"
     - "npm install"
 
 cache: "pip"
@@ -53,7 +53,7 @@ before_script:
     - 'make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
 
 script:
-    - 'pytest -x -vvv -s -n 2 -k "$TEST_PATTERN" --cov=src --cov=tests'
+    - 'pytest -x -vvv -s -k "$TEST_PATTERN" --cov=src --cov=tests'
 
 after_success:
     - "codecov"
