@@ -1,3 +1,4 @@
 docker==2.3.0
 PyYAML==3.12
+requests==2.18.1
 retry==0.9.2
