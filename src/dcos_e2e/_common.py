@@ -72,10 +72,6 @@ class Node:
 
         ssh_args = [
             'ssh',
-            # Suppress warnings.
-            # In particular, we don't care about remote host identification
-            # changes.
-            "-q",
             # The node may be an unknown host.
             "-o",
             "StrictHostKeyChecking=no",
