@@ -99,3 +99,6 @@ vagrant/
 .mypy_cache/
 *.DS_Store
 node_modules/
+
+# NPM
+package-lock.json
