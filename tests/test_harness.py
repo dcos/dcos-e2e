@@ -167,7 +167,7 @@ class TestExtendConfig:
             (master, ) = cluster.masters
             master.run_as_root(args=['test', '-f', path])
 
-    def test_default(
+    def test_default_config(
         self,
         path: str,
         cluster_backend: ClusterBackend,

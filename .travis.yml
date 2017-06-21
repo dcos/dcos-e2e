@@ -12,13 +12,16 @@ env:
   # Travis has a maximum test run time of 50 minutes.
   # In order to avoid this and to see failures faster, we run multiple builds
   # per commit.
+  # A maximum of two tests which wait for DC/OS per builder.
   matrix:
       - "TEST_PATTERN=TestNode"
       - "TEST_PATTERN=TestIntegrationTests"
-      - "TEST_PATTERN=TestExtendConfig"
+      - "TEST_PATTERN=TestExtendConfig and not test_default_config"
+      - "TEST_PATTERN=TestExtendConfig and test_default_config"
       - "TEST_PATTERN=TestClusterSize"
       - "TEST_PATTERN=TestClusterLogging"
-      - "TEST_PATTERN=TestDestroyOnError"
+      - "TEST_PATTERN=TestDestroyOnError and test_default_exception_raised"
+      - "TEST_PATTERN=TestDestroyOnError and not test_default_exception_raised"
       - "TEST_PATTERN=TestCopyFiles"
       - "TEST_PATTERN=TestEnterpriseIntegrationTests"
       - "TEST_PATTERN=TestMultipleClusters"
