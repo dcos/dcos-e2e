@@ -93,14 +93,7 @@ class Cluster(ContextDecorator):
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
         """
-        diagnostics_args = ['/opt/mesosphere/bin/./3dt', '--diag']
-
         for node in self.masters:
-            node.run_as_root(
-                args=diagnostics_args,
-                log_output_live=self._log_output_live,
-            )
-
             url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
                 ip_address=node.ip_address,
             )
@@ -110,6 +103,11 @@ class Cluster(ContextDecorator):
                     status_code=resp.status_code,
                 )
                 raise ValueError(message)
+
+        # This is a placeholder until we use `dcos-diagnostics`.
+        # See https://jira.mesosphere.com/browse/DCOS_OSS-1276.
+        from time import sleep
+        sleep(60 * 15)
 
     def __enter__(self) -> 'Cluster':
         """
