@@ -14,19 +14,19 @@ env:
   # per commit.
   # A maximum of two tests which wait for DC/OS per builder.
   matrix:
-      # - "TEST_PATTERN=TestNode"
+      - "TEST_PATTERN=TestNode"
       - "TEST_PATTERN=TestIntegrationTests"
-      # - "TEST_PATTERN=TestExtendConfig and not test_default_config"
-      # - "TEST_PATTERN=TestExtendConfig and test_default_config"
-      # - "TEST_PATTERN=TestClusterSize"
-      # - "TEST_PATTERN=TestClusterLogging"
-      # - "TEST_PATTERN=TestDestroyOnError and test_default_exception_raised"
-      # - "TEST_PATTERN=TestDestroyOnError and not test_default_exception_raised"
-      # - "TEST_PATTERN=TestCopyFiles"
+      - "TEST_PATTERN=TestExtendConfig and not test_default_config"
+      - "TEST_PATTERN=TestExtendConfig and test_default_config"
+      - "TEST_PATTERN=TestClusterSize"
+      - "TEST_PATTERN=TestClusterLogging"
+      - "TEST_PATTERN=TestDestroyOnError and test_default_exception_raised"
+      - "TEST_PATTERN=TestDestroyOnError and not test_default_exception_raised"
+      - "TEST_PATTERN=TestCopyFiles"
       - "TEST_PATTERN=TestEnterpriseIntegrationTests"
-      # - "TEST_PATTERN=TestMultipleClusters"
-      # - "TEST_PATTERN=TestBadParameters"
-      # - "TEST_PATTERN=TestWaitForDCOS"
+      - "TEST_PATTERN=TestMultipleClusters"
+      - "TEST_PATTERN=TestBadParameters"
+      - "TEST_PATTERN=TestWaitForDCOS"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
