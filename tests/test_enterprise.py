@@ -67,6 +67,8 @@ class TestWaitForDCOS:
         """
         After `Cluster.wait_for_dcos`, the cluster can communicate with the
         CLI.
+
+        Unfortunately this test is prone to flakiness as it depends on races.
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
