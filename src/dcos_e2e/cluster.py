@@ -94,11 +94,11 @@ class Cluster(ContextDecorator):
         Wait until DC/OS has started and all nodes have joined the cluster.
         """
         diagnostics_args = [
-            'dcos-diagnostics',
+            '/opt/mesosphere/bin/dcos-diagnostics',
             'check',
             'node-poststart',
             '&&',
-            'dcos-diagnostics',
+            '/opt/mesosphere/bin/dcos-diagnostics',
             'check',
             'cluster',
         ]
