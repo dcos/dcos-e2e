@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [2017.06.22.0](#201706220)
   - [2017.06.21.1](#201706211)
   - [2017.06.21.0](#201706210)
   - [2017.06.20.0](#201706200)
@@ -16,6 +17,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## 2017.06.22.0
+
+* Account for the name of `3dt` having changed to `dcos-diagnostics`.
 
 ## 2017.06.21.1
 
