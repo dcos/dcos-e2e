@@ -6,6 +6,7 @@ import subprocess
 import uuid
 from pathlib import Path
 
+import pytest
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
@@ -54,6 +55,9 @@ class TestWaitForDCOS:
     Tests for `Cluster.wait_for_dcos`.
     """
 
+    @pytest.mark.xfail(
+        reason="See https://jira.mesosphere.com/browse/DCOS_OSS-1313",
+    )
     def test_auth_with_cli(
         self,
         cluster_backend: ClusterBackend,
