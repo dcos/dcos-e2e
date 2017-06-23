@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [2017.06.23.0](#201706230)
   - [2017.06.22.0](#201706220)
   - [2017.06.21.1](#201706211)
   - [2017.06.21.0](#201706210)
@@ -17,6 +18,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## 2017.06.23.0
+
+* Wait for 5 minutes after diagnostics check.
 
 ## 2017.06.22.0
 
