@@ -57,6 +57,7 @@ class TestWaitForDCOS:
 
     @pytest.mark.xfail(
         reason="See https://jira.mesosphere.com/browse/DCOS_OSS-1313",
+        raises=AssertionError,
     )
     def test_auth_with_cli(
         self,
@@ -66,6 +67,8 @@ class TestWaitForDCOS:
         """
         After `Cluster.wait_for_dcos`, the cluster can communicate with the
         CLI.
+
+        Unfortunately this test is prone to flakiness as it depends on races.
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
@@ -99,4 +102,5 @@ class TestWaitForDCOS:
             )
 
             assert setup.returncode == 0
-            assert setup.stderr == b''
+            # Do not cover the following line - see the xfail marker.
+            assert setup.stderr == b''  # pragma: no cover

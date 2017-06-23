@@ -32,3 +32,4 @@ url
 utils
 username
 vm
+xfail
