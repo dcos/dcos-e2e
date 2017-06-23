@@ -102,4 +102,5 @@ class TestWaitForDCOS:
             )
 
             assert setup.returncode == 0
-            assert setup.stderr == b''
+            # Do not cover the following line - see the xfail marker.
+            assert setup.stderr == b''  # pragma: no cover
