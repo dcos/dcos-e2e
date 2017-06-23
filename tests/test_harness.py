@@ -99,6 +99,7 @@ class TestIntegrationTests:
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
             log_output_live=True,
+            destroy_on_error=False,
         ) as cluster:
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
