@@ -54,11 +54,9 @@ from dcos_e2e.cluster import Cluster
 class TestExample:
 
     def test_example(self):
-        dcos_docker_backend = DCOS_Docker(dcos_docker_path=Path('/tmp/dcos-docker'))
-
         with Cluster(
             extra_config={'check_time': True},
-            cluster_backend=dcos_docker_backend,
+            cluster_backend=DCOS_Docker(),
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
         ) as cluster:
             (master, ) = cluster.masters
