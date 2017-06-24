@@ -47,7 +47,7 @@ Then, create a test, such as the following:
 import subprocess
 from pathlib import Path
 
-from dcos_e2e.backend import DCOS_Docker
+from dcos_e2e.backends import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
 
