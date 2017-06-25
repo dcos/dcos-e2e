@@ -39,7 +39,7 @@ before_install:
       # Ideally we would use `addons.apt.packages` for enchant but this is not
       # supported by the linter.
     - "sudo apt-get install docker-ce enchant"
-    - "npm -g install npm@latest"
+    - "travis_retry npm -g install npm@latest"
 
 install:
     - "pip install --upgrade --editable .[dev]"
@@ -50,7 +50,7 @@ cache: "pip"
 before_script:
     - "make clean"
     - "make lint"
-    - 'make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
+    - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
 
 script:
     - 'pytest -x -vvv -s -k "$TEST_PATTERN" --cov=src --cov=tests'
