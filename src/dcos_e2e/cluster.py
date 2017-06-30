@@ -5,6 +5,7 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
+from time import sleep
 from typing import Any, Dict, List, Optional, Set
 
 import requests
@@ -118,6 +119,16 @@ class Cluster(ContextDecorator):
                     status_code=resp.status_code,
                 )
                 raise ValueError(message)
+
+        # Ideally we would use diagnostics checks as per
+        # https://jira.mesosphere.com/browse/DCOS_OSS-1276
+        # and these would wait long enough.
+        #
+        # However, until then, there is a race condition with the cluster.
+        # This is not always caught by the tests.
+        #
+        # For now we sleep for 5 minutes as this has been shown to be enough.
+        sleep(60 * 5)
 
     def __enter__(self) -> 'Cluster':
         """

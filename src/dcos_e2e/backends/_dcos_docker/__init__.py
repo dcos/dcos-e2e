@@ -195,7 +195,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'MASTER_CTR': '{unique}-master-'.format(unique=unique),
             'AGENT_CTR': '{unique}-agent-'.format(unique=unique),
             'PUBLIC_AGENT_CTR': '{unique}-public-agent-'.format(unique=unique),
-            'INSTALLER_CTR': '{unique}-installer-'.format(unique=unique),
+            'INSTALLER_CTR': '{unique}-installer'.format(unique=unique),
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
