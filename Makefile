@@ -45,6 +45,7 @@ clean:
 # Fix some linting errors.
 .PHONY: fix-lint
 fix-lint: toc
+	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
 	yapf --in-place --recursive .
 	isort --recursive --apply
 

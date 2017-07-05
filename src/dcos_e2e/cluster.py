@@ -59,13 +59,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_masters: A mapping of host paths to paths on the
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS.
-
-        Raises:
-            ValueError: There is no file at `generate_config_path`.
         """
-        if not generate_config_path.exists():
-            raise ValueError()
-
         self._destroy_on_error = destroy_on_error
         self._log_output_live = log_output_live
         extra_config = dict(extra_config or {})

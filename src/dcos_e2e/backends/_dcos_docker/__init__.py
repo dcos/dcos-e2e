@@ -55,6 +55,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
         """
+
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
@@ -110,7 +111,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+
+        Raises:
+            ValueError: There is no file at `generate_config_path`.
         """
+        if generate_config_path is None or not generate_config_path.exists():
+            raise ValueError()
+
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
