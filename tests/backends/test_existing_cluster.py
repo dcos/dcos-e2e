@@ -4,22 +4,18 @@ Tests for the existing cluster backend.
 
 from pathlib import Path
 
-"""
-XXX
-"""
-
 import pytest
 
 from dcos_e2e.backends import DCOS_Docker, Existing_Cluster
 from dcos_e2e.cluster import Cluster
 
 # TODO:
-# - make node public
 # - fill in tests
 #  - destroy on error must be false
+# - new: destroy on success - must be false
 # files to copy to installer / master must be empty
-# document Node and new backend
-# Separate making Node public
+# document new backend
+
 
 class TestExistingCluster:
     """
@@ -30,7 +26,52 @@ class TestExistingCluster:
         """
         It is possible to create a cluster from existing nodes.
         """
-        pass
+        num_masters = 1
+        num_agents = 1
+        num_public_agents = 1
+
+        with Cluster(
+            cluster_backend=DCOS_Docker(),
+            generate_config_path=oss_artifact,
+            masters=num_masters,
+            agents=num_agents,
+            public_agents=num_public_agents,
+        ) as cluster:
+            (master, ) = cluster.masters
+            (agent, ) = cluster.agents
+            (public_agent, ) = cluster.public_agents
+
+            existing_cluster = Existing_Cluster(
+                masters=cluster.masters,
+                agents=cluster.agents,
+                public_agents=cluster.public_agents,
+            )
+
+            with Cluster(
+                cluster_backend=existing_cluster,
+                masters=num_masters,
+                agents=num_agents,
+                public_agents=num_public_agents,
+            ) as duplicate_cluster:
+                (duplicate_master, ) = duplicate_cluster.masters
+                (duplicate_agent, ) = duplicate_cluster.agents
+                (duplicate_public_agent, ) = duplicate_cluster.public_agents
+
+                duplicate_master.run_as_root(
+                    args=['touch', 'example_master_file'],
+                )
+                duplicate_agent.run_as_root(
+                    args=['touch', 'example_agent_file'],
+                )
+                duplicate_public_agent.run_as_root(
+                    args=['touch', 'example_public_agent_file'],
+                )
+
+                master.run_as_root(args=['test', '-f', 'example_master_file'])
+                agent.run_as_root(args=['test', '-f', 'example_agent_file'])
+                public_agent.run_as_root(
+                    args=['test', '-f', 'example_public_agent_file'],
+                )
 
 
 class TestBadParameters:
