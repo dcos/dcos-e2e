@@ -29,11 +29,14 @@
     - [`masters`](#masters-1)
     - [`agents`](#agents-1)
     - [`public_agents`](#public_agents-1)
-- [Nodes](#nodes)
+- [`dcos_e2e.node.Node`](#dcos_e2enodenode)
+  - [Parameters](#parameters-2)
+    - [`ip_address`](#ip_address)
+    - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
     - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
   - [Attributes](#attributes-1)
-    - [`ip_address`](#ip_address)
+    - [`ip_address`](#ip_address-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->

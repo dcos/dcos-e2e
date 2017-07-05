@@ -12,10 +12,10 @@ import requests
 from requests import codes
 from retry import retry
 
-from ._common import Node
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
+from .node import Node
 
 
 class Cluster(ContextDecorator):
