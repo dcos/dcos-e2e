@@ -11,10 +11,11 @@ from dcos_e2e.cluster import Cluster
 
 # TODO:
 # - fill in tests
-#  - destroy on error must be false
-# - new: destroy on success - must be false
+# - destroy on error must be false
+# -  destroy on success - must be false
 # files to copy to installer / master must be empty
 # document new backend
+# Make tests pass
 
 
 class TestExistingCluster:
@@ -79,112 +80,128 @@ class TestBadParameters:
     Tests for unexpected parameter values.
     """
 
-    def test_installer_file(self, oss_artifact: Path) -> None:
+    @pytest.fixture(scope='module')
+    def dcos_cluster(self, oss_artifact: Path) -> Cluster:
         """
-        If an installer file is given, an error is raised.
-        """
-        num_masters = 1
-        num_agents = 0
-        num_public_agents = 0
+        Return a `Cluster`.
 
+        This is module scoped as we do not intend to modify the cluster.
+        """
         with Cluster(
             cluster_backend=DCOS_Docker(),
             generate_config_path=oss_artifact,
-            masters=num_masters,
-            agents=num_agents,
-            public_agents=num_public_agents,
+            masters=1,
+            agents=0,
+            public_agents=0,
         ) as cluster:
-            existing_cluster = Existing_Cluster(
-                masters=cluster.masters,
-                agents=cluster.agents,
-                public_agents=cluster.public_agents,
-            )
+            yield cluster
 
-            with pytest.raises(ValueError) as excinfo:
-                with Cluster(
-                    cluster_backend=existing_cluster,
-                    generate_config_path=oss_artifact,
-                    masters=num_masters,
-                    agents=num_agents,
-                    public_agents=num_public_agents,
-                ):
-                    pass  # pragma: no cover
-
-            expected_error = (
-                'Cluster already exists with DC/OS installed. '
-                '`generate_config_path` must be `None`.'
-            )
-
-            assert excinfo.value == expected_error
-
-    def test_mismatched_node_numbers(self, oss_artifact: Path) -> None:
+    def test_installer_file(
+        self, cluster: Cluster, oss_artifact: Path
+    ) -> None:
         """
         If an installer file is given, an error is raised.
         """
-        num_masters = 1
-        num_agents = 0
-        num_public_agents = 0
+        existing_cluster = Existing_Cluster(
+            masters=cluster.masters,
+            agents=cluster.agents,
+            public_agents=cluster.public_agents,
+        )
 
-        with Cluster(
-            cluster_backend=DCOS_Docker(),
-            generate_config_path=oss_artifact,
-            masters=num_masters,
-            agents=num_agents,
-            public_agents=num_public_agents,
-        ) as cluster:
-            existing_cluster = Existing_Cluster(
-                masters=cluster.masters,
-                agents=cluster.agents,
-                public_agents=cluster.public_agents,
-            )
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster,
+                generate_config_path=oss_artifact,
+                masters=len(cluster.masters),
+                agents=len(cluster.agents),
+                public_agents=len(cluster.public_agents),
+            ):
+                pass  # pragma: no cover
 
-            with pytest.raises(ValueError) as excinfo:
-                with Cluster(
-                    cluster_backend=existing_cluster,
-                    generate_config_path=None,
-                    masters=num_masters + 1,
-                    agents=num_agents,
-                    public_agents=num_public_agents,
-                ):
-                    pass  # pragma: no cover
+        expected_error = (
+            'Cluster already exists with DC/OS installed. '
+            '`generate_config_path` must be `None`.'
+        )
 
-            expected_error = (
-                'The number of master nodes is `1`. '
-                'Therefore `masters` must be set to `1`.'
-            )
+        assert excinfo.value == expected_error
 
-            assert excinfo.value == expected_error
+    def test_mismatched_masters(self, cluster: Cluster) -> None:
+        """
+        If `masters` differs from the number of masters an error is raised.
+        """
+        existing_cluster = Existing_Cluster(
+            masters=cluster.masters,
+            agents=cluster.agents,
+            public_agents=cluster.public_agents,
+        )
 
-            with pytest.raises(ValueError) as excinfo:
-                with Cluster(
-                    cluster_backend=existing_cluster,
-                    generate_config_path=None,
-                    masters=num_masters,
-                    agents=num_agents + 1,
-                    public_agents=num_public_agents,
-                ):
-                    pass  # pragma: no cover
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster,
+                generate_config_path=None,
+                masters=len(cluster.masters) + 2,
+                agents=len(cluster.agents),
+                public_agents=len(cluster.public_agents),
+            ):
+                pass  # pragma: no cover
 
-            expected_error = (
-                'The number of agent nodes is `0`. '
-                'Therefore `agents` must be set to `0`.'
-            )
+        expected_error = (
+            'The number of master nodes is `1`. '
+            'Therefore `masters` must be set to `1`.'
+        )
 
-            assert excinfo.value == expected_error
+        assert excinfo.value == expected_error
 
-            with pytest.raises(ValueError) as excinfo:
-                with Cluster(
-                    cluster_backend=existing_cluster,
-                    generate_config_path=None,
-                    masters=num_masters,
-                    agents=num_agents,
-                    public_agents=num_public_agents + 1,
-                ):
-                    pass  # pragma: no cover
+    def test_mismatched_agents(self, cluster: Cluster) -> None:
+        """
+        If `agents` differs from the number of agents an error is raised.
+        """
+        existing_cluster = Existing_Cluster(
+            masters=cluster.masters,
+            agents=cluster.agents,
+            public_agents=cluster.public_agents,
+        )
 
-            expected_error = (
-                'The number of public agent nodes is `0`. '
-                'Therefore `public_agents` must be set to `0`.'
-            )
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster,
+                generate_config_path=None,
+                masters=len(cluster.masters),
+                agents=len(cluster.agents) + 1,
+                public_agents=len(cluster.public_agents),
+            ):
+                pass  # pragma: no cover
 
-            assert excinfo.value == expected_error
+        expected_error = (
+            'The number of agent nodes is `1`. '
+            'Therefore `agents` must be set to `1`.'
+        )
+
+        assert excinfo.value == expected_error
+
+    def test_mismatched_public_agents(self, cluster: Cluster) -> None:
+        """
+        If `agents` differs from the number of agents an error is raised.
+        """
+        existing_cluster = Existing_Cluster(
+            masters=cluster.masters,
+            agents=cluster.agents,
+            public_agents=cluster.public_agents,
+        )
+
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster,
+                generate_config_path=None,
+                masters=len(cluster.masters),
+                agents=len(cluster.agents),
+                public_agents=len(cluster.public_agents),
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'The number of public agent nodes is `1`. '
+            'Therefore `public_agents` must be set to `1`.'
+        )
+
+        assert excinfo.value == expected_error
