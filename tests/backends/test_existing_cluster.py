@@ -10,8 +10,6 @@ from dcos_e2e.backends import ClusterBackend, DCOS_Docker, Existing_Cluster
 from dcos_e2e.cluster import Cluster
 
 # TODO:
-# - fill in tests
-# - destroy on error must be false
 # -  destroy on success - must be false
 # files to copy to installer / master must be empty
 # extra config must be empty
@@ -106,10 +104,31 @@ class TestBadParameters:
             public_agents=dcos_cluster.public_agents,
         )
 
-    def test_destroy_on_error(self, dcos_cluster: Cluster) -> None:
+    def test_destroy_on_error(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
         """
         XXX
         """
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster_backend,
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=True,
+                destroy_on_success=False,
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'Destruction of an existing cluster must be handled by the caller. '
+            'Therefore `destroy_on_error` must be set to `False`.'
+        )
+
+        assert excinfo.value == expected_error
 
     def test_installer_file(
         self,
@@ -127,6 +146,8 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
             ):
                 pass  # pragma: no cover
 
@@ -152,6 +173,8 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters) + 2,
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
             ):
                 pass  # pragma: no cover
 
@@ -177,6 +200,8 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents) + 1,
                 public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
             ):
                 pass  # pragma: no cover
 
@@ -202,6 +227,8 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
             ):
                 pass  # pragma: no cover
 
