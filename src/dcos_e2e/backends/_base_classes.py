@@ -6,7 +6,7 @@ import abc
 from pathlib import Path
 from typing import Any, Dict, Set, Type
 
-from .._common import Node
+from ..node import Node
 
 
 class ClusterManager(abc.ABC):
