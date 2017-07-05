@@ -4,7 +4,7 @@ Abstract base classes.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Optional, Set, Type
 
 from .._common import Node
 
@@ -17,7 +17,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def __init__(
         self,
-        generate_config_path: Path,
+        generate_config_path: Optional[Path],
         masters: int,
         agents: int,
         public_agents: int,
