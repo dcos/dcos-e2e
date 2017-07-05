@@ -28,7 +28,7 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
-        generate_config_path: Path,
+        generate_config_path: Path=None,
         extra_config: Optional[Dict[str, Any]]=None,
         masters: int=1,
         agents: int=1,

@@ -59,12 +59,35 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
+## `dcos_e2e.backend.Existing_Cluster`
+
+This is a backend which can be used to run a `Cluster`.
+It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s.
+This means that it cannot support various operations which rely on access to the start up and teardown mechanisms of a cluster.
+
+As such, various `Cluster` parameters must be set in particular ways.
+
+```python
+Existing_Cluster(masters, agents, public_agents)
+```
+
+When creating a `Cluster` with this backend, the following parameter conditions must be true:
+*
+* `masters` matches the number of master nodes in the existing cluster,
+* `agents` matches the number of agent nodes in the existing cluster,
+* `public_agents` matches the number of public agent nodes in the existing cluster,
+* `generate_config_path` must be `None`,
+* `destroy_on_error` must be `False`,
+* `destroy_on_success` must be `False`,
+* `files_to_copy_to_installer` must be `None` or `{}`,
+* `files_to_copy_to_masters` must be `None` or `{}`
+
 ## `dcos_e2e.cluster.Cluster`
 
 ```python
 Cluster(
     cluster_backend,
-    generate_config_path,
+    generate_config_path=None,
     extra_config=None,
     masters=1,
     agents=1,
