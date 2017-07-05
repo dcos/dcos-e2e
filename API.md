@@ -21,6 +21,7 @@
     - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
     - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
     - [`destroy_on_error`](#destroy_on_error)
+    - [`destroy_on_success`](#destroy_on_success)
   - [Methods](#methods)
     - [`run_integration_tests(pytest_command, env=None)`](#run_integration_testspytest_command-envnone)
     - [`destroy()`](#destroy)
@@ -70,6 +71,7 @@ Cluster(
     public_agents=1,
     log_output_live=False,
     destroy_on_error=True,
+    destroy_on_success=False,
     files_to_copy_to_installer=None,
     files_to_copy_to_masters=None,
 )
@@ -124,8 +126,11 @@ On DC/OS Docker the files are mounted, read only, to the masters.
 
 #### `destroy_on_error`
 
-If set to `True`, the cluster is destroyed on exit in all cases.
-If set to `False`, the cluster is preserved if there is an error.
+If set to `True`, the cluster is destroyed on exit if there is an exception raised in the context of the context manager.
+
+#### `destroy_on_success`
+
+If set to `True`, the cluster is destroyed on exit if there is no exception raised in the context of the context manager.
 
 ### Methods
 
