@@ -35,6 +35,7 @@ class Cluster(ContextDecorator):
         public_agents: int=1,
         log_output_live: bool=False,
         destroy_on_error: bool=True,
+        destroy_on_success: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
     ) -> None:
@@ -53,6 +54,8 @@ class Cluster(ContextDecorator):
                 If `True`, stderr is merged into stdout in the return value.
             destroy_on_error: If `False`, the cluster will not be destroyed
                 if there is an exception raised in the context of this object.
+            destroy_on_success: If `False`, the cluster will not be destroyed
+                if there is no exception raised in the context of this object.
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
@@ -61,6 +64,7 @@ class Cluster(ContextDecorator):
                 the master nodes before installing DC/OS.
         """
         self._destroy_on_error = destroy_on_error
+        self._destroy_on_success = destroy_on_success
         self._log_output_live = log_output_live
         extra_config = dict(extra_config or {})
 
@@ -207,6 +211,10 @@ class Cluster(ContextDecorator):
         """
         On exiting, destroy all nodes in the cluster.
         """
-        if exc_type is None or self._destroy_on_error:
+        if exc_type is None and self._destroy_on_success:
             self.destroy()
+
+        if exc_type is not None and self._destroy_on_error:
+            self.destroy()
+
         return False
