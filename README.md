@@ -128,6 +128,8 @@ reboot
 
 ## Cleaning Up
 
+### DC/OS Docker Backend
+
 Tests run with this harness clean up after themselves.
 However, if a test is interrupted, it can leave behind containers, volumes and files.
 To remove these, run the following:
@@ -142,7 +144,9 @@ If this repository is available, run `make clean`.
 
 ## Troubleshooting
 
-### macOS File Sharing
+### DC/OS Docker Backend
+
+#### macOS File Sharing
 
 On macOS `/tmp` is a symlink to `/private/tmp`.
 `/tmp` is used by the harness.
@@ -150,11 +154,11 @@ Docker for Mac must be configured to allow `/private` to be bind mounted into Do
 This is the default.
 See Docker > Preferences > File Sharing.
 
-### Out of space errors
+#### Out of space errors
 
 See "Cleaning up".
 
-### Parallelization
+## Parallelization
 
 To see print output while running tests in parallel,
 use the `-s` `pytest` flag and put the following in the code:
