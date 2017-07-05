@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from dcos_e2e.backends import DCOS_Docker, Existing_Cluster
+from dcos_e2e.backends import ClusterBackend, DCOS_Docker, Existing_Cluster
 from dcos_e2e.cluster import Cluster
 
 # TODO:
@@ -14,6 +14,7 @@ from dcos_e2e.cluster import Cluster
 # - destroy on error must be false
 # -  destroy on success - must be false
 # files to copy to installer / master must be empty
+# extra config must be empty
 # document new backend
 # Make tests pass
 
@@ -27,16 +28,12 @@ class TestExistingCluster:
         """
         It is possible to create a cluster from existing nodes.
         """
-        num_masters = 1
-        num_agents = 1
-        num_public_agents = 1
-
         with Cluster(
             cluster_backend=DCOS_Docker(),
             generate_config_path=oss_artifact,
-            masters=num_masters,
-            agents=num_agents,
-            public_agents=num_public_agents,
+            masters=1,
+            agents=1,
+            public_agents=1,
         ) as cluster:
             (master, ) = cluster.masters
             (agent, ) = cluster.agents
@@ -50,9 +47,9 @@ class TestExistingCluster:
 
             with Cluster(
                 cluster_backend=existing_cluster,
-                masters=num_masters,
-                agents=num_agents,
-                public_agents=num_public_agents,
+                masters=len(cluster.masters),
+                agents=len(cluster.agents),
+                public_agents=len(cluster.public_agents),
             ) as duplicate_cluster:
                 (duplicate_master, ) = duplicate_cluster.masters
                 (duplicate_agent, ) = duplicate_cluster.agents
@@ -96,25 +93,40 @@ class TestBadParameters:
         ) as cluster:
             yield cluster
 
+    @pytest.fixture()
+    def existing_cluster_backend(
+        self, dcos_cluster: Cluster
+    ) -> ClusterBackend:
+        """
+        Return an `Existing_Cluster` with the nodes from `dcos_cluster`.
+        """
+        return Existing_Cluster(
+            masters=dcos_cluster.masters,
+            agents=dcos_cluster.agents,
+            public_agents=dcos_cluster.public_agents,
+        )
+
+    def test_destroy_on_error(self, dcos_cluster: Cluster) -> None:
+        """
+        XXX
+        """
+
     def test_installer_file(
-        self, cluster: Cluster, oss_artifact: Path
+        self,
+        dcos_cluster: Cluster,
+        oss_artifact: Path,
+        existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
         If an installer file is given, an error is raised.
         """
-        existing_cluster = Existing_Cluster(
-            masters=cluster.masters,
-            agents=cluster.agents,
-            public_agents=cluster.public_agents,
-        )
-
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
-                cluster_backend=existing_cluster,
+                cluster_backend=existing_cluster_backend,
                 generate_config_path=oss_artifact,
-                masters=len(cluster.masters),
-                agents=len(cluster.agents),
-                public_agents=len(cluster.public_agents),
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
             ):
                 pass  # pragma: no cover
 
@@ -125,23 +137,21 @@ class TestBadParameters:
 
         assert excinfo.value == expected_error
 
-    def test_mismatched_masters(self, cluster: Cluster) -> None:
+    def test_mismatched_masters(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
         """
         If `masters` differs from the number of masters an error is raised.
         """
-        existing_cluster = Existing_Cluster(
-            masters=cluster.masters,
-            agents=cluster.agents,
-            public_agents=cluster.public_agents,
-        )
-
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
-                cluster_backend=existing_cluster,
+                cluster_backend=existing_cluster_backend,
                 generate_config_path=None,
-                masters=len(cluster.masters) + 2,
-                agents=len(cluster.agents),
-                public_agents=len(cluster.public_agents),
+                masters=len(dcos_cluster.masters) + 2,
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
             ):
                 pass  # pragma: no cover
 
@@ -152,23 +162,21 @@ class TestBadParameters:
 
         assert excinfo.value == expected_error
 
-    def test_mismatched_agents(self, cluster: Cluster) -> None:
+    def test_mismatched_agents(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
         """
         If `agents` differs from the number of agents an error is raised.
         """
-        existing_cluster = Existing_Cluster(
-            masters=cluster.masters,
-            agents=cluster.agents,
-            public_agents=cluster.public_agents,
-        )
-
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
-                cluster_backend=existing_cluster,
+                cluster_backend=existing_cluster_backend,
                 generate_config_path=None,
-                masters=len(cluster.masters),
-                agents=len(cluster.agents) + 1,
-                public_agents=len(cluster.public_agents),
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents) + 1,
+                public_agents=len(dcos_cluster.public_agents),
             ):
                 pass  # pragma: no cover
 
@@ -179,23 +187,21 @@ class TestBadParameters:
 
         assert excinfo.value == expected_error
 
-    def test_mismatched_public_agents(self, cluster: Cluster) -> None:
+    def test_mismatched_public_agents(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
         """
         If `agents` differs from the number of agents an error is raised.
         """
-        existing_cluster = Existing_Cluster(
-            masters=cluster.masters,
-            agents=cluster.agents,
-            public_agents=cluster.public_agents,
-        )
-
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
-                cluster_backend=existing_cluster,
+                cluster_backend=existing_cluster_backend,
                 generate_config_path=None,
-                masters=len(cluster.masters),
-                agents=len(cluster.agents),
-                public_agents=len(cluster.public_agents),
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
             ):
                 pass  # pragma: no cover
 

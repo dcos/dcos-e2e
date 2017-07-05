@@ -31,6 +31,7 @@ env:
       - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_false"
       - "TEST_PATTERN=tests/test_harness.py::TestCopyFiles::test_copy_files"
       - "TEST_PATTERN=tests/backends/test_dcos_docker.py::TestBadParameters::test_no_installer_file"
+      - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::"
       # This test classes uses one scoped cluster so we run it on one builder.
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
   global:
