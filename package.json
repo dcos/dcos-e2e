@@ -1,7 +1,7 @@
 {
   "scripts": {
     "doctoc": "doctoc",
-    "lint-md": "remark ."
+    "lint-md": "remark"
   },
   "remarkConfig": {
     "plugins": [
