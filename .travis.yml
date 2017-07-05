@@ -14,19 +14,22 @@ env:
   # per commit.
   # A maximum of two tests which wait for DC/OS per builder.
   matrix:
-      - "TEST_PATTERN=TestNode"
-      - "TEST_PATTERN=TestIntegrationTests"
-      - "TEST_PATTERN=TestExtendConfig and not test_default_config"
-      - "TEST_PATTERN=TestExtendConfig and test_default_config"
-      - "TEST_PATTERN=TestClusterSize"
-      - "TEST_PATTERN=TestClusterLogging"
-      - "TEST_PATTERN=TestDestroyOnError and test_default_exception_raised"
-      - "TEST_PATTERN=TestDestroyOnError and not test_default_exception_raised"
-      - "TEST_PATTERN=TestCopyFiles"
-      - "TEST_PATTERN=TestEnterpriseIntegrationTests"
-      - "TEST_PATTERN=TestMultipleClusters"
-      - "TEST_PATTERN=TestBadParameters"
-      - "TEST_PATTERN=TestWaitForDCOS"
+      - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
+      - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
+      - "TEST_PATTERN=tests/test_harness.py::TestNode::test_run_as_root"
+      - "TEST_PATTERN=tests/test_harness.py::TestIntegrationTests::test_run_pytest"
+      - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_extend_config"
+      - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_default_config"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterSize::test_default"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterSize::test_custom"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterLogging::test_live_logging"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterLogging::test_no_live_logging"
+      - "TEST_PATTERN=tests/test_harness.py::TestMultipleClusters::test_two_clusters"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_default_exception_raised"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_set_false_exception_raised"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_set_false_no_exception"
+      - "TEST_PATTERN=tests/test_harness.py::TestCopyFiles::test_copy_files"
+      - "TEST_PATTERN=tests/test_dcos_docker.py::TestBadParameters::test_no_installer_file"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
@@ -53,7 +56,7 @@ before_script:
     - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
 
 script:
-    - 'pytest -x -vvv -s -k "$TEST_PATTERN" --cov=src --cov=tests'
+    - 'pytest -x -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
 
 after_success:
     - "codecov"
