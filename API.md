@@ -169,9 +169,23 @@ The agent nodes in the cluster.
 
 The public agent nodes in the cluster.
 
-## Nodes
+## `dcos_e2e.node.Node`
 
 Commands can be run on nodes in clusters.
+
+```python
+Node(ip_address, ssh_key_path)
+```
+
+### Parameters
+
+#### `ip_address`
+
+The IP address of the node.
+
+#### `ssh_key_path`
+
+The path to an SSH key which can be used to SSH to the node as the `root` user.
 
 ### Methods
 
