@@ -17,7 +17,7 @@ class TestBadParameters:
     Tests for unexpected parameter values.
     """
 
-    @pytest.mark.parametrize('no_such_path', [None, str(uuid.uuid4())])
+    @pytest.mark.parametrize('no_such_path', [None, Path(str(uuid.uuid4()))])
     def test_no_installer_file(self, no_such_path: Optional[Path]) -> None:
         """
         If no file exists at the given `generate_config_path`, a `ValueError`
