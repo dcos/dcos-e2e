@@ -110,7 +110,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+
+        Raises:
+            ValueError: There is no file at `generate_config_path`.
         """
+        if generate_config_path is None or not generate_config_path.exists():
+            raise ValueError()
+
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
