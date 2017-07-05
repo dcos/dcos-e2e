@@ -2,17 +2,13 @@
 Tests for the DC/OS Docker backend.
 """
 
-import logging
 import uuid
 from pathlib import Path
-from subprocess import CalledProcessError
-from typing import List
 
 import pytest
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
-from pytest_capturelog import CaptureLogFuncArg
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
