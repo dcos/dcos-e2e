@@ -27,7 +27,8 @@ env:
       - "TEST_PATTERN=tests/test_harness.py::TestMultipleClusters::test_two_clusters"
       - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_default_exception_raised"
       - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_set_false_exception_raised"
-      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_set_false_no_exception"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_default"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_false"
       - "TEST_PATTERN=tests/test_harness.py::TestCopyFiles::test_copy_files"
       - "TEST_PATTERN=tests/backends/test_dcos_docker.py::TestBadParameters::test_no_installer_file"
   global:
