@@ -15,8 +15,9 @@ from typing import Any, Dict, Optional, Set, Type
 import docker
 import yaml
 
-from dcos_e2e._common import Node, run_subprocess
+from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.node import Node
 
 
 def _get_open_port() -> int:
