@@ -17,7 +17,7 @@ lint-python-only:
 
 .PHONY: lint-docs
 lint-docs:
-	npm run lint-md 2>&1 | \
+	npm run lint-md *.md 2>&1 | \
 	    python -c '\
 		import sys; \
 		result = sys.stdin.read(); \

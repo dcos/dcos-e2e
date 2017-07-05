@@ -55,7 +55,6 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
         """
-
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'

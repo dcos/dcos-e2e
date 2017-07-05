@@ -4,13 +4,11 @@ Tests for the DC/OS Docker backend.
 
 import uuid
 from pathlib import Path
+from typing import Optional
 
 import pytest
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
-from dcos_e2e.backends import ClusterBackend
+from dcos_e2e.backends import DCOS_Docker
 from dcos_e2e.cluster import Cluster
 
 
@@ -19,16 +17,15 @@ class TestBadParameters:
     Tests for unexpected parameter values.
     """
 
-    def test_no_installer_file(self, cluster_backend: ClusterBackend) -> None:
+    @pytest.mark.parametrize('no_such_path', [None, str(uuid.uuid4())])
+    def test_no_installer_file(self, no_such_path: Optional[Path]) -> None:
         """
         If no file exists at the given `generate_config_path`, a `ValueError`
         is raised.
         """
         with pytest.raises(ValueError):
             with Cluster(
-                cluster_backend=cluster_backend,
-                generate_config_path=Path(str(uuid.uuid4)),
-                agents=0,
-                public_agents=0,
+                cluster_backend=DCOS_Docker(),
+                generate_config_path=no_such_path,
             ):
                 pass  # pragma: no cover
