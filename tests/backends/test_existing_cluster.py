@@ -10,10 +10,8 @@ from dcos_e2e.backends import ClusterBackend, DCOS_Docker, Existing_Cluster
 from dcos_e2e.cluster import Cluster
 
 # TODO:
-# -  destroy on success - must be false
 # files to copy to installer / master must be empty
 # extra config must be empty
-# document new backend
 # Make tests pass
 
 
@@ -110,7 +108,7 @@ class TestBadParameters:
         existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
-        XXX
+        If `destroy_on_error` is set to `True` an error is raised.
         """
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
@@ -124,8 +122,34 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'Destruction of an existing cluster must be handled by the caller. '
-            'Therefore `destroy_on_error` must be set to `False`.'
+            'Destruction of an existing cluster must be handled by the caller.'
+            ' Therefore `destroy_on_error` must be set to `False`.'
+        )
+
+        assert excinfo.value == expected_error
+
+    def test_destroy_on_success(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        If `destroy_on_success` is set to `True` an error is raised.
+        """
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster_backend,
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=True,
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'Destruction of an existing cluster must be handled by the caller.'
+            ' Therefore `destroy_on_success` must be set to `False`.'
         )
 
         assert excinfo.value == expected_error
