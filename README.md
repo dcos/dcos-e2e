@@ -159,15 +159,3 @@ See Docker > Preferences > File Sharing.
 #### Out of space errors
 
 See "Cleaning up".
-
-## Parallelization
-
-To see print output while running tests in parallel,
-use the `-s` `pytest` flag and put the following in the code:
-
-```python
-import sys
-sys.stdout = sys.stderr
-```
-
-`pdb` will not work when running tests in parallel.

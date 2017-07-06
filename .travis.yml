@@ -60,7 +60,7 @@ before_script:
     - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
 
 script:
-    - 'pytest -x -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
+    - 'pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
 
 after_success:
     - "codecov"
