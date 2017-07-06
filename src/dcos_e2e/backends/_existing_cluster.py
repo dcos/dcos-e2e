@@ -164,7 +164,8 @@ class ExistingClusterManager(ClusterManager):
 
     def destroy(self) -> None:
         """
-        The destruction of an existing cluster is the responsibility of the
-        caller.
+        Destroying an existing cluster is the responsibility of the caller.
+
+        Raises: NotImplementedError when called.
         """
         raise NotImplementedError
