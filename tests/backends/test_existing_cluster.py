@@ -126,7 +126,7 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'Destruction of an existing cluster must be handled by the caller.'
+            'The given cluster backend does not support being destroyed.'
             ' Therefore, `destroy_on_error` must be set to `False`.'
         )
 
@@ -152,7 +152,7 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'Destruction of an existing cluster must be handled by the caller.'
+            'The given cluster backend does not support being destroyed.'
             ' Therefore, `destroy_on_success` must be set to `False`.'
         )
 

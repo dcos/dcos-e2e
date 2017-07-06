@@ -36,6 +36,13 @@ class ExistingCluster(ClusterBackend):
         """
         return ExistingClusterManager
 
+    @property
+    def supports_destruction(self) -> bool:
+        """
+        Destroying an existing cluster is the responsibility of the caller.
+        """
+        return False
+
 
 class ExistingClusterManager(ClusterManager):
     """

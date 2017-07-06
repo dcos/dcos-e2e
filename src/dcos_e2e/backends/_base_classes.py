@@ -90,3 +90,11 @@ class ClusterBackend(abc.ABC):
         Return the `ClusterManager` class to use to create and manage a
         cluster.
         """
+
+    @property
+    @abc.abstractmethod
+    def supports_destruction(self) -> bool:
+        """
+        Return whether this backend supports being destroyed with a `destroy`
+        method.
+        """

@@ -62,7 +62,25 @@ class Cluster(ContextDecorator):
             files_to_copy_to_masters: A mapping of host paths to paths on the
                 master nodes. These are files to copy from the host to
                 the master nodes before installing DC/OS.
+
+        Raises:
+            ValueError: `destroy_on_error` or `destroy_on_success` is `True`
+                and the `cluster_backend` does not support being destroyed.
         """
+        if destroy_on_error and not cluster_backend.supports_destruction:
+            message = (
+                'The given cluster backend does not support being destroyed.'
+                ' Therefore, `destroy_on_error` must be set to `False`.'
+            )
+            raise ValueError(message)
+
+        if destroy_on_success and not cluster_backend.supports_destruction:
+            message = (
+                'The given cluster backend does not support being destroyed.'
+                ' Therefore, `destroy_on_success` must be set to `False`.'
+            )
+            raise ValueError(message)
+
         self._destroy_on_error = destroy_on_error
         self._destroy_on_success = destroy_on_success
         self._log_output_live = log_output_live
