@@ -9,7 +9,7 @@
 - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
-- [`dcos_e2e.backend.Existing_Cluster`](#dcos_e2ebackendexisting_cluster)
+- [`dcos_e2e.backend.ExistingCluster`](#dcos_e2ebackendexisting_cluster)
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters-1)
     - [`cluster_backend`](#cluster_backend)
@@ -60,7 +60,7 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
-## `dcos_e2e.backend.Existing_Cluster`
+## `dcos_e2e.backend.ExistingCluster`
 
 This is a backend which can be used to run a `Cluster`.
 It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s.
@@ -69,7 +69,7 @@ This means that it cannot support various operations which rely on access to the
 As such, various `Cluster` parameters must be set in particular ways.
 
 ```python
-Existing_Cluster(masters, agents, public_agents)
+ExistingCluster(masters, agents, public_agents)
 ```
 
 When creating a `Cluster` with this backend, the following parameter conditions must be true:

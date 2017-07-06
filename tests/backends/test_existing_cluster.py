@@ -6,18 +6,19 @@ from pathlib import Path
 
 import pytest
 
-from dcos_e2e.backends import ClusterBackend, DCOS_Docker, Existing_Cluster
+from dcos_e2e.backends import ClusterBackend, DCOS_Docker, ExistingCluster
 from dcos_e2e.cluster import Cluster
 
 
 class TestExistingCluster:
     """
-    Tests for creating a `Cluster` with the `Existing_Cluster` backend.
+    Tests for creating a `Cluster` with the `ExistingCluster` backend.
     """
 
     def test_existing_cluster(self, oss_artifact: Path) -> None:
         """
-        It is possible to create a cluster from existing nodes.
+        It is possible to create a cluster from existing nodes, but not destroy
+        it.
         """
         with Cluster(
             cluster_backend=DCOS_Docker(),
@@ -25,12 +26,13 @@ class TestExistingCluster:
             masters=1,
             agents=1,
             public_agents=1,
+            destroy_on_success=False,
         ) as cluster:
             (master, ) = cluster.masters
             (agent, ) = cluster.agents
             (public_agent, ) = cluster.public_agents
 
-            existing_cluster = Existing_Cluster(
+            existing_cluster = ExistingCluster(
                 masters=cluster.masters,
                 agents=cluster.agents,
                 public_agents=cluster.public_agents,
@@ -41,6 +43,8 @@ class TestExistingCluster:
                 masters=len(cluster.masters),
                 agents=len(cluster.agents),
                 public_agents=len(cluster.public_agents),
+                destroy_on_success=False,
+                destroy_on_error=False,
             ) as duplicate_cluster:
                 (duplicate_master, ) = duplicate_cluster.masters
                 (duplicate_agent, ) = duplicate_cluster.agents
@@ -61,6 +65,11 @@ class TestExistingCluster:
                 public_agent.run_as_root(
                     args=['test', '-f', 'example_public_agent_file'],
                 )
+
+            with pytest.raises(NotImplementedError):
+                duplicate_cluster.destroy()
+
+            cluster.destroy()
 
 
 class TestBadParameters:
@@ -89,9 +98,9 @@ class TestBadParameters:
         self, dcos_cluster: Cluster
     ) -> ClusterBackend:
         """
-        Return an `Existing_Cluster` with the nodes from `dcos_cluster`.
+        Return an `ExistingCluster` with the nodes from `dcos_cluster`.
         """
-        return Existing_Cluster(
+        return ExistingCluster(
             masters=dcos_cluster.masters,
             agents=dcos_cluster.agents,
             public_agents=dcos_cluster.public_agents,

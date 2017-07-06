@@ -9,7 +9,7 @@ from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
 
 
-class Existing_Cluster(ClusterBackend):
+class ExistingCluster(ClusterBackend):
     """
     A record of an existing DC/OS cluster.
     """
@@ -21,22 +21,23 @@ class Existing_Cluster(ClusterBackend):
         public_agents: Set[Node],
     ) -> None:
         """
-        A record of an existing DC/OS Docker cluster backend.
+        Create a record of an existing cluster backend for use by a cluster
+        manager.
         """
         self.masters = masters
         self.agents = agents
         self.public_agents = public_agents
 
     @property
-    def cluster_cls(self) -> Type['Existing_Cluster_Manager']:
+    def cluster_cls(self) -> Type['ExistingClusterManager']:
         """
         Return the `ClusterManager` class to use to create and manage a
         cluster.
         """
-        return Existing_Cluster_Manager
+        return ExistingClusterManager
 
 
-class Existing_Cluster_Manager(ClusterManager):
+class ExistingClusterManager(ClusterManager):
     """
     A record of a DC/OS cluster.
     """
@@ -51,7 +52,7 @@ class Existing_Cluster_Manager(ClusterManager):
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
         files_to_copy_to_masters: Dict[Path, Path],
-        cluster_backend: Existing_Cluster,
+        cluster_backend: ExistingCluster,
     ) -> None:
         """
         Create a manager for an existing DC/OS cluster.
@@ -160,3 +161,10 @@ class Existing_Cluster_Manager(ClusterManager):
         Return all DC/OS public agent ``Node``s.
         """
         return self._public_agents
+
+    def destroy(self) -> None:
+        """
+        The destruction of an existing cluster is the responsibility of the
+        caller.
+        """
+        raise NotImplementedError
