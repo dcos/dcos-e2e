@@ -69,6 +69,13 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         """
         return DCOS_Docker_Cluster
 
+    @property
+    def supports_destruction(self) -> bool:
+        """
+        DC/OS Docker clusters can be destroyed.
+        """
+        return True
+
 
 class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
     """
@@ -77,7 +84,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        generate_config_path: Path,
+        generate_config_path: Optional[Path],
         masters: int,
         agents: int,
         public_agents: int,

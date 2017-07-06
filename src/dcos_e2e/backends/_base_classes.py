@@ -4,7 +4,7 @@ Abstract base classes.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Optional, Set, Type
 
 from ..node import Node
 
@@ -17,7 +17,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def __init__(
         self,
-        generate_config_path: Path,
+        generate_config_path: Optional[Path],
         masters: int,
         agents: int,
         public_agents: int,
@@ -89,4 +89,12 @@ class ClusterBackend(abc.ABC):
         """
         Return the `ClusterManager` class to use to create and manage a
         cluster.
+        """
+
+    @property
+    @abc.abstractmethod
+    def supports_destruction(self) -> bool:
+        """
+        Return whether this backend supports being destroyed with a `destroy`
+        method.
         """
