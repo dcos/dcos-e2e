@@ -77,7 +77,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        generate_config_path: Path,
+        generate_config_path: Optional[Path],
         masters: int,
         agents: int,
         public_agents: int,

@@ -3,7 +3,7 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Set
+from typing import Any, Dict, Optional, Set
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
@@ -35,7 +35,7 @@ class Existing_Cluster_Manager(ClusterManager):
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        generate_config_path: Path,
+        generate_config_path: Optional[Path],
         masters: int,
         agents: int,
         public_agents: int,
@@ -52,7 +52,25 @@ class Existing_Cluster_Manager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-        if not 1 == 2:
+        if generate_config_path is not None:
+            pass
+
+        if masters != len(self._masters):
+            pass
+
+        if agents != len(self._agents):
+            pass
+
+        if public_agents != len(self._public_agents):
+            pass
+
+        if extra_config not in (None, {}):
+            pass
+
+        if files_to_copy_to_installer != {}:
+            pass
+
+        if files_to_copy_to_masters != {}:
             pass
 
     @property
