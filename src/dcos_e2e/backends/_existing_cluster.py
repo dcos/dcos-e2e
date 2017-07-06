@@ -3,7 +3,7 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional, Set, Type
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
@@ -21,11 +21,19 @@ class Existing_Cluster(ClusterBackend):
         public_agents: Set[Node],
     ) -> None:
         """
-        XXX
+        A record of an existing DC/OS Docker cluster backend.
         """
         self.masters = masters
         self.agents = agents
         self.public_agents = public_agents
+
+    @property
+    def cluster_cls(self) -> Type['Existing_Cluster_Manager']:
+        """
+        Return the `ClusterManager` class to use to create and manage a
+        cluster.
+        """
+        return Existing_Cluster_Manager
 
 
 class Existing_Cluster_Manager(ClusterManager):
