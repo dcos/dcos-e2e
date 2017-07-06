@@ -9,11 +9,6 @@ import pytest
 from dcos_e2e.backends import ClusterBackend, DCOS_Docker, Existing_Cluster
 from dcos_e2e.cluster import Cluster
 
-# TODO:
-# files to copy to installer / master must be empty
-# extra config must be empty
-# Make tests pass
-
 
 class TestExistingCluster:
     """
@@ -123,7 +118,7 @@ class TestBadParameters:
 
         expected_error = (
             'Destruction of an existing cluster must be handled by the caller.'
-            ' Therefore `destroy_on_error` must be set to `False`.'
+            ' Therefore, `destroy_on_error` must be set to `False`.'
         )
 
         assert excinfo.value == expected_error
@@ -149,7 +144,89 @@ class TestBadParameters:
 
         expected_error = (
             'Destruction of an existing cluster must be handled by the caller.'
-            ' Therefore `destroy_on_success` must be set to `False`.'
+            ' Therefore, `destroy_on_success` must be set to `False`.'
+        )
+
+        assert excinfo.value == expected_error
+
+    def test_files_to_copy_to_installer(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        If there are any files to copy to installers, an error is raised.
+        """
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster_backend,
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
+                files_to_copy_to_installer={Path('/foo'): Path('/bar')},
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'No files can be copied to the installer of an existing cluster. '
+            'Therefore, `files_to_copy_to_installer` must be `None` or `{}`.'
+        )
+
+        assert excinfo.value == expected_error
+
+    def test_files_to_copy_to_masters(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        If there are any files to copy to masters, an error is raised.
+        """
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster_backend,
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
+                files_to_copy_to_masters={Path('/foo'): Path('/bar')},
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'No files can be copied to the masters of an existing cluster at '
+            'install time. '
+            'Therefore, `files_to_copy_to_installer` must be `None` or `{}`.'
+        )
+
+        assert excinfo.value == expected_error
+
+    def test_extra_config(
+        self,
+        dcos_cluster: Cluster,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        If `extra_config` is not empty, an error is raised.
+        """
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster_backend,
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
+                extra_config={'foo': 'bar'},
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'Nodes are already configured. '
+            'Therefore, `extra_config` must be `None` or `{}`.'
         )
 
         assert excinfo.value == expected_error
@@ -204,7 +281,7 @@ class TestBadParameters:
 
         expected_error = (
             'The number of master nodes is `1`. '
-            'Therefore `masters` must be set to `1`.'
+            'Therefore, `masters` must be set to `1`.'
         )
 
         assert excinfo.value == expected_error
@@ -231,7 +308,7 @@ class TestBadParameters:
 
         expected_error = (
             'The number of agent nodes is `1`. '
-            'Therefore `agents` must be set to `1`.'
+            'Therefore, `agents` must be set to `1`.'
         )
 
         assert excinfo.value == expected_error
@@ -258,7 +335,7 @@ class TestBadParameters:
 
         expected_error = (
             'The number of public agent nodes is `1`. '
-            'Therefore `public_agents` must be set to `1`.'
+            'Therefore, `public_agents` must be set to `1`.'
         )
 
         assert excinfo.value == expected_error

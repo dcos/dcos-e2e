@@ -72,11 +72,11 @@ Existing_Cluster(masters, agents, public_agents)
 ```
 
 When creating a `Cluster` with this backend, the following parameter conditions must be true:
-*
+* `generate_config_path` must be `None`,
+* `extra_config` must be `None` or `{}`,
 * `masters` matches the number of master nodes in the existing cluster,
 * `agents` matches the number of agent nodes in the existing cluster,
 * `public_agents` matches the number of public agent nodes in the existing cluster,
-* `generate_config_path` must be `None`,
 * `destroy_on_error` must be `False`,
 * `destroy_on_success` must be `False`,
 * `files_to_copy_to_installer` must be `None` or `{}`,
