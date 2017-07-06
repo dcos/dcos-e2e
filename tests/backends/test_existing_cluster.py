@@ -180,7 +180,7 @@ class TestBadParameters:
 
         expected_error = (
             'No files can be copied to the installer of an existing cluster. '
-            'Therefore `files_to_copy_to_installer` must be empty.'
+            'Therefore, `files_to_copy_to_installer` must be empty.'
         )
 
         assert str(excinfo.value) == expected_error
@@ -263,7 +263,7 @@ class TestBadParameters:
 
         expected_error = (
             'Cluster already exists with DC/OS installed. '
-            '`generate_config_path` must be `None`.'
+            'Therefore, `generate_config_path` must be `None`.'
         )
 
         assert str(excinfo.value) == expected_error
