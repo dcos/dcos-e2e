@@ -21,10 +21,11 @@ For example, a test may require a cluster with a certain number of agents, or ce
 - [Test Environment](#test-environment)
   - [Vagrant Quick Start](#vagrant-quick-start)
 - [Cleaning Up](#cleaning-up)
+  - [DC/OS Docker Backend](#dcos-docker-backend)
 - [Troubleshooting](#troubleshooting)
-  - [macOS File Sharing](#macos-file-sharing)
-  - [Out of space errors](#out-of-space-errors)
-  - [Parallelization](#parallelization)
+  - [DC/OS Docker Backend](#dcos-docker-backend-1)
+    - [macOS File Sharing](#macos-file-sharing)
+    - [Out of space errors](#out-of-space-errors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
@@ -128,6 +129,8 @@ reboot
 
 ## Cleaning Up
 
+### DC/OS Docker Backend
+
 Tests run with this harness clean up after themselves.
 However, if a test is interrupted, it can leave behind containers, volumes and files.
 To remove these, run the following:
@@ -142,7 +145,9 @@ If this repository is available, run `make clean`.
 
 ## Troubleshooting
 
-### macOS File Sharing
+### DC/OS Docker Backend
+
+#### macOS File Sharing
 
 On macOS `/tmp` is a symlink to `/private/tmp`.
 `/tmp` is used by the harness.
@@ -150,18 +155,6 @@ Docker for Mac must be configured to allow `/private` to be bind mounted into Do
 This is the default.
 See Docker > Preferences > File Sharing.
 
-### Out of space errors
+#### Out of space errors
 
 See "Cleaning up".
-
-### Parallelization
-
-To see print output while running tests in parallel,
-use the `-s` `pytest` flag and put the following in the code:
-
-```python
-import sys
-sys.stdout = sys.stderr
-```
-
-`pdb` will not work when running tests in parallel.
