@@ -130,7 +130,7 @@ class TestBadParameters:
             ' Therefore, `destroy_on_error` must be set to `False`.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_destroy_on_success(
         self,
@@ -156,7 +156,7 @@ class TestBadParameters:
             ' Therefore, `destroy_on_success` must be set to `False`.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_files_to_copy_to_installer(
         self,
@@ -183,7 +183,7 @@ class TestBadParameters:
             'Therefore `files_to_copy_to_installer` must be empty.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_files_to_copy_to_masters(
         self,
@@ -211,7 +211,7 @@ class TestBadParameters:
             'Therefore, `files_to_copy_to_masters` must be empty.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_extra_config(
         self,
@@ -238,7 +238,7 @@ class TestBadParameters:
             'Therefore, `extra_config` must be empty.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_installer_file(
         self,
@@ -266,7 +266,7 @@ class TestBadParameters:
             '`generate_config_path` must be `None`.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_mismatched_masters(
         self,
@@ -293,7 +293,7 @@ class TestBadParameters:
             'Therefore, `masters` must be set to `1`.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_mismatched_agents(
         self,
@@ -320,7 +320,7 @@ class TestBadParameters:
             'Therefore, `agents` must be set to `1`.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
 
     def test_mismatched_public_agents(
         self,
@@ -347,4 +347,4 @@ class TestBadParameters:
             'Therefore, `public_agents` must be set to `1`.'
         )
 
-        assert excinfo.value == expected_error
+        assert str(excinfo.value) == expected_error
