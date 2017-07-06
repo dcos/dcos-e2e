@@ -46,7 +46,36 @@ class Existing_Cluster_Manager(ClusterManager):
         cluster_backend: Existing_Cluster,
     ) -> None:
         """
-        XXX
+        Create a manager for an existing DC/OS cluster.
+
+        Args:
+            generate_config_path: The path to a build artifact to install.
+                This must be `None` as the cluster already exists.
+            masters: The number of master nodes to create.
+                This must match the number of masters in `cluster_backend`.
+            agents: The number of agent nodes to create.
+                This must match the number of agents in `cluster_backend`.
+            public_agents: The number of public agent nodes to create.
+                This must match the number of public agents in
+                `cluster_backend`.
+            extra_config: This dictionary can contain extra installation
+                configuration variables. However, as the cluster already
+                exists, there may not be
+            log_output_live: If `True`, log output of subprocesses live.
+                If `True`, stderr is merged into stdout in the return value.
+            files_to_copy_to_installer: A mapping of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS. As the cluster
+                already exists, there can be no paths given.
+            files_to_copy_to_masters: A mapping of host paths to paths on the
+                master nodes. These are files to copy from the host to
+                the master nodes before installing DC/OS. As the cluster
+                already exists, there can be no paths given.
+            cluster_backend: Details of the specific existing cluster backend
+                to use.
+
+        Raises:
+            ValueError: See `Args` for invalid arguments.
         """
         self._masters = cluster_backend.masters
         self._agents = cluster_backend.agents
