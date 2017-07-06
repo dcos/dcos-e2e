@@ -26,7 +26,6 @@ For example, a test may require a cluster with a certain number of agents, or ce
   - [DC/OS Docker Backend](#dcos-docker-backend-1)
     - [macOS File Sharing](#macos-file-sharing)
     - [Out of space errors](#out-of-space-errors)
-- [Parallelization](#parallelization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
