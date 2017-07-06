@@ -14,6 +14,19 @@ class Existing_Cluster(ClusterBackend):
     A record of an existing DC/OS cluster.
     """
 
+    def __init__(
+        self,
+        masters: Set[Node],
+        agents: Set[Node],
+        public_agents: Set[Node],
+    ) -> None:
+        """
+        XXX
+        """
+        self.masters = masters
+        self.agents = agents
+        self.public_agents = public_agents
+
 
 class Existing_Cluster_Manager(ClusterManager):
     """
