@@ -21,10 +21,12 @@ For example, a test may require a cluster with a certain number of agents, or ce
 - [Test Environment](#test-environment)
   - [Vagrant Quick Start](#vagrant-quick-start)
 - [Cleaning Up](#cleaning-up)
+  - [DC/OS Docker Backend](#dcos-docker-backend)
 - [Troubleshooting](#troubleshooting)
-  - [macOS File Sharing](#macos-file-sharing)
-  - [Out of space errors](#out-of-space-errors)
-  - [Parallelization](#parallelization)
+  - [DC/OS Docker Backend](#dcos-docker-backend-1)
+    - [macOS File Sharing](#macos-file-sharing)
+    - [Out of space errors](#out-of-space-errors)
+- [Parallelization](#parallelization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->

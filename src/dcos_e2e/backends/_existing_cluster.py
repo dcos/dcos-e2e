@@ -3,9 +3,10 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Set
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.node import Node
 
 
 class Existing_Cluster(ClusterBackend):
@@ -34,9 +35,30 @@ class Existing_Cluster_Manager(ClusterManager):
         """
         XXX
         """
-        self.masters = masters
-        self.agents = agents
-        self.public_agents = public_agents
+        self._masters = cluster_backend.masters
+        self._agents = cluster_backend.agents
+        self._public_agents = cluster_backend.public_agents
 
         if not 1 == 2:
             pass
+
+    @property
+    def masters(self) -> Set[Node]:
+        """
+        Return all DC/OS master ``Node``s.
+        """
+        return self._masters
+
+    @property
+    def agents(self) -> Set[Node]:
+        """
+        Return all DC/OS agent ``Node``s.
+        """
+        return self._agents
+
+    @property
+    def public_agents(self) -> Set[Node]:
+        """
+        Return all DC/OS public agent ``Node``s.
+        """
+        return self._public_agents

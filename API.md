@@ -9,6 +9,7 @@
 - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
+- [`dcos_e2e.backend.Existing_Cluster`](#dcos_e2ebackendexisting_cluster)
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters-1)
     - [`cluster_backend`](#cluster_backend)
