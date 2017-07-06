@@ -171,7 +171,7 @@ class TestBadParameters:
 
         expected_error = (
             'No files can be copied to the installer of an existing cluster. '
-            'Therefore, `files_to_copy_to_installer` must be `None` or `{}`.'
+            'Therefore `files_to_copy_to_installer` must be empty.'
         )
 
         assert excinfo.value == expected_error
@@ -199,7 +199,7 @@ class TestBadParameters:
         expected_error = (
             'No files can be copied to the masters of an existing cluster at '
             'install time. '
-            'Therefore, `files_to_copy_to_installer` must be `None` or `{}`.'
+            'Therefore, `files_to_copy_to_masters` must be empty.'
         )
 
         assert excinfo.value == expected_error
@@ -226,7 +226,7 @@ class TestBadParameters:
 
         expected_error = (
             'Nodes are already configured. '
-            'Therefore, `extra_config` must be `None` or `{}`.'
+            'Therefore, `extra_config` must be empty.'
         )
 
         assert excinfo.value == expected_error

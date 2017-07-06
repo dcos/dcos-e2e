@@ -53,25 +53,55 @@ class Existing_Cluster_Manager(ClusterManager):
         self._public_agents = cluster_backend.public_agents
 
         if generate_config_path is not None:
-            pass
+            message = (
+                'Cluster already exists with DC/OS installed. '
+                'Therefore, `generate_config_path` must be `None`.'
+            )
+            raise ValueError(message)
 
         if masters != len(self._masters):
-            pass
+            message = (
+                'The number of master nodes is `1`. '
+                'Therefore, `masters` must be set to `1`.'
+            )
+            raise ValueError(message)
 
         if agents != len(self._agents):
-            pass
+            message = (
+                'The number of agent nodes is `1`. '
+                'Therefore, `agents` must be set to `1`.'
+            )
+            raise ValueError(message)
 
         if public_agents != len(self._public_agents):
-            pass
+            message = (
+                'The number of public agent nodes is `1`. '
+                'Therefore, `public_agents` must be set to `1`.'
+            )
+            raise ValueError(message)
 
         if extra_config not in (None, {}):
-            pass
+            message = (
+                'Nodes are already configured. '
+                'Therefore, `extra_config` must be empty.'
+            )
+            raise ValueError(message)
 
         if files_to_copy_to_installer != {}:
-            pass
+            message = (
+                'No files can be copied to the installer of an existing '
+                'cluster. '
+                'Therefore, `files_to_copy_to_installer` must be empty.'
+            )
+            raise ValueError(message)
 
         if files_to_copy_to_masters != {}:
-            pass
+            message = (
+                'No files can be copied to the masters of an existing cluster '
+                'at install time. '
+                'Therefore, `files_to_copy_to_masters` must be empty.'
+            )
+            raise ValueError(message)
 
     @property
     def masters(self) -> Set[Node]:
