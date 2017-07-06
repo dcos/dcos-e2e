@@ -328,7 +328,8 @@ class TestBadParameters:
         existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If `agents` differs from the number of agents an error is raised.
+        If `public_agents` differs from the number of public agents an error is
+        raised.
         """
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
@@ -336,7 +337,7 @@ class TestBadParameters:
                 generate_config_path=None,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
+                public_agents=len(dcos_cluster.public_agents) + 1,
                 destroy_on_error=False,
                 destroy_on_success=False,
             ):
