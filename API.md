@@ -9,6 +9,7 @@
 - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
+- [`dcos_e2e.backend.ExistingCluster`](#dcos_e2ebackendexistingcluster)
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters-1)
     - [`cluster_backend`](#cluster_backend)
@@ -21,6 +22,7 @@
     - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
     - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
     - [`destroy_on_error`](#destroy_on_error)
+    - [`destroy_on_success`](#destroy_on_success)
   - [Methods](#methods)
     - [`run_integration_tests(pytest_command, env=None)`](#run_integration_testspytest_command-envnone)
     - [`destroy()`](#destroy)
@@ -29,11 +31,14 @@
     - [`masters`](#masters-1)
     - [`agents`](#agents-1)
     - [`public_agents`](#public_agents-1)
-- [Nodes](#nodes)
+- [`dcos_e2e.node.Node`](#dcos_e2enodenode)
+  - [Parameters](#parameters-2)
+    - [`ip_address`](#ip_address)
+    - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
     - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
   - [Attributes](#attributes-1)
-    - [`ip_address`](#ip_address)
+    - [`ip_address`](#ip_address-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
@@ -55,18 +60,42 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
+## `dcos_e2e.backend.ExistingCluster`
+
+This is a backend which can be used to run a `Cluster`.
+It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s.
+This means that it cannot support various operations which rely on access to the start up and teardown mechanisms of a cluster.
+
+As such, various `Cluster` parameters must be set in particular ways.
+
+```python
+ExistingCluster(masters, agents, public_agents)
+```
+
+When creating a `Cluster` with this backend, the following parameter conditions must be true:
+* `generate_config_path` must be `None`,
+* `extra_config` must be `None` or `{}`,
+* `masters` matches the number of master nodes in the existing cluster,
+* `agents` matches the number of agent nodes in the existing cluster,
+* `public_agents` matches the number of public agent nodes in the existing cluster,
+* `destroy_on_error` must be `False`,
+* `destroy_on_success` must be `False`,
+* `files_to_copy_to_installer` must be `None` or `{}`,
+* `files_to_copy_to_masters` must be `None` or `{}`
+
 ## `dcos_e2e.cluster.Cluster`
 
 ```python
 Cluster(
     cluster_backend,
-    generate_config_path,
+    generate_config_path=None,
     extra_config=None,
     masters=1,
     agents=1,
     public_agents=1,
     log_output_live=False,
     destroy_on_error=True,
+    destroy_on_success=False,
     files_to_copy_to_installer=None,
     files_to_copy_to_masters=None,
 )
@@ -121,8 +150,11 @@ On DC/OS Docker the files are mounted, read only, to the masters.
 
 #### `destroy_on_error`
 
-If set to `True`, the cluster is destroyed on exit in all cases.
-If set to `False`, the cluster is preserved if there is an error.
+If set to `True`, the cluster is destroyed on exit if there is an exception raised in the context of the context manager.
+
+#### `destroy_on_success`
+
+If set to `True`, the cluster is destroyed on exit if there is no exception raised in the context of the context manager.
 
 ### Methods
 
@@ -169,9 +201,23 @@ The agent nodes in the cluster.
 
 The public agent nodes in the cluster.
 
-## Nodes
+## `dcos_e2e.node.Node`
 
 Commands can be run on nodes in clusters.
+
+```python
+Node(ip_address, ssh_key_path)
+```
+
+### Parameters
+
+#### `ip_address`
+
+The IP address of the node.
+
+#### `ssh_key_path`
+
+The path to an SSH key which can be used to SSH to the node as the `root` user.
 
 ### Methods
 

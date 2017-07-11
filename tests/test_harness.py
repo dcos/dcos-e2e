@@ -21,66 +21,6 @@ from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
 
-class TestNode:
-    """
-    Tests for interacting with cluster nodes.
-    """
-
-    def test_run_as_root(
-        self,
-        caplog: CaptureLogFuncArg,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
-    ) -> None:
-        """
-        It is possible to run commands as root and see their output.
-        """
-        with Cluster(
-            agents=0,
-            public_agents=0,
-            cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
-        ) as cluster:
-            (master, ) = cluster.masters
-            result = master.run_as_root(args=['echo', '$USER'])
-            assert result.returncode == 0
-            assert result.stdout.strip() == b'root'
-            assert result.stderr == b''
-
-            # Commands which return a non-0 code raise a
-            # ``CalledProcessError``.
-            with pytest.raises(CalledProcessError) as excinfo:
-                master.run_as_root(args=['unset_command'])
-
-            exception = excinfo.value
-            assert exception.returncode == 127
-            assert exception.stdout == b''
-            assert b'command not found' in exception.stderr
-            for record in caplog.records():
-                # The error which caused this exception is not in the debug
-                # log output.
-                if record.levelno == logging.DEBUG:
-                    assert 'unset_command' not in record.getMessage()
-
-            # With `log_output_live`, output is logged and stderr is merged
-            # into stdout.
-            with pytest.raises(CalledProcessError) as excinfo:
-                master.run_as_root(
-                    args=['unset_command'], log_output_live=True
-                )
-
-            exception = excinfo.value
-            assert exception.stderr == b''
-            assert b'command not found' in exception.stdout
-            expected_error_substring = 'unset_command'
-            found_expected_error = False
-            for record in caplog.records():
-                if expected_error_substring in record.getMessage():
-                    if record.levelno == logging.DEBUG:
-                        found_expected_error = True
-            assert found_expected_error
-
-
 class TestIntegrationTests:
     """
     Tests for running integration tests on a node.
@@ -389,20 +329,24 @@ class TestDestroyOnError:
         master.run_as_root(args=['echo', 'hello'], log_output_live=True)
         cluster.destroy()
 
-    def test_set_false_no_exception(
+
+class TestDestroyOnSuccess:
+    """
+    Tests for `destroy_on_success`.
+    """
+
+    def test_default(
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
     ) -> None:
         """
-        If `destroy_on_error` is set to `False` and no exception is raised,
-        the cluster is not destroyed.
+        By default the cluster is destroyed if there is no exception raised.
         """
         with Cluster(
             generate_config_path=oss_artifact,
             agents=0,
             public_agents=0,
-            destroy_on_error=False,
             cluster_backend=cluster_backend,
         ) as cluster:
             cluster.wait_for_dcos()
@@ -410,6 +354,28 @@ class TestDestroyOnError:
 
         with pytest.raises(CalledProcessError):
             master.run_as_root(args=['echo', 'hello'])
+
+    def test_false(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        If `destroy_on_success` is set to `False`, the cluster is
+        preserved if there is no exception raised.
+        """
+        with Cluster(
+            generate_config_path=oss_artifact,
+            agents=0,
+            public_agents=0,
+            cluster_backend=cluster_backend,
+            destroy_on_success=False,
+        ) as cluster:
+            cluster.wait_for_dcos()
+            (master, ) = cluster.masters
+
+        master.run_as_root(args=['echo', 'hello'])
+        cluster.destroy()
 
 
 class TestCopyFiles:
@@ -452,23 +418,3 @@ class TestCopyFiles:
             args = ['cat', str(master_destination_path)]
             result = master.run_as_root(args=args)
             assert result.stdout.decode() == content
-
-
-class TestBadParameters:
-    """
-    Tests for unexpected parameter values.
-    """
-
-    def test_no_installer_file(self, cluster_backend: ClusterBackend) -> None:
-        """
-        If no file exists at the given `generate_config_path`, a `ValueError`
-        is raised.
-        """
-        with pytest.raises(ValueError):
-            with Cluster(
-                cluster_backend=cluster_backend,
-                generate_config_path=Path(str(uuid.uuid4)),
-                agents=0,
-                public_agents=0,
-            ):
-                pass  # pragma: no cover

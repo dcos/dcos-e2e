@@ -12,10 +12,10 @@ import requests
 from requests import codes
 from retry import retry
 
-from ._common import Node
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
+from .node import Node
 
 
 class Cluster(ContextDecorator):
@@ -28,13 +28,14 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
-        generate_config_path: Path,
+        generate_config_path: Path=None,
         extra_config: Optional[Dict[str, Any]]=None,
         masters: int=1,
         agents: int=1,
         public_agents: int=1,
         log_output_live: bool=False,
         destroy_on_error: bool=True,
+        destroy_on_success: bool=True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
         files_to_copy_to_masters: Optional[Dict[Path, Path]]=None,
     ) -> None:
@@ -53,6 +54,8 @@ class Cluster(ContextDecorator):
                 If `True`, stderr is merged into stdout in the return value.
             destroy_on_error: If `False`, the cluster will not be destroyed
                 if there is an exception raised in the context of this object.
+            destroy_on_success: If `False`, the cluster will not be destroyed
+                if there is no exception raised in the context of this object.
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
@@ -61,12 +64,25 @@ class Cluster(ContextDecorator):
                 the master nodes before installing DC/OS.
 
         Raises:
-            ValueError: There is no file at `generate_config_path`.
+            ValueError: `destroy_on_error` or `destroy_on_success` is `True`
+                and the `cluster_backend` does not support being destroyed.
         """
-        if not generate_config_path.exists():
-            raise ValueError()
+        if destroy_on_error and not cluster_backend.supports_destruction:
+            message = (
+                'The given cluster backend does not support being destroyed.'
+                ' Therefore, `destroy_on_error` must be set to `False`.'
+            )
+            raise ValueError(message)
+
+        if destroy_on_success and not cluster_backend.supports_destruction:
+            message = (
+                'The given cluster backend does not support being destroyed.'
+                ' Therefore, `destroy_on_success` must be set to `False`.'
+            )
+            raise ValueError(message)
 
         self._destroy_on_error = destroy_on_error
+        self._destroy_on_success = destroy_on_success
         self._log_output_live = log_output_live
         extra_config = dict(extra_config or {})
 
@@ -215,6 +231,10 @@ class Cluster(ContextDecorator):
         """
         On exiting, destroy all nodes in the cluster.
         """
-        if exc_type is None or self._destroy_on_error:
+        if exc_type is None and self._destroy_on_success:
             self.destroy()
+
+        if exc_type is not None and self._destroy_on_error:
+            self.destroy()
+
         return False

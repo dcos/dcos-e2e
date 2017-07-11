@@ -15,8 +15,9 @@ from typing import Any, Dict, Optional, Set, Type
 import docker
 import yaml
 
-from dcos_e2e._common import Node, run_subprocess
+from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.node import Node
 
 
 def _get_open_port() -> int:
@@ -24,11 +25,7 @@ def _get_open_port() -> int:
     Return a free port.
     """
     host = ''
-    # We ignore type hinting to avoid a bug in `typeshed`.
-    # See https://github.com/python/typeshed/issues/1391.
-    with socket.socket(  # type: ignore
-        socket.AF_INET, socket.SOCK_STREAM
-    ) as new_socket:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as new_socket:
         new_socket.bind((host, 0))
         new_socket.listen(1)
         return int(new_socket.getsockname()[1])
@@ -68,6 +65,13 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         """
         return DCOS_Docker_Cluster
 
+    @property
+    def supports_destruction(self) -> bool:
+        """
+        DC/OS Docker clusters can be destroyed.
+        """
+        return True
+
 
 class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
     """
@@ -76,7 +80,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        generate_config_path: Path,
+        generate_config_path: Optional[Path],
         masters: int,
         agents: int,
         public_agents: int,
@@ -110,7 +114,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+
+        Raises:
+            ValueError: There is no file at `generate_config_path`.
         """
+        if generate_config_path is None or not generate_config_path.exists():
+            raise ValueError()
+
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
