@@ -190,6 +190,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'overlay', 'overlay2', 'aufs'
         ) else 'overlay2'
 
+        self._master_prefix = '{unique}-master-'.format(unique=unique)
+        self._agent_prefix = '{unique}-agent-'.format(unique=unique)
+        self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
+
         self._variables = {
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
@@ -202,9 +206,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
             # Container names.
-            'MASTER_CTR': '{unique}-master-'.format(unique=unique),
-            'AGENT_CTR': '{unique}-agent-'.format(unique=unique),
-            'PUBLIC_AGENT_CTR': '{unique}-public-agent-'.format(unique=unique),
+            'MASTER_CTR': self._master_prefix,
+            'AGENT_CTR': self._agent_prefix,
+            'PUBLIC_AGENT_CTR': self._public_agent_prefix,
             'INSTALLER_CTR': '{unique}-installer'.format(unique=unique),
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
@@ -250,13 +254,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         Destroy all nodes in the cluster.
         """
-        self._make(target='clean')
-        rmtree(
-            path=str(self._path),
-            # Some files may be created in the container that we cannot clean
-            # up.
-            ignore_errors=True,
-        )
+        client = docker.from_env(version='auto')
+        for prefix in (
+            self._master_prefix,
+            self._agent_prefix,
+            self._public_agent_prefix,
+        ):
+            containers = client.containers.list(filters={'name': prefix})
+            for container in containers:
+                container.remove(v=True, force=True)
+
+        rmtree(path=str(self._path), ignore_errors=True)
 
     def _nodes(self, container_base_name: str) -> Set[Node]:
         """
@@ -291,13 +299,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         Return all DC/OS agent ``Node``s.
         """
-        return self._nodes(container_base_name=self._variables['AGENT_CTR'])
+        return self._nodes(container_base_name=self._agent_prefix)
 
     @property
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public agent ``Node``s.
         """
-        return self._nodes(
-            container_base_name=self._variables['PUBLIC_AGENT_CTR'],
-        )
+        return self._nodes(container_base_name=self._public_agent_prefix)
