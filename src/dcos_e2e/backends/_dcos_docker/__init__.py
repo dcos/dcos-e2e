@@ -232,7 +232,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             make_args.append(set_variable)
 
         run_subprocess(
-            args=['make'] + make_args + ['all'],
+            args=['make'] + make_args + ['install'],
             cwd=str(self._path),
             log_output_live=self.log_output_live
         )
