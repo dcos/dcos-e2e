@@ -1,7 +1,11 @@
+# Since this Makefile was not designed with parallel execution in mind, opt
+# out of any parallelism users might enable have via the `make` invocation.
+.NOTPARALLEL:
+
 .DEFAULT_GOAL := all
 include common.mk
 
-.PHONY: all vagrant build build-all start postflight master agent public_agent installer clean-installer genconf registry open-browser preflight deploy clean clean-certs clean-containers clean-slice test hosts clean-hosts
+.PHONY: all vagrant build-base build-base-docker build build-all start postflight master agent public_agent installer clean-installer genconf registry open-browser preflight deploy clean clean-certs clean-containers clean-slice test hosts clean-hosts
 
 # Set the number of DC/OS masters.
 MASTERS := 1
@@ -18,7 +22,9 @@ ALL_AGENTS := $$(( $(PUBLIC_AGENTS)+$(AGENTS) ))
 DISTRO := centos-7
 
 # Installer variables
-CONFIG_FILE := $(CURDIR)/genconf/config.yaml
+GENCONF_DIR_SRC := $(CURDIR)/genconf.src
+GENCONF_DIR := $(CURDIR)/genconf
+CONFIG_FILE := $(GENCONF_DIR)/config.yaml
 DCOS_GENERATE_CONFIG_URL := https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh
 DCOS_GENERATE_CONFIG_PATH := $(CURDIR)/dcos_generate_config.sh
 INSTALLER_PORT := 9000
@@ -28,21 +34,22 @@ INSTALLER_CMD := \
 	bash $(DCOS_GENERATE_CONFIG_PATH) --offline -v
 
 # Bootstrap variables
-BOOTSTRAP_GENCONF_PATH := $(CURDIR)/genconf/serve/
+BOOTSTRAP_GENCONF_PATH := $(GENCONF_DIR)/serve/
 BOOTSTRAP_TMP_PATH := /opt/dcos_install_tmp
 
 # Detect default resolvers inside a docker container.
 RESOLVERS := $(shell docker run --rm alpine cat /etc/resolv.conf | grep '^nameserver.*' | tr -s ' ' | cut -d' ' -f2 | paste -sd ' ' -)
 
 # Local docker systemd service variables
-SERVICE_DIR := $(CURDIR)/include/systemd
-DOCKER_SERVICE_FILE := $(SERVICE_DIR)/docker.service
-
-SBIN_DIR := $(CURDIR)/include/sbin
-DCOS_POSTFLIGHT_FILE := $(SBIN_DIR)/dcos-postflight
+INCLUDE_DIR_SRC := $(CURDIR)/include.src
+INCLUDE_DIR := $(CURDIR)/include
+SERVICE_DIR_SRC := $(INCLUDE_DIR_SRC)/systemd
+SERVICE_DIR := $(INCLUDE_DIR)/systemd
+SBIN_DIR_SRC := $(INCLUDE_DIR_SRC)/sbin
+SBIN_DIR := $(INCLUDE_DIR)/sbin
 
 # Variables for the certs for a registry on the first master node.
-CERTS_DIR := $(CURDIR)/include/certs
+CERTS_DIR := $(INCLUDE_DIR)/certs
 ROOTCA_CERT := $(CERTS_DIR)/cacert.pem
 CLIENT_CSR := $(CERTS_DIR)/client.csr
 CLIENT_KEY := $(CERTS_DIR)/client.key
@@ -50,7 +57,7 @@ CLIENT_CERT := $(CERTS_DIR)/client.cert
 
 # Variables for the ssh keys that will be generated for installing DC/OS in the
 # containers.
-SSH_DIR := $(CURDIR)/include/ssh
+SSH_DIR := $(INCLUDE_DIR)/ssh
 SSH_ALGO := rsa
 SSH_KEY := $(SSH_DIR)/id_$(SSH_ALGO)
 
@@ -80,6 +87,8 @@ SYSTEMD_MOUNTS := \
 VOLUME_MOUNTS := \
 	-v /var/lib/docker \
 	-v /opt
+AGENT_VOLUME_MOUNTS := \
+	-v /var/lib/mesos/slave
 BOOTSTRAP_VOLUME_MOUNT := \
 	-v $(BOOTSTRAP_GENCONF_PATH):$(BOOTSTRAP_TMP_PATH):ro
 TMPFS_MOUNTS := \
@@ -122,18 +131,21 @@ info: ips ## Provides information about the master and agent's ips.
 open-browser: ips ## Opens your browser to the master ip.
 	$(OPEN_CMD) "http://$(firstword $(MASTER_IPS))"
 
-build: generate $(DOCKER_SERVICE_FILE) $(DCOS_POSTFLIGHT_FILE) $(CURDIR)/genconf/ssh_key ## Build the docker image that will be used for the containers.
+build-base: generate $(SERVICE_DIR)/systemd-journald-init.service ## Build the base docker image.
 	@echo "+ Building the base $(DISTRO) image"
 	@$(foreach distro,$(wildcard build/base/$(DISTRO)*/Dockerfile),$(call build_base_image,$(word 3,$(subst /, ,$(distro)))))
 	@docker tag $(DOCKER_IMAGE):base-$(DISTRO) $(DOCKER_IMAGE):base
+
+build-base-docker: build-base $(SERVICE_DIR)/docker.service ## Build the base-docker (base + docker daemon) docker image.
 	@echo "+ Building the base-docker $(DOCKER_VERSION) image"
 	@$(call build_base_docker_image,$(DOCKER_VERSION))
 	@docker tag $(DOCKER_IMAGE):base-docker-$(DOCKER_VERSION) $(DOCKER_IMAGE):base-docker
+
+build: build-base-docker $(GENCONF_DIR)/ip-detect $(SBIN_DIR)/dcos-postflight $(GENCONF_DIR)/ssh_key ## Build the dcos-docker docker image used for all node containers.
 	@echo "+ Building the dcos-docker image"
 	@docker build --rm --force-rm -t $(DOCKER_IMAGE) .
 
-
-build-all: generate ## Build the Dockerfiles for all the various base distros and docker versions.
+build-all: generate ## Build the base and base-docker images for all permutations of distros and docker versions.
 	@echo "+ Building the base images"
 	@$(foreach distro,$(wildcard build/base/*/Dockerfile),$(call build_base_image,$(word 3,$(subst /, ,$(distro)))))
 	@echo "+ Building the base-docker images"
@@ -142,19 +154,26 @@ build-all: generate ## Build the Dockerfiles for all the various base distros an
 generate: $(CURDIR)/build/base ## generate the Dockerfiles for all the base distros.
 	@$(CURDIR)/build/base/generate.sh
 
-$(SSH_DIR):
+$(SSH_DIR): $(INCLUDE_DIR)
 	@mkdir -p $@
 
 $(SSH_KEY): $(SSH_DIR)
 	@ssh-keygen -f $@ -t $(SSH_ALGO) -N ''
 
-$(CURDIR)/genconf/ssh_key: $(SSH_KEY)
+$(GENCONF_DIR)/ssh_key: $(SSH_KEY)
 	@cp $(SSH_KEY) $@
 
 start: build clean-certs $(CERTS_DIR) clean-containers master agent public_agent installer
 
 postflight: ## Polls DC/OS until it is healthy (5m timeout)
-	@docker exec $(INTERACTIVE) $(MASTER_CTR)1 dcos-postflight
+	@echo "+ Checking master nodes"
+	$(foreach NUM,$(shell [[ $(MASTERS) == 0 ]] || seq 1 1 $(MASTERS)),$(call postflight_container,$(MASTER_CTR),$(NUM)))
+	@echo "+ DC/OS Healthy (Master Nodes)"
+	@echo "+ Checking agent nodes"
+	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(MASTERS)),$(call postflight_container,$(AGENT_CTR),$(NUM)))
+	@echo "+ Checking public agent nodes"
+	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(MASTERS)),$(call postflight_container,$(PUBLIC_AGENT_CTR),$(NUM)))
+	@echo "+ DC/OS Healthy (All Nodes)"
 
 master: ## Starts the containers for DC/OS masters.
 	@echo "+ Starting master nodes"
@@ -169,11 +188,11 @@ $(MESOS_SLICE):
 
 agent: $(MESOS_SLICE) ## Starts the containers for DC/OS agents.
 	@echo "+ Starting agent nodes"
-	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(AGENTS)),$(call start_dcos_container,$(AGENT_CTR),$(NUM),$(TMPFS_MOUNTS) $(SYSTEMD_MOUNTS) $(CERT_MOUNTS) $(HOME_MOUNTS) $(VOLUME_MOUNTS)))
+	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(AGENTS)),$(call start_dcos_container,$(AGENT_CTR),$(NUM),$(TMPFS_MOUNTS) $(SYSTEMD_MOUNTS) $(CERT_MOUNTS) $(HOME_MOUNTS) $(VOLUME_MOUNTS) $(AGENT_VOLUME_MOUNTS)))
 
 public_agent: $(MESOS_SLICE) ## Starts the containers for DC/OS public agents.
 	@echo "+ Starting public agent nodes"
-	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(PUBLIC_AGENTS)),$(call start_dcos_container,$(PUBLIC_AGENT_CTR),$(NUM),$(TMPFS_MOUNTS) $(SYSTEMD_MOUNTS) $(CERT_MOUNTS) $(HOME_MOUNTS) $(VOLUME_MOUNTS)))
+	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(PUBLIC_AGENTS)),$(call start_dcos_container,$(PUBLIC_AGENT_CTR),$(NUM),$(TMPFS_MOUNTS) $(SYSTEMD_MOUNTS) $(CERT_MOUNTS) $(HOME_MOUNTS) $(VOLUME_MOUNTS) $(AGENT_VOLUME_MOUNTS)))
 
 $(DCOS_GENERATE_CONFIG_PATH):
 	curl --fail --location --show-error -o $@ $(DCOS_GENERATE_CONFIG_URL)
@@ -183,26 +202,38 @@ installer: $(DCOS_GENERATE_CONFIG_PATH) ## Downloads the DC/OS installer.
 clean-installer: ## Removes the DC/OS installer
 	rm -f $(DCOS_GENERATE_CONFIG_PATH)
 
+$(GENCONF_DIR):
+	@mkdir -p $@
+
+$(GENCONF_DIR)/ip-detect: $(GENCONF_DIR) ## Writes the ip-detect script to return node IP.
+	@cp $(GENCONF_DIR_SRC)/ip-detect $@
+	@chmod +x $@
+
+$(INCLUDE_DIR):
+	@mkdir -p $@
+
 $(CONFIG_FILE): ips ## Writes the config file for the currently running containers.
 	$(eval export CONFIG_BODY)
 	echo "$$CONFIG_BODY" > $@
 
-$(SERVICE_DIR):
+$(SERVICE_DIR): $(INCLUDE_DIR)
 	@mkdir -p $@
 
-$(DOCKER_SERVICE_FILE): $(SERVICE_DIR) ## Writes the docker service file so systemd can run docker in our containers.
+$(SERVICE_DIR)/docker.service: $(SERVICE_DIR) ## Writes the docker service file so systemd can run docker in our containers.
 	$(eval export DOCKER_SERVICE_BODY)
 	echo "$$DOCKER_SERVICE_BODY" > $@
 
-$(SBIN_DIR):
+$(SERVICE_DIR)/systemd-journald-init.service: $(SERVICE_DIR) ## Writes the systemd-journald-init service file so /run/log/journal has the correct permissions.
+	@cp $(SERVICE_DIR_SRC)/systemd-journald-init.service $@
+
+$(SBIN_DIR): $(INCLUDE_DIR)
 	@mkdir -p $@
 
-export DCOS_POSTFLIGHT_BODY
-$(DCOS_POSTFLIGHT_FILE): $(SBIN_DIR) ## Writes the dc/os postflight script to verify installation.
-	@echo "$$DCOS_POSTFLIGHT_BODY" > $@
+$(SBIN_DIR)/dcos-postflight: $(SBIN_DIR) ## Writes the dc/os postflight script to verify installation.
+	@cp $(SBIN_DIR_SRC)/dcos-postflight $@
 	@chmod +x $@
 
-$(CERTS_DIR):
+$(CERTS_DIR): $(INCLUDE_DIR)
 	@mkdir -p $@
 
 $(CERTS_DIR)/openssl-ca.cnf: $(CERTS_DIR)
@@ -301,18 +332,19 @@ clean-slice: ## Removes and cleanups up the systemd slice for the mesos executor
 		sudo rm -f $(MESOS_SLICE); \
 	fi
 
-clean: clean-certs clean-containers clean-slice ## Stops all containers and removes all generated files for the cluster.
-	$(RM) $(CURDIR)/genconf/ssh_key
-	$(RM) $(CONFIG_FILE)
-	$(RM) -r $(SSH_DIR)
-	$(RM) -r $(SBIN_DIR)
+clean: clean-containers clean-slice clean-certs ## Stops all containers and removes all generated files for the cluster.
+	$(RM) -r $(GENCONF_DIR)
+	$(RM) -r $(INCLUDE_DIR)
 	$(RM) dcos-genconf.*.tar
-	$(RM) -r $(SERVICE_DIR)
 
 # Use SSH to execute tests because docker run/exec has a bug that breaks unbuffered pytest output.
 # https://github.com/moby/moby/issues/8755 - Fixed in Docker 17.06+
 test: ips ## Executes the integration tests
-	@ssh -i $(CURDIR)/genconf/ssh_key -l root -p 22 -o StrictHostKeyChecking=no $(firstword $(MASTER_IPS)) " \
+	@[[ -f ~/.ssh/known_hosts ]] && grep -q $(firstword $(MASTER_IPS)) ~/.ssh/known_hosts && ( \
+		echo "Removing known host: $(firstword $(MASTER_IPS))" && \
+		sed -i"" -e '/$(firstword $(MASTER_IPS))/d' ~/.ssh/known_hosts \
+	) || true
+	@ssh -i $(GENCONF_DIR)/ssh_key -l root -p 22 -o StrictHostKeyChecking=no $(firstword $(MASTER_IPS)) " \
 		set -o errexit -o nounset -o pipefail && \
         source /opt/mesosphere/environment.export && \
         source /opt/mesosphere/active/dcos-integration-test/util/test_env.export || \
@@ -406,7 +438,7 @@ endef
 # Define the function for building a base distro's Dockerfile.
 # @param distro	  Distro to build the base Dockerfile for.
 define build_base_image
-docker build --rm --force-rm -t $(DOCKER_IMAGE):base-$(1) build/base/$(1)/;
+docker build --rm --force-rm -t $(DOCKER_IMAGE):base-$(1) --file build/base/$(1)/Dockerfile .;
 docker tag  $(DOCKER_IMAGE):base-$(1) $(DOCKER_IMAGE):$(firstword $(subst -, ,$(1)));
 endef
 
@@ -467,51 +499,11 @@ check_time: false
 $(EXTRA_GENCONF_CONFIG)
 endef
 
-# Define the postflight script to wait until DC/OS is up and running
-define DCOS_POSTFLIGHT_BODY
-#!/usr/bin/env bash
-shopt -s nullglob
-
-# Run the DC/OS diagnostic script for up to the specified number of seconds to ensure
-# we do not return ERROR on a cluster that hasn't fully achieved quorum.
-TIMEOUT_SECONDS="$${1:-900}"
-function await() {
-    until OUT=$$($${CMD} 2>&1) || [[ TIMEOUT_SECONDS -eq 0 ]]; do
-        sleep 5
-        let TIMEOUT_SECONDS=TIMEOUT_SECONDS-5
-    done
-    RETCODE=$$?
-    if [[ "$${RETCODE}" != "0" ]]; then
-        echo "DC/OS Unhealthy\\n\$${OUT}" >&2
-        exit $${RETCODE}
-    fi
-}
-CMD="curl --insecure --fail --location --silent http://127.0.0.1/"
-echo "Polling web server ($${TIMEOUT_SECONDS}s timeout)..." >&2
-await
-if [[ -e "/opt/mesosphere/bin/dcos-diagnostics" ]]; then
-    # DC/OS >= 1.10
-    CMD="/opt/mesosphere/bin/dcos-diagnostics --diag"
-elif [[ -e "/opt/mesosphere/bin/3dt" ]]; then
-    # DC/OS <= 1.9
-    CMD="/opt/mesosphere/bin/3dt --diag"
-    # 3dt --diag will complain about missing endpoints_config.json if not
-    # passed explicitly. This error is not influencing the diagnostics status.
-    # This is a bug, which has been fixed in DC/OS >= 1.10
-    cfg_files=( /opt/mesosphere/etc/dcos-3dt-endpoint-config*.json )
-    cfg_files+=( /opt/mesosphere/endpoints_config*.json )
-    cfg_files+=( /opt/mesosphere/etc/endpoints_config*.json )
-    if [ $${#cfg_files[@]} -gt 0 ]; then
-        CMD="$${CMD} --endpoint-config=$${cfg_files[0]}"
-    fi
-elif [[ -e "/opt/mesosphere/bin/dcos-diagnostics.py" ]]; then
-    # DC/OS <= 1.6
-    CMD="/opt/mesosphere/bin/dcos-diagnostics.py"
-else
-    echo "Postflight Failure: either 3dt or dcos-diagnostics.py must be present"
-    exit 1
-fi
-echo "Polling component status ($${TIMEOUT_SECONDS}s timeout)..." >&2
-await
-echo "DC/OS Healthy" >&2
+# Define the function to run postflight on a specific node.
+# @param name	  First part of the container name.
+# @param number	  ID of the container.
+define postflight_container
+@echo "+ Checking node health ($(1)$(2))"
+@docker exec $(INTERACTIVE) $(1)$(2) dcos-postflight
+@echo "+ Node Healthy ($(1)$(2))"
 endef
