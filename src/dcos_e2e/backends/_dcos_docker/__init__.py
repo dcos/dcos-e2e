@@ -267,9 +267,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             with ``container_base_name``.
         """
         client = docker.from_env(version='auto')
-        containers = client.containers.list(
-            filters={'name': container_base_name}
-        )
+        filters = {'name': container_base_name}
+        containers = client.containers.list(filters=filters)
+
         return set(
             Node(
                 ip_address=IPv4Address(
