@@ -284,18 +284,14 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         Return all DC/OS master ``Node``s.
         """
-        return self._nodes(
-            container_base_name=self._variables['MASTER_CTR'],
-        )
+        return self._nodes(container_base_name=self._variables['MASTER_CTR'])
 
     @property
     def agents(self) -> Set[Node]:
         """
         Return all DC/OS agent ``Node``s.
         """
-        return self._nodes(
-            container_base_name=self._variables['AGENT_CTR'],
-        )
+        return self._nodes(container_base_name=self._variables['AGENT_CTR'])
 
     @property
     def public_agents(self) -> Set[Node]:
