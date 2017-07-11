@@ -117,6 +117,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         Raises:
             ValueError: There is no file at `generate_config_path`.
+            CalledProcessError: The step to create and install containers
+                exited with a non-zero code.
         """
         if generate_config_path is None or not generate_config_path.exists():
             raise ValueError()
@@ -194,7 +196,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         self._agent_prefix = '{unique}-agent-'.format(unique=unique)
         self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
 
-        self._variables = {
+        variables = {
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
             'DOCKER_STORAGEDRIVER': storage_driver,
@@ -220,32 +222,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'HOME_MOUNTS': '',
         }  # type: Dict[str, str]
 
-        self._make(target='all')
-
-    def _make(self, target: str) -> None:
-        """
-        Run `make` in the DC/OS Docker directory using variables associated
-        with this instance.
-
-        Args:
-            target: `make` target to run.
-
-        Raises:
-            CalledProcessError: The process exited with a non-zero code.
-        """
-        args = ['make']
-
-        # See https://stackoverflow.com/a/7860705 for details on escaping Make
-        # variables.
-        for key, value in self._variables.items():
+        make_args = []
+        for key, value in variables.items():
+            # See https://stackoverflow.com/a/7860705 for details on escaping
+            # Make variables.
             escaped_value = value.replace('$', '$$')
             escaped_value = escaped_value.replace('#', '\\#')
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
-            args.append(set_variable)
-        args.append(target)
+            make_args.append(set_variable)
 
         run_subprocess(
-            args=args,
+            args=['make'] + make_args + ['all'],
             cwd=str(self._path),
             log_output_live=self.log_output_live
         )
@@ -256,9 +243,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         client = docker.from_env(version='auto')
         for prefix in (
-            self._master_prefix,
-            self._agent_prefix,
-            self._public_agent_prefix,
+            self._master_prefix, self._agent_prefix, self._public_agent_prefix,
         ):
             containers = client.containers.list(filters={'name': prefix})
             for container in containers:
@@ -292,7 +277,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         Return all DC/OS master ``Node``s.
         """
-        return self._nodes(container_base_name=self._variables['MASTER_CTR'])
+        return self._nodes(container_base_name=self._master_prefix)
 
     @property
     def agents(self) -> Set[Node]:
