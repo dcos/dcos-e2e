@@ -258,32 +258,26 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ignore_errors=True,
         )
 
-    def _nodes(self, container_base_name: str, num_nodes: int) -> Set[Node]:
+    def _nodes(self, container_base_name: str) -> Set[Node]:
         """
         Args:
             container_base_name: The start of the container names.
-            num_nodes: The number of nodes.
 
         Returns: ``Node``s corresponding to containers with names starting
             with ``container_base_name``.
         """
         client = docker.from_env(version='auto')
-        nodes = set([])  # type: Set[Node]
-
-        while len(nodes) < num_nodes:
-            container_name = '{container_base_name}{number}'.format(
-                container_base_name=container_base_name,
-                number=len(nodes) + 1,
-            )
-            container = client.containers.get(container_name)
-            ip_address = container.attrs['NetworkSettings']['IPAddress']
-            node = Node(
-                ip_address=IPv4Address(ip_address),
+        containers = client.containers.list(
+            filters={'name': container_base_name}
+        )
+        return set(
+            Node(
+                ip_address=IPv4Address(
+                    container.attrs['NetworkSettings']['IPAddress']
+                ),
                 ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
-            )
-            nodes.add(node)
-
-        return nodes
+            ) for container in containers
+        )
 
     @property
     def masters(self) -> Set[Node]:
@@ -292,7 +286,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         return self._nodes(
             container_base_name=self._variables['MASTER_CTR'],
-            num_nodes=int(self._variables['MASTERS']),
         )
 
     @property
@@ -302,7 +295,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         return self._nodes(
             container_base_name=self._variables['AGENT_CTR'],
-            num_nodes=int(self._variables['AGENTS']),
         )
 
     @property
@@ -312,5 +304,4 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         return self._nodes(
             container_base_name=self._variables['PUBLIC_AGENT_CTR'],
-            num_nodes=int(self._variables['PUBLIC_AGENTS']),
         )
