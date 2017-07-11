@@ -8,7 +8,7 @@ import socket
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from shutil import copyfile, copytree, ignore_patterns, rmtree
+from shutil import copyfile, copytree, rmtree
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Optional, Set, Type
 
@@ -55,7 +55,11 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
-        self.workspace_dir = workspace_dir
+        self.workspace_dir = Path(
+            TemporaryDirectory(
+                dir=(str(workspace_dir) if workspace_dir else None)
+            ).name
+        )
 
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
@@ -137,22 +141,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        self._path = Path(
-            TemporaryDirectory(
-                suffix=unique,
-                dir=(
-                    str(cluster_backend.workspace_dir)
-                    if cluster_backend.workspace_dir else None
-                ),
-            ).name
-        )
+        self._path = cluster_backend.workspace_dir
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
             dst=str(self._path),
-            # If there is already a config, we do not copy it as it will be
-            # overwritten and therefore copying it is wasteful.
-            ignore=ignore_patterns('dcos_generate_config.sh'),
         )
 
         # Files in the DC/OS Docker directory's genconf directory are mounted
