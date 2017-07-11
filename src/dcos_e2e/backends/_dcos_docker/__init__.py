@@ -117,6 +117,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         Raises:
             ValueError: There is no file at `generate_config_path`.
+            CalledProcessError: The step to create and install containers
+                exited with a non-zero code.
         """
         if generate_config_path is None or not generate_config_path.exists():
             raise ValueError()
@@ -190,7 +192,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'overlay', 'overlay2', 'aufs'
         ) else 'overlay2'
 
-        self._variables = {
+        self._master_prefix = '{unique}-master-'.format(unique=unique)
+        self._agent_prefix = '{unique}-agent-'.format(unique=unique)
+        self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
+
+        variables = {
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
             'DOCKER_STORAGEDRIVER': storage_driver,
@@ -202,9 +208,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'AGENTS': str(agents),
             'PUBLIC_AGENTS': str(public_agents),
             # Container names.
-            'MASTER_CTR': '{unique}-master-'.format(unique=unique),
-            'AGENT_CTR': '{unique}-agent-'.format(unique=unique),
-            'PUBLIC_AGENT_CTR': '{unique}-public-agent-'.format(unique=unique),
+            'MASTER_CTR': self._master_prefix,
+            'AGENT_CTR': self._agent_prefix,
+            'PUBLIC_AGENT_CTR': self._public_agent_prefix,
             'INSTALLER_CTR': '{unique}-installer'.format(unique=unique),
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
@@ -216,32 +222,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'HOME_MOUNTS': '',
         }  # type: Dict[str, str]
 
-        self._make(target='all')
-
-    def _make(self, target: str) -> None:
-        """
-        Run `make` in the DC/OS Docker directory using variables associated
-        with this instance.
-
-        Args:
-            target: `make` target to run.
-
-        Raises:
-            CalledProcessError: The process exited with a non-zero code.
-        """
-        args = ['make']
-
-        # See https://stackoverflow.com/a/7860705 for details on escaping Make
-        # variables.
-        for key, value in self._variables.items():
+        make_args = []
+        for key, value in variables.items():
+            # See https://stackoverflow.com/a/7860705 for details on escaping
+            # Make variables.
             escaped_value = value.replace('$', '$$')
             escaped_value = escaped_value.replace('#', '\\#')
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
-            args.append(set_variable)
-        args.append(target)
+            make_args.append(set_variable)
 
         run_subprocess(
-            args=args,
+            args=['make'] + make_args + ['install'],
             cwd=str(self._path),
             log_output_live=self.log_output_live
         )
@@ -250,67 +241,54 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         Destroy all nodes in the cluster.
         """
-        self._make(target='clean')
-        rmtree(
-            path=str(self._path),
-            # Some files may be created in the container that we cannot clean
-            # up.
-            ignore_errors=True,
-        )
+        client = docker.from_env(version='auto')
+        for prefix in (
+            self._master_prefix, self._agent_prefix, self._public_agent_prefix,
+        ):
+            containers = client.containers.list(filters={'name': prefix})
+            for container in containers:
+                container.remove(v=True, force=True)
 
-    def _nodes(self, container_base_name: str, num_nodes: int) -> Set[Node]:
+        rmtree(path=str(self._path), ignore_errors=True)
+
+    def _nodes(self, container_base_name: str) -> Set[Node]:
         """
         Args:
             container_base_name: The start of the container names.
-            num_nodes: The number of nodes.
 
         Returns: ``Node``s corresponding to containers with names starting
             with ``container_base_name``.
         """
         client = docker.from_env(version='auto')
-        nodes = set([])  # type: Set[Node]
+        filters = {'name': container_base_name}
+        containers = client.containers.list(filters=filters)
 
-        while len(nodes) < num_nodes:
-            container_name = '{container_base_name}{number}'.format(
-                container_base_name=container_base_name,
-                number=len(nodes) + 1,
-            )
-            container = client.containers.get(container_name)
-            ip_address = container.attrs['NetworkSettings']['IPAddress']
-            node = Node(
-                ip_address=IPv4Address(ip_address),
+        return set(
+            Node(
+                ip_address=IPv4Address(
+                    container.attrs['NetworkSettings']['IPAddress']
+                ),
                 ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
-            )
-            nodes.add(node)
-
-        return nodes
+            ) for container in containers
+        )
 
     @property
     def masters(self) -> Set[Node]:
         """
         Return all DC/OS master ``Node``s.
         """
-        return self._nodes(
-            container_base_name=self._variables['MASTER_CTR'],
-            num_nodes=int(self._variables['MASTERS']),
-        )
+        return self._nodes(container_base_name=self._master_prefix)
 
     @property
     def agents(self) -> Set[Node]:
         """
         Return all DC/OS agent ``Node``s.
         """
-        return self._nodes(
-            container_base_name=self._variables['AGENT_CTR'],
-            num_nodes=int(self._variables['AGENTS']),
-        )
+        return self._nodes(container_base_name=self._agent_prefix)
 
     @property
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public agent ``Node``s.
         """
-        return self._nodes(
-            container_base_name=self._variables['PUBLIC_AGENT_CTR'],
-            num_nodes=int(self._variables['PUBLIC_AGENTS']),
-        )
+        return self._nodes(container_base_name=self._public_agent_prefix)
