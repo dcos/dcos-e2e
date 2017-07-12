@@ -21,6 +21,7 @@ oss
 postflight
 pragma
 pytest
+src
 stderr
 stdout
 str
