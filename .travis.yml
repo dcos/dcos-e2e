@@ -64,7 +64,7 @@ before_script:
     - "make clean"
     - "make lint"
     - "if [[ $UPDATE_DCOS_DOCKER == 'true' ]]; then make update-dcos-docker; fi"
-    - "travis_retry if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts; fi"
+    - "travis_retry if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts; fi"
 
 script:
     # We only run tests on one Python because they are slow.
