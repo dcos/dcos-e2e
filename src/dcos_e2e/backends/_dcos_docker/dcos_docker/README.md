@@ -68,7 +68,7 @@ Host Docker storage drivers of `overlay` and `aufs` are supported automatically.
 1. (**Mac-only**) Modify the DC/OS installer to support BSD sed:
 
     ```console
-    sed -i="" -E -e 'H;1h;$!d;x' -e "s/sed '0,/sed '1,/" dcos_generate_config.sh
+    sed -i"" -E -e 'H;1h;$!d;x' -e "s/sed '0,/sed '1,/" dcos_generate_config.sh
     ```
 
     See [Mac Compatible installers](#mac-compatible-installers) for more details.
@@ -106,6 +106,21 @@ Host Docker storage drivers of `overlay` and `aufs` are supported automatically.
     ```
 
 For other make commands, see `make help`.
+
+## DC/OS Login
+
+DC/OS uses OAuth for authentication, configured through [Auth0](https://auth0.com/) by default.
+
+Use a Google, Github, Microsoft email account to authenticate.
+
+### Enterprise DC/OS Login
+
+Enterprise DC/OS uses built-in identity and access management (IAM), instead of OAuth.
+
+For dcos-docker, the superuser account is pre-configured:
+
+- Username: `admin`
+- Password: `admin`
 
 ## Network Routing
 
@@ -259,47 +274,6 @@ One reason to use Docker 1.13.1 might be to use the `overlay2` storage driver,
 which is not supported by Docker 1.11.2.
 See [Storage Driver](#storage-driver) for details.
 
-## Troubleshooting
-
-Oh dear, you must be in an unfortunate position. You have a few options with
-regard to debugging your container cluster.
-
-If the containers are currently running then the best option is to `docker exec`
-into the master or agent and poke around. Here is an example of that:
-
-```console
-$ docker exec -it dcos-docker-master1 bash
-
-# list the systemd units
-[root@dcos-docker-master1 /]# systemctl list-units
-...
-dbus.socket                         loaded active     running         D-Bus System Message Bus Socket
-systemd-fail.service                loaded failed     exited          Journal Audit Socket
-systemd-journald-dev-log.socket     loaded active     running         Journal Socket (/dev/log)
-systemd-journald.socket             loaded active     running         Journal Socket
-basic.target                        loaded active     active          Basic System
-dcos.target                         loaded active     active          dcos.target
-local-fs.target                     loaded active     active          Local File Systems
-...
-
-# find the failed unit and get the status
-[root@dcos-docker-master1 /]# systemctl status systemd-fail
-
-# get the logs from journald
-[root@dcos-docker-master1 /]# journalctl -xefu systemd-fail
-```
-
-For the `dcos-spartan` service to start successfully, make sure that
-you have dummy net driver support (`CONFIG_DUMMY`) enabled in your kernel.
-Most standard distribution kernels should have this by default. On some
-older kernels you may need to manually install this module with
-`modprobe dummy` before starting the container cluster.
-
-## Docker out of space
-
-```
-docker volume prune
-```
 
 ## Github Pull Request (PR) Labels
 
@@ -324,7 +298,7 @@ DC/OS installers are not immediately compatible with the BSD sed that ships with
 1. Modify the installer with the following script:
 
     ```
-    sed -i="" -E -e 'H;1h;$!d;x' -e "s/sed '0,/sed '1,/" dcos_generate_config.sh
+    sed -i"" -E -e 'H;1h;$!d;x' -e "s/sed '0,/sed '1,/" dcos_generate_config.sh
     ```
 
 2. Install GNU sed with Homebrew:
@@ -334,3 +308,7 @@ DC/OS installers are not immediately compatible with the BSD sed that ships with
     ```
 
     Warning: This method will make GNU sed the default sed, which may have unforeseen side-effects.
+
+## Troubleshooting
+
+See [`the troubleshooting document`](./troubleshooting.md) for details.
