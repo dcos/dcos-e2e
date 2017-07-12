@@ -153,8 +153,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ignore=ignore_patterns('dcos_generate_config.sh'),
         )
 
-        # Files in the DC/OS Docker directory's genconf directory are mounted
-        # to the installer at `/genconf`.
+        # Files in the DC/OS Docker directory's `genconf.src` directory are
+        # mounted to the installer at `/genconf`.
         # Therefore, every file which we want to copy to `/genconf` on the
         # installer is put into the genconf directory in DC/OS Docker.
         # The way to fix this if we want to be able to put files anywhere is
