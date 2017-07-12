@@ -7,6 +7,7 @@ language: "python"
 
 python:
     - "3.5"
+    - "3.6"
 
 env:
   # Travis has a maximum test run time of 50 minutes.
@@ -34,11 +35,16 @@ env:
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
       # This test class uses one scoped cluster so we run it on one builder.
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
+      # We run some testst with an updated DC/OS Docker.
+      # We run just enough to give us confidence that we will probably find most errors.
+      - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest UPDATE_DCOS_DOCKER=true"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
     #     travis encrypt --repo adamtheturtle/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
-    secure: "H1P6GG9HmZxEZlt+vwOvmK6RD9OmVYRnh93hBYFUcUqpAoklfIyt5kaex4vh2n4mowmsn101oINjPIXAlbHZ+iN344kPCvbr7vDcvQfo73DbqwfhzN//TLFL4ToYaOqs7ruNhsnFWaDOWakULu/A+Mx6s8sj1khyAqbFMfRjCoMoTkGSk7McjkEvYusRo12rM7fp2JvG+QRspet6V01HFyi5g+JbcNdHkzUyWcOaUOGHdWLAzlR50vnj6F9pMFD3DKIo/oVe3Qnm8YORE6L9rzoHJ7sVdOLYS3sbg9oTANc6OcBN8wofyr6tKCls8oF0GdDtY0j7nYBXiUj0ka7gxQftaoyeNtbyueilU2zq15sy9UcXfEldJXP7MXyU023FhGWL7jApwQWqBmLzPixCje2jWWRX7NjeVr12yH6KDBlHlweo17EyEKYLEPh6qnlgvsE1LLi8xS0gvtt6uMEiupcdalhxNiqGqfHP+FtxlCoKK1/9m9+EP0mXCi60KSN2Xgbm+5ti2y0JjCRm0v3VS9S3ozZD52YFqINF9ICvdL8zyF5FsikXLxNY5yGqRPr2JpoGLC3PmjkSsGTZ2ueOf4yB7IB0cNSMxp7ySjXqXuUG3m8iSns/D9aHLCX9HnE3UnN96TZDllOfCgER/FSk+pvUiS123FNgNgOvJxPNRC8="
+    - "UPDATE_DCOS_DOCKER=false"
+    - secure: "H1P6GG9HmZxEZlt+vwOvmK6RD9OmVYRnh93hBYFUcUqpAoklfIyt5kaex4vh2n4mowmsn101oINjPIXAlbHZ+iN344kPCvbr7vDcvQfo73DbqwfhzN//TLFL4ToYaOqs7ruNhsnFWaDOWakULu/A+Mx6s8sj1khyAqbFMfRjCoMoTkGSk7McjkEvYusRo12rM7fp2JvG+QRspet6V01HFyi5g+JbcNdHkzUyWcOaUOGHdWLAzlR50vnj6F9pMFD3DKIo/oVe3Qnm8YORE6L9rzoHJ7sVdOLYS3sbg9oTANc6OcBN8wofyr6tKCls8oF0GdDtY0j7nYBXiUj0ka7gxQftaoyeNtbyueilU2zq15sy9UcXfEldJXP7MXyU023FhGWL7jApwQWqBmLzPixCje2jWWRX7NjeVr12yH6KDBlHlweo17EyEKYLEPh6qnlgvsE1LLi8xS0gvtt6uMEiupcdalhxNiqGqfHP+FtxlCoKK1/9m9+EP0mXCi60KSN2Xgbm+5ti2y0JjCRm0v3VS9S3ozZD52YFqINF9ICvdL8zyF5FsikXLxNY5yGqRPr2JpoGLC3PmjkSsGTZ2ueOf4yB7IB0cNSMxp7ySjXqXuUG3m8iSns/D9aHLCX9HnE3UnN96TZDllOfCgER/FSk+pvUiS123FNgNgOvJxPNRC8="
+
 
 before_install:
     - "pip install --upgrade pip setuptools codecov"
@@ -57,10 +63,13 @@ cache: "pip"
 before_script:
     - "make clean"
     - "make lint"
-    - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
+    - "if [[ $UPDATE_DCOS_DOCKER == 'true' ]]; then make update-dcos-docker; fi"
+    - "travis_retry if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts; fi"
 
 script:
-    - 'pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
+    # We only run tests on one Python because they are slow.
+    # We lint with multiple Python versions.
+    - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then pytest -vvv -s $TEST_PATTERN --cov=src --cov=tests; fi"
 
 after_success:
     - "codecov"
