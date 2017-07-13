@@ -66,3 +66,13 @@ download-artifacts:
 .PHONY: toc
 toc:
 	npm run doctoc *.md --github --notitle
+
+# DC/OS Docker is vendored in this repository using git subtree.
+# To update DC/OS Docker, use the following command.
+.PHONY: toc
+update-dcos-docker:
+	git subtree pull \
+	    --prefix src/dcos_e2e/backends/_dcos_docker/dcos_docker \
+	    --squash \
+	    git@github.com:dcos/dcos-docker.git \
+	    master
