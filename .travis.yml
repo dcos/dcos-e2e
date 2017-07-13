@@ -6,6 +6,8 @@ services:
 language: "python"
 
 python:
+    # We care that the tests pass on Python 3.5 as this is what DC/OS runs on.
+    # We lint on newer Python to gain some confidence that we could upgrade.
     - "3.5"
 
 env:
@@ -34,6 +36,11 @@ env:
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
       # This test class uses one scoped cluster so we run it on one builder.
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
+  include:
+      - python: "3.6"
+        env: 'TEST_PATTERN=""'
+      - python: "nightly"
+        env: 'TEST_PATTERN=""'
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
@@ -57,10 +64,10 @@ cache: "pip"
 before_script:
     - "make clean"
     - "make lint"
-    - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
+    - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' ]]; then travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts; fi"
 
 script:
-    - 'pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
+    - "if [[ $TRAVIS_PYTHON_VERSION == '3.5' && $TEST_PATTERN != \"\" ]]; then pytest -vvv -s $TEST_PATTERN --cov=src --cov=tests; fi"
 
 after_success:
     - "codecov"
