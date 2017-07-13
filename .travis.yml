@@ -47,16 +47,16 @@ env:
 
 
 before_install:
-    - "pip install --upgrade pip setuptools codecov"
-    - "sudo apt-get update"
+    - "travis_retry pip install --upgrade pip setuptools codecov"
+    - "travis_retry sudo apt-get update"
       # Ideally we would use `addons.apt.packages` for enchant but this is not
       # supported by the linter.
-    - "sudo apt-get install docker-ce enchant"
+    - "travis_retry sudo apt-get install docker-ce enchant"
     - "travis_retry npm -g install npm@latest"
 
 install:
-    - "pip install --upgrade --editable .[dev]"
-    - "npm install"
+    - "travis_retry pip install --upgrade --editable .[dev]"
+    - "travis_retry npm install"
 
 cache: "pip"
 
