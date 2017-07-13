@@ -78,6 +78,8 @@ disable=line-too-long,
         invalid-sequence-index,
         # Let isort deal with sorting
         ungrouped-imports,
+        # Let pydocstyle deal with docstrings
+        missing-docstring,
         # We don't need everything to be documented because of mypy
         missing-type-doc,
         missing-returns-doc,
@@ -91,9 +93,9 @@ disable=line-too-long,
         # This is a pain for test files where tests are separated into
         # classes.
         no-self-use,
-		# This cannot be overridden when pylint is overzealous.
-		# See https://github.com/PyCQA/pylint/issues/214.
-		duplicate-code,
+        # This cannot be overridden when pylint is overzealous.
+        # See https://github.com/PyCQA/pylint/issues/214.
+        duplicate-code,
 
 [REPORTS]
 
