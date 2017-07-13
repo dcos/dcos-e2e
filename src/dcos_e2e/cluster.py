@@ -112,10 +112,12 @@ class Cluster(ContextDecorator):
         """
         diagnostics_args = [
             '/opt/mesosphere/bin/dcos-diagnostics',
-            '--diag',
-            '||',
-            '/opt/mesosphere/bin/3dt',
-            '--diag',
+            'check',
+            'node-poststart',
+            '&&',
+            '/opt/mesosphere/bin/dcos-diagnostics',
+            'check',
+            'cluster',
         ]
 
         for node in self.masters:
