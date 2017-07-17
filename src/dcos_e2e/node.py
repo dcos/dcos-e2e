@@ -67,19 +67,19 @@ class Node:
             # Suppress warnings.
             # In particular, we don't care about remote host identification
             # changes.
-            "-q",
+            '-q',
             # The node may be an unknown host.
-            "-o",
-            "StrictHostKeyChecking=no",
+            '-o',
+            'StrictHostKeyChecking=no',
             # Use an SSH key which is authorized.
-            "-i",
+            '-i',
             str(self._ssh_key_path),
             # Run commands as the root user.
-            "-l",
-            "root",
+            '-l',
+            'root',
             # Bypass password checking.
-            "-o",
-            "PreferredAuthentications=publickey",
+            '-o',
+            'PreferredAuthentications=publickey',
             str(self.ip_address),
         ] + command
 
