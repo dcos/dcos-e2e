@@ -6,7 +6,7 @@ isort==4.2.15
 mypy==0.520
 passlib==1.7.1
 pydocstyle==2.0.0
-pyenchant==1.6.9
+pyenchant==1.6.10
 py==1.4.34
 pylint==1.7.2
 pytest==3.1.3
