@@ -95,7 +95,7 @@ Cluster(
     public_agents=1,
     log_output_live=False,
     destroy_on_error=True,
-    destroy_on_success=False,
+    destroy_on_success=True,
     files_to_copy_to_installer=None,
     files_to_copy_to_masters=None,
 )
