@@ -18,14 +18,14 @@ class TestNode:
     Tests for interacting with cluster nodes.
     """
 
-    def test_run_as_root(
+    def test_run(
         self,
         caplog: CaptureLogFuncArg,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
     ) -> None:
         """
-        It is possible to run commands as root and see their output.
+        It is possible to run commands as a given user and see their output.
         """
         with Cluster(
             agents=0,
@@ -34,15 +34,36 @@ class TestNode:
             generate_config_path=oss_artifact,
         ) as cluster:
             (master, ) = cluster.masters
-            result = master.run_as_root(args=['echo', '$USER'])
+            result = master.run(args=['echo', '$USER'], user='root')
             assert result.returncode == 0
             assert result.stdout.strip() == b'root'
+            assert result.stderr == b''
+
+            # The user is configurable.
+            # Create a user.
+            result = master.run(args=['adduser', 'testuser'], user='root')
+            assert result.returncode == 0
+            # Prepare the user account for public key SSH access from the test
+            result = master.run(
+                args=['cp', '-a', '/root/.ssh', '/home/adduser/.ssh'],
+                user='root'
+            )
+            assert result.returncode == 0
+            result = master.run(
+                args=['chown', '-R', 'adduser', '/home/adduser/.ssh'],
+                user='root'
+            )
+            assert result.returncode == 0
+            # Confirm that commands can be run as the new user.
+            result = master.run(args=['echo', '$USER'], user='testuser')
+            assert result.returncode == 0
+            assert result.stdout.strip() == b'testuser'
             assert result.stderr == b''
 
             # Commands which return a non-0 code raise a
             # ``CalledProcessError``.
             with pytest.raises(CalledProcessError) as excinfo:
-                master.run_as_root(args=['unset_command'])
+                master.run(args=['unset_command'], user='root')
 
             exception = excinfo.value
             assert exception.returncode == 127
@@ -57,8 +78,8 @@ class TestNode:
             # With `log_output_live`, output is logged and stderr is merged
             # into stdout.
             with pytest.raises(CalledProcessError) as excinfo:
-                master.run_as_root(
-                    args=['unset_command'], log_output_live=True
+                master.run(
+                    args=['unset_command'], user='root', log_output_live=True
                 )
 
             exception = excinfo.value
