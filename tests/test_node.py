@@ -41,7 +41,9 @@ class TestNode:
 
             # The user is configurable.
             # Create a user.
-            adduser_result = master.run(args=['adduser', 'testuser'], user='root')
+            adduser_result = master.run(
+                args=['adduser', 'testuser'], user='root'
+            )
             assert adduser_result.returncode == 0
             # Prepare the user account for public key SSH access from the test
             cp_result = master.run(
