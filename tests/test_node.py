@@ -34,31 +34,31 @@ class TestNode:
             generate_config_path=oss_artifact,
         ) as cluster:
             (master, ) = cluster.masters
-            result = master.run(args=['echo', '$USER'], user='root')
-            assert result.returncode == 0
-            assert result.stdout.strip() == b'root'
-            assert result.stderr == b''
+            echo_result = master.run(args=['echo', '$USER'], user='root')
+            assert echo_result.returncode == 0
+            assert echo_result.stdout.strip() == b'root'
+            assert echo_result.stderr == b''
 
             # The user is configurable.
             # Create a user.
-            result = master.run(args=['adduser', 'testuser'], user='root')
-            assert result.returncode == 0
+            adduser_result = master.run(args=['adduser', 'testuser'], user='root')
+            assert adduser_result.returncode == 0
             # Prepare the user account for public key SSH access from the test
-            result = master.run(
+            cp_result = master.run(
                 args=['cp', '-a', '/root/.ssh', '/home/adduser/.ssh'],
                 user='root'
             )
-            assert result.returncode == 0
-            result = master.run(
+            assert cp_result.returncode == 0
+            chown_result = master.run(
                 args=['chown', '-R', 'adduser', '/home/adduser/.ssh'],
                 user='root'
             )
-            assert result.returncode == 0
+            assert chown_result.returncode == 0
             # Confirm that commands can be run as the new user.
-            result = master.run(args=['echo', '$USER'], user='testuser')
-            assert result.returncode == 0
-            assert result.stdout.strip() == b'testuser'
-            assert result.stderr == b''
+            echo_result2 = master.run(args=['echo', '$USER'], user='testuser')
+            assert echo_result2.returncode == 0
+            assert echo_result2.stdout.strip() == b'testuser'
+            assert echo_result2.stderr == b''
 
             # Commands which return a non-0 code raise a
             # ``CalledProcessError``.
