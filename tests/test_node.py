@@ -32,6 +32,7 @@ class TestNode:
             public_agents=0,
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            destroy_on_error=False,
         ) as cluster:
             (master, ) = cluster.masters
             echo_result = master.run(args=['echo', '$USER'], user='root')
@@ -46,16 +47,26 @@ class TestNode:
             )
             assert adduser_result.returncode == 0
             # Prepare the user account for public key SSH access from the test
+            mkdir_result = master.run(
+                args=['mkdir', '-p', '/home/testuser'], user='root'
+            )
+            assert mkdir_result.returncode == 0
             cp_result = master.run(
-                args=['cp', '-a', '/root/.ssh', '/home/adduser/.ssh'],
+                args=['cp', '-a', '/root/.ssh', '/home/testuser/.ssh'],
                 user='root'
             )
             assert cp_result.returncode == 0
             chown_result = master.run(
-                args=['chown', '-R', 'adduser', '/home/adduser/.ssh'],
+                args=['chown', '-R', 'testuser', '/home/testuser/.ssh'],
                 user='root'
             )
             assert chown_result.returncode == 0
+            # Remove stray nologin file that prevents non-root SSH.
+            # https://ubuntuforums.org/showthread.php?t=2327330
+            rm_result = master.run(
+                args=['rm', '-f', '/run/nologin'], user='root'
+            )
+            assert rm_result.returncode == 0
             # Confirm that commands can be run as the new user.
             echo_result2 = master.run(args=['echo', '$USER'], user='testuser')
             assert echo_result2.returncode == 0
