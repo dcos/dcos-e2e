@@ -87,13 +87,13 @@ See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/RE
 Download dependencies which are used by the tests:
 
 ```
-make download-dependencies
+make download-artifacts
 ```
 
 or, to additionally download a DC/OS Enterprise artifact, run the following:
 
 ```
-make EE_ARTIFACT_URL=<http://...> download-dependencies
+make EE_ARTIFACT_URL=<http://...> download-artifacts
 ```
 
 The DC/OS Enterprise artifact is required for some tests.
