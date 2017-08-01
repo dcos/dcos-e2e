@@ -121,7 +121,7 @@ class Cluster(ContextDecorator):
         for node in self.masters:
             node.run_as_root(
                 args=diagnostics_args,
-                log_output_live=self._log_output_live,
+                log_output_live=False,
             )
 
             url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
