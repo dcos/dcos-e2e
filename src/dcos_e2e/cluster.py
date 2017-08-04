@@ -203,6 +203,14 @@ class Cluster(ContextDecorator):
             '&&',
         ]
 
+        env = env or {}
+        environment_variables = {
+            'MASTER_HOSTS': ','.join(map(str, self.masters)),
+            'SLAVE_HOSTS': ','.join(map(str, self.agents)),
+            'PUBLIC_SLAVE_HOSTS': ','.join(map(str, self.public_agents)),
+            **env,
+        }
+
         args += pytest_command
 
         # Tests are run on a random master node.
@@ -211,7 +219,7 @@ class Cluster(ContextDecorator):
         return test_host.run_as_root(
             args=args,
             log_output_live=self._log_output_live,
-            env=env,
+            env=environment_variables,
         )
 
     def destroy(self) -> None:
