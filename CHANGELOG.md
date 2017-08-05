@@ -19,6 +19,10 @@
 
 # Changelog
 
+## 2017.08.05.0
+
+* The Enterprise DC/OS integration tests now require environment variables describing the IP addresses of the cluster. Now passes these environment variables.
+
 ## 2017.06.23.0
 
 * Wait for 5 minutes after diagnostics check.
