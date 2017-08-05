@@ -4,7 +4,7 @@ Setup script for DC/OS End to End tests.
 
 from setuptools import find_packages, setup
 
-VERSION = '2017.06.23.0'
+VERSION = '2017.08.05.0'
 
 with open('requirements.txt') as requirements:
     INSTALL_REQUIRES = []

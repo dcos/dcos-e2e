@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [2017.08.05.0](#201708050)
   - [2017.06.23.0](#201706230)
   - [2017.06.22.0](#201706220)
   - [2017.06.21.1](#201706211)
@@ -18,6 +19,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## 2017.08.05.0
+
+* The Enterprise DC/OS integration tests now require environment variables describing the IP addresses of the cluster. Now passes these environment variables.
 
 ## 2017.06.23.0
 
