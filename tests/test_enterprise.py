@@ -8,6 +8,9 @@ from pathlib import Path
 
 import pytest
 from passlib.hash import sha512_crypt
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -48,6 +51,34 @@ class TestEnterpriseIntegrationTests:
                     'DCOS_LOGIN_PW': superuser_password,
                 },
             )
+
+
+class TestCopyFiles:
+    """
+    Tests for copying files to nodes.
+    """
+
+    def test_copy_files_to_installers(
+        self,
+        cluster_backend: ClusterBackend,
+        tmpdir: local,
+        enterprise_artifact: Path,
+    ) -> None:
+        """
+        Files can be copied from the host to the installer nodes at creation
+        time.
+        """
+        files_to_copy_to_installer = {
+            source_path: Path('/genconf/on_installer.txt'),
+        }
+        with Cluster(
+            cluster_backend=cluster_backend,
+            generate_config_path=enterprise_artifact,
+            files_to_copy_to_installer=files_to_copy_to_installer,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            cluster.wait_for_dcos()
 
 
 class TestWaitForDCOS:
