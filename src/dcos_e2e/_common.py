@@ -63,7 +63,7 @@ def run_subprocess(
                 process.communicate()
             else:
                 stdout, stderr = process.communicate()
-        except:  # pragma: no cover
+        except:  # noqa: B001 pragma: no cover
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
             process.kill()

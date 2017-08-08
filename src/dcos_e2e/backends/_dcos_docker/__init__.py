@@ -164,7 +164,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # `-v` mounts.
         # Then `INSTALLER_MOUNTS` can be added to DC/OS Docker.
         genconf_dir = self._path / 'genconf'
-        genconf_dir.mkdir(exist_ok=True)
+        # We wrap this in `Path` to work around
+        # https://github.com/PyCQA/pylint/issues/224.
+        Path(genconf_dir).mkdir(exist_ok=True)
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = genconf_dir / relative_installer_path
