@@ -56,7 +56,7 @@ class TestWaitForDCOS:
     """
 
     @pytest.mark.xfail(
-        reason="See https://jira.mesosphere.com/browse/DCOS_OSS-1313",
+        reason='See https://jira.mesosphere.com/browse/DCOS_OSS-1313',
         raises=AssertionError,
     )
     def test_auth_with_cli(
@@ -86,13 +86,13 @@ class TestWaitForDCOS:
             (master, ) = cluster.masters
             cluster.wait_for_dcos()
             setup_args = [
-                "dcos",
-                "cluster",
-                "setup",
+                'dcos',
+                'cluster',
+                'setup',
                 'https://' + str(master.ip_address),
-                "--no-check",
-                "--username={username}".format(username=superuser_username),
-                "--password={password}".format(password=superuser_password),
+                '--no-check',
+                '--username={username}'.format(username=superuser_username),
+                '--password={password}'.format(password=superuser_password),
             ]
 
             setup = subprocess.run(

@@ -69,7 +69,7 @@ toc:
 
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.
-.PHONY: toc
+.PHONY: update-dcos-docker
 update-dcos-docker:
 	git subtree pull \
 	    --prefix src/dcos_e2e/backends/_dcos_docker/dcos_docker \
