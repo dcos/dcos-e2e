@@ -75,8 +75,6 @@ class TestCopyFiles:
 
         See CA certificate tests in Enterprise DC/OS for more details.
         """
-        cert_dir_on_host = Path('certificates')
-
         cert_filename = 'dcos-ca-certificate.crt'
         key_filename = 'dcos-ca-certificate-key.key'
 
@@ -84,6 +82,7 @@ class TestCopyFiles:
         installer_cert_path = genconf / cert_filename
         installer_key_path = genconf / key_filename
 
+        cert_dir_on_host = Path('tests/certificates')
         cert_path = cert_dir_on_host / cert_filename
         ca_key_path = cert_dir_on_host / key_filename
 
