@@ -6,7 +6,7 @@ import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
 from time import sleep
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 import requests
 from requests import codes
@@ -204,10 +204,14 @@ class Cluster(ContextDecorator):
         ]
 
         env = env or {}
+
+        def ip_addresses(nodes: Iterable[Node]) -> str:
+            return ','.join(map(lambda node: str(node.ip_address), nodes))
+
         environment_variables = {
-            'MASTER_HOSTS': ','.join(map(str, self.masters)),
-            'SLAVE_HOSTS': ','.join(map(str, self.agents)),
-            'PUBLIC_SLAVE_HOSTS': ','.join(map(str, self.public_agents)),
+            'MASTER_HOSTS': ip_addresses(self.masters),
+            'SLAVE_HOSTS': ip_addresses(self.agents),
+            'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
             **env,
         }
 
