@@ -12,4 +12,4 @@ pylint==1.7.2
 pytest==3.2.1
 pytest-capturelog==0.7
 pytest-cov==2.5.1  # Measure code coverage
-yapf==0.16.3
+yapf==0.17.0
