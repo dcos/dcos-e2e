@@ -6,7 +6,7 @@ import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
 from time import sleep
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 import requests
 from requests import codes
@@ -205,6 +205,18 @@ class Cluster(ContextDecorator):
             '&&',
         ]
 
+        env = env or {}
+
+        def ip_addresses(nodes: Iterable[Node]) -> str:
+            return ','.join(map(lambda node: str(node.ip_address), nodes))
+
+        environment_variables = {
+            'MASTER_HOSTS': ip_addresses(self.masters),
+            'SLAVE_HOSTS': ip_addresses(self.agents),
+            'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
+            **env,
+        }
+
         args += pytest_command
 
         # Tests are run on a random master node.
@@ -213,7 +225,7 @@ class Cluster(ContextDecorator):
         return test_host.run_as_root(
             args=args,
             log_output_live=self._log_output_live,
-            env=env,
+            env=environment_variables,
         )
 
     def destroy(self) -> None:

@@ -5,6 +5,9 @@
 
 
 - [Changelog](#changelog)
+  - [2017.08.11.0](#201708110)
+  - [2017.08.08.0](#201708080)
+  - [2017.08.05.0](#201708050)
   - [2017.06.23.0](#201706230)
   - [2017.06.22.0](#201706220)
   - [2017.06.21.1](#201706211)
@@ -18,6 +21,18 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## 2017.08.11.0
+
+* Fix bug where `Node` `repr`s were put into environment variables rather than IP addresses. This prevented some integration tests from working.
+
+## 2017.08.08.0
+
+* Fixed issue which prevented `files_to_copy_to_installer` from working.
+
+## 2017.08.05.0
+
+* The Enterprise DC/OS integration tests now require environment variables describing the IP addresses of the cluster. Now passes these environment variables.
 
 ## 2017.06.23.0
 
