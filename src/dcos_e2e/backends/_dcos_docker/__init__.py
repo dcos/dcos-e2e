@@ -247,7 +247,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         client = docker.from_env(version='auto')
         for prefix in (
-            self._master_prefix, self._agent_prefix, self._public_agent_prefix,
+            self._master_prefix,
+            self._agent_prefix,
+            self._public_agent_prefix,
         ):
             containers = client.containers.list(filters={'name': prefix})
             for container in containers:
