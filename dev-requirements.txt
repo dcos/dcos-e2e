@@ -10,6 +10,6 @@ pyenchant==1.6.11
 py==1.4.34
 pylint==1.7.2
 pytest==3.2.1
-pytest-capturelog==0.7
+pytest-catchlog==1.2.2
 pytest-cov==2.5.1  # Measure code coverage
 yapf==0.16.3

@@ -15,7 +15,7 @@ import pytest
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
-from pytest_capturelog import CaptureLogFuncArg
+from pytest_catchlog import CompatLogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -209,7 +209,7 @@ class TestClusterLogging:
 
     def test_live_logging(
         self,
-        caplog: CaptureLogFuncArg,
+        caplog: CompatLogCaptureFixture,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
     ) -> None:
@@ -226,11 +226,11 @@ class TestClusterLogging:
             ):
                 pass  # pragma: no cover
 
-        assert self._two_masters_error_logged(log_records=caplog.records())
+        assert self._two_masters_error_logged(log_records=caplog.records)
 
     def test_no_live_logging(
         self,
-        caplog: CaptureLogFuncArg,
+        caplog: CompatLogCaptureFixture,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
     ) -> None:
@@ -247,7 +247,7 @@ class TestClusterLogging:
             ):
                 pass  # pragma: no cover
 
-        assert not self._two_masters_error_logged(log_records=caplog.records())
+        assert not self._two_masters_error_logged(log_records=caplog.records)
 
 
 class TestMultipleClusters:
