@@ -7,7 +7,7 @@ from pathlib import Path
 from subprocess import CalledProcessError
 
 import pytest
-from pytest_capturelog import CaptureLogFuncArg
+from pytest_catchlog import CompatLogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -20,7 +20,7 @@ class TestNode:
 
     def test_run_as_root(
         self,
-        caplog: CaptureLogFuncArg,
+        caplog: CompatLogCaptureFixture,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
     ) -> None:
@@ -48,7 +48,7 @@ class TestNode:
             assert exception.returncode == 127
             assert exception.stdout == b''
             assert b'command not found' in exception.stderr
-            for record in caplog.records():
+            for record in caplog.records:
                 # The error which caused this exception is not in the debug
                 # log output.
                 if record.levelno == logging.DEBUG:
@@ -66,7 +66,7 @@ class TestNode:
             assert b'command not found' in exception.stdout
             expected_error_substring = 'unset_command'
             found_expected_error = False
-            for record in caplog.records():
+            for record in caplog.records:
                 if expected_error_substring in record.getMessage():
                     if record.levelno == logging.DEBUG:
                         found_expected_error = True
