@@ -9,8 +9,7 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 lint-python-only:
 	flake8 .
 	isort --recursive --check-only
-	yapf --diff --recursive src/ tests/ | \
-	    python -c 'import sys; result = sys.stdin.read(); assert not result, result;'
+	yapf --diff --recursive src/ tests/
 	mypy src/ tests/
 	pydocstyle
 	pylint *.py src/dcos_e2e/ tests/

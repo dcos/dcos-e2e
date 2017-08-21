@@ -100,7 +100,8 @@ class Cluster(ContextDecorator):
 
     @retry(
         exceptions=(
-            subprocess.CalledProcessError, ValueError,
+            subprocess.CalledProcessError,
+            ValueError,
             requests.exceptions.ConnectionError,
         ),
         tries=500,
