@@ -111,9 +111,6 @@ class Cluster(ContextDecorator):
         Wait until DC/OS has started and all nodes have joined the cluster.
         """
         diagnostics_args = [
-            'source',
-            '/opt/mesosphere/environment.export',
-            '&&',
             '/opt/mesosphere/bin/dcos-diagnostics',
             'check',
             'node-poststart',
@@ -127,6 +124,10 @@ class Cluster(ContextDecorator):
             node.run_as_root(
                 args=diagnostics_args,
                 log_output_live=self._log_output_live,
+                env={
+                    'LC_ALL': 'en_US.UTF-8',
+                    'LANG': 'en_US.UTF-8',
+                }
             )
 
             url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
