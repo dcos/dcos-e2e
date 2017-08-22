@@ -118,6 +118,9 @@ class Cluster(ContextDecorator):
             '/opt/mesosphere/bin/dcos-diagnostics',
             'check',
             'cluster',
+            'mesos-leader',
+            'marathon-leader',
+            'metronome-leader',
         ]
 
         for node in self.masters:
