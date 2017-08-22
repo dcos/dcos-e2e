@@ -140,16 +140,6 @@ class Cluster(ContextDecorator):
                 )
                 raise ValueError(message)
 
-        # Ideally we would use diagnostics checks as per
-        # https://jira.mesosphere.com/browse/DCOS_OSS-1276
-        # and these would wait long enough.
-        #
-        # However, until then, there is a race condition with the cluster.
-        # This is not always caught by the tests.
-        #
-        # For now we sleep for 5 minutes as this has been shown to be enough.
-        sleep(60 * 5)
-
     def __enter__(self) -> 'Cluster':
         """
         Enter a context manager.
