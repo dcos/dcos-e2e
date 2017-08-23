@@ -5,6 +5,7 @@ Tests for managing DC/OS cluster nodes.
 import logging
 from pathlib import Path
 from subprocess import CalledProcessError
+from time import sleep
 
 import pytest
 from pytest_catchlog import CompatLogCaptureFixture
@@ -71,3 +72,46 @@ class TestNode:
                     if record.levelno == logging.DEBUG:
                         found_expected_error = True
             assert found_expected_error
+
+    # An arbitrary time slice that is longer than it takes to spin up a cluster
+    # but avoids bash infinite loops.
+    @pytest.mark.timeout(60 * 15)
+    def test_popen_as_root(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        It is possible to run commands as root asynchronously
+        """
+        with Cluster(
+            agents=0,
+            public_agents=0,
+            cluster_backend=cluster_backend,
+            generate_config_path=oss_artifact,
+        ) as cluster:
+            (master, ) = cluster.masters
+            popen_1 = master.popen_as_root(
+                args=[
+                    '(mkfifo', '/tmp/pipe', '|', 'true)'
+                    '&&', '(cat', '/tmp/pipe)'
+                ]
+            )
+            sleep(1)
+            popen_2 = master.popen_as_root(
+                args=[
+                    '(mkfifo', '/tmp/pipe', '|', 'true)'
+                    '&&', '(echo', 'foo', '>', '/tmp/pipe)'
+                ]
+            )
+
+            stdout, _ = popen_1.communicate()
+            return_code_1 = popen_1.poll()
+
+            # Needed to cleanly terminate second subprocess
+            popen_2.communicate()
+            return_code_2 = popen_2.poll()
+
+            assert stdout == b'foo\n'
+            assert return_code_1 == 0
+            assert return_code_2 == 0

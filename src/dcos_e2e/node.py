@@ -4,10 +4,10 @@ Tools for managing DC/OS cluster nodes.
 
 from ipaddress import IPv4Address
 from pathlib import Path
-from subprocess import CompletedProcess
+from subprocess import PIPE, CompletedProcess, Popen
 from typing import Dict, List, Optional
 
-from ._common import run_subprocess
+from ._common import compose_ssh_command, run_subprocess
 
 
 class Node:
@@ -51,36 +51,30 @@ class Node:
         Raises:
             CalledProcessError: The process exited with a non-zero code.
         """
-        env = dict(env or {})
-
-        command = []
-
-        for key, value in env.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
-            command.append(export)
-            command.append('&&')
-
-        command += args
-
-        ssh_args = [
-            'ssh',
-            # Suppress warnings.
-            # In particular, we don't care about remote host identification
-            # changes.
-            '-q',
-            # The node may be an unknown host.
-            '-o',
-            'StrictHostKeyChecking=no',
-            # Use an SSH key which is authorized.
-            '-i',
-            str(self._ssh_key_path),
-            # Run commands as the root user.
-            '-l',
-            'root',
-            # Bypass password checking.
-            '-o',
-            'PreferredAuthentications=publickey',
-            str(self.ip_address),
-        ] + command
+        ssh_args = compose_ssh_command(
+            self.ip_address, self._ssh_key_path, args, env
+        )
 
         return run_subprocess(args=ssh_args, log_output_live=log_output_live)
+
+    def popen_as_root(self, args: List[str],
+                      env: Optional[Dict]=None) -> Popen:
+        """
+        Open a pipe to a command run on a node as `root`.
+
+        Args:
+            args: The command to run on the node.
+            env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
+
+        Returns:
+            The pipe object attached to the specified process.
+        """
+        ssh_args = compose_ssh_command(
+            self.ip_address, self._ssh_key_path, args, env
+        )
+
+        process = Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+
+        return process
