@@ -17,10 +17,7 @@ lint-python-only:
 .PHONY: lint-docs
 lint-docs:
 	npm run lint-md *.md 2>&1 | \
-	    python -c '\
-		import sys; \
-		result = sys.stdin.read(); \
-		assert "warning" not in result, result'
+	    python -c 'import sys; result = sys.stdin.read(); assert "warning" not in result, result'
 	# Add ToCs and if there is a diff on Travis, error because we don't
 	# want to ship docs without an up to date ToC
 	if [ "${TRAVIS}" = "true" ] ; then \
