@@ -28,17 +28,19 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(
+    def run(
         self,
         args: List[str],
+        user: str,
         log_output_live: bool=False,
         env: Optional[Dict]=None,
     ) -> CompletedProcess:
         """
-        Run a command on this node as `root`.
+        Run a command on this node as a specific user.
 
         Args:
             args: The command to run on the node.
+            user: The username to SSH as.
             log_output_live: If `True`, log output live. If `True`, stderr is
                 merged into stdout in the return value.
             env: Environment variables to be set on the node before running
@@ -76,7 +78,7 @@ class Node:
             str(self._ssh_key_path),
             # Run commands as the root user.
             '-l',
-            'root',
+            user,
             # Bypass password checking.
             '-o',
             'PreferredAuthentications=publickey',

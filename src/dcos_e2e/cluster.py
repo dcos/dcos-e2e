@@ -120,8 +120,9 @@ class Cluster(ContextDecorator):
         ]
 
         for node in self.masters:
-            node.run_as_root(
+            node.run(
                 args=diagnostics_args,
+                user='root',
                 log_output_live=self._log_output_live,
             )
 
@@ -221,8 +222,9 @@ class Cluster(ContextDecorator):
         # Tests are run on a random master node.
         test_host = next(iter(self.masters))
 
-        return test_host.run_as_root(
+        return test_host.run(
             args=args,
+            user='root',
             log_output_live=self._log_output_live,
             env=environment_variables,
         )
