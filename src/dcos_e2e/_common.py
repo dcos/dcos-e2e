@@ -3,6 +3,8 @@ Common utilities for end to end tests.
 """
 
 import logging
+from ipaddress import IPv4Address
+from pathlib import Path
 from subprocess import (
     PIPE,
     STDOUT,
@@ -10,7 +12,7 @@ from subprocess import (
     CompletedProcess,
     Popen,
 )
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
@@ -76,3 +78,60 @@ def run_subprocess(
                 retcode, args, output=stdout, stderr=stderr
             )
     return CompletedProcess(args, retcode, stdout, stderr)
+
+
+def compose_ssh_command(
+    ip_address: IPv4Address,
+    ssh_key_path: Path,
+    args: List[str],
+    env: Optional[Dict]=None,
+) -> List[str]:
+    """
+    Run the specified command on the given host using ssh.
+
+    Args:
+        ip_address: The IP address of the node.
+        ssh_key_path: The path to an SSH key which can be used to SSH to
+            the node as the `root` user.
+        args: The command to run on the node.
+        env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
+
+    Returns:
+        Full ssh command to be run (ssh arguments + environment variables +
+        other arguments).
+    """
+    env = dict(env or {})
+
+    command = []
+
+    for key, value in env.items():
+        export = "export {key}='{value}'".format(key=key, value=value)
+        command.append(export)
+        command.append('&&')
+
+    command += args
+
+    ssh_args = [
+        'ssh',
+        # Suppress warnings.
+        # In particular, we don't care about remote host identification
+        # changes.
+        '-q',
+        # The node may be an unknown host.
+        '-o',
+        'StrictHostKeyChecking=no',
+        # Use an SSH key which is authorized.
+        '-i',
+        str(ssh_key_path),
+        # Run commands as the root user.
+        '-l',
+        'root',
+        # Bypass password checking.
+        '-o',
+        'PreferredAuthentications=publickey',
+        str(ip_address),
+    ] + command
+
+    return ssh_args
