@@ -37,6 +37,7 @@
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
     - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
+    - [`node.popen_as_root(args, env=None) -> Popen`](#nodepopen_as_rootargs-envnone---popen)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address-1)
 
@@ -229,6 +230,13 @@ To see these logs in `pytest` tests, use the `-s` flag.
 
 `env` is an optional mapping of environment variable names to values.
 These environment variables will be set on the node before running the command specified in `args`.
+
+#### `node.popen_as_root(args, env=None) -> Popen`
+
+`env` is an optional mapping of environment variable names to values.
+These environment variables will be set on the node before running the command specified in `args`.
+
+The method returns a `Popen` object that can be used to communicate to the underlying subprocess.
 
 ### Attributes
 
