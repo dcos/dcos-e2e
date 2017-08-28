@@ -243,7 +243,3 @@ The method returns a `Popen` object that can be used to communicate to the under
 #### `ip_address`
 
 The IP address of the node.
-
-#### `ssh_key_path`
-
-The path to an SSH key which can be used to SSH to the node as the `root` user.
