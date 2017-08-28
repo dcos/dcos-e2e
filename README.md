@@ -79,7 +79,8 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to t
 ## Test Environment
 
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
-See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
+For more information about `DC/OS Docker` see the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
+To run unit tests see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 ### Vagrant Quick Start
 
