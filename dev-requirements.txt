@@ -1,5 +1,5 @@
 autoflake==0.7
-dcoscli==0.5.4
+dcoscli==0.5.5
 flake8==3.4.1
 flake8-quotes==0.11.0
 isort==4.2.15
