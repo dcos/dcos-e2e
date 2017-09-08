@@ -1,8 +1,8 @@
-[![Build Status](https://travis-ci.org/adamtheturtle/dcos-e2e.svg?branch=master)](https://travis-ci.org/adamtheturtle/dcos-e2e)
+[![Build Status](https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master)](https://travis-ci.org/mesosphere/dcos-e2e)
 
-[![Requirements Status](https://requires.io/github/adamtheturtle/dcos-e2e/requirements.svg?branch=master)](https://requires.io/github/adamtheturtle/dcos-e2e/requirements/?branch=master)
+[![Requirements Status](https://requires.io/github/mesosphere/dcos-e2e/requirements.svg?branch=master)](https://requires.io/github/mesosphere/dcos-e2e/requirements/?branch=master)
 
-[![codecov](https://codecov.io/gh/adamtheturtle/dcos-e2e/branch/master/graph/badge.svg)](https://codecov.io/gh/adamtheturtle/dcos-e2e)
+[![codecov](https://codecov.io/gh/mesosphere/dcos-e2e/branch/master/graph/badge.svg)](https://codecov.io/gh/mesosphere/dcos-e2e)
 
 # DC/OS End to End tests
 
@@ -39,7 +39,7 @@ See "Test Environment".
 To create tests using clusters with custom configurations, first install the harness:
 
 ```sh
-pip install git+https://github.com/adamtheturtle/dcos-e2e.git@master
+pip install git+https://github.com/mesosphere/dcos-e2e.git@master
 ```
 
 Then, create a test, such as the following:
@@ -107,7 +107,7 @@ vagrant/resize-disk.sh 102400
 Then create a virtual environment:
 
 ```
-vagrant ssh -c 'curl https://raw.githubusercontent.com/adamtheturtle/dcos-e2e/master/vagrant_create_env.sh | /bin/bash'
+vagrant ssh -c 'curl https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/vagrant_create_env.sh | /bin/bash'
 ```
 
 Then, to enter the environment, run the following:
