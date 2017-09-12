@@ -1,7 +1,4 @@
 sudo: required
-language: python
-python:
-- '3.5'
 before_script:
 - echo $EE_ARTIFACT_URL
 - export EE_ARTIFACT_URL="X"
