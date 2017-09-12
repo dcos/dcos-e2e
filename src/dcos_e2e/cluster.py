@@ -104,8 +104,8 @@ class Cluster(ContextDecorator):
             ValueError,
             requests.exceptions.ConnectionError,
         ),
-        tries=500,
-        delay=5,
+        tries=150,
+        delay=20,
     )
     def wait_for_dcos(self) -> None:
         """
