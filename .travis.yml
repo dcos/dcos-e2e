@@ -35,11 +35,11 @@ env:
       # - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
       # # This test class uses one scoped cluster so we run it on one builder.
       # - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
-  # global:
-  #   # The encrypted URL for a DC/OS Enterprise artifact.
-  #   # Generate this by running:
-  #   #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
-  #   - secure: "UwUXSjaD1V2OkWTtOAAGZyZ0EezH2Di1Ol+KhBkNS6ZD1TiLA0oXEtl07t8VB9/E/vT6McgFSQfgMx77X5H81O2puUYsynAiurz8eMe5n44Akd09EdSH3eXoAD03C8hDsejmVtMkKXQLgCzkqRZ0YGUxAu/5zXBOoEBrSYHBodjRP1UNAnpE0fIqsVIbHYV2+Ak+TyFMfhZu8sFNVDE2t4E90V4ihnm/iMOvhUkpZESpV8TZQPs1aTrVh3pdTAsP1THaGP/Ld2gR7QacWK+ZjTujvsdWh1XCMHEQ5B13tpN+ZDGv0tSyVF+B/4i09kU3v6wUV0OItbYP5x1eYKK+CeFlLFSzz7FYUsNxmMwRL6cnHIUU/ECEGERBarMKp0+XGQw5PJN1ilNPdTa3/u0W8W82xZbvB+5nnQs9VJqwH9l3DiOihD5Xq7IPITGYs2gKlHpheF8ku4m6zJDRUqOV407Z7/HOVI/5pPTZUCs34+FKB2yn+BH6/q9iuSSo2zYA3gd1poIsTHP5FGpS5YdqP8NxHJL/tw+U4IGKzUOIQWnRz7tvZW+7Blgvoos5DDqJIUNdaztPNDMQT/QPMB6rUz4059ULkq6Pnt9Y6OdynkMeLXAPZKmqp3XSlycWOIhv1k9sQD/g+hL/qnfiVWP1F22Vaw7n9TPjjo4O7ROR+eE="
+  global:
+    # The encrypted URL for a DC/OS Enterprise artifact.
+    # Generate this by running:
+    #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
+    - secure: "grTUpsDCaWWgGV7ZkRep8fgXmBS89ASeMSPgFth+//Yeb7jX+ruGLv56U/2CMJPTq113lebPZlT2bBB/k4mBBeIHJ/IB6TuG8ENwROCId2oIC5gxuNXzell26w/e3AeqeSYgy/lJNDb9ZP9t7dKLusOWNUouM2YYOFAXt9sklGDReICIpsS0shFeJGgBNB5y2zIJkbflu/fjCOdeBVO65BzaR8p/5/5A0iqSrz1GStFQO0+MOLRxFISn7rFHV/2XxhPU5FuPA29Cn59GlrGbWVgOyDYMlleoydvAJX25vrowqMwrtgvAUzXuGlEtgr3yOmvR6yUQGwUmNXGQ1xgm1bR2fXFYLvjPGtxvHJd/z4rHuD6eI8UOOTa1YAVDiAKDNq6q1zLk0MJJ1Y7/plc9Hp0I0aCCIqPx00FoawuwFDWh+LRgZ1soqsEIqH7zHGYtHQ2OKhe1NzA4HTeP0ZbMouOuORNQvWanoTEz9n/v0mWQyB5KpeAo0eZHkoMjVhpfo5TXJCI7HVxjVe4D4NKBpOownDnjoWDdn2mduBGZbCdMhpkbFD9JRmXIaSyBVuQT6a4wV/z4RkUAetn3m6lDr/d6QeqxCnQ9X1KFyHXhJ8XnpUNIB2LoI7rJswy1+q+ZtZMJ+3mgvxnWHkvKUNExLzXXUVIGIk8LnJHqAytShxY="
 
 # before_install:
 #     - "travis_retry pip install --upgrade pip setuptools codecov"
@@ -58,7 +58,7 @@ cache: "pip"
 before_script:
     # - "make clean"
     # - "make lint"
-    - 'travis_retry make EE_ARTIFACT_URL="adam" download-artifacts'
+    - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
 
 # script:
 #     - 'pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
