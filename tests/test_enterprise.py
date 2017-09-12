@@ -2,6 +2,7 @@
 Tests for using the test harness with a DC/OS Enterprise cluster.
 """
 
+import logging
 import subprocess
 import uuid
 from pathlib import Path
@@ -22,11 +23,13 @@ class TestEnterpriseIntegrationTests:
         self,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
+        caplog,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
+        caplog.setLevel(logging.CRITICAL)
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         extra_config = {
