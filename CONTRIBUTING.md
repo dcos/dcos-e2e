@@ -219,7 +219,7 @@ git push
 
 8. Tag a release.
 
-Visit <https://github.com/adamtheturtle/dcos-e2e/releases/new>.
+Visit <https://github.com/mesosphere/dcos-e2e/releases/new>.
 Set the "Tag version" to the new version.
 Choose "master" as the target.
 Add the changes from the changelog to the release description.
