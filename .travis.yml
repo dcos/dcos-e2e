@@ -41,17 +41,17 @@ env:
     #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
     - secure: "UwUXSjaD1V2OkWTtOAAGZyZ0EezH2Di1Ol+KhBkNS6ZD1TiLA0oXEtl07t8VB9/E/vT6McgFSQfgMx77X5H81O2puUYsynAiurz8eMe5n44Akd09EdSH3eXoAD03C8hDsejmVtMkKXQLgCzkqRZ0YGUxAu/5zXBOoEBrSYHBodjRP1UNAnpE0fIqsVIbHYV2+Ak+TyFMfhZu8sFNVDE2t4E90V4ihnm/iMOvhUkpZESpV8TZQPs1aTrVh3pdTAsP1THaGP/Ld2gR7QacWK+ZjTujvsdWh1XCMHEQ5B13tpN+ZDGv0tSyVF+B/4i09kU3v6wUV0OItbYP5x1eYKK+CeFlLFSzz7FYUsNxmMwRL6cnHIUU/ECEGERBarMKp0+XGQw5PJN1ilNPdTa3/u0W8W82xZbvB+5nnQs9VJqwH9l3DiOihD5Xq7IPITGYs2gKlHpheF8ku4m6zJDRUqOV407Z7/HOVI/5pPTZUCs34+FKB2yn+BH6/q9iuSSo2zYA3gd1poIsTHP5FGpS5YdqP8NxHJL/tw+U4IGKzUOIQWnRz7tvZW+7Blgvoos5DDqJIUNdaztPNDMQT/QPMB6rUz4059ULkq6Pnt9Y6OdynkMeLXAPZKmqp3XSlycWOIhv1k9sQD/g+hL/qnfiVWP1F22Vaw7n9TPjjo4O7ROR+eE="
 
-before_install:
-    - "travis_retry pip install --upgrade pip setuptools codecov"
-    - "travis_retry sudo apt-get update"
-      # Ideally we would use `addons.apt.packages` for enchant but this is not
-      # supported by the linter.
-    - "travis_retry sudo apt-get install docker-ce enchant"
-    - "travis_retry npm -g install npm@latest"
-
-install:
-    - "travis_retry pip install --upgrade --editable .[dev]"
-    - "travis_retry npm install"
+# before_install:
+#     - "travis_retry pip install --upgrade pip setuptools codecov"
+#     - "travis_retry sudo apt-get update"
+#       # Ideally we would use `addons.apt.packages` for enchant but this is not
+#       # supported by the linter.
+#     - "travis_retry sudo apt-get install docker-ce enchant"
+#     - "travis_retry npm -g install npm@latest"
+#
+# install:
+#     - "travis_retry pip install --upgrade --editable .[dev]"
+#     - "travis_retry npm install"
 
 cache: "pip"
 
