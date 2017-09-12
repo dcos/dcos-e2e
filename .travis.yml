@@ -39,7 +39,7 @@ env:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
     #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
-    - secure: "p3tDhBj721ld4HP+Wg15N/EHkTKt2UPh+LaEiqIOd91R5rmlymgh839KkYUY3wX4fM4Bki2wBSLJITm0AzFEavvvgA35BgeOaoJNya+mCik0zdZUqgUCDswQ/barT/RcPGzfX5/Qa5nf+o6OKtbQybM5E1MN3MXOy8SdloWwhL6zPvwObI2UxTkLQWyDhC1Bic4/ZA7WuN8PWxpQP4CbEO08QTIv2r4xeW/Qf15mCU+GBLlSifr2DkydKQJPHOBasc23d4Gm2zKeKpx2d4IhZiKxi9PMGKif539C33Yv3qMV+t5bdHeNY6Lt9/PTrAP1I67Sim//GZUcEOKwogr4MwGPdOTxKrwKpjXAszFBDrEcZZjDfhh5S08sz9CjDpzbgiv5q8TjY4PytiSujB5u0kGJb2UonmWIVkmk3LG5fpWZmH+fbhpHQ4GxiRmLdYCZNQXud8+BSqpVvivBvfijU7gQdM5sV16VP1GWOlJhsB6xWoBxofXXzLsJ66D0I8OBfejeu63y+y5ZlVnmtGuXnGqVcjI6RIEiGDNP1GRb2tYJSooWT+fFiFPGG1PYjmdmKcbTHBVPIY+e+hkJovo92KKT4fErmiI0rIvO/QDjc4ZNE/PwPO76ZKro+saO+Z/5StS/DpLFzSoaCIJuG8GAPZsjlgllP4wYdX540kKgACU="
+    secure: "p3tDhBj721ld4HP+Wg15N/EHkTKt2UPh+LaEiqIOd91R5rmlymgh839KkYUY3wX4fM4Bki2wBSLJITm0AzFEavvvgA35BgeOaoJNya+mCik0zdZUqgUCDswQ/barT/RcPGzfX5/Qa5nf+o6OKtbQybM5E1MN3MXOy8SdloWwhL6zPvwObI2UxTkLQWyDhC1Bic4/ZA7WuN8PWxpQP4CbEO08QTIv2r4xeW/Qf15mCU+GBLlSifr2DkydKQJPHOBasc23d4Gm2zKeKpx2d4IhZiKxi9PMGKif539C33Yv3qMV+t5bdHeNY6Lt9/PTrAP1I67Sim//GZUcEOKwogr4MwGPdOTxKrwKpjXAszFBDrEcZZjDfhh5S08sz9CjDpzbgiv5q8TjY4PytiSujB5u0kGJb2UonmWIVkmk3LG5fpWZmH+fbhpHQ4GxiRmLdYCZNQXud8+BSqpVvivBvfijU7gQdM5sV16VP1GWOlJhsB6xWoBxofXXzLsJ66D0I8OBfejeu63y+y5ZlVnmtGuXnGqVcjI6RIEiGDNP1GRb2tYJSooWT+fFiFPGG1PYjmdmKcbTHBVPIY+e+hkJovo92KKT4fErmiI0rIvO/QDjc4ZNE/PwPO76ZKro+saO+Z/5StS/DpLFzSoaCIJuG8GAPZsjlgllP4wYdX540kKgACU="r
 
 # before_install:
 #     - "travis_retry pip install --upgrade pip setuptools codecov"
