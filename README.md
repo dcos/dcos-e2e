@@ -1,7 +1,5 @@
 [![Build Status](https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master)](https://travis-ci.org/mesosphere/dcos-e2e)
 
-[![Requirements Status](https://requires.io/github/mesosphere/dcos-e2e/requirements.svg?branch=master)](https://requires.io/github/mesosphere/dcos-e2e/requirements/?branch=master)
-
 [![codecov](https://codecov.io/gh/mesosphere/dcos-e2e/branch/master/graph/badge.svg)](https://codecov.io/gh/mesosphere/dcos-e2e)
 
 # DC/OS End to End tests
