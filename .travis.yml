@@ -58,7 +58,7 @@ cache: "pip"
 before_script:
     # - "make clean"
     # - "make lint"
-    - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
+    - 'travis_retry make EE_ARTIFACT_URL="adam" download-artifacts'
 
 # script:
 #     - 'pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
