@@ -38,8 +38,8 @@ env:
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
-    #     travis encrypt --repo adamtheturtle/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
-    secure: "H1P6GG9HmZxEZlt+vwOvmK6RD9OmVYRnh93hBYFUcUqpAoklfIyt5kaex4vh2n4mowmsn101oINjPIXAlbHZ+iN344kPCvbr7vDcvQfo73DbqwfhzN//TLFL4ToYaOqs7ruNhsnFWaDOWakULu/A+Mx6s8sj1khyAqbFMfRjCoMoTkGSk7McjkEvYusRo12rM7fp2JvG+QRspet6V01HFyi5g+JbcNdHkzUyWcOaUOGHdWLAzlR50vnj6F9pMFD3DKIo/oVe3Qnm8YORE6L9rzoHJ7sVdOLYS3sbg9oTANc6OcBN8wofyr6tKCls8oF0GdDtY0j7nYBXiUj0ka7gxQftaoyeNtbyueilU2zq15sy9UcXfEldJXP7MXyU023FhGWL7jApwQWqBmLzPixCje2jWWRX7NjeVr12yH6KDBlHlweo17EyEKYLEPh6qnlgvsE1LLi8xS0gvtt6uMEiupcdalhxNiqGqfHP+FtxlCoKK1/9m9+EP0mXCi60KSN2Xgbm+5ti2y0JjCRm0v3VS9S3ozZD52YFqINF9ICvdL8zyF5FsikXLxNY5yGqRPr2JpoGLC3PmjkSsGTZ2ueOf4yB7IB0cNSMxp7ySjXqXuUG3m8iSns/D9aHLCX9HnE3UnN96TZDllOfCgER/FSk+pvUiS123FNgNgOvJxPNRC8="
+    #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
+    secure: "DCA/nGUV8IUrFg7SmL8K2WvLd3V/6JD7RINUyzBoKoADmJ9xvcQOI8Zm91//fJtiTNpEZOfOkFXYVQwGHAoPlgaS5/ENqbCV+4zn4RoS3q+WvuAaRR/mXj+z2Jzbgp+x9Pe1FTJroY521+Qqj1sjl9nQK24WOUPhlXe9bdFiRCNAK49r+dxa7dURVq0WyOcBk22psTxXpuBRfciV/dzun2llfdL0Ur9+enlMwj13HByMxR+TOPcsZ6ZXC4A8SxKKSpkT19lCTmfW34Ks0N6Gfqaad46eqfc97mwTyIaGW73iVLRsiI5sjBlXTlsdp2qPmn7WJih7BNOFdcoLNmqHW72akon+z5On2K5kwUqvobtrJ+d0n8hf+5HozZz4Tl6glByeMcWlcQgOqLZuH5scZK3U0rHOqeTsEDBlg45Y1CrTOCHWvetFgMwa9QQlmVNmnkWQ0B5fDuspW+sjqbeTMwwQk/2+eWYgi8vaR9N6gEouqUg5nZmpk3ppmY8NxHaVe1w5WWMOJyyws3T4f78eubGs3KLL2fcgLVhCWQNYa5zXXZRPG9d+kJsCCJFK7Bj8cIva31zbLTkTlA80xDxRYw33PvkWRKMP08zkyoo4MiYKvq42fpLuv7BbOksK1GosX+YvxyRK+yr0Uix62vNc4c6MwwLmtxWzJQEjOLEl4FU="
 
 before_install:
     - "travis_retry pip install --upgrade pip setuptools codecov"
