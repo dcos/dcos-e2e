@@ -10,6 +10,8 @@ env:
 
 before_script:
     - 'echo $EE_ARTIFACT_URL'
+    - 'export EE_ARTIFACT_URL="X"'
+    - 'echo $EE_ARTIFACT_URL'
 
 after_success:
     - "codecov"
