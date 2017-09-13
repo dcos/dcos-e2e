@@ -55,7 +55,7 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    LOGGER.debug(line)
+                    # LOGGER.debug(line)
                     stdout += line
                 # Without this, `.poll()` will return None on some
                 # systems.
@@ -71,7 +71,7 @@ def run_subprocess(
             raise
         retcode = process.poll()
         if retcode > 0:
-            LOGGER.info(str(stderr))
+            # LOGGER.info(str(stderr))
             raise CalledProcessError(
                 retcode, args, output=stdout, stderr=stderr
             )
