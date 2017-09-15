@@ -123,6 +123,10 @@ class Cluster(ContextDecorator):
             node.run_as_root(
                 args=diagnostics_args,
                 log_output_live=self._log_output_live,
+                env={
+                    'LC_ALL': 'en_US.UTF-8',
+                    'LANG': 'en_US.UTF-8',
+                },
             )
 
             url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
