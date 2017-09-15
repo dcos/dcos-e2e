@@ -4,7 +4,7 @@ Tools for managing DC/OS cluster nodes.
 
 from ipaddress import IPv4Address
 from pathlib import Path
-from subprocess import CompletedProcess
+from subprocess import PIPE, CompletedProcess, Popen
 from typing import Dict, List, Optional
 
 from ._common import run_subprocess
@@ -28,28 +28,23 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def run_as_root(
+    def compose_ssh_command(
         self,
         args: List[str],
-        log_output_live: bool=False,
         env: Optional[Dict]=None,
-    ) -> CompletedProcess:
+    ) -> List[str]:
         """
-        Run a command on this node as `root`.
+        Run the specified command on the given host using SSH.
 
         Args:
             args: The command to run on the node.
-            log_output_live: If `True`, log output live. If `True`, stderr is
-                merged into stdout in the return value.
             env: Environment variables to be set on the node before running
-                the command. A mapping of environment variable names to
-                values.
+                    the command. A mapping of environment variable names to
+                    values.
 
         Returns:
-            The representation of the finished process.
-
-        Raises:
-            CalledProcessError: The process exited with a non-zero code.
+            Full SSH command to be run (SSH arguments + environment variables +
+            other arguments).
         """
         env = dict(env or {})
 
@@ -83,4 +78,51 @@ class Node:
             str(self.ip_address),
         ] + command
 
+        return ssh_args
+
+    def run_as_root(
+        self,
+        args: List[str],
+        log_output_live: bool=False,
+        env: Optional[Dict]=None,
+    ) -> CompletedProcess:
+        """
+        Run a command on this node as `root`.
+
+        Args:
+            args: The command to run on the node.
+            log_output_live: If `True`, log output live. If `True`, stderr is
+                merged into stdout in the return value.
+            env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
+
+        Returns:
+            The representation of the finished process.
+
+        Raises:
+            CalledProcessError: The process exited with a non-zero code.
+        """
+        ssh_args = self.compose_ssh_command(args, env)
+
         return run_subprocess(args=ssh_args, log_output_live=log_output_live)
+
+    def popen_as_root(self, args: List[str],
+                      env: Optional[Dict]=None) -> Popen:
+        """
+        Open a pipe to a command run on a node as `root`.
+
+        Args:
+            args: The command to run on the node.
+            env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
+
+        Returns:
+            The pipe object attached to the specified process.
+        """
+        ssh_args = self.compose_ssh_command(args, env)
+
+        process = Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+
+        return process

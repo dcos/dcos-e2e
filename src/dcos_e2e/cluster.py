@@ -130,7 +130,7 @@ class Cluster(ContextDecorator):
                 env={
                     'LC_ALL': 'en_US.UTF-8',
                     'LANG': 'en_US.UTF-8',
-                }
+                },
             )
 
             url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
