@@ -193,6 +193,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
         bootstrap_genconf_path = genconf_dir / 'serve'
+        bootstrap_genconf_path.mkdir()
 
         node_volumes = {
             '/var/lib/docker': '/var/lib/docker',
