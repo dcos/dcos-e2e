@@ -187,6 +187,51 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             )
             master_mounts.append(mount)
 
+        include_dir = self._path / 'include'
+        certs_dir = include_dir / 'certs'
+
+        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
+
+        bootstrap_genconf_path = genconf_dir / 'serve'
+        bootstrap_genconf_path.mkdir()
+
+        node_volumes = {
+            '/var/lib/docker': '/var/lib/docker',
+            '/opt': '/opt',
+            str(certs_dir): '/etc/docker/certs.d',
+            str(bootstrap_genconf_path): {
+                'bind': str(bootstrap_tmp_path),
+                'mode': 'ro'
+            },
+        }
+
+        node_tmpfs_mounts = {
+            '/run': 'rw,exec,nosuid,size=2097152k',
+            '/tmp': 'rw,exec,nosuid,size=2097152k',
+        }
+
+        node_mounts = []
+        for node_mount_host_path, node_details in node_volumes.items():
+            if isinstance(node_details, dict):
+                mount = '-v {host_path}:{node_path}:{mode}'.format(
+                    host_path=node_mount_host_path,
+                    node_path=node_details['bind'],
+                    mode=node_details['mode'],
+                )
+            else:
+                mount = '-v {host_path}:{node_path}'.format(
+                    host_path=node_mount_host_path,
+                    node_path=node_details,
+                )
+            node_mounts.append(mount)
+
+        for node_tmpfs_host_path, tmpfs_details in node_tmpfs_mounts.items():
+            mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
+                host_path=node_tmpfs_host_path,
+                tmpfs_details=tmpfs_details,
+            )
+            node_mounts.append(mount)
+
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
@@ -260,6 +305,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'MASTER_MOUNTS': ' '.join(master_mounts),
+            'NODE_VOLUMES': ' '.join(node_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
             # Make sure that there are no home mounts.
             # If $HOME is set to a directory we use, like `/root`, home mounts
@@ -281,10 +327,56 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             make_args.append(set_variable)
 
         run_subprocess(
-            args=['make'] + make_args + ['install'],
+            args=['make'] + make_args + ['genconf'],
             cwd=str(self._path),
             log_output_live=self.log_output_live
         )
+
+        for master_number in range(1, masters + 1):
+            self._run_dcos_install_in_container(
+                container_base_name=self._master_prefix,
+                container_number_id=master_number,
+                dcos_role='master',
+            )
+
+        for agent_number in range(1, agents + 1):
+            self._run_dcos_install_in_container(
+                container_base_name=self._agent_prefix,
+                container_number_id=agent_number,
+                dcos_role='slave',
+            )
+
+        for public_agent_number in range(1, public_agents + 1):
+            self._run_dcos_install_in_container(
+                container_base_name=self._public_agent_prefix,
+                container_number_id=public_agent_number,
+                dcos_role='slave_public',
+            )
+
+    def _run_dcos_install_in_container(
+        self,
+        container_base_name: str,
+        container_number_id: int,
+        dcos_role: str,
+    ) -> None:
+        """
+        Run ``dcos_install.shzz in a container.
+
+        Args:
+            container_base_name: The start of the container name.
+            container_number_id: The end of the container name.
+            dcos_role: One of 'master', 'slave', 'slave_public'.
+        """
+        client = docker.from_env(version='auto')
+        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
+        container_name = container_base_name + str(container_number_id)
+        container = client.containers.get(container_id=container_name)
+        cmd = [
+            '/bin/bash',
+            str(bootstrap_tmp_path / 'dcos_install.sh'),
+            '--no-block-dcos-setup', dcos_role
+        ]
+        container.exec_run(cmd=cmd)
 
     def destroy(self) -> None:
         """
