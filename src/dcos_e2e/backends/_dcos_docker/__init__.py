@@ -200,6 +200,42 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         self._agent_prefix = '{unique}-agent-'.format(unique=unique)
         self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
 
+        include_dir = self._path / 'include'
+        certs_dir = include_dir / 'certs'
+
+        node_volumes = {
+            '/var/lib/docker': '/var/lib/docker',
+            '/opt': '/opt',
+            str(certs_dir): '/etc/docker/certs.d',
+        }
+
+        node_tmpfs_mounts = {
+            '/run': 'rw,exec,nosuid,size=2097152k',
+            '/tmp': 'rw,exec,nosuid,size=2097152k',
+        }
+
+        node_mounts = []
+        for node_mount_host_path, node_details in node_volumes.items():
+            if isinstance(node_details, dict):
+                mount = '-v {host_path}:{node_path}:{mode}'.format(
+                    host_path=node_mount_host_path,
+                    node_path=node_details['bind'],
+                    mode=node_details['mode'],
+                )
+            else:
+                mount = '-v {host_path}:{node_path}'.format(
+                    host_path=node_mount_host_path,
+                    node_path=node_details,
+                )
+            node_mounts.append(mount)
+
+        for node_tmpfs_host_path, tmpfs_details in node_tmpfs_mounts.items():
+            mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
+                host_path=node_tmpfs_host_path,
+                tmpfs_details=tmpfs_details,
+            )
+            node_mounts.append(mount)
+
         variables = {
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
@@ -224,6 +260,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # If $HOME is set to a directory we use, like `/root`, home mounts
             # can cause problems.
             'HOME_MOUNTS': '',
+            'NODE_VOLUMES': ' '.join(node_mounts),
         }  # type: Dict[str, str]
 
         make_args = []
