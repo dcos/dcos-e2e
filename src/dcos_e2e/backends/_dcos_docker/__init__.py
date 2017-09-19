@@ -210,8 +210,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         }
 
         node_mounts = []
-        for node_mount_host_path in node_volumes:
-            node_details = node_volumes[node_mount_host_path]
+        for node_mount_host_path, node_details in node_volumes.items():
             if isinstance(node_details, dict):
                 mount = '-v {host_path}:{node_path}:{mode}'.format(
                     host_path=node_mount_host_path,
@@ -225,10 +224,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 )
             node_mounts.append(mount)
 
-        for node_tmpfs_host_path, tmpfs_configuration in node_tmpfs_mounts:
-            mount = '--tmpfs {host_path}:{tmpfs_configuration}'.format(
+        for node_tmpfs_host_path, tmpfs_details in node_tmpfs_mounts.items():
+            mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
                 host_path=node_tmpfs_host_path,
-                tmpfs_configuration=tmpfs_configuration,
+                tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
 
