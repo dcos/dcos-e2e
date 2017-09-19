@@ -219,17 +219,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         node_mounts = []
         for node_mount_host_path, node_details in node_volumes.items():
-            if isinstance(node_details, dict):
-                mount = '-v {host_path}:{node_path}:{mode}'.format(
-                    host_path=node_mount_host_path,
-                    node_path=node_details['bind'],
-                    mode=node_details['mode'],
-                )
-            else:
-                mount = '-v {host_path}:{node_path}'.format(
-                    host_path=node_mount_host_path,
-                    node_path=node_details,
-                )
+            mount = '-v {host_path}:{node_path}'.format(
+                host_path=node_mount_host_path,
+                node_path=node_details,
+            )
             node_mounts.append(mount)
 
         for node_tmpfs_host_path, tmpfs_details in node_tmpfs_mounts.items():
