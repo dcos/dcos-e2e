@@ -265,8 +265,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # If $HOME is set to a directory we use, like `/root`, home mounts
             # can cause problems.
             'HOME_MOUNTS': '',
-            'NODE_VOLUMES': ' '.join(node_mounts),
-            'BOOTSTRAP_VOLUMES': ' '.join(bootstrap_mounts),
+            'NODE_VOLUMES': ' '.join(node_mounts + bootstrap_mounts),
+            # These are empty because they are already in `NODE_VOLUMES`, as
+            # done in `make install`.
+            'BOOTSTRAP_VOLUMES': '',
         }  # type: Dict[str, str]
 
         make_args = []
