@@ -164,9 +164,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # `-v` mounts.
         # Then `INSTALLER_MOUNTS` can be added to DC/OS Docker.
         genconf_dir = self._path / 'genconf'
-        bootstrap_genconf_path = genconf_dir / 'serve'
-        bootstrap_genconf_path.mkdir()
-        bootstrap_tmp_path = '/opt/dcos_install_tmp'
         # We wrap this in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
         Path(genconf_dir).mkdir(exist_ok=True)
@@ -231,6 +228,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
+
+        bootstrap_genconf_path = genconf_dir / 'serve'
+        bootstrap_genconf_path.mkdir()
+        bootstrap_tmp_path = '/opt/dcos_install_tmp'
 
         bootstrap_mount = (
             '-v {bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
