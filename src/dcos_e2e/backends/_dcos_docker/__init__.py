@@ -323,6 +323,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
     ) -> None:
         """
         Run ``dcos_install.sh`` in a container.
+
+        Args:
+            container_base_name: The start of the container name.
+            container_number: The end of the container name.
+            role: One of 'master', 'slave', 'slave_public'.
         """
         client = docker.from_env(version='auto')
         container_name = container_base_name + str(container_number)
