@@ -156,7 +156,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ignore=ignore_patterns('dcos_generate_config.sh'),
         )
 
-
         # Files in the DC/OS Docker directory's `genconf` directory are mounted
         # to the installer at `/genconf`.
         # Therefore, every file which we want to copy to `/genconf` on the
