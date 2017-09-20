@@ -3,31 +3,16 @@
 .NOTPARALLEL:
 
 .DEFAULT_GOAL := all
-include common.mk
+include make-common.mk
 
 .PHONY: all vagrant build-base build-base-docker build build-all start postflight master agent public_agent installer clean-installer genconf registry open-browser preflight deploy clean clean-certs clean-containers clean-slice test hosts clean-hosts
 
-# Set the number of DC/OS masters.
-MASTERS := 1
-
-# Set the number of DC/OS agents.
-AGENTS := 1
-
-# Set the number of DC/OS public agents.
-PUBLIC_AGENTS := 1
-
 ALL_AGENTS := $$(( $(PUBLIC_AGENTS)+$(AGENTS) ))
-
-# Distro to use as the OS for the "node" containers
-DISTRO := centos-7
 
 # Installer variables
 GENCONF_DIR_SRC := $(CURDIR)/genconf.src
 GENCONF_DIR := $(CURDIR)/genconf
 CONFIG_FILE := $(GENCONF_DIR)/config.yaml
-DCOS_GENERATE_CONFIG_URL := https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh
-DCOS_GENERATE_CONFIG_PATH := $(CURDIR)/dcos_generate_config.sh
-INSTALLER_PORT := 9000
 INSTALLER_CMD := \
 	PORT=${INSTALLER_PORT} \
 	DCOS_INSTALLER_CONTAINER_NAME=${INSTALLER_CTR} \
@@ -36,9 +21,6 @@ INSTALLER_CMD := \
 # Bootstrap variables
 BOOTSTRAP_GENCONF_PATH := $(GENCONF_DIR)/serve/
 BOOTSTRAP_TMP_PATH := /opt/dcos_install_tmp
-
-# Detect default resolvers inside a docker container.
-RESOLVERS := $(shell docker run --rm alpine cat /etc/resolv.conf | grep '^nameserver.*' | tr -s ' ' | cut -d' ' -f2 | paste -sd ' ' -)
 
 # Local docker systemd service variables
 INCLUDE_DIR_SRC := $(CURDIR)/include.src
@@ -64,48 +46,18 @@ SSH_KEY := $(SSH_DIR)/id_$(SSH_ALGO)
 # Variable for the path to the mesos executors systemd slice.
 MESOS_SLICE := /run/systemd/system/mesos_executors.slice
 
-# Detect the docker host's init system.
-# Docker host may be remote (boot2docker).
-# /proc/$PID/comm is only available in Linux 2.6.33 and later.
-DOCKER_HOST_INIT_SYS := $(docker run $(INTERACTIVE) -v /proc:/host/proc:ro alpine cat /host/proc/1/comm)
-
-# Disable Mesos systemd support when the docker host is not systemd.
-# This is not officially supported or tested by DC/OS.
-# Disabling MESOS_SYSTEMD_ENABLE_SUPPORT means that executors will be namespaced under the Mesos agent.
-# So executors (and tasks) will be killed when the Mesos agent is restarted.
-# This makes zero downtime in-place DC/OS upgrades impossible.
-ifeq ($(DOCKER_HOST_INIT_SYS), systemd)
-	MESOS_SYSTEMD_ENABLE_SUPPORT := true
-else
-	MESOS_SYSTEMD_ENABLE_SUPPORT := false
-endif
-
 # Variables for various docker arguments.
-MASTER_MOUNTS :=
-SYSTEMD_MOUNTS := \
-	-v /sys/fs/cgroup:/sys/fs/cgroup:ro
-VOLUME_MOUNTS := \
+NODE_VOLUMES := \
 	-v /var/lib/docker \
-	-v /opt
-AGENT_VOLUME_MOUNTS := \
-	-v /var/lib/mesos/slave
-BOOTSTRAP_VOLUME_MOUNT := \
-	-v $(BOOTSTRAP_GENCONF_PATH):$(BOOTSTRAP_TMP_PATH):ro
-TMPFS_MOUNTS := \
+	-v /opt \
 	--tmpfs /run:rw,exec,nosuid,size=2097152k \
-	--tmpfs /tmp:rw,exec,nosuid,size=2097152k
-CERT_MOUNTS := \
+	--tmpfs /tmp:rw,exec,nosuid,size=2097152k \
 	-v $(CERTS_DIR):/etc/docker/certs.d
-
-# The home directory can be mounted as a development convenience.
-# However, on some platforms, where $(HOME) is not set, we default to not mounting anything.
-# Otherwise a mount of `::ro` would be attempted.
-ifdef HOME
-    HOME_MOUNTS := \
-	-v $(HOME):$(HOME):ro
-else
-    HOME_MOUNTS :=
-endif
+AGENT_VOLUMES := \
+	-v /var/lib/mesos/slave \
+	-v /sys/fs/cgroup:/sys/fs/cgroup:ro
+BOOTSTRAP_VOLUMES := \
+	-v $(BOOTSTRAP_GENCONF_PATH):$(BOOTSTRAP_TMP_PATH):ro
 
 # if this session isn't interactive, then we don't want to allocate a
 # TTY, which would fail, but if it is interactive, we do want to attach
@@ -149,7 +101,7 @@ build-all: generate ## Build the base and base-docker images for all permutation
 	@echo "+ Building the base images"
 	@$(foreach distro,$(wildcard build/base/*/Dockerfile),$(call build_base_image,$(word 3,$(subst /, ,$(distro)))))
 	@echo "+ Building the base-docker images"
-	@$(foreach version,$(wildcard build/base-docker/*/Dockerfile),$(call build_base_docker_image,$(word 3,$(subst /, ,$(distro)))))
+	@$(foreach version,$(wildcard build/base-docker/*/Dockerfile),$(call build_base_docker_image,$(word 3,$(subst /, ,$(version)))))
 
 generate: $(CURDIR)/build/base ## generate the Dockerfiles for all the base distros.
 	@$(CURDIR)/build/base/generate.sh
@@ -175,9 +127,9 @@ postflight: ## Polls DC/OS until it is healthy (5m timeout)
 	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(MASTERS)),$(call postflight_container,$(PUBLIC_AGENT_CTR),$(NUM)))
 	@echo "+ DC/OS Healthy (All Nodes)"
 
-master: ## Starts the containers for DC/OS masters.
+master: $(BOOTSTRAP_GENCONF_PATH) ## Starts the containers for DC/OS masters.
 	@echo "+ Starting master nodes"
-	$(foreach NUM,$(shell [[ $(MASTERS) == 0 ]] || seq 1 1 $(MASTERS)),$(call start_dcos_container,$(MASTER_CTR),$(NUM),$(MASTER_MOUNTS) $(TMPFS_MOUNTS) $(CERT_MOUNTS) $(HOME_MOUNTS) $(VOLUME_MOUNTS)))
+	$(foreach NUM,$(shell [[ $(MASTERS) == 0 ]] || seq 1 1 $(MASTERS)),$(call start_dcos_container,$(MASTER_CTR),$(NUM),$(NODE_VOLUMES) $(CUSTOM_VOLUMES) $(CUSTOM_MASTER_VOLUMES)))
 
 $(MESOS_SLICE):
 	@if [ "$(MESOS_SYSTEMD_ENABLE_SUPPORT)" == "true" ]; then \
@@ -185,14 +137,13 @@ $(MESOS_SLICE):
 		sudo systemctl start mesos_executors.slice; \
 	fi
 
-
-agent: $(MESOS_SLICE) ## Starts the containers for DC/OS agents.
+agent: $(BOOTSTRAP_GENCONF_PATH) $(MESOS_SLICE) ## Starts the containers for DC/OS agents.
 	@echo "+ Starting agent nodes"
-	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(AGENTS)),$(call start_dcos_container,$(AGENT_CTR),$(NUM),$(TMPFS_MOUNTS) $(SYSTEMD_MOUNTS) $(CERT_MOUNTS) $(HOME_MOUNTS) $(VOLUME_MOUNTS) $(AGENT_VOLUME_MOUNTS)))
+	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(AGENTS)),$(call start_dcos_container,$(AGENT_CTR),$(NUM),$(NODE_VOLUMES) $(AGENT_VOLUMES) $(CUSTOM_VOLUMES) $(CUSTOM_AGENT_VOLUMES)))
 
-public_agent: $(MESOS_SLICE) ## Starts the containers for DC/OS public agents.
+public_agent: $(BOOTSTRAP_GENCONF_PATH) $(MESOS_SLICE) ## Starts the containers for DC/OS public agents.
 	@echo "+ Starting public agent nodes"
-	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(PUBLIC_AGENTS)),$(call start_dcos_container,$(PUBLIC_AGENT_CTR),$(NUM),$(TMPFS_MOUNTS) $(SYSTEMD_MOUNTS) $(CERT_MOUNTS) $(HOME_MOUNTS) $(VOLUME_MOUNTS) $(AGENT_VOLUME_MOUNTS)))
+	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(PUBLIC_AGENTS)),$(call start_dcos_container,$(PUBLIC_AGENT_CTR),$(NUM),$(NODE_VOLUMES) $(AGENT_VOLUMES) $(CUSTOM_VOLUMES) $(CUSTOM_PUBLIC_AGENT_VOLUMES)))
 
 $(DCOS_GENERATE_CONFIG_PATH):
 	curl --fail --location --show-error -o $@ $(DCOS_GENERATE_CONFIG_URL)
@@ -208,6 +159,9 @@ $(GENCONF_DIR):
 $(GENCONF_DIR)/ip-detect: $(GENCONF_DIR) ## Writes the ip-detect script to return node IP.
 	@cp $(GENCONF_DIR_SRC)/ip-detect $@
 	@chmod +x $@
+
+$(BOOTSTRAP_GENCONF_PATH):
+	@mkdir -p $@
 
 $(INCLUDE_DIR):
 	@mkdir -p $@
@@ -303,7 +257,7 @@ deploy: preflight ## Run the DC/OS installer with --deploy.
 	@echo "+ Running deploy"
 	$(INSTALLER_CMD) --deploy
 
-install: VOLUME_MOUNTS += $(BOOTSTRAP_VOLUME_MOUNT)
+install: NODE_VOLUMES += $(BOOTSTRAP_VOLUMES)
 install: genconf ## Install DC/OS using "advanced" method
 	@echo "+ Running dcos_install.sh on masters"
 	$(foreach NUM,$(shell [[ $(MASTERS) == 0 ]] || seq 1 1 $(MASTERS)),$(call run_dcos_install_in_container,$(MASTER_CTR),$(NUM),master))
@@ -320,11 +274,11 @@ web: preflight ## Run the DC/OS installer with --web.
 clean-certs: ## Remove all the certs generated for the registry.
 	$(RM) -r $(CERTS_DIR)
 
-clean-containers: ## Removes and cleans up the master, agent, and installer containers.
+clean-containers: ## Removes and cleans up all master, agent, and installer containers.
 	@docker rm -fv $(INSTALLER_CTR) > /dev/null 2>&1 || true
-	$(foreach NUM,$(shell [[ $(MASTERS) == 0 ]] || seq 1 1 $(MASTERS)),$(call remove_container,$(MASTER_CTR),$(NUM)))
-	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(AGENTS)),$(call remove_container,$(AGENT_CTR),$(NUM)))
-	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(PUBLIC_AGENTS)),$(call remove_container,$(PUBLIC_AGENT_CTR),$(NUM)))
+	$(foreach NUM,$(shell MAX=$(call count_running_containers,$(MASTER_CTR)) && [[ $$MAX == 0 ]] || seq 1 1 $$MAX),$(call remove_container,$(MASTER_CTR),$(NUM))${newline})
+	$(foreach NUM,$(shell MAX=$(call count_running_containers,$(AGENT_CTR)) && [[ $$MAX == 0 ]] || seq 1 1 $$MAX),$(call remove_container,$(AGENT_CTR),$(NUM))${newline})
+	$(foreach NUM,$(shell MAX=$(call count_running_containers,$(PUBLIC_AGENT_CTR)) && [[ $$MAX == 0 ]] || seq 1 1 $$MAX),$(call remove_container,$(PUBLIC_AGENT_CTR),$(NUM))${newline})
 
 clean-slice: ## Removes and cleanups up the systemd slice for the mesos executor.
 	@if [ "$(MESOS_SYSTEMD_ENABLE_SUPPORT)" == "true" ]; then \
@@ -339,22 +293,10 @@ clean: clean-containers clean-slice clean-certs ## Stops all containers and remo
 
 # Use SSH to execute tests because docker run/exec has a bug that breaks unbuffered pytest output.
 # https://github.com/moby/moby/issues/8755 - Fixed in Docker 17.06+
+export TEST_INTEGRATION
 test: ips ## Executes the integration tests
-	@[[ -f ~/.ssh/known_hosts ]] && grep -q $(firstword $(MASTER_IPS)) ~/.ssh/known_hosts && ( \
-		echo "Removing known host: $(firstword $(MASTER_IPS))" && \
-		sed -i"" -e '/$(firstword $(MASTER_IPS))/d' ~/.ssh/known_hosts \
-	) || true
-	@ssh -i $(GENCONF_DIR)/ssh_key -l root -p 22 -o StrictHostKeyChecking=no $(firstword $(MASTER_IPS)) " \
-		set -o errexit -o nounset -o pipefail && \
-        source /opt/mesosphere/environment.export && \
-        source /opt/mesosphere/active/dcos-integration-test/util/test_env.export || \
-          source /opt/mesosphere/active/dcos-integration-test/test_env.export || \
-            true && \
-        export SLAVE_HOSTS='$(subst ${space},${comma},$(AGENT_IPS))' && \
-        export PUBLIC_SLAVE_HOSTS='$(subst ${space},${comma},$(PUBLIC_AGENT_IPS))' && \
-        cd '$(DCOS_PYTEST_DIR)' && \
-        $(DCOS_PYTEST_CMD) \
-    "
+	[ -f ~/.ssh/known_hosts ] && ssh-keygen -R $(firstword $(MASTER_IPS)) || true
+	echo "$$TEST_INTEGRATION" | ssh -T -i $(GENCONF_DIR)/ssh_key -l root -p 22 -o StrictHostKeyChecking=no $(firstword $(MASTER_IPS))
 
 hosts: ## Creates entries in /etc/hosts
 	@echo "Before:"
@@ -504,6 +446,19 @@ endef
 # @param number	  ID of the container.
 define postflight_container
 @echo "+ Checking node health ($(1)$(2))"
-@docker exec $(INTERACTIVE) $(1)$(2) dcos-postflight
+@docker exec $(INTERACTIVE) $(1)$(2) dcos-postflight $(POSTFLIGHT_PROGRESS)
 @echo "+ Node Healthy ($(1)$(2))"
+endef
+
+define TEST_INTEGRATION
+#!/usr/bin/env bash
+set -o errexit -o nounset -o pipefail -o xtrace
+source /opt/mesosphere/environment.export
+source /opt/mesosphere/active/dcos-integration-test/util/test_env.export || true # old location
+source /opt/mesosphere/active/dcos-integration-test/test_env.export || true # old location
+export MASTER_HOSTS='$(subst ${space},${comma},$(MASTER_IPS))'
+export SLAVE_HOSTS='$(subst ${space},${comma},$(AGENT_IPS))'
+export PUBLIC_SLAVE_HOSTS='$(subst ${space},${comma},$(PUBLIC_AGENT_IPS))'
+cd '$(DCOS_PYTEST_DIR)'
+$(DCOS_PYTEST_CMD)
 endef
