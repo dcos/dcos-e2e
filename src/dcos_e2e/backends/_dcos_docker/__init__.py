@@ -78,7 +78,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
     A record of a DC/OS Docker cluster.
     """
 
-    def __init__(  # pylint: disable=super-init-not-called
+    def __init__(  # pylint: disable=super-init-not-called,too-many-statements
         self,
         generate_config_path: Optional[Path],
         masters: int,
