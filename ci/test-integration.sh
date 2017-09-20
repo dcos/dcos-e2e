@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-# Performs End To End (e2e) testing of DC/OS Docker.
+# Performs smoke testing of DC/OS Docker.
 #
 # Options:
-#   DCOS_VERSION Version of the supplied DC/OS installer (defaults to the latest stable version)
 #   LOG_LINES    Number of log lines to export for each node (exports all, if unset)
 #
 # Usage:
@@ -36,12 +35,6 @@ echo "${BASH_VERSINFO[@]}"
 
 # Check for running containers
 docker ps
-
-# Default to latest known version unless DCOS_VERSION is specified
-if [[ -z "${DCOS_VERSION:-}" ]]; then
-  bash dcos_generate_config.sh --version
-  DCOS_VERSION="$(bash dcos_generate_config.sh --version | jq -r '.version')"
-fi
 
 # Destroy all containers
 make clean
@@ -99,50 +92,17 @@ make hosts
 # Test API (unauthenticated)
 curl --fail --location --silent --show-error --verbose http://m1.dcos/dcos-metadata/dcos-version.json
 
-# Install CLI
-DCOS_CLI="$(ci/dcos-install-cli.sh)"
-echo "${DCOS_CLI}"
-
-# Delete CLI on exit
-function cleanup3() {
-  # only use sudo if required
-  if [[ -w "$(dirname "${DCOS_CLI}")" ]]; then
-    rm -rf "${DCOS_CLI}"
-  else
-    sudo rm -rf "${DCOS_CLI}"
-  fi
-  cleanup2
-}
-trap cleanup3 EXIT
-
-# Create User
-DCOS_USER="test@example.com"
-ci/dcos-create-user.sh "${DCOS_USER}"
-
-# Login
-DCOS_ACS_TOKEN="$(ci/dcos-login.sh "${DCOS_USER}")"
-dcos config set core.dcos_acs_token "${DCOS_ACS_TOKEN}"
-
-# Install & test Oinker
-ci/test-oinker.sh
-
-# Detect URL
-DCOS_URL="$(dcos config show core.dcos_url)"
-
-# Test GUI (authenticated)
-curl --fail --location --silent --show-error --verbose -H "Authorization: token=${DCOS_ACS_TOKEN}" ${DCOS_URL} -o /dev/null
-
 # Add test user (required to be added when not the first user)
 # TODO: only required for OSS DC/OS
 ci/dcos-create-user.sh "albert@bekstil.net"
 
 # Delete CLI on exit
-function cleanup4() {
+function cleanup3() {
   # Copy out test results
   docker cp dcos-docker-master1:/opt/mesosphere/active/dcos-integration-test/test-junit.xml test-junit.xml || true
-  cleanup3
+  cleanup2
 }
-trap cleanup4 EXIT
+trap cleanup3 EXIT
 
 # Integration tests
 make test
