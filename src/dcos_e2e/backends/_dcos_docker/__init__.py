@@ -210,7 +210,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         node_anonymous_volumes = [Path('/var/lib/docker'), Path('/opt')]
 
         node_host_volumes = {
-            certs_dir: Path('/etc/docker/certs.d'),
+            certs_dir.resolve(): Path('/etc/docker/certs.d'),
         }
 
         node_tmpfs_mounts = {
