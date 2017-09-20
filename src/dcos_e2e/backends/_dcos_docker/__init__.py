@@ -343,8 +343,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         Path(config_file_path).write_text(config_body)
 
         genconf_args = [
-            'PORT=' + str(installer_port),
-            'DCOS_INSTALLER_CONTAINER_NAME=' + installer_ctr,
             'bash',
             str(generate_config_path),
             '--offline',
@@ -352,7 +350,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             '--genconf',
         ]
 
-        check_call(args=genconf_args)
+        check_call(args=genconf_args, env={
+            'PORT': str(installer_port),
+            'DCOS_INSTALLER_CONTAINER_NAME': installer_ctr,
+        })
 
         for master_number in range(1, masters + 1):
             self._run_dcos_install_in_container(
