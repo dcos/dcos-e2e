@@ -146,7 +146,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 ),
             ).name
         )
-        self._path.mkdir()
+        self._path.mkdir(exist_ok=True)
         self._path = self._path.resolve()
 
         copytree(
@@ -205,31 +205,35 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         include_dir = self._path / 'include'
         certs_dir = include_dir / 'certs'
 
-        node_volumes = {
-            '/var/lib/docker': None,
-            '/opt': None,
-            str(certs_dir): '/etc/docker/certs.d',
+        # See https://success.docker.com/KBase/Different_Types_of_Volumes
+        # for a definition of different types of volumes.
+        node_anonymous_volumes = [Path('/var/lib/docker'), Path('/opt')]
+
+        node_host_volumes = {
+            certs_dir: Path('/etc/docker/certs.d'),
         }
 
         node_tmpfs_mounts = {
-            '/run': 'rw,exec,nosuid,size=2097152k',
-            '/tmp': 'rw,exec,nosuid,size=2097152k',
+            Path('/run'): 'rw,exec,nosuid,size=2097152k',
+            Path('/tmp'): 'rw,exec,nosuid,size=2097152k',
         }
 
         node_mounts = []
-        for node_mount_host_path, node_details in node_volumes.items():
-            if node_details is None:
-                mount = '-v {host_path}'.format(host_path=node_mount_host_path)
-            else:
-                mount = '-v {host_path}:{node_path}'.format(
-                    host_path=node_mount_host_path,
-                    node_path=node_details,
-                )
+
+        for node_path in node_anonymous_volumes:
+            mount = '-v {path}'.format(path=node_path)
             node_mounts.append(mount)
 
-        for node_tmpfs_host_path, tmpfs_details in node_tmpfs_mounts.items():
+        for host_volume_path, node_path in node_host_volumes.items():
+            mount = '-v {host_path}:{node_path}'.format(
+                host_path=host_volume_path,
+                node_path=node_path,
+            )
+            node_mounts.append(mount)
+
+        for host_path, tmpfs_details in node_tmpfs_mounts.items():
             mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
-                host_path=node_tmpfs_host_path,
+                host_path=host_path,
                 tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
