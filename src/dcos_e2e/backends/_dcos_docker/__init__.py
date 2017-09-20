@@ -145,7 +145,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                     if cluster_backend.workspace_dir else None
                 ),
             ).name
-        ).resolve()
+        )
+        self._path.mkdir()
+        self._path = self._path.resolve()
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
