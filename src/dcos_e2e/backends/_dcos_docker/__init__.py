@@ -164,9 +164,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # `-v` mounts.
         # Then `INSTALLER_MOUNTS` can be added to DC/OS Docker.
         genconf_dir = self._path / 'genconf'
-        # We wrap this in `Path` to work around
+        # We wrap these in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
         Path(genconf_dir).mkdir(exist_ok=True)
+        genconf_dir = Path(genconf_dir).resolve()
+
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = genconf_dir / relative_installer_path
@@ -202,36 +204,46 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         include_dir = self._path / 'include'
         certs_dir = include_dir / 'certs'
+        certs_dir.mkdir(parents=True)
 
-        node_volumes = {
-            '/var/lib/docker': '/var/lib/docker',
-            '/opt': '/opt',
-            str(certs_dir): '/etc/docker/certs.d',
+        # See https://success.docker.com/KBase/Different_Types_of_Volumes
+        # for a definition of different types of volumes.
+        node_anonymous_volumes = [Path('/var/lib/docker'), Path('/opt')]
+
+        node_host_volumes = {
+            certs_dir.resolve(): Path('/etc/docker/certs.d'),
         }
 
         node_tmpfs_mounts = {
-            '/run': 'rw,exec,nosuid,size=2097152k',
-            '/tmp': 'rw,exec,nosuid,size=2097152k',
+            Path('/run'): 'rw,exec,nosuid,size=2097152k',
+            Path('/tmp'): 'rw,exec,nosuid,size=2097152k',
         }
 
         node_mounts = []
-        for node_mount_host_path, node_details in node_volumes.items():
+
+        for node_path in node_anonymous_volumes:
+            mount = '-v {path}'.format(path=node_path)
+            node_mounts.append(mount)
+
+        for host_volume_path, node_path in node_host_volumes.items():
             mount = '-v {host_path}:{node_path}'.format(
-                host_path=node_mount_host_path,
-                node_path=node_details,
+                host_path=host_volume_path,
+                node_path=node_path,
             )
             node_mounts.append(mount)
 
-        for node_tmpfs_host_path, tmpfs_details in node_tmpfs_mounts.items():
+        for host_path, tmpfs_details in node_tmpfs_mounts.items():
             mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
-                host_path=node_tmpfs_host_path,
+                host_path=host_path,
                 tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
 
         bootstrap_genconf_path = genconf_dir / 'serve'
-        bootstrap_genconf_path.mkdir()
-        bootstrap_tmp_path = '/opt/dcos_install_tmp'
+        # We wrap this in `Path` to work around
+        # https://github.com/PyCQA/pylint/issues/224.
+        Path(bootstrap_genconf_path).mkdir()
+        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
         bootstrap_mount = (
             '-v {bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
@@ -259,12 +271,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'INSTALLER_CTR': '{unique}-installer'.format(unique=unique),
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
-            'MASTER_MOUNTS': ' '.join(master_mounts),
+            'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
-            # Make sure that there are no home mounts.
-            # If $HOME is set to a directory we use, like `/root`, home mounts
-            # can cause problems.
-            'HOME_MOUNTS': '',
             'NODE_VOLUMES': ' '.join(node_mounts + bootstrap_mounts),
             # These are empty because they are already in `NODE_VOLUMES`, as
             # done in `make install`.
