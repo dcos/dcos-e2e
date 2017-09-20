@@ -146,7 +146,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 ),
             ).name
         )
-        self._path.mkdir(exist_ok=True)
         self._path = self._path.resolve()
 
         copytree(
@@ -156,6 +155,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # overwritten and therefore copying it is wasteful.
             ignore=ignore_patterns('dcos_generate_config.sh'),
         )
+
 
         # Files in the DC/OS Docker directory's `genconf` directory are mounted
         # to the installer at `/genconf`.
@@ -169,6 +169,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # We wrap this in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
         Path(genconf_dir).mkdir(exist_ok=True)
+        genconf_dir = genconf_dir.resolve()
+
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = genconf_dir / relative_installer_path
