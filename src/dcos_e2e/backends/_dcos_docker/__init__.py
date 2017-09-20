@@ -281,10 +281,53 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             make_args.append(set_variable)
 
         run_subprocess(
-            args=['make'] + make_args + ['install'],
+            args=['make'] + make_args + ['genconf'],
             cwd=str(self._path),
             log_output_live=self.log_output_live
         )
+
+        for master_number in range(start=1, stop=masters + 1):
+            self._run_dcos_install_in_container(
+                container_base_name=self._master_prefix,
+                container_number=master_number,
+                role='master',
+            )
+
+        for agent_number in range(start=1, stop=agents + 1):
+            self._run_dcos_install_in_container(
+                container_base_name=self._agent_prefix,
+                container_number=agent_number,
+                role='slave',
+            )
+
+        for public_agent_number in range(start=1, stop=public_agents + 1):
+            self._run_dcos_install_in_container(
+                container_base_name=self._public_agent_prefix,
+                container_number=public_agent_number,
+                role='slave_public',
+            )
+
+    def _run_dcos_install_in_container(
+        self,
+        container_base_name: str,
+        container_number: int,
+        role: str,
+    ) -> None:
+        """
+        Run ``dcos_install.sh`` in a container.
+        """
+        client = docker.from_env(version='auto')
+        container_name = container_base_name + str(container_number)
+        container = client.containers.get(container_name)
+        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
+        dcos_install_path = bootstrap_tmp_path / 'dcos_install.sh'
+        cmd = [
+            '/bin/bash',
+            str(dcos_install_path),
+            '--no-block-dcos-setup',
+            role,
+        ]
+        container.exec_run(cmd=cmd)
 
     def destroy(self) -> None:
         """
