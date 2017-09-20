@@ -217,7 +217,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         node_mounts = []
         for node_mount_host_path, node_details in node_volumes.items():
             if node_details is None:
-                mount = '-v host_path'
+                mount = '-v {host_path}'.format(host_path=node_mount_host_path)
             else:
                 mount = '-v {host_path}:{node_path}'.format(
                     host_path=node_mount_host_path,
@@ -262,12 +262,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'INSTALLER_CTR': '{unique}-installer'.format(unique=unique),
             'INSTALLER_PORT': str(_get_open_port()),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
-            'MASTER_MOUNTS': ' '.join(master_mounts),
+            'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
-            # Make sure that there are no home mounts.
-            # If $HOME is set to a directory we use, like `/root`, home mounts
-            # can cause problems.
-            'HOME_MOUNTS': '',
             'NODE_VOLUMES': ' '.join(node_mounts + bootstrap_mounts),
             # These are empty because they are already in `NODE_VOLUMES`, as
             # done in `make install`.
