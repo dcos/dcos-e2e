@@ -204,8 +204,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         certs_dir = include_dir / 'certs'
 
         node_volumes = {
-            '/var/lib/docker': '/var/lib/docker',
-            '/opt': '/opt',
+            '/var/lib/docker': None,
+            '/opt': None,
             str(certs_dir): '/etc/docker/certs.d',
         }
 
@@ -216,10 +216,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         node_mounts = []
         for node_mount_host_path, node_details in node_volumes.items():
-            mount = '-v {host_path}:{node_path}'.format(
-                host_path=node_mount_host_path,
-                node_path=node_details,
-            )
+            if node_details is None:
+                mount = '-v host_path'
+            else:
+                mount = '-v {host_path}:{node_path}'.format(
+                    host_path=node_mount_host_path,
+                    node_path=node_details,
+                )
             node_mounts.append(mount)
 
         for node_tmpfs_host_path, tmpfs_details in node_tmpfs_mounts.items():
