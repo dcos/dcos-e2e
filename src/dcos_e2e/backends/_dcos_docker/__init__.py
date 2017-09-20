@@ -286,21 +286,21 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             log_output_live=self.log_output_live
         )
 
-        for master_number in range(start=1, stop=masters + 1):
+        for master_number in range(1, masters + 1):
             self._run_dcos_install_in_container(
                 container_base_name=self._master_prefix,
                 container_number=master_number,
                 role='master',
             )
 
-        for agent_number in range(start=1, stop=agents + 1):
+        for agent_number in range(1, agents + 1):
             self._run_dcos_install_in_container(
                 container_base_name=self._agent_prefix,
                 container_number=agent_number,
                 role='slave',
             )
 
-        for public_agent_number in range(start=1, stop=public_agents + 1):
+        for public_agent_number in range(1, public_agents + 1):
             self._run_dcos_install_in_container(
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
