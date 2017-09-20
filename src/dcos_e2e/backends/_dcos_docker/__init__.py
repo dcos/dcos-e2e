@@ -204,6 +204,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         include_dir = self._path / 'include'
         certs_dir = include_dir / 'certs'
+        certs_dir.mkdir()
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
