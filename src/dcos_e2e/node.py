@@ -64,6 +64,8 @@ class Node:
             # changes.
             '-q',
             # This makes sure that only keys passed wih the -i option are used.
+            # Needed when there are already keys present in the SSH keychain,
+            # which cause `Error: Too many Authentication Failures`.
             '-o',
             'IdentitiesOnly=yes',
             # The node may be an unknown host.
