@@ -63,6 +63,9 @@ class Node:
             # In particular, we don't care about remote host identification
             # changes.
             '-q',
+            # This makes sure that only keys passed wih the -i option are used.
+            '-o',
+            'IdentitiesOnly=yes',
             # The node may be an unknown host.
             '-o',
             'StrictHostKeyChecking=no',
