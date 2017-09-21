@@ -183,7 +183,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         master_mounts = []
         for host_path, master_path in files_to_copy_to_masters.items():
-            mount = '-v {host_path}:{master_path}:ro'.format(
+            # The volume is mounted `read-write` because certain processes
+            # change the content or permission of the files on the volume.
+            mount = '-v {host_path}:{master_path}:rw'.format(
                 host_path=host_path.absolute(),
                 master_path=master_path,
             )
