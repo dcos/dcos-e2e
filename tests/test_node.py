@@ -60,13 +60,8 @@ class TestNode:
                 user='root'
             )
             assert chown_result.returncode == 0
-            # Remove stray file that prevents non-root SSH.
-            # https://ubuntuforums.org/showthread.php?t=2327330
-            rm_result = master.run(
-                args=['rm', '-f', '/run/nologin'], user='root'
-            )
-            assert rm_result.returncode == 0
-            # Confirm that commands can be run as the new user.
+
+             # Confirm that commands can be run as the new user.
             echo_result2 = master.run(args=['echo', '$USER'], user='testuser')
             assert echo_result2.returncode == 0
             assert echo_result2.stdout.strip() == b'testuser'
@@ -199,12 +194,6 @@ class TestNode:
                 user='root'
             )
             assert chown_result.returncode == 0
-            # Remove stray file that prevents non-root SSH.
-            # https://ubuntuforums.org/showthread.php?t=2327330
-            rm_result = master.run(
-                args=['rm', '-f', '/run/nologin'], user='root'
-            )
-            assert rm_result.returncode == 0
 
             popen_1 = master.popen(
                 args=[
