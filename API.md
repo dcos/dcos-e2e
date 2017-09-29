@@ -36,7 +36,7 @@
     - [`ip_address`](#ip_address)
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
-    - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-log_output_livefalse-envnone)
+    - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
     - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address-1)
