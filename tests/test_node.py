@@ -61,7 +61,7 @@ class TestNode:
             )
             assert chown_result.returncode == 0
 
-             # Confirm that commands can be run as the new user.
+            # Confirm that commands can be run as the new user.
             echo_result2 = master.run(args=['echo', '$USER'], user='testuser')
             assert echo_result2.returncode == 0
             assert echo_result2.stdout.strip() == b'testuser'
