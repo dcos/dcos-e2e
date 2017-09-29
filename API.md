@@ -36,8 +36,8 @@
     - [`ip_address`](#ip_address)
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
-    - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
-    - [`node.popen_as_root(args, env=None) -> Popen`](#nodepopen_as_rootargs-envnone---popen)
+    - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-log_output_livefalse-envnone)
+    - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address-1)
 
@@ -222,7 +222,7 @@ The path to an SSH key which can be used to SSH to the node as the `root` user.
 
 ### Methods
 
-#### `node.run_as_root(args, log_output_live=False, env=None)`
+#### `node.run(args, user, log_output_live=False, env=None)`
 
 If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 
@@ -231,7 +231,7 @@ To see these logs in `pytest` tests, use the `-s` flag.
 `env` is an optional mapping of environment variable names to values.
 These environment variables will be set on the node before running the command specified in `args`.
 
-#### `node.popen_as_root(args, env=None) -> Popen`
+#### `node.popen(args, user, env=None) -> Popen`
 
 `env` is an optional mapping of environment variable names to values.
 These environment variables will be set on the node before running the command specified in `args`.
@@ -243,3 +243,4 @@ The method returns a `Popen` object that can be used to communicate to the under
 #### `ip_address`
 
 The IP address of the node.
+

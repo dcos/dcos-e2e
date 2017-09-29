@@ -50,20 +50,25 @@ class TestExistingCluster:
                 (duplicate_agent, ) = duplicate_cluster.agents
                 (duplicate_public_agent, ) = duplicate_cluster.public_agents
 
-                duplicate_master.run_as_root(
-                    args=['touch', 'example_master_file'],
+                duplicate_master.run(
+                    args=['touch', 'example_master_file'], user='root'
                 )
-                duplicate_agent.run_as_root(
-                    args=['touch', 'example_agent_file'],
+                duplicate_agent.run(
+                    args=['touch', 'example_agent_file'], user='root'
                 )
-                duplicate_public_agent.run_as_root(
-                    args=['touch', 'example_public_agent_file'],
+                duplicate_public_agent.run(
+                    args=['touch', 'example_public_agent_file'], user='root'
                 )
 
-                master.run_as_root(args=['test', '-f', 'example_master_file'])
-                agent.run_as_root(args=['test', '-f', 'example_agent_file'])
-                public_agent.run_as_root(
+                master.run(
+                    args=['test', '-f', 'example_master_file'], user='root'
+                )
+                agent.run(
+                    args=['test', '-f', 'example_agent_file'], user='root'
+                )
+                public_agent.run(
                     args=['test', '-f', 'example_public_agent_file'],
+                    user='root'
                 )
 
             with pytest.raises(NotImplementedError):
