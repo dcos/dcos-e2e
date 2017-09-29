@@ -96,7 +96,7 @@ class Node:
         env: Optional[Dict]=None,
     ) -> CompletedProcess:
         """
-        Run a command on this node as `root`.
+        Run a command on this node the given user.
 
         Args:
             args: The command to run on the node.
@@ -116,6 +116,34 @@ class Node:
         ssh_args = self.compose_ssh_command(args, user, env)
 
         return run_subprocess(args=ssh_args, log_output_live=log_output_live)
+
+    def run_as_root(
+        self,
+        args: List[str],
+        log_output_live: bool=False,
+        env: Optional[Dict]=None,
+    ) -> CompletedProcess:
+        """
+        Run a command on this node as `root`.
+
+        Args:
+            args: The command to run on the node.
+            log_output_live: If `True`, log output live. If `True`, stderr is
+                merged into stdout in the return value.
+            env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
+
+        Returns:
+            The representation of the finished process.
+
+        Raises:
+            CalledProcessError: The process exited with a non-zero code.
+        """
+
+        return self.run(
+            args=args, user='root', log_output_live=log_output_live, env=env
+        )
 
     def popen(self, args: List[str], user: str,
               env: Optional[Dict]=None) -> Popen:

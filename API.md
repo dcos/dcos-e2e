@@ -37,6 +37,7 @@
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
     - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
+    - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
     - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address-1)
@@ -224,6 +225,17 @@ The path to an SSH key which can be used to SSH to the node as the `root` user.
 
 #### `node.run(args, user, log_output_live=False, env=None)`
 
+`user` specifies the user that the given command will be run for over SSH.
+
+If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
+
+To see these logs in `pytest` tests, use the `-s` flag.
+
+`env` is an optional mapping of environment variable names to values.
+These environment variables will be set on the node before running the command specified in `args`.
+
+#### `node.run_as_root(args, log_output_live=False, env=None)`
+
 If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 
 To see these logs in `pytest` tests, use the `-s` flag.
@@ -232,6 +244,8 @@ To see these logs in `pytest` tests, use the `-s` flag.
 These environment variables will be set on the node before running the command specified in `args`.
 
 #### `node.popen(args, user, env=None) -> Popen`
+
+`user` specifies the user that the given command will be run for over SSH.
 
 `env` is an optional mapping of environment variable names to values.
 These environment variables will be set on the node before running the command specified in `args`.
