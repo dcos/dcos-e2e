@@ -128,7 +128,7 @@ class TestExtendConfig:
             (master, ) = cluster.masters
             cluster.wait_for_dcos()
             with pytest.raises(CalledProcessError):
-                master.run(args=['test', '-f', path], user='root')
+                master.run_as_root(args=['test', '-f', path])
 
 
 class TestClusterSize:
@@ -303,7 +303,7 @@ class TestDestroyOnError:
                 raise Exception()
 
         with pytest.raises(CalledProcessError):
-            master.run(args=['echo', 'hello'], user='root')
+            master.run_as_root(args=['echo', 'hello'])
 
     def test_set_false_exception_raised(
         self,
@@ -326,7 +326,7 @@ class TestDestroyOnError:
                 cluster.wait_for_dcos()
                 raise Exception()
         # No exception is raised. The node still exists.
-        master.run(args=['echo', 'hello'], log_output_live=True, user='root')
+        master.run_as_root(args=['echo', 'hello'], log_output_live=True)
         cluster.destroy()
 
 
@@ -353,7 +353,7 @@ class TestDestroyOnSuccess:
             (master, ) = cluster.masters
 
         with pytest.raises(CalledProcessError):
-            master.run(args=['echo', 'hello'], user='root')
+            master.run_as_root(args=['echo', 'hello'])
 
     def test_false(
         self,
@@ -374,7 +374,7 @@ class TestDestroyOnSuccess:
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
 
-        master.run(args=['echo', 'hello'], user='root')
+        master.run_as_root(args=['echo', 'hello'])
         cluster.destroy()
 
 
@@ -416,5 +416,5 @@ class TestCopyFiles:
         ) as cluster:
             (master, ) = cluster.masters
             args = ['cat', str(master_destination_path)]
-            result = master.run(args=args, user='root')
+            result = master.run_as_root(args=args)
             assert result.stdout.decode() == content
