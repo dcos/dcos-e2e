@@ -257,4 +257,3 @@ The method returns a `Popen` object that can be used to communicate to the under
 #### `ip_address`
 
 The IP address of the node.
-

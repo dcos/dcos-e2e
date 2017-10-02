@@ -106,7 +106,7 @@ class TestExtendConfig:
         ) as cluster:
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
-            master.run(args=['test', '-f', path], user='root')
+            master.run_as_root(args=['test', '-f', path])
 
     def test_default_config(
         self,
