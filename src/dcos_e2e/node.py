@@ -39,7 +39,8 @@ class Node:
 
         Args:
             args: The command to run on the node.
-            user: The the user on the given host that the command will be run for over SSH.
+            user: The user on the given host that the command will be run for
+                    over SSH.
             env: Environment variables to be set on the node before running
                     the command. A mapping of environment variable names to
                     values.
