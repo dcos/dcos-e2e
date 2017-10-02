@@ -317,6 +317,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 role='slave_public',
             )
 
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            # Remove stray file that prevents non-root SSH.
+            # https://ubuntuforums.org/showthread.php?t=2327330
+            node.run_as_root(args=['rm', '-f', '/run/nologin'])
+
     def _run_dcos_install_in_container(
         self,
         container_base_name: str,

@@ -16,8 +16,9 @@ env:
   matrix:
       - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
       - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
+      - "TEST_PATTERN=tests/test_node.py::TestNode::test_run"
       - "TEST_PATTERN=tests/test_node.py::TestNode::test_run_as_root"
-      - "TEST_PATTERN=tests/test_node.py::TestNode::test_popen_as_root"
+      - "TEST_PATTERN=tests/test_node.py::TestNode::test_popen"
       - "TEST_PATTERN=tests/test_harness.py::TestIntegrationTests::test_run_pytest"
       - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_extend_config"
       - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_default_config"
