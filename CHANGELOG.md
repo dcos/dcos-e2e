@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [2017.10.04.0](#201710040)
   - [2017.08.11.0](#201708110)
   - [2017.08.08.0](#201708080)
   - [2017.08.05.0](#201708050)
@@ -21,6 +22,12 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## 2017.10.04.0
+
+* Added Apache2 license.
+* Repository moved to /mesosphere/dcos-e2e.
+* Add 2 new functions - run and popen, which have customisable users.
 
 ## 2017.08.11.0
 
