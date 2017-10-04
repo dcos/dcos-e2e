@@ -26,8 +26,9 @@
 ## 2017.10.04.0
 
 * Added Apache2 license.
-* Repository moved to /mesosphere/dcos-e2e.
-* Add 2 new functions - run and popen, which have customisable users.
+* Repository moved to `https://github.com/mesosphere/dcos-e2e`.
+* Added `run`, which is similar to `run_as_root` but takes a `user` argument.
+* Added `popen`, which can be used for running commands asynchronously.
 
 ## 2017.08.11.0
 
