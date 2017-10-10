@@ -1,4 +1,5 @@
 sudo: "required"
+filter_secrets: "false"
 
 services:
     - "docker"
