@@ -173,7 +173,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = genconf_dir / relative_installer_path
-            copyfile(src=host_path, dst=destination_path)
+            copyfile(src=str(host_path), dst=str(destination_path))
 
         extra_genconf_config = ''
         if extra_config:
