@@ -9,7 +9,6 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from subprocess import check_call
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Optional, Set, Type
 
@@ -350,21 +349,26 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         print('CONFIG BODY =')
         print(config_body)
 
-        genconf_args = [
-            'bash',
-            str(generate_config_path),
-            '--offline',
-            '-v',
-            '--genconf',
-        ]
+        # genconf_args = [
+        #     'bash',
+        #     str(generate_config_path),
+        #     '--offline',
+        #     '-v',
+        #     '--genconf',
+        # ]
+        #
+        # check_call(
+        #     args=genconf_args,
+        #     env={
+        #         'PORT': str(installer_port),
+        #         'DCOS_INSTALLER_CONTAINER_NAME': installer_ctr,
+        #     },
+        #     cwd=str(self._path),
 
-        check_call(
-            args=genconf_args,
-            env={
-                'PORT': str(installer_port),
-                'DCOS_INSTALLER_CONTAINER_NAME': installer_ctr,
-            },
+        run_subprocess(
+            args=['make'] + make_args + ['genconf'],
             cwd=str(self._path),
+            log_output_live=self.log_output_live
         )
 
         for master_number in range(1, masters + 1):
