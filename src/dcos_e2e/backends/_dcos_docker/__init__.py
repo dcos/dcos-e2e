@@ -14,6 +14,7 @@ from typing import Any, Dict, Optional, Set, Type
 
 import docker
 import yaml
+from passlib.hash import sha512_crypt
 
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -255,6 +256,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
         bootstrap_mounts = [bootstrap_mount]
 
+        installer_ctr = '{unique}-installer'.format(unique=unique)
+        installer_port = _get_open_port()
+
         variables = {
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
@@ -270,8 +274,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'MASTER_CTR': self._master_prefix,
             'AGENT_CTR': self._agent_prefix,
             'PUBLIC_AGENT_CTR': self._public_agent_prefix,
-            'INSTALLER_CTR': '{unique}-installer'.format(unique=unique),
-            'INSTALLER_PORT': str(_get_open_port()),
+            'INSTALLER_CTR': installer_ctr,
+            'INSTALLER_PORT': str(installer_port),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
@@ -291,9 +295,74 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             make_args.append(set_variable)
 
         run_subprocess(
-            args=['make'] + make_args + ['genconf'],
+            args=['make'] + make_args + ['start'],
             cwd=str(self._path),
-            log_output_live=self.log_output_live
+            log_output_live=self.log_output_live,
+        )
+
+        assert len(self.agents) == agents
+        assert len(self.public_agents) == public_agents
+        assert len(self.masters) == masters
+
+        superuser_password = 'admin'
+        superuser_password_hash = sha512_crypt.hash(superuser_password)
+        config_file_path = genconf_dir / 'config.yaml'
+        config_body_dict = {
+            'agent_list': [str(agent.ip_address) for agent in self.agents],
+            'public_agent_list': [
+                str(public_agent.ip_address)
+                for public_agent in self.public_agents
+            ],
+            'bootstrap_url':
+            'file://' + str(bootstrap_tmp_path),
+            'cluster_name':
+            'DCOS',
+            'exhibitor_storage_backend':
+            'static',
+            'master_discovery':
+            'static',
+            'master_list': [str(master.ip_address) for master in self.masters],
+            'process_timeout':
+            10000,
+            'resolvers': ['8.8.8.8'],
+            'ssh_port':
+            22,
+            'ssh_user':
+            'root',
+            'superuser_password_hash':
+            superuser_password_hash,
+            'superuser_username':
+            'admin',
+            'platform':
+            'docker',
+            'check_time':
+            'false',
+        }
+
+        config_body_dict.update(extra_config)
+        config_body = yaml.dump(
+            data=config_body_dict,
+            default_flow_style=False,
+        )
+
+        Path(config_file_path).write_text(config_body)
+
+        genconf_args = [
+            'bash',
+            str(generate_config_path),
+            '--offline',
+            '-v',
+            '--genconf',
+        ]
+
+        run_subprocess(
+            args=genconf_args,
+            env={
+                'PORT': str(installer_port),
+                'DCOS_INSTALLER_CONTAINER_NAME': installer_ctr,
+            },
+            log_output_live=self.log_output_live,
+            cwd=str(self._path),
         )
 
         for master_number in range(1, masters + 1):
