@@ -37,7 +37,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self, workspace_dir: Optional[Path]=None) -> None:
+    def __init__(self, workspace_dir: Optional[Path] = None) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
@@ -79,7 +79,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
     A record of a DC/OS Docker cluster.
     """
 
-    def __init__(  # pylint: disable=super-init-not-called,too-many-statements
+    def __init__(  # noqa: E501 pylint: disable=super-init-not-called,too-many-statements,too-many-branches,wrong-spelling-in-comment
         self,
         generate_config_path: Optional[Path],
         masters: int,
@@ -294,11 +294,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
             make_args.append(set_variable)
 
-        run_subprocess(
-            args=['make'] + make_args + ['start'],
-            cwd=str(self._path),
-            log_output_live=self.log_output_live,
-        )
+        for target in [
+            'build',
+            'master',
+            'agent',
+            'public_agent',
+        ]:
+            run_subprocess(
+                args=['make'] + make_args + [target],
+                cwd=str(self._path),
+                log_output_live=self.log_output_live,
+            )
 
         assert len(self.agents) == agents
         assert len(self.public_agents) == public_agents
