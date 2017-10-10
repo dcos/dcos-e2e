@@ -347,6 +347,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         Path(config_file_path).write_text(config_body)
+        print('CONFIG BODY =')
+        print(config_body)
 
         genconf_args = [
             'bash',
