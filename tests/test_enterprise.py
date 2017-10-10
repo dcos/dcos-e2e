@@ -38,6 +38,7 @@ class TestEnterpriseIntegrationTests:
             generate_config_path=enterprise_artifact,
             cluster_backend=cluster_backend,
             extra_config=extra_config,
+            log_output_live=True,
         ) as cluster:
             # No error is raised with a successful command.
             cluster.run_integration_tests(
@@ -80,6 +81,7 @@ class TestWaitForDCOS:
             generate_config_path=enterprise_artifact,
             cluster_backend=cluster_backend,
             extra_config=extra_config,
+            log_output_live=True,
         ) as cluster:
             (master, ) = cluster.masters
             cluster.wait_for_dcos()

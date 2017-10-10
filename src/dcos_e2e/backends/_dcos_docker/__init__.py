@@ -297,7 +297,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         run_subprocess(
             args=['make'] + make_args + ['start'],
             cwd=str(self._path),
-            log_output_live=self.log_output_live
+            log_output_live=self.log_output_live,
         )
 
         assert len(self.agents) == agents
@@ -346,29 +346,23 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         Path(config_file_path).write_text(config_body)
-        print('CONFIG BODY =')
-        print(config_body)
 
-        # genconf_args = [
-        #     'bash',
-        #     str(generate_config_path),
-        #     '--offline',
-        #     '-v',
-        #     '--genconf',
-        # ]
-        #
-        # check_call(
-        #     args=genconf_args,
-        #     env={
-        #         'PORT': str(installer_port),
-        #         'DCOS_INSTALLER_CONTAINER_NAME': installer_ctr,
-        #     },
-        #     cwd=str(self._path),
+        genconf_args = [
+            'bash',
+            str(generate_config_path),
+            '--offline',
+            '-v',
+            '--genconf',
+        ]
 
         run_subprocess(
-            args=['make'] + make_args + ['genconf'],
+            args=genconf_args,
+            env={
+                'PORT': str(installer_port),
+                'DCOS_INSTALLER_CONTAINER_NAME': installer_ctr,
+            },
+            log_output_live=self.log_output_live,
             cwd=str(self._path),
-            log_output_live=self.log_output_live
         )
 
         for master_number in range(1, masters + 1):

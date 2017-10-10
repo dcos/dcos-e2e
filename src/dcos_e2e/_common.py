@@ -10,7 +10,7 @@ from subprocess import (
     CompletedProcess,
     Popen,
 )
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
@@ -19,7 +19,8 @@ LOGGER = logging.getLogger(__name__)
 def run_subprocess(
     args: List[str],
     log_output_live: bool,
-    cwd: Optional[Union[bytes, str]]=None
+    cwd: Optional[Union[bytes, str]]=None,
+    env: Optional[Dict[str, str]]=None,
 ) -> CompletedProcess:
     """
     Run a command in a subprocess.
@@ -29,6 +30,7 @@ def run_subprocess(
         log_output_live: If `True`, log output live. If `True`, stderr is
             merged into stdout in the return value.
         cwd: See `subprocess.run`.
+        env: See `subprocess.run`.
 
     Returns:
         See `subprocess.run`.
@@ -49,6 +51,7 @@ def run_subprocess(
         cwd=cwd,
         stdout=PIPE,
         stderr=process_stderr,
+        env=env,
     ) as process:
         try:
             if log_output_live:
