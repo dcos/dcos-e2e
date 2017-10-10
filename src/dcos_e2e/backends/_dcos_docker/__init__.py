@@ -296,8 +296,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         for target in [
             'build',
-            'clean-certs',
-            'clean-containers',
             'master',
             'agent',
             'public_agent',
