@@ -301,7 +301,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'master',
             'agent',
             'public_agent',
-            'installer',
         ]:
             run_subprocess(
                 args=['make'] + make_args + [target],
