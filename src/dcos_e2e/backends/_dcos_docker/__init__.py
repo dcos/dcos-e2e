@@ -299,6 +299,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             log_output_live=self.log_output_live
         )
 
+        assert len(self.agents) == agents
+        assert len(self.public_agents) == agents
+        assert len(self.masters) == agents
+
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
         config_file_path = genconf_dir / 'config.yaml'
