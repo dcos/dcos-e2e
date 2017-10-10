@@ -31,6 +31,7 @@ class Node:
     def compose_ssh_command(
         self,
         args: List[str],
+        user: str,
         env: Optional[Dict]=None,
     ) -> List[str]:
         """
@@ -38,6 +39,8 @@ class Node:
 
         Args:
             args: The command to run on the node.
+            user: The user on the given host that the command will be run for
+                    over SSH.
             env: Environment variables to be set on the node before running
                     the command. A mapping of environment variable names to
                     values.
@@ -63,15 +66,21 @@ class Node:
             # In particular, we don't care about remote host identification
             # changes.
             '-q',
+            # This makes sure that only keys passed with the -i option are
+            # used. Needed when there are already keys present in the SSH
+            # key chain, which cause `Error: Too many Authentication
+            # Failures`.
+            '-o',
+            'IdentitiesOnly=yes',
             # The node may be an unknown host.
             '-o',
             'StrictHostKeyChecking=no',
             # Use an SSH key which is authorized.
             '-i',
             str(self._ssh_key_path),
-            # Run commands as the root user.
+            # Run commands as the specified user.
             '-l',
-            'root',
+            user,
             # Bypass password checking.
             '-o',
             'PreferredAuthentications=publickey',
@@ -79,6 +88,35 @@ class Node:
         ] + command
 
         return ssh_args
+
+    def run(
+        self,
+        args: List[str],
+        user: str,
+        log_output_live: bool=False,
+        env: Optional[Dict]=None,
+    ) -> CompletedProcess:
+        """
+        Run a command on this node the given user.
+
+        Args:
+            args: The command to run on the node.
+            user: The username to SSH as.
+            log_output_live: If `True`, log output live. If `True`, stderr is
+                merged into stdout in the return value.
+            env: Environment variables to be set on the node before running
+                the command. A mapping of environment variable names to
+                values.
+
+        Returns:
+            The representation of the finished process.
+
+        Raises:
+            CalledProcessError: The process exited with a non-zero code.
+        """
+        ssh_args = self.compose_ssh_command(args, user, env)
+
+        return run_subprocess(args=ssh_args, log_output_live=log_output_live)
 
     def run_as_root(
         self,
@@ -103,17 +141,19 @@ class Node:
         Raises:
             CalledProcessError: The process exited with a non-zero code.
         """
-        ssh_args = self.compose_ssh_command(args, env)
 
-        return run_subprocess(args=ssh_args, log_output_live=log_output_live)
+        return self.run(
+            args=args, user='root', log_output_live=log_output_live, env=env
+        )
 
-    def popen_as_root(self, args: List[str],
-                      env: Optional[Dict]=None) -> Popen:
+    def popen(self, args: List[str], user: str,
+              env: Optional[Dict]=None) -> Popen:
         """
-        Open a pipe to a command run on a node as `root`.
+        Open a pipe to a command run on a node as the given user.
 
         Args:
             args: The command to run on the node.
+            user: The user to open a pipe for a command for over SSH.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
@@ -121,7 +161,7 @@ class Node:
         Returns:
             The pipe object attached to the specified process.
         """
-        ssh_args = self.compose_ssh_command(args, env)
+        ssh_args = self.compose_ssh_command(args, user, env)
 
         process = Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
 

@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [2017.10.04.0](#201710040)
   - [2017.08.11.0](#201708110)
   - [2017.08.08.0](#201708080)
   - [2017.08.05.0](#201708050)
@@ -21,6 +22,13 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## 2017.10.04.0
+
+* Added Apache2 license.
+* Repository moved to `https://github.com/mesosphere/dcos-e2e`.
+* Added `run`, which is similar to `run_as_root` but takes a `user` argument.
+* Added `popen`, which can be used for running commands asynchronously.
 
 ## 2017.08.11.0
 
