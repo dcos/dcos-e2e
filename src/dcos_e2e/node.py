@@ -32,7 +32,7 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict]=None,
+        env: Optional[Dict] = None,
     ) -> List[str]:
         """
         Run the specified command on the given host using SSH.
@@ -93,8 +93,8 @@ class Node:
         self,
         args: List[str],
         user: str,
-        log_output_live: bool=False,
-        env: Optional[Dict]=None,
+        log_output_live: bool = False,
+        env: Optional[Dict] = None,
     ) -> CompletedProcess:
         """
         Run a command on this node the given user.
@@ -121,8 +121,8 @@ class Node:
     def run_as_root(
         self,
         args: List[str],
-        log_output_live: bool=False,
-        env: Optional[Dict]=None,
+        log_output_live: bool = False,
+        env: Optional[Dict] = None,
     ) -> CompletedProcess:
         """
         Run a command on this node as `root`.
@@ -147,7 +147,7 @@ class Node:
         )
 
     def popen(self, args: List[str], user: str,
-              env: Optional[Dict]=None) -> Popen:
+              env: Optional[Dict] = None) -> Popen:
         """
         Open a pipe to a command run on a node as the given user.
 

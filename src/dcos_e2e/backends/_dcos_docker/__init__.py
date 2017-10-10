@@ -36,7 +36,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self, workspace_dir: Optional[Path]=None) -> None:
+    def __init__(self, workspace_dir: Optional[Path] = None) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 

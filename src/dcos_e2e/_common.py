@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 def run_subprocess(
     args: List[str],
     log_output_live: bool,
-    cwd: Optional[Union[bytes, str]]=None
+    cwd: Optional[Union[bytes, str]] = None
 ) -> CompletedProcess:
     """
     Run a command in a subprocess.
