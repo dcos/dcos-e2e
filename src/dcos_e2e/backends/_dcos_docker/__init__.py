@@ -173,7 +173,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = genconf_dir / relative_installer_path
-            copyfile(src=str(host_path), dst=str(destination_path))
+            copyfile(src=host_path, dst=destination_path)
 
         extra_genconf_config = ''
         if extra_config:
@@ -294,11 +294,20 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
             make_args.append(set_variable)
 
-        run_subprocess(
-            args=['make'] + make_args + ['start'],
-            cwd=str(self._path),
-            log_output_live=self.log_output_live,
-        )
+        for target in [
+            'build',
+            'clean-certs',
+            'clean-containers',
+            'master',
+            'agent',
+            'public_agent',
+            'installer',
+        ]:
+            run_subprocess(
+                args=['make'] + make_args + [target],
+                cwd=str(self._path),
+                log_output_live=self.log_output_live,
+            )
 
         assert len(self.agents) == agents
         assert len(self.public_agents) == public_agents
