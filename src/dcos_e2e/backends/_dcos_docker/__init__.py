@@ -356,6 +356,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 'PORT': str(installer_port),
                 'DCOS_INSTALLER_CONTAINER_NAME': installer_ctr,
             },
+            cwd=str(self._path),
         )
 
         for master_number in range(1, masters + 1):
