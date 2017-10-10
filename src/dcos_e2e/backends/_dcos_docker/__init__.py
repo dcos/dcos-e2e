@@ -302,8 +302,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         assert len(self.agents) == agents
-        assert len(self.public_agents) == agents
-        assert len(self.masters) == agents
+        assert len(self.public_agents) == public_agents
+        assert len(self.masters) == masters
 
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
