@@ -56,16 +56,16 @@ class TestCopyFiles:
     Tests for copying files to nodes.
     """
 
-    def test_copy_files_to_installers(
+    def test_copy_files_to_installer(
         self,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
     ) -> None:
         """
-        Files can be copied from the host to the installer nodes at creation
+        Files can be copied from the host to the installer node at creation
         time.
 
-        The installer containers are removed shortly after creation by DC/OS
+        The installer container isremoved shortly after creation by DC/OS
         Docker. Therefore, we inspect the symptoms - we can use custom CA
         certificates.
 
