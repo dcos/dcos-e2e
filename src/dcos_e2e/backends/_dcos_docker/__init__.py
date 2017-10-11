@@ -424,6 +424,26 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         ]
         container.exec_run(cmd=cmd)
 
+    def _start_dcos_container(
+        self,
+        volumes: Dict[str, Dict[
+    ):
+        docker_image = 'XXX'
+        hostname = 'XXX'
+        environment = {}
+        extra_hosts = {}
+
+        client = docker.from_env(version='auto')
+        client.containers.run(
+            privileged=True,
+            environment=environment,
+            hostname=hostname,
+            extra_hosts=extra_hosts,
+            image=docker_image,
+            volumes=volumes,
+        )
+        pass
+
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
