@@ -105,6 +105,7 @@ class TestCopyFiles:
             generate_config_path=enterprise_artifact,
             files_to_copy_to_installer=files_to_copy_to_installer,
             files_to_copy_to_masters={ca_key_path: master_key_path},
+            log_output_live=True,
             masters=1,
             agents=0,
             public_agents=0,
