@@ -32,6 +32,7 @@ class TestNode:
             public_agents=0,
             cluster_backend=cluster_backend,
             generate_config_path=oss_artifact,
+            log_output_live=True,
         ) as cluster:
             (master, ) = cluster.masters
             echo_result = master.run(args=['echo', '$USER'], user='root')
@@ -86,7 +87,9 @@ class TestNode:
             # into stdout.
             with pytest.raises(CalledProcessError) as excinfo:
                 master.run(
-                    args=['unset_command'], user='root', log_output_live=True
+                    args=['unset_command'],
+                    user='root',
+                    log_output_live=True,
                 )
 
             exception = excinfo.value
