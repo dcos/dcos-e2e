@@ -65,7 +65,7 @@ class TestCopyFiles:
         Files can be copied from the host to the installer node at creation
         time.
 
-        The installer container isremoved shortly after creation by DC/OS
+        The installer container is removed shortly after creation by DC/OS
         Docker. Therefore, we inspect the symptoms - we can use custom CA
         certificates.
 
