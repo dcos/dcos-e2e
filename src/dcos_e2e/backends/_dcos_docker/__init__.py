@@ -426,8 +426,22 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
     def _start_dcos_container(
         self,
-        volumes: Dict[str, Dict[
-    ):
+        container_base_name: str,
+        container_number: int,
+        volumes: Dict[str, Dict[str, str]],
+    ) -> None:
+        """
+        Start a master, agent or public agent container.
+        In this container, start Docker and `sshd`.
+
+        Run Mesos without `systemd` support. This is not supported by DC/OS.
+        See https://jira.mesosphere.com/browse/DCOS_OSS-1131.
+
+        Args:
+            container_base_name: The start of the container name.
+            container_number: The end of the container name.
+            volumes: XXX
+        """
         docker_image = 'XXX'
         hostname = 'XXX'
         environment = {}
