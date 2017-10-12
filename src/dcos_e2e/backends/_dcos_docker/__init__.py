@@ -442,7 +442,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             container_number: The end of the container name.
             volumes: XXX
         """
-        docker_image = 'XXX'
+        docker_image = 'mesosphere/dcos-docker'
         hostname = 'XXX'
         environment = {}
         extra_hosts = {}
