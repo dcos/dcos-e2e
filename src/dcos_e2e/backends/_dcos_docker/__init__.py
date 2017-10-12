@@ -443,7 +443,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             volumes: XXX
         """
         docker_image = 'mesosphere/dcos-docker'
-        hostname = 'XXX'
+        registry_host = 'registry.local'
+        extra_host_ip_address = 'XXX'
+        hostname = container_base_name + str(container_number)
         environment = {}
         extra_hosts = {}
 
