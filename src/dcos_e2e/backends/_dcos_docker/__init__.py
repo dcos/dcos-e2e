@@ -10,7 +10,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Optional, Set, Type
+from typing import Any, Dict, List, Optional, Set, Type, Union
 
 import docker
 import yaml
@@ -186,7 +186,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         for host_path, master_path in files_to_copy_to_masters.items():
             # The volume is mounted `read-write` because certain processes
             # change the content or permission of the files on the volume.
-            mount = '-v {host_path}:{master_path}:rw'.format(
+            mount = '{host_path}:{master_path}:rw'.format(
                 host_path=host_path.absolute(),
                 master_path=master_path,
             )
@@ -211,34 +211,23 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
-        node_anonymous_volumes = [Path('/var/lib/docker'), Path('/opt')]
+        node_anonymous_volumes = ['/var/lib/docker', '/opt']
 
         node_host_volumes = {
             certs_dir.resolve(): Path('/etc/docker/certs.d'),
         }
 
         node_tmpfs_mounts = {
-            Path('/run'): 'rw,exec,nosuid,size=2097152k',
-            Path('/tmp'): 'rw,exec,nosuid,size=2097152k',
+            '/run': 'rw,exec,nosuid,size=2097152k',
+            '/tmp': 'rw,exec,nosuid,size=2097152k',
         }
 
-        node_mounts = []
-
-        for node_path in node_anonymous_volumes:
-            mount = '-v {path}'.format(path=node_path)
-            node_mounts.append(mount)
+        node_mounts = node_anonymous_volumes
 
         for host_volume_path, node_path in node_host_volumes.items():
-            mount = '-v {host_path}:{node_path}'.format(
+            mount = '{host_path}:{node_path}'.format(
                 host_path=host_volume_path,
                 node_path=node_path,
-            )
-            node_mounts.append(mount)
-
-        for host_path, tmpfs_details in node_tmpfs_mounts.items():
-            mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
-                host_path=host_path,
-                tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
 
@@ -249,12 +238,12 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
         bootstrap_mount = (
-            '-v {bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
+            '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
                 bootstrap_genconf_path=bootstrap_genconf_path,
                 bootstrap_tmp_path=bootstrap_tmp_path,
             )
         )
-        bootstrap_mounts = [bootstrap_mount]
+        node_mounts += [bootstrap_mount]
 
         installer_ctr = '{unique}-installer'.format(unique=unique)
         installer_port = _get_open_port()
@@ -263,9 +252,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
             'DOCKER_STORAGEDRIVER': storage_driver,
-            # Some platforms support systemd and some do not.
-            # Disabling support makes all platforms consistent in this aspect.
-            'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',
             # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
@@ -277,12 +263,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'INSTALLER_CTR': installer_ctr,
             'INSTALLER_PORT': str(installer_port),
             'EXTRA_GENCONF_CONFIG': extra_genconf_config,
-            'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
-            'NODE_VOLUMES': ' '.join(node_mounts + bootstrap_mounts),
-            # These are empty because they are already in `NODE_VOLUMES`, as
-            # done in `make install`.
-            'BOOTSTRAP_VOLUMES': '',
         }  # type: Dict[str, str]
 
         make_args = []
@@ -294,16 +275,40 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
             make_args.append(set_variable)
 
-        for target in [
-            'build',
-            'master',
-            'agent',
-            'public_agent',
-        ]:
-            run_subprocess(
-                args=['make'] + make_args + [target],
-                cwd=str(self._path),
-                log_output_live=self.log_output_live,
+        run_subprocess(
+            args=['make'] + make_args + ['build'],
+            cwd=str(self._path),
+            log_output_live=self.log_output_live,
+        )
+
+        for master_number in range(1, masters + 1):
+            self._start_dcos_container(
+                container_base_name=self._master_prefix,
+                container_number=master_number,
+                dcos_num_masters=masters,
+                dcos_num_agents=agents + public_agents,
+                volumes=master_mounts + node_mounts,
+                tmpfs=node_tmpfs_mounts,
+            )
+
+        for agent_number in range(1, agents + 1):
+            self._start_dcos_container(
+                container_base_name=self._agent_prefix,
+                container_number=agent_number,
+                dcos_num_masters=masters,
+                dcos_num_agents=agents + public_agents,
+                volumes=node_mounts,
+                tmpfs=node_tmpfs_mounts,
+            )
+
+        for public_agent_number in range(1, public_agents + 1):
+            self._run_dcos_install_in_container(
+                container_base_name=self._public_agent_prefix,
+                container_number=public_agent_number,
+                dcos_num_masters=masters,
+                dcos_num_agents=agents + public_agents,
+                volumes=node_mounts,
+                tmpfs=node_tmpfs_mounts,
             )
 
         assert len(self.agents) == agents
@@ -428,7 +433,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         self,
         container_base_name: str,
         container_number: int,
-        volumes: Dict[str, Dict[str, str]],
+        volumes: Union[Dict[str, Dict[str, str]], List[str]],
+        tmpfs: Dict[str, str],
         dcos_num_masters: int,
         dcos_num_agents: int,
     ) -> None:
@@ -443,8 +449,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             container_base_name: The start of the container name.
             container_number: The end of the container name.
             volumes: XXX
-            dcos_num_masters: XXX
-            dcos_num_agents: XXX
+            dcos_num_masters: The number of master nodes expected to be in the
+                cluster once it has been created.
+            dcos_num_agents: The number of agent nodes (agent and public
+                agents) expected to be in the cluster once it has been created.
         """
         docker_image = 'mesosphere/dcos-docker'
         registry_host = 'registry.local'
@@ -471,12 +479,18 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             extra_hosts=extra_hosts,
             image=docker_image,
             volumes=volumes,
+            tmpfs=tmpfs,
         )
+
+        disable_systemd_support_cmd = (
+            "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
+            '/var/lib/dcos/mesos-slave-common'
+        )
+
         for cmd in [
-            ['mkdir', '-p', '/var/lib/dcos'], [
-                '/bin/bash', '-c',
-                "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> /var/lib/dcos/mesos-slave-common"
-            ]['systemctl', 'start', 'sshd.service']
+            ['mkdir', '-p', '/var/lib/dcos'],
+            ['/bin/bash', '-c', disable_systemd_support_cmd],
+            ['systemctl', 'start', 'sshd.service'],
         ]:
             container.exec_run(cmd=cmd)
 
