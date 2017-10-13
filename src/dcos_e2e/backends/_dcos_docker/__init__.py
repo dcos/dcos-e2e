@@ -6,6 +6,7 @@ import inspect
 import os
 import socket
 import uuid
+from copy import deepcopy
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
@@ -182,7 +183,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 default_flow_style=False,
             )
 
-
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
@@ -209,18 +209,25 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
         agent_mounts = {
-            str(certs_dir.resolve()): '/etc/docker/certs.d',
-            'var_lib_docker': '/var/lib/docker',
-            'opt': '/opt',
-            str(bootstrap_genconf_path): str(bootstrap_tmp_path),
+            str(certs_dir.resolve()): {
+                'bind': '/etc/docker/certs.d',
+                'mode': 'rw'
+            },
+            'var_lib_docker': {
+                'bind': '/var/lib/docker',
+                'mode': 'rw'
+            },
+            'opt': {
+                'bind': '/opt',
+                'mode': 'rw'
+            },
+            str(bootstrap_genconf_path): {
+                'bind': str(bootstrap_tmp_path),
+                'mode': 'rw'
+            }
         }
 
-        master_mounts = {
-            str(certs_dir.resolve()): {'bind': '/etc/docker/certs.d', 'mode': 'rw'},
-            'var_lib_docker': {'bind': '/var/lib/docker', 'mode': 'rw'},
-            'opt': {'bind': '/opt', 'mode': 'rw'},
-            str(bootstrap_genconf_path): {'bind': str(bootstrap_tmp_path), 'mode': 'rw'}
-        }
+        master_mounts = deepcopy(agent_mounts)
 
         for host_path, master_path in files_to_copy_to_masters.items():
             # The volume is mounted `read-write` because certain processes
