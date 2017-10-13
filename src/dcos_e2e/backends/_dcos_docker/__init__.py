@@ -476,6 +476,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         client = docker.from_env(version='auto')
         container = client.containers.run(
+            name=hostname,
             privileged=True,
             detach=True,
             tty=True,
