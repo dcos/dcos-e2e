@@ -253,8 +253,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'MASTER_CTR': self._master_prefix,
             'AGENT_CTR': self._agent_prefix,
             'PUBLIC_AGENT_CTR': self._public_agent_prefix,
-            'INSTALLER_CTR': installer_ctr,
-            'INSTALLER_PORT': str(installer_port),
             'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
             'NODE_VOLUMES': ' '.join(node_mounts),
