@@ -225,7 +225,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             '-v {bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
                 bootstrap_genconf_path=bootstrap_genconf_path,
                 bootstrap_tmp_path=bootstrap_tmp_path,
-            )
+            ),
         ]
 
         for node_path, tmpfs_details in node_tmpfs_mounts.items():
