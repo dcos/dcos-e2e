@@ -429,6 +429,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         container_base_name: str,
         container_number: int,
         volumes: Dict[str, Dict[str, str]],
+        dcos_num_masters: int,
+        dcos_num_agents: int,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -441,24 +443,42 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             container_base_name: The start of the container name.
             container_number: The end of the container name.
             volumes: XXX
+            dcos_num_masters: XXX
+            dcos_num_agents: XXX
         """
         docker_image = 'mesosphere/dcos-docker'
         registry_host = 'registry.local'
-        extra_host_ip_address = 'XXX'
+        if len(self.masters):
+            first_master = next(iter(self.masters))
+            extra_host_ip_address = str(first_master.ip_address)
+        else:
+            extra_host_ip_address = '127.0.0.1'
         hostname = container_base_name + str(container_number)
-        environment = {}
-        extra_hosts = {}
+        environment = {
+            'container': hostname,
+            'DCOS_NUM_MASTERS': dcos_num_masters,
+            'DCOS_NUM_AGENTS': dcos_num_agents,
+        }
+        extra_hosts = {registry_host: extra_host_ip_address}
 
         client = docker.from_env(version='auto')
-        client.containers.run(
+        container = client.containers.run(
             privileged=True,
+            detach=True,
+            tty=True,
             environment=environment,
             hostname=hostname,
             extra_hosts=extra_hosts,
             image=docker_image,
             volumes=volumes,
         )
-        pass
+        for cmd in [
+            ['mkdir', '-p', '/var/lib/dcos'], [
+                '/bin/bash', '-c',
+                "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> /var/lib/dcos/mesos-slave-common"
+            ]['systemctl', 'start', 'sshd.service']
+        ]:
+            container.exec_run(cmd=cmd)
 
     def destroy(self) -> None:
         """
