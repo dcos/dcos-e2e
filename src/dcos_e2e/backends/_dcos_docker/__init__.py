@@ -176,13 +176,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             destination_path = genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        extra_genconf_config = ''
-        if extra_config:
-            extra_genconf_config = yaml.dump(
-                data=extra_config,
-                default_flow_style=False,
-            )
-
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
@@ -259,7 +252,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'PUBLIC_AGENT_CTR': self._public_agent_prefix,
             'INSTALLER_CTR': installer_ctr,
             'INSTALLER_PORT': str(installer_port),
-            'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
         }  # type: Dict[str, str]
 
