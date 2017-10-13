@@ -175,6 +175,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             destination_path = genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
+        extra_genconf_config = ''
+        if extra_config:
+            extra_genconf_config = yaml.dump(
+                data=extra_config,
+                default_flow_style=False,
+            )
+
         master_mounts = []
         for host_path, master_path in files_to_copy_to_masters.items():
             # The volume is mounted `read-write` because certain processes
@@ -269,6 +276,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'PUBLIC_AGENT_CTR': self._public_agent_prefix,
             'INSTALLER_CTR': installer_ctr,
             'INSTALLER_PORT': str(installer_port),
+            'EXTRA_GENCONF_CONFIG': extra_genconf_config,
             'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
             'NODE_VOLUMES': ' '.join(node_mounts + bootstrap_mounts),
