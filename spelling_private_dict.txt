@@ -15,6 +15,7 @@ dir
 env
 genconf
 ip
+mesos
 noqa
 os
 oss
@@ -22,11 +23,13 @@ postflight
 pragma
 pytest
 src
+sshd
 stderr
 stdout
 str
 systemd
 tmp
+tmpfs
 travis
 typeshed
 url
