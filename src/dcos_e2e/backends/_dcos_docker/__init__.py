@@ -202,22 +202,21 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
 
+        bootstrap_genconf_path = genconf_dir / 'serve'
+        # We wrap this in `Path` to work around
+        # https://github.com/PyCQA/pylint/issues/224.
+        Path(bootstrap_genconf_path).mkdir()
+        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
+
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
-        node_volumes = {
-            str(certs_dir.resolve()): {
-                'bind': '/etc/docker/certs.d',
-                'mode': 'rw'
-            },
-            'var_lib_docker': {
-                'bind': '/var/lib/docker',
-                'mode': 'rw'
-            },
-            'opt': {
-                'bind': '/opt',
-                'mode': 'rw'
-            },
-        }
+        node_volumes = [
+            str(certs_dir.resolve()) + ':/etc/docker/certs.d'
+            '/var/lib/docker',
+            '/opt',
+            str(bootstrap_genconf_path) + ':' + str(bootstrap_tmp_path) +
+            ':ro',
+        ]
 
         node_tmpfs_mounts = {
             '/run': 'rw,exec,nosuid,size=2097152k',
@@ -226,12 +225,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         node_mounts = []
 
-        for mount_key, mount_value in node_volumes.items():
-            mount = '-v {first_part}:{node_path}:{mode}'.format(
-                first_part=mount_key,
-                node_path=mount_value['bind'],
-                mode=mount_value['mode'],
-            )
+        for mount_value in node_volumes:
+            mount = '-v ' + mount_value
             node_mounts.append(mount)
 
         for node_path, tmpfs_details in node_tmpfs_mounts.items():
@@ -240,20 +235,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
-
-        bootstrap_genconf_path = genconf_dir / 'serve'
-        # We wrap this in `Path` to work around
-        # https://github.com/PyCQA/pylint/issues/224.
-        Path(bootstrap_genconf_path).mkdir()
-        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
-
-        bootstrap_mount = (
-            '-v {bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
-                bootstrap_genconf_path=bootstrap_genconf_path,
-                bootstrap_tmp_path=bootstrap_tmp_path,
-            )
-        )
-        bootstrap_mounts = [bootstrap_mount]
 
         installer_ctr = '{unique}-installer'.format(unique=unique)
         installer_port = _get_open_port()
@@ -277,7 +258,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'INSTALLER_PORT': str(installer_port),
             'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
             'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
-            'NODE_VOLUMES': ' '.join(node_mounts + bootstrap_mounts),
+            'NODE_VOLUMES': ' '.join(node_mounts),
             # These are empty because they are already in `NODE_VOLUMES`, as
             # done in `make install`.
             'BOOTSTRAP_VOLUMES': '',
