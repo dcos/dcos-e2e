@@ -5,7 +5,6 @@ Helpers for interacting with DC/OS Docker.
 import inspect
 import os
 import socket
-import time
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -183,15 +182,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 default_flow_style=False,
             )
 
-        master_mounts = []
-        for host_path, master_path in files_to_copy_to_masters.items():
-            # The volume is mounted `read-write` because certain processes
-            # change the content or permission of the files on the volume.
-            mount = '{host_path}:{master_path}:rw'.format(
-                host_path=host_path.absolute(),
-                master_path=master_path,
-            )
-            master_mounts.append(mount)
 
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
@@ -210,41 +200,40 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
 
-        # See https://success.docker.com/KBase/Different_Types_of_Volumes
-        # for a definition of different types of volumes.
-        node_anonymous_volumes = ['/var/lib/docker', '/opt']
-
-        node_host_volumes = {
-            certs_dir.resolve(): Path('/etc/docker/certs.d'),
-        }
-
-        node_tmpfs_mounts = {
-            '/run': 'rw,exec,nosuid,size=2097152k',
-            '/tmp': 'rw,exec,nosuid,size=2097152k',
-        }
-
-        node_mounts = node_anonymous_volumes
-
-        for host_volume_path, node_path in node_host_volumes.items():
-            mount = '{host_path}:{node_path}'.format(
-                host_path=host_volume_path,
-                node_path=node_path,
-            )
-            node_mounts.append(mount)
-
         bootstrap_genconf_path = genconf_dir / 'serve'
         # We wrap this in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
         Path(bootstrap_genconf_path).mkdir()
         bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
-        bootstrap_mount = (
-            '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
-                bootstrap_genconf_path=bootstrap_genconf_path,
-                bootstrap_tmp_path=bootstrap_tmp_path,
-            )
-        )
-        node_mounts += [bootstrap_mount]
+        # See https://success.docker.com/KBase/Different_Types_of_Volumes
+        # for a definition of different types of volumes.
+        agent_mounts = {
+            str(certs_dir.resolve()): '/etc/docker/certs.d',
+            'var_lib_docker': '/var/lib/docker',
+            'opt': '/opt',
+            str(bootstrap_genconf_path): str(bootstrap_tmp_path),
+        }
+
+        master_mounts = {
+            str(certs_dir.resolve()): {'bind': '/etc/docker/certs.d', 'mode': 'rw'},
+            'var_lib_docker': {'bind': '/var/lib/docker', 'mode': 'rw'},
+            'opt': {'bind': '/opt', 'mode': 'rw'},
+            str(bootstrap_genconf_path): {'bind': str(bootstrap_tmp_path), 'mode': 'rw'}
+        }
+
+        for host_path, master_path in files_to_copy_to_masters.items():
+            # The volume is mounted `read-write` because certain processes
+            # change the content or permission of the files on the volume.
+            master_mounts[str(host_path)] = {
+                'bind': str(master_path),
+                'mode': 'rw',
+            }
+
+        node_tmpfs_mounts = {
+            '/run': 'rw,exec,nosuid,size=2097152k',
+            '/tmp': 'rw,exec,nosuid,size=2097152k',
+        }
 
         installer_ctr = '{unique}-installer'.format(unique=unique)
         installer_port = _get_open_port()
@@ -288,7 +277,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=master_mounts + node_mounts,
+                volumes=master_mounts,
                 tmpfs=node_tmpfs_mounts,
             )
 
@@ -298,7 +287,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 container_number=agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=node_mounts,
+                volumes=agent_mounts,
                 tmpfs=node_tmpfs_mounts,
             )
 
@@ -308,11 +297,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=node_mounts,
+                volumes=agent_mounts,
                 tmpfs=node_tmpfs_mounts,
             )
 
-        time.sleep(5)
         assert len(self.agents) == agents
         assert len(self.public_agents) == public_agents
         assert len(self.masters) == masters
