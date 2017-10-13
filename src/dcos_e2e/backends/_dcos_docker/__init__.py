@@ -204,33 +204,39 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
-        node_anonymous_volumes = [Path('/var/lib/docker'), Path('/opt')]
-
-        node_host_volumes = {
-            certs_dir.resolve(): Path('/etc/docker/certs.d'),
+        node_volumes = {
+            str(certs_dir.resolve()): {
+                'bind': '/etc/docker/certs.d',
+                'mode': 'rw'
+            },
+            'var_lib_docker': {
+                'bind': '/var/lib/docker',
+                'mode': 'rw'
+            },
+            'opt': {
+                'bind': '/opt',
+                'mode': 'rw'
+            },
         }
 
         node_tmpfs_mounts = {
-            Path('/run'): 'rw,exec,nosuid,size=2097152k',
-            Path('/tmp'): 'rw,exec,nosuid,size=2097152k',
+            '/run': 'rw,exec,nosuid,size=2097152k',
+            '/tmp': 'rw,exec,nosuid,size=2097152k',
         }
 
         node_mounts = []
 
-        for node_path in node_anonymous_volumes:
-            mount = '-v {path}'.format(path=node_path)
-            node_mounts.append(mount)
-
-        for host_volume_path, node_path in node_host_volumes.items():
-            mount = '-v {host_path}:{node_path}'.format(
-                host_path=host_volume_path,
-                node_path=node_path,
+        for mount_key, mount_value in node_volumes.items():
+            mount = '-v {first_part}:{node_path}:{mode}'.format(
+                first_part=mount_key,
+                node_path=mount_value['bind'],
+                mode=mount_value['mode'],
             )
             node_mounts.append(mount)
 
-        for host_path, tmpfs_details in node_tmpfs_mounts.items():
+        for node_path, tmpfs_details in node_tmpfs_mounts.items():
             mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
-                host_path=host_path,
+                host_path=node_path,
                 tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
