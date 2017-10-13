@@ -302,7 +302,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             )
 
         for public_agent_number in range(1, public_agents + 1):
-            self._run_dcos_install_in_container(
+            self._start_dcos_container(
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
@@ -448,7 +448,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         Args:
             container_base_name: The start of the container name.
             container_number: The end of the container name.
-            volumes: XXX
+            volumes: See `volumes` on
+                http://docker-py.readthedocs.io/en/latest/containers.html.
+            tmpfs: See `tmpfs` on
+                http://docker-py.readthedocs.io/en/latest/containers.html.
             dcos_num_masters: The number of master nodes expected to be in the
                 cluster once it has been created.
             dcos_num_agents: The number of agent nodes (agent and public
@@ -456,7 +459,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         """
         docker_image = 'mesosphere/dcos-docker'
         registry_host = 'registry.local'
-        if len(self.masters):
+        if self.masters:
             first_master = next(iter(self.masters))
             extra_host_ip_address = str(first_master.ip_address)
         else:
