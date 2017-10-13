@@ -201,7 +201,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
-        agent_mounts = {
+        node_mounts = {
             str(certs_dir.resolve()): {
                 'bind': '/etc/docker/certs.d',
                 'mode': 'rw'
@@ -216,11 +216,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             },
             str(bootstrap_genconf_path): {
                 'bind': str(bootstrap_tmp_path),
-                'mode': 'rw'
+                'mode': 'ro'
             }
         }
 
-        master_mounts = deepcopy(agent_mounts)
+        agent_mounts = {
+            **node_mounts,
+            'mesos_slave': {'bind': '/var/lib/mesos/slave', 'mode': 'rw'},
+            '/sys/fs/cgroup': {'bind': '/sys/fs/cgroup', 'mode': 'ro'}
+        }
+
+        master_mounts = deepcopy(node_mounts)
 
         for host_path, master_path in files_to_copy_to_masters.items():
             # The volume is mounted `read-write` because certain processes
