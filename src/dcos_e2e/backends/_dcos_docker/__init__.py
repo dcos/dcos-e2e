@@ -204,15 +204,15 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
-        node_anonymous_volumes = [Path('/var/lib/docker'), Path('/opt')]
+        node_anonymous_volumes = ['/var/lib/docker', '/opt']
 
         node_host_volumes = {
-            certs_dir.resolve(): Path('/etc/docker/certs.d'),
+            str(certs_dir.resolve()): '/etc/docker/certs.d',
         }
 
         node_tmpfs_mounts = {
-            Path('/run'): 'rw,exec,nosuid,size=2097152k',
-            Path('/tmp'): 'rw,exec,nosuid,size=2097152k',
+            '/run': 'rw,exec,nosuid,size=2097152k',
+            '/tmp': 'rw,exec,nosuid,size=2097152k',
         }
 
         node_mounts = []
@@ -228,9 +228,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             )
             node_mounts.append(mount)
 
-        for host_path, tmpfs_details in node_tmpfs_mounts.items():
-            mount = '--tmpfs {host_path}:{tmpfs_details}'.format(
-                host_path=host_path,
+        for node_path, tmpfs_details in node_tmpfs_mounts.items():
+            mount = '--tmpfs {node_path}:{tmpfs_details}'.format(
+                node_path=node_path,
                 tmpfs_details=tmpfs_details,
             )
             node_mounts.append(mount)
