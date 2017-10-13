@@ -5,6 +5,7 @@ Helpers for interacting with DC/OS Docker.
 import inspect
 import os
 import socket
+import time
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -311,6 +312,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 tmpfs=node_tmpfs_mounts,
             )
 
+        time.sleep(5)
         assert len(self.agents) == agents
         assert len(self.public_agents) == public_agents
         assert len(self.masters) == masters
