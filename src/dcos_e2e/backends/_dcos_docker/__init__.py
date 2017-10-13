@@ -219,7 +219,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             '-v /var/lib/docker',
             '-v /opt',
             '-v {certs_host}:{certs_node}'.format(
-                certs_host=str(certs_dir.resolve()),
+                certs_host=certs_dir.resolve(),
                 certs_node='/etc/docker/certs.d',
             ),
             '-v {bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
