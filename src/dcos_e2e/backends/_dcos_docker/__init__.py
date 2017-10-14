@@ -5,6 +5,7 @@ Helpers for interacting with DC/OS Docker.
 import inspect
 import os
 import socket
+import stat
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -169,6 +170,19 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # https://github.com/PyCQA/pylint/issues/224.
         Path(genconf_dir).mkdir(exist_ok=True)
         genconf_dir = Path(genconf_dir).resolve()
+        genconf_dir_src = self._path / 'genconf.src'
+        include_dir = self._path / 'include'
+        certs_dir = include_dir / 'certs'
+        certs_dir.mkdir(parents=True)
+
+        ip_detect = genconf_dir / 'ip-detect'
+
+        copyfile(
+            src=str(genconf_dir_src / 'ip-detect'),
+            dst=str(ip_detect)
+        )
+        ip_detect_stat_info = os.stat(str(ip_detect))
+        os.chmod(str(ip_detect), ip_detect_stat_info.st_mode | stat.S_IEXEC)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
@@ -197,10 +211,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         self._master_prefix = '{unique}-master-'.format(unique=unique)
         self._agent_prefix = '{unique}-agent-'.format(unique=unique)
         self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
-
-        include_dir = self._path / 'include'
-        certs_dir = include_dir / 'certs'
-        certs_dir.mkdir(parents=True)
 
         bootstrap_genconf_path = genconf_dir / 'serve'
         # We wrap this in `Path` to work around
