@@ -187,17 +187,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         sbin_dir = include_dir / 'sbin'
         sbin_dir.mkdir(parents=True)
 
-        ip_detect = genconf_dir / 'ip-detect'
+        ip_detect = Path(genconf_dir / 'ip-detect')
 
         copyfile(
             src=str(genconf_dir_src / 'ip-detect'),
             dst=str(ip_detect),
         )
-        ip_detect_stat_info = os.stat(path=str(ip_detect))
-        os.chmod(
-            path=str(ip_detect),
-            mode=ip_detect_stat_info.st_mode | stat.S_IEXEC,
-        )
+        ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
 
         dcos_postflight = sbin_dir / 'dcos-postflight'
 
@@ -205,9 +201,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             src=str(sbin_dir_src / 'dcos-postflight'),
             dst=str(dcos_postflight),
         )
-        dcos_postflight_stat_info = os.stat(path=str(dcos_postflight))
         dcos_postflight.chmod(
-            mode=dcos_postflight_stat_info.st_mode | stat.S_IEXEC,
+            mode=dcos_postflight.stat().st_mode | stat.S_IEXEC,
         )
 
         rsa_key_pair = rsa.generate_private_key(
