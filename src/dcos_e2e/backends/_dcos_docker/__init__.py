@@ -202,13 +202,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             src=str(sbin_dir_src / 'dcos-postflight'),
             dst=str(dcos_postflight),
         )
-        dcos_postflight_stat_info = os.stat(path=str(ip_detect))
-        os.chmod(
-            path=str(dcos_postflight),
+        dcos_postflight_stat_info = os.stat(path=str(dcos_postflight))
+        dcos_postflight.chmod(
             mode=dcos_postflight_stat_info.st_mode | stat.S_IEXEC,
         )
 
-        # generate private/public key pair
         rsa_key_pair = rsa.generate_private_key(
             backend=default_backend(),
             public_exponent=65537,
@@ -226,8 +224,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             encryption_algorithm=serialization.NoEncryption(),
         )
 
-        (ssh_dir / 'id_rsa.pub').write_bytes(public_key)
-        (ssh_dir / 'id_rsa').write_bytes(private_key)
+        public_key_file = ssh_dir / 'id_rsa.pub'
+        private_key_file = ssh_dir / 'id_rsa'
+        public_key_file.write_bytes(data=public_key)
+        private_key_file.write_bytes(data=private_key)
+        private_key_file.chmod(600)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
