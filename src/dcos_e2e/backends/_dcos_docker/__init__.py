@@ -11,6 +11,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import TemporaryDirectory
+from textwrap import dedent
 from typing import Any, Dict, Optional, Set, Type
 
 import docker
@@ -185,6 +186,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         sbin_dir_src = include_dir_src / 'sbin'
         sbin_dir = include_dir / 'sbin'
         sbin_dir.mkdir(parents=True)
+        service_dir = include_dir / 'systemd'
+        service_dir.mkdir(parents=True)
 
         ip_detect = Path(genconf_dir / 'ip-detect')
 
@@ -250,6 +253,30 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         storage_driver = host_driver if host_driver in (
             'overlay', 'overlay2', 'aufs'
         ) else 'overlay2'
+
+        docker_service_body = dedent(
+            """\
+            [Unit]
+            Description=Docker Application Container Engine
+            Documentation=https://docs.docker.com
+            After=dbus.service
+
+            [Service]
+            ExecStart=/usr/bin/docker daemon -D -s ${docker_storage_driver} \
+                --disable-legacy-registry=true \
+                --exec-opt=native.cgroupdriver=cgroupfs
+            LimitNOFILE=1048576
+            LimitNPROC=1048576
+            LimitCORE=infinity
+            Delegate=yes
+            TimeoutStartSec=0
+
+            [Install]
+            WantedBy=default.target
+            """.format(docker_storage_driver=storage_driver)
+        )
+
+        (service_dir / 'docker.service').write_text(docker_service_body)
 
         self._master_prefix = '{unique}-master-'.format(unique=unique)
         self._agent_prefix = '{unique}-agent-'.format(unique=unique)
@@ -323,10 +350,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             make_args.append(set_variable)
 
         run_subprocess(
-            args=['make'] + make_args + ['build-base-docker'],
+            args=['make'] + make_args + ['build-base'],
             cwd=str(self._path),
             log_output_live=self.log_output_live,
         )
+
+        # docker.service
+        # stuff inside
 
         client.images.build(
             path=str(self._path),
