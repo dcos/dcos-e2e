@@ -233,16 +233,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             destination_path = genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        custom_master_volumes = []
-        for host_path, master_path in files_to_copy_to_masters.items():
-            # The volume is mounted `read-write` because certain processes
-            # change the content or permission of the files on the volume.
-            mount = '{host_path}:{master_path}:rw'.format(
-                host_path=host_path.absolute(),
-                master_path=master_path,
-            )
-            custom_master_volumes.append(mount)
-
         # Only overlay, overlay2, and aufs storage drivers are supported.
         # This chooses the overlay2 driver if the host's driver is not
         # supported for speed reasons.
@@ -296,81 +286,100 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             tag='mesosphere/dcos-docker',
         )
 
-        common_mounts = [
-            '{certs_host}:{certs_node}'.format(
-                certs_host=certs_dir.resolve(),
-                certs_node='/etc/docker/certs.d',
-            ),
-            '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
-                bootstrap_genconf_path=bootstrap_genconf_path,
-                bootstrap_tmp_path=bootstrap_tmp_path,
-            ),
-        ]
+        common_mounts = {
+            str(certs_dir.resolve()): {
+                'bind': '/etc/docker/certs.d',
+                'mode': 'rw'
+            },
+            str(bootstrap_genconf_path): {
+                'bind': str(bootstrap_tmp_path),
+                'mode': 'ro'
+            },
+        }
 
-        agent_mounts = [
-            '/sys/fs/cgroup:/sys/fs/cgroup:ro',
-        ]
+        agent_mounts = {
+            'sys/fs/cgroup': {'bind': 'sys/fs/cgroup', 'mode': 'ro'},
+            **common_mounts,
+        }
+
+        custom_master_mounts = {
+            str(host_path.absolute()): {
+                'bind': str(master_path),
+                'mode': 'rw'
+            }
+            for host_path, master_path in files_to_copy_to_masters.items()
+        }
+
+        master_mounts = {**common_mounts, **custom_master_mounts}
 
         for master_number in range(1, masters + 1):
-            unique_mounts = [
-                '{host_path}:/var/lib/docker'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-                '{host_path}:/opt'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-            ]
+            unique_mounts = {
+                str(uuid.uuid4()): {
+                    'bind': '/var/lib/docker',
+                    'mode': 'rw'
+                },
+                str(uuid.uuid4()): {
+                    'bind': '/opt',
+                    'mode': 'rw'
+                },
+            }
 
             self._start_dcos_container(
                 container_base_name=self._master_prefix,
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=common_mounts + unique_mounts + custom_master_volumes,
+                volumes={**master_mounts, **unique_mounts},
                 tmpfs=node_tmpfs_mounts,
             )
 
         for agent_number in range(1, agents + 1):
-            unique_mounts = [
-                '{host_path}:/var/lib/docker'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-                '{host_path}:/opt'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-                '{host_path}:/var/lib/mesos/slave'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-            ]
+            unique_mounts = {
+                str(uuid.uuid4()): {
+                    'bind': '/var/lib/docker',
+                    'mode': 'rw'
+                },
+                str(uuid.uuid4()): {
+                    'bind': '/opt',
+                    'mode': 'rw'
+                },
+                str(uuid.uuid4()): {
+                    'bind': '/var/lib/mesos/slave',
+                    'mode': 'rw'
+                },
+            }
 
             self._start_dcos_container(
                 container_base_name=self._agent_prefix,
                 container_number=agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=common_mounts + unique_mounts + agent_mounts,
+                volumes={**agent_mounts, **unique_mounts},
                 tmpfs=node_tmpfs_mounts,
             )
 
         for public_agent_number in range(1, public_agents + 1):
-            unique_mounts = [
-                '{host_path}:/var/lib/docker'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-                '{host_path}:/opt'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-                '{host_path}:/var/lib/mesos/slave'.format(
-                    host_path=self._path / str(uuid.uuid4()),
-                ),
-            ]
+            unique_mounts = {
+                str(uuid.uuid4()): {
+                    'bind': '/var/lib/docker',
+                    'mode': 'rw'
+                },
+                str(uuid.uuid4()): {
+                    'bind': '/opt',
+                    'mode': 'rw'
+                },
+                str(uuid.uuid4()): {
+                    'bind': '/var/lib/mesos/slave',
+                    'mode': 'rw'
+                },
+            }
 
             self._start_dcos_container(
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=common_mounts + unique_mounts + agent_mounts,
+                volumes={**agent_mounts, **unique_mounts},
                 tmpfs=node_tmpfs_mounts,
             )
 
