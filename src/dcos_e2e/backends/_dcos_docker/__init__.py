@@ -179,7 +179,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         for host_path, master_path in files_to_copy_to_masters.items():
             # The volume is mounted `read-write` because certain processes
             # change the content or permission of the files on the volume.
-            mount = '-v {host_path}:{master_path}:rw'.format(
+            mount = '{host_path}:{master_path}:rw'.format(
                 host_path=host_path.absolute(),
                 master_path=master_path,
             )
@@ -216,21 +216,21 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         }
 
         node_mounts = [
-            '-v /var/lib/docker',
-            '-v /opt',
-            '-v {certs_host}:{certs_node}'.format(
+            '/var/lib/docker',
+            '/opt',
+            '{certs_host}:{certs_node}'.format(
                 certs_host=certs_dir.resolve(),
                 certs_node='/etc/docker/certs.d',
             ),
-            '-v {bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
+            '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
                 bootstrap_genconf_path=bootstrap_genconf_path,
                 bootstrap_tmp_path=bootstrap_tmp_path,
             ),
         ]
 
         agent_only_mounts = [
-            '-v /var/lib/mesos/slave',
-            '-v /sys/fs/cgroup:/sys/fs/cgroup:ro',
+            '/var/lib/mesos/slave',
+            '/sys/fs/cgroup:/sys/fs/cgroup:ro',
         ]
 
         master_mounts = node_mounts + custom_master_volumes
@@ -243,9 +243,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
             'DOCKER_STORAGEDRIVER': storage_driver,
-            # Some platforms support systemd and some do not.
-            # Disabling support makes all platforms consistent in this aspect.
-            'MESOS_SYSTEMD_ENABLE_SUPPORT': 'false',
             # Number of nodes.
             'MASTERS': str(masters),
             'AGENTS': str(agents),
@@ -265,18 +262,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             escaped_value = escaped_value.replace('#', '\\#')
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
             make_args.append(set_variable)
-
-        for target in [
-            'build',
-            'master',
-            'agent',
-            'public_agent',
-        ]:
-            run_subprocess(
-                args=['make'] + make_args + [target],
-                cwd=str(self._path),
-                log_output_live=self.log_output_live,
-            )
 
         run_subprocess(
             args=['make'] + make_args + ['build'],
