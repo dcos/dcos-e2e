@@ -175,6 +175,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
+        ssh_dir.mkdir(parents=True)
 
         ip_detect = genconf_dir / 'ip-detect'
 
