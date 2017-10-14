@@ -233,13 +233,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             '-v /sys/fs/cgroup:/sys/fs/cgroup:ro',
         ]
 
-        for node_path, tmpfs_details in node_tmpfs_mounts.items():
-            mount = '--tmpfs {node_path}:{tmpfs_details}'.format(
-                node_path=node_path,
-                tmpfs_details=tmpfs_details,
-            )
-            node_mounts.append(mount)
-
         master_mounts = node_mounts + custom_master_volumes
         agent_mounts = node_mounts + agent_only_mounts
 
