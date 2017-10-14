@@ -182,6 +182,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         ssh_dir.mkdir(parents=True)
         sbin_dir_src = include_dir_src / 'sbin'
         sbin_dir = include_dir / 'sbin'
+        sbin_dir.mkdir(parents=True)
 
         ip_detect = genconf_dir / 'ip-detect'
 
