@@ -228,7 +228,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         private_key_file = ssh_dir / 'id_rsa'
         public_key_file.write_bytes(data=public_key)
         private_key_file.write_bytes(data=private_key)
-        private_key_file.chmod(600)
+        private_key_file.chmod(400)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
