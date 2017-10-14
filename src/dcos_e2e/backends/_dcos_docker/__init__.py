@@ -281,23 +281,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # This version of Docker supports `overlay2`.
             'DOCKER_VERSION': '1.13.1',
             'DOCKER_STORAGEDRIVER': storage_driver,
-            # Number of nodes.
-            'MASTERS': str(masters),
-            'AGENTS': str(agents),
-            'PUBLIC_AGENTS': str(public_agents),
-            # Container names.
-            'MASTER_CTR': self._master_prefix,
-            'AGENT_CTR': self._agent_prefix,
-            'PUBLIC_AGENT_CTR': self._public_agent_prefix,
         }  # type: Dict[str, str]
 
         make_args = []
         for key, value in variables.items():
-            # See https://stackoverflow.com/a/7860705 for details on escaping
-            # Make variables.
-            escaped_value = value.replace('$', '$$')
-            escaped_value = escaped_value.replace('#', '\\#')
-            set_variable = '{key}={value}'.format(key=key, value=escaped_value)
+            set_variable = '{key}={value}'.format(key=key, value=value)
             make_args.append(set_variable)
 
         run_subprocess(
