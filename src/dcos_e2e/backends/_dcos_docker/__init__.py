@@ -5,6 +5,7 @@ Helpers for interacting with DC/OS Docker.
 import inspect
 import os
 import socket
+import stat
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -14,6 +15,9 @@ from typing import Any, Dict, Optional, Set, Type
 
 import docker
 import yaml
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend
 from passlib.hash import sha512_crypt
 
 from dcos_e2e._common import run_subprocess
@@ -169,6 +173,62 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # https://github.com/PyCQA/pylint/issues/224.
         Path(genconf_dir).mkdir(exist_ok=True)
         genconf_dir = Path(genconf_dir).resolve()
+        genconf_dir_src = self._path / 'genconf.src'
+        include_dir = self._path / 'include'
+        include_dir_src = self._path / 'include.src'
+        certs_dir = include_dir / 'certs'
+        certs_dir.mkdir(parents=True)
+        ssh_dir = include_dir / 'ssh'
+        ssh_dir.mkdir(parents=True)
+        sbin_dir_src = include_dir_src / 'sbin'
+        sbin_dir = include_dir / 'sbin'
+        sbin_dir.mkdir(parents=True)
+
+        ip_detect = genconf_dir / 'ip-detect'
+
+        copyfile(
+            src=str(genconf_dir_src / 'ip-detect'),
+            dst=str(ip_detect),
+        )
+        ip_detect_stat_info = os.stat(path=str(ip_detect))
+        os.chmod(
+            path=str(ip_detect),
+            mode=ip_detect_stat_info.st_mode | stat.S_IEXEC,
+        )
+
+        dcos_postflight = sbin_dir / 'dcos-postflight'
+
+        copyfile(
+            src=str(sbin_dir_src / 'dcos-postflight'),
+            dst=str(dcos_postflight),
+        )
+        dcos_postflight_stat_info = os.stat(path=str(dcos_postflight))
+        dcos_postflight.chmod(
+            mode=dcos_postflight_stat_info.st_mode | stat.S_IEXEC,
+        )
+
+        rsa_key_pair = rsa.generate_private_key(
+            backend=default_backend(),
+            public_exponent=65537,
+            key_size=2048,
+        )
+
+        public_key = rsa_key_pair.public_key().public_bytes(
+            serialization.Encoding.OpenSSH,
+            serialization.PublicFormat.OpenSSH,
+        )
+
+        private_key = rsa_key_pair.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        )
+
+        public_key_file = ssh_dir / 'id_rsa.pub'
+        private_key_file = ssh_dir / 'id_rsa'
+        public_key_file.write_bytes(data=public_key)
+        private_key_file.write_bytes(data=private_key)
+        private_key_file.chmod(mode=stat.S_IRUSR)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
@@ -197,10 +257,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         self._master_prefix = '{unique}-master-'.format(unique=unique)
         self._agent_prefix = '{unique}-agent-'.format(unique=unique)
         self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
-
-        include_dir = self._path / 'include'
-        certs_dir = include_dir / 'certs'
-        certs_dir.mkdir(parents=True)
 
         bootstrap_genconf_path = genconf_dir / 'serve'
         # We wrap this in `Path` to work around
@@ -269,8 +325,20 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
             make_args.append(set_variable)
 
+        run_subprocess(
+            args=['make'] + make_args + ['build-base-docker'],
+            cwd=str(self._path),
+            log_output_live=self.log_output_live,
+        )
+
+        client.images.build(
+            path=str(self._path),
+            rm=True,
+            forcerm=True,
+            tag='mesosphere/dcos-docker',
+        )
+
         for target in [
-            'build',
             'master',
             'agent',
             'public_agent',
