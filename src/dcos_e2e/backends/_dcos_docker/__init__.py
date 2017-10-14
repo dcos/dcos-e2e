@@ -15,6 +15,9 @@ from typing import Any, Dict, Optional, Set, Type
 
 import docker
 import yaml
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend
 from passlib.hash import sha512_crypt
 
 from dcos_e2e._common import run_subprocess
@@ -181,10 +184,31 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         copyfile(
             src=str(genconf_dir_src / 'ip-detect'),
-            dst=str(ip_detect)
+            dst=str(ip_detect),
         )
         ip_detect_stat_info = os.stat(str(ip_detect))
         os.chmod(str(ip_detect), ip_detect_stat_info.st_mode | stat.S_IEXEC)
+
+        # generate private/public key pair
+        rsa_key_pair = rsa.generate_private_key(
+            backend=default_backend(),
+            public_exponent=65537,
+            key_size=2048,
+        )
+
+        public_key = rsa_key_pair.public_key().public_bytes(
+            serialization.Encoding.OpenSSH,
+            serialization.PublicFormat.OpenSSH,
+        )
+
+        private_key = rsa_key_pair.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption(),
+        )
+
+        (ssh_dir / 'id_rsa.pub').write_bytes(public_key)
+        (ssh_dir / 'id_rsa').write_bytes(private_key)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
@@ -282,8 +306,20 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             set_variable = '{key}={value}'.format(key=key, value=escaped_value)
             make_args.append(set_variable)
 
+        run_subprocess(
+            args=['make'] + make_args + ['build-base-docker'],
+            cwd=str(self._path),
+            log_output_live=self.log_output_live,
+        )
+
+        client.images.build(
+            path=str(self._path),
+            rm=True,
+            forcerm=True,
+            tag='mesosphere/dcos-docker',
+        )
+
         for target in [
-            'build',
             'master',
             'agent',
             'public_agent',
