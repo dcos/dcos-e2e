@@ -217,8 +217,12 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         }
 
         node_mounts = [
-            'var_lib_docker:/var/lib/docker',
-            'opt:/opt',
+            '{host_path}:/var/lib/docker'.format(
+                host_path=self._path / str(uuid.uuid4()),
+            ),
+            '{host_path}:/opt'.format(
+                host_path=self._path / str(uuid.uuid4()),
+            ),
             '{certs_host}:{certs_node}'.format(
                 certs_host=certs_dir.resolve(),
                 certs_node='/etc/docker/certs.d',
@@ -230,7 +234,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         ]
 
         agent_only_mounts = [
-            'var_lib_mesos_slave:/var/lib/mesos/slave',
+            '{host_path}:/var/lib/mesos/slave'.format(
+                host_path=self._path / str(uuid.uuid4()),
+            ),
             '/sys/fs/cgroup:/sys/fs/cgroup:ro',
         ]
 
