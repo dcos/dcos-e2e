@@ -222,9 +222,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             '{host_path}:/var/lib/docker'.format(
                 host_path=self._path / str(uuid.uuid4()),
             ),
-            '{host_path}:/opt'.format(
-                host_path=self._path / str(uuid.uuid4()),
-            ),
+            # '{host_path}:/opt'.format(
+            #     host_path=self._path / str(uuid.uuid4()),
+            # ),
             '{certs_host}:{certs_node}'.format(
                 certs_host=certs_dir.resolve(),
                 certs_node='/etc/docker/certs.d',
