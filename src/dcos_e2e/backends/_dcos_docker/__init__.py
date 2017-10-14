@@ -310,7 +310,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'AGENT_CTR': self._agent_prefix,
             'PUBLIC_AGENT_CTR': self._public_agent_prefix,
             'CUSTOM_MASTER_VOLUMES': ' '.join(master_mounts),
-            'DCOS_GENERATE_CONFIG_PATH': str(generate_config_path),
             'NODE_VOLUMES': ' '.join(node_mounts),
             # These are empty because they are already in `NODE_VOLUMES`, as
             # done in `make install`.
