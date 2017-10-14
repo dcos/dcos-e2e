@@ -160,6 +160,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ignore=ignore_patterns('dcos_generate_config.sh'),
         )
 
+        self._path = self._path.resolve()
+
         # Files in the DC/OS Docker directory's `genconf` directory are mounted
         # to the installer at `/genconf`.
         # Therefore, every file which we want to copy to `/genconf` on the
@@ -184,17 +186,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         sbin_dir = include_dir / 'sbin'
         sbin_dir.mkdir(parents=True)
 
-        ip_detect = genconf_dir / 'ip-detect'
+        ip_detect = Path(genconf_dir / 'ip-detect')
 
         copyfile(
             src=str(genconf_dir_src / 'ip-detect'),
             dst=str(ip_detect),
         )
-        ip_detect_stat_info = os.stat(path=str(ip_detect))
-        os.chmod(
-            path=str(ip_detect),
-            mode=ip_detect_stat_info.st_mode | stat.S_IEXEC,
-        )
+        ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
 
         dcos_postflight = sbin_dir / 'dcos-postflight'
 
@@ -202,9 +200,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             src=str(sbin_dir_src / 'dcos-postflight'),
             dst=str(dcos_postflight),
         )
-        dcos_postflight_stat_info = os.stat(path=str(dcos_postflight))
         dcos_postflight.chmod(
-            mode=dcos_postflight_stat_info.st_mode | stat.S_IEXEC,
+            mode=dcos_postflight.stat().st_mode | stat.S_IEXEC,
         )
 
         rsa_key_pair = rsa.generate_private_key(
@@ -348,10 +345,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 cwd=str(self._path),
                 log_output_live=self.log_output_live,
             )
-
-        assert len(self.agents) == agents
-        assert len(self.public_agents) == public_agents
-        assert len(self.masters) == masters
 
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
