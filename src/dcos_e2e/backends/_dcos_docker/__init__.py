@@ -301,99 +301,81 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             tag='mesosphere/dcos-docker',
         )
 
+        common_mounts = [
+            '{certs_host}:{certs_node}'.format(
+                certs_host=certs_dir.resolve(),
+                certs_node='/etc/docker/certs.d',
+            ),
+            '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
+                bootstrap_genconf_path=bootstrap_genconf_path,
+                bootstrap_tmp_path=bootstrap_tmp_path,
+            ),
+        ]
+
+        agent_mounts = [
+            '/sys/fs/cgroup:/sys/fs/cgroup:ro',
+        ]
+
         for master_number in range(1, masters + 1):
-            node_mounts = [
+            unique_mounts = [
                 '{host_path}:/var/lib/docker'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
                 '{host_path}:/opt'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
-                '{certs_host}:{certs_node}'.format(
-                    certs_host=certs_dir.resolve(),
-                    certs_node='/etc/docker/certs.d',
-                ),
-                '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
-                    bootstrap_genconf_path=bootstrap_genconf_path,
-                    bootstrap_tmp_path=bootstrap_tmp_path,
-                ),
             ]
+
             self._start_dcos_container(
                 container_base_name=self._master_prefix,
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=node_mounts + custom_master_volumes,
+                volumes=common_mounts + unique_mounts + custom_master_volumes,
                 tmpfs=node_tmpfs_mounts,
             )
 
         for agent_number in range(1, agents + 1):
-            node_mounts = [
+            unique_mounts = [
                 '{host_path}:/var/lib/docker'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
                 '{host_path}:/opt'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
-                '{certs_host}:{certs_node}'.format(
-                    certs_host=certs_dir.resolve(),
-                    certs_node='/etc/docker/certs.d',
-                ),
-                '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
-                    bootstrap_genconf_path=bootstrap_genconf_path,
-                    bootstrap_tmp_path=bootstrap_tmp_path,
-                ),
-            ]
-
-            agent_only_mounts = [
                 '{host_path}:/var/lib/mesos/slave'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
-                '/sys/fs/cgroup:/sys/fs/cgroup:ro',
             ]
 
-            agent_mounts = node_mounts + agent_only_mounts
             self._start_dcos_container(
                 container_base_name=self._agent_prefix,
                 container_number=agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=agent_mounts,
+                volumes=common_mounts + unique_mounts + agent_mounts,
                 tmpfs=node_tmpfs_mounts,
             )
 
         for public_agent_number in range(1, public_agents + 1):
-            node_mounts = [
+            unique_mounts = [
                 '{host_path}:/var/lib/docker'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
                 '{host_path}:/opt'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
-                '{certs_host}:{certs_node}'.format(
-                    certs_host=certs_dir.resolve(),
-                    certs_node='/etc/docker/certs.d',
-                ),
-                '{bootstrap_genconf_path}:{bootstrap_tmp_path}:ro'.format(
-                    bootstrap_genconf_path=bootstrap_genconf_path,
-                    bootstrap_tmp_path=bootstrap_tmp_path,
-                ),
-            ]
-
-            agent_only_mounts = [
                 '{host_path}:/var/lib/mesos/slave'.format(
                     host_path=self._path / str(uuid.uuid4()),
                 ),
-                '/sys/fs/cgroup:/sys/fs/cgroup:ro',
             ]
 
-            agent_mounts = node_mounts + agent_only_mounts
             self._start_dcos_container(
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=agent_mounts,
+                volumes=common_mounts + unique_mounts + agent_mounts,
                 tmpfs=node_tmpfs_mounts,
             )
 
