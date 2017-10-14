@@ -175,10 +175,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         genconf_dir = Path(genconf_dir).resolve()
         genconf_dir_src = self._path / 'genconf.src'
         include_dir = self._path / 'include'
+        include_dir_src = self._path / 'include.src'
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
+        sbin_dir_src = include_dir_src / 'sbin'
+        sbin_dir = include_dir / 'sbin'
 
         ip_detect = genconf_dir / 'ip-detect'
 
@@ -186,8 +189,23 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             src=str(genconf_dir_src / 'ip-detect'),
             dst=str(ip_detect),
         )
-        ip_detect_stat_info = os.stat(str(ip_detect))
-        os.chmod(str(ip_detect), ip_detect_stat_info.st_mode | stat.S_IEXEC)
+        ip_detect_stat_info = os.stat(path=str(ip_detect))
+        os.chmod(
+            path=str(ip_detect),
+            mode=ip_detect_stat_info.st_mode | stat.S_IEXEC,
+        )
+
+        dcos_postflight = sbin_dir / 'dcos-postflight'
+
+        copyfile(
+            src=str(sbin_dir_src / 'dcos-postflight'),
+            dst=str(dcos_postflight),
+        )
+        dcos_postflight_stat_info = os.stat(path=str(ip_detect))
+        os.chmod(
+            path=str(dcos_postflight),
+            mode=dcos_postflight_stat_info.st_mode | stat.S_IEXEC,
+        )
 
         # generate private/public key pair
         rsa_key_pair = rsa.generate_private_key(
