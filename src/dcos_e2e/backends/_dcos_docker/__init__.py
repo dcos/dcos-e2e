@@ -397,10 +397,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 tmpfs=node_tmpfs_mounts,
             )
 
-        assert len(self.agents) == agents
-        assert len(self.public_agents) == public_agents
-        assert len(self.masters) == masters
-
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
         config_file_path = genconf_dir / 'config.yaml'
