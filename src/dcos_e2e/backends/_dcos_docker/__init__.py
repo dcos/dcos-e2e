@@ -131,6 +131,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         # This version of Docker supports `overlay2`.
         docker_version = '1.13.1'
+        docker_image_tag = 'mes'
 
         self.log_output_live = log_output_live
 
@@ -357,6 +358,12 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         # docker.service
         # stuff inside
+        client.images.build(
+            path=str(self._path),
+            rm=True,
+            forcerm=True,
+            tag='mesosphere/dcos-docker',
+        )
 
         client.images.build(
             path=str(self._path),
