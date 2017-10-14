@@ -149,8 +149,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ).name
         )
 
-        self._path = self._path.resolve()
-
         copytree(
             src=str(cluster_backend.dcos_docker_path),
             dst=str(self._path),
@@ -158,6 +156,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             # overwritten and therefore copying it is wasteful.
             ignore=ignore_patterns('dcos_generate_config.sh'),
         )
+
+        self._path = self._path.resolve()
 
         # Files in the DC/OS Docker directory's `genconf` directory are mounted
         # to the installer at `/genconf`.
