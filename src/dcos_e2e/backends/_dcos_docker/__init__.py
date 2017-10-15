@@ -469,26 +469,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             cwd=str(self._path),
         )
 
-        for master_number in range(1, masters + 1):
-            self._run_dcos_install_in_container(
-                container_base_name=self._master_prefix,
-                container_number=master_number,
-                role='master',
-            )
-
-        for agent_number in range(1, agents + 1):
-            self._run_dcos_install_in_container(
-                container_base_name=self._agent_prefix,
-                container_number=agent_number,
-                role='slave',
-            )
-
-        for public_agent_number in range(1, public_agents + 1):
-            self._run_dcos_install_in_container(
-                container_base_name=self._public_agent_prefix,
-                container_number=public_agent_number,
-                role='slave_public',
-            )
+        for role, prefix, number in [
+            ('master', self._master_prefix, masters),
+            ('agent', self._agent_prefix, agents),
+            ('slave_public', self._public_agent_prefix, public_agents),
+        ]:
+            for container_number in range(1, number + 1):
+                self._run_dcos_install_in_container(
+                    container_base_name=prefix,
+                    container_number=container_number,
+                    role=role,
+                )
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
             # Remove stray file that prevents non-root SSH.
