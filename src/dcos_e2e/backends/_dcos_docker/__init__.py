@@ -298,20 +298,21 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             log_output_live=self.log_output_live,
         )
 
-        # docker.service
-        # stuff inside
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
-            tag='mesosphere/dcos-docker',
+            tag=docker_image_tag + ':base-docker-' + docker_version,
+            dockerfile=str(
+                Path('build') / 'base-docker' / docker_version / 'Dockerfile'
+            ),
         )
 
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
-            tag='mesosphere/dcos-docker',
+            tag=docker_image_tag,
         )
 
         common_mounts = {
