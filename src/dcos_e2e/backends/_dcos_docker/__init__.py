@@ -210,7 +210,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         copyfile(
             src=str(service_dir_src / 'systemd-journald-init.service'),
-            dst=str(service_dir),
+            dst=str(service_dir / 'systemd-journald-init.service'),
         )
 
         rsa_key_pair = rsa.generate_private_key(
