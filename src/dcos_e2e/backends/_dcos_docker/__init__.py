@@ -293,7 +293,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         installer_port = _get_open_port()
 
         run_subprocess(
-            args=['bash', str(self._path / 'build' / 'base' / 'generate.sh')],
+            args=[
+                'bash',
+                str(self._path / 'build' / 'base' / 'generate.sh'),
+            ],
             cwd=str(self._path),
             log_output_live=self.log_output_live,
         )
@@ -312,9 +315,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             rm=True,
             forcerm=True,
             tag=base_tag,
-            dockerfile=str(
-                Path('build') / 'base' / distro / 'Dockerfile'
-            ),
+            dockerfile=str(Path('build') / 'base' / distro / 'Dockerfile'),
         )
 
         client.images.build(
