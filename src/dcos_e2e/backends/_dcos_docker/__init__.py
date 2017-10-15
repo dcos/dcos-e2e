@@ -186,6 +186,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         sbin_dir_src = include_dir_src / 'sbin'
         sbin_dir = include_dir / 'sbin'
         sbin_dir.mkdir(parents=True)
+        service_dir_src = include_dir_src / 'systemd'
         service_dir = include_dir / 'systemd'
         service_dir.mkdir(parents=True)
 
@@ -205,6 +206,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
         dcos_postflight.chmod(
             mode=dcos_postflight.stat().st_mode | stat.S_IEXEC,
+        )
+
+        copyfile(
+            src=str(service_dir_src / 'systemd-journald-init.service'),
+            dst=str(service_dir / 'systemd-journald-init.service'),
         )
 
         rsa_key_pair = rsa.generate_private_key(
@@ -287,7 +293,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         installer_port = _get_open_port()
 
         run_subprocess(
-            args=['make', 'build-base'],
+            args=[
+                'bash',
+                str(self._path / 'build' / 'base' / 'generate.sh'),
+            ],
             cwd=str(self._path),
             log_output_live=self.log_output_live,
         )
@@ -295,9 +304,19 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         (service_dir / 'docker.service').write_text(docker_service_body)
 
         docker_image_tag = 'mesosphere/dcos-docker'
-        base_docker_tag = docker_image_tag + ':base-docker'
+        base_tag = docker_image_tag + ':base'
+        base_docker_tag = base_tag + '-docker'
         # This version of Docker supports `overlay2`.
         docker_version = '1.13.1'
+        distro = 'centos-7'
+
+        client.images.build(
+            path=str(self._path),
+            rm=True,
+            forcerm=True,
+            tag=base_tag,
+            dockerfile=str(Path('build') / 'base' / distro / 'Dockerfile'),
+        )
 
         client.images.build(
             path=str(self._path),
