@@ -292,15 +292,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         installer_ctr = '{unique}-installer'.format(unique=unique)
         installer_port = _get_open_port()
 
-        run_subprocess(
-            args=[
-                'bash',
-                str(self._path / 'build' / 'base' / 'generate.sh'),
-            ],
-            cwd=str(self._path),
-            log_output_live=self.log_output_live,
-        )
-
         (service_dir / 'docker.service').write_text(docker_service_body)
 
         docker_image_tag = 'mesosphere/dcos-docker'
