@@ -122,10 +122,6 @@ class TestWaitForDCOS:
     Tests for `Cluster.wait_for_dcos`.
     """
 
-    @pytest.mark.xfail(
-        reason='See https://jira.mesosphere.com/browse/DCOS_OSS-1313',
-        raises=AssertionError,
-    )
     def test_auth_with_cli(
         self,
         cluster_backend: ClusterBackend,
@@ -170,4 +166,4 @@ class TestWaitForDCOS:
 
             assert setup.returncode == 0
             # Do not cover the following line - see the xfail marker.
-            assert setup.stderr == b''  # pragma: no cover
+            assert setup.stderr == b''
