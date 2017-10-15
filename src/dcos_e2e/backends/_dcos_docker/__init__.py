@@ -297,7 +297,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         }
 
         agent_mounts = {
-            '/sys/fs/cgroup': {'bind': 'sys/fs/cgroup', 'mode': 'ro'},
+            '/sys/fs/cgroup': {'bind': '/sys/fs/cgroup', 'mode': 'ro'},
             **common_mounts,
         }
 
