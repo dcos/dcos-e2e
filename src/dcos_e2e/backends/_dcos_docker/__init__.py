@@ -494,10 +494,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             for node in nodes:
                 node.run_as_root(args=dcos_install_args)
 
+        disable_systemd_support = (
+            "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
+            '/var/lib/dcos/mesos-slave-common'
+        )
+
         for node in {*self.masters, *self.agents, *self.public_agents}:
             # Remove stray file that prevents non-root SSH.
             # https://ubuntuforums.org/showthread.php?t=2327330
             node.run_as_root(args=['rm', '-f', '/run/nologin'])
+            node.run_as_root(args=['mkdir', '-p', '/var/lib/dcos'])
+            node.run_as_root(args=['/bin/bash', '-c', disable_systemd_support])
 
     def _start_dcos_container(
         self,
@@ -556,17 +563,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             tmpfs=tmpfs,
         )
 
-        disable_systemd_support_cmd = (
-            "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
-            '/var/lib/dcos/mesos-slave-common'
-        )
-
-        for cmd in [
-            ['mkdir', '-p', '/var/lib/dcos'],
-            ['/bin/bash', '-c', disable_systemd_support_cmd],
-            ['systemctl', 'start', 'sshd.service'],
-        ]:
-            container.exec_run(cmd=cmd)
+        container.exec_run(cmd=['systemctl', 'start', 'sshd.service'])
 
     def destroy(self) -> None:
         """
