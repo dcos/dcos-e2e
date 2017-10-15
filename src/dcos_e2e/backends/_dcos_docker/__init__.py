@@ -6,7 +6,6 @@ import inspect
 import os
 import socket
 import stat
-import time
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -522,8 +521,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
             '/var/lib/dcos/mesos-slave-common'
         )
-
-        time.sleep(10)
 
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
