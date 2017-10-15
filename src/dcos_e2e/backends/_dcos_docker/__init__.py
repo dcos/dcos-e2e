@@ -288,16 +288,16 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         common_mounts = {
             str(certs_dir.resolve()): {
                 'bind': '/etc/docker/certs.d',
-                'mode': 'rw'
+                'mode': 'rw',
             },
             str(bootstrap_genconf_path): {
                 'bind': str(bootstrap_tmp_path),
-                'mode': 'ro'
+                'mode': 'ro',
             },
         }
 
         agent_mounts = {
-            'sys/fs/cgroup': {'bind': 'sys/fs/cgroup', 'mode': 'ro'},
+            '/sys/fs/cgroup': {'bind': 'sys/fs/cgroup', 'mode': 'ro'},
             **common_mounts,
         }
 
