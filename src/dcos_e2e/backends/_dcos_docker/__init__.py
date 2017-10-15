@@ -176,7 +176,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # https://github.com/PyCQA/pylint/issues/224.
         Path(genconf_dir).mkdir(exist_ok=True)
         genconf_dir = Path(genconf_dir).resolve()
-        genconf_dir_src = self._path / 'genconf.src'
         include_dir = self._path / 'include'
         include_dir_src = self._path / 'include.src'
         certs_dir = include_dir / 'certs'
@@ -191,10 +190,16 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         service_dir.mkdir(parents=True)
 
         ip_detect = Path(genconf_dir / 'ip-detect')
-
-        copyfile(
-            src=str(genconf_dir_src / 'ip-detect'),
-            dst=str(ip_detect),
+        # See
+        # https://github.com/dcos/dcos-docker/blob/master/genconf.src/ip-detect
+        ip_detect.write_text(
+            dedent(
+                """\
+                #!/bin/bash -e
+                /sbin/ip -4 -o addr show dev eth0 |
+                awk '{split($4,a,"/");print a[1]}'
+                """
+            )
         )
         ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
 
