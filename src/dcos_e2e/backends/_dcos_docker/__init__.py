@@ -252,9 +252,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             After=dbus.service
 
             [Service]
-            ExecStart=/usr/bin/docker daemon -D -s ${docker_storage_driver} \
-                --disable-legacy-registry=true \
-                --exec-opt=native.cgroupdriver=cgroupfs
+            ExecStart=/usr/bin/docker daemon -D -s {docker_storage_driver} \
+            --disable-legacy-registry=true \
+            --exec-opt=native.cgroupdriver=cgroupfs
             LimitNOFILE=1048576
             LimitNPROC=1048576
             LimitCORE=infinity
@@ -293,6 +293,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         (service_dir / 'docker.service').write_text(docker_service_body)
+        import pdb; pdb.set_trace()
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_docker_tag = docker_image_tag + ':base-docker'
