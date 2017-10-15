@@ -129,10 +129,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         if generate_config_path is None or not generate_config_path.exists():
             raise ValueError()
 
-        # This version of Docker supports `overlay2`.
-        docker_version = '1.13.1'
-        docker_image_tag = 'mesosphere/dcos-docker'
-
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
@@ -298,7 +294,10 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             log_output_live=self.log_output_live,
         )
 
+        docker_image_tag = 'mesosphere/dcos-docker'
         base_docker_tag = docker_image_tag + ':base-docker'
+        # This version of Docker supports `overlay2`.
+        docker_version = '1.13.1'
 
         client.images.build(
             path=str(self._path),
