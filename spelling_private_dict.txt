@@ -14,7 +14,9 @@ dict
 dir
 env
 genconf
+init
 ip
+mesos
 noqa
 os
 oss
@@ -22,11 +24,13 @@ postflight
 pragma
 pytest
 src
+sshd
 stderr
 stdout
 str
 systemd
 tmp
+tmpfs
 travis
 typeshed
 url

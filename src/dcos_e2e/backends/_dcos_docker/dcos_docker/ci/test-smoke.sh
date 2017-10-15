@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-# Performs End To End (e2e) testing of DC/OS Docker.
+# Performs smoke testing of DC/OS Docker.
 #
 # Options:
-#   DCOS_VERSION Version of the supplied DC/OS installer (defaults to the latest stable version)
 #   LOG_LINES    Number of log lines to export for each node (exports all, if unset)
 #
 # Usage:
@@ -37,16 +36,10 @@ echo "${BASH_VERSINFO[@]}"
 # Check for running containers
 docker ps
 
-# Default to latest known version unless DCOS_VERSION is specified
-if [[ -z "${DCOS_VERSION:-}" ]]; then
-  bash dcos_generate_config.sh --version
-  DCOS_VERSION="$(bash dcos_generate_config.sh --version | jq -r '.version')"
-fi
-
-# Destroy all containers
+# Destroy All VMs
 make clean
 
-# Destroy all containers on exit
+# Destroy All VMs on exit
 function cleanup() {
   ci/dcos-logs.sh ${LOG_LINES_ARG} || true
   make clean
@@ -56,36 +49,15 @@ trap cleanup EXIT
 # Auto-configure
 ./configure --auto
 
-# Networking integration tests require 2 private agents
 # Cassandra requires 3 private agents
 sed 's/^AGENTS :=.*/AGENTS := 3/' make-config.mk > make-config.mk.bak
 mv make-config.mk.bak make-config.mk
-
-# Unbuffered postflight output
-tee >> make-config.mk << EOM
-POSTFLIGHT_PROGRESS := --progress=time
-EOM
-
-# Verbose test output
-TEST_ARGS='-vv'
-# Report test results as junit xml
-TEST_ARGS+=' --junitxml=test-junit.xml'
-# Skip CCM-only tests
-TEST_ARGS+=' -m "not ccm"'
-# Use teamcity-messages to fold unbuffered stdout/stderr
-if [[ -n "${TEAMCITY_VERSION}" ]]; then
-  TEST_ARGS+=' --teamcity --capture=no'
-fi
-# Configure integration tests
-tee >> make-config.mk << EOM
-DCOS_PYTEST_CMD := py.test ${TEST_ARGS}
-EOM
 
 # Deploy
 make
 
 # Wait
-make postflight
+make postflight POSTFLIGHT_PROGRESS=--progress=time
 
 # Cleanup hosts on exit
 function cleanup2() {
@@ -132,18 +104,3 @@ DCOS_URL="$(dcos config show core.dcos_url)"
 
 # Test GUI (authenticated)
 curl --fail --location --silent --show-error --verbose -H "Authorization: token=${DCOS_ACS_TOKEN}" ${DCOS_URL} -o /dev/null
-
-# Add test user (required to be added when not the first user)
-# TODO: only required for OSS DC/OS
-ci/dcos-create-user.sh "albert@bekstil.net"
-
-# Delete CLI on exit
-function cleanup4() {
-  # Copy out test results
-  docker cp dcos-docker-master1:/opt/mesosphere/active/dcos-integration-test/test-junit.xml test-junit.xml || true
-  cleanup3
-}
-trap cleanup4 EXIT
-
-# Integration tests
-make test

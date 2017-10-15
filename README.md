@@ -2,6 +2,8 @@
 
 [![codecov](https://codecov.io/gh/mesosphere/dcos-e2e/branch/master/graph/badge.svg)](https://codecov.io/gh/mesosphere/dcos-e2e)
 
+[![Updates](https://pyup.io/repos/github/mesosphere/dcos-e2e/shield.svg)](https://pyup.io/repos/github/mesosphere/dcos-e2e/)
+
 # DC/OS End to End tests
 
 End to end tests are tests which require a DC/OS cluster to run against.
