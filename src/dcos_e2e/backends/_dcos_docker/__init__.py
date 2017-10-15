@@ -469,17 +469,20 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             cwd=str(self._path),
         )
 
-        for role, prefix, number in [
-            ('master', self._master_prefix, masters),
-            ('agent', self._agent_prefix, agents),
-            ('slave_public', self._public_agent_prefix, public_agents),
+        for role, nodes in [
+            ('master', self.masters),
+            ('slave', self.agents),
+            ('slave_public', self.public_agents),
         ]:
-            for container_number in range(1, number + 1):
-                self._run_dcos_install_in_container(
-                    container_base_name=prefix,
-                    container_number=container_number,
-                    role=role,
-                )
+            dcos_install_args = [
+                '/bin/bash',
+                str(bootstrap_tmp_path / 'dcos_install.sh'),
+                '--no-block-dcos-setup',
+                role,
+            ]
+
+            for node in nodes:
+                node.run_as_root(args=dcos_install_args)
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
             # Remove stray file that prevents non-root SSH.
@@ -554,33 +557,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ['systemctl', 'start', 'sshd.service'],
         ]:
             container.exec_run(cmd=cmd)
-
-    def _run_dcos_install_in_container(
-        self,
-        container_base_name: str,
-        container_number: int,
-        role: str,
-    ) -> None:
-        """
-        Run ``dcos_install.sh`` in a container.
-
-        Args:
-            container_base_name: The start of the container name.
-            container_number: The end of the container name.
-            role: One of 'master', 'slave', 'slave_public'.
-        """
-        client = docker.from_env(version='auto')
-        container_name = container_base_name + str(container_number)
-        container = client.containers.get(container_name)
-        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
-        dcos_install_path = bootstrap_tmp_path / 'dcos_install.sh'
-        cmd = [
-            '/bin/bash',
-            str(dcos_install_path),
-            '--no-block-dcos-setup',
-            role,
-        ]
-        container.exec_run(cmd=cmd)
 
     def destroy(self) -> None:
         """
