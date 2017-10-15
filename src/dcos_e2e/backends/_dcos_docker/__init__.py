@@ -11,6 +11,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import TemporaryDirectory
+from textwrap import dedent
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
 import docker
@@ -83,7 +84,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
     A record of a DC/OS Docker cluster.
     """
 
-    def __init__(  # noqa: E501 pylint: disable=super-init-not-called,too-many-statements,too-many-branches,wrong-spelling-in-comment
+    def __init__(  # pylint: disable=super-init-not-called,too-many-statements
         self,
         generate_config_path: Optional[Path],
         masters: int,
@@ -185,6 +186,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         sbin_dir_src = include_dir_src / 'sbin'
         sbin_dir = include_dir / 'sbin'
         sbin_dir.mkdir(parents=True)
+        service_dir = include_dir / 'systemd'
+        service_dir.mkdir(parents=True)
 
         ip_detect = Path(genconf_dir / 'ip-detect')
 
@@ -241,6 +244,28 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'overlay', 'overlay2', 'aufs'
         ) else 'overlay2'
 
+        docker_service_body = dedent(
+            """\
+            [Unit]
+            Description=Docker Application Container Engine
+            Documentation=https://docs.docker.com
+            After=dbus.service
+
+            [Service]
+            ExecStart=/usr/bin/docker daemon -D -s {docker_storage_driver} \
+            --disable-legacy-registry=true \
+            --exec-opt=native.cgroupdriver=cgroupfs
+            LimitNOFILE=1048576
+            LimitNPROC=1048576
+            LimitCORE=infinity
+            Delegate=yes
+            TimeoutStartSec=0
+
+            [Install]
+            WantedBy=default.target
+            """.format(docker_storage_driver=storage_driver)
+        )
+
         self._master_prefix = '{unique}-master-'.format(unique=unique)
         self._agent_prefix = '{unique}-agent-'.format(unique=unique)
         self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
@@ -261,28 +286,34 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         installer_ctr = '{unique}-installer'.format(unique=unique)
         installer_port = _get_open_port()
 
-        variables = {
-            # This version of Docker supports `overlay2`.
-            'DOCKER_VERSION': '1.13.1',
-            'DOCKER_STORAGEDRIVER': storage_driver,
-        }  # type: Dict[str, str]
-
-        make_args = []
-        for key, value in variables.items():
-            set_variable = '{key}={value}'.format(key=key, value=value)
-            make_args.append(set_variable)
-
         run_subprocess(
-            args=['make'] + make_args + ['build-base-docker'],
+            args=['make', 'build-base'],
             cwd=str(self._path),
             log_output_live=self.log_output_live,
+        )
+
+        (service_dir / 'docker.service').write_text(docker_service_body)
+
+        docker_image_tag = 'mesosphere/dcos-docker'
+        base_docker_tag = docker_image_tag + ':base-docker'
+        # This version of Docker supports `overlay2`.
+        docker_version = '1.13.1'
+
+        client.images.build(
+            path=str(self._path),
+            rm=True,
+            forcerm=True,
+            tag=base_docker_tag,
+            dockerfile=str(
+                Path('build') / 'base-docker' / docker_version / 'Dockerfile'
+            ),
         )
 
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
-            tag='mesosphere/dcos-docker',
+            tag=docker_image_tag,
         )
 
         common_mounts = {
