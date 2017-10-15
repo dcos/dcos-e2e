@@ -298,11 +298,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             log_output_live=self.log_output_live,
         )
 
+        base_docker_tag = docker_image_tag + ':base-docker'
+
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
-            tag=docker_image_tag + ':base-docker-' + docker_version,
+            tag=base_docker_tag,
             dockerfile=str(
                 Path('build') / 'base-docker' / docker_version / 'Dockerfile'
             ),
