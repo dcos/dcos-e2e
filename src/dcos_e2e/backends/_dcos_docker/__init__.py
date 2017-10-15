@@ -448,13 +448,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'false',
         }
 
-        config_body_dict.update(extra_config)
-        config_body = yaml.dump(
-            data=config_body_dict,
-            default_flow_style=False,
-        )
-
-        Path(config_file_path).write_text(config_body)
+        config_body = yaml.dump(data={**config_body_dict, **extra_config})
+        Path(config_file_path).write_text(data=config_body)
 
         genconf_args = [
             'bash',
