@@ -301,11 +301,22 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         docker_image_tag = 'mesosphere/dcos-docker'
-        base_docker_tag = docker_image_tag + ':base-docker'
+        base_tag = docker_image_tag + ':base'
+        base_docker_tag = base_tag + '-docker'
         # This version of Docker supports `overlay2`.
         docker_version = '1.13.1'
+        distro = 'centos-7'
 
-        # TODO build_base_image
+        client.images.build(
+            path=str(self._path),
+            rm=True,
+            forcerm=True,
+            tag=base_tag,
+            dockerfile=str(
+                Path('build') / 'base' / distro / 'Dockerfile'
+            ),
+        )
+
         client.images.build(
             path=str(self._path),
             rm=True,
