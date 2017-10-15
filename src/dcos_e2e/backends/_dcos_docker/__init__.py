@@ -266,8 +266,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             """.format(docker_storage_driver=storage_driver)
         )
 
-        (service_dir / 'docker.service').write_text(docker_service_body)
-
         self._master_prefix = '{unique}-master-'.format(unique=unique)
         self._agent_prefix = '{unique}-agent-'.format(unique=unique)
         self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
@@ -293,6 +291,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             cwd=str(self._path),
             log_output_live=self.log_output_live,
         )
+
+        (service_dir / 'docker.service').write_text(docker_service_body)
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_docker_tag = docker_image_tag + ':base-docker'
