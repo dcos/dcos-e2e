@@ -293,7 +293,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         )
 
         (service_dir / 'docker.service').write_text(docker_service_body)
-        import pdb; pdb.set_trace()
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_docker_tag = docker_image_tag + ':base-docker'
