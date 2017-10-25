@@ -13,5 +13,5 @@
 #	- D406
 # Section names do not need dashed underlines
 # 	- D407
-# No blank line is needed after the last seaction
+# No blank line is needed after the last section
 ignore = D200,D202,D203,D205,D212,D400,D406,D407,D413
