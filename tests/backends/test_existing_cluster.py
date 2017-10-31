@@ -3,6 +3,7 @@ Tests for the existing cluster backend.
 """
 
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
@@ -83,7 +84,7 @@ class TestBadParameters:
     """
 
     @pytest.fixture(scope='module')
-    def dcos_cluster(self, oss_artifact: Path) -> Cluster:
+    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
         """
         Return a `Cluster`.
 

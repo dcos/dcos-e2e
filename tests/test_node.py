@@ -6,6 +6,7 @@ import logging
 import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
+from typing import Iterator
 
 import pytest
 from pytest_catchlog import CompatLogCaptureFixture
@@ -24,7 +25,7 @@ class TestNode:
         self,
         oss_artifact: Path,
         cluster_backend: ClusterBackend,
-    ) -> Cluster:
+    ) -> Iterator[Cluster]:
         """
         Return a `Cluster`.
 
