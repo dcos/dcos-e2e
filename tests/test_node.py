@@ -58,22 +58,20 @@ class TestNode:
         home_path = Path('/home') / new_user_name
         ssh_path = home_path / '.ssh'
 
-        # Create a new user which can be SSH'd into.
+        # Create a new user which can be we can SSH into.
         commands = [
             ['adduser', new_user_name],
             ['mkdir', '-p', str(home_path)],
             ['cp', '-a', '/root/.ssh', str(ssh_path)],
-            ['chown', '-R', new_user_name, str(ssh_path)],
+            ['chown', '-R', new_user_name,
+             str(ssh_path)],
         ]
 
         for command in commands:
             result = master.run_as_root(args=command)
             assert result.returncode == 0
 
-        new_user_echo = master.run(
-            args=['echo', '$USER'],
-            user=new_user_name,
-        )
+        new_user_echo = master.run(args=['echo', '$USER'], user=new_user_name)
         assert new_user_echo.returncode == 0
         assert new_user_echo.stdout.strip().decode() == new_user_name
         assert new_user_echo.stderr == b''
