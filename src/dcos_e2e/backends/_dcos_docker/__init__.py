@@ -297,15 +297,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         installer_ctr = '{unique}-installer'.format(unique=unique)
         installer_port = _get_open_port()
 
-        run_subprocess(
-            args=[
-                'bash',
-                str(self._path / 'build' / 'base' / 'generate.sh'),
-            ],
-            cwd=str(self._path),
-            log_output_live=self.log_output_live,
-        )
-
         (service_dir / 'docker.service').write_text(docker_service_body)
 
         docker_image_tag = 'mesosphere/dcos-docker'
@@ -472,13 +463,8 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             'false',
         }
 
-        config_body_dict.update(extra_config)
-        config_body = yaml.dump(
-            data=config_body_dict,
-            default_flow_style=False,
-        )
-
-        Path(config_file_path).write_text(config_body)
+        config_body = yaml.dump(data={**config_body_dict, **extra_config})
+        Path(config_file_path).write_text(data=config_body)
 
         genconf_args = [
             'bash',
@@ -498,26 +484,20 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             cwd=str(self._path),
         )
 
-        for master_number in range(1, masters + 1):
-            self._run_dcos_install_in_container(
-                container_base_name=self._master_prefix,
-                container_number=master_number,
-                role='master',
-            )
+        for role, nodes in [
+            ('master', self.masters),
+            ('slave', self.agents),
+            ('slave_public', self.public_agents),
+        ]:
+            dcos_install_args = [
+                '/bin/bash',
+                str(bootstrap_tmp_path / 'dcos_install.sh'),
+                '--no-block-dcos-setup',
+                role,
+            ]
 
-        for agent_number in range(1, agents + 1):
-            self._run_dcos_install_in_container(
-                container_base_name=self._agent_prefix,
-                container_number=agent_number,
-                role='slave',
-            )
-
-        for public_agent_number in range(1, public_agents + 1):
-            self._run_dcos_install_in_container(
-                container_base_name=self._public_agent_prefix,
-                container_number=public_agent_number,
-                role='slave_public',
-            )
+            for node in nodes:
+                node.run_as_root(args=dcos_install_args)
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
             # Remove stray file that prevents non-root SSH.
@@ -592,33 +572,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             ['systemctl', 'start', 'sshd.service'],
         ]:
             container.exec_run(cmd=cmd)
-
-    def _run_dcos_install_in_container(
-        self,
-        container_base_name: str,
-        container_number: int,
-        role: str,
-    ) -> None:
-        """
-        Run ``dcos_install.sh`` in a container.
-
-        Args:
-            container_base_name: The start of the container name.
-            container_number: The end of the container name.
-            role: One of 'master', 'slave', 'slave_public'.
-        """
-        client = docker.from_env(version='auto')
-        container_name = container_base_name + str(container_number)
-        container = client.containers.get(container_name)
-        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
-        dcos_install_path = bootstrap_tmp_path / 'dcos_install.sh'
-        cmd = [
-            '/bin/bash',
-            str(dcos_install_path),
-            '--no-block-dcos-setup',
-            role,
-        ]
-        container.exec_run(cmd=cmd)
 
     def destroy(self) -> None:
         """
