@@ -28,24 +28,26 @@ class Node:
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
 
-    def _compose_ssh_command(
+    def compose_ssh_command(
         self,
         args: List[str],
         user: str,
         env: Optional[Dict] = None,
     ) -> List[str]:
         """
-        Return a command to run `args` on this node over SSH.
+        Run the specified command on the given host using SSH.
 
         Args:
-            args: The command to run on this node.
-            user: The user that the command will be run for over SSH.
+            args: The command to run on the node.
+            user: The user on the given host that the command will be run for
+                    over SSH.
             env: Environment variables to be set on the node before running
-                the command. A mapping of environment variable names to
-                values.
+                    the command. A mapping of environment variable names to
+                    values.
 
         Returns:
-            The full SSH command to be run.
+            Full SSH command to be run (SSH arguments + environment variables +
+            other arguments).
         """
         env = dict(env or {})
 
@@ -112,7 +114,8 @@ class Node:
         Raises:
             CalledProcessError: The process exited with a non-zero code.
         """
-        ssh_args = self._compose_ssh_command(args=args, user=user, env=env)
+        ssh_args = self.compose_ssh_command(args, user, env)
+
         return run_subprocess(args=ssh_args, log_output_live=log_output_live)
 
     def run_as_root(
@@ -140,18 +143,11 @@ class Node:
         """
 
         return self.run(
-            args=args,
-            user='root',
-            log_output_live=log_output_live,
-            env=env,
+            args=args, user='root', log_output_live=log_output_live, env=env
         )
 
-    def popen(
-        self,
-        args: List[str],
-        user: str,
-        env: Optional[Dict] = None,
-    ) -> Popen:
+    def popen(self, args: List[str], user: str,
+              env: Optional[Dict] = None) -> Popen:
         """
         Open a pipe to a command run on a node as the given user.
 
@@ -165,5 +161,8 @@ class Node:
         Returns:
             The pipe object attached to the specified process.
         """
-        ssh_args = self._compose_ssh_command(args=args, user=user, env=env)
-        return Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+        ssh_args = self.compose_ssh_command(args, user, env)
+
+        process = Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+
+        return process
