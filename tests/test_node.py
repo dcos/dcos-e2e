@@ -22,212 +22,201 @@ class TestNode:
     Tests for interacting with cluster nodes.
     """
 
+    @pytest.fixture(scope='module')
+    def dcos_cluster(
+        self,
+        oss_artifact: Path,
+        cluster_backend: ClusterBackend,
+    ) -> Cluster:
+        """
+        Return a `Cluster`.
+
+        This is module scoped as we do not intend to modify the cluster.
+        """
+        with Cluster(
+            cluster_backend=cluster_backend,
+            generate_config_path=oss_artifact,
+            masters=1,
+            agents=0,
+            public_agents=0,
+            log_output_live=True,
+        ) as cluster:
+            yield cluster
+
     def test_run(
         self,
+        dcos_cluster: Cluster,
         caplog: CompatLogCaptureFixture,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
     ) -> None:
         """
         It is possible to run commands as the given user and see their output.
         """
-        with Cluster(
-            agents=0,
-            public_agents=0,
-            cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
-            log_output_live=True,
-        ) as cluster:
-            (master, ) = cluster.masters
-            echo_result = master.run(args=['echo', '$USER'], user='root')
-            assert echo_result.returncode == 0
-            assert echo_result.stdout.strip() == b'root'
-            assert echo_result.stderr == b''
+        (master, ) = dcos_cluster.masters
+        echo_result = master.run(args=['echo', '$USER'], user='root')
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip() == b'root'
+        assert echo_result.stderr == b''
 
-            # The user is configurable.
-            # Create a user.
-            adduser_result = master.run(
-                args=['adduser', 'testuser'], user='root'
-            )
-            assert adduser_result.returncode == 0
-            # Prepare the user account for public key SSH access from the test
-            mkdir_result = master.run(
-                args=['mkdir', '-p', '/home/testuser'], user='root'
-            )
-            assert mkdir_result.returncode == 0
-            cp_result = master.run(
-                args=['cp', '-a', '/root/.ssh', '/home/testuser/.ssh'],
-                user='root'
-            )
-            assert cp_result.returncode == 0
-            chown_result = master.run(
-                args=['chown', '-R', 'testuser', '/home/testuser/.ssh'],
-                user='root'
-            )
-            assert chown_result.returncode == 0
+        # The user is configurable.
+        # Create a user.
+        adduser_result = master.run(args=['adduser', 'testuser'], user='root')
+        assert adduser_result.returncode == 0
+        # Prepare the user account for public key SSH access from the test
+        mkdir_result = master.run(
+            args=['mkdir', '-p', '/home/testuser'], user='root'
+        )
+        assert mkdir_result.returncode == 0
+        cp_result = master.run(
+            args=['cp', '-a', '/root/.ssh', '/home/testuser/.ssh'],
+            user='root'
+        )
+        assert cp_result.returncode == 0
+        chown_result = master.run(
+            args=['chown', '-R', 'testuser', '/home/testuser/.ssh'],
+            user='root'
+        )
+        assert chown_result.returncode == 0
 
-            # Confirm that commands can be run as the new user.
-            echo_result2 = master.run(args=['echo', '$USER'], user='testuser')
-            assert echo_result2.returncode == 0
-            assert echo_result2.stdout.strip() == b'testuser'
-            assert echo_result2.stderr == b''
+        # Confirm that commands can be run as the new user.
+        echo_result2 = master.run(args=['echo', '$USER'], user='testuser')
+        assert echo_result2.returncode == 0
+        assert echo_result2.stdout.strip() == b'testuser'
+        assert echo_result2.stderr == b''
 
-            # Commands which return a non-0 code raise a
-            # ``CalledProcessError``.
-            with pytest.raises(CalledProcessError) as excinfo:
-                master.run(args=['unset_command'], user='root')
+        # Commands which return a non-0 code raise a
+        # ``CalledProcessError``.
+        with pytest.raises(CalledProcessError) as excinfo:
+            master.run(args=['unset_command'], user='root')
 
-            exception = excinfo.value
-            assert exception.returncode == 127
-            assert exception.stdout == b''
-            assert b'command not found' in exception.stderr
-            for record in caplog.records:
-                # The error which caused this exception is not in the debug
-                # log output.
+        exception = excinfo.value
+        assert exception.returncode == 127
+        assert exception.stdout == b''
+        assert b'command not found' in exception.stderr
+        for record in caplog.records:
+            # The error which caused this exception is not in the debug
+            # log output.
+            if record.levelno == logging.DEBUG:
+                assert 'unset_command' not in record.getMessage()
+
+        # With `log_output_live`, output is logged and stderr is merged
+        # into stdout.
+        with pytest.raises(CalledProcessError) as excinfo:
+            master.run(
+                args=['unset_command'],
+                user='root',
+                log_output_live=True,
+            )
+
+        exception = excinfo.value
+        assert exception.stderr == b''
+        assert b'command not found' in exception.stdout
+        expected_error_substring = 'unset_command'
+        found_expected_error = False
+        for record in caplog.records:
+            if expected_error_substring in record.getMessage():
                 if record.levelno == logging.DEBUG:
-                    assert 'unset_command' not in record.getMessage()
-
-            # With `log_output_live`, output is logged and stderr is merged
-            # into stdout.
-            with pytest.raises(CalledProcessError) as excinfo:
-                master.run(
-                    args=['unset_command'],
-                    user='root',
-                    log_output_live=True,
-                )
-
-            exception = excinfo.value
-            assert exception.stderr == b''
-            assert b'command not found' in exception.stdout
-            expected_error_substring = 'unset_command'
-            found_expected_error = False
-            for record in caplog.records:
-                if expected_error_substring in record.getMessage():
-                    if record.levelno == logging.DEBUG:
-                        found_expected_error = True
-            assert found_expected_error
+                    found_expected_error = True
+        assert found_expected_error
 
     def test_run_as_root(
         self,
         caplog: CompatLogCaptureFixture,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        dcos_cluster: Cluster,
     ) -> None:
         """
         It is possible to run commands as root and see their output.
         """
-        with Cluster(
-            agents=0,
-            public_agents=0,
-            cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
-        ) as cluster:
-            (master, ) = cluster.masters
-            echo_result = master.run_as_root(args=['echo', '$USER'])
-            assert echo_result.returncode == 0
-            assert echo_result.stdout.strip() == b'root'
-            assert echo_result.stderr == b''
+        (master, ) = dcos_cluster.masters
+        echo_result = master.run_as_root(args=['echo', '$USER'])
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip() == b'root'
+        assert echo_result.stderr == b''
 
-            # Commands which return a non-0 code raise a
-            # ``CalledProcessError``.
-            with pytest.raises(CalledProcessError) as excinfo:
-                master.run_as_root(args=['unset_command'])
+        # Commands which return a non-0 code raise a
+        # ``CalledProcessError``.
+        with pytest.raises(CalledProcessError) as excinfo:
+            master.run_as_root(args=['unset_command'])
 
-            exception = excinfo.value
-            assert exception.returncode == 127
-            assert exception.stdout == b''
-            assert b'command not found' in exception.stderr
-            for record in caplog.records:
-                # The error which caused this exception is not in the debug
-                # log output.
+        exception = excinfo.value
+        assert exception.returncode == 127
+        assert exception.stdout == b''
+        assert b'command not found' in exception.stderr
+        for record in caplog.records:
+            # The error which caused this exception is not in the debug
+            # log output.
+            if record.levelno == logging.DEBUG:
+                assert 'unset_command' not in record.getMessage()
+
+        # With `log_output_live`, output is logged and stderr is merged
+        # into stdout.
+        with pytest.raises(CalledProcessError) as excinfo:
+            master.run_as_root(args=['unset_command'], log_output_live=True)
+
+        exception = excinfo.value
+        assert exception.stderr == b''
+        assert b'command not found' in exception.stdout
+        expected_error_substring = 'unset_command'
+        found_expected_error = False
+        for record in caplog.records:
+            if expected_error_substring in record.getMessage():
                 if record.levelno == logging.DEBUG:
-                    assert 'unset_command' not in record.getMessage()
+                    found_expected_error = True
+        assert found_expected_error
 
-            # With `log_output_live`, output is logged and stderr is merged
-            # into stdout.
-            with pytest.raises(CalledProcessError) as excinfo:
-                master.run_as_root(
-                    args=['unset_command'], log_output_live=True
-                )
-
-            exception = excinfo.value
-            assert exception.stderr == b''
-            assert b'command not found' in exception.stdout
-            expected_error_substring = 'unset_command'
-            found_expected_error = False
-            for record in caplog.records:
-                if expected_error_substring in record.getMessage():
-                    if record.levelno == logging.DEBUG:
-                        found_expected_error = True
-            assert found_expected_error
-
-    # An arbitrary time slice that is longer than it takes to spin up a cluster
-    # but avoids bash infinite loops.
+    # We time out after an arbitrary amount of time to avoid infinite loops.
     @pytest.mark.timeout(60 * 15)
-    def test_popen(
-        self,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
-    ) -> None:
+    def test_popen(self, dcos_cluster: Cluster) -> None:
         """
         It is possible to run commands as the given user asynchronously.
         """
-        with Cluster(
-            agents=0,
-            public_agents=0,
-            cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
-        ) as cluster:
-            (master, ) = cluster.masters
+        (master, ) = cluster.masters
 
-            # The user is configurable.
-            # Create a user.
-            adduser_result = master.run(
-                args=['adduser', 'testuser'], user='root'
-            )
-            assert adduser_result.returncode == 0
-            # Prepare the user account for public key SSH access from the test
-            mkdir_result = master.run(
-                args=['mkdir', '-p', '/home/testuser'], user='root'
-            )
-            assert mkdir_result.returncode == 0
-            cp_result = master.run(
-                args=['cp', '-a', '/root/.ssh', '/home/testuser/.ssh'],
-                user='root'
-            )
-            assert cp_result.returncode == 0
-            chown_result = master.run(
-                args=['chown', '-R', 'testuser', '/home/testuser/.ssh'],
-                user='root'
-            )
-            assert chown_result.returncode == 0
+        # The user is configurable.
+        # Create a user.
+        adduser_result = master.run(args=['adduser', 'testuser'], user='root')
+        assert adduser_result.returncode == 0
+        # Prepare the user account for public key SSH access from the test
+        mkdir_result = master.run(
+            args=['mkdir', '-p', '/home/testuser'], user='root'
+        )
+        assert mkdir_result.returncode == 0
+        cp_result = master.run(
+            args=['cp', '-a', '/root/.ssh', '/home/testuser/.ssh'],
+            user='root'
+        )
+        assert cp_result.returncode == 0
+        chown_result = master.run(
+            args=['chown', '-R', 'testuser', '/home/testuser/.ssh'],
+            user='root'
+        )
+        assert chown_result.returncode == 0
 
-            popen_1 = master.popen(
-                args=[
-                    '(mkfifo', '/tmp/pipe', '|', 'true)'
-                    '&&', '(cat', '/tmp/pipe)'
-                ],
-                user='testuser'
-            )
+        popen_1 = master.popen(
+            args=[
+                '(mkfifo', '/tmp/pipe', '|', 'true)'
+                '&&', '(cat', '/tmp/pipe)'
+            ],
+            user='testuser'
+        )
 
-            popen_2 = master.popen(
-                args=[
-                    '(mkfifo', '/tmp/pipe', '|', 'true)'
-                    '&&', '(echo', 'foo', '>', '/tmp/pipe)'
-                ],
-                user='testuser'
-            )
+        popen_2 = master.popen(
+            args=[
+                '(mkfifo', '/tmp/pipe', '|', 'true)'
+                '&&', '(echo', 'foo', '>', '/tmp/pipe)'
+            ],
+            user='testuser'
+        )
 
-            stdout, _ = popen_1.communicate()
-            return_code_1 = popen_1.poll()
+        stdout, _ = popen_1.communicate()
+        return_code_1 = popen_1.poll()
 
-            # Needed to cleanly terminate second subprocess
-            popen_2.communicate()
-            return_code_2 = popen_2.poll()
+        # Needed to cleanly terminate second subprocess
+        popen_2.communicate()
+        return_code_2 = popen_2.poll()
 
-            assert stdout == b'foo\n'
-            assert return_code_1 == 0
-            assert return_code_2 == 0
+        assert stdout == b'foo\n'
+        assert return_code_1 == 0
+        assert return_code_2 == 0
 
     def test_send_file(
         self,
