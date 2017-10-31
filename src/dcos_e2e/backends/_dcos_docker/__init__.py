@@ -122,13 +122,9 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 use.
 
         Raises:
-            ValueError: There is no file at `generate_config_path`.
             CalledProcessError: The step to create and install containers
                 exited with a non-zero code.
         """
-        if generate_config_path is None or not generate_config_path.exists():
-            raise ValueError()
-
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
