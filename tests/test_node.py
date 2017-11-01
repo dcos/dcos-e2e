@@ -14,6 +14,30 @@ from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
 
+def _create_user(cluster: Cluster, username: str) -> None:
+    """
+    Create a user which one can SSH into.
+
+    Args:
+        cluster: The cluster to create a user on.
+        username: The name of the user to create.
+    """
+    (master, ) = cluster.masters
+    home_path = Path('/home') / username
+    ssh_path = home_path / '.ssh'
+
+    commands = [
+        ['adduser', username],
+        ['mkdir', '-p', str(home_path)],
+        ['cp', '-a', '/root/.ssh', str(ssh_path)],
+        ['chown', '-R', username, str(ssh_path)],
+    ]
+
+    for command in commands:
+        result = master.run_as_root(args=command)
+        assert result.returncode == 0
+
+
 class TestNode:
     """
     Tests for interacting with cluster nodes.
@@ -42,21 +66,7 @@ class TestNode:
             assert echo_result.stderr == b''
 
             username = uuid.uuid4().hex
-            home_path = Path('/home') / username
-            ssh_path = home_path / '.ssh'
-
-            commands = [
-                ['adduser', username],
-                ['mkdir', '-p', str(home_path)],
-                ['cp', '-a', '/root/.ssh',
-                 str(ssh_path)],
-                ['chown', '-R', username,
-                 str(ssh_path)],
-            ]
-
-            for command in commands:
-                result = master.run_as_root(args=command)
-                assert result.returncode == 0
+            _create_user(cluster=cluster, username=username)
 
             new_user_echo = master.run(args=['echo', '$USER'], user=username)
             assert new_user_echo.returncode == 0
@@ -170,23 +180,8 @@ class TestNode:
             generate_config_path=oss_artifact,
         ) as cluster:
             (master, ) = cluster.masters
-
             username = uuid.uuid4().hex
-            home_path = Path('/home') / username
-            ssh_path = home_path / '.ssh'
-
-            commands = [
-                ['adduser', username],
-                ['mkdir', '-p', str(home_path)],
-                ['cp', '-a', '/root/.ssh',
-                 str(ssh_path)],
-                ['chown', '-R', username,
-                 str(ssh_path)],
-            ]
-
-            for command in commands:
-                result = master.run_as_root(args=command)
-                assert result.returncode == 0
+            _create_user(cluster=cluster, username=username)
 
             popen_1 = master.popen(
                 args=[
