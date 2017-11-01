@@ -100,8 +100,7 @@ class TestBadParameters:
 
     @pytest.fixture()
     def existing_cluster_backend(
-        self,
-        dcos_cluster: Cluster,
+        self, dcos_cluster: Cluster
     ) -> ClusterBackend:
         """
         Return an `ExistingCluster` with the nodes from `dcos_cluster`.
