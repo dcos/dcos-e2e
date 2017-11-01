@@ -177,16 +177,18 @@ class TestNode:
 
             popen_1 = master.popen(
                 args=[
-                    '(mkfifo', '/tmp/pipe', '|', 'true)'
-                    '&&', '(cat', '/tmp/pipe)'
+                    '(mkfifo /tmp/pipe | true)',
+                    '&&',
+                    '(cat /tmp/pipe)',
                 ],
                 user='testuser'
             )
 
             popen_2 = master.popen(
                 args=[
-                    '(mkfifo', '/tmp/pipe', '|', 'true)'
-                    '&&', '(echo', 'foo', '>', '/tmp/pipe)'
+                    '(mkfifo /tmp/pipe | true)',
+                    '&&',
+                    '(echo foo > /tmp/pipe)',
                 ],
                 user='testuser'
             )
