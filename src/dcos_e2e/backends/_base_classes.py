@@ -24,7 +24,6 @@ class ClusterManager(abc.ABC):
         extra_config: Dict[str, Any],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
-        files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
     ) -> None:
         """
@@ -43,9 +42,6 @@ class ClusterManager(abc.ABC):
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            files_to_copy_to_masters: A mapping of host paths to paths on the
-                master nodes. These are files to copy from the host to
-                the master nodes before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
         """

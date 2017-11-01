@@ -63,6 +63,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
         self.workspace_dir = workspace_dir
+        self.custom_master_mounts = custom_master_mounts
 
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
