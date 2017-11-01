@@ -17,10 +17,8 @@ env:
       - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
       - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
       - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
-      - "TEST_PATTERN=tests/test_node.py::TestNode::test_run"
-      - "TEST_PATTERN=tests/test_node.py::TestNode::test_run_as_root"
-      - "TEST_PATTERN=tests/test_node.py::TestNode::test_popen"
-      - "TEST_PATTERN=tests/test_node.py::TestNode::test_send_file"
+      # This test class uses one scoped cluster so we run it on one builder.
+      - "TEST_PATTERN=tests/test_node.py::TestNode"
       - "TEST_PATTERN=tests/test_harness.py::TestIntegrationTests::test_run_pytest"
       - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_extend_config"
       - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_default_config"
