@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [Next](#next)
   - [2017.10.04.0](#201710040)
   - [2017.08.11.0](#201708110)
   - [2017.08.08.0](#201708080)
@@ -22,6 +23,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## Next
+
+* Added `Node.send_file` to allow files to be copied to nodes.
 
 ## 2017.10.04.0
 

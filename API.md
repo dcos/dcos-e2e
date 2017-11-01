@@ -39,6 +39,7 @@
     - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
     - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
     - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
+    - [`node.send_file(local_path, remote_path) -> None`](#nodesend_filelocal_path-remote_path---none)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address-1)
 
@@ -251,6 +252,10 @@ These environment variables will be set on the node before running the command s
 These environment variables will be set on the node before running the command specified in `args`.
 
 The method returns a `Popen` object that can be used to communicate to the underlying subprocess.
+
+#### `node.send_file(local_path, remote_path) -> None`
+
+Copy a file to the node.
 
 ### Attributes
 
