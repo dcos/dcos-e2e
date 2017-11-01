@@ -51,11 +51,10 @@ class TestNode:
                 result = master.run_as_root(args=command)
                 assert result.returncode == 0
 
-            # Confirm that commands can be run as the new user.
-            echo_result2 = master.run(args=['echo', '$USER'], user='testuser')
-            assert echo_result2.returncode == 0
-            assert echo_result2.stdout.strip() == b'testuser'
-            assert echo_result2.stderr == b''
+            new_user_echo = master.run(args=['echo', '$USER'], user='testuser')
+            assert new_user_echo.returncode == 0
+            assert new_user_echo.stdout.strip() == b'testuser'
+            assert new_user_echo.stderr == b''
 
             # Commands which return a non-0 code raise a
             # ``CalledProcessError``.
