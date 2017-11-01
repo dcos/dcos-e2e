@@ -3,6 +3,7 @@ Tests for managing DC/OS cluster nodes.
 """
 
 import logging
+import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
 
@@ -164,11 +165,15 @@ class TestNode:
         ) as cluster:
             (master, ) = cluster.masters
 
+            username = uuid.uuid4().hex
+            home_path = Path('/home') / username
+            ssh_path = home_path / '.ssh'
+
             commands = [
-                ['adduser', 'testuser'],
-                ['mkdir', '-p', '/home/testuser'],
-                ['cp', '-a', '/root/.ssh', '/home/testuser/.ssh'],
-                ['chown', '-R', 'testuser', '/home/testuser/.ssh'],
+                ['adduser', username],
+                ['mkdir', '-p', str(home_path)],
+                ['cp', '-a', '/root/.ssh', str(ssh_path)],
+                ['chown', '-R', username, str(ssh_path)],
             ]
 
             for command in commands:
@@ -181,7 +186,7 @@ class TestNode:
                     '&&',
                     '(cat /tmp/pipe)',
                 ],
-                user='testuser'
+                user=username,
             )
 
             popen_2 = master.popen(
@@ -190,7 +195,7 @@ class TestNode:
                     '&&',
                     '(echo foo > /tmp/pipe)',
                 ],
-                user='testuser'
+                user=username,
             )
 
             stdout, _ = popen_1.communicate()
