@@ -41,20 +41,26 @@ class TestNode:
             assert echo_result.stdout.strip() == b'root'
             assert echo_result.stderr == b''
 
+            username = uuid.uuid4().hex
+            home_path = Path('/home') / username
+            ssh_path = home_path / '.ssh'
+
             commands = [
-                ['adduser', 'testuser'],
-                ['mkdir', '-p', '/home/testuser'],
-                ['cp', '-a', '/root/.ssh', '/home/testuser/.ssh'],
-                ['chown', '-R', 'testuser', '/home/testuser/.ssh'],
+                ['adduser', username],
+                ['mkdir', '-p', str(home_path)],
+                ['cp', '-a', '/root/.ssh',
+                 str(ssh_path)],
+                ['chown', '-R', username,
+                 str(ssh_path)],
             ]
 
             for command in commands:
                 result = master.run_as_root(args=command)
                 assert result.returncode == 0
 
-            new_user_echo = master.run(args=['echo', '$USER'], user='testuser')
+            new_user_echo = master.run(args=['echo', '$USER'], user=username)
             assert new_user_echo.returncode == 0
-            assert new_user_echo.stdout.strip() == b'testuser'
+            assert new_user_echo.stdout.strip().decode() == username
             assert new_user_echo.stderr == b''
 
             # Commands which return a non-0 code raise a
@@ -172,8 +178,10 @@ class TestNode:
             commands = [
                 ['adduser', username],
                 ['mkdir', '-p', str(home_path)],
-                ['cp', '-a', '/root/.ssh', str(ssh_path)],
-                ['chown', '-R', username, str(ssh_path)],
+                ['cp', '-a', '/root/.ssh',
+                 str(ssh_path)],
+                ['chown', '-R', username,
+                 str(ssh_path)],
             ]
 
             for command in commands:
