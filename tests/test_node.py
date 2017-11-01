@@ -3,10 +3,14 @@ Tests for managing DC/OS cluster nodes.
 """
 
 import logging
+import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
 
 import pytest
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 from pytest_catchlog import CompatLogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
@@ -224,3 +228,32 @@ class TestNode:
             assert stdout == b'foo\n'
             assert return_code_1 == 0
             assert return_code_2 == 0
+
+    def test_send_file(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_artifact: Path,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node.
+        """
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        master_destination_path = Path('/etc/on_master_node.txt')
+
+        with Cluster(
+            agents=0,
+            public_agents=0,
+            cluster_backend=cluster_backend,
+            generate_config_path=oss_artifact,
+        ) as cluster:
+            (master, ) = cluster.masters
+            master.send_file(
+                local_path=Path(str(local_file)),
+                remote_path=master_destination_path,
+            )
+            args = ['cat', str(master_destination_path)]
+            result = master.run_as_root(args=args)
+            assert result.stdout.decode() == content
