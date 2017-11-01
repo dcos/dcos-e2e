@@ -57,6 +57,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
                 This clone will be used to create the cluster.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            custom_master_mounts: The XXX
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
@@ -338,16 +339,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             **common_mounts,
         }
 
-        custom_master_mounts = {
-            str(host_path.absolute()): {
-                'bind': str(master_path),
-                'mode': 'rw'
-            }
-            for host_path, master_path in files_to_copy_to_masters.items()
-        }
-
-        master_mounts = {**common_mounts, **custom_master_mounts}
-
         for master_number in range(1, masters + 1):
             unique_mounts = {
                 str(uuid.uuid4()): {
@@ -365,7 +356,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={**master_mounts, **unique_mounts},
+                volumes={
+                    **common_mounts,
+                    **cluster_backend.custom_master_mounts,
+                    **unique_mounts,
+                },
                 tmpfs=node_tmpfs_mounts,
             )
 

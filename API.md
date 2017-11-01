@@ -63,6 +63,8 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
+#### `master_mounts`
+
 ## `dcos_e2e.backend.ExistingCluster`
 
 This is a backend which can be used to run a `Cluster`.
