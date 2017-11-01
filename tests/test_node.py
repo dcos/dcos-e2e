@@ -201,7 +201,7 @@ class TestNode:
                 args=[
                     '(mkfifo /tmp/pipe | true)',
                     '&&',
-                    '(echo foo > /tmp/pipe)',
+                    '(echo $USER > /tmp/pipe)',
                 ],
                 user=username,
             )
@@ -213,6 +213,6 @@ class TestNode:
             popen_2.communicate()
             return_code_2 = popen_2.poll()
 
-            assert stdout == b'foo\n'
+            assert stdout.strip().decode() == username
             assert return_code_1 == 0
             assert return_code_2 == 0
