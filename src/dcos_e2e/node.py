@@ -7,6 +7,9 @@ from pathlib import Path
 from subprocess import PIPE, CompletedProcess, Popen
 from typing import Dict, List, Optional
 
+import paramiko
+from scp import SCPClient
+
 from ._common import run_subprocess
 
 
@@ -167,3 +170,23 @@ class Node:
         """
         ssh_args = self._compose_ssh_command(args=args, user=user, env=env)
         return Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+
+    def send_file(self, local_path: Path, remote_path: Path) -> None:
+        """
+        Copy a file to this node.
+
+        Args:
+            local_path: The path on the host of the file to send.
+            remote_path: The path on the node to place the file.
+        """
+        user = 'root'
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(
+            str(self.ip_address),
+            username=user,
+            key_filename=str(self._ssh_key_path),
+        )
+
+        with SCPClient(ssh_client.get_transport()) as scp:
+            scp.put(files=str(local_path), remote_path=str(remote_path))
