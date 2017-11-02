@@ -58,7 +58,6 @@ class ExistingClusterManager(ClusterManager):
         extra_config: Dict[str, Any],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
-        files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: ExistingCluster,
     ) -> None:
         """
@@ -76,16 +75,12 @@ class ExistingClusterManager(ClusterManager):
                 `cluster_backend`.
             extra_config: This dictionary can contain extra installation
                 configuration variables. However, as the cluster already
-                exists, there may not be
+                exists, there may not be any entries.
             log_output_live: If `True`, log output of subprocesses live.
                 If `True`, stderr is merged into stdout in the return value.
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS. As the cluster
-                already exists, there can be no paths given.
-            files_to_copy_to_masters: A mapping of host paths to paths on the
-                master nodes. These are files to copy from the host to
-                the master nodes before installing DC/OS. As the cluster
                 already exists, there can be no paths given.
             cluster_backend: Details of the specific existing cluster backend
                 to use.
@@ -137,14 +132,6 @@ class ExistingClusterManager(ClusterManager):
                 'No files can be copied to the installer of an existing '
                 'cluster. '
                 'Therefore, `files_to_copy_to_installer` must be empty.'
-            )
-            raise ValueError(message)
-
-        if files_to_copy_to_masters != {}:
-            message = (
-                'No files can be copied to the masters of an existing cluster '
-                'at install time. '
-                'Therefore, `files_to_copy_to_masters` must be empty.'
             )
             raise ValueError(message)
 

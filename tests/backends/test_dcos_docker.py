@@ -5,7 +5,6 @@ Tests for the DC/OS Docker backend.
 import uuid
 from pathlib import Path
 
-import pytest
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
@@ -32,7 +31,10 @@ class TestCustomMasterMounts:
         local_file.write(content)
         master_path = Path('/etc/on_master_nodes.txt')
         custom_master_mounts = {
-            str(local_file): {'bind': str(master_path), 'mode': 'rw'},
+            str(local_file): {
+                'bind': str(master_path),
+                'mode': 'rw',
+            },
         }
         backend = DCOS_Docker(custom_master_mounts=custom_master_mounts)
 
