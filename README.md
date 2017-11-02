@@ -19,7 +19,6 @@ For example, a test may require a cluster with a certain number of agents, or ce
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Test Environment](#test-environment)
-  - [Vagrant Quick Start](#vagrant-quick-start)
 - [Cleaning Up](#cleaning-up)
   - [DC/OS Docker Backend](#dcos-docker-backend)
 - [Troubleshooting](#troubleshooting)
@@ -81,52 +80,6 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to t
 Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
 For more information about `DC/OS Docker` see the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
 To run unit tests see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
-
-### Vagrant Quick Start
-
-With [Vagrant](https://www.vagrantup.com) and [VirtualBox](https://www.virtualbox.org/wiki/Downloads), it is possible to quickly get a test environment running.
-
-Run the following commands to create an environment.
-These commands will create a Vagrant VM with access to the files in the
-directory from which they are launched.
-These files will be at `/vagrant` in the VM.
-
-```sh
-# Download files from the DC/OS Docker repository to create a VM.
-mkdir -p vagrant
-cd vagrant
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/resize-disk.sh
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/vagrant/vbox-network.sh
-chmod +x resize-disk.sh
-chmod +x vbox-network.sh
-cd ..
-curl -O https://raw.githubusercontent.com/dcos/dcos-docker/master/Vagrantfile
-vagrant/resize-disk.sh 102400
-```
-
-Then create a virtual environment:
-
-```
-vagrant ssh -c 'curl https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/vagrant_create_env.sh | /bin/bash'
-```
-
-Then, to enter the environment, run the following:
-
-```sh
-laptop$ vagrant ssh
-[root@vagrant]$ pyenv activate dcos
-```
-
-Then install the dependencies of the package you want to test.
-
-There is a common issue which causes error messages on old kernels.
-See  <https://github.com/moby/moby/issues/5618>.
-Optionally on the VM run the following commands to update the kernel:
-
-```sh
-sudo yum update -y kernel
-reboot
-```
 
 ## Cleaning Up
 
