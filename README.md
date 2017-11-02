@@ -18,11 +18,11 @@ For example, a test may require a cluster with a certain number of agents, or ce
 
 - [Usage](#usage)
 - [Contributing](#contributing)
-- [Test Environment](#test-environment)
-- [Cleaning Up](#cleaning-up)
-  - [DC/OS Docker Backend](#dcos-docker-backend)
+- [Required Environment](#required-environment)
+- [Cleaning Up and Troubleshooting](#cleaning-up-and-troubleshooting)
+  - [Docker Backend](#docker-backend)
 - [Troubleshooting](#troubleshooting)
-  - [DC/OS Docker Backend](#dcos-docker-backend-1)
+  - [Docker Backend](#docker-backend-1)
     - [macOS File Sharing](#macos-file-sharing)
     - [Out of space errors](#out-of-space-errors)
 
@@ -33,7 +33,7 @@ For example, a test may require a cluster with a certain number of agents, or ce
 ## Usage
 
 Tests must be run in a supported environment.
-See "Test Environment".
+See "Required Environment".
 
 To create tests using clusters with custom configurations, first install the harness:
 
@@ -47,7 +47,7 @@ Then, create a test, such as the following:
 import subprocess
 from pathlib import Path
 
-from dcos_e2e.backends import DCOS_Docker
+from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 
 
@@ -56,7 +56,7 @@ class TestExample:
     def test_example(self):
         with Cluster(
             extra_config={'check_time': True},
-            cluster_backend=DCOS_Docker(),
+            cluster_backend=Docker(),
             generate_config_path=Path('/tmp/dcos_generate_config.sh'),
         ) as cluster:
             (master, ) = cluster.masters
@@ -77,36 +77,9 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to t
 
 ## Required Environment
 
-See [`API.md`](./API.md) for details on the API.
+See [`BACKENDS.md`](./BACKENDS.md) for details on requirements for launching clusters with each backend.
 
-## Cleaning Up
+## Cleaning Up and Troubleshooting
 
-### Docker Backend
-
-Tests run with this harness clean up after themselves.
-However, if a test is interrupted, it can leave behind containers, volumes and files.
-To remove these, run the following:
-
-```sh
-docker stop $(docker ps -a -q --filter="name=dcos-e2e")
-docker rm --volumes $(docker ps -a -q --filter="name=dcos-e2e")
-docker volume prune --force
-```
-
-If this repository is available, run `make clean`.
-
-## Troubleshooting
-
-### DC/OS Docker Backend
-
-#### macOS File Sharing
-
-On macOS `/tmp` is a symlink to `/private/tmp`.
-`/tmp` is used by the harness.
-Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
-This is the default.
-See Docker > Preferences > File Sharing.
-
-#### Out of space errors
-
-See "Cleaning up".
+Some backends leave junk around, especially when tests are cancelled.
+See [`BACKENDS.md`](./BACKENDS.md) for specifics of dealing with particular backends.

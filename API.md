@@ -6,13 +6,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
-  - [Parameters](#parameters)
-    - [`workspace_dir`](#workspace_dir)
-    - [`master_mounts`](#master_mounts)
-- [`dcos_e2e.backend.ExistingCluster`](#dcos_e2ebackendexistingcluster)
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
-  - [Parameters](#parameters-1)
+  - [Parameters](#parameters)
     - [`cluster_backend`](#cluster_backend)
     - [`generate_config_path`](#generate_config_path)
     - [`extra_config`](#extra_config)
@@ -32,7 +27,7 @@
     - [`agents`](#agents-1)
     - [`public_agents`](#public_agents-1)
 - [`dcos_e2e.node.Node`](#dcos_e2enodenode)
-  - [Parameters](#parameters-2)
+  - [Parameters](#parameters-1)
     - [`ip_address`](#ip_address)
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
@@ -47,48 +42,6 @@
 <!--lint enable list-item-indent-->
 <!--lint enable list-item-bullet-indent-->
 
-## `dcos_e2e.backend.DCOS_Docker`
-
-This is a backend which can be used to run a `Cluster`.
-
-```python
-DCOS_Docker(workspace_dir=None)
-```
-
-### Parameters
-
-#### `workspace_dir`
-
-The directory in which large temporary files will be created.
-These files will be deleted at the end of a test run.
-This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
-
-#### `master_mounts`
-
-Mounts to add to master node containers.
-See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
-
-## `dcos_e2e.backend.ExistingCluster`
-
-This is a backend which can be used to run a `Cluster`.
-It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s.
-This means that it cannot support various operations which rely on access to the start up and teardown mechanisms of a cluster.
-
-As such, various `Cluster` parameters must be set in particular ways.
-
-```python
-ExistingCluster(masters, agents, public_agents)
-```
-
-When creating a `Cluster` with this backend, the following parameter conditions must be true:
-* `generate_config_path` must be `None`,
-* `extra_config` must be `None` or `{}`,
-* `masters` matches the number of master nodes in the existing cluster,
-* `agents` matches the number of agent nodes in the existing cluster,
-* `public_agents` matches the number of public agent nodes in the existing cluster,
-* `destroy_on_error` must be `False`,
-* `destroy_on_success` must be `False`,
-* `files_to_copy_to_installer` must be `None` or `{}`,
 
 ## `dcos_e2e.cluster.Cluster`
 
@@ -114,7 +67,7 @@ This is a context manager which spins up a cluster.
 #### `cluster_backend`
 
 The backend to use for the cluster.
-Currently, the only supported backend is an instance of `dcos_e2e.backend.DCOS_Docker`.
+See [`BACKENDS.md`](./BACKENDS.md) for details.
 
 #### `generate_config_path`
 
@@ -146,7 +99,6 @@ To see these logs in `pytest` tests, use the `-s` flag.
 
 A mapping of host paths to paths on the installer node.
 These are files to copy from the host to the installer node before installing DC/OS.
-Currently on DC/OS Docker the only supported paths on the installer are in the `/genconf` directory.
 
 #### `destroy_on_error`
 
