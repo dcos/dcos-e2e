@@ -45,6 +45,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     def __init__(
         self,
         workspace_dir: Optional[Path] = None,
+        custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
@@ -60,13 +61,16 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
                 This clone will be used to create the cluster.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
-            custom_master_mounts: The XXX
+            custom_master_mounts: Custom mounts add to master node containers.
+                See `volumes` on
+                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
+                for details.
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
         self.workspace_dir = workspace_dir
-        self.custom_master_mounts = custom_master_mounts
+        self.custom_master_mounts = dict(custom_master_mounts or {})
 
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:

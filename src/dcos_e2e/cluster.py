@@ -89,7 +89,6 @@ class Cluster(ContextDecorator):
             extra_config=extra_config,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
-            files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
             generate_config_path=generate_config_path,
         )  # type: ClusterManager
