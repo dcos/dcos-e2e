@@ -189,4 +189,8 @@ class Node:
         )
 
         with SCPClient(ssh_client.get_transport()) as scp:
+            self.run(
+                args=['mkdir', '--parents', str(remote_path.parent)],
+                user=user,
+            )
             scp.put(files=str(local_path), remote_path=str(remote_path))
