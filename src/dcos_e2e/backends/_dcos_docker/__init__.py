@@ -55,6 +55,10 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory  # noqa
+            custom_master_mounts: Custom mounts add to master node containers.
+                See `volumes` on
+                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
+                for details.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -102,7 +106,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         extra_config: Dict[str, Any],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
-        files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: DCOS_Docker,
     ) -> None:
         """
