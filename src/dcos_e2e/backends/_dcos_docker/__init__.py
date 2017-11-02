@@ -123,10 +123,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 the installer node before installing DC/OS. Currently on DC/OS
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
-            files_to_copy_to_masters: A mapping of host paths to paths on the
-                master nodes. These are files to copy from the host to
-                the master nodes before installing DC/OS. On DC/OS Docker the
-                files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
 
