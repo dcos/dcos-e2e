@@ -6,15 +6,11 @@ long time to run.
 """
 
 import logging
-import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import List
 
 import pytest
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 from pytest_catchlog import CompatLogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
@@ -376,37 +372,3 @@ class TestDestroyOnSuccess:
 
         master.run_as_root(args=['echo', 'hello'])
         cluster.destroy()
-
-
-class TestCopyFiles:
-    """
-    Tests for copying files to nodes.
-    """
-
-    def test_copy_files_to_masters(
-        self,
-        cluster_backend: ClusterBackend,
-        tmpdir: local,
-        oss_artifact: Path,
-    ) -> None:
-        """
-        Files can be copied from the host to master nodes node at creation
-        time.
-        """
-        content = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
-        source_path = Path(str(local_file))
-        master_destination_path = Path('/etc/on_master_nodes.txt')
-        files_to_copy_to_masters = {source_path: master_destination_path}
-        with Cluster(
-            cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
-            files_to_copy_to_masters=files_to_copy_to_masters,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            args = ['cat', str(master_destination_path)]
-            result = master.run_as_root(args=args)
-            assert result.stdout.decode() == content
