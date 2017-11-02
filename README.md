@@ -75,15 +75,13 @@ See [`API.md`](./API.md) for details on the API.
 
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to this repository.
 
-## Test Environment
+## Required Environment
 
-Tests for this package and tests which use this package must be run on a host which is supported by DC/OS Docker.
-For more information about `DC/OS Docker` see the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/README.md).
-To run unit tests see [`CONTRIBUTING.md`](./CONTRIBUTING.md).
+See [`API.md`](./API.md) for details on the API.
 
 ## Cleaning Up
 
-### DC/OS Docker Backend
+### Docker Backend
 
 Tests run with this harness clean up after themselves.
 However, if a test is interrupted, it can leave behind containers, volumes and files.

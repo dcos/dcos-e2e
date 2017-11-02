@@ -27,6 +27,7 @@
 ## Next
 
 * Added `Node.send_file` to allow files to be copied to nodes.
+* Backwards incompatible change: Rename `DCOS_Docker` backend to `Docker` backend.
 
 ## 2017.10.04.0
 
