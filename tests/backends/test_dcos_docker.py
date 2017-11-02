@@ -25,8 +25,7 @@ class TestCustomMasterMounts:
         oss_artifact: Path,
     ) -> None:
         """
-        If no file exists at the given `generate_config_path`, a `ValueError`
-        is raised.
+        It is possible to mount local files to master nodes.
         """
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
