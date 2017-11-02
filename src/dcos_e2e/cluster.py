@@ -37,7 +37,6 @@ class Cluster(ContextDecorator):
         destroy_on_error: bool = True,
         destroy_on_success: bool = True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
-        files_to_copy_to_masters: Optional[Dict[Path, Path]] = None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -59,9 +58,6 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            files_to_copy_to_masters: A mapping of host paths to paths on the
-                master nodes. These are files to copy from the host to
-                the master nodes before installing DC/OS.
 
         Raises:
             ValueError: `destroy_on_error` or `destroy_on_success` is `True`
@@ -93,7 +89,6 @@ class Cluster(ContextDecorator):
             extra_config=extra_config,
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
-            files_to_copy_to_masters=dict(files_to_copy_to_masters or {}),
             cluster_backend=cluster_backend,
             generate_config_path=generate_config_path,
         )  # type: ClusterManager

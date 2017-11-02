@@ -27,6 +27,9 @@
 ## Next
 
 * Added `Node.send_file` to allow files to be copied to nodes.
+* Added `custom_master_mounts` to the DC/OS Docker backend.
+* Backwards incompatible change: Removed `files_to_copy_to_masters`.
+  Instead, use `custom_master_mounts` or `Node.send_file`.
 
 ## 2017.10.04.0
 

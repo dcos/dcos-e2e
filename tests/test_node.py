@@ -223,7 +223,7 @@ class TestNode:
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
-        master_destination_path = Path('/etc/on_master_node.txt')
+        master_destination_path = Path('/etc/new_dir/on_master_node.txt')
         (master, ) = dcos_cluster.masters
         master.send_file(
             local_path=Path(str(local_file)),

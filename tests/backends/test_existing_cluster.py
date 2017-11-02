@@ -191,34 +191,6 @@ class TestBadParameters:
 
         assert str(excinfo.value) == expected_error
 
-    def test_files_to_copy_to_masters(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If there are any files to copy to masters, an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
-                files_to_copy_to_masters={Path('/foo'): Path('/bar')},
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'No files can be copied to the masters of an existing cluster at '
-            'install time. '
-            'Therefore, `files_to_copy_to_masters` must be empty.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
     def test_extra_config(
         self,
         dcos_cluster: Cluster,
