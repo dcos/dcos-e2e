@@ -9,6 +9,7 @@
 - [`dcos_e2e.backend.DCOS_Docker`](#dcos_e2ebackenddcos_docker)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
+    - [`master_mounts`](#master_mounts)
 - [`dcos_e2e.backend.ExistingCluster`](#dcos_e2ebackendexistingcluster)
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters-1)
@@ -20,7 +21,6 @@
     - [`public_agents`](#public_agents)
     - [`log_output_live`](#log_output_live)
     - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
-    - [`files_to_copy_to_masters`](#files_to_copy_to_masters)
     - [`destroy_on_error`](#destroy_on_error)
     - [`destroy_on_success`](#destroy_on_success)
   - [Methods](#methods)
@@ -63,6 +63,11 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
+#### `master_mounts`
+
+Mounts to add to master node containers.
+See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
+
 ## `dcos_e2e.backend.ExistingCluster`
 
 This is a backend which can be used to run a `Cluster`.
@@ -84,7 +89,6 @@ When creating a `Cluster` with this backend, the following parameter conditions 
 * `destroy_on_error` must be `False`,
 * `destroy_on_success` must be `False`,
 * `files_to_copy_to_installer` must be `None` or `{}`,
-* `files_to_copy_to_masters` must be `None` or `{}`
 
 ## `dcos_e2e.cluster.Cluster`
 
@@ -100,7 +104,6 @@ Cluster(
     destroy_on_error=True,
     destroy_on_success=True,
     files_to_copy_to_installer=None,
-    files_to_copy_to_masters=None,
 )
 ```
 
@@ -144,12 +147,6 @@ To see these logs in `pytest` tests, use the `-s` flag.
 A mapping of host paths to paths on the installer node.
 These are files to copy from the host to the installer node before installing DC/OS.
 Currently on DC/OS Docker the only supported paths on the installer are in the `/genconf` directory.
-
-#### `files_to_copy_to_masters`
-
-A mapping of host paths to paths on the master nodes.
-These are files to copy from the host to the master nodes before installing DC/OS.
-On DC/OS Docker the files are mounted, read only, to the masters.
 
 #### `destroy_on_error`
 

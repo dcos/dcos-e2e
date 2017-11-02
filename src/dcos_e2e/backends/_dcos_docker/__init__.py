@@ -42,7 +42,11 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
     A record of a DC/OS Docker backend which can be used to create clusters.
     """
 
-    def __init__(self, workspace_dir: Optional[Path] = None) -> None:
+    def __init__(
+        self,
+        workspace_dir: Optional[Path] = None,
+        custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+    ) -> None:
         """
         Create a configuration for a DC/OS Docker cluster backend.
 
@@ -51,17 +55,26 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory  # noqa
+            custom_master_mounts: Custom mounts add to master node containers.
+                See `volumes` on
+                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
+                for details.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
                 This clone will be used to create the cluster.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            custom_master_mounts: Custom mounts add to master node containers.
+                See `volumes` on
+                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
+                for details.
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
         self.workspace_dir = workspace_dir
+        self.custom_master_mounts = dict(custom_master_mounts or {})
 
     @property
     def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
@@ -93,7 +106,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         extra_config: Dict[str, Any],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
-        files_to_copy_to_masters: Dict[Path, Path],
         cluster_backend: DCOS_Docker,
     ) -> None:
         """
@@ -114,10 +126,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 the installer node before installing DC/OS. Currently on DC/OS
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
-            files_to_copy_to_masters: A mapping of host paths to paths on the
-                master nodes. These are files to copy from the host to
-                the master nodes before installing DC/OS. On DC/OS Docker the
-                files are mounted, read only, to the masters.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
 
@@ -338,16 +346,6 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
             **common_mounts,
         }
 
-        custom_master_mounts = {
-            str(host_path.absolute()): {
-                'bind': str(master_path),
-                'mode': 'rw'
-            }
-            for host_path, master_path in files_to_copy_to_masters.items()
-        }
-
-        master_mounts = {**common_mounts, **custom_master_mounts}
-
         for master_number in range(1, masters + 1):
             unique_mounts = {
                 str(uuid.uuid4()): {
@@ -365,7 +363,11 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={**master_mounts, **unique_mounts},
+                volumes={
+                    **common_mounts,
+                    **cluster_backend.custom_master_mounts,
+                    **unique_mounts,
+                },
                 tmpfs=node_tmpfs_mounts,
             )
 

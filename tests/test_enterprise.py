@@ -104,14 +104,18 @@ class TestCopyFiles:
             extra_config=config,
             generate_config_path=enterprise_artifact,
             files_to_copy_to_installer=files_to_copy_to_installer,
-            files_to_copy_to_masters={ca_key_path: master_key_path},
             log_output_live=True,
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
-            cluster.wait_for_dcos()
             (master, ) = cluster.masters
+            master.send_file(
+                local_path=ca_key_path,
+                remote_path=master_key_path,
+            )
+
+            cluster.wait_for_dcos()
             master_url = 'https://' + str(master.ip_address)
             response = requests.get(master_url, verify=str(cert_path))
             response.raise_for_status()
