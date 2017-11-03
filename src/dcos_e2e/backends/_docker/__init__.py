@@ -1,5 +1,5 @@
 """
-Helpers for creating and interacting with clusters on DC/OS.
+Helpers for creating and interacting with clusters on Docker.
 """
 
 import inspect
