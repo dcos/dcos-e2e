@@ -1,5 +1,5 @@
 """
-Tests for the DC/OS Docker backend.
+Tests for the Docker backend.
 """
 
 import uuid
