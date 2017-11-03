@@ -1,5 +1,5 @@
 """
-Helpers for interacting with DC/OS Docker.
+Helpers for creating and interacting with clusters on Docker.
 """
 
 import inspect
@@ -37,9 +37,9 @@ def _get_open_port() -> int:
         return int(new_socket.getsockname()[1])
 
 
-class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
+class Docker(ClusterBackend):
     """
-    A record of a DC/OS Docker backend which can be used to create clusters.
+    A record of a Docker backend which can be used to create clusters.
     """
 
     def __init__(
@@ -48,7 +48,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> None:
         """
-        Create a configuration for a DC/OS Docker cluster backend.
+        Create a configuration for a Docker cluster backend.
 
         Args:
             workspace_dir: The directory in which large temporary files will be
@@ -77,24 +77,24 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         self.custom_master_mounts = dict(custom_master_mounts or {})
 
     @property
-    def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
+    def cluster_cls(self) -> Type['DockerCluster']:
         """
         Return the `ClusterManager` class to use to create and manage a
         cluster.
         """
-        return DCOS_Docker_Cluster
+        return DockerCluster
 
     @property
     def supports_destruction(self) -> bool:
         """
-        DC/OS Docker clusters can be destroyed.
+        Docker clusters can be destroyed.
         """
         return True
 
 
-class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
+class DockerCluster(ClusterManager):
     """
-    A record of a DC/OS Docker cluster.
+    A record of a Docker cluster.
     """
 
     def __init__(  # pylint: disable=super-init-not-called,too-many-statements
@@ -106,17 +106,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         extra_config: Dict[str, Any],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
-        cluster_backend: DCOS_Docker,
+        cluster_backend: Docker,
     ) -> None:
         """
-        Create a DC/OS Docker cluster.
+        Create a Docker cluster.
 
         Args:
             generate_config_path: The path to a build artifact to install.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            extra_config: DC/OS Docker comes with a "base" configuration.
+            extra_config: By default this uses a base configuration.
                 This dictionary can contain extra installation configuration
                 variables.
             log_output_live: If `True`, log output of subprocesses live.
@@ -126,8 +126,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
                 the installer node before installing DC/OS. Currently on DC/OS
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
-            cluster_backend: Details of the specific DC/OS Docker backend to
-                use.
+            cluster_backend: Details of the specific Docker backend to use.
 
         Raises:
             CalledProcessError: The step to create and install containers
@@ -143,8 +142,7 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         # only these containers.
         unique = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
 
-        # We create a new instance of DC/OS Docker and we work in this
-        # directory.
+        # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
         self._path = Path(
@@ -167,14 +165,13 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
 
         self._path = self._path.resolve()
 
-        # Files in the DC/OS Docker directory's `genconf` directory are mounted
-        # to the installer at `/genconf`.
+        # Files in the `genconf` directory are mounted to the installer at
+        # `/genconf`.
         # Therefore, every file which we want to copy to `/genconf` on the
-        # installer is put into the genconf directory in DC/OS Docker.
+        # installer is put into the `genconf` directory.
         # The way to fix this if we want to be able to put files anywhere is
         # to add an variable to `dcos_generate_config.sh.in` which allows
         # `-v` mounts.
-        # Then `INSTALLER_MOUNTS` can be added to DC/OS Docker.
         genconf_dir = self._path / 'genconf'
         # We wrap these in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
