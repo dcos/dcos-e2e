@@ -14,6 +14,9 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
     - [`master_mounts`](#master_mounts)
+  - [Troubleshooting](#troubleshooting)
+    - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
+    - [macOS File Sharing](#macos-file-sharing)
 - [`dcos_e2e.backend.ExistingCluster`](#dcos_e2ebackendexistingcluster)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->

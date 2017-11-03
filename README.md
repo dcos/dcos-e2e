@@ -20,11 +20,6 @@ For example, a test may require a cluster with a certain number of agents, or ce
 - [Contributing](#contributing)
 - [Required Environment](#required-environment)
 - [Cleaning Up and Troubleshooting](#cleaning-up-and-troubleshooting)
-  - [Docker Backend](#docker-backend)
-- [Troubleshooting](#troubleshooting)
-  - [Docker Backend](#docker-backend-1)
-    - [macOS File Sharing](#macos-file-sharing)
-    - [Out of space errors](#out-of-space-errors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
