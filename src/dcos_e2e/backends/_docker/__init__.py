@@ -77,12 +77,12 @@ class Docker(ClusterBackend):
         self.custom_master_mounts = dict(custom_master_mounts or {})
 
     @property
-    def cluster_cls(self) -> Type['Docker_Cluster']:
+    def cluster_cls(self) -> Type['DockerCluster']:
         """
         Return the `ClusterManager` class to use to create and manage a
         cluster.
         """
-        return Docker_Cluster
+        return DockerCluster
 
     @property
     def supports_destruction(self) -> bool:
@@ -92,7 +92,7 @@ class Docker(ClusterBackend):
         return True
 
 
-class Docker_Cluster(ClusterManager):
+class DockerCluster(ClusterManager):
     """
     A record of a Docker cluster.
     """
@@ -116,7 +116,7 @@ class Docker_Cluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            extra_config: XXX
+            extra_config: By default this uses a base configuration.
                 This dictionary can contain extra installation configuration
                 variables.
             log_output_live: If `True`, log output of subprocesses live.
