@@ -7,7 +7,7 @@ from typing import Iterator
 
 import pytest
 
-from dcos_e2e.backends import ClusterBackend, DCOS_Docker, ExistingCluster
+from dcos_e2e.backends import ClusterBackend, Docker, ExistingCluster
 from dcos_e2e.cluster import Cluster
 
 
@@ -22,7 +22,7 @@ class TestExistingCluster:
         it.
         """
         with Cluster(
-            cluster_backend=DCOS_Docker(),
+            cluster_backend=Docker(),
             generate_config_path=oss_artifact,
             masters=1,
             agents=1,
@@ -91,7 +91,7 @@ class TestBadParameters:
         This is module scoped as we do not intend to modify the cluster.
         """
         with Cluster(
-            cluster_backend=DCOS_Docker(),
+            cluster_backend=Docker(),
             generate_config_path=oss_artifact,
             masters=1,
             agents=0,

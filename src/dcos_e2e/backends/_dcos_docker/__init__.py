@@ -1,5 +1,5 @@
 """
-Helpers for interacting with DC/OS Docker.
+Helpers for creating and interacting with clusters on DC/OS.
 """
 
 import inspect
@@ -37,9 +37,9 @@ def _get_open_port() -> int:
         return int(new_socket.getsockname()[1])
 
 
-class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
+class Docker(ClusterBackend):
     """
-    A record of a DC/OS Docker backend which can be used to create clusters.
+    A record of a Docker backend which can be used to create clusters.
     """
 
     def __init__(
@@ -48,7 +48,7 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> None:
         """
-        Create a configuration for a DC/OS Docker cluster backend.
+        Create a configuration for a Docker cluster backend.
 
         Args:
             workspace_dir: The directory in which large temporary files will be
@@ -77,24 +77,24 @@ class DCOS_Docker(ClusterBackend):  # pylint: disable=invalid-name
         self.custom_master_mounts = dict(custom_master_mounts or {})
 
     @property
-    def cluster_cls(self) -> Type['DCOS_Docker_Cluster']:
+    def cluster_cls(self) -> Type['Docker_Cluster']:
         """
         Return the `ClusterManager` class to use to create and manage a
         cluster.
         """
-        return DCOS_Docker_Cluster
+        return Docker_Cluster
 
     @property
     def supports_destruction(self) -> bool:
         """
-        DC/OS Docker clusters can be destroyed.
+        Docker clusters can be destroyed.
         """
         return True
 
 
-class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
+class Docker_Cluster(ClusterManager):
     """
-    A record of a DC/OS Docker cluster.
+    A record of a Docker cluster.
     """
 
     def __init__(  # pylint: disable=super-init-not-called,too-many-statements
@@ -106,17 +106,17 @@ class DCOS_Docker_Cluster(ClusterManager):  # pylint: disable=invalid-name
         extra_config: Dict[str, Any],
         log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
-        cluster_backend: DCOS_Docker,
+        cluster_backend: Docker,
     ) -> None:
         """
-        Create a DC/OS Docker cluster.
+        Create a Docker cluster.
 
         Args:
             generate_config_path: The path to a build artifact to install.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            extra_config: DC/OS Docker comes with a "base" configuration.
+            extra_config: XXX
                 This dictionary can contain extra installation configuration
                 variables.
             log_output_live: If `True`, log output of subprocesses live.
