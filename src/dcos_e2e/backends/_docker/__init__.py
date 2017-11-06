@@ -468,8 +468,7 @@ class DockerCluster(ClusterManager):
         config_body = yaml.dump(data={**config_body_dict, **extra_config})
         Path(config_file_path).write_text(data=config_body)
 
-        parse_result = urlparse(generate_config_url, scheme='file')
-        generate_config_path = Path(parse_result.path)
+        parse_result = urlparse(generate_config_url)
 
         if parse_result.scheme == 'http' or parse_result.scheme == 'https':
             # Download build artifact first
@@ -483,6 +482,15 @@ class DockerCluster(ClusterManager):
                     if not chunk:
                         break
                     artifact_file.write(chunk)
+
+        elif parse_result.scheme == 'file':
+            generate_config_path = Path(parse_result.path)
+
+        else:
+            raise ValueError(
+                'The given artifact url scheme is not supported'
+                'by the Docker cluster backend.'
+            )
 
         genconf_args = [
             'bash',

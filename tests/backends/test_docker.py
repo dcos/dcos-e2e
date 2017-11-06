@@ -7,6 +7,7 @@ from pathlib import Path
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
+import pytest
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
@@ -56,12 +57,38 @@ class TestCustomMasterMounts:
             assert result.stdout.decode() == new_content
 
 
-class TestBuildArtifactUrl:
+class TestArtifactUrl:
     """
     Tests for build artifacts in different locations.
     """
 
-    def test_local_build_artifact(
+    def test_no_artifact_url(self, tmpdir: local) -> None:
+
+        with Cluster(
+            cluster_backend=Docker(workspace_dir=tmpdir),
+            generate_config_url=None,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ):
+            with pytest.raises(ValueError):
+                pass
+
+    def test_unsupported_artifact_url(self, tmpdir: local) -> None:
+
+        unsupported_url = 'scheme://{}'.format(uuid.uuid4())
+
+        with Cluster(
+            cluster_backend=Docker(workspace_dir=tmpdir),
+            generate_config_url=unsupported_url,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ):
+            with pytest.raises(ValueError):
+                pass
+
+    def test_local_artifact_url(
         self, tmpdir: local, oss_artifact: str
     ) -> None:
 
@@ -74,7 +101,7 @@ class TestBuildArtifactUrl:
         ):
             pass
 
-    def test_remote_build_artifact(
+    def test_remote_artifact_url(
         self, tmpdir: local, oss_artifact_url: str
     ) -> None:
 
