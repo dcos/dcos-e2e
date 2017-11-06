@@ -7,6 +7,7 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from time import sleep
 from typing import Any, Dict, Iterable, List, Optional, Set
+from urllib.parse import urlparse
 
 import requests
 from requests import codes
@@ -28,7 +29,7 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
-        generate_config_path: Path = None,
+        generate_config_url: str = None,
         extra_config: Optional[Dict[str, Any]] = None,
         masters: int = 1,
         agents: int = 1,
@@ -43,7 +44,8 @@ class Cluster(ContextDecorator):
 
         Args:
             cluster_backend: The backend to use for the cluster.
-            generate_config_path: The path to a build artifact to install.
+            generate_config_url: The url to a build artifact to install.
+                Supported url types may vary between implementations.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
             masters: The number of master nodes to create.
@@ -77,6 +79,9 @@ class Cluster(ContextDecorator):
             )
             raise ValueError(message)
 
+        if generate_config_url:
+            urlparse(generate_config_url)
+
         self._destroy_on_error = destroy_on_error
         self._destroy_on_success = destroy_on_success
         self._log_output_live = log_output_live
@@ -90,7 +95,7 @@ class Cluster(ContextDecorator):
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            generate_config_path=generate_config_path,
+            generate_config_url=generate_config_url,
         )  # type: ClusterManager
 
     @retry(

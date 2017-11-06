@@ -6,7 +6,6 @@ long time to run.
 """
 
 import logging
-from pathlib import Path
 from subprocess import CalledProcessError
 from typing import List
 
@@ -23,9 +22,7 @@ class TestIntegrationTests:
     """
 
     def test_run_pytest(
-        self,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        self, cluster_backend: ClusterBackend, oss_artifact: str
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -33,7 +30,7 @@ class TestIntegrationTests:
         """
         with Cluster(
             cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             log_output_live=True,
         ) as cluster:
             # No error is raised with a successful command.
@@ -73,7 +70,7 @@ class TestExtendConfig:
         self,
         path: str,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         This example demonstrates that it is possible to create a cluster
@@ -94,7 +91,7 @@ class TestExtendConfig:
         }
 
         with Cluster(
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             extra_config=config,
             agents=0,
             public_agents=0,
@@ -108,7 +105,7 @@ class TestExtendConfig:
         self,
         path: str,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         The example file does not exist with the standard configuration.
@@ -116,7 +113,7 @@ class TestExtendConfig:
         configuration.
         """
         with Cluster(
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
@@ -133,7 +130,7 @@ class TestClusterSize:
     """
 
     def test_default(
-        self, cluster_backend: ClusterBackend, oss_artifact: Path
+        self, cluster_backend: ClusterBackend, oss_artifact: str
     ) -> None:
         """
         By default, a cluster with one master and one agent and one private
@@ -141,7 +138,7 @@ class TestClusterSize:
         """
         with Cluster(
             cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
         ) as cluster:
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
@@ -150,7 +147,7 @@ class TestClusterSize:
     def test_custom(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         It is possible to create a cluster with a custom number of nodes.
@@ -164,7 +161,7 @@ class TestClusterSize:
         public_agents = 2
 
         with Cluster(
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             masters=masters,
             agents=agents,
             public_agents=public_agents,
@@ -207,7 +204,7 @@ class TestClusterLogging:
         self,
         caplog: CompatLogCaptureFixture,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         If `log_output_live` is given as `True`, subprocess output is logged.
@@ -215,7 +212,7 @@ class TestClusterLogging:
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
             with Cluster(
-                generate_config_path=oss_artifact,
+                generate_config_url=oss_artifact,
                 masters=2,
                 log_output_live=True,
                 cluster_backend=cluster_backend
@@ -228,7 +225,7 @@ class TestClusterLogging:
         self,
         caplog: CompatLogCaptureFixture,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         By default, subprocess output is not logged in the creation of a
@@ -239,7 +236,7 @@ class TestClusterLogging:
             with Cluster(
                 masters=2,
                 cluster_backend=cluster_backend,
-                generate_config_path=oss_artifact,
+                generate_config_url=oss_artifact,
             ):
                 pass  # pragma: no cover
 
@@ -254,7 +251,7 @@ class TestMultipleClusters:
     def test_two_clusters(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         It is possible to start two clusters.
@@ -265,11 +262,11 @@ class TestMultipleClusters:
         """
         with Cluster(
             cluster_backend=cluster_backend,
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
         ):
             with Cluster(
                 cluster_backend=cluster_backend,
-                generate_config_path=oss_artifact,
+                generate_config_url=oss_artifact,
             ):
                 pass
 
@@ -282,14 +279,14 @@ class TestDestroyOnError:
     def test_default_exception_raised(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         By default, if an exception is raised, the cluster is destroyed.
         """
         with pytest.raises(Exception):
             with Cluster(
-                generate_config_path=oss_artifact,
+                generate_config_url=oss_artifact,
                 agents=0,
                 public_agents=0,
                 cluster_backend=cluster_backend,
@@ -304,7 +301,7 @@ class TestDestroyOnError:
     def test_set_false_exception_raised(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         If `destroy_on_error` is set to `False` and an exception is raised,
@@ -312,7 +309,7 @@ class TestDestroyOnError:
         """
         with pytest.raises(Exception):
             with Cluster(
-                generate_config_path=oss_artifact,
+                generate_config_url=oss_artifact,
                 agents=0,
                 public_agents=0,
                 destroy_on_error=False,
@@ -334,13 +331,13 @@ class TestDestroyOnSuccess:
     def test_default(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         By default the cluster is destroyed if there is no exception raised.
         """
         with Cluster(
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
@@ -354,14 +351,14 @@ class TestDestroyOnSuccess:
     def test_false(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         If `destroy_on_success` is set to `False`, the cluster is
         preserved if there is no exception raised.
         """
         with Cluster(
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,

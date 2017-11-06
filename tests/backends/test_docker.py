@@ -21,7 +21,7 @@ class TestCustomMasterMounts:
     def test_custom_master_mounts(
         self,
         tmpdir: local,
-        oss_artifact: Path,
+        oss_artifact: str,
     ) -> None:
         """
         It is possible to mount local files to master nodes.
@@ -40,7 +40,7 @@ class TestCustomMasterMounts:
 
         with Cluster(
             cluster_backend=backend,
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             masters=1,
             agents=0,
             public_agents=0,
@@ -54,3 +54,41 @@ class TestCustomMasterMounts:
             local_file.write(new_content)
             result = master.run_as_root(args=args)
             assert result.stdout.decode() == new_content
+
+
+class TestLocalBuildArtifact:
+    """
+    Tests for build artifact located on a HTTPS server.
+    """
+
+    def test_remote_build_artifact(
+        self, tmpdir: local, oss_artifact: str
+    ) -> None:
+
+        with Cluster(
+            cluster_backend=Docker(workspace_dir=tmpdir),
+            generate_config_url=oss_artifact,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ):
+            pass
+
+
+class TestRemoteBuildArtifact:
+    """
+    Tests for build artifact located on a HTTPS server.
+    """
+
+    def test_remote_build_artifact(
+        self, tmpdir: local, oss_artifact_url: str
+    ) -> None:
+
+        with Cluster(
+            cluster_backend=Docker(workspace_dir=tmpdir),
+            generate_config_url=oss_artifact_url,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ):
+            pass

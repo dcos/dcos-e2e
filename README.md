@@ -40,7 +40,6 @@ Then, create a test, such as the following:
 
 ```python
 import subprocess
-from pathlib import Path
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -52,7 +51,7 @@ class TestExample:
         with Cluster(
             extra_config={'check_time': True},
             cluster_backend=Docker(),
-            generate_config_path=Path('/tmp/dcos_generate_config.sh'),
+            generate_config_url=Path('file:///tmp/dcos_generate_config.sh'),
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])

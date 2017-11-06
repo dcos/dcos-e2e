@@ -16,14 +16,14 @@ class TestExistingCluster:
     Tests for creating a `Cluster` with the `ExistingCluster` backend.
     """
 
-    def test_existing_cluster(self, oss_artifact: Path) -> None:
+    def test_existing_cluster(self, oss_artifact: str) -> None:
         """
         It is possible to create a cluster from existing nodes, but not destroy
         it.
         """
         with Cluster(
             cluster_backend=Docker(),
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             masters=1,
             agents=1,
             public_agents=1,
@@ -84,7 +84,7 @@ class TestBadParameters:
     """
 
     @pytest.fixture(scope='module')
-    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
+    def dcos_cluster(self, oss_artifact: str) -> Iterator[Cluster]:
         """
         Return a `Cluster`.
 
@@ -92,7 +92,7 @@ class TestBadParameters:
         """
         with Cluster(
             cluster_backend=Docker(),
-            generate_config_path=oss_artifact,
+            generate_config_url=oss_artifact,
             masters=1,
             agents=0,
             public_agents=0,
@@ -221,7 +221,7 @@ class TestBadParameters:
     def test_installer_file(
         self,
         dcos_cluster: Cluster,
-        oss_artifact: Path,
+        oss_artifact: str,
         existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
@@ -230,7 +230,7 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                generate_config_path=oss_artifact,
+                generate_config_url=oss_artifact,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
@@ -241,7 +241,7 @@ class TestBadParameters:
 
         expected_error = (
             'Cluster already exists with DC/OS installed. '
-            'Therefore, `generate_config_path` must be `None`.'
+            'Therefore, `generate_config_url` must be `None`.'
         )
 
         assert str(excinfo.value) == expected_error
@@ -257,7 +257,7 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                generate_config_path=None,
+                generate_config_url=None,
                 masters=len(dcos_cluster.masters) + 2,
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
@@ -284,7 +284,7 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                generate_config_path=None,
+                generate_config_url=None,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents) + 1,
                 public_agents=len(dcos_cluster.public_agents),
@@ -312,7 +312,7 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                generate_config_path=None,
+                generate_config_url=None,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents) + 1,

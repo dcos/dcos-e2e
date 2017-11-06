@@ -2,8 +2,6 @@
 Helpers for running tests with `pytest`.
 """
 
-from pathlib import Path
-
 import pytest
 
 from dcos_e2e.backends import ClusterBackend, Docker
@@ -18,16 +16,24 @@ def cluster_backend() -> ClusterBackend:
 
 
 @pytest.fixture(scope='session')
-def oss_artifact() -> Path:
+def oss_artifact() -> str:
     """
-    Return the path to an artifact for DC/OS OSS.
+    Return the url to a local artifact for DC/OS OSS.
     """
-    return Path('/tmp/dcos_generate_config.sh')
+    return 'file:///tmp/dcos_generate_config.sh'
 
 
 @pytest.fixture(scope='session')
-def enterprise_artifact() -> Path:
+def enterprise_artifact() -> str:
     """
-    Return the path to an artifact for DC/OS Enterprise.
+    Return the url to a local artifact for DC/OS Enterprise.
     """
-    return Path('/tmp/dcos_generate_config.ee.sh')
+    return 'file:///tmp/dcos_generate_config.ee.sh'
+
+
+@pytest.fixture(scope='session')
+def oss_artifact_url() -> str:
+    """
+    Return the url to a for DC/OS Enterprise artifact on a HTTPS server.
+    """
+    return 'https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh'

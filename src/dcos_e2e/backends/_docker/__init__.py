@@ -13,6 +13,8 @@ from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import TemporaryDirectory
 from textwrap import dedent
 from typing import Any, Dict, List, Optional, Set, Type, Union
+from urllib.request import urlopen
+from urllib.parse import urlparse
 
 import docker
 import yaml
@@ -99,7 +101,7 @@ class DockerCluster(ClusterManager):
 
     def __init__(  # pylint: disable=super-init-not-called,too-many-statements
         self,
-        generate_config_path: Optional[Path],
+        generate_config_url: Optional[str],
         masters: int,
         agents: int,
         public_agents: int,
@@ -112,7 +114,7 @@ class DockerCluster(ClusterManager):
         Create a Docker cluster.
 
         Args:
-            generate_config_path: The path to a build artifact to install.
+            generate_config_url: The url to a build artifact to install.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -131,7 +133,17 @@ class DockerCluster(ClusterManager):
         Raises:
             CalledProcessError: The step to create and install containers
                 exited with a non-zero code.
+            ValueError: If url scheme is different from file | HTTP | HTTPS.
+                or the build artifact url is missing.
         """
+        if not generate_config_url:
+            message = (
+                'The Docker backend only supports creating new clusters.'
+                'Therefore the given cluster backend must receive a build'
+                'artifact url.'
+            )
+            raise ValueError(message)
+
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
@@ -455,6 +467,21 @@ class DockerCluster(ClusterManager):
 
         config_body = yaml.dump(data={**config_body_dict, **extra_config})
         Path(config_file_path).write_text(data=config_body)
+
+        parse_result = urlparse(generate_config_url, scheme='file')
+        generate_config_path = Path(parse_result.path)
+
+        if parse_result.scheme == 'http' or parse_result.scheme == 'https':
+            # Download build artifact first
+            generate_config_path = Path(self._path / 'build_artifact')
+            response = urlopen(parse_result.geturl())
+            chunk_size = 16 * 1024
+            with open(generate_config_path, 'wb') as artifact_file:
+                while True:
+                    chunk = response.read(chunk_size)
+                    if not chunk:
+                        break
+                    artifact_file.write(chunk)
 
         genconf_args = [
             'bash',
