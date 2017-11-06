@@ -56,12 +56,12 @@ class TestCustomMasterMounts:
             assert result.stdout.decode() == new_content
 
 
-class TestLocalBuildArtifact:
+class TestBuildArtifactUrl:
     """
-    Tests for build artifact located on a HTTPS server.
+    Tests for build artifacts in different locations.
     """
 
-    def test_remote_build_artifact(
+    def test_local_build_artifact(
         self, tmpdir: local, oss_artifact: str
     ) -> None:
 
@@ -73,12 +73,6 @@ class TestLocalBuildArtifact:
             public_agents=0,
         ):
             pass
-
-
-class TestRemoteBuildArtifact:
-    """
-    Tests for build artifact located on a HTTPS server.
-    """
 
     def test_remote_build_artifact(
         self, tmpdir: local, oss_artifact_url: str
