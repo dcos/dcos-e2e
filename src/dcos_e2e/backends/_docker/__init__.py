@@ -476,7 +476,8 @@ class DockerCluster(ClusterManager):
             generate_config_path = Path(self._path / 'build_artifact')
             response = urlopen(parse_result.geturl())
             chunk_size = 16 * 1024
-            with open(generate_config_path, 'wb') as artifact_file:
+            # Convert Path to str to support Python < 3.6
+            with open(str(generate_config_path), 'wb') as artifact_file:
                 while True:
                     chunk = response.read(chunk_size)
                     if not chunk:
