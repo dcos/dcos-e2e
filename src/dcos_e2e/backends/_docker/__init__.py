@@ -142,14 +142,14 @@ class DockerCluster(ClusterManager):
             message = (
                 'The Docker backend only supports creating new clusters. '
                 'Therefore the given cluster backend must receive a build '
-                'artifact path.'
+                'artifact.'
             )
             raise ValueError(message)
 
         if not isinstance(build_artifact, Path):
             message = (
                 'The Docker backend only supports creating clusters from '
-                'build artifacts specified by their local file system path.'
+                'build artifacts specified by Path.'
             )
             raise NotImplementedError(message)
 

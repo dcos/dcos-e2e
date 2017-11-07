@@ -65,7 +65,7 @@ class TestBadParameters:
 
     def test_no_build_artifact(self, tmpdir: local) -> None:
         """
-        The docker backend requires an artifact url in order
+        The docker backend requires a build artifact in order
         to launch a DC/OS cluster.
         """
         with pytest.raises(ValueError) as excinfo:
@@ -81,7 +81,7 @@ class TestBadParameters:
         expected_error = (
             'The Docker backend only supports creating new clusters. '
             'Therefore the given cluster backend must receive a build '
-            'artifact path.'
+            'artifact.'
         )
 
         assert str(excinfo.value) == expected_error
@@ -90,8 +90,8 @@ class TestBadParameters:
         self, tmpdir: local, oss_artifact_url: str
     ) -> None:
         """
-        If the given url does not point to a valid build artifact
-        the subprocess for calling DC/OS Docker will fail.
+        If the given build artifact is not a Path
+        the Docker backend will not accept it.
         """
         with pytest.raises(NotImplementedError) as excinfo:
             with Cluster(
@@ -105,14 +105,14 @@ class TestBadParameters:
 
         expected_error = (
             'The Docker backend only supports creating clusters from '
-            'build artifacts specified by their local file system path.'
+            'build artifacts specified by Path.'
         )
 
         assert str(excinfo.value) == expected_error
 
     def test_invalid_build_artifact(self, tmpdir: local) -> None:
         """
-        If the given url does not point to a valid build artifact
+        If the given Path does not point to a valid build artifact
         the subprocess for calling DC/OS Docker will fail.
         """
         invalid_build_artifact = Path('/{}'.format(uuid.uuid4()))
