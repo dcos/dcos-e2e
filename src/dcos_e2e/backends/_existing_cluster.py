@@ -2,7 +2,6 @@
 Helpers for interacting with existing clusters.
 """
 
-from pathlib import Path
 from typing import Any, Dict, Optional, Set, Type
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -51,7 +50,7 @@ class ExistingClusterManager(ClusterManager):
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        generate_config_path: Optional[Path],
+        generate_config_url: str,
         masters: int,
         agents: int,
         public_agents: int,
@@ -64,7 +63,7 @@ class ExistingClusterManager(ClusterManager):
         Create a manager for an existing DC/OS cluster.
 
         Args:
-            generate_config_path: The path to a build artifact to install.
+            generate_config_url: The url to a build artifact to install.
                 This must be `None` as the cluster already exists.
             masters: The number of master nodes to create.
                 This must match the number of masters in `cluster_backend`.
@@ -92,10 +91,10 @@ class ExistingClusterManager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-        if generate_config_path is not None:
+        if generate_config_url is not None:
             message = (
                 'Cluster already exists with DC/OS installed. '
-                'Therefore, `generate_config_path` must be `None`.'
+                'Therefore, `generate_config_url` must be `None`.'
             )
             raise ValueError(message)
 

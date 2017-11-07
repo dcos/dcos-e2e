@@ -79,8 +79,8 @@ class TestBadParameters:
                 pass
 
         expected_error = (
-            'The Docker backend only supports creating new clusters.'
-            'Therefore the given cluster backend must receive a build'
+            'The Docker backend only supports creating new clusters. '
+            'Therefore the given cluster backend must receive a build '
             'artifact url.'
         )
 
@@ -104,7 +104,7 @@ class TestBadParameters:
                 pass
 
         expected_error = (
-            'The given artifact url scheme is not supported'
+            'The given artifact url scheme is not supported '
             'by the Docker cluster backend.'
         )
 

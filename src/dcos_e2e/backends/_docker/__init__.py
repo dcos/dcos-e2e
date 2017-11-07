@@ -138,8 +138,8 @@ class DockerCluster(ClusterManager):
         """
         if not generate_config_url:
             message = (
-                'The Docker backend only supports creating new clusters.'
-                'Therefore the given cluster backend must receive a build'
+                'The Docker backend only supports creating new clusters. '
+                'Therefore the given cluster backend must receive a build '
                 'artifact url.'
             )
             raise ValueError(message)
@@ -488,7 +488,7 @@ class DockerCluster(ClusterManager):
 
         else:
             raise ValueError(
-                'The given artifact url scheme is not supported'
+                'The given artifact url scheme is not supported '
                 'by the Docker cluster backend.'
             )
 

@@ -7,7 +7,6 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from time import sleep
 from typing import Any, Dict, Iterable, List, Optional, Set
-from urllib.parse import urlparse
 
 import requests
 from requests import codes
@@ -78,9 +77,6 @@ class Cluster(ContextDecorator):
                 ' Therefore, `destroy_on_success` must be set to `False`.'
             )
             raise ValueError(message)
-
-        if generate_config_url:
-            urlparse(generate_config_url)
 
         self._destroy_on_error = destroy_on_error
         self._destroy_on_success = destroy_on_success

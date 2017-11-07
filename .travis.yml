@@ -14,33 +14,33 @@ env:
   # per commit.
   # We run almost one builder per test.
   matrix:
-      # - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
-      # - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
-      # - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
-      # # This test class uses one scoped cluster so we run it on one builder.
-      # - "TEST_PATTERN=tests/test_node.py::TestNode"
-      # - "TEST_PATTERN=tests/test_harness.py::TestIntegrationTests::test_run_pytest"
-      # - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_extend_config"
-      # - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_default_config"
-      # - "TEST_PATTERN=tests/test_harness.py::TestClusterSize::test_default"
-      # - "TEST_PATTERN=tests/test_harness.py::TestClusterSize::test_custom"
-      # - "TEST_PATTERN=tests/test_harness.py::TestClusterLogging::test_live_logging"
-      # - "TEST_PATTERN=tests/test_harness.py::TestClusterLogging::test_no_live_logging"
-      # - "TEST_PATTERN=tests/test_harness.py::TestMultipleClusters::test_two_clusters"
-      # - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_default_exception_raised"
-      # - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_set_false_exception_raised"
-      # - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_default"
-      # - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_false"
-      # - "TEST_PATTERN=tests/backends/test_docker.py::TestCustomMasterMounts::test_custom_master_mounts"
+      - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
+      - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
+      - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
+      # This test class uses one scoped cluster so we run it on one builder.
+      - "TEST_PATTERN=tests/test_node.py::TestNode"
+      - "TEST_PATTERN=tests/test_harness.py::TestIntegrationTests::test_run_pytest"
+      - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_extend_config"
+      - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_default_config"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterSize::test_default"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterSize::test_custom"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterLogging::test_live_logging"
+      - "TEST_PATTERN=tests/test_harness.py::TestClusterLogging::test_no_live_logging"
+      - "TEST_PATTERN=tests/test_harness.py::TestMultipleClusters::test_two_clusters"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_default_exception_raised"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError::test_set_false_exception_raised"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_default"
+      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_false"
+      - "TEST_PATTERN=tests/backends/test_docker.py::TestCustomMasterMounts::test_custom_master_mounts"
 
       - "TEST_PATTERN=tests/backends/test_docker.py::TestBadParameters::test_no_artifact_url"
       - "TEST_PATTERN=tests/backends/test_docker.py::TestBadParameters::test_unsupported_artifact_url"
       - "TEST_PATTERN=tests/backends/test_docker.py::TestBadParameters::test_not_an_artifact_url"
       - "TEST_PATTERN=tests/backends/test_docker.py::TestBadParameters::test_local_artifact_url"
       - "TEST_PATTERN=tests/backends/test_docker.py::TestBadParameters::test_remote_artifact_url"
-      # # - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
-      # # This test class uses one scoped cluster so we run it on one builder.
-      # - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
+      - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
+      # This test class uses one scoped cluster so we run it on one builder.
+      - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
