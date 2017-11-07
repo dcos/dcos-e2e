@@ -1,6 +1,7 @@
 """
 Helpers for running tests with `pytest`.
 """
+from pathlib import Path
 
 import pytest
 
@@ -16,24 +17,24 @@ def cluster_backend() -> ClusterBackend:
 
 
 @pytest.fixture(scope='session')
-def oss_artifact() -> str:
+def oss_artifact() -> Path:
     """
-    Return the url to a local artifact for DC/OS OSS.
+    Return the path to a build artifact for DC/OS OSS.
     """
-    return '/tmp/dcos_generate_config.sh'
+    return Path('/tmp/dcos_generate_config.sh')
 
 
 @pytest.fixture(scope='session')
-def enterprise_artifact() -> str:
+def enterprise_artifact() -> Path:
     """
-    Return the url to a local artifact for DC/OS Enterprise.
+    Return the path to a build artifact for DC/OS Enterprise.
     """
-    return '/tmp/dcos_generate_config.ee.sh'
+    return Path('/tmp/dcos_generate_config.ee.sh')
 
 
 @pytest.fixture(scope='session')
 def oss_artifact_url() -> str:
     """
-    Return the url to a for DC/OS Enterprise artifact on a HTTPS server.
+    Return the url to a build artifact for DC/OS OSS.
     """
     return 'https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh'
