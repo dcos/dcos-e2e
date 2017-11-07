@@ -6,7 +6,6 @@
 
 - [Changelog](#changelog)
   - [Next](#next)
-  - [2017.11.07.0](#201711070)
   - [2017.11.02.0](#201711020)
   - [2017.10.04.0](#201710040)
   - [2017.08.11.0](#201708110)
@@ -29,11 +28,9 @@
 ## Next
 
 * Backwards incompatible change: Rename `DCOS_Docker` backend to `Docker` backend.
-
-## 2017.11.07.0
-
-* Replaced `generate_config_path` with `generate_config_url` to allow for supporting
-installation methods that require build artifacts to be downloaded via HTTPS.
+* Replace `generate_config_path` with `build_artifact` that can either be a 
+Path or a HTTP(S) url string. This allows for supporting installation methods
+that require build artifacts to be downloaded from HTTP servers.
 
 ## 2017.11.02.0
 

@@ -34,7 +34,7 @@ def dcos_cluster(
     """
     with Cluster(
         cluster_backend=cluster_backend,
-        generate_config_url=oss_artifact,
+        build_artifact=oss_artifact,
         masters=1,
         agents=0,
         public_agents=0,

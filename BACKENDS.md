@@ -42,6 +42,10 @@ This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/li
 Mounts to add to master node containers.
 See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
 
+
+When creating a `Cluster` with this backend, the following parameter conditions must be true:
+* `build_artifact` must be of type Path
+
 ### Troubleshooting
 
 #### Cleaning Up and Fixing "Out of Space" Errors
@@ -78,7 +82,7 @@ ExistingCluster(masters, agents, public_agents)
 ```
 
 When creating a `Cluster` with this backend, the following parameter conditions must be true:
-* `generate_config_url` must be `None`,
+* `build_artifact` must be `None`,
 * `extra_config` must be `None` or `{}`,
 * `masters` matches the number of master nodes in the existing cluster,
 * `agents` matches the number of agent nodes in the existing cluster,

@@ -42,7 +42,7 @@ class TestCustomMasterMounts:
 
         with Cluster(
             cluster_backend=backend,
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
             masters=1,
             agents=0,
             public_agents=0,
@@ -63,7 +63,7 @@ class TestBadParameters:
     Tests for bad parameters passed to Docker clusters.
     """
 
-    def test_no_artifact_url(self, tmpdir: local) -> None:
+    def test_no_build_artifact(self, tmpdir: local) -> None:
         """
         The docker backend requires an artifact url in order
         to launch a DC/OS cluster.
@@ -71,7 +71,7 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=Docker(workspace_dir=tmpdir),
-                generate_config_url=None,
+                build_artifact=None,
                 masters=1,
                 agents=0,
                 public_agents=0,
@@ -81,80 +81,48 @@ class TestBadParameters:
         expected_error = (
             'The Docker backend only supports creating new clusters. '
             'Therefore the given cluster backend must receive a build '
-            'artifact url.'
+            'artifact path.'
         )
 
         assert str(excinfo.value) == expected_error
 
-    def test_unsupported_artifact_url(self, tmpdir: local) -> None:
-        """
-        The Docker backend supports file | HTTP | HTTPS schemes.
-        If a different url scheme is given a ValueError is raised.
-        """
-        unsupported_url = 'scheme://{}'.format(uuid.uuid4())
-
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=Docker(workspace_dir=tmpdir),
-                generate_config_url=unsupported_url,
-                masters=1,
-                agents=0,
-                public_agents=0,
-            ):
-                pass
-
-        expected_error = (
-            'The given artifact url scheme is not supported '
-            'by the Docker cluster backend.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
-    def test_not_an_artifact_url(self, tmpdir: local) -> None:
+    def test_unsupported_build_artifact(
+        self, tmpdir: local, oss_artifact_url: str
+    ) -> None:
         """
         If the given url does not point to a valid build artifact
         the subprocess for calling DC/OS Docker will fail.
         """
-        invalid_artifact_url = 'https://google.com'
-
-        with pytest.raises(CalledProcessError):
+        with pytest.raises(NotImplementedError) as excinfo:
             with Cluster(
                 cluster_backend=Docker(workspace_dir=tmpdir),
-                generate_config_url=invalid_artifact_url,
+                build_artifact=oss_artifact_url,
                 masters=1,
                 agents=0,
                 public_agents=0,
             ):
-                pass
+                pass  # pragma: no cover
 
-    def test_local_artifact_url(
-        self, tmpdir: local, oss_artifact: str
-    ) -> None:
-        """
-        Asserts whether a cluster is successfully created from
-        an artifact url that points to the local file system.
-        """
-        with Cluster(
-            cluster_backend=Docker(workspace_dir=tmpdir),
-            generate_config_url=oss_artifact,
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ):
-            pass
+        expected_error = (
+            'The Docker backend only supports creating clusters from '
+            'build artifacts specified by their local file system path.'
+        )
 
-    def test_remote_artifact_url(
-        self, tmpdir: local, oss_artifact_url: str
-    ) -> None:
+        assert str(excinfo.value) == expected_error
+
+    def test_invalid_build_artifact(self, tmpdir: local) -> None:
         """
-        Asserts whether a cluster is successfully created
-        from an artifact url that point to a HTTPS server.
+        If the given url does not point to a valid build artifact
+        the subprocess for calling DC/OS Docker will fail.
         """
-        with Cluster(
-            cluster_backend=Docker(workspace_dir=tmpdir),
-            generate_config_url=oss_artifact_url,
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ):
-            pass
+        invalid_build_artifact = Path('/{}'.format(uuid.uuid4()))
+
+        with pytest.raises(CalledProcessError):
+            with Cluster(
+                cluster_backend=Docker(workspace_dir=tmpdir),
+                build_artifact=invalid_build_artifact,
+                masters=1,
+                agents=0,
+                public_agents=0,
+            ):
+                pass  # pragma: no cover

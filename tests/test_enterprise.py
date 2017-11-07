@@ -36,7 +36,7 @@ class TestEnterpriseIntegrationTests:
         }
 
         with Cluster(
-            generate_config_url=enterprise_artifact,
+            build_artifact=enterprise_artifact,
             cluster_backend=cluster_backend,
             extra_config=extra_config,
             log_output_live=True,
@@ -102,7 +102,7 @@ class TestCopyFiles:
         with Cluster(
             cluster_backend=cluster_backend,
             extra_config=config,
-            generate_config_url=enterprise_artifact,
+            build_artifact=enterprise_artifact,
             files_to_copy_to_installer=files_to_copy_to_installer,
             log_output_live=True,
             masters=1,
@@ -149,7 +149,7 @@ class TestWaitForDCOS:
         }
 
         with Cluster(
-            generate_config_url=enterprise_artifact,
+            build_artifact=enterprise_artifact,
             cluster_backend=cluster_backend,
             extra_config=extra_config,
             log_output_live=True,

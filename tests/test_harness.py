@@ -30,7 +30,7 @@ class TestIntegrationTests:
         """
         with Cluster(
             cluster_backend=cluster_backend,
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
             log_output_live=True,
         ) as cluster:
             # No error is raised with a successful command.
@@ -91,7 +91,7 @@ class TestExtendConfig:
         }
 
         with Cluster(
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
             extra_config=config,
             agents=0,
             public_agents=0,
@@ -113,7 +113,7 @@ class TestExtendConfig:
         configuration.
         """
         with Cluster(
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
@@ -138,7 +138,7 @@ class TestClusterSize:
         """
         with Cluster(
             cluster_backend=cluster_backend,
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
         ) as cluster:
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
@@ -161,7 +161,7 @@ class TestClusterSize:
         public_agents = 2
 
         with Cluster(
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
             masters=masters,
             agents=agents,
             public_agents=public_agents,
@@ -212,7 +212,7 @@ class TestClusterLogging:
         with pytest.raises(CalledProcessError):
             # It is not possible to create a cluster with two master nodes.
             with Cluster(
-                generate_config_url=oss_artifact,
+                build_artifact=oss_artifact,
                 masters=2,
                 log_output_live=True,
                 cluster_backend=cluster_backend
@@ -236,7 +236,7 @@ class TestClusterLogging:
             with Cluster(
                 masters=2,
                 cluster_backend=cluster_backend,
-                generate_config_url=oss_artifact,
+                build_artifact=oss_artifact,
             ):
                 pass  # pragma: no cover
 
@@ -262,11 +262,11 @@ class TestMultipleClusters:
         """
         with Cluster(
             cluster_backend=cluster_backend,
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
         ):
             with Cluster(
                 cluster_backend=cluster_backend,
-                generate_config_url=oss_artifact,
+                build_artifact=oss_artifact,
             ):
                 pass
 
@@ -286,7 +286,7 @@ class TestDestroyOnError:
         """
         with pytest.raises(Exception):
             with Cluster(
-                generate_config_url=oss_artifact,
+                build_artifact=oss_artifact,
                 agents=0,
                 public_agents=0,
                 cluster_backend=cluster_backend,
@@ -309,7 +309,7 @@ class TestDestroyOnError:
         """
         with pytest.raises(Exception):
             with Cluster(
-                generate_config_url=oss_artifact,
+                build_artifact=oss_artifact,
                 agents=0,
                 public_agents=0,
                 destroy_on_error=False,
@@ -337,7 +337,7 @@ class TestDestroyOnSuccess:
         By default the cluster is destroyed if there is no exception raised.
         """
         with Cluster(
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
@@ -358,7 +358,7 @@ class TestDestroyOnSuccess:
         preserved if there is no exception raised.
         """
         with Cluster(
-            generate_config_url=oss_artifact,
+            build_artifact=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,

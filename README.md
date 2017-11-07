@@ -51,7 +51,7 @@ class TestExample:
         with Cluster(
             extra_config={'check_time': True},
             cluster_backend=Docker(),
-            generate_config_url=Path('file:///tmp/dcos_generate_config.sh'),
+            generate_config_url=Path('/tmp/dcos_generate_config.sh'),
         ) as cluster:
             (master, ) = cluster.masters
             result = master.run_as_root(args=['test', '-f', path])

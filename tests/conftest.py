@@ -20,7 +20,7 @@ def oss_artifact() -> str:
     """
     Return the url to a local artifact for DC/OS OSS.
     """
-    return 'file:///tmp/dcos_generate_config.sh'
+    return '/tmp/dcos_generate_config.sh'
 
 
 @pytest.fixture(scope='session')
@@ -28,7 +28,7 @@ def enterprise_artifact() -> str:
     """
     Return the url to a local artifact for DC/OS Enterprise.
     """
-    return 'file:///tmp/dcos_generate_config.ee.sh'
+    return '/tmp/dcos_generate_config.ee.sh'
 
 
 @pytest.fixture(scope='session')
