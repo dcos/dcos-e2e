@@ -131,10 +131,12 @@ class DockerCluster(ClusterManager):
         Raises:
             CalledProcessError: The step to create and install containers
                 exited with a non-zero code.
-            ValueError: If `build_artifact` is `None`.
-            NotImplementedError: If url is a string instead
-                of a path on the local file system.
-
+            ValueError: Raised if `build_artifact`is `None`. The Docker backend
+                requires a path to valid `build_artifact` to install DC/OS on
+                a newly created Docker cluster.
+            NotImplementedError: Raised if `build_artifact` is a url string
+                instead of a Path because the Docker backend only supports
+                installation from a local build artifact.
         """
         if not build_artifact:
             message = (
