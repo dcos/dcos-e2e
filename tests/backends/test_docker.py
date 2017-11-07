@@ -80,8 +80,8 @@ class TestBadParameters:
 
         expected_error = (
             'The Docker backend only supports creating new clusters. '
-            'Therefore the given cluster backend must receive a build '
-            'artifact.'
+            'Therefore any cluster created with the backend must '
+            'receive a build artifact.'
         )
 
         assert str(excinfo.value) == expected_error
