@@ -44,7 +44,7 @@ class Cluster(ContextDecorator):
         Args:
             cluster_backend: The backend to use for the cluster.
             build_artifact: The path or url string to a build artifact
-                to install. Supported types may between implementations.
+                to install. Supported types may vary between implementations.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
             masters: The number of master nodes to create.
