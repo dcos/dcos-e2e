@@ -2,7 +2,8 @@
 Helpers for interacting with existing clusters.
 """
 
-from typing import Any, Dict, Optional, Set, Type
+from pathlib import Path
+from typing import Any, Dict, Set, Type
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
