@@ -9,7 +9,7 @@
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters)
     - [`cluster_backend`](#cluster_backend)
-    - [`generate_config_url`](#generate_config_url)
+    - [`build_artifact`](#build_artifact)
     - [`extra_config`](#extra_config)
     - [`masters`](#masters)
     - [`agents`](#agents)

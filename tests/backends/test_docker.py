@@ -76,7 +76,7 @@ class TestBadParameters:
                 agents=0,
                 public_agents=0,
             ):
-                pass
+                pass  # pragma: no cover
 
         expected_error = (
             'The Docker backend only supports creating new clusters. '
