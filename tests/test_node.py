@@ -23,7 +23,7 @@ from dcos_e2e.cluster import Cluster
 
 @pytest.fixture(scope='module')
 def dcos_cluster(
-    oss_artifact: str,
+    oss_artifact: Path,
     cluster_backend: ClusterBackend,
 ) -> Iterator[Cluster]:
     """

@@ -22,7 +22,7 @@ class TestEnterpriseIntegrationTests:
     def test_run_pytest(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: str,
+        enterprise_artifact: Path,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -59,7 +59,7 @@ class TestCopyFiles:
     def test_copy_files_to_installer(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: str,
+        enterprise_artifact: Path,
     ) -> None:
         """
         Files can be copied from the host to the installer node at creation
@@ -133,7 +133,7 @@ class TestWaitForDCOS:
     def test_auth_with_cli(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: str,
+        enterprise_artifact: Path,
     ) -> None:
         """
         After `Cluster.wait_for_dcos`, the cluster can communicate with the

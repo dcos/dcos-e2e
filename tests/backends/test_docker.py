@@ -23,7 +23,7 @@ class TestCustomMasterMounts:
     def test_custom_master_mounts(
         self,
         tmpdir: local,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         It is possible to mount local files to master nodes.

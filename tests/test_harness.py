@@ -6,6 +6,7 @@ long time to run.
 """
 
 import logging
+from pathlib import Path
 from subprocess import CalledProcessError
 from typing import List
 
@@ -22,7 +23,7 @@ class TestIntegrationTests:
     """
 
     def test_run_pytest(
-        self, cluster_backend: ClusterBackend, oss_artifact: str
+        self, cluster_backend: ClusterBackend, oss_artifact: Path
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -70,7 +71,7 @@ class TestExtendConfig:
         self,
         path: str,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         This example demonstrates that it is possible to create a cluster
@@ -105,7 +106,7 @@ class TestExtendConfig:
         self,
         path: str,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         The example file does not exist with the standard configuration.
@@ -130,7 +131,7 @@ class TestClusterSize:
     """
 
     def test_default(
-        self, cluster_backend: ClusterBackend, oss_artifact: str
+        self, cluster_backend: ClusterBackend, oss_artifact: Path
     ) -> None:
         """
         By default, a cluster with one master and one agent and one private
@@ -147,7 +148,7 @@ class TestClusterSize:
     def test_custom(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         It is possible to create a cluster with a custom number of nodes.
@@ -204,7 +205,7 @@ class TestClusterLogging:
         self,
         caplog: CompatLogCaptureFixture,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         If `log_output_live` is given as `True`, subprocess output is logged.
@@ -225,7 +226,7 @@ class TestClusterLogging:
         self,
         caplog: CompatLogCaptureFixture,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         By default, subprocess output is not logged in the creation of a
@@ -251,7 +252,7 @@ class TestMultipleClusters:
     def test_two_clusters(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         It is possible to start two clusters.
@@ -279,7 +280,7 @@ class TestDestroyOnError:
     def test_default_exception_raised(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         By default, if an exception is raised, the cluster is destroyed.
@@ -301,7 +302,7 @@ class TestDestroyOnError:
     def test_set_false_exception_raised(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         If `destroy_on_error` is set to `False` and an exception is raised,
@@ -331,7 +332,7 @@ class TestDestroyOnSuccess:
     def test_default(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         By default the cluster is destroyed if there is no exception raised.
@@ -351,7 +352,7 @@ class TestDestroyOnSuccess:
     def test_false(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: str,
+        oss_artifact: Path,
     ) -> None:
         """
         If `destroy_on_success` is set to `False`, the cluster is

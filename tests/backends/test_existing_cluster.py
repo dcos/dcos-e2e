@@ -16,7 +16,7 @@ class TestExistingCluster:
     Tests for creating a `Cluster` with the `ExistingCluster` backend.
     """
 
-    def test_existing_cluster(self, oss_artifact: str) -> None:
+    def test_existing_cluster(self, oss_artifact: Path) -> None:
         """
         It is possible to create a cluster from existing nodes, but not destroy
         it.
@@ -84,7 +84,7 @@ class TestBadParameters:
     """
 
     @pytest.fixture(scope='module')
-    def dcos_cluster(self, oss_artifact: str) -> Iterator[Cluster]:
+    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
         """
         Return a `Cluster`.
 
@@ -221,7 +221,7 @@ class TestBadParameters:
     def test_installer_file(
         self,
         dcos_cluster: Cluster,
-        oss_artifact: str,
+        oss_artifact: Path,
         existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
