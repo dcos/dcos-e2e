@@ -48,7 +48,7 @@
 ```python
 Cluster(
     cluster_backend,
-    generate_config_url=None,
+    build_artifact=None,
     extra_config=None,
     masters=1,
     agents=1,
@@ -69,7 +69,7 @@ This is a context manager which spins up a cluster.
 The backend to use for the cluster.
 See [`BACKENDS.md`](./BACKENDS.md) for details.
 
-#### `generate_config_url`
+#### `build_artifact`
 
 The url to a build artifact to install.
 
