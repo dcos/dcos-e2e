@@ -71,7 +71,7 @@ See [`BACKENDS.md`](./BACKENDS.md) for details.
 
 #### `build_artifact`
 
-The url to a build artifact to install.
+The url or path to a build artifact to install.
 
 #### `extra_config`
 

@@ -40,6 +40,7 @@ Then, create a test, such as the following:
 
 ```python
 import subprocess
+from pathlib import Path
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
