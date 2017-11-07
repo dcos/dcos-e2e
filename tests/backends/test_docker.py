@@ -4,6 +4,7 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
+from subprocess import CalledProcessError
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
@@ -57,14 +58,17 @@ class TestCustomMasterMounts:
             assert result.stdout.decode() == new_content
 
 
-class TestArtifactUrl:
+class TestBadParameters:
     """
-    Tests for build artifacts in different locations.
+    Tests for bad parameters passed to Docker clusters.
     """
 
     def test_no_artifact_url(self, tmpdir: local) -> None:
-
-        with pytest.raises(ValueError):
+        """
+        The docker backend requires an artifact url in order
+        to launch a DC/OS cluster.
+        """
+        with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=Docker(workspace_dir=tmpdir),
                 generate_config_url=None,
@@ -74,11 +78,22 @@ class TestArtifactUrl:
             ):
                 pass
 
-    def test_unsupported_artifact_url(self, tmpdir: local) -> None:
+        expected_error = (
+            'The Docker backend only supports creating new clusters.'
+            'Therefore the given cluster backend must receive a build'
+            'artifact url.'
+        )
 
+        assert str(excinfo.value) == expected_error
+
+    def test_unsupported_artifact_url(self, tmpdir: local) -> None:
+        """
+        The Docker backend supports file | HTTP | HTTPS schemes.
+        If a different url scheme is given a ValueError is raised.
+        """
         unsupported_url = 'scheme://{}'.format(uuid.uuid4())
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=Docker(workspace_dir=tmpdir),
                 generate_config_url=unsupported_url,
@@ -88,10 +103,37 @@ class TestArtifactUrl:
             ):
                 pass
 
+        expected_error = (
+            'The given artifact url scheme is not supported'
+            'by the Docker cluster backend.'
+        )
+
+        assert str(excinfo.value) == expected_error
+
+    def test_not_an_artifact_url(self, tmpdir: local) -> None:
+        """
+        If the given url does not point to a valid build artifact
+        the subprocess for calling DC/OS Docker will fail.
+        """
+        invalid_artifact_url = 'https://google.com'
+
+        with pytest.raises(CalledProcessError):
+            with Cluster(
+                cluster_backend=Docker(workspace_dir=tmpdir),
+                generate_config_url=invalid_artifact_url,
+                masters=1,
+                agents=0,
+                public_agents=0,
+            ):
+                pass
+
     def test_local_artifact_url(
         self, tmpdir: local, oss_artifact: str
     ) -> None:
-
+        """
+        Asserts whether a cluster is successfully created from
+        an artifact url that points to the local file system.
+        """
         with Cluster(
             cluster_backend=Docker(workspace_dir=tmpdir),
             generate_config_url=oss_artifact,
@@ -104,7 +146,10 @@ class TestArtifactUrl:
     def test_remote_artifact_url(
         self, tmpdir: local, oss_artifact_url: str
     ) -> None:
-
+        """
+        Asserts whether a cluster is successfully created
+        from an artifact url that point to a HTTPS server.
+        """
         with Cluster(
             cluster_backend=Docker(workspace_dir=tmpdir),
             generate_config_url=oss_artifact_url,
