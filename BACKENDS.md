@@ -44,7 +44,7 @@ See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io
 
 
 When creating a `Cluster` with this backend, the following parameter conditions must be true:
-* `build_artifact` must be of type Path
+* `build_artifact` must be of type `pathlib.Path`
 
 ### Troubleshooting
 

@@ -112,7 +112,7 @@ class DockerCluster(ClusterManager):
         Create a Docker cluster.
 
         Args:
-            build_artifact: The path to a build artifact to install.
+            build_artifact: The `Path` to a build artifact to install from.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -132,24 +132,23 @@ class DockerCluster(ClusterManager):
             CalledProcessError: The step to create and install containers
                 exited with a non-zero code.
             ValueError: Raised if `build_artifact`is `None`. The Docker backend
-                requires a path to valid `build_artifact` to install DC/OS on
-                a newly created Docker cluster.
-            NotImplementedError: Raised if `build_artifact` is a url string
-                instead of a Path because the Docker backend only supports
+                requires a `Path` to a valid `build_artifact` to install DC/OS
+                on a newly created Docker cluster.
+            NotImplementedError: Raised if `build_artifact` is a URL string
+                instead of a `Path` because the Docker backend only supports
                 installation from a local build artifact.
         """
         if not build_artifact:
             message = (
                 'The Docker backend only supports creating new clusters. '
-                'Therefore any cluster created with the backend must '
-                'receive a build artifact.'
+                'build_artifact must be a path to a build artifact.'
             )
             raise ValueError(message)
 
         if not isinstance(build_artifact, Path):
             message = (
                 'The Docker backend only supports creating clusters from '
-                'build artifacts specified by Path.'
+                'build artifacts specified by path.'
             )
             raise NotImplementedError(message)
 
