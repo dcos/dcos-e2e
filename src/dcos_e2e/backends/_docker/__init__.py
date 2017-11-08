@@ -99,7 +99,7 @@ class DockerCluster(ClusterManager):
 
     def __init__(  # pylint: disable=super-init-not-called,too-many-statements
         self,
-        generate_config_path: Optional[Path],
+        build_artifact: Optional[Union[str, Path]],
         masters: int,
         agents: int,
         public_agents: int,
@@ -112,7 +112,7 @@ class DockerCluster(ClusterManager):
         Create a Docker cluster.
 
         Args:
-            generate_config_path: The path to a build artifact to install.
+            build_artifact: The `Path` to a build artifact to install from.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -131,7 +131,27 @@ class DockerCluster(ClusterManager):
         Raises:
             CalledProcessError: The step to create and install containers
                 exited with a non-zero code.
+            ValueError: Raised if `build_artifact`is `None`. The Docker backend
+                requires a `Path` to a valid `build_artifact` to install DC/OS
+                on a newly created Docker cluster.
+            NotImplementedError: Raised if `build_artifact` is a URL string
+                instead of a `Path` because the Docker backend only supports
+                installation from a local build artifact.
         """
+        if not build_artifact:
+            message = (
+                'The Docker backend only supports creating new clusters. '
+                'build_artifact must be a path to a build artifact.'
+            )
+            raise ValueError(message)
+
+        if not isinstance(build_artifact, Path):
+            message = (
+                'The Docker backend only supports creating clusters from '
+                'build artifacts specified by path.'
+            )
+            raise NotImplementedError(message)
+
         self.log_output_live = log_output_live
 
         # To avoid conflicts, we use random container names.
@@ -458,7 +478,7 @@ class DockerCluster(ClusterManager):
 
         genconf_args = [
             'bash',
-            str(generate_config_path),
+            str(build_artifact),
             '--offline',
             '-v',
             '--genconf',

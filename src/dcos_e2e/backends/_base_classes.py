@@ -4,7 +4,7 @@ Abstract base classes.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Type
+from typing import Any, Dict, Optional, Set, Type, Union
 
 from ..node import Node
 
@@ -17,7 +17,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def __init__(
         self,
-        generate_config_path: Optional[Path],
+        build_artifact: Optional[Union[str, Path]],
         masters: int,
         agents: int,
         public_agents: int,
@@ -30,7 +30,8 @@ class ClusterManager(abc.ABC):
         Create a DC/OS cluster with the given `cluster_backend`.
 
         Args:
-            generate_config_path: The path to a build artifact to install.
+            build_artifact: The `Path` or URL string to a build artifact
+            of DC/OS to install from.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.

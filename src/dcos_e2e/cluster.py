@@ -6,7 +6,7 @@ import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
 from time import sleep
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set, Union
 
 import requests
 from requests import codes
@@ -28,7 +28,7 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
-        generate_config_path: Path = None,
+        build_artifact: Union[str, Path] = None,
         extra_config: Optional[Dict[str, Any]] = None,
         masters: int = 1,
         agents: int = 1,
@@ -43,7 +43,9 @@ class Cluster(ContextDecorator):
 
         Args:
             cluster_backend: The backend to use for the cluster.
-            generate_config_path: The path to a build artifact to install.
+            build_artifact: The `Path` or URL string to a build artifact
+                to install from. Supported ways of supplying the build
+                artifact may vary between backend implementations.
             extra_config: This dictionary can contain extra installation
                 configuration variables to add to base configurations.
             masters: The number of master nodes to create.
@@ -90,7 +92,7 @@ class Cluster(ContextDecorator):
             log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            generate_config_path=generate_config_path,
+            build_artifact=build_artifact,
         )  # type: ClusterManager
 
     @retry(

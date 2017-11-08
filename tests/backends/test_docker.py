@@ -7,6 +7,7 @@ from pathlib import Path
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
+import pytest
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
@@ -40,7 +41,7 @@ class TestCustomMasterMounts:
 
         with Cluster(
             cluster_backend=backend,
-            generate_config_path=oss_artifact,
+            build_artifact=oss_artifact,
             masters=1,
             agents=0,
             public_agents=0,
@@ -54,3 +55,55 @@ class TestCustomMasterMounts:
             local_file.write(new_content)
             result = master.run_as_root(args=args)
             assert result.stdout.decode() == new_content
+
+
+class TestBadParameters:
+    """
+    Tests for bad parameters passed to Docker clusters.
+    """
+
+    def test_no_build_artifact(self, tmpdir: local) -> None:
+        """
+        The Docker backend requires a build artifact in order
+        to launch a DC/OS cluster.
+        """
+        with pytest.raises(ValueError) as excinfo:
+            with Cluster(
+                cluster_backend=Docker(workspace_dir=tmpdir),
+                build_artifact=None,
+                masters=1,
+                agents=0,
+                public_agents=0,
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'The Docker backend only supports creating new clusters. '
+            'build_artifact must be a path to a build artifact.'
+        )
+
+        assert str(excinfo.value) == expected_error
+
+    def test_url_given_artifact(
+        self, tmpdir: local, oss_artifact_url: str
+    ) -> None:
+        """
+        If the given build artifact is not a `Path`
+        the Docker backend will raise a `NotImplementedError`.
+        """
+        with pytest.raises(NotImplementedError) as excinfo:
+            with Cluster(
+                cluster_backend=Docker(workspace_dir=tmpdir),
+                build_artifact=oss_artifact_url,
+                masters=1,
+                agents=0,
+                public_agents=0,
+            ):
+                pass  # pragma: no cover
+
+        expected_error = (
+            'The Docker backend only supports creating clusters from '
+            'build artifacts specified by path.'
+        )
+
+        assert str(excinfo.value) == expected_error

@@ -9,7 +9,7 @@
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters)
     - [`cluster_backend`](#cluster_backend)
-    - [`generate_config_path`](#generate_config_path)
+    - [`build_artifact`](#build_artifact)
     - [`extra_config`](#extra_config)
     - [`masters`](#masters)
     - [`agents`](#agents)
@@ -48,7 +48,7 @@
 ```python
 Cluster(
     cluster_backend,
-    generate_config_path=None,
+    build_artifact=None,
     extra_config=None,
     masters=1,
     agents=1,
@@ -69,9 +69,9 @@ This is a context manager which spins up a cluster.
 The backend to use for the cluster.
 See [`BACKENDS.md`](./BACKENDS.md) for details.
 
-#### `generate_config_path`
+#### `build_artifact`
 
-The path to a build artifact to install.
+The HTTP(S) URL string or `pathlib.Path` to a build artifact to install.
 
 #### `extra_config`
 
