@@ -445,8 +445,6 @@ class DockerCluster(ClusterManager):
                 tmpfs=node_tmpfs_mounts,
             )
 
-        self._default_ssh_user = 'root'
-
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
         config_file_path = genconf_dir / 'config.yaml'
@@ -471,7 +469,7 @@ class DockerCluster(ClusterManager):
             'ssh_port':
             22,
             'ssh_user':
-            self._default_ssh_user,
+            cluster_backend.default_ssh_user,
             'superuser_password_hash':
             superuser_password_hash,
             'superuser_username':
