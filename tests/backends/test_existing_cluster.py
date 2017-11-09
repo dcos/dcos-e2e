@@ -21,8 +21,9 @@ class TestExistingCluster:
         It is possible to create a cluster from existing nodes, but not destroy
         it.
         """
+        backend = Docker()
         with Cluster(
-            cluster_backend=Docker(),
+            cluster_backend=backend,
             build_artifact=oss_artifact,
             masters=1,
             agents=1,
@@ -37,6 +38,7 @@ class TestExistingCluster:
                 masters=cluster.masters,
                 agents=cluster.agents,
                 public_agents=cluster.public_agents,
+                default_ssh_user=backend.default_ssh_user
             )
 
             with Cluster(
@@ -52,24 +54,29 @@ class TestExistingCluster:
                 (duplicate_public_agent, ) = duplicate_cluster.public_agents
 
                 duplicate_master.run(
-                    args=['touch', 'example_master_file'], user='root'
+                    args=['touch', 'example_master_file'],
+                    user=duplicate_cluster.default_ssh_user
                 )
                 duplicate_agent.run(
-                    args=['touch', 'example_agent_file'], user='root'
+                    args=['touch', 'example_agent_file'],
+                    user=duplicate_cluster.default_ssh_user
                 )
                 duplicate_public_agent.run(
-                    args=['touch', 'example_public_agent_file'], user='root'
+                    args=['touch', 'example_public_agent_file'],
+                    user=duplicate_cluster.default_ssh_user
                 )
 
                 master.run(
-                    args=['test', '-f', 'example_master_file'], user='root'
+                    args=['test', '-f', 'example_master_file'],
+                    user=duplicate_cluster.default_ssh_user
                 )
                 agent.run(
-                    args=['test', '-f', 'example_agent_file'], user='root'
+                    args=['test', '-f', 'example_agent_file'],
+                    user=duplicate_cluster.default_ssh_user
                 )
                 public_agent.run(
                     args=['test', '-f', 'example_public_agent_file'],
-                    user='root'
+                    user=duplicate_cluster.default_ssh_user
                 )
 
             with pytest.raises(NotImplementedError):
@@ -110,6 +117,7 @@ class TestBadParameters:
             masters=dcos_cluster.masters,
             agents=dcos_cluster.agents,
             public_agents=dcos_cluster.public_agents,
+            default_ssh_user=dcos_cluster.default_ssh_user
         )
 
     def test_destroy_on_error(

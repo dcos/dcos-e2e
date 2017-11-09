@@ -43,30 +43,6 @@ def dcos_cluster(
         yield cluster
 
 
-def _create_user(cluster: Cluster, username: str) -> None:
-    """
-    Create a user which one can SSH into.
-
-    Args:
-        cluster: The cluster to create a user on.
-        username: The name of the user to create.
-    """
-    (master, ) = cluster.masters
-    home_path = Path('/home') / username
-    ssh_path = home_path / '.ssh'
-
-    commands = [
-        ['adduser', username],
-        ['mkdir', '-p', str(home_path)],
-        ['cp', '-a', '/root/.ssh', str(ssh_path)],
-        ['chown', '-R', username, str(ssh_path)],
-    ]
-
-    for command in commands:
-        result = master.run_as_root(args=command)
-        assert result.returncode == 0
-
-
 class TestNode:
     """
     Tests for interacting with cluster nodes.
@@ -81,23 +57,17 @@ class TestNode:
         It is possible to run commands as the given user and see their output.
         """
         (master, ) = dcos_cluster.masters
-        echo_result = master.run(args=['echo', '$USER'], user='root')
+        default = dcos_cluster.default_ssh_user
+
+        echo_result = master.run(args=['echo', '$USER'], user=default)
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'root'
         assert echo_result.stderr == b''
 
-        username = uuid.uuid4().hex
-        _create_user(cluster=dcos_cluster, username=username)
-
-        new_user_echo = master.run(args=['echo', '$USER'], user=username)
-        assert new_user_echo.returncode == 0
-        assert new_user_echo.stdout.strip().decode() == username
-        assert new_user_echo.stderr == b''
-
         # Commands which return a non-0 code raise a
         # ``CalledProcessError``.
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(args=['unset_command'], user='root')
+            master.run(args=['unset_command'], user=default)
 
         exception = excinfo.value
         assert exception.returncode == 127
@@ -114,54 +84,9 @@ class TestNode:
         with pytest.raises(CalledProcessError) as excinfo:
             master.run(
                 args=['unset_command'],
-                user='root',
+                user=default,
                 log_output_live=True,
             )
-
-        exception = excinfo.value
-        assert exception.stderr == b''
-        assert b'command not found' in exception.stdout
-        expected_error_substring = 'unset_command'
-        found_expected_error = False
-        for record in caplog.records:
-            if expected_error_substring in record.getMessage():
-                if record.levelno == logging.DEBUG:
-                    found_expected_error = True
-        assert found_expected_error
-
-    def test_run_as_root(
-        self,
-        caplog: CompatLogCaptureFixture,
-        dcos_cluster: Cluster,
-    ) -> None:
-        """
-        It is possible to run commands as root and see their output.
-        """
-        (master, ) = dcos_cluster.masters
-        echo_result = master.run_as_root(args=['echo', '$USER'])
-        assert echo_result.returncode == 0
-        assert echo_result.stdout.strip() == b'root'
-        assert echo_result.stderr == b''
-
-        # Commands which return a non-0 code raise a
-        # ``CalledProcessError``.
-        with pytest.raises(CalledProcessError) as excinfo:
-            master.run_as_root(args=['unset_command'])
-
-        exception = excinfo.value
-        assert exception.returncode == 127
-        assert exception.stdout == b''
-        assert b'command not found' in exception.stderr
-        for record in caplog.records:
-            # The error which caused this exception is not in the debug
-            # log output.
-            if record.levelno == logging.DEBUG:
-                assert 'unset_command' not in record.getMessage()
-
-        # With `log_output_live`, output is logged and stderr is merged
-        # into stdout.
-        with pytest.raises(CalledProcessError) as excinfo:
-            master.run_as_root(args=['unset_command'], log_output_live=True)
 
         exception = excinfo.value
         assert exception.stderr == b''
@@ -184,12 +109,11 @@ class TestNode:
         It is possible to run commands as the given user asynchronously.
         """
         (master, ) = dcos_cluster.masters
-        username = uuid.uuid4().hex
-        _create_user(cluster=dcos_cluster, username=username)
+        default = dcos_cluster.default_ssh_user
 
         popen_1 = master.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
-            user=username,
+            user=default,
         )
 
         popen_2 = master.popen(
@@ -198,7 +122,7 @@ class TestNode:
                 '&&',
                 '(echo $USER > /tmp/pipe)',
             ],
-            user=username,
+            user=default,
         )
 
         stdout, _ = popen_1.communicate()
@@ -208,7 +132,7 @@ class TestNode:
         popen_2.communicate()
         return_code_2 = popen_2.poll()
 
-        assert stdout.strip().decode() == username
+        assert stdout.strip().decode() == default
         assert return_code_1 == 0
         assert return_code_2 == 0
 
@@ -230,5 +154,5 @@ class TestNode:
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
-        result = master.run_as_root(args=args)
+        result = master.run(args=args, user=dcos_cluster.default_ssh_user)
         assert result.stdout.decode() == content

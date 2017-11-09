@@ -79,6 +79,7 @@ class Cluster(ContextDecorator):
             )
             raise ValueError(message)
 
+        self._default_ssh_user = cluster_backend.default_ssh_user
         self._destroy_on_error = destroy_on_error
         self._destroy_on_success = destroy_on_success
         self._log_output_live = log_output_live
@@ -116,9 +117,14 @@ class Cluster(ContextDecorator):
             '--diag',
         ]
 
+        # Must be run privileged
+        if not self.default_ssh_user == 'root':
+            diagnostics_args = ['sudo'] + diagnostics_args
+
         for node in self.masters:
-            node.run_as_root(
+            node.run(
                 args=diagnostics_args,
+                user=self.default_ssh_user,
                 log_output_live=self._log_output_live,
                 env={
                     'LC_ALL': 'en_US.UTF-8',
@@ -174,6 +180,13 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
+    @property
+    def default_ssh_user(self) -> str:
+        """
+        Return the default SSH user for accessing a node.
+        """
+        return self._default_ssh_user
+
     def run_integration_tests(
         self,
         pytest_command: List[str],
@@ -222,8 +235,9 @@ class Cluster(ContextDecorator):
         # Tests are run on a random master node.
         test_host = next(iter(self.masters))
 
-        return test_host.run_as_root(
+        return test_host.run(
             args=args,
+            user=self.default_ssh_user,
             log_output_live=self._log_output_live,
             env=environment_variables,
         )

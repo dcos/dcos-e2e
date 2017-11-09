@@ -15,10 +15,8 @@ class ExistingCluster(ClusterBackend):
     """
 
     def __init__(
-        self,
-        masters: Set[Node],
-        agents: Set[Node],
-        public_agents: Set[Node],
+        self, masters: Set[Node], agents: Set[Node], public_agents: Set[Node],
+        default_ssh_user: str
     ) -> None:
         """
         Create a record of an existing cluster backend for use by a cluster
@@ -27,6 +25,7 @@ class ExistingCluster(ClusterBackend):
         self.masters = masters
         self.agents = agents
         self.public_agents = public_agents
+        self._default_ssh_user = default_ssh_user
 
     @property
     def cluster_cls(self) -> Type['ExistingClusterManager']:
@@ -42,6 +41,13 @@ class ExistingCluster(ClusterBackend):
         Destroying an existing cluster is the responsibility of the caller.
         """
         return False
+
+    @property
+    def default_ssh_user(self) -> str:
+        """
+        Return the default SSH user for this backend.
+        """
+        return self._default_ssh_user
 
 
 class ExistingClusterManager(ClusterManager):

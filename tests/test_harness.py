@@ -100,7 +100,9 @@ class TestExtendConfig:
         ) as cluster:
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
-            master.run_as_root(args=['test', '-f', path])
+            master.run(
+                args=['test', '-f', path], user=cluster.default_ssh_user
+            )
 
     def test_default_config(
         self,
@@ -122,7 +124,9 @@ class TestExtendConfig:
             (master, ) = cluster.masters
             cluster.wait_for_dcos()
             with pytest.raises(CalledProcessError):
-                master.run_as_root(args=['test', '-f', path])
+                master.run(
+                    args=['test', '-f', path], user=cluster.default_ssh_user
+                )
 
 
 class TestClusterSize:
@@ -297,7 +301,7 @@ class TestDestroyOnError:
                 raise Exception()
 
         with pytest.raises(CalledProcessError):
-            master.run_as_root(args=['echo', 'hello'])
+            master.run(args=['echo', 'hello'], user=cluster.default_ssh_user)
 
     def test_set_false_exception_raised(
         self,
@@ -320,7 +324,11 @@ class TestDestroyOnError:
                 cluster.wait_for_dcos()
                 raise Exception()
         # No exception is raised. The node still exists.
-        master.run_as_root(args=['echo', 'hello'], log_output_live=True)
+        master.run(
+            args=['echo', 'hello'],
+            log_output_live=True,
+            user=cluster.default_ssh_user
+        )
         cluster.destroy()
 
 
@@ -347,7 +355,7 @@ class TestDestroyOnSuccess:
             (master, ) = cluster.masters
 
         with pytest.raises(CalledProcessError):
-            master.run_as_root(args=['echo', 'hello'])
+            master.run(args=['echo', 'hello'], user=cluster.default_ssh_user)
 
     def test_false(
         self,
@@ -368,5 +376,5 @@ class TestDestroyOnSuccess:
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
 
-        master.run_as_root(args=['echo', 'hello'])
+        master.run(args=['echo', 'hello'], user=cluster.default_ssh_user)
         cluster.destroy()
