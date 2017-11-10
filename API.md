@@ -173,7 +173,7 @@ The IP address of the node.
 
 #### `ssh_key_path`
 
-The path to an SSH key which can be used to SSH to the node as the clusters `default_ssh_user` user.
+The path to an SSH key which can be used to SSH to the node as the cluster's `default_ssh_user` user.
 
 ### Methods
 

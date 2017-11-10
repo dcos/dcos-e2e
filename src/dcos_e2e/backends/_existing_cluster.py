@@ -15,8 +15,11 @@ class ExistingCluster(ClusterBackend):
     """
 
     def __init__(
-        self, masters: Set[Node], agents: Set[Node], public_agents: Set[Node],
-        default_ssh_user: str
+        self,
+        masters: Set[Node],
+        agents: Set[Node],
+        public_agents: Set[Node],
+        default_ssh_user: str,
     ) -> None:
         """
         Create a record of an existing cluster backend for use by a cluster
