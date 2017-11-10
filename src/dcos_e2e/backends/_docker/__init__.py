@@ -100,6 +100,7 @@ class Docker(ClusterBackend):
 
 
 class DockerCluster(ClusterManager):
+    # pylint: disable=too-many-instance-attributes
     """
     A record of a Docker cluster.
     """

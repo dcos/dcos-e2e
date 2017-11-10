@@ -96,9 +96,6 @@ disable=line-too-long,
         # This cannot be overridden when pylint is overzealous.
         # See https://github.com/PyCQA/pylint/issues/214.
         duplicate-code,
-        # Disable temporary until split _docker/__init__.py
-	too-many-branches,
-        too-many-instance-attributes,
 
 [REPORTS]
 
