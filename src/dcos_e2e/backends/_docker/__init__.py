@@ -456,7 +456,11 @@ class DockerCluster(ClusterManager):
                 user=cluster_backend.default_ssh_user
             )
 
-        # Should probably have a different solution
+        # Logically a SSH user should be part of a `Node`
+        # However with the DC/OS config there is a notion of a SSH user for
+        # an entire DC/OS cluster, which in our case maps to a single SSH user
+        # for every cluster created with the corresponding backend. Maybe
+        # we're better off making this a ssh_user of a ClusterManager instead.
         self._default_ssh_user = cluster_backend.default_ssh_user
 
         self._install_dcos_from_path(build_artifact, extra_config)
@@ -466,13 +470,13 @@ class DockerCluster(ClusterManager):
         build_artifact: Path,
         extra_config: Dict[str, Any],
     ) -> None:
-        # Should probably have a different solution
+
         ssh_user = self._default_ssh_user
 
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
         config_file_path = self._genconf_dir / 'config.yaml'
-        self._config = {
+        config = {
             'agent_list': [str(agent.ip_address) for agent in self.agents],
             'public_agent_list': [
                 str(public_agent.ip_address)
@@ -504,7 +508,7 @@ class DockerCluster(ClusterManager):
             'false',
         }
 
-        config_yaml = yaml.dump(data={**self._config, **extra_config})
+        config_yaml = yaml.dump(data={**config, **extra_config})
         Path(config_file_path).write_text(data=config_yaml)
 
         genconf_args = [
