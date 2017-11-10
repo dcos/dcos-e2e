@@ -17,12 +17,9 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def __init__(
         self,
-        build_artifact: Optional[Union[str, Path]],
         masters: int,
         agents: int,
         public_agents: int,
-        extra_config: Dict[str, Any],
-        log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
     ) -> None:
@@ -30,16 +27,9 @@ class ClusterManager(abc.ABC):
         Create a DC/OS cluster with the given `cluster_backend`.
 
         Args:
-            build_artifact: The `Path` or URL string to a build artifact
-                of DC/OS to install from.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
-            log_output_live: If `True`, log output of subprocesses live.
-                If `True`, stderr is merged into stdout in the return value.
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
@@ -48,10 +38,72 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
+    def install_dcos_from_url(
+        self,
+        build_artifact: str,
+        extra_config: Dict[str, Any]),
+        log_output_live: bool,
+    ) -> None:
+        """
+        Stub for the DC/OS advanced installation method.
+
+        Args:
+            build_artifact: The URL string to a build artifact to install DC/OS
+                from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
+            log_output_live: If `True`, log output of the installation live.
+                If `True`, stderr is merged into stdout in the return value.
+
+        Raises:
+            NotImplementedError: `NotImplementedError` because the Docker backend
+                does not support the DC/OS advanced installation method.
+        """
+        message = (
+            'This backend does not support the installation of DC/OS via build'
+            'artifacts passed by URL string. This is because a more efficient '
+            'installation method exists that uses a local build artifact.'
+        )
+        raise NotImplementedError(message)
+
+    def install_dcos_from_path(
+        self,
+        build_artifact: str,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Stub for a more efficient local DC/OS installation method.
+
+        Args:
+            build_artifact: The `Path`to a build artifact to install DC/OS from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
+            log_output_live: If `True`, log output of the installation live.
+                If `True`, stderr is merged into stdout in the return value.
+
+        Raises:
+            NotImplementedError: `NotImplementedError` because the Docker backend
+                does not support the DC/OS advanced installation method.
+        """
+        message = (
+            'This backend does not support the installation of DC/OS via local'
+            'build artifacts. This is because a more efficient installation'
+            'method exists that uses a remote build artifact.'
+        )
+        raise NotImplementedError(message)
+
+    @abc.abstractmethod
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
+        message = (
+            'The user is responsible for destroying the cluster.'
+        )
+        raise NotImplementedError(message)
 
     @property
     @abc.abstractmethod
@@ -95,7 +147,7 @@ class ClusterBackend(abc.ABC):
         Return whether this backend supports being destroyed with a `destroy`
         method.
         """
-
+        return False
     @property
     @abc.abstractmethod
     def default_ssh_user(self) -> str:
