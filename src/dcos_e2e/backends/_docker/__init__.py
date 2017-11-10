@@ -167,14 +167,14 @@ class DockerCluster(ClusterManager):
         #
         # Starting with "dcos-e2e" allows `make clean` to remove these and
         # only these containers.
-        unique = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
+        self._cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
 
         # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
         self._path = Path(
             TemporaryDirectory(
-                suffix=unique,
+                suffix=self._cluster_id,
                 dir=(
                     str(cluster_backend.workspace_dir)
                     if cluster_backend.workspace_dir else None
@@ -199,12 +199,12 @@ class DockerCluster(ClusterManager):
         # The way to fix this if we want to be able to put files anywhere is
         # to add an variable to `dcos_generate_config.sh.in` which allows
         # `-v` mounts.
-        genconf_dir = self._path / 'genconf'
+        self._genconf_dir = self._path / 'genconf'
         # We wrap these in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
-        Path(genconf_dir).mkdir(exist_ok=True)
-        genconf_dir = Path(genconf_dir).resolve()
-        genconf_dir_src = self._path / 'genconf.src'
+        Path(self._genconf_dir).mkdir(exist_ok=True)
+        self._genconf_dir = Path(self._genconf_dir).resolve()
+        self._genconf_dir_src = self._path / 'genconf.src'
         include_dir = self._path / 'include'
         include_dir_src = self._path / 'include.src'
         certs_dir = include_dir / 'certs'
@@ -218,10 +218,10 @@ class DockerCluster(ClusterManager):
         service_dir = include_dir / 'systemd'
         service_dir.mkdir(parents=True)
 
-        ip_detect = Path(genconf_dir / 'ip-detect')
+        ip_detect = Path(self._genconf_dir / 'ip-detect')
 
         copyfile(
-            src=str(genconf_dir_src / 'ip-detect'),
+            src=str(self._genconf_dir_src / 'ip-detect'),
             dst=str(ip_detect),
         )
         ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
@@ -266,7 +266,7 @@ class DockerCluster(ClusterManager):
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = genconf_dir / relative_installer_path
+            destination_path = self._genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
         # Only overlay, overlay2, and aufs storage drivers are supported.
@@ -300,15 +300,21 @@ class DockerCluster(ClusterManager):
             """.format(docker_storage_driver=storage_driver)
         )
 
-        self._master_prefix = '{unique}-master-'.format(unique=unique)
-        self._agent_prefix = '{unique}-agent-'.format(unique=unique)
-        self._public_agent_prefix = '{unique}-pub-agent-'.format(unique=unique)
+        self._master_prefix = '{cluster_id}-master-'.format(
+            cluster_id=self._cluster_id
+        )
+        self._agent_prefix = '{cluster_id}-agent-'.format(
+            cluster_id=self._cluster_id
+        )
+        self._public_agent_prefix = '{cluster_id}-pub-agent-'.format(
+            cluster_id=self._cluster_id
+        )
 
-        bootstrap_genconf_path = genconf_dir / 'serve'
+        bootstrap_genconf_path = self._genconf_dir / 'serve'
         # We wrap this in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
         Path(bootstrap_genconf_path).mkdir()
-        bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
+        self._bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
@@ -316,9 +322,6 @@ class DockerCluster(ClusterManager):
             '/run': 'rw,exec,nosuid,size=2097152k',
             '/tmp': 'rw,exec,nosuid,size=2097152k',
         }
-
-        installer_ctr = '{unique}-installer'.format(unique=unique)
-        installer_port = _get_open_port()
 
         (service_dir / 'docker.service').write_text(docker_service_body)
 
@@ -360,7 +363,7 @@ class DockerCluster(ClusterManager):
                 'mode': 'rw',
             },
             str(bootstrap_genconf_path): {
-                'bind': str(bootstrap_tmp_path),
+                'bind': str(self._bootstrap_tmp_path),
                 'mode': 'ro',
             },
         }
@@ -445,17 +448,38 @@ class DockerCluster(ClusterManager):
                 tmpfs=node_tmpfs_mounts,
             )
 
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            # Remove stray file that prevents non-root SSH.
+            # https://ubuntuforums.org/showthread.php?t=2327330
+            node.run(
+                args=['rm', '-f', '/run/nologin'],
+                user=cluster_backend.default_ssh_user
+            )
+
+        # Should probably have a different solution
+        self._default_ssh_user = cluster_backend.default_ssh_user
+
+        self._install_dcos_from_path(build_artifact, extra_config)
+
+    def _install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        extra_config: Dict[str, Any],
+    ) -> None:
+        # Should probably have a different solution
+        ssh_user = self._default_ssh_user
+
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
-        config_file_path = genconf_dir / 'config.yaml'
-        config_body_dict = {
+        config_file_path = self._genconf_dir / 'config.yaml'
+        self._config = {
             'agent_list': [str(agent.ip_address) for agent in self.agents],
             'public_agent_list': [
                 str(public_agent.ip_address)
                 for public_agent in self.public_agents
             ],
             'bootstrap_url':
-            'file://' + str(bootstrap_tmp_path),
+            'file://' + str(self._bootstrap_tmp_path),
             'cluster_name':
             'DCOS',
             'exhibitor_storage_backend':
@@ -469,7 +493,7 @@ class DockerCluster(ClusterManager):
             'ssh_port':
             22,
             'ssh_user':
-            cluster_backend.default_ssh_user,
+            ssh_user,
             'superuser_password_hash':
             superuser_password_hash,
             'superuser_username':
@@ -480,8 +504,8 @@ class DockerCluster(ClusterManager):
             'false',
         }
 
-        config_body = yaml.dump(data={**config_body_dict, **extra_config})
-        Path(config_file_path).write_text(data=config_body)
+        config_yaml = yaml.dump(data={**self._config, **extra_config})
+        Path(config_file_path).write_text(data=config_yaml)
 
         genconf_args = [
             'bash',
@@ -490,6 +514,11 @@ class DockerCluster(ClusterManager):
             '-v',
             '--genconf',
         ]
+
+        installer_ctr = '{cluster_id}-installer'.format(
+            cluster_id=self._cluster_id
+        )
+        installer_port = _get_open_port()
 
         run_subprocess(
             args=genconf_args,
@@ -508,24 +537,13 @@ class DockerCluster(ClusterManager):
         ]:
             dcos_install_args = [
                 '/bin/bash',
-                str(bootstrap_tmp_path / 'dcos_install.sh'),
+                str(self._bootstrap_tmp_path / 'dcos_install.sh'),
                 '--no-block-dcos-setup',
                 role,
             ]
 
             for node in nodes:
-                node.run(
-                    args=dcos_install_args,
-                    user=cluster_backend.default_ssh_user
-                )
-
-        for node in {*self.masters, *self.agents, *self.public_agents}:
-            # Remove stray file that prevents non-root SSH.
-            # https://ubuntuforums.org/showthread.php?t=2327330
-            node.run(
-                args=['rm', '-f', '/run/nologin'],
-                user=cluster_backend.default_ssh_user
-            )
+                node.run(args=dcos_install_args, user=ssh_user)
 
     def _start_dcos_container(
         self,
