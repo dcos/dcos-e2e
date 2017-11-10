@@ -72,7 +72,7 @@ See Docker > Preferences > File Sharing.
 ## `dcos_e2e.backend.ExistingCluster`
 
 This is a backend which can be used to run a `Cluster`.
-It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s anda `default_ssh_user` that can `run` commands on those `Node`s.
+It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s and a `default_ssh_user` that can `run` commands on those `Node`s.
 This means that it cannot support various operations which rely on access to the start up and teardown mechanisms of a cluster.
 
 As such, various `Cluster` parameters must be set in particular ways.
