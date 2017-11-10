@@ -31,6 +31,8 @@
 * Backwards incompatible change: Replace `generate_config_path` with `build_artifact`
 that can either be a `Path` or a HTTP(S) URL string. This allows for supporting installation
 methods that require build artifacts to be downloaded from a HTTP server.
+* Backwards incompatible change: Remove `run_as_root`. Instead require a `default_ssh_user`
+for backends to `run` commands over SSH on any cluster `Node` created with this backend.
 
 ## 2017.11.02.0
 

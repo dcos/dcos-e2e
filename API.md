@@ -26,13 +26,13 @@
     - [`masters`](#masters-1)
     - [`agents`](#agents-1)
     - [`public_agents`](#public_agents-1)
+    - [`default_ssh_user`](#default_ssh_user)
 - [`dcos_e2e.node.Node`](#dcos_e2enodenode)
   - [Parameters](#parameters-1)
     - [`ip_address`](#ip_address)
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
     - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
-    - [`node.run_as_root(args, log_output_live=False, env=None)`](#noderun_as_rootargs-log_output_livefalse-envnone)
     - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
     - [`node.send_file(local_path, remote_path) -> None`](#nodesend_filelocal_path-remote_path---none)
   - [Attributes](#attributes-1)
@@ -153,6 +153,10 @@ The agent nodes in the cluster.
 
 The public agent nodes in the cluster.
 
+#### `default_ssh_user`
+
+The default SSH user to access cluster nodes.
+
 ## `dcos_e2e.node.Node`
 
 Commands can be run on nodes in clusters.
@@ -169,22 +173,13 @@ The IP address of the node.
 
 #### `ssh_key_path`
 
-The path to an SSH key which can be used to SSH to the node as the `root` user.
+The path to an SSH key which can be used to SSH to the node as the cluster's `default_ssh_user` user.
 
 ### Methods
 
 #### `node.run(args, user, log_output_live=False, env=None)`
 
 `user` specifies the user that the given command will be run for over SSH.
-
-If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
-
-To see these logs in `pytest` tests, use the `-s` flag.
-
-`env` is an optional mapping of environment variable names to values.
-These environment variables will be set on the node before running the command specified in `args`.
-
-#### `node.run_as_root(args, log_output_live=False, env=None)`
 
 If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
 

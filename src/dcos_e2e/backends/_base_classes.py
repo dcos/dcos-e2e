@@ -31,7 +31,7 @@ class ClusterManager(abc.ABC):
 
         Args:
             build_artifact: The `Path` or URL string to a build artifact
-            of DC/OS to install from.
+                of DC/OS to install from.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
@@ -94,4 +94,11 @@ class ClusterBackend(abc.ABC):
         """
         Return whether this backend supports being destroyed with a `destroy`
         method.
+        """
+
+    @property
+    @abc.abstractmethod
+    def default_ssh_user(self) -> str:
+        """
+        Return the default SSH user as a string.
         """

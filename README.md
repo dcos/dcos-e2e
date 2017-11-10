@@ -55,11 +55,13 @@ class TestExample:
             build_artifact=Path('/tmp/dcos_generate_config.sh'),
         ) as cluster:
             (master, ) = cluster.masters
-            result = master.run_as_root(args=['test', '-f', path])
+            result = master.run(args=['test', '-f', path],
+                                user=cluster.default_ssh_user)
             print(result.stdout)
             cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
             try:
-                master.run_as_root(args=['test', '-f', '/no/file/here'])
+                master.run(args=['test', '-f', '/no/file/here'],
+                           user=cluster.default_ssh_user)
             except subprocess.CalledProcessError:
                 print('No file exists')
 ```

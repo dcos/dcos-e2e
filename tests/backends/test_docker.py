@@ -48,12 +48,12 @@ class TestCustomMasterMounts:
         ) as cluster:
             (master, ) = cluster.masters
             args = ['cat', str(master_path)]
-            result = master.run_as_root(args=args)
+            result = master.run(args=args, user=cluster.default_ssh_user)
             assert result.stdout.decode() == content
 
             new_content = str(uuid.uuid4())
             local_file.write(new_content)
-            result = master.run_as_root(args=args)
+            result = master.run(args=args, user=cluster.default_ssh_user)
             assert result.stdout.decode() == new_content
 
 

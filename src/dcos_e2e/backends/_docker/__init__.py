@@ -91,6 +91,13 @@ class Docker(ClusterBackend):
         """
         return True
 
+    @property
+    def default_ssh_user(self) -> str:
+        """
+        Return `root` as the default SSH user for the Docker backend.
+        """
+        return 'root'
+
 
 class DockerCluster(ClusterManager):
     """
@@ -462,7 +469,7 @@ class DockerCluster(ClusterManager):
             'ssh_port':
             22,
             'ssh_user':
-            'root',
+            cluster_backend.default_ssh_user,
             'superuser_password_hash':
             superuser_password_hash,
             'superuser_username':
@@ -507,12 +514,18 @@ class DockerCluster(ClusterManager):
             ]
 
             for node in nodes:
-                node.run_as_root(args=dcos_install_args)
+                node.run(
+                    args=dcos_install_args,
+                    user=cluster_backend.default_ssh_user
+                )
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
             # Remove stray file that prevents non-root SSH.
             # https://ubuntuforums.org/showthread.php?t=2327330
-            node.run_as_root(args=['rm', '-f', '/run/nologin'])
+            node.run(
+                args=['rm', '-f', '/run/nologin'],
+                user=cluster_backend.default_ssh_user
+            )
 
     def _start_dcos_container(
         self,
