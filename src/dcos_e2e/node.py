@@ -35,7 +35,7 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict]=None,
+        env: Optional[Dict] = None,
     ) -> List[str]:
         """
         Return a command to run `args` on this node over SSH.
@@ -94,8 +94,8 @@ class Node:
         self,
         args: List[str],
         user: str,
-        log_output_live: bool=False,
-        env: Optional[Dict]=None,
+        log_output_live: bool = False,
+        env: Optional[Dict] = None,
     ) -> CompletedProcess:
         """
         Run a command on this node the given user.
@@ -122,7 +122,7 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict]=None,
+        env: Optional[Dict] = None,
     ) -> Popen:
         """
         Open a pipe to a command run on a node as the given user.

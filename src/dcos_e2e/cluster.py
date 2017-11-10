@@ -28,15 +28,15 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
-        build_artifact: Union[str, Path]=None,
-        extra_config: Optional[Dict[str, Any]]=None,
-        masters: int=1,
-        agents: int=1,
-        public_agents: int=1,
-        log_output_live: bool=False,
-        destroy_on_error: bool=True,
-        destroy_on_success: bool=True,
-        files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
+        build_artifact: Union[str, Path] = None,
+        extra_config: Optional[Dict[str, Any]] = None,
+        masters: int = 1,
+        agents: int = 1,
+        public_agents: int = 1,
+        log_output_live: bool = False,
+        destroy_on_error: bool = True,
+        destroy_on_success: bool = True,
+        files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -188,7 +188,7 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
-        env: Optional[Dict]=None,
+        env: Optional[Dict] = None,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
