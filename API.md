@@ -98,7 +98,7 @@ If set to `True`, the cluster is destroyed on exit if there is no exception rais
 
 ### Methods
 
-#### `run_integration_tests(pytest_command,  env=None, log_output_live=False)`
+#### `run_integration_tests(pytest_command, env=None, log_output_live=False)`
 
 Run integration tests on the cluster.
 

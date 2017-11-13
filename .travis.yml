@@ -32,11 +32,12 @@ env:
       - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_default"
       - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess::test_false"
       - "TEST_PATTERN=tests/backends/test_docker.py::TestCustomMasterMounts::test_custom_master_mounts"
-      # Since we do only have 5 builders we run these tests on a single one.
+      # These test class use one scoped cluster so we run it on one builder.
       - "TEST_PATTERN=tests/backends/test_docker.py::UnsupportedInstallationMethods"
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
-      # This test class uses one scoped cluster so we run it on one builder.
+      # These test class use one scoped cluster so we run it on one builder.
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
+      - "TEST_PATTERN=tests/backends/test_existing_cluster.py::UnsupportedInstallationMethods"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:

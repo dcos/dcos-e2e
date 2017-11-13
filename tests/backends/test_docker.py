@@ -4,6 +4,7 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
+from typing import Iterator
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
@@ -62,23 +63,32 @@ class TestUnsupportedInstallationMethods:
     Tests for bad parameters passed to Docker clusters.
     """
 
+    @pytest.fixture(scope='module')
+    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
+        """
+        Return a `Cluster`.
+
+        This is module scoped as we do not intend to modify the cluster.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            yield cluster
+
     def test_install_dcos_from_url(
         self,
+        dcos_cluster: Cluster,
         oss_artifact_url: str,
-        tmpdir: local,
     ) -> None:
         """
         The Docker backend requires a build artifact in order
         to launch a DC/OS cluster.
         """
         with pytest.raises(NotImplementedError) as excinfo:
-            with Cluster(
-                cluster_backend=Docker(workspace_dir=tmpdir),
-                masters=1,
-                agents=0,
-                public_agents=0,
-            ) as cluster:
-                cluster.install_dcos_from_url(oss_artifact_url)
+            dcos_cluster.install_dcos_from_url(oss_artifact_url)
 
         expected_error = (
             'The Docker backend does not support the installation of DC/OS '
