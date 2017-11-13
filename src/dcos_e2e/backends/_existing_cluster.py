@@ -160,7 +160,6 @@ class ExistingClusterManager(ClusterManager):
         )
         raise NotImplementedError(message)
 
-
     @property
     def masters(self) -> Set[Node]:
         """
@@ -184,10 +183,8 @@ class ExistingClusterManager(ClusterManager):
 
     def destroy(self) -> None:
         """
-        Destroy all nodes in the cluster.
+        Destroying an existing cluster is the responsibility of the caller.
+
+        Raises: NotImplementedError when called.
         """
-        message = (
-            'The given cluster backend does not support being destroyed.'
-            ' Therefore, `destroy_on_success` must be set to `False`.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError

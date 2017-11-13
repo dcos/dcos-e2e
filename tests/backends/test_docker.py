@@ -60,7 +60,7 @@ class TestCustomMasterMounts:
 
 class TestUnsupportedInstallationMethods:
     """
-    Tests for bad parameters passed to Docker clusters.
+    Tests for unsupported installation methods on Docker clusters.
     """
 
     @pytest.fixture(scope='module')

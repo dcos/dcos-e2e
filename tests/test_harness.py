@@ -29,7 +29,7 @@ class TestIntegrationTests:
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
@@ -144,7 +144,7 @@ class TestClusterSize:
         By default, a cluster with one master and one agent and one private
         agent is created.
         """
-        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(oss_artifact)
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
@@ -265,9 +265,9 @@ class TestMultipleClusters:
         This is because Travis CI has a space limit which is exceeded if we
         have multiple installer artifacts.
         """
-        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(oss_artifact)
-            with Cluster(cluster_backend=cluster_backend, ) as cluster:
+            with Cluster(cluster_backend=cluster_backend) as cluster:
                 cluster.install_dcos_from_path(oss_artifact)
 
 

@@ -35,7 +35,7 @@ class TestEnterpriseIntegrationTests:
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
-        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 enterprise_artifact,
                 extra_config=config,
@@ -152,7 +152,7 @@ class TestWaitForDCOS:
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
-        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 enterprise_artifact,
                 extra_config=config,
