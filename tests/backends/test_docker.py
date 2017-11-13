@@ -64,7 +64,7 @@ class TestUnsupportedInstallationMethods:
     """
 
     @pytest.fixture(scope='module')
-    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
+    def dcos_cluster(self) -> Iterator[Cluster]:
         """
         Return a `Cluster`.
 

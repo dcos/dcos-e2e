@@ -107,7 +107,6 @@ class ClusterBackend(abc.ABC):
         Return whether this backend supports being destroyed with a `destroy`
         method.
         """
-        return False
 
     @property
     @abc.abstractmethod

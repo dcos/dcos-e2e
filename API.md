@@ -16,7 +16,6 @@
     - [`destroy_on_error`](#destroy_on_error)
     - [`destroy_on_success`](#destroy_on_success)
   - [Methods](#methods)
-    - [`run_integration_tests(pytest_command,  env=None, log_output_live=False)`](#run_integration_testspytest_command--envnone-log_output_livefalse)
     - [`install_dcos_from_url(build_artifact, extra_config=None, log_output_live=False)`](#install_dcos_from_urlbuild_artifact-extra_confignone-log_output_livefalse)
       - [`build_artifact`](#build_artifact)
       - [`extra_config`](#extra_config)
@@ -25,6 +24,7 @@
       - [`build_artifact`](#build_artifact-1)
       - [`extra_config`](#extra_config-1)
       - [`log_output_live`](#log_output_live-1)
+    - [`run_integration_tests(pytest_command, env=None, log_output_live=False)`](#run_integration_testspytest_command-envnone-log_output_livefalse)
     - [`destroy()`](#destroy)
     - [`wait_for_dcos()`](#wait_for_dcos)
   - [Attributes](#attributes)
@@ -98,29 +98,6 @@ If set to `True`, the cluster is destroyed on exit if there is no exception rais
 
 ### Methods
 
-#### `run_integration_tests(pytest_command, env=None, log_output_live=False)`
-
-Run integration tests on the cluster.
-
-To run integration tests on an enterprise cluster, an administrator's username and password must be set as environment variables.
-For example:
-
-```
-pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
-
-environment_variables = {
-    'DCOS_LOGIN_UNAME': 'alice',
-    'DCOS_LOGIN_PW': 'password123',
-}
-
-cluster.run_integration_tests(
-    pytest_command=pytest_command,
-    env=environment_variables,
-)
-```
-
-To see the logs in `pytest` tests specify `log_output_live` as `True` and use the `-s` flag in the `pytest_command`.
-
 #### `install_dcos_from_url(build_artifact, extra_config=None, log_output_live=False)`
 
 Installs DC/OS on the given cluster using the DC/OS advanced installation method if supported
@@ -158,6 +135,29 @@ Configuration variables to add to a base configuration.
 ##### `log_output_live`
 
 If set to `True`, the output of the DC/OS installation process will be logged.
+
+#### `run_integration_tests(pytest_command, env=None, log_output_live=False)`
+
+Run integration tests on the cluster.
+
+To run integration tests on an enterprise cluster, an administrator's username and password must be set as environment variables.
+For example:
+
+```
+pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
+
+environment_variables = {
+    'DCOS_LOGIN_UNAME': 'alice',
+    'DCOS_LOGIN_PW': 'password123',
+}
+
+cluster.run_integration_tests(
+    pytest_command=pytest_command,
+    env=environment_variables,
+)
+```
+
+To see the logs in `pytest` tests specify `log_output_live` as `True` and use the `-s` flag in the `pytest_command`.
 
 #### `destroy()`
 

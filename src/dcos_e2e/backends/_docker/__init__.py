@@ -126,10 +126,6 @@ class DockerCluster(ClusterManager):
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
             cluster_backend: Details of the specific Docker backend to use.
-
-        Raises:
-            CalledProcessError: The step to create containers
-                exited with a non-zero code.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so

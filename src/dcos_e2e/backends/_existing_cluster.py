@@ -160,15 +160,6 @@ class ExistingClusterManager(ClusterManager):
         )
         raise NotImplementedError(message)
 
-    def destroy(self) -> None:
-        """
-        Destroy all nodes in the cluster.
-        """
-        message = (
-            'The user is responsible for destroying clusters created with '
-            'the ExistingCluster backend.'
-        )
-        raise NotImplementedError(message)
 
     @property
     def masters(self) -> Set[Node]:
@@ -190,3 +181,13 @@ class ExistingClusterManager(ClusterManager):
         Return all DC/OS public agent ``Node``s.
         """
         return self._public_agents
+
+    def destroy(self) -> None:
+        """
+        Destroy all nodes in the cluster.
+        """
+        message = (
+            'The given cluster backend does not support being destroyed.'
+            ' Therefore, `destroy_on_success` must be set to `False`.'
+        )
+        raise NotImplementedError(message)
