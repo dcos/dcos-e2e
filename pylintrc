@@ -96,7 +96,6 @@ disable=line-too-long,
         # This cannot be overridden when pylint is overzealous.
         # See https://github.com/PyCQA/pylint/issues/214.
         duplicate-code,
-	too-many-branches,
 
 [REPORTS]
 
