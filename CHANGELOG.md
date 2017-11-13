@@ -33,6 +33,12 @@ that can either be a `Path` or a HTTP(S) URL string. This allows for supporting 
 methods that require build artifacts to be downloaded from a HTTP server.
 * Backwards incompatible change: Remove `run_as_root`. Instead require a `default_ssh_user`
 for backends to `run` commands over SSH on any cluster `Node` created with this backend.
+* Backwards incompatible change: Split the DC/OS installation from the ClusterManager
+`__init__` procedure. This allows for installing DC/OS after `Cluster` creation,
+and therefore enables decoupling of transfering files ahead of the installation process.
+* Backwards incompatible change: Explicit distinction of installtion methods by providing
+separate methods for `install_dcos_from_path` and `install_dcos_from_url` instead
+of inspecting the type of `build_artifact`.
 
 ## 2017.11.02.0
 

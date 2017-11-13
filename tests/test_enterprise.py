@@ -30,17 +30,17 @@ class TestEnterpriseIntegrationTests:
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
-        extra_config = {
+        config = {
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
-        with Cluster(
-            build_artifact=enterprise_artifact,
-            cluster_backend=cluster_backend,
-            extra_config=extra_config,
-            log_output_live=True,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+            cluster.install_dcos_from_path(
+                enterprise_artifact,
+                extra_config=config,
+                log_output_live=True,
+            )
             # No error is raised with a successful command.
             cluster.run_integration_tests(
                 pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
@@ -48,6 +48,7 @@ class TestEnterpriseIntegrationTests:
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
+                log_output_live=True,
             )
 
 
@@ -101,18 +102,21 @@ class TestCopyFiles:
 
         with Cluster(
             cluster_backend=cluster_backend,
-            extra_config=config,
-            build_artifact=enterprise_artifact,
             files_to_copy_to_installer=files_to_copy_to_installer,
-            log_output_live=True,
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
+            cluster.install_dcos_from_path(
+                enterprise_artifact,
+                extra_config=config,
+                log_output_live=True,
+            )
             (master, ) = cluster.masters
             master.send_file(
                 local_path=ca_key_path,
                 remote_path=master_key_path,
+                user=cluster.default_ssh_user
             )
 
             cluster.wait_for_dcos()
@@ -143,17 +147,17 @@ class TestWaitForDCOS:
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
-        extra_config = {
+        config = {
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
         }
 
-        with Cluster(
-            build_artifact=enterprise_artifact,
-            cluster_backend=cluster_backend,
-            extra_config=extra_config,
-            log_output_live=True,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+            cluster.install_dcos_from_path(
+                enterprise_artifact,
+                extra_config=config,
+                log_output_live=True,
+            )
             (master, ) = cluster.masters
             cluster.wait_for_dcos()
             setup_args = [

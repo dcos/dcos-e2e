@@ -4,7 +4,7 @@ Abstract base classes.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Type, Union
+from typing import Any, Dict, Set, Type
 
 from ..node import Node
 
@@ -41,69 +41,29 @@ class ClusterManager(abc.ABC):
     def install_dcos_from_url(
         self,
         build_artifact: str,
-        extra_config: Dict[str, Any]),
+        extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
         Stub for the DC/OS advanced installation method.
-
-        Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
-                from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
-            log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
-
-        Raises:
-            NotImplementedError: `NotImplementedError` because the Docker backend
-                does not support the DC/OS advanced installation method.
         """
-        message = (
-            'This backend does not support the installation of DC/OS via build'
-            'artifacts passed by URL string. This is because a more efficient '
-            'installation method exists that uses a local build artifact.'
-        )
-        raise NotImplementedError(message)
 
+    @abc.abstractmethod
     def install_dcos_from_path(
         self,
-        build_artifact: str,
+        build_artifact: Path,
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
         Stub for a more efficient local DC/OS installation method.
-
-        Args:
-            build_artifact: The `Path`to a build artifact to install DC/OS from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
-            log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
-
-        Raises:
-            NotImplementedError: `NotImplementedError` because the Docker backend
-                does not support the DC/OS advanced installation method.
         """
-        message = (
-            'This backend does not support the installation of DC/OS via local'
-            'build artifacts. This is because a more efficient installation'
-            'method exists that uses a remote build artifact.'
-        )
-        raise NotImplementedError(message)
 
     @abc.abstractmethod
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
-        message = (
-            'The user is responsible for destroying the cluster.'
-        )
-        raise NotImplementedError(message)
 
     @property
     @abc.abstractmethod
@@ -148,6 +108,7 @@ class ClusterBackend(abc.ABC):
         method.
         """
         return False
+
     @property
     @abc.abstractmethod
     def default_ssh_user(self) -> str:

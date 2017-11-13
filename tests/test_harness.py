@@ -29,20 +29,21 @@ class TestIntegrationTests:
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            build_artifact=oss_artifact,
-            log_output_live=True,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
-            cluster.run_integration_tests(pytest_command=pytest_command)
+            cluster.run_integration_tests(
+                pytest_command=pytest_command,
+                log_output_live=True,
+            )
 
             # An error is raised with an unsuccessful command.
             with pytest.raises(CalledProcessError) as excinfo:
                 pytest_command = ['pytest', 'test_no_such_file.py']
                 result = cluster.run_integration_tests(
-                    pytest_command=pytest_command
+                    pytest_command=pytest_command,
+                    log_output_live=True,
                 )
                 # This result will not be printed if the test passes, but it
                 # may provide useful debugging information.
@@ -92,12 +93,14 @@ class TestExtendConfig:
         }
 
         with Cluster(
-            build_artifact=oss_artifact,
-            extra_config=config,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
+            cluster.install_dcos_from_path(
+                oss_artifact,
+                extra_config=config,
+            )
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
             master.run(
@@ -116,11 +119,11 @@ class TestExtendConfig:
         configuration.
         """
         with Cluster(
-            build_artifact=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             (master, ) = cluster.masters
             cluster.wait_for_dcos()
             with pytest.raises(CalledProcessError):
@@ -141,10 +144,8 @@ class TestClusterSize:
         By default, a cluster with one master and one agent and one private
         agent is created.
         """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            build_artifact=oss_artifact,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
             assert len(cluster.public_agents) == 1
@@ -166,12 +167,12 @@ class TestClusterSize:
         public_agents = 2
 
         with Cluster(
-            build_artifact=oss_artifact,
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             cluster_backend=cluster_backend,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             assert len(cluster.masters) == masters
             assert len(cluster.agents) == agents
             assert len(cluster.public_agents) == public_agents
@@ -212,17 +213,18 @@ class TestClusterLogging:
         oss_artifact: Path,
     ) -> None:
         """
-        If `log_output_live` is given as `True`, subprocess output is logged.
+        If `log_output_live` is given as `True`, the installation output is
+        logged live.
         """
         with pytest.raises(CalledProcessError):
-            # It is not possible to create a cluster with two master nodes.
             with Cluster(
-                build_artifact=oss_artifact,
-                masters=2,
-                log_output_live=True,
-                cluster_backend=cluster_backend
-            ):
-                pass  # pragma: no cover
+                masters=2, cluster_backend=cluster_backend
+            ) as cluster:
+                # It is not possible to install DC/OS with two master nodes.
+                cluster.install_dcos_from_path(
+                    oss_artifact,
+                    log_output_live=True,
+                )
 
         assert self._two_masters_error_logged(log_records=caplog.records)
 
@@ -233,17 +235,15 @@ class TestClusterLogging:
         oss_artifact: Path,
     ) -> None:
         """
-        By default, subprocess output is not logged in the creation of a
-        cluster.
+        By default, subprocess output is not logged during DC/OS installation.
         """
         with pytest.raises(CalledProcessError):
-            # It is not possible to create a cluster with two master nodes.
             with Cluster(
                 masters=2,
                 cluster_backend=cluster_backend,
-                build_artifact=oss_artifact,
-            ):
-                pass  # pragma: no cover
+            ) as cluster:
+                # It is not possible to install DC/OS with two master nodes.
+                cluster.install_dcos_from_path(oss_artifact)
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
 
@@ -265,15 +265,10 @@ class TestMultipleClusters:
         This is because Travis CI has a space limit which is exceeded if we
         have multiple installer artifacts.
         """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            build_artifact=oss_artifact,
-        ):
-            with Cluster(
-                cluster_backend=cluster_backend,
-                build_artifact=oss_artifact,
-            ):
-                pass
+        with Cluster(cluster_backend=cluster_backend, ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
+            with Cluster(cluster_backend=cluster_backend, ) as cluster:
+                cluster.install_dcos_from_path(oss_artifact)
 
 
 class TestDestroyOnError:
@@ -291,11 +286,11 @@ class TestDestroyOnError:
         """
         with pytest.raises(Exception):
             with Cluster(
-                build_artifact=oss_artifact,
                 agents=0,
                 public_agents=0,
                 cluster_backend=cluster_backend,
             ) as cluster:
+                cluster.install_dcos_from_path(oss_artifact)
                 (master, ) = cluster.masters
                 cluster.wait_for_dcos()
                 raise Exception()
@@ -314,12 +309,12 @@ class TestDestroyOnError:
         """
         with pytest.raises(Exception):
             with Cluster(
-                build_artifact=oss_artifact,
                 agents=0,
                 public_agents=0,
                 destroy_on_error=False,
                 cluster_backend=cluster_backend,
             ) as cluster:
+                cluster.install_dcos_from_path(oss_artifact)
                 (master, ) = cluster.masters
                 cluster.wait_for_dcos()
                 raise Exception()
@@ -346,11 +341,11 @@ class TestDestroyOnSuccess:
         By default the cluster is destroyed if there is no exception raised.
         """
         with Cluster(
-            build_artifact=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
 
@@ -367,12 +362,12 @@ class TestDestroyOnSuccess:
         preserved if there is no exception raised.
         """
         with Cluster(
-            build_artifact=oss_artifact,
             agents=0,
             public_agents=0,
             cluster_backend=cluster_backend,
             destroy_on_success=False,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             cluster.wait_for_dcos()
             (master, ) = cluster.masters
 

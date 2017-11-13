@@ -4,7 +4,6 @@ DC/OS Cluster management tools. Independent of back ends.
 
 import subprocess
 from contextlib import ContextDecorator
-from functools import singledispatch
 from pathlib import Path
 from time import sleep
 from typing import Any, Dict, Iterable, List, Optional, Set
@@ -91,15 +90,21 @@ class Cluster(ContextDecorator):
         tries=500,
         delay=5,
     )
-    def wait_for_dcos(self,
+    def wait_for_dcos(
+        self,
         log_output_live: bool = False,
     ) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
 
         Args:
-            log_output_live: If `True`, log output of subprocess live.
-                If `True`, stderr is merged into stdout in the return value.
+            log_output_live: If `True`, log output of the diagnostics check
+                live. If `True`, stderr is merged into stdout in the return
+                value.
+
+        Raises:
+            ValueError: Raised if cluster HTTPS certificate could not be
+                obtained successfully.
         """
 
         diagnostics_args = [
@@ -177,39 +182,59 @@ class Cluster(ContextDecorator):
         """
         return self._default_ssh_user
 
-    def install_dcos(
+    def install_dcos_from_url(
         self,
-        build_artifact: Union[str, Path],
-        extra_config: Dict[str, Any] = {},
+        build_artifact: str,
+        extra_config: Dict[str, Any] = None,
         log_output_live: bool = False,
     ) -> None:
         """
         Args:
-            build_artifact: The `Path` or URL string to a build artifact
-                of DC/OS to install from.
-            extra_config: This dictionary can contain extra installation
-                configuration variables to add to base configurations.
+            build_artifact: The URL string to a build artifact to install DC/OS
+                from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
+
+        Raises:
+            NotImplementedError: `NotImplementedError` because the given
+                backend provides a more efficient installation method than
+                the DC/OS advanced installation method.
         """
-        @singledispatch
-        def install_from(artifact):
-            message = ('No backend supports installation methods for this type.')
-            raise NotImplementedError(message)
+        self._cluster.install_dcos_from_url(
+            build_artifact,
+            extra_config if extra_config else {},
+            log_output_live,
+        )
 
-        @install_from.register(str)
-        def _(artifact):
-            self._cluster.install_dcos_from_url(
-                artifact, extra_config, log_output_live
-            )
+    def install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        extra_config: Dict[str, Any] = None,
+        log_output_live: bool = False,
+    ) -> None:
+        """
+        Args:
+            build_artifact: The `Path` to a build artifact to install DC/OS
+                from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
+            log_output_live: If `True`, log output of the installation live.
+                If `True`, stderr is merged into stdout in the return value.
 
-        @install_from.register(Path)
-        def _(artifact):
-            self._cluster.install_dcos_from_path(
-                artifact, extra_config, log_output_live
-            )
-
-        install_from(build_artifact)
+        Raises:
+            NotImplementedError: `NotImplementedError` because it is more
+                efficient for the given backend to use the DC/OS advanced
+                installation method that takes build artifacts by URL string.
+        """
+        self._cluster.install_dcos_from_path(
+            build_artifact,
+            extra_config if extra_config else {},
+            log_output_live,
+        )
 
     def run_integration_tests(
         self,
@@ -225,9 +250,9 @@ class Cluster(ContextDecorator):
             env: Environment variables to be set on the node before running
                 the `pytest_command`. On enterprise
                 clusters, `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW` must be set.
-            log_output_live: If `True`, log output of `pytest_command` live.
-                If `True`, stderr is merged into stdout in the return value.
-        """
+            log_output_live: If `True`, log output of the `pytest_command`
+                live. If `True`, stderr is merged into stdout in the return
+                value.
 
         Returns:
             The result of the ``pytest`` command.

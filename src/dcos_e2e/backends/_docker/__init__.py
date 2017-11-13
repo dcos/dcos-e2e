@@ -130,9 +130,6 @@ class DockerCluster(ClusterManager):
         Raises:
             CalledProcessError: The step to create containers
                 exited with a non-zero code.
-            NotImplementedError: Raised if `build_artifact` is a URL string
-                instead of a `Path` because the Docker backend only supports
-                installation from a local build artifact.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -429,12 +426,42 @@ class DockerCluster(ClusterManager):
                 user=cluster_backend.default_ssh_user
             )
 
-        # Logically a SSH user should be part of a `Node`
+        # Logically a SSH user should be part of a `Node`.
         # However with the DC/OS config there is a notion of a SSH user for
         # an entire DC/OS cluster, which in our case maps to a single SSH user
         # for every cluster created with the corresponding backend. Maybe
-        # we're better off making this a ssh_user of a ClusterManager instead.
+        # we're better off making this a `default_ssh_user` of a
+        # `ClusterManager` instead.
         self._default_ssh_user = cluster_backend.default_ssh_user
+
+    def install_dcos_from_url(
+        self,
+        build_artifact: str,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Args:
+            build_artifact: The URL string to a build artifact to install DC/OS
+                from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
+            log_output_live: If `True`, log output of the installation live.
+                If `True`, stderr is merged into stdout in the return value.
+
+        Raises:
+            NotImplementedError: `NotImplementedError` because the Docker
+                backend does not support the DC/OS advanced installation
+                method.
+        """
+        message = (
+            'The Docker backend does not support the installation of DC/OS '
+            'by build artifacts passed via URL string. This is because a more '
+            'efficient installation method exists that uses a local build '
+            'artifact.'
+        )
+        raise NotImplementedError(message)
 
     def install_dcos_from_path(
         self,
@@ -442,6 +469,16 @@ class DockerCluster(ClusterManager):
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
+        """
+        Args:
+            build_artifact: The `Path` to a build artifact to install DC/OS
+                from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
+            log_output_live: If `True`, log output of the installation live.
+                If `True`, stderr is merged into stdout in the return value.
+        """
 
         ssh_user = self._default_ssh_user
 

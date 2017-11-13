@@ -3,7 +3,7 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Type
+from typing import Any, Dict, Set, Type
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
@@ -119,6 +119,56 @@ class ExistingClusterManager(ClusterManager):
                 'Therefore, `files_to_copy_to_installer` must be empty.'
             )
             raise ValueError(message)
+
+    def install_dcos_from_url(
+        self,
+        build_artifact: str,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Raises:
+            NotImplementedError: Raises `NotImplementedError` because it
+                is assumed that clusters created with the ExistingCluster
+                backend already have an installed instance of DC/OS
+                running on them.
+        """
+        message = (
+            'The ExistingCluster backend does not support the installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
+        )
+        raise NotImplementedError(message)
+
+    def install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Raises:
+            NotImplementedError: Raises `NotImplementedError` because it
+                is assumed that clusters created with the ExistingCluster
+                backend already have an installed instance of DC/OS
+                running on them.
+        """
+        message = (
+            'The ExistingCluster backend does not support the installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
+        )
+        raise NotImplementedError(message)
+
+    def destroy(self) -> None:
+        """
+        Destroy all nodes in the cluster.
+        """
+        message = (
+            'The user is responsible for destroying clusters created with '
+            'the ExistingCluster backend.'
+        )
+        raise NotImplementedError(message)
 
     @property
     def masters(self) -> Set[Node]:

@@ -24,12 +24,12 @@ class TestExistingCluster:
         backend = Docker()
         with Cluster(
             cluster_backend=backend,
-            build_artifact=oss_artifact,
             masters=1,
             agents=1,
             public_agents=1,
             destroy_on_success=False,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             (master, ) = cluster.masters
             (agent, ) = cluster.agents
             (public_agent, ) = cluster.public_agents
@@ -99,11 +99,11 @@ class TestBadParameters:
         """
         with Cluster(
             cluster_backend=Docker(),
-            build_artifact=oss_artifact,
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             yield cluster
 
     @pytest.fixture()
@@ -199,15 +199,17 @@ class TestBadParameters:
 
         assert str(excinfo.value) == expected_error
 
-    def test_extra_config(
+    def test_install_dcos_from_url(
         self,
         dcos_cluster: Cluster,
+        oss_artifact_url: str,
         existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If `extra_config` is not empty, an error is raised.
+        If `install_dcos_from_url` is called on an existing
+        cluster, an error is raised.
         """
-        with pytest.raises(ValueError) as excinfo:
+        with pytest.raises(NotImplementedError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
                 masters=len(dcos_cluster.masters),
@@ -215,18 +217,18 @@ class TestBadParameters:
                 public_agents=len(dcos_cluster.public_agents),
                 destroy_on_error=False,
                 destroy_on_success=False,
-                extra_config={'foo': 'bar'},
-            ):
-                pass  # pragma: no cover
+            ) as cluster:
+                cluster.install_dcos_from_url(oss_artifact_url)
 
         expected_error = (
-            'Nodes are already configured. '
-            'Therefore, `extra_config` must be empty.'
+            'The ExistingCluster backend does not support the installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
         )
 
         assert str(excinfo.value) == expected_error
 
-    def test_installer_file(
+    def test_install_dcos_from_path(
         self,
         dcos_cluster: Cluster,
         oss_artifact: Path,
@@ -235,21 +237,21 @@ class TestBadParameters:
         """
         If an installer file is given, an error is raised.
         """
-        with pytest.raises(ValueError) as excinfo:
+        with pytest.raises(NotImplementedError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                build_artifact=oss_artifact,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
                 destroy_on_error=False,
                 destroy_on_success=False,
-            ):
-                pass  # pragma: no cover
+            ) as cluster:
+                cluster.install_dcos_from_path(oss_artifact)
 
         expected_error = (
-            'Cluster already exists with DC/OS installed. '
-            'Therefore, `build_artifact` must be `None`.'
+            'The ExistingCluster backend does not support the installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
         )
 
         assert str(excinfo.value) == expected_error
@@ -265,7 +267,6 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                build_artifact=None,
                 masters=len(dcos_cluster.masters) + 2,
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
@@ -292,7 +293,6 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                build_artifact=None,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents) + 1,
                 public_agents=len(dcos_cluster.public_agents),
@@ -320,7 +320,6 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                build_artifact=None,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents) + 1,
