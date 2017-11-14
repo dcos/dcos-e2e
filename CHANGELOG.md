@@ -6,6 +6,7 @@
 
 - [Changelog](#changelog)
   - [Next](#next)
+  - [2017.11.14.0](#201711140)
   - [2017.11.02.0](#201711020)
   - [2017.10.04.0](#201710040)
   - [2017.08.11.0](#201708110)
@@ -26,6 +27,8 @@
 # Changelog
 
 ## Next
+
+## 2017.11.14.0
 
 * Backwards incompatible change: Rename `DCOS_Docker` backend to `Docker` backend.
 * Backwards incompatible change: Replace `generate_config_path` with `build_artifact`
