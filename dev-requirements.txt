@@ -7,7 +7,7 @@ mypy==0.550
 passlib==1.7.1
 pydocstyle==2.1.1
 pyenchant==1.6.11
-py==1.4.34
+py==1.5.0
 pylint==1.7.4
 pytest==3.2.3
 pytest-catchlog==1.2.2
