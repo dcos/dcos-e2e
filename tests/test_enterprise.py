@@ -37,7 +37,7 @@ class TestEnterpriseIntegrationTests:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                enterprise_artifact,
+                build_artifact=enterprise_artifact,
                 extra_config=config,
                 log_output_live=True,
             )
@@ -108,7 +108,7 @@ class TestCopyFiles:
             public_agents=0,
         ) as cluster:
             cluster.install_dcos_from_path(
-                enterprise_artifact,
+                build_artifact=enterprise_artifact,
                 extra_config=config,
                 log_output_live=True,
             )
@@ -154,7 +154,7 @@ class TestWaitForDCOS:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                enterprise_artifact,
+                build_artifact=enterprise_artifact,
                 extra_config=config,
                 log_output_live=True,
             )

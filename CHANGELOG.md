@@ -39,6 +39,8 @@ and therefore enables decoupling of transfering files ahead of the installation 
 * Backwards incompatible change: Explicit distinction of installtion methods by providing
 separate methods for `install_dcos_from_path` and `install_dcos_from_url` instead
 of inspecting the type of `build_artifact`.
+* Backwards incompatible change: `log_output_live` is no longer an attribute of the `Cluster`
+class. It may now be passed separately as a parameter for each output-generating operation.
 
 ## 2017.11.02.0
 

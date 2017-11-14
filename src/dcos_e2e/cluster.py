@@ -204,9 +204,9 @@ class Cluster(ContextDecorator):
                 the DC/OS advanced installation method.
         """
         self._cluster.install_dcos_from_url(
-            build_artifact,
-            extra_config if extra_config else {},
-            log_output_live,
+            build_artifact=build_artifact,
+            extra_config=extra_config if extra_config else {},
+            log_output_live=log_output_live,
         )
 
     def install_dcos_from_path(
@@ -231,9 +231,9 @@ class Cluster(ContextDecorator):
                 installation method that takes build artifacts by URL string.
         """
         self._cluster.install_dcos_from_path(
-            build_artifact,
-            extra_config if extra_config else {},
-            log_output_live,
+            build_artifact=build_artifact,
+            extra_config=extra_config if extra_config else {},
+            log_output_live=log_output_live,
         )
 
     def run_integration_tests(

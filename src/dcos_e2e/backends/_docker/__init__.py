@@ -440,11 +440,10 @@ class DockerCluster(ClusterManager):
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
+            extra_config: may contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration of the docker backend.
             log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
 
         Raises:
             NotImplementedError: `NotImplementedError` because the Docker
@@ -454,8 +453,7 @@ class DockerCluster(ClusterManager):
         message = (
             'The Docker backend does not support the installation of DC/OS '
             'by build artifacts passed via URL string. This is because a more '
-            'efficient installation method exists that uses a local build '
-            'artifact.'
+            'efficient installation method exists in `install_dcos_from_path`.'
         )
         raise NotImplementedError(message)
 
@@ -469,11 +467,10 @@ class DockerCluster(ClusterManager):
         Args:
             build_artifact: The `Path` to a build artifact to install DC/OS
                 from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
+            extra_config: may contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration of the docker backend.
             log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
         """
 
         ssh_user = self._default_ssh_user

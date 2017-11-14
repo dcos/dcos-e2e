@@ -93,8 +93,7 @@ class TestUnsupportedInstallationMethods:
         expected_error = (
             'The Docker backend does not support the installation of DC/OS '
             'by build artifacts passed via URL string. This is because a more '
-            'efficient installation method exists that uses a local build '
-            'artifact.'
+            'efficient installation method exists in `install_dcos_from_path`.'
         )
 
         assert str(excinfo.value) == expected_error

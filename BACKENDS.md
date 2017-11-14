@@ -92,5 +92,5 @@ When creating a `Cluster` with this backend, the following parameter conditions 
 
 ### DC/OS Installation
 
-`Cluster`s created by the ExistingCluster backend do not support installing DC/OS.
+`Cluster`s created by the `ExistingCluster` backend do not support installing DC/OS.
 It is assumed that DC/OS is already up and running on the given hosts.

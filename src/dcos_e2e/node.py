@@ -152,7 +152,8 @@ class Node:
         Args:
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
-            user: The name of the user used to send the file over SSH.
+            user: The name of the remote user to send the file via
+                secure copy.
         """
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())

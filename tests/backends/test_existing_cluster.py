@@ -111,8 +111,7 @@ class TestBadParameters:
         self, dcos_cluster: Cluster
     ) -> ClusterBackend:
         """
-        Return an `ExistingCluster` with the nodes from `dcos_cluster`.
-        """
+        Return an `ExistingCluster` with the nodes from `dcos_cluster`. """
         return ExistingCluster(
             masters=dcos_cluster.masters,
             agents=dcos_cluster.agents,
@@ -300,6 +299,19 @@ class TestUnsupportedInstallationMethods:
             cluster.install_dcos_from_path(oss_artifact)
             yield cluster
 
+    @pytest.fixture()
+    def existing_cluster_backend(
+        self, dcos_cluster: Cluster
+    ) -> ClusterBackend:
+        """
+        Return an `ExistingCluster` with the nodes from `dcos_cluster`. """
+        return ExistingCluster(
+            masters=dcos_cluster.masters,
+            agents=dcos_cluster.agents,
+            public_agents=dcos_cluster.public_agents,
+            default_ssh_user=dcos_cluster.default_ssh_user
+        )
+
     def test_install_dcos_from_url(
         self,
         dcos_cluster: Cluster,
@@ -307,8 +319,8 @@ class TestUnsupportedInstallationMethods:
         existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If `install_dcos_from_url` is called on an existing
-        cluster, an error is raised.
+        If `install_dcos_from_url` is called on a `Cluster` created with
+        the `ExistingCluster` backend, a `NotImplementedError` is raised.
         """
         with pytest.raises(NotImplementedError) as excinfo:
             with Cluster(
@@ -322,8 +334,8 @@ class TestUnsupportedInstallationMethods:
                 cluster.install_dcos_from_url(oss_artifact_url)
 
         expected_error = (
-            'The ExistingCluster backend does not support the installing '
-            'DC/OS because it is assumed that an instance of DC/OS is '
+            'The ExistingCluster backend does not support installing DC/OS'
+            'because it is assumed that an instance of DC/OS is '
             'already installed and running on the cluster.'
         )
 
@@ -336,7 +348,8 @@ class TestUnsupportedInstallationMethods:
         existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If an installer file is given, an error is raised.
+        If `install_dcos_from_path` is called on a `Cluster` created with
+        the `ExistingCluster` backend, a `NotImplementedError` is raised.
         """
         with pytest.raises(NotImplementedError) as excinfo:
             with Cluster(

@@ -116,7 +116,8 @@ Configuration variables to add to a base configuration.
 
 ##### `log_output_live`
 
-If set to `True`, the output of the DC/OS installation process will be logged.
+If set to `True`, the output of the DC/OS installation process will be logged live.
+To see these logs in pytest tests, use the -s flag.
 
 #### `install_dcos_from_path(build_artifact, extra_config=None, log_output_live=False)`
 
@@ -134,7 +135,8 @@ Configuration variables to add to a base configuration.
 
 ##### `log_output_live`
 
-If set to `True`, the output of the DC/OS installation process will be logged.
+If set to `True`, the output of the DC/OS installation process will be logged live.
+To see these logs in pytest tests, use the -s flag.
 
 #### `run_integration_tests(pytest_command, env=None, log_output_live=False)`
 
@@ -157,7 +159,8 @@ cluster.run_integration_tests(
 )
 ```
 
-To see the logs in `pytest` tests specify `log_output_live` as `True` and use the `-s` flag in the `pytest_command`.
+If set to `True`, the output of the `pytest_command` will be logged live.
+To see these logs in pytest tests, use the -s flag.
 
 #### `destroy()`
 
@@ -209,7 +212,7 @@ The path to an SSH key which can be used to SSH to the node as the cluster's `de
 
 `user` specifies the user that the given command will be run for over SSH.
 
-If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
+If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged live.
 
 To see these logs in `pytest` tests, use the `-s` flag.
 

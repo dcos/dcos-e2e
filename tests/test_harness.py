@@ -137,24 +137,17 @@ class TestClusterSize:
     Tests for setting the cluster size.
     """
 
-    def test_default(
-        self, cluster_backend: ClusterBackend, oss_artifact: Path
-    ) -> None:
+    def test_default(self, cluster_backend: ClusterBackend) -> None:
         """
         By default, a cluster with one master and one agent and one private
         agent is created.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
             assert len(cluster.masters) == 1
             assert len(cluster.agents) == 1
             assert len(cluster.public_agents) == 1
 
-    def test_custom(
-        self,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
-    ) -> None:
+    def test_custom(self, cluster_backend: ClusterBackend) -> None:
         """
         It is possible to create a cluster with a custom number of nodes.
         """
@@ -172,15 +165,15 @@ class TestClusterSize:
             public_agents=public_agents,
             cluster_backend=cluster_backend,
         ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
             assert len(cluster.masters) == masters
             assert len(cluster.agents) == agents
             assert len(cluster.public_agents) == public_agents
 
 
-class TestClusterLogging:
+class TestInstallDcosFromPath:
     """
-    Tests for logs created by the ``Cluster``.
+    Tests for logs created when calling `install_dcos_from_path` on
+    ``Cluster``.
     """
 
     def _two_masters_error_logged(
@@ -217,10 +210,11 @@ class TestClusterLogging:
         logged live.
         """
         with pytest.raises(CalledProcessError):
+            # It is not possible to install DC/OS with two master nodes.
             with Cluster(
-                masters=2, cluster_backend=cluster_backend
+                masters=2,
+                cluster_backend=cluster_backend,
             ) as cluster:
-                # It is not possible to install DC/OS with two master nodes.
                 cluster.install_dcos_from_path(
                     oss_artifact,
                     log_output_live=True,
@@ -238,11 +232,11 @@ class TestClusterLogging:
         By default, subprocess output is not logged during DC/OS installation.
         """
         with pytest.raises(CalledProcessError):
+            # It is not possible to install DC/OS with two master nodes.
             with Cluster(
                 masters=2,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                # It is not possible to install DC/OS with two master nodes.
                 cluster.install_dcos_from_path(oss_artifact)
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
@@ -260,10 +254,6 @@ class TestMultipleClusters:
     ) -> None:
         """
         It is possible to start two clusters.
-
-        We ignore this test's coverage because it cannot be run on Travis CI.
-        This is because Travis CI has a space limit which is exceeded if we
-        have multiple installer artifacts.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(oss_artifact)

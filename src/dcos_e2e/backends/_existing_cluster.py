@@ -93,22 +93,29 @@ class ExistingClusterManager(ClusterManager):
 
         if masters != len(self._masters):
             message = (
-                'The number of master nodes is `1`. '
-                'Therefore, `masters` must be set to `1`.'
+                'The number of master nodes is {len_masters}. '
+                'Therefore, masters must be set to {num_masters}.'
+            ).format(
+                len_masters=len(self._masters), num_masters=masters
             )
             raise ValueError(message)
 
         if agents != len(self._agents):
             message = (
-                'The number of agent nodes is `1`. '
-                'Therefore, `agents` must be set to `1`.'
+                'The number of agent nodes is {len_agents}. '
+                'Therefore, agents must be set to {num_agents}.'
+            ).format(
+                len_agents=len(self._agents), num_agents=agents
             )
             raise ValueError(message)
 
         if public_agents != len(self._public_agents):
             message = (
-                'The number of public agent nodes is `1`. '
-                'Therefore, `public_agents` must be set to `1`.'
+                'The number of public agent nodes is {len_public_agents}. '
+                'Therefore, public_agents must be set to {num_public_agents}.'
+            ).format(
+                len_public_agents=len(self._public_agents),
+                num_public_agents=public_agents
             )
             raise ValueError(message)
 
@@ -154,7 +161,7 @@ class ExistingClusterManager(ClusterManager):
                 running on them.
         """
         message = (
-            'The ExistingCluster backend does not support the installing '
+            'The ExistingCluster backend does not support installing DC/OS'
             'DC/OS because it is assumed that an instance of DC/OS is '
             'already installed and running on the cluster.'
         )

@@ -45,7 +45,7 @@ class ClusterManager(abc.ABC):
         log_output_live: bool,
     ) -> None:
         """
-        Stub for the DC/OS advanced installation method.
+        Install DC/OS from a build artifact passed as an URL string.
         """
 
     @abc.abstractmethod
@@ -56,7 +56,7 @@ class ClusterManager(abc.ABC):
         log_output_live: bool,
     ) -> None:
         """
-        Stub for a more efficient local DC/OS installation method.
+        Install DC/OS from a build artifact passed as a file system `Path`.
         """
 
     @abc.abstractmethod
