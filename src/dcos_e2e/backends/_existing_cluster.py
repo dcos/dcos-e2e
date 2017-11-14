@@ -11,7 +11,7 @@ from dcos_e2e.node import Node
 
 class ExistingCluster(ClusterBackend):
     """
-    A record of an existing DC/OS cluster.
+    A record of an existing DC/OS cluster backend.
     """
 
     def __init__(
