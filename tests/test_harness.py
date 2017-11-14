@@ -269,7 +269,6 @@ class TestDestroyOnError:
     def test_default_exception_raised(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
     ) -> None:
         """
         By default, if an exception is raised, the cluster is destroyed.
@@ -280,9 +279,7 @@ class TestDestroyOnError:
                 public_agents=0,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(oss_artifact)
                 (master, ) = cluster.masters
-                cluster.wait_for_dcos()
                 raise Exception()
 
         with pytest.raises(CalledProcessError):
@@ -291,7 +288,6 @@ class TestDestroyOnError:
     def test_set_false_exception_raised(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
     ) -> None:
         """
         If `destroy_on_error` is set to `False` and an exception is raised,
@@ -304,9 +300,7 @@ class TestDestroyOnError:
                 destroy_on_error=False,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(oss_artifact)
                 (master, ) = cluster.masters
-                cluster.wait_for_dcos()
                 raise Exception()
         # No exception is raised. The node still exists.
         master.run(
@@ -325,7 +319,6 @@ class TestDestroyOnSuccess:
     def test_default(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
     ) -> None:
         """
         By default the cluster is destroyed if there is no exception raised.
@@ -335,8 +328,6 @@ class TestDestroyOnSuccess:
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
-            cluster.wait_for_dcos()
             (master, ) = cluster.masters
 
         with pytest.raises(CalledProcessError):
@@ -345,7 +336,6 @@ class TestDestroyOnSuccess:
     def test_false(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
     ) -> None:
         """
         If `destroy_on_success` is set to `False`, the cluster is
@@ -357,8 +347,6 @@ class TestDestroyOnSuccess:
             cluster_backend=cluster_backend,
             destroy_on_success=False,
         ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
-            cluster.wait_for_dcos()
             (master, ) = cluster.masters
 
         master.run(args=['echo', 'hello'], user=cluster.default_ssh_user)
