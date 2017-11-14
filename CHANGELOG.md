@@ -26,12 +26,10 @@
 
 # Changelog
 
-## Next Again
+## Next
 
 * Remove `destroy_on_error` and `destroy_on_success` from `Cluster`.
   Instead, avoid using `Cluster` as a context manager to keep the cluster alive.
-
-## Next
 
 ## 2017.11.14.0
 

@@ -13,8 +13,6 @@
     - [`agents`](#agents)
     - [`public_agents`](#public_agents)
     - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
-    - [`destroy_on_error`](#destroy_on_error)
-    - [`destroy_on_success`](#destroy_on_success)
   - [Methods](#methods)
     - [`install_dcos_from_url(build_artifact, extra_config=None, log_output_live=False)`](#install_dcos_from_urlbuild_artifact-extra_confignone-log_output_livefalse)
       - [`build_artifact`](#build_artifact)

@@ -77,6 +77,7 @@ This is a backend which can be used to run a `Cluster`.
 It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s and a `default_ssh_user` that can `run` commands on those `Node`s.
 This means that it cannot support various operations which rely on access to the start up and teardown mechanisms of a cluster.
 As such, various `Cluster` parameters must be set in particular ways.
+Also, the cluster is not destroyed when exiting the context manager.
 
 ```python
 ExistingCluster(masters, agents, public_agents, default_ssh_user)
@@ -86,6 +87,7 @@ When creating a `Cluster` with this backend, the following parameter conditions 
 * `masters` matches the number of master nodes in the existing cluster,
 * `agents` matches the number of agent nodes in the existing cluster,
 * `public_agents` matches the number of public agent nodes in the existing cluster,
+* `files_to_copy_to_installer` must be `None` or `{}`,
 
 ### DC/OS Installation
 
