@@ -274,9 +274,6 @@ class Cluster(ContextDecorator):
         """
         Destroy all nodes in the cluster.
         """
-        if not self._supports_destruction:
-            raise NotImplementedError()
-
         self._cluster.destroy()
 
     def __exit__(
