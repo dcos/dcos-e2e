@@ -27,7 +27,6 @@ class TestExistingCluster:
             masters=1,
             agents=1,
             public_agents=1,
-            destroy_on_success=False,
         ) as cluster:
             cluster.install_dcos_from_path(oss_artifact)
             (master, ) = cluster.masters
@@ -46,8 +45,6 @@ class TestExistingCluster:
                 masters=len(cluster.masters),
                 agents=len(cluster.agents),
                 public_agents=len(cluster.public_agents),
-                destroy_on_success=False,
-                destroy_on_error=False,
             ) as duplicate_cluster:
                 (duplicate_master, ) = duplicate_cluster.masters
                 (duplicate_agent, ) = duplicate_cluster.agents
@@ -119,58 +116,6 @@ class TestBadParameters:
             default_ssh_user=dcos_cluster.default_ssh_user
         )
 
-    def test_destroy_on_error(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If `destroy_on_error` is set to `True` an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=True,
-                destroy_on_success=False,
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'The given cluster backend does not support being destroyed.'
-            ' Therefore, `destroy_on_error` must be set to `False`.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
-    def test_destroy_on_success(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If `destroy_on_success` is set to `True` an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=True,
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'The given cluster backend does not support being destroyed.'
-            ' Therefore, `destroy_on_success` must be set to `False`.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
     def test_files_to_copy_to_installer(
         self,
         dcos_cluster: Cluster,
@@ -185,8 +130,6 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
                 files_to_copy_to_installer={Path('/foo'): Path('/bar')},
             ):
                 pass  # pragma: no cover
@@ -212,8 +155,6 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters) + 2,
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
             ):
                 pass  # pragma: no cover
 
@@ -238,8 +179,6 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents) + 1,
                 public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
             ):
                 pass  # pragma: no cover
 
@@ -265,8 +204,6 @@ class TestBadParameters:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents) + 1,
-                destroy_on_error=False,
-                destroy_on_success=False,
             ):
                 pass  # pragma: no cover
 
@@ -328,8 +265,6 @@ class TestUnsupportedInstallationMethods:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
             ) as cluster:
                 cluster.install_dcos_from_url(oss_artifact_url)
 
@@ -357,8 +292,6 @@ class TestUnsupportedInstallationMethods:
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
             ) as cluster:
                 cluster.install_dcos_from_path(oss_artifact)
 
