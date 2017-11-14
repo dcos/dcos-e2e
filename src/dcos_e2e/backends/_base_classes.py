@@ -46,6 +46,14 @@ class ClusterManager(abc.ABC):
     ) -> None:
         """
         Install DC/OS from a build artifact passed as an URL string.
+
+        Args:
+            build_artifact: The URL string to a build artifact to install DC/OS
+                from.
+            extra_config: This may contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration for a particular backend.
+            log_output_live: If `True`, log output of the installation live.
         """
 
     @abc.abstractmethod
@@ -57,6 +65,14 @@ class ClusterManager(abc.ABC):
     ) -> None:
         """
         Install DC/OS from a build artifact passed as a file system `Path`.
+
+        Args:
+            build_artifact: The `Path` to a build artifact to install DC/OS
+                from.
+            extra_config: May contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration for a particular backend.
+            log_output_live: If `True`, log output of the installation live.
         """
 
     @abc.abstractmethod

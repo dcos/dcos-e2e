@@ -28,12 +28,12 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
-        masters: int = 1,
-        agents: int = 1,
-        public_agents: int = 1,
-        destroy_on_error: bool = True,
-        destroy_on_success: bool = True,
-        files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
+        masters: int=1,
+        agents: int=1,
+        public_agents: int=1,
+        destroy_on_error: bool=True,
+        destroy_on_success: bool=True,
+        files_to_copy_to_installer: Optional[Dict[Path, Path]]=None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -92,7 +92,7 @@ class Cluster(ContextDecorator):
     )
     def wait_for_dcos(
         self,
-        log_output_live: bool = False,
+        log_output_live: bool=False,
     ) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
@@ -185,8 +185,8 @@ class Cluster(ContextDecorator):
     def install_dcos_from_url(
         self,
         build_artifact: str,
-        extra_config: Dict[str, Any] = None,
-        log_output_live: bool = False,
+        extra_config: Dict[str, Any]=None,
+        log_output_live: bool=False,
     ) -> None:
         """
         Args:
@@ -212,8 +212,8 @@ class Cluster(ContextDecorator):
     def install_dcos_from_path(
         self,
         build_artifact: Path,
-        extra_config: Dict[str, Any] = None,
-        log_output_live: bool = False,
+        extra_config: Dict[str, Any]=None,
+        log_output_live: bool=False,
     ) -> None:
         """
         Args:
@@ -239,8 +239,8 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
-        env: Optional[Dict] = None,
-        log_output_live: bool = False,
+        env: Optional[Dict]=None,
+        log_output_live: bool=False,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.

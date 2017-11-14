@@ -94,29 +94,22 @@ class ExistingClusterManager(ClusterManager):
         if masters != len(self._masters):
             message = (
                 'The number of master nodes is {len_masters}. '
-                'Therefore, masters must be set to {num_masters}.'
-            ).format(
-                len_masters=len(self._masters), num_masters=masters
-            )
+                'Therefore, masters must be set to {len_masters}.'
+            ).format(len_masters=len(self._masters))
             raise ValueError(message)
 
         if agents != len(self._agents):
             message = (
                 'The number of agent nodes is {len_agents}. '
-                'Therefore, agents must be set to {num_agents}.'
-            ).format(
-                len_agents=len(self._agents), num_agents=agents
-            )
+                'Therefore, agents must be set to {len_agents}.'
+            ).format(len_agents=len(self._agents))
             raise ValueError(message)
 
         if public_agents != len(self._public_agents):
             message = (
                 'The number of public agent nodes is {len_public_agents}. '
-                'Therefore, public_agents must be set to {num_public_agents}.'
-            ).format(
-                len_public_agents=len(self._public_agents),
-                num_public_agents=public_agents
-            )
+                'Therefore, public_agents must be set to {len_public_agents}.'
+            ).format(len_public_agents=len(self._public_agents))
             raise ValueError(message)
 
         if files_to_copy_to_installer != {}:

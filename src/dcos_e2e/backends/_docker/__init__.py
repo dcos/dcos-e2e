@@ -44,8 +44,8 @@ class Docker(ClusterBackend):
 
     def __init__(
         self,
-        workspace_dir: Optional[Path] = None,
-        custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        workspace_dir: Optional[Path]=None,
+        custom_master_mounts: Optional[Dict[str, Dict[str, str]]]=None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -440,9 +440,9 @@ class DockerCluster(ClusterManager):
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: may contain extra installation configuration
+            extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
-                configuration of the docker backend.
+                configuration of the Docker backend.
             log_output_live: If `True`, log output of the installation live.
 
         Raises:
@@ -467,9 +467,9 @@ class DockerCluster(ClusterManager):
         Args:
             build_artifact: The `Path` to a build artifact to install DC/OS
                 from.
-            extra_config: may contain extra installation configuration
+            extra_config: May contain extra installation configuration
                 variables that are applied on top of the default DC/OS
-                configuration of the docker backend.
+                configuration of the Docker backend.
             log_output_live: If `True`, log output of the installation live.
         """
 

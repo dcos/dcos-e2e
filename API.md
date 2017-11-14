@@ -100,11 +100,9 @@ If set to `True`, the cluster is destroyed on exit if there is no exception rais
 
 #### `install_dcos_from_url(build_artifact, extra_config=None, log_output_live=False)`
 
-Installs DC/OS on the given cluster using the DC/OS advanced installation method if supported
-by the backend. This method spins up a persistent bootstrap host that supplies all
-dedicated DC/OS hosts with the necessary installation files. Since the bootstrap host is different
-from the host initating the cluster creation passing the `build_artifact` via URL string
-saves the time of copying the `build_artifact` to the boostrap host.
+Installs DC/OS on the given cluster using the DC/OS advanced installation method if supported by the backend.
+This method spins up a persistent bootstrap host that supplies all dedicated DC/OS hosts with the necessary installation files.
+Since the bootstrap host is different from the host initating the cluster creation passing the `build_artifact` via URL string saves the time of copying the `build_artifact` to the boostrap host.
 
 ##### `build_artifact`
 
@@ -117,13 +115,12 @@ Configuration variables to add to a base configuration.
 ##### `log_output_live`
 
 If set to `True`, the output of the DC/OS installation process will be logged live.
-To see these logs in pytest tests, use the -s flag.
+To see these logs in pytest tests, use the `-s` flag.
 
 #### `install_dcos_from_path(build_artifact, extra_config=None, log_output_live=False)`
 
-Installs DC/OS on the given cluster using an alternative installation method that uses
-a `build_artifact` stored on the local filesystem. If supported by a given backend,
-this method is more efficient than the advanced installation method.
+Installs DC/OS on the given cluster using an alternative installation method that uses a `build_artifact` stored on the local filesystem.
+If supported by a given backend, this method is more efficient than the advanced installation method.
 
 ##### `build_artifact`
 
@@ -136,7 +133,7 @@ Configuration variables to add to a base configuration.
 ##### `log_output_live`
 
 If set to `True`, the output of the DC/OS installation process will be logged live.
-To see these logs in pytest tests, use the -s flag.
+To see these logs in pytest tests, use the `-s` flag.
 
 #### `run_integration_tests(pytest_command, env=None, log_output_live=False)`
 
@@ -160,7 +157,7 @@ cluster.run_integration_tests(
 ```
 
 If set to `True`, the output of the `pytest_command` will be logged live.
-To see these logs in pytest tests, use the -s flag.
+To see these logs in pytest tests, use the `-s` flag.
 
 #### `destroy()`
 

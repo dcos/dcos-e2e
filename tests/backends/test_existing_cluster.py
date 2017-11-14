@@ -218,9 +218,9 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'The number of master nodes is `1`. '
-            'Therefore, `masters` must be set to `1`.'
-        )
+            'The number of master nodes is {len_masters}. '
+            'Therefore, masters must be set to {len_masters}.'
+        ).format(len_masters=len(dcos_cluster.masters))
 
         assert str(excinfo.value) == expected_error
 
@@ -244,9 +244,9 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'The number of agent nodes is `1`. '
-            'Therefore, `agents` must be set to `1`.'
-        )
+            'The number of agent nodes is {len_agents}. '
+            'Therefore, agents must be set to {len_agents}.'
+        ).format(len_agents=len(dcos_cluster.agents))
 
         assert str(excinfo.value) == expected_error
 
@@ -271,9 +271,9 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'The number of public agent nodes is `1`. '
-            'Therefore, `public_agents` must be set to `1`.'
-        )
+            'The number of public agent nodes is {len_public_agents}. '
+            'Therefore, public_agents must be set to {len_public_agents}.'
+        ).format(len_public_agents=len(dcos_cluster.public_agents))
 
         assert str(excinfo.value) == expected_error
 
