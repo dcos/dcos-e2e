@@ -46,8 +46,6 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
-        self._supports_destruction = cluster_backend.supports_destruction
-
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
@@ -283,8 +281,12 @@ class Cluster(ContextDecorator):
         traceback: Any,
     ) -> bool:
         """
-        On exiting, destroy all nodes in the cluster.
+        On exiting, destroy all nodes in the cluster if the backend supports
+        it.
         """
-        if self._supports_destruction:
+        try:
             self.destroy()
+        except NotImplementedError:
+            pass
+
         return False

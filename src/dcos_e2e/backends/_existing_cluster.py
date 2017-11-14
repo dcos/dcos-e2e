@@ -39,13 +39,6 @@ class ExistingCluster(ClusterBackend):
         return ExistingClusterManager
 
     @property
-    def supports_destruction(self) -> bool:
-        """
-        Destroying an existing cluster is the responsibility of the caller.
-        """
-        return False
-
-    @property
     def default_ssh_user(self) -> str:
         """
         Return the default SSH user for this backend.

@@ -118,14 +118,6 @@ class ClusterBackend(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def supports_destruction(self) -> bool:
-        """
-        Return whether this backend supports being destroyed with a `destroy`
-        method.
-        """
-
-    @property
-    @abc.abstractmethod
     def default_ssh_user(self) -> str:
         """
         Return the default SSH user as a string.
