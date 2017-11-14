@@ -141,7 +141,7 @@ class ExistingClusterManager(ClusterManager):
                 running on them.
         """
         message = (
-            'The ExistingCluster backend does not support the installing '
+            'The ExistingCluster backend does not support installing '
             'DC/OS because it is assumed that an instance of DC/OS is '
             'already installed and running on the cluster.'
         )
@@ -161,7 +161,7 @@ class ExistingClusterManager(ClusterManager):
                 running on them.
         """
         message = (
-            'The ExistingCluster backend does not support installing DC/OS'
+            'The ExistingCluster backend does not support installing '
             'DC/OS because it is assumed that an instance of DC/OS is '
             'already installed and running on the cluster.'
         )

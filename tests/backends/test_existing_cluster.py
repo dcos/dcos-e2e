@@ -334,8 +334,8 @@ class TestUnsupportedInstallationMethods:
                 cluster.install_dcos_from_url(oss_artifact_url)
 
         expected_error = (
-            'The ExistingCluster backend does not support installing DC/OS'
-            'because it is assumed that an instance of DC/OS is '
+            'The ExistingCluster backend does not support installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
             'already installed and running on the cluster.'
         )
 
@@ -363,7 +363,7 @@ class TestUnsupportedInstallationMethods:
                 cluster.install_dcos_from_path(oss_artifact)
 
         expected_error = (
-            'The ExistingCluster backend does not support the installing '
+            'The ExistingCluster backend does not support installing '
             'DC/OS because it is assumed that an instance of DC/OS is '
             'already installed and running on the cluster.'
         )
