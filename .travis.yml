@@ -22,15 +22,11 @@ env:
       - "TEST_PATTERN=tests/test_harness.py::TestIntegrationTests::test_run_pytest"
       - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_extend_config"
       - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_default_config"
-      # This test class does not need to install DC/OS anymore so we run it on one builder.
+      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
       - "TEST_PATTERN=tests/test_harness.py::TestClusterSize"
       - "TEST_PATTERN=tests/test_harness.py::TestInstallDcosFromPath::test_live_logging"
       - "TEST_PATTERN=tests/test_harness.py::TestInstallDcosFromPath::test_no_live_logging"
       - "TEST_PATTERN=tests/test_harness.py::TestMultipleClusters::test_two_clusters"
-      # This test class does not need to install DC/OS anymore so we run it on one builder.
-      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnError"
-      # This test class does not need to install DC/OS anymore so we run it on one builder.
-      - "TEST_PATTERN=tests/test_harness.py::TestDestroyOnSuccess"
       - "TEST_PATTERN=tests/backends/test_docker.py::TestCustomMasterMounts::test_custom_master_mounts"
       # This test class uses one scoped cluster so we run it on one builder.
       - "TEST_PATTERN=tests/backends/test_docker.py::TestUnsupportedInstallationMethods"

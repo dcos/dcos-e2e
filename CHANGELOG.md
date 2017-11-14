@@ -25,6 +25,11 @@
 
 # Changelog
 
+## Next Again
+
+* Remove `destroy_on_error` and `destroy_on_success` from `Cluster`.
+  Instead, avoid using `Cluster` as a context manager to keep the cluster alive.
+
 ## Next
 
 * Backwards incompatible change: Rename `DCOS_Docker` backend to `Docker` backend.

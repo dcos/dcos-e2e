@@ -31,8 +31,6 @@ class Cluster(ContextDecorator):
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        destroy_on_error: bool = True,
-        destroy_on_success: bool = True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
     ) -> None:
         """
@@ -43,35 +41,12 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            destroy_on_error: If `False`, the cluster will not be destroyed
-                if there is an exception raised in the context of this object.
-            destroy_on_success: If `False`, the cluster will not be destroyed
-                if there is no exception raised in the context of this object.
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-
-        Raises:
-            ValueError: `destroy_on_error` or `destroy_on_success` is `True`
-                and the `cluster_backend` does not support being destroyed.
         """
-        if destroy_on_error and not cluster_backend.supports_destruction:
-            message = (
-                'The given cluster backend does not support being destroyed.'
-                ' Therefore, `destroy_on_error` must be set to `False`.'
-            )
-            raise ValueError(message)
-
-        if destroy_on_success and not cluster_backend.supports_destruction:
-            message = (
-                'The given cluster backend does not support being destroyed.'
-                ' Therefore, `destroy_on_success` must be set to `False`.'
-            )
-            raise ValueError(message)
-
         self._default_ssh_user = cluster_backend.default_ssh_user
-        self._destroy_on_error = destroy_on_error
-        self._destroy_on_success = destroy_on_success
+        self._supports_destruction = cluster_backend.supports_destruction
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
@@ -299,6 +274,9 @@ class Cluster(ContextDecorator):
         """
         Destroy all nodes in the cluster.
         """
+        if not self._supports_destruction:
+            raise NotImplementedError()
+
         self._cluster.destroy()
 
     def __exit__(
@@ -310,10 +288,6 @@ class Cluster(ContextDecorator):
         """
         On exiting, destroy all nodes in the cluster.
         """
-        if exc_type is None and self._destroy_on_success:
+        if self._supports_destruction:
             self.destroy()
-
-        if exc_type is not None and self._destroy_on_error:
-            self.destroy()
-
         return False

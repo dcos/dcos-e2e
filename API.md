@@ -56,8 +56,6 @@ Cluster(
     masters=1,
     agents=1,
     public_agents=1,
-    destroy_on_error=True,
-    destroy_on_success=True,
     files_to_copy_to_installer=None,
 )
 ```
@@ -87,14 +85,6 @@ The number of public agent nodes.
 
 A mapping of host paths to paths on the installer node.
 These are files to copy from the host to the installer node before installing DC/OS.
-
-#### `destroy_on_error`
-
-If set to `True`, the cluster is destroyed on exit if there is an exception raised in the context of the context manager.
-
-#### `destroy_on_success`
-
-If set to `True`, the cluster is destroyed on exit if there is no exception raised in the context of the context manager.
 
 ### Methods
 

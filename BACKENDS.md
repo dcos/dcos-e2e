@@ -86,9 +86,6 @@ When creating a `Cluster` with this backend, the following parameter conditions 
 * `masters` matches the number of master nodes in the existing cluster,
 * `agents` matches the number of agent nodes in the existing cluster,
 * `public_agents` matches the number of public agent nodes in the existing cluster,
-* `destroy_on_error` must be `False`,
-* `destroy_on_success` must be `False`,
-* `files_to_copy_to_installer` must be `None` or `{}`,
 
 ### DC/OS Installation
 
