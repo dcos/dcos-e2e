@@ -4,6 +4,7 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
+from typing import Iterator
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
@@ -41,11 +42,11 @@ class TestCustomMasterMounts:
 
         with Cluster(
             cluster_backend=backend,
-            build_artifact=oss_artifact,
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             (master, ) = cluster.masters
             args = ['cat', str(master_path)]
             result = master.run(args=args, user=cluster.default_ssh_user)
@@ -57,53 +58,42 @@ class TestCustomMasterMounts:
             assert result.stdout.decode() == new_content
 
 
-class TestBadParameters:
+class TestUnsupportedInstallationMethods:
     """
-    Tests for bad parameters passed to Docker clusters.
+    Tests for unsupported installation methods on Docker clusters.
     """
 
-    def test_no_build_artifact(self, tmpdir: local) -> None:
+    @pytest.fixture(scope='module')
+    def dcos_cluster(self) -> Iterator[Cluster]:
+        """
+        Return a `Cluster`.
+
+        This is module scoped as we do not intend to modify the cluster.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            yield cluster
+
+    def test_install_dcos_from_url(
+        self,
+        dcos_cluster: Cluster,
+        oss_artifact_url: str,
+    ) -> None:
         """
         The Docker backend requires a build artifact in order
         to launch a DC/OS cluster.
         """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=Docker(workspace_dir=tmpdir),
-                build_artifact=None,
-                masters=1,
-                agents=0,
-                public_agents=0,
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'The Docker backend only supports creating new clusters. '
-            'build_artifact must be a path to a build artifact.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
-    def test_url_given_artifact(
-        self, tmpdir: local, oss_artifact_url: str
-    ) -> None:
-        """
-        If the given build artifact is not a `Path`
-        the Docker backend will raise a `NotImplementedError`.
-        """
         with pytest.raises(NotImplementedError) as excinfo:
-            with Cluster(
-                cluster_backend=Docker(workspace_dir=tmpdir),
-                build_artifact=oss_artifact_url,
-                masters=1,
-                agents=0,
-                public_agents=0,
-            ):
-                pass  # pragma: no cover
+            dcos_cluster.install_dcos_from_url(oss_artifact_url)
 
         expected_error = (
-            'The Docker backend only supports creating clusters from '
-            'build artifacts specified by path.'
+            'The Docker backend does not support the installation of DC/OS '
+            'by build artifacts passed via URL string. This is because a more '
+            'efficient installation method exists in `install_dcos_from_path`.'
         )
 
         assert str(excinfo.value) == expected_error

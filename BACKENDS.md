@@ -14,10 +14,12 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
     - [`master_mounts`](#master_mounts)
+  - [DC/OS Installation](#dcos-installation)
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
     - [macOS File Sharing](#macos-file-sharing)
 - [`dcos_e2e.backend.ExistingCluster`](#dcos_e2ebackendexistingcluster)
+  - [DC/OS Installation](#dcos-installation-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
@@ -42,9 +44,9 @@ This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/li
 Mounts to add to master node containers.
 See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
 
+### DC/OS Installation
 
-When creating a `Cluster` with this backend, the following parameter conditions must be true:
-* `build_artifact` must be of type `pathlib.Path`
+`Cluster`s created by the Docker backend only support installing DC/OS via `install_dcos_from_path`.
 
 ### Troubleshooting
 
@@ -74,7 +76,6 @@ See Docker > Preferences > File Sharing.
 This is a backend which can be used to run a `Cluster`.
 It is unusual because it does not provision a cluster, but it instead takes `set`s of `dcos_e2e.node.Node`s and a `default_ssh_user` that can `run` commands on those `Node`s.
 This means that it cannot support various operations which rely on access to the start up and teardown mechanisms of a cluster.
-
 As such, various `Cluster` parameters must be set in particular ways.
 
 ```python
@@ -82,11 +83,14 @@ ExistingCluster(masters, agents, public_agents, default_ssh_user)
 ```
 
 When creating a `Cluster` with this backend, the following parameter conditions must be true:
-* `build_artifact` must be `None`,
-* `extra_config` must be `None` or `{}`,
 * `masters` matches the number of master nodes in the existing cluster,
 * `agents` matches the number of agent nodes in the existing cluster,
 * `public_agents` matches the number of public agent nodes in the existing cluster,
 * `destroy_on_error` must be `False`,
 * `destroy_on_success` must be `False`,
 * `files_to_copy_to_installer` must be `None` or `{}`,
+
+### DC/OS Installation
+
+`Cluster`s created by the `ExistingCluster` backend do not support installing DC/OS.
+It is assumed that DC/OS is already up and running on the given hosts.

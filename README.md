@@ -50,10 +50,12 @@ class TestExample:
 
     def test_example(self):
         with Cluster(
-            extra_config={'check_time': True},
             cluster_backend=Docker(),
-            build_artifact=Path('/tmp/dcos_generate_config.sh'),
         ) as cluster:
+            cluster.install_dcos_from_path(
+                build_artifact=Path('/tmp/dcos_generate_config.sh'),
+                extra_config={'check_time': True},
+            )
             (master, ) = cluster.masters
             result = master.run(args=['test', '-f', path],
                                 user=cluster.default_ssh_user)

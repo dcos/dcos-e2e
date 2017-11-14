@@ -140,15 +140,21 @@ class Node:
         ssh_args = self._compose_ssh_command(args=args, user=user, env=env)
         return Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
 
-    def send_file(self, local_path: Path, remote_path: Path) -> None:
+    def send_file(
+        self,
+        local_path: Path,
+        remote_path: Path,
+        user: str,
+    ) -> None:
         """
         Copy a file to this node.
 
         Args:
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
+            user: The name of the remote user to send the file via
+                secure copy.
         """
-        user = 'root'
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(

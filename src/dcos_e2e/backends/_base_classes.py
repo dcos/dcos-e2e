@@ -4,7 +4,7 @@ Abstract base classes.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Type, Union
+from typing import Any, Dict, Set, Type
 
 from ..node import Node
 
@@ -17,12 +17,9 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def __init__(
         self,
-        build_artifact: Optional[Union[str, Path]],
         masters: int,
         agents: int,
         public_agents: int,
-        extra_config: Dict[str, Any],
-        log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
     ) -> None:
@@ -30,21 +27,52 @@ class ClusterManager(abc.ABC):
         Create a DC/OS cluster with the given `cluster_backend`.
 
         Args:
-            build_artifact: The `Path` or URL string to a build artifact
-                of DC/OS to install from.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
-            log_output_live: If `True`, log output of subprocesses live.
-                If `True`, stderr is merged into stdout in the return value.
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
+        """
+
+    @abc.abstractmethod
+    def install_dcos_from_url(
+        self,
+        build_artifact: str,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Install DC/OS from a build artifact passed as an URL string.
+
+        Args:
+            build_artifact: The URL string to a build artifact to install DC/OS
+                from.
+            extra_config: This may contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration for a particular backend.
+            log_output_live: If `True`, log output of the installation live.
+        """
+
+    @abc.abstractmethod
+    def install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Install DC/OS from a build artifact passed as a file system `Path`.
+
+        Args:
+            build_artifact: The `Path` to a build artifact to install DC/OS
+                from.
+            extra_config: May contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration for a particular backend.
+            log_output_live: If `True`, log output of the installation live.
         """
 
     @abc.abstractmethod

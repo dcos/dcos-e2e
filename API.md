@@ -9,17 +9,22 @@
 - [`dcos_e2e.cluster.Cluster`](#dcos_e2eclustercluster)
   - [Parameters](#parameters)
     - [`cluster_backend`](#cluster_backend)
-    - [`build_artifact`](#build_artifact)
-    - [`extra_config`](#extra_config)
     - [`masters`](#masters)
     - [`agents`](#agents)
     - [`public_agents`](#public_agents)
-    - [`log_output_live`](#log_output_live)
     - [`files_to_copy_to_installer`](#files_to_copy_to_installer)
     - [`destroy_on_error`](#destroy_on_error)
     - [`destroy_on_success`](#destroy_on_success)
   - [Methods](#methods)
-    - [`run_integration_tests(pytest_command, env=None)`](#run_integration_testspytest_command-envnone)
+    - [`install_dcos_from_url(build_artifact, extra_config=None, log_output_live=False)`](#install_dcos_from_urlbuild_artifact-extra_confignone-log_output_livefalse)
+      - [`build_artifact`](#build_artifact)
+      - [`extra_config`](#extra_config)
+      - [`log_output_live`](#log_output_live)
+    - [`install_dcos_from_path(build_artifact, extra_config=None, log_output_live=False)`](#install_dcos_from_pathbuild_artifact-extra_confignone-log_output_livefalse)
+      - [`build_artifact`](#build_artifact-1)
+      - [`extra_config`](#extra_config-1)
+      - [`log_output_live`](#log_output_live-1)
+    - [`run_integration_tests(pytest_command, env=None, log_output_live=False)`](#run_integration_testspytest_command-envnone-log_output_livefalse)
     - [`destroy()`](#destroy)
     - [`wait_for_dcos()`](#wait_for_dcos)
   - [Attributes](#attributes)
@@ -34,7 +39,7 @@
   - [Methods](#methods-1)
     - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
     - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
-    - [`node.send_file(local_path, remote_path) -> None`](#nodesend_filelocal_path-remote_path---none)
+    - [`node.send_file(local_path, remote_path, user) -> None`](#nodesend_filelocal_path-remote_path-user---none)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address-1)
 
@@ -48,12 +53,9 @@
 ```python
 Cluster(
     cluster_backend,
-    build_artifact=None,
-    extra_config=None,
     masters=1,
     agents=1,
     public_agents=1,
-    log_output_live=False,
     destroy_on_error=True,
     destroy_on_success=True,
     files_to_copy_to_installer=None,
@@ -69,14 +71,6 @@ This is a context manager which spins up a cluster.
 The backend to use for the cluster.
 See [`BACKENDS.md`](./BACKENDS.md) for details.
 
-#### `build_artifact`
-
-The HTTP(S) URL string or `pathlib.Path` to a build artifact to install.
-
-#### `extra_config`
-
-Configuration variables to add to a base configuration.
-
 #### `masters`
 
 The number of master nodes.
@@ -88,12 +82,6 @@ The number of agent nodes.
 #### `public_agents`
 
 The number of public agent nodes.
-
-#### `log_output_live`
-
-If set to `True`, the output of processes run on the host to create and manage clusters will be logged.
-
-To see these logs in `pytest` tests, use the `-s` flag.
 
 #### `files_to_copy_to_installer`
 
@@ -110,7 +98,44 @@ If set to `True`, the cluster is destroyed on exit if there is no exception rais
 
 ### Methods
 
-#### `run_integration_tests(pytest_command, env=None)`
+#### `install_dcos_from_url(build_artifact, extra_config=None, log_output_live=False)`
+
+Installs DC/OS on the given cluster using the DC/OS advanced installation method if supported by the backend.
+This method spins up a persistent bootstrap host that supplies all dedicated DC/OS hosts with the necessary installation files.
+Since the bootstrap host is different from the host initating the cluster creation passing the `build_artifact` via URL string saves the time of copying the `build_artifact` to the boostrap host.
+
+##### `build_artifact`
+
+The HTTP(S) URL string to a build artifact to install.
+
+##### `extra_config`
+
+Configuration variables to add to a base configuration.
+
+##### `log_output_live`
+
+If set to `True`, the output of the DC/OS installation process will be logged live.
+To see these logs in pytest tests, use the `-s` flag.
+
+#### `install_dcos_from_path(build_artifact, extra_config=None, log_output_live=False)`
+
+Installs DC/OS on the given cluster using an alternative installation method that uses a `build_artifact` stored on the local filesystem.
+If supported by a given backend, this method is more efficient than the advanced installation method.
+
+##### `build_artifact`
+
+The `pathlib.Path` to a build artifact to install.
+
+##### `extra_config`
+
+Configuration variables to add to a base configuration.
+
+##### `log_output_live`
+
+If set to `True`, the output of the DC/OS installation process will be logged live.
+To see these logs in pytest tests, use the `-s` flag.
+
+#### `run_integration_tests(pytest_command, env=None, log_output_live=False)`
 
 Run integration tests on the cluster.
 
@@ -130,6 +155,9 @@ cluster.run_integration_tests(
     env=environment_variables,
 )
 ```
+
+If set to `True`, the output of the `pytest_command` will be logged live.
+To see these logs in pytest tests, use the `-s` flag.
 
 #### `destroy()`
 
@@ -181,7 +209,7 @@ The path to an SSH key which can be used to SSH to the node as the cluster's `de
 
 `user` specifies the user that the given command will be run for over SSH.
 
-If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged.
+If `log_output_live` is set to `True`, the output of processes run on the host to create and manage clusters will be logged live.
 
 To see these logs in `pytest` tests, use the `-s` flag.
 
@@ -197,9 +225,9 @@ These environment variables will be set on the node before running the command s
 
 The method returns a `Popen` object that can be used to communicate to the underlying subprocess.
 
-#### `node.send_file(local_path, remote_path) -> None`
+#### `node.send_file(local_path, remote_path, user) -> None`
 
-Copy a file to the node.
+Copy a file to the node via SSH as the given user.
 
 ### Attributes
 

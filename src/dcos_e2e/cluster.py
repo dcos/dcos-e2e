@@ -6,7 +6,7 @@ import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
 from time import sleep
-from typing import Any, Dict, Iterable, List, Optional, Set, Union
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 import requests
 from requests import codes
@@ -28,12 +28,9 @@ class Cluster(ContextDecorator):
     def __init__(
         self,
         cluster_backend: ClusterBackend,
-        build_artifact: Union[str, Path] = None,
-        extra_config: Optional[Dict[str, Any]] = None,
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        log_output_live: bool = False,
         destroy_on_error: bool = True,
         destroy_on_success: bool = True,
         files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
@@ -43,16 +40,9 @@ class Cluster(ContextDecorator):
 
         Args:
             cluster_backend: The backend to use for the cluster.
-            build_artifact: The `Path` or URL string to a build artifact
-                to install from. Supported ways of supplying the build
-                artifact may vary between backend implementations.
-            extra_config: This dictionary can contain extra installation
-                configuration variables to add to base configurations.
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            log_output_live: If `True`, log output of subprocesses live.
-                If `True`, stderr is merged into stdout in the return value.
             destroy_on_error: If `False`, the cluster will not be destroyed
                 if there is an exception raised in the context of this object.
             destroy_on_success: If `False`, the cluster will not be destroyed
@@ -82,18 +72,13 @@ class Cluster(ContextDecorator):
         self._default_ssh_user = cluster_backend.default_ssh_user
         self._destroy_on_error = destroy_on_error
         self._destroy_on_success = destroy_on_success
-        self._log_output_live = log_output_live
-        extra_config = dict(extra_config or {})
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            extra_config=extra_config,
-            log_output_live=self._log_output_live,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            build_artifact=build_artifact,
         )  # type: ClusterManager
 
     @retry(
@@ -105,9 +90,21 @@ class Cluster(ContextDecorator):
         tries=500,
         delay=5,
     )
-    def wait_for_dcos(self) -> None:
+    def wait_for_dcos(
+        self,
+        log_output_live: bool = False,
+    ) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
+
+        Args:
+            log_output_live: If `True`, log output of the diagnostics check
+                live. If `True`, stderr is merged into stdout in the return
+                value.
+
+        Raises:
+            ValueError: Raised if cluster HTTPS certificate could not be
+                obtained successfully.
         """
 
         diagnostics_args = [
@@ -123,7 +120,7 @@ class Cluster(ContextDecorator):
                 args=diagnostics_args,
                 # Keep in mind this must be run as privileged user.
                 user=self.default_ssh_user,
-                log_output_live=self._log_output_live,
+                log_output_live=log_output_live,
                 env={
                     'LC_ALL': 'en_US.UTF-8',
                     'LANG': 'en_US.UTF-8',
@@ -185,10 +182,65 @@ class Cluster(ContextDecorator):
         """
         return self._default_ssh_user
 
+    def install_dcos_from_url(
+        self,
+        build_artifact: str,
+        extra_config: Dict[str, Any] = None,
+        log_output_live: bool = False,
+    ) -> None:
+        """
+        Args:
+            build_artifact: The URL string to a build artifact to install DC/OS
+                from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
+            log_output_live: If `True`, log output of the installation live.
+                If `True`, stderr is merged into stdout in the return value.
+
+        Raises:
+            NotImplementedError: `NotImplementedError` because the given
+                backend provides a more efficient installation method than
+                the DC/OS advanced installation method.
+        """
+        self._cluster.install_dcos_from_url(
+            build_artifact=build_artifact,
+            extra_config=extra_config if extra_config else {},
+            log_output_live=log_output_live,
+        )
+
+    def install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        extra_config: Dict[str, Any] = None,
+        log_output_live: bool = False,
+    ) -> None:
+        """
+        Args:
+            build_artifact: The `Path` to a build artifact to install DC/OS
+                from.
+            extra_config: Implementations may come with a "base"
+                configuration. This dictionary can contain extra installation
+                configuration variables.
+            log_output_live: If `True`, log output of the installation live.
+                If `True`, stderr is merged into stdout in the return value.
+
+        Raises:
+            NotImplementedError: `NotImplementedError` because it is more
+                efficient for the given backend to use the DC/OS advanced
+                installation method that takes build artifacts by URL string.
+        """
+        self._cluster.install_dcos_from_path(
+            build_artifact=build_artifact,
+            extra_config=extra_config if extra_config else {},
+            log_output_live=log_output_live,
+        )
+
     def run_integration_tests(
         self,
         pytest_command: List[str],
         env: Optional[Dict] = None,
+        log_output_live: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -198,6 +250,9 @@ class Cluster(ContextDecorator):
             env: Environment variables to be set on the node before running
                 the `pytest_command`. On enterprise
                 clusters, `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW` must be set.
+            log_output_live: If `True`, log output of the `pytest_command`
+                live. If `True`, stderr is merged into stdout in the return
+                value.
 
         Returns:
             The result of the ``pytest`` command.
@@ -236,7 +291,7 @@ class Cluster(ContextDecorator):
         return test_host.run(
             args=args,
             user=self.default_ssh_user,
-            log_output_live=self._log_output_live,
+            log_output_live=log_output_live,
             env=environment_variables,
         )
 

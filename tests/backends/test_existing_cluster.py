@@ -24,12 +24,12 @@ class TestExistingCluster:
         backend = Docker()
         with Cluster(
             cluster_backend=backend,
-            build_artifact=oss_artifact,
             masters=1,
             agents=1,
             public_agents=1,
             destroy_on_success=False,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             (master, ) = cluster.masters
             (agent, ) = cluster.agents
             (public_agent, ) = cluster.public_agents
@@ -99,11 +99,11 @@ class TestBadParameters:
         """
         with Cluster(
             cluster_backend=Docker(),
-            build_artifact=oss_artifact,
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
             yield cluster
 
     @pytest.fixture()
@@ -111,8 +111,7 @@ class TestBadParameters:
         self, dcos_cluster: Cluster
     ) -> ClusterBackend:
         """
-        Return an `ExistingCluster` with the nodes from `dcos_cluster`.
-        """
+        Return an `ExistingCluster` with the nodes from `dcos_cluster`. """
         return ExistingCluster(
             masters=dcos_cluster.masters,
             agents=dcos_cluster.agents,
@@ -199,61 +198,6 @@ class TestBadParameters:
 
         assert str(excinfo.value) == expected_error
 
-    def test_extra_config(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If `extra_config` is not empty, an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
-                extra_config={'foo': 'bar'},
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'Nodes are already configured. '
-            'Therefore, `extra_config` must be empty.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
-    def test_installer_file(
-        self,
-        dcos_cluster: Cluster,
-        oss_artifact: Path,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If an installer file is given, an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                build_artifact=oss_artifact,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-                destroy_on_error=False,
-                destroy_on_success=False,
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'Cluster already exists with DC/OS installed. '
-            'Therefore, `build_artifact` must be `None`.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
     def test_mismatched_masters(
         self,
         dcos_cluster: Cluster,
@@ -265,7 +209,6 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                build_artifact=None,
                 masters=len(dcos_cluster.masters) + 2,
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents),
@@ -275,9 +218,9 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'The number of master nodes is `1`. '
-            'Therefore, `masters` must be set to `1`.'
-        )
+            'The number of master nodes is {len_masters}. '
+            'Therefore, masters must be set to {len_masters}.'
+        ).format(len_masters=len(dcos_cluster.masters))
 
         assert str(excinfo.value) == expected_error
 
@@ -292,7 +235,6 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                build_artifact=None,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents) + 1,
                 public_agents=len(dcos_cluster.public_agents),
@@ -302,9 +244,9 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'The number of agent nodes is `1`. '
-            'Therefore, `agents` must be set to `1`.'
-        )
+            'The number of agent nodes is {len_agents}. '
+            'Therefore, agents must be set to {len_agents}.'
+        ).format(len_agents=len(dcos_cluster.agents))
 
         assert str(excinfo.value) == expected_error
 
@@ -320,7 +262,6 @@ class TestBadParameters:
         with pytest.raises(ValueError) as excinfo:
             with Cluster(
                 cluster_backend=existing_cluster_backend,
-                build_artifact=None,
                 masters=len(dcos_cluster.masters),
                 agents=len(dcos_cluster.agents),
                 public_agents=len(dcos_cluster.public_agents) + 1,
@@ -330,8 +271,101 @@ class TestBadParameters:
                 pass  # pragma: no cover
 
         expected_error = (
-            'The number of public agent nodes is `1`. '
-            'Therefore, `public_agents` must be set to `1`.'
+            'The number of public agent nodes is {len_public_agents}. '
+            'Therefore, public_agents must be set to {len_public_agents}.'
+        ).format(len_public_agents=len(dcos_cluster.public_agents))
+
+        assert str(excinfo.value) == expected_error
+
+
+class TestUnsupportedInstallationMethods:
+    """
+    Tests for unsupported installation methods.
+    """
+
+    @pytest.fixture(scope='module')
+    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
+        """
+        Return a `Cluster`.
+
+        This is module scoped as we do not intend to modify the cluster.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact)
+            yield cluster
+
+    @pytest.fixture()
+    def existing_cluster_backend(
+        self, dcos_cluster: Cluster
+    ) -> ClusterBackend:
+        """
+        Return an `ExistingCluster` with the nodes from `dcos_cluster`. """
+        return ExistingCluster(
+            masters=dcos_cluster.masters,
+            agents=dcos_cluster.agents,
+            public_agents=dcos_cluster.public_agents,
+            default_ssh_user=dcos_cluster.default_ssh_user
+        )
+
+    def test_install_dcos_from_url(
+        self,
+        dcos_cluster: Cluster,
+        oss_artifact_url: str,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        If `install_dcos_from_url` is called on a `Cluster` created with
+        the `ExistingCluster` backend, a `NotImplementedError` is raised.
+        """
+        with pytest.raises(NotImplementedError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster_backend,
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
+            ) as cluster:
+                cluster.install_dcos_from_url(oss_artifact_url)
+
+        expected_error = (
+            'The ExistingCluster backend does not support installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
+        )
+
+        assert str(excinfo.value) == expected_error
+
+    def test_install_dcos_from_path(
+        self,
+        dcos_cluster: Cluster,
+        oss_artifact: Path,
+        existing_cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        If `install_dcos_from_path` is called on a `Cluster` created with
+        the `ExistingCluster` backend, a `NotImplementedError` is raised.
+        """
+        with pytest.raises(NotImplementedError) as excinfo:
+            with Cluster(
+                cluster_backend=existing_cluster_backend,
+                masters=len(dcos_cluster.masters),
+                agents=len(dcos_cluster.agents),
+                public_agents=len(dcos_cluster.public_agents),
+                destroy_on_error=False,
+                destroy_on_success=False,
+            ) as cluster:
+                cluster.install_dcos_from_path(oss_artifact)
+
+        expected_error = (
+            'The ExistingCluster backend does not support installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
         )
 
         assert str(excinfo.value) == expected_error

@@ -3,7 +3,7 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Type, Union
+from typing import Any, Dict, Set, Type
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
@@ -60,12 +60,9 @@ class ExistingClusterManager(ClusterManager):
 
     def __init__(  # pylint: disable=super-init-not-called
         self,
-        build_artifact: Optional[Union[str, Path]],
         masters: int,
         agents: int,
         public_agents: int,
-        extra_config: Dict[str, Any],
-        log_output_live: bool,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: ExistingCluster,
     ) -> None:
@@ -73,8 +70,6 @@ class ExistingClusterManager(ClusterManager):
         Create a manager for an existing DC/OS cluster.
 
         Args:
-            build_artifact: The path or url string to a build artifact to
-                install. This must be `None` as the cluster already exists.
             masters: The number of master nodes to create.
                 This must match the number of masters in `cluster_backend`.
             agents: The number of agent nodes to create.
@@ -82,11 +77,6 @@ class ExistingClusterManager(ClusterManager):
             public_agents: The number of public agent nodes to create.
                 This must match the number of public agents in
                 `cluster_backend`.
-            extra_config: This dictionary can contain extra installation
-                configuration variables. However, as the cluster already
-                exists, there may not be any entries.
-            log_output_live: If `True`, log output of subprocesses live.
-                If `True`, stderr is merged into stdout in the return value.
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS. As the cluster
@@ -101,39 +91,25 @@ class ExistingClusterManager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-        if build_artifact is not None:
-            message = (
-                'Cluster already exists with DC/OS installed. '
-                'Therefore, `build_artifact` must be `None`.'
-            )
-            raise ValueError(message)
-
         if masters != len(self._masters):
             message = (
-                'The number of master nodes is `1`. '
-                'Therefore, `masters` must be set to `1`.'
-            )
+                'The number of master nodes is {len_masters}. '
+                'Therefore, masters must be set to {len_masters}.'
+            ).format(len_masters=len(self._masters))
             raise ValueError(message)
 
         if agents != len(self._agents):
             message = (
-                'The number of agent nodes is `1`. '
-                'Therefore, `agents` must be set to `1`.'
-            )
+                'The number of agent nodes is {len_agents}. '
+                'Therefore, agents must be set to {len_agents}.'
+            ).format(len_agents=len(self._agents))
             raise ValueError(message)
 
         if public_agents != len(self._public_agents):
             message = (
-                'The number of public agent nodes is `1`. '
-                'Therefore, `public_agents` must be set to `1`.'
-            )
-            raise ValueError(message)
-
-        if extra_config not in (None, {}):
-            message = (
-                'Nodes are already configured. '
-                'Therefore, `extra_config` must be empty.'
-            )
+                'The number of public agent nodes is {len_public_agents}. '
+                'Therefore, public_agents must be set to {len_public_agents}.'
+            ).format(len_public_agents=len(self._public_agents))
             raise ValueError(message)
 
         if files_to_copy_to_installer != {}:
@@ -143,6 +119,46 @@ class ExistingClusterManager(ClusterManager):
                 'Therefore, `files_to_copy_to_installer` must be empty.'
             )
             raise ValueError(message)
+
+    def install_dcos_from_url(
+        self,
+        build_artifact: str,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Raises:
+            NotImplementedError: Raises `NotImplementedError` because it
+                is assumed that clusters created with the ExistingCluster
+                backend already have an installed instance of DC/OS
+                running on them.
+        """
+        message = (
+            'The ExistingCluster backend does not support installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
+        )
+        raise NotImplementedError(message)
+
+    def install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Raises:
+            NotImplementedError: Raises `NotImplementedError` because it
+                is assumed that clusters created with the ExistingCluster
+                backend already have an installed instance of DC/OS
+                running on them.
+        """
+        message = (
+            'The ExistingCluster backend does not support installing '
+            'DC/OS because it is assumed that an instance of DC/OS is '
+            'already installed and running on the cluster.'
+        )
+        raise NotImplementedError(message)
 
     @property
     def masters(self) -> Set[Node]:

@@ -34,12 +34,11 @@ def dcos_cluster(
     """
     with Cluster(
         cluster_backend=cluster_backend,
-        build_artifact=oss_artifact,
         masters=1,
         agents=0,
         public_agents=0,
-        log_output_live=True,
     ) as cluster:
+        cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
         yield cluster
 
 
@@ -152,6 +151,7 @@ class TestNode:
         master.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
+            user=dcos_cluster.default_ssh_user,
         )
         args = ['cat', str(master_destination_path)]
         result = master.run(args=args, user=dcos_cluster.default_ssh_user)
