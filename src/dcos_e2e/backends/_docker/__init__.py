@@ -85,13 +85,6 @@ class Docker(ClusterBackend):
         return DockerCluster
 
     @property
-    def supports_destruction(self) -> bool:
-        """
-        Docker clusters can be destroyed.
-        """
-        return True
-
-    @property
     def default_ssh_user(self) -> str:
         """
         Return `root` as the default SSH user for the Docker backend.
