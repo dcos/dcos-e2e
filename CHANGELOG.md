@@ -5,7 +5,7 @@
 
 
 - [Changelog](#changelog)
-  - [Next](#next)
+  - [2017.11.15.0](#201711150)
   - [2017.11.14.0](#201711140)
   - [2017.11.02.0](#201711020)
   - [2017.10.04.0](#201710040)
@@ -26,7 +26,7 @@
 
 # Changelog
 
-## Next
+## 2017.11.15.0
 
 * Remove `destroy_on_error` and `destroy_on_success` from `Cluster`.
   Instead, avoid using `Cluster` as a context manager to keep the cluster alive.
