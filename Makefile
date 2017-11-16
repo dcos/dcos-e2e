@@ -7,12 +7,14 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 
 .PHONY: lint-python-only
 lint-python-only:
+	check-manifest .
 	flake8 .
 	isort --recursive --check-only
-	yapf --diff --recursive src/ tests/
 	mypy src/ tests/
 	pydocstyle
 	pylint *.py src/dcos_e2e/ tests/
+	pyroma .
+	yapf --diff --recursive src/ tests/
 
 .PHONY: lint-docs
 lint-docs:
