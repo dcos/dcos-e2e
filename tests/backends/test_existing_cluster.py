@@ -22,197 +22,57 @@ class TestExistingCluster:
         it.
         """
         backend = Docker()
-        with Cluster(
+        cluster = Cluster(
             cluster_backend=backend,
             masters=1,
             agents=1,
             public_agents=1,
-        ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
-            (master, ) = cluster.masters
-            (agent, ) = cluster.agents
-            (public_agent, ) = cluster.public_agents
+        )
 
-            existing_cluster = ExistingCluster(
-                masters=cluster.masters,
-                agents=cluster.agents,
-                public_agents=cluster.public_agents,
-                default_ssh_user=backend.default_ssh_user
+        (master, ) = cluster.masters
+        (agent, ) = cluster.agents
+        (public_agent, ) = cluster.public_agents
+
+        with Cluster.from_nodes(
+            masters=cluster.masters,
+            agents=cluster.agents,
+            public_agents=cluster.public_agents,
+            default_ssh_user=backend.default_ssh_user,
+        ) as duplicate_cluster:
+            (duplicate_master, ) = duplicate_cluster.masters
+            (duplicate_agent, ) = duplicate_cluster.agents
+            (duplicate_public_agent, ) = duplicate_cluster.public_agents
+
+            duplicate_master.run(
+                args=['touch', 'example_master_file'],
+                user=duplicate_cluster.default_ssh_user,
+            )
+            duplicate_agent.run(
+                args=['touch', 'example_agent_file'],
+                user=duplicate_cluster.default_ssh_user,
+            )
+            duplicate_public_agent.run(
+                args=['touch', 'example_public_agent_file'],
+                user=duplicate_cluster.default_ssh_user,
             )
 
-            with Cluster(
-                cluster_backend=existing_cluster,
-                masters=len(cluster.masters),
-                agents=len(cluster.agents),
-                public_agents=len(cluster.public_agents),
-            ) as duplicate_cluster:
-                (duplicate_master, ) = duplicate_cluster.masters
-                (duplicate_agent, ) = duplicate_cluster.agents
-                (duplicate_public_agent, ) = duplicate_cluster.public_agents
+            master.run(
+                args=['test', '-f', 'example_master_file'],
+                user=duplicate_cluster.default_ssh_user,
+            )
+            agent.run(
+                args=['test', '-f', 'example_agent_file'],
+                user=duplicate_cluster.default_ssh_user,
+            )
+            public_agent.run(
+                args=['test', '-f', 'example_public_agent_file'],
+                user=duplicate_cluster.default_ssh_user,
+            )
 
-                duplicate_master.run(
-                    args=['touch', 'example_master_file'],
-                    user=duplicate_cluster.default_ssh_user
-                )
-                duplicate_agent.run(
-                    args=['touch', 'example_agent_file'],
-                    user=duplicate_cluster.default_ssh_user
-                )
-                duplicate_public_agent.run(
-                    args=['touch', 'example_public_agent_file'],
-                    user=duplicate_cluster.default_ssh_user
-                )
+        with pytest.raises(NotImplementedError):
+            duplicate_cluster.destroy()
 
-                master.run(
-                    args=['test', '-f', 'example_master_file'],
-                    user=duplicate_cluster.default_ssh_user
-                )
-                agent.run(
-                    args=['test', '-f', 'example_agent_file'],
-                    user=duplicate_cluster.default_ssh_user
-                )
-                public_agent.run(
-                    args=['test', '-f', 'example_public_agent_file'],
-                    user=duplicate_cluster.default_ssh_user
-                )
-
-            with pytest.raises(NotImplementedError):
-                duplicate_cluster.destroy()
-
-            cluster.destroy()
-
-
-class TestBadParameters:
-    """
-    Tests for unexpected parameter values.
-    """
-
-    @pytest.fixture(scope='module')
-    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
-        """
-        Return a `Cluster`.
-
-        This is module scoped as we do not intend to modify the cluster.
-        """
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
-            yield cluster
-
-    @pytest.fixture()
-    def existing_cluster_backend(
-        self, dcos_cluster: Cluster
-    ) -> ClusterBackend:
-        """
-        Return an `ExistingCluster` with the nodes from `dcos_cluster`. """
-        return ExistingCluster(
-            masters=dcos_cluster.masters,
-            agents=dcos_cluster.agents,
-            public_agents=dcos_cluster.public_agents,
-            default_ssh_user=dcos_cluster.default_ssh_user
-        )
-
-    def test_files_to_copy_to_installer(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If there are any files to copy to installers, an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-                files_to_copy_to_installer={Path('/foo'): Path('/bar')},
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'No files can be copied to the installer of an existing cluster. '
-            'Therefore, `files_to_copy_to_installer` must be empty.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
-    def test_mismatched_masters(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If `masters` differs from the number of masters an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters) + 2,
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'The number of master nodes is {len_masters}. '
-            'Therefore, masters must be set to {len_masters}.'
-        ).format(len_masters=len(dcos_cluster.masters))
-
-        assert str(excinfo.value) == expected_error
-
-    def test_mismatched_agents(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If `agents` differs from the number of agents an error is raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents) + 1,
-                public_agents=len(dcos_cluster.public_agents),
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'The number of agent nodes is {len_agents}. '
-            'Therefore, agents must be set to {len_agents}.'
-        ).format(len_agents=len(dcos_cluster.agents))
-
-        assert str(excinfo.value) == expected_error
-
-    def test_mismatched_public_agents(
-        self,
-        dcos_cluster: Cluster,
-        existing_cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If `public_agents` differs from the number of public agents an error is
-        raised.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents) + 1,
-            ):
-                pass  # pragma: no cover
-
-        expected_error = (
-            'The number of public agent nodes is {len_public_agents}. '
-            'Therefore, public_agents must be set to {len_public_agents}.'
-        ).format(len_public_agents=len(dcos_cluster.public_agents))
-
-        assert str(excinfo.value) == expected_error
+        cluster.destroy()
 
 
 class TestUnsupportedInstallationMethods:

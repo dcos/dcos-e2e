@@ -54,6 +54,9 @@ class Cluster(ContextDecorator):
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
+    @staticmethod
+    def from_nodes(cls, masters, agents, public_agents)
+
     @retry(
         exceptions=(
             subprocess.CalledProcessError,

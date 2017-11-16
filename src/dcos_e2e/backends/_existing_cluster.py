@@ -84,34 +84,6 @@ class ExistingClusterManager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-        for role, argument_name, expected, nodes in [
-            ('master', 'masters', masters, self._masters),
-            ('agent', 'agents', agents, self._agents),
-            (
-                'public agent', 'public_agents', public_agents,
-                self._public_agents
-            ),
-        ]:
-            message = (
-                'The number of {role} nodes is {len_nodes}. '
-                'Therefore, {argument_name} must be set to {len_nodes}.'
-            ).format(
-                role=role,
-                argument_name=argument_name,
-                len_nodes=len(nodes),
-            )
-
-            if expected != len(nodes):
-                raise ValueError(message)
-
-        if files_to_copy_to_installer != {}:
-            message = (
-                'No files can be copied to the installer of an existing '
-                'cluster. '
-                'Therefore, `files_to_copy_to_installer` must be empty.'
-            )
-            raise ValueError(message)
-
     def install_dcos_from_url(
         self,
         build_artifact: str,
