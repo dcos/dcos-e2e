@@ -163,7 +163,6 @@ class DockerCluster(ClusterManager):
         # https://github.com/PyCQA/pylint/issues/224.
         Path(self._genconf_dir).mkdir(exist_ok=True)
         self._genconf_dir = Path(self._genconf_dir).resolve()
-        self._genconf_dir_src = self._path / 'genconf.src'
         include_dir = self._path / 'include'
         include_dir_src = self._path / 'include.src'
         certs_dir = include_dir / 'certs'
@@ -176,14 +175,6 @@ class DockerCluster(ClusterManager):
         service_dir_src = include_dir_src / 'systemd'
         service_dir = include_dir / 'systemd'
         service_dir.mkdir(parents=True)
-
-        ip_detect = Path(self._genconf_dir / 'ip-detect')
-
-        copyfile(
-            src=str(self._genconf_dir_src / 'ip-detect'),
-            dst=str(ip_detect),
-        )
-        ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
 
         dcos_postflight = sbin_dir / 'dcos-postflight'
 
@@ -418,6 +409,19 @@ class DockerCluster(ClusterManager):
         # `ClusterManager` instead.
         self._default_ssh_user = cluster_backend.default_ssh_user
 
+        remote_ip_detect = Path('/genconf') / 'ip-detect'
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            node.send_file(
+                local_path=self._path / 'genconf.src' / 'ip-detect',
+                remote_path=remote_ip_detect,
+                user=cluster_backend.default_ssh_user,
+            )
+
+            node.run(
+                args=['chmod', '+x', str(remote_ip_detect)],
+                user=cluster_backend.default_ssh_user,
+            )
+
     def install_dcos_from_url(
         self,
         build_artifact: str,
@@ -460,7 +464,6 @@ class DockerCluster(ClusterManager):
                 configuration of the Docker backend.
             log_output_live: If `True`, log output of the installation live.
         """
-
         ssh_user = self._default_ssh_user
 
         superuser_password = 'admin'
