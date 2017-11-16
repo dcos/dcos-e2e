@@ -355,6 +355,7 @@ class DockerCluster(ClusterManager):
                     **unique_mounts,
                 },
                 tmpfs=node_tmpfs_mounts,
+                docker_image=docker_image_tag,
             )
 
         for agent_number in range(1, agents + 1):
@@ -380,6 +381,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={**agent_mounts, **unique_mounts},
                 tmpfs=node_tmpfs_mounts,
+                docker_image=docker_image_tag,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -405,14 +407,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={**agent_mounts, **unique_mounts},
                 tmpfs=node_tmpfs_mounts,
-            )
-
-        for node in {*self.masters, *self.agents, *self.public_agents}:
-            # Remove stray file that prevents non-root SSH.
-            # https://ubuntuforums.org/showthread.php?t=2327330
-            node.run(
-                args=['rm', '-f', '/run/nologin'],
-                user=cluster_backend.default_ssh_user
+                docker_image=docker_image_tag,
             )
 
         # Logically a SSH user should be part of a `Node`.
@@ -552,6 +547,7 @@ class DockerCluster(ClusterManager):
         tmpfs: Dict[str, str],
         dcos_num_masters: int,
         dcos_num_agents: int,
+        docker_image: str,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -571,8 +567,8 @@ class DockerCluster(ClusterManager):
                 cluster once it has been created.
             dcos_num_agents: The number of agent nodes (agent and public
                 agents) expected to be in the cluster once it has been created.
+            docker_image: The name of the Docker image to use.
         """
-        docker_image = 'mesosphere/dcos-docker'
         registry_host = 'registry.local'
         if self.masters:
             first_master = next(iter(self.masters))
