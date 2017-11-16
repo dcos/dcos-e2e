@@ -13,6 +13,7 @@ lint-python-only:
 	mypy src/ tests/
 	pydocstyle
 	pylint *.py src/dcos_e2e/ tests/
+	pyroma .
 
 .PHONY: lint-docs
 lint-docs:
