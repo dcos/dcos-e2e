@@ -31,8 +31,6 @@ env:
       # This test class uses one scoped cluster so we run it on one builder.
       - "TEST_PATTERN=tests/backends/test_docker.py::TestUnsupportedInstallationMethods"
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
-      # This test class uses one scoped cluster so we run it on one builder.
-      - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
       - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestUnsupportedInstallationMethods"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.

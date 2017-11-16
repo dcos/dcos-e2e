@@ -55,7 +55,8 @@ class Cluster(ContextDecorator):
         )  # type: ClusterManager
 
     @staticmethod
-    def from_nodes(cls, masters, agents, public_agents)
+    def from_nodes(cls, masters, agents, public_agents):
+        pass
 
     @retry(
         exceptions=(
