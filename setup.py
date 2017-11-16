@@ -33,6 +33,9 @@ setup(
     package_dir={'': 'src'},
     install_requires=INSTALL_REQUIRES,
     include_package_data=True,
+    license='Apache2',
+    keywords='dcos mesos docker',
+    url='https://github.com/mesosphere/dcos-e2e',
     extras_require={
         'dev': DEV_REQUIRES,
     },
