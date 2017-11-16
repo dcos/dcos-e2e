@@ -407,14 +407,6 @@ class DockerCluster(ClusterManager):
                 tmpfs=node_tmpfs_mounts,
             )
 
-        for node in {*self.masters, *self.agents, *self.public_agents}:
-            # Remove stray file that prevents non-root SSH.
-            # https://ubuntuforums.org/showthread.php?t=2327330
-            node.run(
-                args=['rm', '-f', '/run/nologin'],
-                user=cluster_backend.default_ssh_user
-            )
-
         # Logically a SSH user should be part of a `Node`.
         # However with the DC/OS config there is a notion of a SSH user for
         # an entire DC/OS cluster, which in our case maps to a single SSH user
