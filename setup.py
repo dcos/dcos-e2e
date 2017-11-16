@@ -33,7 +33,7 @@ setup(
     package_dir={'': 'src'},
     install_requires=INSTALL_REQUIRES,
     include_package_data=True,
-    license='Apache2',
+    license='Apache License 2.0',
     keywords='dcos mesos docker',
     url='https://github.com/mesosphere/dcos-e2e',
     extras_require={
@@ -43,5 +43,6 @@ setup(
         'Operating System :: POSIX',
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
+        'License :: OSI Approved :: Apache License 2.0',
     ],
 )
