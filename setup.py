@@ -22,7 +22,7 @@ with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
 
 setup(
-    name='DC_OS_E2E',
+    name='DCOS E2E',
     version=VERSION,
     author='Adam Dangoor',
     author_email='adangoor@mesosphere.com',
