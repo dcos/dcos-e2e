@@ -5,9 +5,9 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from time import sleep
 from typing import Any, Dict, Iterable, List, Optional, Set
 
+from dcos_test_utils.dcos_api_session import DcosApiSession
 from dcos_test_utils.enterprise import EnterpriseApiSession, EnterpriseUser
 
 # Ignore a spurious error - this import is used in a type hint.
@@ -52,13 +52,34 @@ class Cluster(ContextDecorator):
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
-    def wait_for_dcos(
+    def wait_for_dcos(self) -> None:
+        """
+        Wait until DC/OS has started and all nodes have joined.
+
+        Raises:
+            RetryError: Raised if any cluster component did not become
+                healthy in time.
+        """
+
+        any_master = next(iter(self.masters))
+
+        cluster_args = {
+            'dcos_url': 'https://{ip}'.format(ip=any_master.ip_address),
+            'masters': [str(n.ip_address) for n in self.masters],
+            'slaves': [str(n.ip_address) for n in self.agents],
+            'public_slaves': [str(n.ip_address) for n in self.public_agents],
+        }
+
+        session = DcosApiSession(**cluster_args)
+        session.wait_for_dcos()
+
+    def wait_for_dcos_ee(
         self,
-        superuser_username: str = None,
-        superuser_password: str = None,
+        superuser_username: str,
+        superuser_password: str,
     ) -> None:
         """
-        Wait until DC/OS has started and all nodes have joined the cluster.
+        Wait until DC/OS Enterprise has started and all nodes have joined.
 
         Args:
             superuser_username: Username of the default superuser.
@@ -68,27 +89,20 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
-        if not superuser_username and not superuser_password:
-            sleep(5 * 60)
-            return
 
         any_master = next(iter(self.masters))
-
-        # Hack, should work with DC/OS Enterprise for the purpose of waiting
-        auth_user = EnterpriseUser(superuser_username, superuser_password)
 
         cluster_args = {
             'dcos_url': 'https://{ip}'.format(ip=any_master.ip_address),
             'masters': [str(n.ip_address) for n in self.masters],
             'slaves': [str(n.ip_address) for n in self.agents],
             'public_slaves': [str(n.ip_address) for n in self.public_agents],
-            'auth_user': auth_user,
         }
+
+        auth_user = EnterpriseUser(superuser_username, superuser_password)
+        cluster_args['auth_user'] = auth_user
         session = EnterpriseApiSession(**cluster_args)
         session.wait_for_dcos()
-
-        # Wait 25 seconds for Admin Router cache expiration and refresh.
-        sleep(25 + 5)
 
     def __enter__(self) -> 'Cluster':
         """
