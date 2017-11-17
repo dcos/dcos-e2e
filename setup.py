@@ -4,25 +4,25 @@ Setup script for DC/OS End to End tests.
 
 from setuptools import find_packages, setup
 
-VERSION = '2017.11.14.0'
+VERSION = '2017.11.15.0'
 
 DEPENDENCY_LINKS = []
 
 with open('requirements.txt') as requirements:
     INSTALL_REQUIRES = []
     for line in requirements.readlines():
-        if not line.startswith('#'):
-            INSTALL_REQUIRES.append(line)
-
-with open('dev-requirements.txt') as dev_requirements:
-    DEV_REQUIRES = []
-    for line in dev_requirements.readlines():
         if line.startswith('#'):
             continue
         if line.startswith('--find-links '):
             _, link = line.split('--find-links ')
             DEPENDENCY_LINKS.append(link)
         else:
+            INSTALL_REQUIRES.append(line)
+
+with open('dev-requirements.txt') as dev_requirements:
+    DEV_REQUIRES = []
+    for line in dev_requirements.readlines():
+        if not line.startswith('#'):
             DEV_REQUIRES.append(line)
 
 with open('README.md') as f:
