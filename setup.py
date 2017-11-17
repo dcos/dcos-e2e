@@ -6,6 +6,8 @@ from setuptools import find_packages, setup
 
 VERSION = '2017.11.14.0'
 
+DEPENDENCY_LINKS = []
+
 with open('requirements.txt') as requirements:
     INSTALL_REQUIRES = []
     for line in requirements.readlines():
@@ -15,11 +17,18 @@ with open('requirements.txt') as requirements:
 with open('dev-requirements.txt') as dev_requirements:
     DEV_REQUIRES = []
     for line in dev_requirements.readlines():
-        if not line.startswith('#'):
+        if line.startswith('#'):
+            continue
+        if line.startswith('--find-links '):
+            _, link = line.split('--find-links ')
+            DEPENDENCY_LINKS.append(link)
+        else:
             DEV_REQUIRES.append(line)
 
 with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
+
+TEST_UTILS_SHA = ''
 
 setup(
     name='DC/OS E2E',
@@ -41,4 +50,5 @@ setup(
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
     ],
+    dependency_links=DEPENDENCY_LINKS,
 )

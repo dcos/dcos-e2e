@@ -6,18 +6,14 @@ import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
 from time import sleep
-from threading import Thread
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-import requests
-from requests import codes
-from retry import retry
+from dcos_test_utils.enterprise import EnterpriseApiSession, EnterpriseUser
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend
 from .node import Node
-from dcos_test_utils.enterprise import EnterpriseApiSession, EnterpriseUser
 
 
 class Cluster(ContextDecorator):
@@ -56,164 +52,42 @@ class Cluster(ContextDecorator):
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
-
-
-    # @retry(
-    #     exceptions=(
-    #         subprocess.CalledProcessError,
-    #         ValueError,
-    #         requests.exceptions.ConnectionError,
-    #     ),
-    #     tries=500,
-    #     delay=5,
-    # )
-
-    def wait_for_diagnostics(self, log_output_live: bool = False) -> None:
-        """
-        Determine the point in time where all systemd units are running.
-        """
-        # Ping Marathon UI for 200
-        diagnostics_args = [
-            '/opt/mesosphere/bin/dcos-diagnostics',
-            '--diag',
-            '||',
-            '/opt/mesosphere/bin/3dt',
-            '--diag',
-        ]
-
-        for node in self.masters:
-            node.run(
-                args=diagnostics_args,
-                # Keep in mind this must be run as privileged user.
-                user=self.default_ssh_user,
-                log_output_live=log_output_live,
-                env={
-                    'LC_ALL': 'en_US.UTF-8',
-                    'LANG': 'en_US.UTF-8',
-                },
-            )
-
-    def wait_for_zookeeper(self, log_output_live: bool = False) -> None:
-        """
-        Await the launch of Zookeeper.
-        """
-        # 1. Wait for ZK up
-        # check GET :8181 STATUS 200
-
-        # 2. Wait for ZK ensemble
-        # check GET :8181/exhibitor/v1/cluster/state json['leader'] == 'true'
-        pass
-
-    def wait_for_mesos(self, log_output_live: bool = False) -> None:
-        """
-        Enable Mesos framework registration through HTTP.
-        """
-        # Wait until Mesos is up on all master nodes.
-        for master in self.masters:
-            _dcos_wait.mesos_up(master)
-
-        # Wait for Mesos consensus.
-        _dcos_wait.mesos_consensus(self.masters)
-
-        any_master = next(iter(self.masters))
-
-        # Wait for MesosDNS Mesos leader update on any Mesos master.
-        _dcos_wait.dns_mesos_leader(any_master, self.default_ssh_user)
-
-        # Wait until Mesos serves HTTP on the leader (we use all masters)
-        for master in self.masters:
-            _dcos_wait.mesos_http_serving(master)
-
-        # Wait 25 seconds for Adminrouter cache expiration + refresh.
-        sleep(25 + 5)
-
-    def wait_for_marathon(self, log_output_live: bool = False) -> None:
-        """
-        Enable Marathon application deployment through HTTP.
-        """
-        # 1. Wait until Marathon is up on all master nodes.
-        for master in self.masters:
-            _dcos_wait.marathon_up(master)
-
-        # 2. Wait for Marathon consensus.
-        _dcos_wait.marathon_consensus(self.masters)
-
-        any_master = next(iter(self.masters))
-
-        # 3. Wait for MesosDNS Mesos leader update on any Marathon master.
-        _dcos_wait.dns_marathon_leader(any_master, self.default_ssh_user)
-
-        # Wait until Marathon serves HTTP on the leader (we use all masters)
-        for master in self.masters:
-            _dcos_wait.marathon_http_serving(master)
-
-        # Wait 25 seconds for Adminrouter cache expiration + refresh.
-        sleep(25 + 5)
-
-    @retry(
-        exceptions=(
-            subprocess.CalledProcessError,
-            ValueError,
-            requests.exceptions.ConnectionError,
-        ),
-        tries=500,
-        delay=5,
-    )
-    def wait_for_cli(self, log_output_live: bool = False) -> None:
-
-        # 1. Wait for IAM up
-        # check GET :8101 STATUS 200
-
-        # 2. Wait for Adminrouter up
-        # check GET / STATUS 200
-
-        any_master = next(iter(self.masters))
-
-        # 3. Download CA crt
-        url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
-            ip_address=any_master.ip_address,
-        )
-        resp = requests.get(url, verify=False)
-        if resp.status_code not in (codes.OK):  # noqa: E501 pragma: no cover pylint: disable=no-member
-            message = 'Status code is: {status_code}'.format(
-                status_code=resp.status_code,
-            )
-            raise ValueError(message)
-
     def wait_for_dcos(
         self,
-        superuser_username,
-        superuser_password,
-        log_output_live: bool = False
+        superuser_username: str = None,
+        superuser_password: str = None,
     ) -> None:
         """
         Wait until DC/OS has started and all nodes have joined the cluster.
 
         Args:
-            log_output_live: If `True`, log output of the diagnostics check
-                live. If `True`, stderr is merged into stdout in the return
-                value.
+            superuser_username: Username of the default superuser.
+            superuser_password: Password of the default superuser.
 
         Raises:
             RetryError: Raised if any cluster component did not become
-            healthy in time.
+                healthy in time.
         """
+        if not superuser_username and not superuser_password:
+            sleep(5 * 60)
+            return
+
         any_master = next(iter(self.masters))
 
-        # Hack, should work with DC/OS EE for the purpose of waiting
+        # Hack, should work with DC/OS Enterprise for the purpose of waiting
         auth_user = EnterpriseUser(superuser_username, superuser_password)
 
-        session = EnterpriseApiSession(
-            dcos_url='https://{ip}'.format(ip=any_master.ip_address),
-            masters=[str(n.ip_address) for n in self.masters],
-            agents=[str(n.ip_address) for n in self.agents],
-            public_agents=[str(n.ip_address) for n in self.public_agents],
-            auth_user=auth_user,
-        )
-
+        cluster_args = {
+            'dcos_url': 'https://{ip}'.format(ip=any_master.ip_address),
+            'masters': [str(n.ip_address) for n in self.masters],
+            'slaves': [str(n.ip_address) for n in self.agents],
+            'public_slaves': [str(n.ip_address) for n in self.public_agents],
+            'auth_user': auth_user,
+        }
+        session = EnterpriseApiSession(**cluster_args)
         session.wait_for_dcos()
 
-        # Wait 25 seconds for Adminrouter cache expiration + refresh.
+        # Wait 25 seconds for Admin Router cache expiration and refresh.
         sleep(25 + 5)
 
     def __enter__(self) -> 'Cluster':

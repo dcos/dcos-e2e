@@ -1,3 +1,4 @@
+dcos-test-utils==0.1
 autoflake==1.0
 dcoscli==0.5.6
 flake8==3.5.0
