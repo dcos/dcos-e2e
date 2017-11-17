@@ -34,8 +34,8 @@ env:
   #     # This test class uses one scoped cluster so we run it on one builder.
   #     - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
   #     - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestUnsupportedInstallationMethods"
-  # g
-  lobal:
+  #
+  global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
     #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
