@@ -14,7 +14,7 @@ from retry import retry
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
-from .backends import ClusterBackend, ExistingCluster
+from .backends import ClusterBackend, _ExistingCluster
 from .node import Node
 
 
@@ -75,7 +75,7 @@ class Cluster(ContextDecorator):
         Returns:
             A cluster object with the nodes of an existing cluster.
         """
-        backend = ExistingCluster(
+        backend = _ExistingCluster(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
