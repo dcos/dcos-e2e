@@ -260,19 +260,19 @@ class TestMultipleClusters:
             with Cluster(cluster_backend=cluster_backend) as cluster:
                 cluster.install_dcos_from_path(oss_artifact)
 
+
 class TestClusterFromNodes:
     """
     Tests for creating a `Cluster` with the `Cluster.from_nodes` method.
     """
 
-    def test_cluster_from_nodes(self) -> None:
+    def test_cluster_from_nodes(self, cluster_backend: ClusterBackend) -> None:
         """
         It is possible to create a cluster from existing nodes, but not destroy
         it.
         """
-        backend = Docker()
         cluster = Cluster(
-            cluster_backend=backend,
+            cluster_backend=cluster_backend,
             masters=1,
             agents=1,
             public_agents=1,
@@ -286,7 +286,7 @@ class TestClusterFromNodes:
             masters=cluster.masters,
             agents=cluster.agents,
             public_agents=cluster.public_agents,
-            default_ssh_user=backend.default_ssh_user,
+            default_ssh_user=cluster_backend.default_ssh_user,
         ) as duplicate_cluster:
             (duplicate_master, ) = duplicate_cluster.masters
             (duplicate_agent, ) = duplicate_cluster.agents
@@ -327,14 +327,14 @@ class TestClusterFromNodes:
         self,
         oss_artifact: Path,
         oss_artifact_url: str,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         If a user attempts to install DC/OS on is called on a `Cluster` created
         from existing nodes, a `NotImplementedError` is raised.
         """
-        backend = Docker()
         with Cluster(
-            cluster_backend=backend,
+            cluster_backend=cluster_backend,
             masters=1,
             agents=0,
             public_agents=0,
@@ -343,7 +343,7 @@ class TestClusterFromNodes:
                 masters=cluster.masters,
                 agents=cluster.agents,
                 public_agents=cluster.public_agents,
-                default_ssh_user=backend.default_ssh_user,
+                default_ssh_user=cluster_backend.default_ssh_user,
             )
 
             with pytest.raises(NotImplementedError):
