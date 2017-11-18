@@ -54,9 +54,38 @@ class Cluster(ContextDecorator):
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
-    @staticmethod
-    def from_nodes(cls, masters, agents, public_agents):
-        pass
+    @classmethod
+    def from_nodes(
+        cls: 'Cluster',
+        masters: Set[Node],
+        agents: Set[Node],
+        public_agents: Set[Node],
+        default_ssh_user: str,
+    ) -> 'Cluster':
+        """
+        Create a cluster from existing nodes.
+
+        Args:
+            masters: XXX
+            agents: XXX
+            public_agents: XXX
+
+        Returns:
+            XXX
+        """
+        backend = ExistingCluster(
+            masters=len(masters),
+            agents=len(agents),
+            public_agents=len(public_agents),
+            default_ssh_user=default_ssh_user,
+        )
+        return cls(
+            masters=len(masters),
+            agents=len(agents),
+            public_agents=len(public_agents),
+            backend=backend,
+            files_to_copy_to_installer=None,
+        )
 
     @retry(
         exceptions=(
