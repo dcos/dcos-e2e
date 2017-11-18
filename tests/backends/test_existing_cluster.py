@@ -16,7 +16,7 @@ class TestExistingCluster:
     Tests for creating a `Cluster` with the `Cluster.from_nodes` method.
     """
 
-    def test_existing_cluster(self, oss_artifact: Path) -> None:
+    def test_existing_cluster(self) -> None:
         """
         It is possible to create a cluster from existing nodes, but not destroy
         it.

@@ -66,12 +66,14 @@ class Cluster(ContextDecorator):
         Create a cluster from existing nodes.
 
         Args:
-            masters: XXX
-            agents: XXX
-            public_agents: XXX
+            masters: The master nodes in an existing cluster.
+            agents: The agent nodes in an existing cluster.
+            public_agents: The public agent nodes in an existing cluster.
+            default_ssh_user: The SSH user name which can be connected to with
+                the SSH keys associated with all nodes.
 
         Returns:
-            XXX
+            A cluster object with the nodes of an existing cluster.
         """
         backend = ExistingCluster(
             masters=masters,
