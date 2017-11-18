@@ -70,47 +70,14 @@ class ExistingClusterManager(ClusterManager):
             public_agents: The number of public agent nodes to create.
                 This must match the number of public agents in
                 `cluster_backend`.
-            files_to_copy_to_installer: A mapping of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS. As the cluster
-                already exists, there can be no paths given.
+            files_to_copy_to_installer: An ignored mapping of host paths to
+                paths on the installer node.
             cluster_backend: Details of the specific existing cluster backend
                 to use.
-
-        Raises:
-            ValueError: See `Args` for invalid arguments.
         """
         self._masters = cluster_backend.masters
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
-
-        for role, argument_name, expected, nodes in [
-            ('master', 'masters', masters, self._masters),
-            ('agent', 'agents', agents, self._agents),
-            (
-                'public agent', 'public_agents', public_agents,
-                self._public_agents
-            ),
-        ]:
-            message = (
-                'The number of {role} nodes is {len_nodes}. '
-                'Therefore, {argument_name} must be set to {len_nodes}.'
-            ).format(
-                role=role,
-                argument_name=argument_name,
-                len_nodes=len(nodes),
-            )
-
-            if expected != len(nodes):
-                raise ValueError(message)
-
-        if files_to_copy_to_installer != {}:
-            message = (
-                'No files can be copied to the installer of an existing '
-                'cluster. '
-                'Therefore, `files_to_copy_to_installer` must be empty.'
-            )
-            raise ValueError(message)
 
     def install_dcos_from_url(
         self,
@@ -120,17 +87,11 @@ class ExistingClusterManager(ClusterManager):
     ) -> None:
         """
         Raises:
-            NotImplementedError: Raises `NotImplementedError` because it
-                is assumed that clusters created with the ExistingCluster
-                backend already have an installed instance of DC/OS
-                running on them.
+            NotImplementedError: It is assumed that clusters created with the
+                ExistingCluster backend already have an installed instance of
+                DC/OS running on them.
         """
-        message = (
-            'The ExistingCluster backend does not support installing '
-            'DC/OS because it is assumed that an instance of DC/OS is '
-            'already installed and running on the cluster.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError
 
     def install_dcos_from_path(
         self,
@@ -140,17 +101,11 @@ class ExistingClusterManager(ClusterManager):
     ) -> None:
         """
         Raises:
-            NotImplementedError: Raises `NotImplementedError` because it
-                is assumed that clusters created with the ExistingCluster
-                backend already have an installed instance of DC/OS
-                running on them.
+            NotImplementedError: It is assumed that clusters created with the
+                ExistingCluster backend already have an installed instance of
+                DC/OS running on them.
         """
-        message = (
-            'The ExistingCluster backend does not support installing '
-            'DC/OS because it is assumed that an instance of DC/OS is '
-            'already installed and running on the cluster.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError
 
     @property
     def masters(self) -> Set[Node]:
