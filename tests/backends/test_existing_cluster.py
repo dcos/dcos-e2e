@@ -7,7 +7,7 @@ from typing import Iterator
 
 import pytest
 
-from dcos_e2e.backends import ClusterBackend, Docker, ExistingCluster
+from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 
 
@@ -81,7 +81,7 @@ class TestUnsupportedInstallationMethods:
     """
 
     @pytest.fixture()
-    def cluster(self) -> ClusterBackend:
+    def cluster(self) -> Iterator[Cluster]:
         """
         Return an `Cluster` with the nodes from an existing cluster.
         """

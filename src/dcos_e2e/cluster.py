@@ -56,7 +56,7 @@ class Cluster(ContextDecorator):
 
     @classmethod
     def from_nodes(
-        cls: 'Cluster',
+        cls,
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
@@ -74,9 +74,9 @@ class Cluster(ContextDecorator):
             XXX
         """
         backend = ExistingCluster(
-            masters=len(masters),
-            agents=len(agents),
-            public_agents=len(public_agents),
+            masters=masters,
+            agents=agents,
+            public_agents=public_agents,
             default_ssh_user=default_ssh_user,
         )
 
@@ -84,8 +84,8 @@ class Cluster(ContextDecorator):
             masters=len(masters),
             agents=len(agents),
             public_agents=len(public_agents),
-            backend=backend,
             files_to_copy_to_installer=None,
+            cluster_backend=backend,
         )
 
     @retry(
