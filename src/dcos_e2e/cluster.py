@@ -14,7 +14,7 @@ from retry import retry
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
-from .backends import ClusterBackend
+from .backends import ClusterBackend, ExistingCluster
 from .node import Node
 
 
@@ -79,6 +79,7 @@ class Cluster(ContextDecorator):
             public_agents=len(public_agents),
             default_ssh_user=default_ssh_user,
         )
+
         return cls(
             masters=len(masters),
             agents=len(agents),

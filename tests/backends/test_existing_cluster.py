@@ -13,7 +13,7 @@ from dcos_e2e.cluster import Cluster
 
 class TestExistingCluster:
     """
-    Tests for creating a `Cluster` with the `ExistingCluster` backend.
+    Tests for creating a `Cluster` with the `Cluster.from_nodes` method.
     """
 
     def test_existing_cluster(self, oss_artifact: Path) -> None:
@@ -80,53 +80,36 @@ class TestUnsupportedInstallationMethods:
     Tests for unsupported installation methods.
     """
 
-    @pytest.fixture(scope='module')
-    def dcos_cluster(self, oss_artifact: Path) -> Iterator[Cluster]:
+    @pytest.fixture()
+    def cluster(self) -> ClusterBackend:
         """
-        Return a `Cluster`.
-
-        This is module scoped as we do not intend to modify the cluster.
+        Return an `Cluster` with the nodes from an existing cluster.
         """
+        backend = Docker()
         with Cluster(
-            cluster_backend=Docker(),
+            cluster_backend=backend,
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
-            yield cluster
-
-    @pytest.fixture()
-    def existing_cluster_backend(
-        self, dcos_cluster: Cluster
-    ) -> ClusterBackend:
-        """
-        Return an `ExistingCluster` with the nodes from `dcos_cluster`. """
-        return ExistingCluster(
-            masters=dcos_cluster.masters,
-            agents=dcos_cluster.agents,
-            public_agents=dcos_cluster.public_agents,
-            default_ssh_user=dcos_cluster.default_ssh_user
-        )
+            yield Cluster.from_nodes(
+                masters=cluster.masters,
+                agents=cluster.agents,
+                public_agents=cluster.public_agents,
+                default_ssh_user=backend.default_ssh_user,
+            )
 
     def test_install_dcos_from_url(
         self,
-        dcos_cluster: Cluster,
+        cluster: Cluster,
         oss_artifact_url: str,
-        existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If `install_dcos_from_url` is called on a `Cluster` created with
-        the `ExistingCluster` backend, a `NotImplementedError` is raised.
+        If `install_dcos_from_url` is called on a `Cluster` created from
+        existing nodes, a `NotImplementedError` is raised.
         """
         with pytest.raises(NotImplementedError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-            ) as cluster:
-                cluster.install_dcos_from_url(oss_artifact_url)
+            cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
 
         expected_error = (
             'The ExistingCluster backend does not support installing '
@@ -138,22 +121,15 @@ class TestUnsupportedInstallationMethods:
 
     def test_install_dcos_from_path(
         self,
-        dcos_cluster: Cluster,
+        cluster: Cluster,
         oss_artifact: Path,
-        existing_cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If `install_dcos_from_path` is called on a `Cluster` created with
-        the `ExistingCluster` backend, a `NotImplementedError` is raised.
+        If `install_dcos_from_path` is called on a `Cluster` created from
+        existing nodes, a `NotImplementedError` is raised.
         """
         with pytest.raises(NotImplementedError) as excinfo:
-            with Cluster(
-                cluster_backend=existing_cluster_backend,
-                masters=len(dcos_cluster.masters),
-                agents=len(dcos_cluster.agents),
-                public_agents=len(dcos_cluster.public_agents),
-            ) as cluster:
-                cluster.install_dcos_from_path(oss_artifact)
+            cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
         expected_error = (
             'The ExistingCluster backend does not support installing '
