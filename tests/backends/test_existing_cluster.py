@@ -3,7 +3,6 @@ Tests for the existing cluster backend.
 """
 
 from pathlib import Path
-from typing import Iterator
 
 import pytest
 
@@ -11,12 +10,12 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 
 
-class TestExistingCluster:
+class TestClusterFromNodes:
     """
     Tests for creating a `Cluster` with the `Cluster.from_nodes` method.
     """
 
-    def test_existing_cluster(self) -> None:
+    def test_cluster_from_nodes(self) -> None:
         """
         It is possible to create a cluster from existing nodes, but not destroy
         it.
@@ -74,16 +73,14 @@ class TestExistingCluster:
 
         cluster.destroy()
 
-
-class TestUnsupportedInstallationMethods:
-    """
-    Tests for unsupported installation methods.
-    """
-
-    @pytest.fixture()
-    def cluster(self) -> Iterator[Cluster]:
+    def test_install_dcos(
+        self,
+        oss_artifact: Path,
+        oss_artifact_url: str,
+    ) -> None:
         """
-        Return an `Cluster` with the nodes from an existing cluster.
+        If a user attempts to install DC/OS on is called on a `Cluster` created
+        from existing nodes, a `NotImplementedError` is raised.
         """
         backend = Docker()
         with Cluster(
@@ -92,49 +89,15 @@ class TestUnsupportedInstallationMethods:
             agents=0,
             public_agents=0,
         ) as cluster:
-            yield Cluster.from_nodes(
+            cluster = Cluster.from_nodes(
                 masters=cluster.masters,
                 agents=cluster.agents,
                 public_agents=cluster.public_agents,
                 default_ssh_user=backend.default_ssh_user,
             )
 
-    def test_install_dcos_from_url(
-        self,
-        cluster: Cluster,
-        oss_artifact_url: str,
-    ) -> None:
-        """
-        If `install_dcos_from_url` is called on a `Cluster` created from
-        existing nodes, a `NotImplementedError` is raised.
-        """
-        with pytest.raises(NotImplementedError) as excinfo:
-            cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
+            with pytest.raises(NotImplementedError):
+                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
 
-        expected_error = (
-            'The ExistingCluster backend does not support installing '
-            'DC/OS because it is assumed that an instance of DC/OS is '
-            'already installed and running on the cluster.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
-    def test_install_dcos_from_path(
-        self,
-        cluster: Cluster,
-        oss_artifact: Path,
-    ) -> None:
-        """
-        If `install_dcos_from_path` is called on a `Cluster` created from
-        existing nodes, a `NotImplementedError` is raised.
-        """
-        with pytest.raises(NotImplementedError) as excinfo:
-            cluster.install_dcos_from_path(build_artifact=oss_artifact)
-
-        expected_error = (
-            'The ExistingCluster backend does not support installing '
-            'DC/OS because it is assumed that an instance of DC/OS is '
-            'already installed and running on the cluster.'
-        )
-
-        assert str(excinfo.value) == expected_error
+            with pytest.raises(NotImplementedError):
+                cluster.install_dcos_from_path(build_artifact=oss_artifact)
