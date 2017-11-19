@@ -70,6 +70,8 @@ toc:
 .PHONY: update-dcos-docker
 update-dcos-docker:
 	git subtree pull \
+			--squash \
 	    --prefix src/dcos_e2e/backends/_docker/dcos_docker \
 	    git@github.com:dcos/dcos-docker.git \
+			--allow-unrelated-histories \
 	    master
