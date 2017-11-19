@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [Next](#next)
   - [2017.11.15.0](#201711150)
   - [2017.11.14.0](#201711140)
   - [2017.11.02.0](#201711020)
@@ -26,6 +27,12 @@
 
 # Changelog
 
+## Next
+
+* Remove `ExistingCluster` backend and replaced it with simpler `Cluster.from_nodes` method.
+* Simplified the default configuration for the Docker backend.
+  Notably this no longer contains a default `superuser_username` or `superuser_password_hash`.
+
 ## 2017.11.15.0
 
 * Remove `destroy_on_error` and `destroy_on_success` from `Cluster`.
@@ -34,7 +41,7 @@
 ## 2017.11.14.0
 
 * Backwards incompatible change: Rename `DCOS_Docker` backend to `Docker` backend.
-* Backwards incompatible change: Replace `generate_config_path` with `build_artifact`
+* Backwards incompatible change: Replace`generate_config_path` with `build_artifact`
 that can either be a `Path` or a HTTP(S) URL string. This allows for supporting installation
 methods that require build artifacts to be downloaded from a HTTP server.
 * Backwards incompatible change: Remove `run_as_root`. Instead require a `default_ssh_user`

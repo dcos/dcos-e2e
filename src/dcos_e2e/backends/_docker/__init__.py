@@ -19,7 +19,6 @@ import yaml
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
-from passlib.hash import sha512_crypt
 
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -460,12 +459,7 @@ class DockerCluster(ClusterManager):
                 configuration of the Docker backend.
             log_output_live: If `True`, log output of the installation live.
         """
-
         ssh_user = self._default_ssh_user
-
-        superuser_password = 'admin'
-        superuser_password_hash = sha512_crypt.hash(superuser_password)
-        config_file_path = self._genconf_dir / 'config.yaml'
 
         def ip_list(nodes: Set[Node]) -> List[str]:
             return list(map(lambda node: str(node.ip_address), nodes))
@@ -482,12 +476,11 @@ class DockerCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
-            'superuser_password_hash': superuser_password_hash,
-            'superuser_username': 'admin',
         }
 
         config_yaml = yaml.dump(data={**config, **extra_config})
-        Path(config_file_path).write_text(data=config_yaml)
+        config_file_path = self._genconf_dir / 'config.yaml'
+        config_file_path.write_text(data=config_yaml)
 
         genconf_args = [
             'bash',
