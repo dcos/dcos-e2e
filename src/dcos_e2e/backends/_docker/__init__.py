@@ -472,20 +472,18 @@ class DockerCluster(ClusterManager):
 
         config = {
             'agent_list': ip_list(nodes=self.agents),
-            'public_agent_list': ip_list(nodes=self.public_agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
             'master_discovery': 'static',
             'master_list': ip_list(nodes=self.masters),
             'process_timeout': 10000,
+            'public_agent_list': ip_list(nodes=self.public_agents),
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
             'superuser_password_hash': superuser_password_hash,
             'superuser_username': 'admin',
-            'platform': 'docker',
-            'check_time': 'false',
         }
 
         config_yaml = yaml.dump(data={**config, **extra_config})
