@@ -466,36 +466,24 @@ class DockerCluster(ClusterManager):
         superuser_password = 'admin'
         superuser_password_hash = sha512_crypt.hash(superuser_password)
         config_file_path = self._genconf_dir / 'config.yaml'
+
+        def ip_list(nodes: Set[Node]) -> List[str]:
+            return list(map(lambda node: str(node.ip_address), nodes))
+
         config = {
-            'agent_list': [str(agent.ip_address) for agent in self.agents],
-            'public_agent_list': [
-                str(public_agent.ip_address)
-                for public_agent in self.public_agents
-            ],
-            'bootstrap_url':
-            'file://' + str(self._bootstrap_tmp_path),
-            'cluster_name':
-            'DCOS',
-            'exhibitor_storage_backend':
-            'static',
-            'master_discovery':
-            'static',
-            'master_list': [str(master.ip_address) for master in self.masters],
-            'process_timeout':
-            10000,
+            'agent_list': ip_list(nodes=self.agents),
+            'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
+            'cluster_name': 'DCOS',
+            'exhibitor_storage_backend': 'static',
+            'master_discovery': 'static',
+            'master_list': ip_list(nodes=self.masters),
+            'process_timeout': 10000,
+            'public_agent_list': ip_list(nodes=self.public_agents),
             'resolvers': ['8.8.8.8'],
-            'ssh_port':
-            22,
-            'ssh_user':
-            ssh_user,
-            'superuser_password_hash':
-            superuser_password_hash,
-            'superuser_username':
-            'admin',
-            'platform':
-            'docker',
-            'check_time':
-            'false',
+            'ssh_port': 22,
+            'ssh_user': ssh_user,
+            'superuser_password_hash': superuser_password_hash,
+            'superuser_username': 'admin',
         }
 
         config_yaml = yaml.dump(data={**config, **extra_config})
