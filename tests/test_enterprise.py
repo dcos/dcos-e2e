@@ -166,8 +166,10 @@ class TestWaitForDCOS:
                 'setup',
                 'https://' + str(master.ip_address),
                 '--no-check',
-                '--username={username}'.format(username=superuser_username),
-                '--password={password}'.format(password=superuser_password),
+                '--username',
+                superuser_username,
+                '--password',
+                superuser_password,
             ]
 
             setup = subprocess.run(
