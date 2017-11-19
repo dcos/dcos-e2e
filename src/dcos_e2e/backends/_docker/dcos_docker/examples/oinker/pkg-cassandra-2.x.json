@@ -1,0 +1,26 @@
+{
+  "service": {
+    "cpus": 1,
+    "mem": 512,
+    "heap": 256
+  },
+  "executor": {
+    "cpus": 1,
+    "mem": 512,
+    "heap": 256
+  },
+  "nodes": {
+    "cpus": 1,
+    "mem": 2048,
+    "disk": 4096,
+    "heap": {
+      "size": 1024,
+      "new": 100
+    },
+    "count": 3
+  },
+  "task": {
+    "cpus": 1,
+    "mem": 128
+  }
+}
