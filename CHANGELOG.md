@@ -41,7 +41,7 @@
 ## 2017.11.14.0
 
 * Backwards incompatible change: Rename `DCOS_Docker` backend to `Docker` backend.
-* Backwards incompatible change: Replace`generate_config_path` with `build_artifact`
+* Backwards incompatible change: Replace `generate_config_path` with `build_artifact`
 that can either be a `Path` or a HTTP(S) URL string. This allows for supporting installation
 methods that require build artifacts to be downloaded from a HTTP server.
 * Backwards incompatible change: Remove `run_as_root`. Instead require a `default_ssh_user`
