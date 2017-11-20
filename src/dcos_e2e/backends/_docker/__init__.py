@@ -434,6 +434,12 @@ class DockerCluster(ClusterManager):
         # `ClusterManager` instead.
         self._default_ssh_user = cluster_backend.default_ssh_user
 
+        self._masters = self._nodes(container_base_name=self._master_prefix)
+        self._agents = self._nodes(container_base_name=self._agent_prefix)
+        self._public_agents = self._nodes(
+            container_base_name=self._public_agent_prefix
+        )
+
     def install_dcos_from_url(
         self,
         build_artifact: str,
@@ -649,18 +655,18 @@ class DockerCluster(ClusterManager):
         """
         Return all DC/OS master ``Node``s.
         """
-        return self._nodes(container_base_name=self._master_prefix)
+        return self._masters
 
     @property
     def agents(self) -> Set[Node]:
         """
         Return all DC/OS agent ``Node``s.
         """
-        return self._nodes(container_base_name=self._agent_prefix)
+        return self._agents
 
     @property
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public agent ``Node``s.
         """
-        return self._nodes(container_base_name=self._public_agent_prefix)
+        return self._public_agents

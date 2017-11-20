@@ -92,8 +92,7 @@ class Cluster(ContextDecorator):
         )
 
     @retry(
-        wait_exponential_multiplier=1000,
-        wait_exponential_max=10000,
+        wait_fixed=5000,
         stop_max_delay=(300 * 1000),
         retry_on_exception=lambda e: isinstance(e, RequestException)
     )
