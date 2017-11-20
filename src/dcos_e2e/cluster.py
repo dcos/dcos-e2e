@@ -88,16 +88,6 @@ class Cluster(ContextDecorator):
             cluster_backend=backend,
         )
 
-    @retry(
-        exceptions=(
-            subprocess.CalledProcessError,
-            ValueError,
-            requests.exceptions.ConnectionError,
-        ),
-        tries=500,
-        delay=5,
-    )
-
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined.
