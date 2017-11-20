@@ -13,7 +13,7 @@ These backend classes allow backend-specific configuration of the cluster.
 - [`dcos_e2e.backend.Docker`](#dcos_e2ebackenddocker)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
-    - [`master_mounts`](#master_mounts)
+    - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
   - [DC/OS Installation](#dcos-installation)
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
@@ -27,7 +27,7 @@ These backend classes allow backend-specific configuration of the cluster.
 ## `dcos_e2e.backend.Docker`
 
 ```python
-Docker(workspace_dir=None, master_mounts=None)
+Docker(workspace_dir=None, master_mounts=None, agent_mounts=None, public_agent_mounts)
 ```
 
 ### Parameters
@@ -38,9 +38,9 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
-#### `master_mounts`
+#### `master_mounts`, `agent_mounts`, `public_agent_mounts`
 
-Mounts to add to master node containers.
+Mounts to add to node containers.
 See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
 
 ### DC/OS Installation
