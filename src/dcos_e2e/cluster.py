@@ -3,12 +3,14 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-from dcos_test_utils.dcos_api import DcosApiSession
-from dcos_test_utils.enterprise import EnterpriseApiSession, EnterpriseUser
+import requests
+import urllib3
+from retrying import retry
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
@@ -88,6 +90,11 @@ class Cluster(ContextDecorator):
             cluster_backend=backend,
         )
 
+    @retry(
+        wait_fixed=5000,
+        stop_max_delay=(300 * 1000),
+        retry_on_exception=lambda e: isinstance(e, requests.ConnectionError)
+    )
     def wait_for_dcos(self) -> None:
         """
         Wait until DC/OS has started and all nodes have joined.
@@ -96,49 +103,34 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        any_master = next(iter(self.masters))
+        any_master_ip = next(iter(self.masters)).ip_address
+        dcos_url = 'https://{ip}'.format(ip=any_master_ip)
 
-        cluster_args = {
-            'dcos_url': 'https://{ip}'.format(ip=any_master.ip_address),
-            'masters': [str(n.ip_address) for n in self.masters],
-            'slaves': [str(n.ip_address) for n in self.agents],
-            'public_slaves': [str(n.ip_address) for n in self.public_agents],
+        # Wait for Admin Router, retry on ConnectionError
+        requests.get(dcos_url + '/')
+
+        # Wait for CA certificate download ready, retry on bad status
+        response = requests.get(dcos_url + '/ca/dcos-ca.crt')
+        response.raise_for_status()
+
+        # Wait for Bouncer authentication failure, retry if not status 401
+        data = {
+            'uid': '{rand_uid}'.format(rand_uid=uuid.uuid4()),
+            'password': '{rand_password}'.format(rand_password=uuid.uuid4())
         }
+        response = requests.post(
+            dcos_url + '/acs/api/v1/auth/login',
+            headers={'Content-Type': 'application/json'},
+            json=data
+        )
+        if response.status_code != 401:
+            response.raise_for_status()
 
-        session = DcosApiSession(**cluster_args)
-        session.wait_for_dcos()
-
-    def wait_for_dcos_ee(
-        self,
-        superuser_username: str,
-        superuser_password: str,
-    ) -> None:
-        """
-        Wait until DC/OS Enterprise has started and all nodes have joined.
-
-        Args:
-            superuser_username: Username of the default superuser.
-            superuser_password: Password of the default superuser.
-
-        Raises:
-            RetryError: Raised if any cluster component did not become
-                healthy in time.
-        """
-
-        any_master = next(iter(self.masters))
-
-        cluster_args = {
-            'dcos_url': 'https://{ip}'.format(ip=any_master.ip_address),
-            'masters': [str(n.ip_address) for n in self.masters],
-            'slaves': [str(n.ip_address) for n in self.agents],
-            'public_slaves': [str(n.ip_address) for n in self.public_agents],
-        }
-
-        auth_user = EnterpriseUser(superuser_username, superuser_password)
-        cluster_args['auth_user'] = auth_user
-        session = EnterpriseApiSession(**cluster_args)
-        session.wait_for_dcos()
+        # Wait for Marathon, retry if not status 200
+        response = requests.get(dcos_url + ':8443/v2/info')
+        response.raise_for_status()
 
     def __enter__(self) -> 'Cluster':
         """
