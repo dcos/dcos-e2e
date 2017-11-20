@@ -12,7 +12,7 @@ from dcos_test_utils.enterprise import EnterpriseApiSession, EnterpriseUser
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
-from .backends import ClusterBackend
+from .backends import ClusterBackend, _ExistingCluster
 from .node import Node
 
 
@@ -51,6 +51,52 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
+
+    @classmethod
+    def from_nodes(
+        cls,
+        masters: Set[Node],
+        agents: Set[Node],
+        public_agents: Set[Node],
+        default_ssh_user: str,
+    ) -> 'Cluster':
+        """
+        Create a cluster from existing nodes.
+
+        Args:
+            masters: The master nodes in an existing cluster.
+            agents: The agent nodes in an existing cluster.
+            public_agents: The public agent nodes in an existing cluster.
+            default_ssh_user: The SSH user name which can be connected to with
+                the SSH keys associated with all nodes.
+
+        Returns:
+            A cluster object with the nodes of an existing cluster.
+        """
+        backend = _ExistingCluster(
+            masters=masters,
+            agents=agents,
+            public_agents=public_agents,
+            default_ssh_user=default_ssh_user,
+        )
+
+        return cls(
+            masters=len(masters),
+            agents=len(agents),
+            public_agents=len(public_agents),
+            files_to_copy_to_installer=None,
+            cluster_backend=backend,
+        )
+
+    @retry(
+        exceptions=(
+            subprocess.CalledProcessError,
+            ValueError,
+            requests.exceptions.ConnectionError,
+        ),
+        tries=500,
+        delay=5,
+    )
 
     def wait_for_dcos(self) -> None:
         """

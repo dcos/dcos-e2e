@@ -14,27 +14,24 @@ env:
   # per commit.
   # We run almost one builder per test.
   matrix:
-  #     - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
-        - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
-  #     - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
-  #     # This test class uses one scoped cluster so we run it on one builder.
-  #     - "TEST_PATTERN=tests/test_node.py::TestNode"
-  #     - "TEST_PATTERN=tests/test_harness.py::TestIntegrationTests::test_run_pytest"
-  #     - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_extend_config"
-  #     - "TEST_PATTERN=tests/test_harness.py::TestExtendConfig::test_default_config"
-  #     # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-  #     - "TEST_PATTERN=tests/test_harness.py::TestClusterSize"
-  #     - "TEST_PATTERN=tests/test_harness.py::TestInstallDcosFromPath::test_live_logging"
-  #     - "TEST_PATTERN=tests/test_harness.py::TestInstallDcosFromPath::test_no_live_logging"
-  #     - "TEST_PATTERN=tests/test_harness.py::TestMultipleClusters::test_two_clusters"
-  #     - "TEST_PATTERN=tests/backends/test_docker.py::TestCustomMasterMounts::test_custom_master_mounts"
-  #     # This test class uses one scoped cluster so we run it on one builder.
-  #     - "TEST_PATTERN=tests/backends/test_docker.py::TestUnsupportedInstallationMethods"
-  #     - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestExistingCluster::test_existing_cluster"
-  #     # This test class uses one scoped cluster so we run it on one builder.
-  #     - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestBadParameters"
-  #     - "TEST_PATTERN=tests/backends/test_existing_cluster.py::TestUnsupportedInstallationMethods"
-  #
+      # - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
+      - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
+      # - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
+      # # This test class uses one scoped cluster so we run it on one builder.
+      # - "TEST_PATTERN=tests/test_node.py::TestNode"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/test_cluster.py::TestClusterSize"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPath::test_live_logging"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPath::test_no_live_logging"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"
+      # - "TEST_PATTERN=tests/backends/test_docker.py::TestCustomMasterMounts::test_custom_master_mounts"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/backends/test_docker.py::TestUnsupportedInstallationMethods"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:

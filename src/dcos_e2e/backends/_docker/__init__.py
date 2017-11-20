@@ -19,7 +19,6 @@ import yaml
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
-from passlib.hash import sha512_crypt
 
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -355,6 +354,7 @@ class DockerCluster(ClusterManager):
                     **unique_mounts,
                 },
                 tmpfs=node_tmpfs_mounts,
+                docker_image=docker_image_tag,
             )
 
         for agent_number in range(1, agents + 1):
@@ -380,6 +380,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={**agent_mounts, **unique_mounts},
                 tmpfs=node_tmpfs_mounts,
+                docker_image=docker_image_tag,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -405,14 +406,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={**agent_mounts, **unique_mounts},
                 tmpfs=node_tmpfs_mounts,
-            )
-
-        for node in {*self.masters, *self.agents, *self.public_agents}:
-            # Remove stray file that prevents non-root SSH.
-            # https://ubuntuforums.org/showthread.php?t=2327330
-            node.run(
-                args=['rm', '-f', '/run/nologin'],
-                user=cluster_backend.default_ssh_user
+                docker_image=docker_image_tag,
             )
 
         # Logically a SSH user should be part of a `Node`.
@@ -465,46 +459,28 @@ class DockerCluster(ClusterManager):
                 configuration of the Docker backend.
             log_output_live: If `True`, log output of the installation live.
         """
-
         ssh_user = self._default_ssh_user
 
-        superuser_password = 'admin'
-        superuser_password_hash = sha512_crypt.hash(superuser_password)
-        config_file_path = self._genconf_dir / 'config.yaml'
+        def ip_list(nodes: Set[Node]) -> List[str]:
+            return list(map(lambda node: str(node.ip_address), nodes))
+
         config = {
-            'agent_list': [str(agent.ip_address) for agent in self.agents],
-            'public_agent_list': [
-                str(public_agent.ip_address)
-                for public_agent in self.public_agents
-            ],
-            'bootstrap_url':
-            'file://' + str(self._bootstrap_tmp_path),
-            'cluster_name':
-            'DCOS',
-            'exhibitor_storage_backend':
-            'static',
-            'master_discovery':
-            'static',
-            'master_list': [str(master.ip_address) for master in self.masters],
-            'process_timeout':
-            10000,
+            'agent_list': ip_list(nodes=self.agents),
+            'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
+            'cluster_name': 'DCOS',
+            'exhibitor_storage_backend': 'static',
+            'master_discovery': 'static',
+            'master_list': ip_list(nodes=self.masters),
+            'process_timeout': 10000,
+            'public_agent_list': ip_list(nodes=self.public_agents),
             'resolvers': ['8.8.8.8'],
-            'ssh_port':
-            22,
-            'ssh_user':
-            ssh_user,
-            'superuser_password_hash':
-            superuser_password_hash,
-            'superuser_username':
-            'admin',
-            'platform':
-            'docker',
-            'check_time':
-            'false',
+            'ssh_port': 22,
+            'ssh_user': ssh_user,
         }
 
         config_yaml = yaml.dump(data={**config, **extra_config})
-        Path(config_file_path).write_text(data=config_yaml)
+        config_file_path = self._genconf_dir / 'config.yaml'
+        config_file_path.write_text(data=config_yaml)
 
         genconf_args = [
             'bash',
@@ -552,6 +528,7 @@ class DockerCluster(ClusterManager):
         tmpfs: Dict[str, str],
         dcos_num_masters: int,
         dcos_num_agents: int,
+        docker_image: str,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -571,8 +548,8 @@ class DockerCluster(ClusterManager):
                 cluster once it has been created.
             dcos_num_agents: The number of agent nodes (agent and public
                 agents) expected to be in the cluster once it has been created.
+            docker_image: The name of the Docker image to use.
         """
-        docker_image = 'mesosphere/dcos-docker'
         registry_host = 'registry.local'
         if self.masters:
             first_master = next(iter(self.masters))

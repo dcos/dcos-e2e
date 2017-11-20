@@ -7,12 +7,14 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 
 .PHONY: lint-python-only
 lint-python-only:
+	check-manifest .
 	flake8 .
 	isort --recursive --check-only
-	yapf --diff --recursive src/ tests/
 	mypy src/ tests/
 	pydocstyle
 	pylint *.py src/dcos_e2e/ tests/
+	pyroma .
+	yapf --diff --recursive src/ tests/
 
 .PHONY: lint-docs
 lint-docs:
@@ -68,7 +70,7 @@ toc:
 .PHONY: update-dcos-docker
 update-dcos-docker:
 	git subtree pull \
-	    --prefix src/dcos_e2e/backends/_dcos_docker/dcos_docker \
+	    --prefix src/dcos_e2e/backends/_docker/dcos_docker \
 	    --squash \
 	    git@github.com:dcos/dcos-docker.git \
 	    master

@@ -58,6 +58,17 @@ Cluster(
 )
 ```
 
+or
+
+```python
+Cluster.from_nodes(
+    masters,
+    agents,
+    public_agents,
+    default_ssh_user,
+)
+```
+
 This is a context manager which spins up a cluster.
 
 ### Parameters

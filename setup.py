@@ -31,7 +31,7 @@ with open('README.md') as f:
 TEST_UTILS_SHA = 'd983e3c1e7a65576e8828dccd7429e844560202f'
 
 setup(
-    name='DC/OS E2E',
+    name='DCOS E2E',
     version=VERSION,
     author='Adam Dangoor',
     author_email='adangoor@mesosphere.com',
@@ -42,6 +42,9 @@ setup(
     package_dir={'': 'src'},
     install_requires=INSTALL_REQUIRES,
     include_package_data=True,
+    license='Apache License 2.0',
+    keywords='dcos mesos docker',
+    url='https://github.com/mesosphere/dcos-e2e',
     extras_require={
         'dev': DEV_REQUIRES,
     },
@@ -49,6 +52,7 @@ setup(
         'Operating System :: POSIX',
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
+        'License :: OSI Approved :: Apache License 2.0',
     ],
     dependency_links=DEPENDENCY_LINKS,
 )
