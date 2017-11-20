@@ -104,6 +104,7 @@ class Cluster(ContextDecorator):
         auth_user = EnterpriseUser(superuser_username, superuser_password)
         cluster_args['auth_user'] = auth_user
         session = EnterpriseApiSession(**cluster_args)
+        session.set_ca_cert()
         session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
