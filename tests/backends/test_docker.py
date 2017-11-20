@@ -19,37 +19,37 @@ class TestDockerBackend:
     Tests for functionality specific to the Docker backend.
     """
 
-    def test_custom_mounts(
-        self,
-        tmpdir: local,
-        oss_artifact: Path,
-    ) -> None:
+    def test_custom_mounts(self, tmpdir: local) -> None:
         """
         It is possible to mount local files to master nodes.
         """
-        content = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
+        local_master_file = tmpdir.join('master_file.txt')
+        local_master_file.write('')
+        local_agent_file = tmpdir.join('agent_file.txt')
+        local_agent_file.write('')
+        local_public_agent_file = tmpdir.join('public_agent_file.txt')
+        local_public_agent_file.write('')
+
         master_path = Path('/etc/on_master_nodes.txt')
         agent_path = Path('/etc/on_agent_nodes.txt')
         public_agent_path = Path('/etc/on_public_agent_nodes.txt')
 
         custom_master_mounts = {
-            str(local_file): {
+            str(local_master_file): {
                 'bind': str(master_path),
                 'mode': 'rw',
             },
         }
 
         custom_agent_mounts = {
-            str(local_file): {
+            str(local_agent_file): {
                 'bind': str(agent_path),
                 'mode': 'rw',
             },
         }
 
         custom_public_agent_mounts = {
-            str(local_file): {
+            str(local_public_agent_file): {
                 'bind': str(public_agent_path),
                 'mode': 'rw',
             },
@@ -67,20 +67,20 @@ class TestDockerBackend:
             agents=1,
             public_agents=1,
         ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
-            for node, path in [
-                (next(iter(cluster.masters)), master_path),
-                (next(iter(cluster.agents)), agent_path),
-                (next(iter(cluster.public_agents)), public_agent_path),
+            for nodes, path, local_file in [
+                (cluster.masters, master_path, local_master_file),
+                (cluster.agents, agent_path, local_agent_file),
+                (
+                    cluster.public_agents, public_agent_path,
+                    local_public_agent_file
+                ),
             ]:
-                args = ['cat', str(path)]
-                result = node.run(args=args, user=cluster.default_ssh_user)
-                assert result.stdout.decode() == content
-
-                new_content = str(uuid.uuid4())
-                local_file.write(new_content)
-                result = node.run(args=args, user=cluster.default_ssh_user)
-                assert result.stdout.decode() == new_content
+                for node in nodes:
+                    content = str(uuid.uuid4())
+                    local_file.write(content)
+                    args = ['cat', str(path)]
+                    result = node.run(args=args, user=cluster.default_ssh_user)
+                    assert result.stdout.decode() == content
 
     def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
         """
