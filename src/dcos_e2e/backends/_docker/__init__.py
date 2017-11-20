@@ -484,6 +484,13 @@ class DockerCluster(ClusterManager):
         config = {
             'agent_list': ip_list(nodes=self.agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
+            # Without this, we see errors like:
+            # "Time is not synchronized / marked as bad by the kernel.".
+            # Adam saw this on Docker for Mac 17.09.0-ce-mac35.
+            #
+            # In that case this was fixable with:
+            #   $ docker run --rm --privileged alpine hwclock -s
+            'check_time': 'false',
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
             'master_discovery': 'static',
