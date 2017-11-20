@@ -91,9 +91,9 @@ class Cluster(ContextDecorator):
         )
 
     @retry(
-        wait_fixed=5000,
-        stop_max_delay=(300 * 1000),
-        retry_on_exception=lambda e: isinstance(e, requests.ConnectionError)
+        wait_exponential_multiplier=1000,
+        wait_exponential_max=10000,
+        stop_max_delay=(300 * 1000)
     )
     def wait_for_dcos(self) -> None:
         """
@@ -109,7 +109,8 @@ class Cluster(ContextDecorator):
         dcos_url = 'https://{ip}'.format(ip=any_master_ip)
 
         # Wait for Admin Router, retry on ConnectionError
-        requests.get(dcos_url + '/')
+        response = requests.get(dcos_url + '/')
+        response.raise_for_status()
 
         # Wait for CA certificate download ready, retry on bad status
         response = requests.get(dcos_url + '/ca/dcos-ca.crt')
