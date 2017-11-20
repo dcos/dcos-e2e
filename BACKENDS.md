@@ -70,6 +70,12 @@ Docker for Mac must be configured to allow `/private` to be bind mounted into Do
 This is the default.
 See Docker > Preferences > File Sharing.
 
+#### Clock sync errors
+
+On various platforms, the clock can get out of sync between the host machine and Docker containers.
+This is particularly problematic if using `check_time: true` in the DC/OS configuration.
+To work around this, run `docker run --rm --privileged alpine hwclock -s`.
+
 ## Using existing nodes
 
 It is possible to use existing nodes on any platform with DC/OS E2E.
