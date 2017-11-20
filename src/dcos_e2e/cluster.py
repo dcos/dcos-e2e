@@ -10,6 +10,7 @@ from typing import Any, Dict, Iterable, List, Optional, Set
 
 import requests
 import urllib3
+from requests import RequestException
 from retrying import retry
 
 # Ignore a spurious error - this import is used in a type hint.
@@ -93,30 +94,35 @@ class Cluster(ContextDecorator):
     @retry(
         wait_exponential_multiplier=1000,
         wait_exponential_max=10000,
-        stop_max_delay=(300 * 1000)
+        stop_max_delay=(300 * 1000),
+        retry_on_exception=lambda e: isinstance(e, RequestException)
     )
     def wait_for_dcos(self) -> None:
         """
-        Wait until DC/OS has started and all nodes have joined.
+        Wait until DC/OS has started and the authentication service
+        as well as Marathon are reachable.
 
         Raises:
-            RetryError: Raised if any cluster component did not become
-                healthy in time.
+            RetryError: Raised if Admin Router, Bouncer or Marathon failed
+                to become ready for testing within 5 minutes.
         """
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         any_master_ip = next(iter(self.masters)).ip_address
         dcos_url = 'https://{ip}'.format(ip=any_master_ip)
 
-        # Wait for Admin Router, retry on ConnectionError
-        response = requests.get(dcos_url + '/')
+        # Wait for Admin Router
+        # Retry on ConnectionError
+        response = requests.get(dcos_url + '/', timeout=1)
         response.raise_for_status()
 
-        # Wait for CA certificate download ready, retry on bad status
-        response = requests.get(dcos_url + '/ca/dcos-ca.crt')
+        # Wait for CA certificate download ready
+        # Retry on ConnectionError or status >= 400
+        response = requests.get(dcos_url + '/ca/dcos-ca.crt', timeout=1)
         response.raise_for_status()
 
-        # Wait for Bouncer authentication failure, retry if not status 401
+        # Wait for Bouncer authentication failure
+        # Retry on status >= 400, except for 401
         data = {
             'uid': '{rand_uid}'.format(rand_uid=uuid.uuid4()),
             'password': '{rand_password}'.format(rand_password=uuid.uuid4())
@@ -124,13 +130,15 @@ class Cluster(ContextDecorator):
         response = requests.post(
             dcos_url + '/acs/api/v1/auth/login',
             headers={'Content-Type': 'application/json'},
-            json=data
+            json=data,
+            timeout=1,
         )
-        if response.status_code != 401:
+        if response.status_code not in [200, 401]:
             response.raise_for_status()
 
-        # Wait for Marathon, retry if not status 200
-        response = requests.get(dcos_url + ':8443/v2/info')
+        # Wait for Marathon
+        # Retry if not 200
+        response = requests.get(dcos_url + ':8443/v2/info', timeout=1)
         response.raise_for_status()
 
     def __enter__(self) -> 'Cluster':
