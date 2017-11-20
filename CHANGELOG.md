@@ -32,6 +32,7 @@
 * Remove `ExistingCluster` backend and replaced it with simpler `Cluster.from_nodes` method.
 * Simplified the default configuration for the Docker backend.
   Notably this no longer contains a default `superuser_username` or `superuser_password_hash`.
+* Support `custom_agent_mounts` and `custom_public_agent_mounts` on the Docker backend.
 
 ## 2017.11.15.0
 
