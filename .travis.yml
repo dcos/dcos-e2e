@@ -24,8 +24,7 @@ env:
       - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config"
       # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
       - "TEST_PATTERN=tests/test_cluster.py::TestClusterSize"
-      - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPath::test_live_logging"
-      - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPath::test_no_live_logging"
+      - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging"
       - "TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters"
       # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
       - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"

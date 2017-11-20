@@ -170,7 +170,7 @@ class TestClusterSize:
             assert len(cluster.public_agents) == public_agents
 
 
-class TestInstallDcosFromPath:
+class TestInstallDcosFromPathLogging:
     """
     Tests for logs created when calling `install_dcos_from_path` on
     ``Cluster``.
