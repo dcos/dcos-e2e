@@ -7,7 +7,7 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-from dcos_test_utils.dcos_api_session import DcosApiSession
+from dcos_test_utils.dcos_api import DcosApiSession
 from dcos_test_utils.enterprise import EnterpriseApiSession, EnterpriseUser
 
 # Ignore a spurious error - this import is used in a type hint.
@@ -68,7 +68,6 @@ class Cluster(ContextDecorator):
             'masters': [str(n.ip_address) for n in self.masters],
             'slaves': [str(n.ip_address) for n in self.agents],
             'public_slaves': [str(n.ip_address) for n in self.public_agents],
-            'default_os_user': self.default_ssh_user,
         }
 
         session = DcosApiSession(**cluster_args)
@@ -98,7 +97,6 @@ class Cluster(ContextDecorator):
             'masters': [str(n.ip_address) for n in self.masters],
             'slaves': [str(n.ip_address) for n in self.agents],
             'public_slaves': [str(n.ip_address) for n in self.public_agents],
-            'default_os_user': self.default_ssh_user,
         }
 
         auth_user = EnterpriseUser(superuser_username, superuser_password)

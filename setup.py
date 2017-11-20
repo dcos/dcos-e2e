@@ -13,8 +13,8 @@ with open('requirements.txt') as requirements:
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
-        if line.startswith('--find-links '):
-            _, link = line.split('--find-links ')
+        if line.startswith('--find-links --no-index'):
+            _, link = line.split('--find-links --no-index ')
             DEPENDENCY_LINKS.append(link)
         else:
             INSTALL_REQUIRES.append(line)
@@ -28,7 +28,7 @@ with open('dev-requirements.txt') as dev_requirements:
 with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
 
-TEST_UTILS_SHA = ''
+TEST_UTILS_SHA = 'd983e3c1e7a65576e8828dccd7429e844560202f'
 
 setup(
     name='DC/OS E2E',
