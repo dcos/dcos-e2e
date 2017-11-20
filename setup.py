@@ -13,8 +13,8 @@ with open('requirements.txt') as requirements:
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
-        if line.startswith('--find-links --no-index'):
-            _, link = line.split('--find-links --no-index ')
+        if line.startswith('--find-links'):
+            _, link = line.split('--find-links ')
             DEPENDENCY_LINKS.append(link)
         else:
             INSTALL_REQUIRES.append(line)
