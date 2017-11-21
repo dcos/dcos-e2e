@@ -3,14 +3,15 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
+import uuid
 from contextlib import ContextDecorator
 from pathlib import Path
-from time import sleep
 from typing import Any, Dict, Iterable, List, Optional, Set
 
 import requests
-from requests import codes
-from retry import retry
+import urllib3
+from requests import RequestException
+from retrying import retry
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
@@ -91,70 +92,53 @@ class Cluster(ContextDecorator):
         )
 
     @retry(
-        exceptions=(
-            subprocess.CalledProcessError,
-            ValueError,
-            requests.exceptions.ConnectionError,
-        ),
-        tries=500,
-        delay=5,
+        wait_fixed=5000,
+        stop_max_delay=(300 * 1000),
+        retry_on_exception=lambda e: isinstance(e, RequestException)
     )
-    def wait_for_dcos(
-        self,
-        log_output_live: bool = False,
-    ) -> None:
+    def wait_for_dcos(self) -> None:
         """
-        Wait until DC/OS has started and all nodes have joined the cluster.
-
-        Args:
-            log_output_live: If `True`, log output of the diagnostics check
-                live. If `True`, stderr is merged into stdout in the return
-                value.
+        Wait until DC/OS has started and the authentication service
+        as well as Marathon are reachable.
 
         Raises:
-            ValueError: Raised if cluster HTTPS certificate could not be
-                obtained successfully.
+            RetryError: Raised if Admin Router, Bouncer or Marathon failed
+                to become ready for testing within 5 minutes.
         """
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-        diagnostics_args = [
-            '/opt/mesosphere/bin/dcos-diagnostics',
-            '--diag',
-            '||',
-            '/opt/mesosphere/bin/3dt',
-            '--diag',
-        ]
+        any_master_ip = next(iter(self.masters)).ip_address
+        dcos_url = 'https://{ip}'.format(ip=any_master_ip)
 
-        for node in self.masters:
-            node.run(
-                args=diagnostics_args,
-                # Keep in mind this must be run as privileged user.
-                user=self.default_ssh_user,
-                log_output_live=log_output_live,
-                env={
-                    'LC_ALL': 'en_US.UTF-8',
-                    'LANG': 'en_US.UTF-8',
-                },
-            )
+        # Wait for Admin Router
+        # Retry on ConnectionError
+        response = requests.get(dcos_url + '/', timeout=1)
+        response.raise_for_status()
 
-            url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
-                ip_address=node.ip_address,
-            )
-            resp = requests.get(url, verify=False)
-            if resp.status_code not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pragma: no cover pylint: disable=no-member
-                message = 'Status code is: {status_code}'.format(
-                    status_code=resp.status_code,
-                )
-                raise ValueError(message)
+        # Wait for CA certificate download ready
+        # Retry on ConnectionError or status >= 400
+        response = requests.get(dcos_url + '/ca/dcos-ca.crt', timeout=1)
+        response.raise_for_status()
 
-        # Ideally we would use diagnostics checks as per
-        # https://jira.mesosphere.com/browse/DCOS_OSS-1276
-        # and these would wait long enough.
-        #
-        # However, until then, there is a race condition with the cluster.
-        # This is not always caught by the tests.
-        #
-        # For now we sleep for 5 minutes as this has been shown to be enough.
-        sleep(60 * 5)
+        # Wait for Bouncer authentication failure
+        # Retry on status >= 400, except for 401
+        data = {
+            'uid': '{rand_uid}'.format(rand_uid=uuid.uuid4()),
+            'password': '{rand_password}'.format(rand_password=uuid.uuid4())
+        }
+        response = requests.post(
+            dcos_url + '/acs/api/v1/auth/login',
+            headers={'Content-Type': 'application/json'},
+            json=data,
+            timeout=1,
+        )
+        if response.status_code not in [200, 401]:
+            response.raise_for_status()
+
+        # Wait for Marathon
+        # Retry if not 200
+        response = requests.get(dcos_url + ':8443/v2/info', timeout=1)
+        response.raise_for_status()
 
     def __enter__(self) -> 'Cluster':
         """

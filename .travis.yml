@@ -14,22 +14,22 @@ env:
   # per commit.
   # We run almost one builder per test.
   matrix:
-      - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
+      # - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
       - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
-      - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
-      # This test class uses one scoped cluster so we run it on one builder.
-      - "TEST_PATTERN=tests/test_node.py::TestNode"
-      - "TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest"
-      - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config"
-      - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/test_cluster.py::TestClusterSize"
-      - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging"
-      - "TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend"
+      # - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
+      # # This test class uses one scoped cluster so we run it on one builder.
+      # - "TEST_PATTERN=tests/test_node.py::TestNode"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/test_cluster.py::TestClusterSize"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
@@ -45,7 +45,7 @@ before_install:
     - "travis_retry npm -g install npm@latest"
 
 install:
-    - "travis_retry pip install --upgrade --editable .[dev]"
+    - "travis_retry pip install --process-dependency-links --upgrade --editable .[dev]"
     - "travis_retry npm install"
 
 cache: "pip"
