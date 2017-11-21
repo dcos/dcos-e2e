@@ -18,6 +18,7 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
     - [macOS File Sharing](#macos-file-sharing)
+    - [Clock sync errors](#clock-sync-errors)
 - [Using existing nodes](#using-existing-nodes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -69,6 +70,12 @@ On macOS `/tmp` is a symlink to `/private/tmp`.
 Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
 This is the default.
 See Docker > Preferences > File Sharing.
+
+#### Clock sync errors
+
+On various platforms, the clock can get out of sync between the host machine and Docker containers.
+This is particularly problematic if using `check_time: true` in the DC/OS configuration.
+To work around this, run `docker run --rm --privileged alpine hwclock -s`.
 
 ## Using existing nodes
 
