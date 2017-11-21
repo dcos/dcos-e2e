@@ -45,6 +45,8 @@ class Docker(ClusterBackend):
         self,
         workspace_dir: Optional[Path] = None,
         custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -55,9 +57,12 @@ class Docker(ClusterBackend):
                 This is equivalent to `dir` in
                 https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory  # noqa
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` on
+            custom_agent_mounts: Custom mounts add to agent node containers.
+            custom_public_agent_mounts: Custom mounts add to public agent node
+                containers.
+
+            For details about mount arguments, see `volumes` on
                 http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
-                for details.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -74,6 +79,10 @@ class Docker(ClusterBackend):
         self.dcos_docker_path = current_parent / 'dcos_docker'
         self.workspace_dir = workspace_dir
         self.custom_master_mounts = dict(custom_master_mounts or {})
+        self.custom_agent_mounts = dict(custom_agent_mounts or {})
+        self.custom_public_agent_mounts = dict(
+            custom_public_agent_mounts or {}
+        )
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -378,7 +387,11 @@ class DockerCluster(ClusterManager):
                 container_number=agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={**agent_mounts, **unique_mounts},
+                volumes={
+                    **agent_mounts,
+                    **cluster_backend.custom_agent_mounts,
+                    **unique_mounts,
+                },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
             )
@@ -404,7 +417,11 @@ class DockerCluster(ClusterManager):
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={**agent_mounts, **unique_mounts},
+                volumes={
+                    **agent_mounts,
+                    **cluster_backend.custom_public_agent_mounts,
+                    **unique_mounts,
+                },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
             )
@@ -467,6 +484,13 @@ class DockerCluster(ClusterManager):
         config = {
             'agent_list': ip_list(nodes=self.agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
+            # Without this, we see errors like:
+            # "Time is not synchronized / marked as bad by the kernel.".
+            # Adam saw this on Docker for Mac 17.09.0-ce-mac35.
+            #
+            # In that case this was fixable with:
+            #   $ docker run --rm --privileged alpine hwclock -s
+            'check_time': 'false',
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
             'master_discovery': 'static',

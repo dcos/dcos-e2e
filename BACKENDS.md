@@ -13,11 +13,12 @@ These backend classes allow backend-specific configuration of the cluster.
 - [`dcos_e2e.backend.Docker`](#dcos_e2ebackenddocker)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
-    - [`master_mounts`](#master_mounts)
+    - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
   - [DC/OS Installation](#dcos-installation)
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
     - [macOS File Sharing](#macos-file-sharing)
+    - [Clock sync errors](#clock-sync-errors)
 - [Using existing nodes](#using-existing-nodes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -27,7 +28,7 @@ These backend classes allow backend-specific configuration of the cluster.
 ## `dcos_e2e.backend.Docker`
 
 ```python
-Docker(workspace_dir=None, master_mounts=None)
+Docker(workspace_dir=None, master_mounts=None, agent_mounts=None, public_agent_mounts)
 ```
 
 ### Parameters
@@ -38,9 +39,9 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
-#### `master_mounts`
+#### `master_mounts`, `agent_mounts`, `public_agent_mounts`
 
-Mounts to add to master node containers.
+Mounts to add to node containers.
 See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
 
 ### DC/OS Installation
@@ -69,6 +70,12 @@ On macOS `/tmp` is a symlink to `/private/tmp`.
 Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
 This is the default.
 See Docker > Preferences > File Sharing.
+
+#### Clock sync errors
+
+On various platforms, the clock can get out of sync between the host machine and Docker containers.
+This is particularly problematic if using `check_time: true` in the DC/OS configuration.
+To work around this, run `docker run --rm --privileged alpine hwclock -s`.
 
 ## Using existing nodes
 

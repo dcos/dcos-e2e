@@ -5,7 +5,7 @@
 
 
 - [Changelog](#changelog)
-  - [Next](#next)
+  - [2017.11.21.0](#201711210)
   - [2017.11.15.0](#201711150)
   - [2017.11.14.0](#201711140)
   - [2017.11.02.0](#201711020)
@@ -27,11 +27,12 @@
 
 # Changelog
 
-## Next
+## 2017.11.21.0
 
 * Remove `ExistingCluster` backend and replaced it with simpler `Cluster.from_nodes` method.
 * Simplified the default configuration for the Docker backend.
   Notably this no longer contains a default `superuser_username` or `superuser_password_hash`.
+* Support `custom_agent_mounts` and `custom_public_agent_mounts` on the Docker backend.
 
 ## 2017.11.15.0
 
