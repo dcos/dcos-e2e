@@ -90,7 +90,11 @@ class Cluster(ContextDecorator):
             cluster_backend=backend,
         )
 
-    def wait_for_dcos(self) -> None:
+    def wait_for_dcos(
+        self,
+        superuser_username,
+        superuser_password,
+    ) -> None:
         """
         Wait until DC/OS Enterprise has started and all nodes have joined.
 
@@ -103,9 +107,7 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
-        config = self._cluster.config
-
-        security_mode = config['security']
+        security_mode = 'strict'
 
         protocol = 'http://'
         if security_mode in ('strict', 'permissive'):
