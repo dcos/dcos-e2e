@@ -1,5 +1,5 @@
 autoflake==1.0
-check-manifest==0.35
+check-manifest==0.36
 dcoscli==0.5.6
 flake8==3.5.0
 flake8-quotes==0.12.0
