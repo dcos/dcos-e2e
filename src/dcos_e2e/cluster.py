@@ -3,12 +3,14 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
+import warnings
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-from dcos_test_utils.dcos_api import DcosApiSession
-from dcos_test_utils.enterprise import EnterpriseApiSession, EnterpriseUser
+import urllib3
+from dcos_test_utils.dcos_api import DcosUser, DcosApiSession
+from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
@@ -90,31 +92,6 @@ class Cluster(ContextDecorator):
 
     def wait_for_dcos(self) -> None:
         """
-        Wait until DC/OS has started and all nodes have joined.
-
-        Raises:
-            RetryError: Raised if any cluster component did not become
-                healthy in time.
-        """
-
-        any_master = next(iter(self.masters))
-
-        cluster_args = {
-            'dcos_url': 'https://{ip}'.format(ip=any_master.ip_address),
-            'masters': [str(n.ip_address) for n in self.masters],
-            'slaves': [str(n.ip_address) for n in self.agents],
-            'public_slaves': [str(n.ip_address) for n in self.public_agents],
-        }
-
-        session = DcosApiSession(**cluster_args)
-        session.wait_for_dcos()
-
-    def wait_for_dcos_ee(
-        self,
-        superuser_username: str,
-        superuser_password: str,
-    ) -> None:
-        """
         Wait until DC/OS Enterprise has started and all nodes have joined.
 
         Args:
@@ -126,19 +103,60 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
+        config = self._cluster.config
+
+        security_mode = config['security']
+
+        protocol = 'http://'
+        if security_mode in ('strict', 'permissive'):
+            protocol = 'https://'
+            credentials = {
+                'uid': superuser_username,
+                'password': superuser_password,
+            }
+        else:
+            credentials = CI_CREDENTIALS
+
         any_master = next(iter(self.masters))
 
-        cluster_args = {
-            'dcos_url': 'https://{ip}'.format(ip=any_master.ip_address),
-            'masters': [str(n.ip_address) for n in self.masters],
-            'slaves': [str(n.ip_address) for n in self.agents],
-            'public_slaves': [str(n.ip_address) for n in self.public_agents],
-        }
+        dcos_url = '{protocol}{ip}'.format(
+            protocol=protocol,
+            ip=any_master.ip_address,
+        )
 
-        auth_user = EnterpriseUser(superuser_username, superuser_password)
-        cluster_args['auth_user'] = auth_user
-        session = EnterpriseApiSession(**cluster_args)
-        session.wait_for_dcos()
+        auth_user = DcosUser(credentials=credentials)
+
+        api_session = DcosApiSession(
+            dcos_url=dcos_url,
+            masters=[str(n.ip_address) for n in self.masters],
+            slaves=[str(n.ip_address) for n in self.agents],
+            public_slaves=[str(n.ip_address) for n in self.public_agents],
+            auth_user=auth_user,
+        )
+
+        warnings.simplefilter(
+            'ignore',
+            urllib3.exceptions.InsecureRequestWarning
+        )
+
+        if security_mode in ('strict', 'permissive'):
+            ca_cert = api_session.get(
+                # We wait up to 10 minutes which is arbitrary but has worked
+                # in testing at the time of writing.
+                '/ca/dcos-ca.crt',
+                retry_timeout=60 * 10,
+                verify=False
+            )
+            ca_cert.raise_for_status()
+            api_session.session.verify = session_tempfile(ca_cert.content)
+
+        warnings.simplefilter(
+            'default',
+            urllib3.exceptions.InsecureRequestWarning,
+        )
+
+        api_session.wait_for_dcos()
+
 
     def __enter__(self) -> 'Cluster':
         """

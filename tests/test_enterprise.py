@@ -5,6 +5,7 @@ Tests for using the test harness with a DC/OS Enterprise cluster.
 import subprocess
 import uuid
 from pathlib import Path
+from time import sleep
 
 import requests
 from passlib.hash import sha512_crypt
@@ -153,7 +154,7 @@ class TestWaitForDCOS:
                 log_output_live=True,
             )
             (master, ) = cluster.masters
-            cluster.wait_for_dcos_ee(
+            cluster.wait_for_dcos(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
