@@ -40,6 +40,10 @@ class TestEnterpriseIntegrationTests:
                 extra_config=config,
                 log_output_live=True,
             )
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
             # No error is raised with a successful command.
             cluster.run_integration_tests(
                 pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
