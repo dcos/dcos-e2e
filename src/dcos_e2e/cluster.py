@@ -271,9 +271,6 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        # wait_for_dcos_oss/ee must be called explicitly before running
-        # integration tests.
-        # self.wait_for_dcos()
 
         args = [
             'source',

@@ -45,7 +45,7 @@ before_install:
     - "travis_retry npm -g install npm@latest"
 
 install:
-    - "travis_retry pip install --upgrade --editable .[dev]"
+    - "travis_retry pip install --process-dependency-links --upgrade --editable .[dev]"
     - "travis_retry npm install"
 
 cache: "pip"
