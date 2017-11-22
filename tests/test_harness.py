@@ -31,7 +31,6 @@ class TestIntegrationTests:
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-            cluster.wait_for_dcos_oss()
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
             cluster.run_integration_tests(
@@ -171,7 +170,7 @@ class TestClusterSize:
             assert len(cluster.public_agents) == public_agents
 
 
-class TestInstallDcosFromPathLogging:
+class TestInstallDcosFromPath:
     """
     Tests for logs created when calling `install_dcos_from_path` on
     ``Cluster``.
@@ -260,95 +259,3 @@ class TestMultipleClusters:
             cluster.install_dcos_from_path(oss_artifact)
             with Cluster(cluster_backend=cluster_backend) as cluster:
                 cluster.install_dcos_from_path(oss_artifact)
-
-
-class TestClusterFromNodes:
-    """
-    Tests for creating a `Cluster` with the `Cluster.from_nodes` method.
-    """
-
-    def test_cluster_from_nodes(self, cluster_backend: ClusterBackend) -> None:
-        """
-        It is possible to create a cluster from existing nodes, but not destroy
-        it.
-        """
-        cluster = Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=1,
-            public_agents=1,
-        )
-
-        (master, ) = cluster.masters
-        (agent, ) = cluster.agents
-        (public_agent, ) = cluster.public_agents
-
-        with Cluster.from_nodes(
-            masters=cluster.masters,
-            agents=cluster.agents,
-            public_agents=cluster.public_agents,
-            default_ssh_user=cluster_backend.default_ssh_user,
-        ) as duplicate_cluster:
-            (duplicate_master, ) = duplicate_cluster.masters
-            (duplicate_agent, ) = duplicate_cluster.agents
-            (duplicate_public_agent, ) = duplicate_cluster.public_agents
-
-            duplicate_master.run(
-                args=['touch', 'example_master_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-            duplicate_agent.run(
-                args=['touch', 'example_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-            duplicate_public_agent.run(
-                args=['touch', 'example_public_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-
-            master.run(
-                args=['test', '-f', 'example_master_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-            agent.run(
-                args=['test', '-f', 'example_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-            public_agent.run(
-                args=['test', '-f', 'example_public_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-
-        with pytest.raises(NotImplementedError):
-            duplicate_cluster.destroy()
-
-        cluster.destroy()
-
-    def test_install_dcos(
-        self,
-        oss_artifact: Path,
-        oss_artifact_url: str,
-        cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If a user attempts to install DC/OS on is called on a `Cluster` created
-        from existing nodes, a `NotImplementedError` is raised.
-        """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            cluster = Cluster.from_nodes(
-                masters=cluster.masters,
-                agents=cluster.agents,
-                public_agents=cluster.public_agents,
-                default_ssh_user=cluster_backend.default_ssh_user,
-            )
-
-            with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
-
-            with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)

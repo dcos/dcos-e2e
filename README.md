@@ -60,6 +60,7 @@ class TestExample:
             result = master.run(args=['test', '-f', path],
                                 user=cluster.default_ssh_user)
             print(result.stdout)
+            cluster.wait_for_dcos_oss()
             cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
             try:
                 master.run(args=['test', '-f', '/no/file/here'],

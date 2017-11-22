@@ -5,7 +5,6 @@ Tests for using the test harness with a DC/OS Enterprise cluster.
 import subprocess
 import uuid
 from pathlib import Path
-from time import sleep
 
 import requests
 from passlib.hash import sha512_crypt
@@ -87,9 +86,12 @@ class TestCopyFiles:
             '/var/lib/dcos/pki/tls/CA/private/custom_ca.key'
         )
 
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+
         config = {
-            'superuser_username': str(uuid.uuid4()),
-            'superuser_password_hash': sha512_crypt.hash(str(uuid.uuid4())),
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'security': 'strict',
             'ca_certificate_path': str(installer_cert_path),
             'ca_certificate_key_path': str(installer_key_path),
@@ -119,7 +121,10 @@ class TestCopyFiles:
                 user=cluster.default_ssh_user
             )
 
-            cluster.wait_for_dcos()
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
             master_url = 'https://' + str(master.ip_address)
             response = requests.get(master_url, verify=str(cert_path))
             response.raise_for_status()
@@ -127,7 +132,7 @@ class TestCopyFiles:
 
 class TestWaitForDCOS:
     """
-    Tests for `Cluster.wait_for_dcos`.
+    Tests for `Cluster.wait_for_dcos_ee`.
     """
 
     def test_auth_with_cli(
@@ -136,8 +141,8 @@ class TestWaitForDCOS:
         enterprise_artifact: Path,
     ) -> None:
         """
-        After `Cluster.wait_for_dcos`, the cluster can communicate with the
-        CLI.
+        After `Cluster.wait_for_dcos_ee`, the DC/OS Enterprise cluster can
+        communicate with the CLI.
         """
 
         superuser_username = str(uuid.uuid4())
@@ -154,7 +159,7 @@ class TestWaitForDCOS:
                 log_output_live=True,
             )
             (master, ) = cluster.masters
-            cluster.wait_for_dcos(
+            cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
