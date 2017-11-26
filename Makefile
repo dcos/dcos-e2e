@@ -11,6 +11,8 @@ lint-python-only:
 	flake8 .
 	isort --recursive --check-only
 	mypy src/ tests/
+	pip-extra-reqs src/
+	pip-missing-reqs src/
 	pydocstyle
 	pylint *.py src/dcos_e2e/ tests/
 	pyroma .
