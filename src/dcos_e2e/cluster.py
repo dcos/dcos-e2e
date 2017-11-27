@@ -320,6 +320,11 @@ class Cluster(ContextDecorator):
         On exiting, destroy all nodes in the cluster if the backend supports
         it.
         """
+        # This is a hack to make Vulture not think that these are unused
+        # arguments. We have to receive them to be a valid context manager.
+        for _ in (exc_type, exc_value, traceback):
+            pass
+
         try:
             self.destroy()
         except NotImplementedError:
