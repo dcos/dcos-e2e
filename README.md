@@ -81,7 +81,7 @@ def test_ee_example():
             extra_config={
                 'superuser_username': superuser_username,
                 'superuser_password_hash': sha512_crypt.hash(superuser_password),
-                'check_time': True
+                'check_time': True,
             },
         )
         cluster.wait_for_dcos_ee(
