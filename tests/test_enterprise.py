@@ -6,7 +6,6 @@ import subprocess
 import uuid
 from pathlib import Path
 
-import pytest
 import requests
 from passlib.hash import sha512_crypt
 
@@ -40,6 +39,10 @@ class TestEnterpriseIntegrationTests:
                 build_artifact=enterprise_artifact,
                 extra_config=config,
                 log_output_live=True,
+            )
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
             )
             # No error is raised with a successful command.
             cluster.run_integration_tests(
@@ -87,9 +90,12 @@ class TestCopyFiles:
             '/var/lib/dcos/pki/tls/CA/private/custom_ca.key'
         )
 
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+
         config = {
-            'superuser_username': str(uuid.uuid4()),
-            'superuser_password_hash': sha512_crypt.hash(str(uuid.uuid4())),
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'security': 'strict',
             'ca_certificate_path': str(installer_cert_path),
             'ca_certificate_key_path': str(installer_key_path),
@@ -119,7 +125,10 @@ class TestCopyFiles:
                 user=cluster.default_ssh_user
             )
 
-            cluster.wait_for_dcos()
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
             master_url = 'https://' + str(master.ip_address)
             response = requests.get(master_url, verify=str(cert_path))
             response.raise_for_status()
@@ -127,24 +136,19 @@ class TestCopyFiles:
 
 class TestWaitForDCOS:
     """
-    Tests for `Cluster.wait_for_dcos`.
+    Tests for `Cluster.wait_for_dcos_ee`.
     """
 
-    @pytest.mark.xfail(
-        reason='See https://jira.mesosphere.com/browse/DCOS_OSS-1313',
-        raises=AssertionError,
-    )
     def test_auth_with_cli(
         self,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
     ) -> None:
         """
-        After `Cluster.wait_for_dcos`, the cluster can communicate with the
-        CLI.
-
-        Unfortunately this test is prone to flakiness as it depends on races.
+        After `Cluster.wait_for_dcos_ee`, the DC/OS Enterprise cluster can
+        communicate with the CLI.
         """
+
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         config = {
@@ -159,7 +163,11 @@ class TestWaitForDCOS:
                 log_output_live=True,
             )
             (master, ) = cluster.masters
-            cluster.wait_for_dcos()
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
+
             setup_args = [
                 'dcos',
                 'cluster',
@@ -179,5 +187,4 @@ class TestWaitForDCOS:
             )
 
             assert setup.returncode == 0
-            # Do not cover the following line - see the xfail marker.
-            assert setup.stderr == b''  # pragma: no cover
+            assert setup.stderr == b''

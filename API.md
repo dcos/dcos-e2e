@@ -24,7 +24,8 @@
       - [`log_output_live`](#log_output_live-1)
     - [`run_integration_tests(pytest_command, env=None, log_output_live=False)`](#run_integration_testspytest_command-envnone-log_output_livefalse)
     - [`destroy()`](#destroy)
-    - [`wait_for_dcos()`](#wait_for_dcos)
+    - [`wait_for_dcos_oss()`](#wait_for_dcos_oss)
+    - [`wait_for_dcos_ee(superuser_username, superuser_password)`](#wait_for_dcos_eesuperuser_username-superuser_password)
   - [Attributes](#attributes)
     - [`masters`](#masters-1)
     - [`agents`](#agents-1)
@@ -162,9 +163,17 @@ To see these logs in pytest tests, use the `-s` flag.
 
 Destroy all nodes in the cluster.
 
-#### `wait_for_dcos()`
+#### `wait_for_dcos_oss()`
 
-Wait for the cluster set up to be complete.
+Wait for the DC/OS OSS cluster set up to be complete.
+
+#### `wait_for_dcos_ee(superuser_username, superuser_password)`
+
+Wait for the DC/OS Enterprise cluster set up to be complete.
+
+`superuser_username` must be set to the cluster's default superuser username.
+
+`superuser_password` must be set to the cluster's default superuser password.
 
 ### Attributes
 
