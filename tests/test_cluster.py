@@ -31,6 +31,7 @@ class TestIntegrationTests:
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
+            cluster.wait_for_dcos_oss()
             # No error is raised with a successful command.
             pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
             cluster.run_integration_tests(
@@ -101,7 +102,7 @@ class TestExtendConfig:
                 oss_artifact,
                 extra_config=config,
             )
-            cluster.wait_for_dcos()
+            cluster.wait_for_dcos_oss()
             (master, ) = cluster.masters
             master.run(
                 args=['test', '-f', path], user=cluster.default_ssh_user
@@ -125,7 +126,7 @@ class TestExtendConfig:
         ) as cluster:
             cluster.install_dcos_from_path(oss_artifact)
             (master, ) = cluster.masters
-            cluster.wait_for_dcos()
+            cluster.wait_for_dcos_oss()
             with pytest.raises(CalledProcessError):
                 master.run(
                     args=['test', '-f', path], user=cluster.default_ssh_user

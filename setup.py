@@ -6,10 +6,17 @@ from setuptools import find_packages, setup
 
 VERSION = '2017.11.21.0'
 
+DEPENDENCY_LINKS = []
+
 with open('requirements.txt') as requirements:
     INSTALL_REQUIRES = []
     for line in requirements.readlines():
-        if not line.startswith('#'):
+        if line.startswith('#'):
+            continue
+        if line.startswith('--find-links'):
+            _, link = line.split('--find-links ')
+            DEPENDENCY_LINKS.append(link)
+        else:
             INSTALL_REQUIRES.append(line)
 
 with open('dev-requirements.txt') as dev_requirements:
@@ -20,6 +27,8 @@ with open('dev-requirements.txt') as dev_requirements:
 
 with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
+
+TEST_UTILS_SHA = '45b76b1a961985343015996adeaa0bdd9128f4b3'
 
 setup(
     name='DCOS E2E',
@@ -45,4 +54,5 @@ setup(
         'Programming Language :: Python :: 3.5',
         'License :: OSI Approved :: Apache License 2.0',
     ],
+    dependency_links=DEPENDENCY_LINKS,
 )

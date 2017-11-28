@@ -3,14 +3,14 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
+import warnings
 from contextlib import ContextDecorator
 from pathlib import Path
-from time import sleep
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-import requests
-from requests import codes
-from retry import retry
+from dcos_test_utils.dcos_api import DcosApiSession, DcosUser
+from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
+from urllib3.exceptions import InsecureRequestWarning
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
@@ -90,71 +90,73 @@ class Cluster(ContextDecorator):
             cluster_backend=backend,
         )
 
-    @retry(
-        exceptions=(
-            subprocess.CalledProcessError,
-            ValueError,
-            requests.exceptions.ConnectionError,
-        ),
-        tries=500,
-        delay=5,
-    )
-    def wait_for_dcos(
-        self,
-        log_output_live: bool = False,
-    ) -> None:
+    def wait_for_dcos_oss(self) -> None:
         """
-        Wait until DC/OS has started and all nodes have joined the cluster.
-
-        Args:
-            log_output_live: If `True`, log output of the diagnostics check
-                live. If `True`, stderr is merged into stdout in the return
-                value.
+        Wait until the DC/OS OSS boot process has completed.
 
         Raises:
-            ValueError: Raised if cluster HTTPS certificate could not be
-                obtained successfully.
+            RetryError: Raised if any cluster component did not become
+                healthy in time.
+        """
+        any_master = next(iter(self.masters))
+
+        api_session = DcosApiSession(
+            dcos_url='http://{ip}'.format(ip=any_master.ip_address),
+            masters=[str(n.ip_address) for n in self.masters],
+            slaves=[str(n.ip_address) for n in self.agents],
+            public_slaves=[str(n.ip_address) for n in self.public_agents],
+            auth_user=DcosUser(credentials=CI_CREDENTIALS),
+        )
+
+        api_session.wait_for_dcos()
+
+    def wait_for_dcos_ee(
+        self,
+        superuser_username: str,
+        superuser_password: str,
+    ) -> None:
+        """
+        Wait until the DC/OS Enterprise boot process has completed.
+
+        Args:
+            superuser_username: Username of the default superuser.
+            superuser_password: Password of the default superuser.
+
+        Raises:
+            RetryError: Raised if any cluster component did not become
+                healthy in time.
         """
 
-        diagnostics_args = [
-            '/opt/mesosphere/bin/dcos-diagnostics',
-            '--diag',
-            '||',
-            '/opt/mesosphere/bin/3dt',
-            '--diag',
-        ]
+        credentials = {
+            'uid': superuser_username,
+            'password': superuser_password,
+        }
 
-        for node in self.masters:
-            node.run(
-                args=diagnostics_args,
-                # Keep in mind this must be run as privileged user.
-                user=self.default_ssh_user,
-                log_output_live=log_output_live,
-                env={
-                    'LC_ALL': 'en_US.UTF-8',
-                    'LANG': 'en_US.UTF-8',
-                },
-            )
+        any_master = next(iter(self.masters))
 
-            url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
-                ip_address=node.ip_address,
-            )
-            resp = requests.get(url, verify=False)
-            if resp.status_code not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pragma: no cover pylint: disable=no-member
-                message = 'Status code is: {status_code}'.format(
-                    status_code=resp.status_code,
-                )
-                raise ValueError(message)
+        api_session = DcosApiSession(
+            dcos_url='https://{ip}'.format(ip=any_master.ip_address),
+            masters=[str(n.ip_address) for n in self.masters],
+            slaves=[str(n.ip_address) for n in self.agents],
+            public_slaves=[str(n.ip_address) for n in self.public_agents],
+            auth_user=DcosUser(credentials=credentials),
+        )
 
-        # Ideally we would use diagnostics checks as per
-        # https://jira.mesosphere.com/browse/DCOS_OSS-1276
-        # and these would wait long enough.
-        #
-        # However, until then, there is a race condition with the cluster.
-        # This is not always caught by the tests.
-        #
-        # For now we sleep for 5 minutes as this has been shown to be enough.
-        sleep(60 * 5)
+        warnings.simplefilter('ignore', InsecureRequestWarning)
+
+        ca_cert = api_session.get(
+            # We wait up to 10 minutes which is arbitrary but has worked
+            # in testing at the time of writing.
+            '/ca/dcos-ca.crt',
+            retry_timeout=60 * 10,
+            verify=False
+        )
+        ca_cert.raise_for_status()
+        api_session.session.verify = session_tempfile(ca_cert.content)
+
+        warnings.simplefilter('default', InsecureRequestWarning)
+
+        api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
         """
@@ -269,7 +271,6 @@ class Cluster(ContextDecorator):
         Raises:
             ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
         """
-        self.wait_for_dcos()
 
         args = [
             'source',

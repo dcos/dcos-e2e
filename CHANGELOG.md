@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [Next](#next)
   - [2017.11.21.0](#201711210)
   - [2017.11.15.0](#201711150)
   - [2017.11.14.0](#201711140)
@@ -26,6 +27,13 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## Next
+
+* Backwards incompatible change: Introduce separate `wait_for_dcos_oss` and `wait_for_dcos_ee` methods.
+Both methods improve the boot process waiting time for the corresponding DC/OS version.
+* Backwards incompatible change: `run_integration_tests` now requires to call `wait_for_dcos_oss` or `wait_for_dcos_ee` beforehand.
+
 
 ## 2017.11.21.0
 
