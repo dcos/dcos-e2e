@@ -28,8 +28,6 @@ with open('dev-requirements.txt') as dev_requirements:
 with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
 
-TEST_UTILS_SHA = '45b76b1a961985343015996adeaa0bdd9128f4b3'
-
 setup(
     name='DCOS E2E',
     version=VERSION,
