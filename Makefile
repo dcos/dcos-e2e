@@ -16,7 +16,7 @@ lint-python-only:
 	pydocstyle
 	pylint *.py src/dcos_e2e/ tests/
 	pyroma .
-	vulture .
+	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
 
 .PHONY: lint-docs
