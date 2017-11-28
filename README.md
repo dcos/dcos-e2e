@@ -72,8 +72,8 @@ def test_ee_example():
 
     ee_artifact = Path('/tmp/dcos_generate_config.ee.sh')
 
-		superuser_username = str(uuid.uuid4())
-		superuser_password = str(uuid.uuid4())
+    superuser_username = str(uuid.uuid4())
+    superuser_password = str(uuid.uuid4())
 
     with Cluster(cluster_backend=Docker()) as cluster:
         cluster.install_dcos_from_path(
