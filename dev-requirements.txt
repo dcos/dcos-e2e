@@ -13,7 +13,6 @@ py==1.5.2
 pylint==1.7.4
 pyroma==2.2
 pytest==3.3.0
-pytest-catchlog==1.2.2
 pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.0
 vulture==0.26
