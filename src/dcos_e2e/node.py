@@ -55,7 +55,7 @@ class Node:
         command = []
 
         for key, value in env.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
+            export = f"export {key}='{value}'"
             command.append(export)
             command.append('&&')
 
