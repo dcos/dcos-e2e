@@ -6,7 +6,7 @@ services:
 language: "python"
 
 python:
-    - "3.6"
+    - "3.5"
 
 env:
   # Travis has a maximum test run time of 50 minutes.
@@ -30,11 +30,16 @@ env:
       - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"
       # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
       - "TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend"
+      - "TEST_PATTERN=tests/backends/test_aws.py::TestAWSBackend"
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
     #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
     secure: "DCA/nGUV8IUrFg7SmL8K2WvLd3V/6JD7RINUyzBoKoADmJ9xvcQOI8Zm91//fJtiTNpEZOfOkFXYVQwGHAoPlgaS5/ENqbCV+4zn4RoS3q+WvuAaRR/mXj+z2Jzbgp+x9Pe1FTJroY521+Qqj1sjl9nQK24WOUPhlXe9bdFiRCNAK49r+dxa7dURVq0WyOcBk22psTxXpuBRfciV/dzun2llfdL0Ur9+enlMwj13HByMxR+TOPcsZ6ZXC4A8SxKKSpkT19lCTmfW34Ks0N6Gfqaad46eqfc97mwTyIaGW73iVLRsiI5sjBlXTlsdp2qPmn7WJih7BNOFdcoLNmqHW72akon+z5On2K5kwUqvobtrJ+d0n8hf+5HozZz4Tl6glByeMcWlcQgOqLZuH5scZK3U0rHOqeTsEDBlg45Y1CrTOCHWvetFgMwa9QQlmVNmnkWQ0B5fDuspW+sjqbeTMwwQk/2+eWYgi8vaR9N6gEouqUg5nZmpk3ppmY8NxHaVe1w5WWMOJyyws3T4f78eubGs3KLL2fcgLVhCWQNYa5zXXZRPG9d+kJsCCJFK7Bj8cIva31zbLTkTlA80xDxRYw33PvkWRKMP08zkyoo4MiYKvq42fpLuv7BbOksK1GosX+YvxyRK+yr0Uix62vNc4c6MwwLmtxWzJQEjOLEl4FU="
+    # The encrypted AWS_ACCESS_KEY_ID.
+    secure: "b4DGo2B6u3f89J4y0hBAKxQ/BI/UJY3HWdprlkgh/mOgwfiU6swUSA3kz1oA4urCMqLhOXpGd2JE/X1cKHwgsapskzHOgN4kuJ/p+UWTCvUIFCm0owZ2YZkmVVENq+xxM08DLpO19vaDysY9dQcs9VD4XlUDCe81GlamDS13OPigmleOiyxxbs73qNQ3S8AN44sPhLWcWk4Xpy2ZDmEwcdJoEfmiDLdeVKdtNzLf1GvnqwRFuaVjEpWwPAE7iye016iWqo6cwmFYZGWfSK4Y1mAEIo4ret6HJShKm6hyySYkVRxvDcn76SB/1XbhN7DEjjoH9sYCV95z1X8i/C0Va4R1iRWwTHEfHjQB8HZ9jyT5rXEOKLIAhMhCvwZVtdCPeLasxZpE0YhADVinUvJ+ahK2SA2yh8N4NFe2zxD4i7bqZLKoHFBEodgKU8SotEABjHS+qOa3BpK9Iyu5s5vL8Vx4Tfj8MhDEScEdk0hEOADdWQw8TiANxSw7aOZc6JF+UwW2vkECMGr/WNEgsZ6r/EmDXi1ivwTHtAeN7ftpvlOvHmZBVqIrpWXyV2wpr2y50jGZLtJuk9QZd5sxH50GwQ919X5F+dSi4KpPFyE6oUnAUeNXwqqW3WdNxqpRiLhEnO0qqJ4ZiuC7kdc8tPtqrJ0bnful6dvVN8O2bchD+lA="
+    # The encrypted SECRET_AWS_ACCESS_KEY.
+    secure: "PLS6M6lmSBGM7B3bpwTwXFCnPjiG3F0Pugna3cDOrs1oczfIY6ST4V0wDuqNl9F8MWVyOaJBhEa45k2I1DGqUgquR1kBHG4brCR8eilydCGFCI4x+v3GDAir9IaVtx+44q+XfvdON3GzgDhjs6dSWY22e++kbuaM6eDw8dgD/y7w/jjAINVROoZanf8AlPFkh9ktwRYJP9W1+cIL+eVw4/OGI2HmfBQS4aI4sdtNCQIyQ1abQPIT1VVxJ/heblm2FUhSmILV5d1sYGrEIRime4NZw2lXgI+S/kJqLHD6lJJPXpzon9msrm9HbQEBFk8yHnf/+nWbfcioTIb1ETPe1DRQqVtDpe4WWc4qtJVqwoeb/lQAAm04xiba9n5gM2xv5Y4iriHm0C5b2UNpXm5++E0CIlKBB01hO3AMm1rwOgDpFK3CZ5hM3XQVG6K5nXFhPEuIpZjzWBIlfZzAHvKkTm7C1bw5ozT3JuHfGA5NO9SQPZvkB9qqKN+PVjxKBlxZw/njUXxB5k1Z6XJkn8fshGhyFEIa4pcNDZkRQd5Hx0m/Lm7kO6/6ry0ESFUqsRka/QMMAXFwPymtBkSuozqDtfuFGNkE+eNnI77AB9ESq8kiaisqHttCg06OkPVRoVoFsYLl3Yxju46T4bDp+jfs1iBQ+MyGC0oybzE0T1UrO60="
 
 before_install:
     - "travis_retry pip install --upgrade pip setuptools codecov"
