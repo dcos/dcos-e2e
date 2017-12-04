@@ -30,7 +30,7 @@ def aws_backend() -> ClusterBackend:
                                      ).read().decode('utf8')
 
     return AWS(
-        aws_region=os.environ['DEFAULT_AWS_REGION'],
+        aws_region='us-east-1',
         aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
         aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
         admin_location=test_public_ip + '/32',

@@ -215,7 +215,7 @@ The path to an SSH key which can be used to SSH to the node as the cluster's `de
 
 #### `private_ip_address`
 
-The DC/OS specific IP address of the node if it differes from the hosts' external IP address.
+The DC/OS specific IP address of the node if it differs from the hosts' external IP address.
 
 ### Methods
 
