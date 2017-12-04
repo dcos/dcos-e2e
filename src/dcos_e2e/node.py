@@ -18,10 +18,16 @@ class Node:
     A record of a DC/OS cluster node.
     """
 
-    def __init__(self, ip_address: IPv4Address, ssh_key_path: Path) -> None:
+    def __init__(
+        self,
+        ip_address: IPv4Address,
+        ssh_key_path: Path,
+        private_ip_address: IPv4Address = None,
+    ) -> None:
         """
         Args:
             ip_address: The IP address of the node.
+            private_ip_address: The DC/OS internal IP address of the node.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the `root` user.
 
@@ -30,6 +36,8 @@ class Node:
         """
         self.ip_address = ip_address
         self._ssh_key_path = ssh_key_path
+        self.private_ip_address = private_ip_address if private_ip_address \
+            else ip_address
 
     def _compose_ssh_command(
         self,

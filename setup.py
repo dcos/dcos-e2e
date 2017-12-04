@@ -28,6 +28,8 @@ with open('dev-requirements.txt') as dev_requirements:
 with open('README.md') as f:
     LONG_DESCRIPTION = f.read()
 
+print(find_packages(where='src'))
+
 setup(
     name='DCOS E2E',
     version=VERSION,

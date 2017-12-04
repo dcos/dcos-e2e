@@ -2,11 +2,13 @@ adam
 admin
 args
 aufs
+aws
 backend
 backends
 calledprocesserror
 ci
 cli
+cloudformation
 config
 cwd
 dc
@@ -34,9 +36,9 @@ systemd
 tmp
 tmpfs
 travis
-typeshed
 url
 utils
 username
 vm
 xfail
+API

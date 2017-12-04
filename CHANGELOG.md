@@ -31,7 +31,7 @@
 
 ## Next
 
-* Remove Python 3.5 support. Now supports Python 3.6+.
+Add basic AWS backend.
 
 ## 2017.11.29.0
 
