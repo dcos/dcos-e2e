@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [Next](#next)
   - [2017.11.29.0](#201711290)
   - [2017.11.21.0](#201711210)
   - [2017.11.15.0](#201711150)
@@ -27,6 +28,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## Next
+
+Add basic AWS backend.
 
 ## 2017.11.29.0
 

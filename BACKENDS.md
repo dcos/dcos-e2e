@@ -19,6 +19,16 @@ These backend classes allow backend-specific configuration of the cluster.
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
     - [macOS File Sharing](#macos-file-sharing)
     - [Clock sync errors](#clock-sync-errors)
+- [`dcos_e2e.backend.AWS`](#dcos_e2ebackendaws)
+  - [Parameters](#parameters-1)
+    - [`aws_access_key_id`](#aws_access_key_id)
+    - [`aws_secret_access_key`](#aws_secret_access_key)
+    - [`aws_region`](#aws_region)
+    - [`admin_location`](#admin_location)
+    - [`instance_type`](#instance_type)
+    - [`deploy_timeout`](#deploy_timeout)
+    - [`workspace_dir`](#workspace_dir-1)
+  - [DC/OS Installation](#dcos-installation-1)
 - [Using existing nodes](#using-existing-nodes)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -76,6 +86,66 @@ See Docker > Preferences > File Sharing.
 On various platforms, the clock can get out of sync between the host machine and Docker containers.
 This is particularly problematic if using `check_time: true` in the DC/OS configuration.
 To work around this, run `docker run --rm --privileged alpine hwclock -s`.
+
+## `dcos_e2e.backend.AWS`
+
+```python
+AWS(
+    aws_access_key_id,
+    aws_secret_access_key,
+    aws_region,
+    admin_location,
+    instance_type,
+    deploy_timeout=60,
+    workspace_dir=None,
+)
+```
+
+### Parameters
+
+#### `aws_access_key_id`
+
+The access key ID which must be specified as part of the authentication with AWS.
+
+#### `aws_secret_access_key`
+
+The secret access key which must be specified as part of the authentication with AWS.
+
+#### `aws_region`
+
+The AWS region that the backend should create the clusters in. This must be a string representation of an [AWS region code](http://docs.aws.amazon.com/general/latest/gr/rande.html). The following regions are supported.
+
+*`'ap-northeast-1'`
+*`'ap-southeast-1'`
+*`'ap-southeast-2'`
+*`'eu-central-1'`
+*`'eu-west-1'`
+*`'sa-east-1'`
+*`'us-east-1'`
+*`'us-west-1'`
+*`'us-west-2'`
+
+#### `admin_location`
+
+IP address range of which the corresponding hosts are allowed to access nodes of clusters created by this backend. Specifiying ``'0.0.0.0/32'`` will alone anyone to connect.
+
+#### `instance_type`
+
+The [AWS instance type](https://aws.amazon.com/ec2/instance-types/) for all hosts of clusters created by this backend.
+
+#### `deploy_timeout`
+
+The lifespan measured in minutes for clusters created by this backend.
+
+#### `workspace_dir`
+
+The directory in which temporary files will be created.
+These files will be deleted at the end of a test run.
+This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
+
+### DC/OS Installation
+
+`Cluster`s created by the AWS backend only support installing DC/OS via `install_dcos_from_url`.
 
 ## Using existing nodes
 

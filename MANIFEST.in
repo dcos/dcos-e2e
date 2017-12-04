@@ -1,1 +1,2 @@
 recursive-include src/dcos_e2e/backends/_docker/dcos_docker *
+recursive-include src/dcos_e2e/backends/_aws/resources *

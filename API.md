@@ -35,12 +35,14 @@
   - [Parameters](#parameters-1)
     - [`ip_address`](#ip_address)
     - [`ssh_key_path`](#ssh_key_path)
+    - [`private_ip_address`](#private_ip_address)
   - [Methods](#methods-1)
     - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
     - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
     - [`node.send_file(local_path, remote_path, user) -> None`](#nodesend_filelocal_path-remote_path-user---none)
   - [Attributes](#attributes-1)
     - [`ip_address`](#ip_address-1)
+    - [`private_ip_address`](#private_ip_address-1)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
@@ -198,18 +200,22 @@ The default SSH user to access cluster nodes.
 Commands can be run on nodes in clusters.
 
 ```python
-Node(ip_address, ssh_key_path)
+Node(ip_address, ssh_key_path, private_ip_address=None)
 ```
 
 ### Parameters
 
 #### `ip_address`
 
-The IP address of the node.
+The external IP address of the node.
 
 #### `ssh_key_path`
 
 The path to an SSH key which can be used to SSH to the node as the cluster's `default_ssh_user` user.
+
+#### `private_ip_address`
+
+The DC/OS specific IP address of the node if it differes from the hosts' external IP address.
 
 ### Methods
 
@@ -241,4 +247,8 @@ Copy a file to the node via SSH as the given user.
 
 #### `ip_address`
 
-The IP address of the node.
+The external IP address of the node.
+
+#### `private_ip_address`
+
+The DC/OS internal IP address of the node if different from the external IP address.
