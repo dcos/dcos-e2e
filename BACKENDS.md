@@ -115,19 +115,19 @@ The secret access key which must be specified as part of the authentication with
 
 The AWS region that the backend should create the clusters in. This must be a string representation of an [AWS region code](http://docs.aws.amazon.com/general/latest/gr/rande.html). The following regions are supported.
 
-*`'ap-northeast-1'`
-*`'ap-southeast-1'`
-*`'ap-southeast-2'`
-*`'eu-central-1'`
-*`'eu-west-1'`
-*`'sa-east-1'`
-*`'us-east-1'`
-*`'us-west-1'`
-*`'us-west-2'`
+* `'ap-northeast-1'`
+* `'ap-southeast-1'`
+* `'ap-southeast-2'`
+* `'eu-central-1'`
+* `'eu-west-1'`
+* `'sa-east-1'`
+* `'us-east-1'`
+* `'us-west-1'`
+* `'us-west-2'`
 
 #### `admin_location`
 
-IP address range of which the corresponding hosts are allowed to access nodes of clusters created by this backend. Specifiying ``'0.0.0.0/32'`` will alone anyone to connect.
+IP address range of which the corresponding hosts are allowed to access nodes of clusters created by this backend. Specifiying ``'0.0.0.0/32'`` will allow anyone to connect.
 
 #### `instance_type`
 

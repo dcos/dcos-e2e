@@ -6,7 +6,7 @@ services:
 language: "python"
 
 python:
-    - "3.6"
+    - "3.5"
 
 env:
   # Travis has a maximum test run time of 50 minutes.
@@ -14,32 +14,33 @@ env:
   # per commit.
   # We run almost one builder per test.
   matrix:
-      - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
-      - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
-      - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
-      # This test class uses one scoped cluster so we run it on one builder.
-      - "TEST_PATTERN=tests/test_node.py::TestNode"
-      - "TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest"
-      - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config"
-      - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/test_cluster.py::TestClusterSize"
-      - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging"
-      - "TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend"
+      # - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
+      # - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
+      # - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
+      # # This test class uses one scoped cluster so we run it on one builder.
+      # - "TEST_PATTERN=tests/test_node.py::TestNode"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/test_cluster.py::TestClusterSize"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging"
+      # - "TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"
+      # # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
+      # - "TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend"
       - "TEST_PATTERN=tests/backends/test_aws.py::TestAWSBackend"
+
   global:
     # The encrypted URL for a DC/OS Enterprise artifact.
     # Generate this by running:
     #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
-    secure: "DCA/nGUV8IUrFg7SmL8K2WvLd3V/6JD7RINUyzBoKoADmJ9xvcQOI8Zm91//fJtiTNpEZOfOkFXYVQwGHAoPlgaS5/ENqbCV+4zn4RoS3q+WvuAaRR/mXj+z2Jzbgp+x9Pe1FTJroY521+Qqj1sjl9nQK24WOUPhlXe9bdFiRCNAK49r+dxa7dURVq0WyOcBk22psTxXpuBRfciV/dzun2llfdL0Ur9+enlMwj13HByMxR+TOPcsZ6ZXC4A8SxKKSpkT19lCTmfW34Ks0N6Gfqaad46eqfc97mwTyIaGW73iVLRsiI5sjBlXTlsdp2qPmn7WJih7BNOFdcoLNmqHW72akon+z5On2K5kwUqvobtrJ+d0n8hf+5HozZz4Tl6glByeMcWlcQgOqLZuH5scZK3U0rHOqeTsEDBlg45Y1CrTOCHWvetFgMwa9QQlmVNmnkWQ0B5fDuspW+sjqbeTMwwQk/2+eWYgi8vaR9N6gEouqUg5nZmpk3ppmY8NxHaVe1w5WWMOJyyws3T4f78eubGs3KLL2fcgLVhCWQNYa5zXXZRPG9d+kJsCCJFK7Bj8cIva31zbLTkTlA80xDxRYw33PvkWRKMP08zkyoo4MiYKvq42fpLuv7BbOksK1GosX+YvxyRK+yr0Uix62vNc4c6MwwLmtxWzJQEjOLEl4FU="
+    - secure: "DCA/nGUV8IUrFg7SmL8K2WvLd3V/6JD7RINUyzBoKoADmJ9xvcQOI8Zm91//fJtiTNpEZOfOkFXYVQwGHAoPlgaS5/ENqbCV+4zn4RoS3q+WvuAaRR/mXj+z2Jzbgp+x9Pe1FTJroY521+Qqj1sjl9nQK24WOUPhlXe9bdFiRCNAK49r+dxa7dURVq0WyOcBk22psTxXpuBRfciV/dzun2llfdL0Ur9+enlMwj13HByMxR+TOPcsZ6ZXC4A8SxKKSpkT19lCTmfW34Ks0N6Gfqaad46eqfc97mwTyIaGW73iVLRsiI5sjBlXTlsdp2qPmn7WJih7BNOFdcoLNmqHW72akon+z5On2K5kwUqvobtrJ+d0n8hf+5HozZz4Tl6glByeMcWlcQgOqLZuH5scZK3U0rHOqeTsEDBlg45Y1CrTOCHWvetFgMwa9QQlmVNmnkWQ0B5fDuspW+sjqbeTMwwQk/2+eWYgi8vaR9N6gEouqUg5nZmpk3ppmY8NxHaVe1w5WWMOJyyws3T4f78eubGs3KLL2fcgLVhCWQNYa5zXXZRPG9d+kJsCCJFK7Bj8cIva31zbLTkTlA80xDxRYw33PvkWRKMP08zkyoo4MiYKvq42fpLuv7BbOksK1GosX+YvxyRK+yr0Uix62vNc4c6MwwLmtxWzJQEjOLEl4FU="
     # The encrypted AWS_ACCESS_KEY_ID.
-    secure: "awkLMgbGxC2m6LJXDBQDyaVu6Re+APNeSoS+BHhH8uPqUXxrzgR2mW/GYyb5Er0JHVoHqUfxqlTQfZOKSwwhFkfIP11IEz5fUpeRJWAlfvgBLPKGqWr2065pxnvw0VxeFVGmPX9ZDAwWg/erKdw/aZr2+b5lnzzC8KL2Tv1fCYj3MzE/vYD89H2Obbg6W2YT3E7Ohi3v+OoF1acWiHUxKZBmSNyCOWylvj+Utcj6lqJuyQC4Nmmxqqvmw5RDfbfBX9cC0xVQTUnwgD1iouP2i/MDzXEbA78J3mie742LknZq8KSJ7y2jF/vTQ55wlu1OiFYOwIFcepD7aEGuyrUbGVHyQ693x/japX3RLxc/cmxosYMQvQP2ag2bCxMEppvK2tqeqV5cXZgQNb1J0i9IBlhwjNefm7j6hDXjqLadKq2dSe4Z7Po97AklSupeBcD6JisBIDuV3utWBxomCrOx2dXRaO4wpoMVXhVQ2muGqeCCii7JLtxbbcDK6wRDVllNJMb6vG9GWHjr66c0egNicreiWCmK5hME49vNPN+jqPbKAnT8cV14SyTA+cNgQYxCf68B9QoNu7WWEiqou+zwOQj0eHhbsOnSWrsk2GY27Z7qoWF70Jdn5vfv4gBjCk7u2Bv0AOmuu5kq98SgjO69MUrj4jUuHsA/xvSxqsQ9kSQ="
+    - secure: "awkLMgbGxC2m6LJXDBQDyaVu6Re+APNeSoS+BHhH8uPqUXxrzgR2mW/GYyb5Er0JHVoHqUfxqlTQfZOKSwwhFkfIP11IEz5fUpeRJWAlfvgBLPKGqWr2065pxnvw0VxeFVGmPX9ZDAwWg/erKdw/aZr2+b5lnzzC8KL2Tv1fCYj3MzE/vYD89H2Obbg6W2YT3E7Ohi3v+OoF1acWiHUxKZBmSNyCOWylvj+Utcj6lqJuyQC4Nmmxqqvmw5RDfbfBX9cC0xVQTUnwgD1iouP2i/MDzXEbA78J3mie742LknZq8KSJ7y2jF/vTQ55wlu1OiFYOwIFcepD7aEGuyrUbGVHyQ693x/japX3RLxc/cmxosYMQvQP2ag2bCxMEppvK2tqeqV5cXZgQNb1J0i9IBlhwjNefm7j6hDXjqLadKq2dSe4Z7Po97AklSupeBcD6JisBIDuV3utWBxomCrOx2dXRaO4wpoMVXhVQ2muGqeCCii7JLtxbbcDK6wRDVllNJMb6vG9GWHjr66c0egNicreiWCmK5hME49vNPN+jqPbKAnT8cV14SyTA+cNgQYxCf68B9QoNu7WWEiqou+zwOQj0eHhbsOnSWrsk2GY27Z7qoWF70Jdn5vfv4gBjCk7u2Bv0AOmuu5kq98SgjO69MUrj4jUuHsA/xvSxqsQ9kSQ="
     # The encrypted SECRET_AWS_ACCESS_KEY.
-    secure: "FJeVkFMUH3K3N49hnjXqmV2VeKuSJ+hSPAstOkrZwvai2fcXi4i9FIucquIdMnayK7X8mSFJfN7nbiQT1N0qI8tqGKIqehg1h7QsNj944HiDtBnXUkbrBoVnFBH7A2aA9a1rNuJl86olCdKM5SFfsl3EyqO71R3LdiQBTg/47Fjd0Hb6XPvrXtc2Vl+ZhJ6eXFRk3iTOm/mE5/LJGCMsCuePojcPSnyBBRfkMFH7Ty7a1efx9F2m+KaBOZBHHP2CpDyWKF2jS/Gntl2rFRG9bHFDZQ7uMBYUkk4irsLYihyxU7g5uKi06kGd9wYtVp8wGeV841TFb7ypH7adnrDpRLvarsSlhGDQ32DYkLpfguoOluVVgK5Db8x/12MxNqiVcm3zUnOCLz7LMz3r9ATT/Iyw99uhJ65uAcwDqVURKZuvVjaawXc84DcCXOGY5aUSUI+ZayaSbW1BNHw2iVldJDetQ3JYmR1ebAXBfHf7EzcxFkipy+BJkcMR3fTkAxd4RAosE45l3wWr9eD1wXsB7WGt7yKGgzVHZRDWi73pR7YVGyj4Ek9E7O9+CwJ4y/rV2XyPDrcpBkRMSH+raVhW2FxnCw2jfdAp3d8E1JqF/RiAIZOVTHjNaz5beHYAXTWhOlzzuaRwS0RN7O8u287IE5rdbvUWdO84DJkp6o9lAgw="
+    - secure: "FJeVkFMUH3K3N49hnjXqmV2VeKuSJ+hSPAstOkrZwvai2fcXi4i9FIucquIdMnayK7X8mSFJfN7nbiQT1N0qI8tqGKIqehg1h7QsNj944HiDtBnXUkbrBoVnFBH7A2aA9a1rNuJl86olCdKM5SFfsl3EyqO71R3LdiQBTg/47Fjd0Hb6XPvrXtc2Vl+ZhJ6eXFRk3iTOm/mE5/LJGCMsCuePojcPSnyBBRfkMFH7Ty7a1efx9F2m+KaBOZBHHP2CpDyWKF2jS/Gntl2rFRG9bHFDZQ7uMBYUkk4irsLYihyxU7g5uKi06kGd9wYtVp8wGeV841TFb7ypH7adnrDpRLvarsSlhGDQ32DYkLpfguoOluVVgK5Db8x/12MxNqiVcm3zUnOCLz7LMz3r9ATT/Iyw99uhJ65uAcwDqVURKZuvVjaawXc84DcCXOGY5aUSUI+ZayaSbW1BNHw2iVldJDetQ3JYmR1ebAXBfHf7EzcxFkipy+BJkcMR3fTkAxd4RAosE45l3wWr9eD1wXsB7WGt7yKGgzVHZRDWi73pR7YVGyj4Ek9E7O9+CwJ4y/rV2XyPDrcpBkRMSH+raVhW2FxnCw2jfdAp3d8E1JqF/RiAIZOVTHjNaz5beHYAXTWhOlzzuaRwS0RN7O8u287IE5rdbvUWdO84DJkp6o9lAgw="
 
 before_install:
     - "travis_retry pip install --upgrade pip setuptools codecov"
