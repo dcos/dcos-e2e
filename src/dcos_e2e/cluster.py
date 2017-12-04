@@ -12,9 +12,7 @@ from dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
 from urllib3.exceptions import InsecureRequestWarning
 
-# Ignore a spurious error - this import is used in a type hint.
-from .backends import ClusterManager  # noqa: F401
-from .backends import ClusterBackend, _ExistingCluster
+from .backends import ClusterBackend, ClusterManager, _ExistingCluster
 from .node import Node
 
 
@@ -46,13 +44,13 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
-        self._cluster = cluster_backend.cluster_cls(
+        self._cluster: ClusterManager = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-        )  # type: ClusterManager
+        )
 
     @classmethod
     def from_nodes(
