@@ -500,6 +500,7 @@ class DockerCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
+            'fault_domain_enabled': 'false',
         }
 
         config_yaml = yaml.dump(data={**config, **extra_config})
