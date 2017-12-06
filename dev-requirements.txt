@@ -12,7 +12,7 @@ pyenchant==1.6.11
 py==1.5.2
 pylint==1.7.4
 pyroma==2.3
-pytest==3.3.0
+pytest==3.3.1
 pytest-catchlog==1.2.2
 pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1
