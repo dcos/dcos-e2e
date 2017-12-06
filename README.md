@@ -33,7 +33,7 @@ See "Required Environment".
 To create tests using clusters with custom configurations, first install the harness:
 
 ```sh
-pip install --process-dependency-links git+https://github.com/mesosphere/dcos-e2e.git@master
+pip install --process-dependency-links git+https://github.com/mesosphere/dcos-e2e.git@master 
 ```
 
 Then, create a test, such as the following:
@@ -99,8 +99,6 @@ See [`API.md`](./API.md) for details on the API.
 See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to this repository.
 
 ## Required Environment
-
-DC/OS E2E is tested on Python 3.6.
 
 See [`BACKENDS.md`](./BACKENDS.md) for details on requirements for launching clusters with each backend.
 
