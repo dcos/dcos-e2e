@@ -29,10 +29,6 @@
 
 # Changelog
 
-## Next
-
-* Remove Python 3.5 support. Now supports Python 3.6+.
-
 ## 2017.11.29.0
 
 * Backwards incompatible change: Introduce separate `wait_for_dcos_oss` and `wait_for_dcos_ee` methods.

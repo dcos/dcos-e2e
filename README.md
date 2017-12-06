@@ -100,8 +100,6 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to t
 
 ## Required Environment
 
-DC/OS E2E is tested on Python 3.6.
-
 See [`BACKENDS.md`](./BACKENDS.md) for details on requirements for launching clusters with each backend.
 
 ## Cleaning Up and Troubleshooting
