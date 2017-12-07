@@ -145,10 +145,10 @@ class Cluster(ContextDecorator):
         warnings.simplefilter('ignore', InsecureRequestWarning)
 
         ca_cert = api_session.get(
-            # We wait up to 10 minutes which is arbitrary but has worked
-            # in testing at the time of writing.
+            # We wait up to 30 minutes which is extraordinarily large
+            # but should avoid problems with 3 or 5 master counts.
             '/ca/dcos-ca.crt',
-            retry_timeout=60 * 10,
+            retry_timeout=60 * 30,
             verify=False
         )
         ca_cert.raise_for_status()
