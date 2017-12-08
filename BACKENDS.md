@@ -18,6 +18,7 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
     - [macOS File Sharing](#macos-file-sharing)
+    - [SELinux](#selinux)
     - [Clock sync errors](#clock-sync-errors)
 - [Using existing nodes](#using-existing-nodes)
 
@@ -70,6 +71,11 @@ On macOS `/tmp` is a symlink to `/private/tmp`.
 Docker for Mac must be configured to allow `/private` to be bind mounted into Docker containers.
 This is the default.
 See Docker > Preferences > File Sharing.
+
+#### SELinux
+
+Tests inherit the host's environment.
+Any tests that rely on SELinux being available require it be available on the host.
 
 #### Clock sync errors
 

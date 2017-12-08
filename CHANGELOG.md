@@ -5,7 +5,7 @@
 
 
 - [Changelog](#changelog)
-- [Next](#next)
+- [2017.12.08.0](#201712080)
   - [2017.11.29.0](#201711290)
   - [2017.11.21.0](#201711210)
   - [2017.11.15.0](#201711150)
@@ -29,7 +29,7 @@
 
 # Changelog
 
-# Next
+# 2017.12.08.0
 
 * Extend `wait_for_dcos_ee` timeout for waiting until the DC/OS CA cert can be fetched.
 

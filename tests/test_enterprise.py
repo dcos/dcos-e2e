@@ -32,6 +32,7 @@ class TestEnterpriseIntegrationTests:
         config = {
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
@@ -99,6 +100,7 @@ class TestCopyFiles:
             'security': 'strict',
             'ca_certificate_path': str(installer_cert_path),
             'ca_certificate_key_path': str(installer_key_path),
+            'fault_domain_enabled': False,
         }
 
         files_to_copy_to_installer = {
@@ -154,6 +156,7 @@ class TestWaitForDCOS:
         config = {
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
