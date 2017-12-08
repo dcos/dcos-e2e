@@ -7,11 +7,9 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
 
-import requests
 from dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from dcos_test_utils.enterprise import EnterpriseApiSession
 from dcos_test_utils.helpers import CI_CREDENTIALS
-from requests import codes
 from retry import retry
 
 # Ignore a spurious error - this import is used in a type hint.
@@ -93,15 +91,11 @@ class Cluster(ContextDecorator):
         )
 
     @retry(
-        exceptions=(
-            subprocess.CalledProcessError,
-            ValueError,
-            requests.exceptions.ConnectionError,
-        ),
+        exceptions=(subprocess.CalledProcessError),
         tries=500,
         delay=5,
     )
-    def _wait_for_adminrouter(
+    def _wait_for_dcos_diagnostics(
         self,
         log_output_live: bool = False,
     ) -> None:
@@ -113,22 +107,10 @@ class Cluster(ContextDecorator):
                 live. If `True`, stderr is merged into stdout in the return
                 value.
 
-        Raises:
-            ValueError: If Admin Router is not capable yet of serving the CA
-                certificate for the DC/OS cluster.
-
         """
-        diagnostics_args = [
-            '/opt/mesosphere/bin/dcos-diagnostics',
-            '--diag',
-            '||',
-            '/opt/mesosphere/bin/3dt',
-            '--diag',
-        ]
-
         for node in self.masters:
             node.run(
-                args=diagnostics_args,
+                args=['/opt/mesosphere/bin/dcos-diagnostics', '--diag'],
                 # Keep in mind this must be run as privileged user.
                 user=self.default_ssh_user,
                 log_output_live=log_output_live,
@@ -137,15 +119,6 @@ class Cluster(ContextDecorator):
                     'LANG': 'en_US.UTF-8',
                 },
             )
-            url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
-                ip_address=node.ip_address,
-            )
-            resp = requests.get(url, verify=False)
-            if resp.status_code not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pragma: no cover pylint: disable=no-member
-                message = 'Status code is: {status_code}'.format(
-                    status_code=resp.status_code,
-                )
-                raise ValueError(message)
 
     def wait_for_dcos_oss(self) -> None:
         """
@@ -155,7 +128,7 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
-        self._wait_for_adminrouter()
+        self._wait_for_dcos_diagnostics()
 
         any_master = next(iter(self.masters))
 
@@ -186,7 +159,7 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
-        self._wait_for_adminrouter()
+        self._wait_for_dcos_diagnostics()
 
         credentials = {
             'uid': superuser_username,
@@ -202,6 +175,15 @@ class Cluster(ContextDecorator):
             public_slaves=[str(n.ip_address) for n in self.public_agents],
             auth_user=DcosUser(credentials=credentials),
         )
+
+        response = enterprise_session.get(
+            # We wait for 10 minutes which is arbitrary but should
+            # be more than enough after all systemd units are healthy.
+            '/ca/dcos-ca.crt',
+            retry_timeout=60 * 10,
+            verify=False,
+        )
+        response.raise_for_status()
 
         enterprise_session.set_ca_cert()
         enterprise_session.wait_for_dcos()
