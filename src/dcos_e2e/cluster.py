@@ -9,6 +9,7 @@ from typing import Any, Dict, Iterable, List, Optional, Set
 
 import requests
 from dcos_test_utils.dcos_api import DcosApiSession, DcosUser
+from dcos_test_utils.enterprise import EnterpriseApiSession
 from dcos_test_utils.helpers import CI_CREDENTIALS
 from requests import codes
 from retry import retry
@@ -154,7 +155,7 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
-        self._wait_for_adminrouter(log_output_live=True)
+        self._wait_for_adminrouter()
 
         any_master = next(iter(self.masters))
 
@@ -185,7 +186,7 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
-        self._wait_for_adminrouter(log_output_live=True)
+        self._wait_for_adminrouter()
 
         credentials = {
             'uid': superuser_username,
@@ -194,7 +195,7 @@ class Cluster(ContextDecorator):
 
         any_master = next(iter(self.masters))
 
-        api_session = DcosApiSession(
+        enterprise_session = EnterpriseApiSession(
             dcos_url='https://{ip}'.format(ip=any_master.ip_address),
             masters=[str(n.ip_address) for n in self.masters],
             slaves=[str(n.ip_address) for n in self.agents],
@@ -202,8 +203,8 @@ class Cluster(ContextDecorator):
             auth_user=DcosUser(credentials=credentials),
         )
 
-        api_session.set_ca_cert()
-        api_session.wait_for_dcos()
+        enterprise_session.set_ca_cert()
+        enterprise_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
         """
