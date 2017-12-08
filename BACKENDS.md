@@ -18,6 +18,7 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
     - [macOS File Sharing](#macos-file-sharing)
+    - [SELinux](#selinux)
     - [Clock sync errors](#clock-sync-errors)
 - [Using existing nodes](#using-existing-nodes)
 
