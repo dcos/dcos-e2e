@@ -8,8 +8,11 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
 
+import requests
 from dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
+from requests import codes
+from retry import retry
 from urllib3.exceptions import InsecureRequestWarning
 
 # Ignore a spurious error - this import is used in a type hint.
@@ -90,6 +93,61 @@ class Cluster(ContextDecorator):
             cluster_backend=backend,
         )
 
+    @retry(
+        exceptions=(
+            subprocess.CalledProcessError,
+            ValueError,
+            requests.exceptions.ConnectionError,
+        ),
+        tries=500,
+        delay=5,
+    )
+    def _wait_for_dcos_diagnostics(
+        self,
+        log_output_live: bool = False,
+    ) -> None:
+        """
+        Wait until all DC/OS systemd units are healthy.
+
+        Args:
+            log_output_live: If `True`, log output of the diagnostics check
+                live. If `True`, stderr is merged into stdout in the return
+                value.
+
+        Raises:
+            ValueError: If Admin Router is not capable yet of serving the CA
+                certificate for the DC/OS cluster.
+
+        """
+        diagnostics_args = [
+            '/opt/mesosphere/bin/dcos-diagnostics',
+            '--diag',
+            '||',
+            '/opt/mesosphere/bin/3dt',
+            '--diag',
+        ]
+
+        for node in self.masters:
+            node.run(
+                args=diagnostics_args,
+                # Keep in mind this must be run as privileged user.
+                user=self.default_ssh_user,
+                log_output_live=log_output_live,
+                env={
+                    'LC_ALL': 'en_US.UTF-8',
+                    'LANG': 'en_US.UTF-8',
+                },
+            )
+            url = 'http://{ip_address}/ca/dcos-ca.crt'.format(
+                ip_address=node.ip_address,
+            )
+            resp = requests.get(url, verify=False)
+            if resp.status_code not in (codes.OK, codes.NOT_FOUND):  # noqa: E501 pragma: no cover pylint: disable=no-member
+                message = 'Status code is: {status_code}'.format(
+                    status_code=resp.status_code,
+                )
+                raise ValueError(message)
+
     def wait_for_dcos_oss(self) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
@@ -98,6 +156,8 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
+        self._wait_for_dcos_diagnostics(log_output_live=True)
+
         any_master = next(iter(self.masters))
 
         api_session = DcosApiSession(
@@ -127,6 +187,8 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
+        self._wait_for_dcos_diagnostics(log_output_live=True)
+
         credentials = {
             'uid': superuser_username,
             'password': superuser_password,
@@ -145,11 +207,7 @@ class Cluster(ContextDecorator):
         warnings.simplefilter('ignore', InsecureRequestWarning)
 
         ca_cert = api_session.get(
-            # We wait up to 30 minutes which is extraordinarily large
-            # but should avoid problems with 3 or 5 master counts.
-            '/ca/dcos-ca.crt',
-            retry_timeout=60 * 30,
-            verify=False
+            '/ca/dcos-ca.crt', retry_timeout=60 * 1, verify=False
         )
         ca_cert.raise_for_status()
         api_session.session.verify = session_tempfile(ca_cert.content)
