@@ -128,7 +128,33 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
+
         self._wait_for_dcos_diagnostics()
+
+        # The dcos-diagnostics check is not yet sufficient to determine
+        # when a CLI login would be possible with DC/OS OSS. It only
+        # checks the healthy state of the systemd units, not reachability
+        # of services through HTTP.
+
+        # Since DC/OS uses a Single-Sign-On flow with Identity Providers
+        # outside the cluster for the login and Admin Router only rewrites
+        # requests to them, the login endpoint does not provide anything.
+
+        # Current solution to guarantee the security CLI login:
+
+        # Try until one can login successfully with a long lived token
+        # (dirty hack in dcos-test-utils wait_for_dcos). This is to avoid
+        # having to simulate a browser that does the SSO flow.
+
+        # Suggestion for replacing this with a DC/OS check for CLI login:
+
+        # Determine and wait for all dependencies of the SSO OAuth login
+        # inside of DC/OS. This should include Admin Router, Zookeeper and
+        # the DC/OS OAuth login service. Note that this may only guarantee
+        # that the login could work, however not that is actually works.
+
+        # In order to fully replace this method one would need to have
+        # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
         any_master = next(iter(self.masters))
 
@@ -160,6 +186,28 @@ class Cluster(ContextDecorator):
         """
 
         self._wait_for_dcos_diagnostics()
+
+        # The dcos-diagnostics check is not yet sufficient to determine
+        # when a CLI login would be possible with Enterprise DC/OS. It only
+        # checks the healthy state of the systemd units, not reachability
+        # of services through HTTP.
+
+        # In the case of Enterprise DC/OS this method uses dcos-test-utils
+        # and superuser credentials to perform a superuser login that
+        # assure authenticating via CLI is working.
+
+        # Suggestion for replacing this with a DC/OS check for CLI login:
+
+        # In Enterprise
+        # DC/OS this could be replace by polling the login endpoint with
+        # random login credentials until it returns 401. In that case
+        # the guarantees would be the same as with the OSS suggestion.
+
+        # The progress on a partial replacement can be followed here:
+        # https://jira.mesosphere.com/browse/DCOS_OSS-1313
+
+        # In order to fully replace this method one would need to have
+        # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
         credentials = {
             'uid': superuser_username,
