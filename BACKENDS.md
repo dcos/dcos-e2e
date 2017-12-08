@@ -71,6 +71,11 @@ Docker for Mac must be configured to allow `/private` to be bind mounted into Do
 This is the default.
 See Docker > Preferences > File Sharing.
 
+#### SELinux
+
+Tests inherit the host's environment.
+Any tests that rely on SELinux being available require it be available on the host.
+
 #### Clock sync errors
 
 On various platforms, the clock can get out of sync between the host machine and Docker containers.
