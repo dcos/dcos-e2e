@@ -3,17 +3,15 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
-import warnings
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
 
 import requests
 from dcos_test_utils.dcos_api import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
+from dcos_test_utils.helpers import CI_CREDENTIALS
 from requests import codes
 from retry import retry
-from urllib3.exceptions import InsecureRequestWarning
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
@@ -102,7 +100,7 @@ class Cluster(ContextDecorator):
         tries=500,
         delay=5,
     )
-    def _wait_for_dcos_diagnostics(
+    def _wait_for_adminrouter(
         self,
         log_output_live: bool = False,
     ) -> None:
@@ -156,7 +154,7 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
-        self._wait_for_dcos_diagnostics(log_output_live=True)
+        self._wait_for_adminrouter(log_output_live=True)
 
         any_master = next(iter(self.masters))
 
@@ -187,7 +185,7 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
-        self._wait_for_dcos_diagnostics(log_output_live=True)
+        self._wait_for_adminrouter(log_output_live=True)
 
         credentials = {
             'uid': superuser_username,
@@ -204,16 +202,7 @@ class Cluster(ContextDecorator):
             auth_user=DcosUser(credentials=credentials),
         )
 
-        warnings.simplefilter('ignore', InsecureRequestWarning)
-
-        ca_cert = api_session.get(
-            '/ca/dcos-ca.crt', retry_timeout=60 * 1, verify=False
-        )
-        ca_cert.raise_for_status()
-        api_session.session.verify = session_tempfile(ca_cert.content)
-
-        warnings.simplefilter('default', InsecureRequestWarning)
-
+        api_session.set_ca_cert()
         api_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
