@@ -40,3 +40,6 @@ utils
 username
 vm
 xfail
+sso
+oauth
+zookeeper

@@ -3,14 +3,14 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import subprocess
-import warnings
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set
 
 from dcos_test_utils.dcos_api import DcosApiSession, DcosUser
-from dcos_test_utils.helpers import CI_CREDENTIALS, session_tempfile
-from urllib3.exceptions import InsecureRequestWarning
+from dcos_test_utils.enterprise import EnterpriseApiSession
+from dcos_test_utils.helpers import CI_CREDENTIALS
+from retry import retry
 
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
@@ -90,6 +90,27 @@ class Cluster(ContextDecorator):
             cluster_backend=backend,
         )
 
+    @retry(
+        exceptions=(subprocess.CalledProcessError),
+        tries=500,
+        delay=10,
+    )
+    def _wait_for_dcos_diagnostics(self) -> None:
+        """
+        Wait until all DC/OS systemd units are healthy.
+        """
+        for node in self.masters:
+            node.run(
+                args=['/opt/mesosphere/bin/dcos-diagnostics', '--diag'],
+                # Keep in mind this must be run as privileged user.
+                user=self.default_ssh_user,
+                log_output_live=True,
+                env={
+                    'LC_ALL': 'en_US.UTF-8',
+                    'LANG': 'en_US.UTF-8',
+                },
+            )
+
     def wait_for_dcos_oss(self) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
@@ -98,6 +119,34 @@ class Cluster(ContextDecorator):
             RetryError: Raised if any cluster component did not become
                 healthy in time.
         """
+
+        self._wait_for_dcos_diagnostics()
+
+        # The dcos-diagnostics check is not yet sufficient to determine
+        # when a CLI login would be possible with DC/OS OSS. It only
+        # checks the healthy state of the systemd units, not reachability
+        # of services through HTTP.
+
+        # Since DC/OS uses a Single-Sign-On flow with Identity Providers
+        # outside the cluster for the login and Admin Router only rewrites
+        # requests to them, the login endpoint does not provide anything.
+
+        # Current solution to guarantee the security CLI login:
+
+        # Try until one can login successfully with a long lived token
+        # (dirty hack in dcos-test-utils wait_for_dcos). This is to avoid
+        # having to simulate a browser that does the SSO flow.
+
+        # Suggestion for replacing this with a DC/OS check for CLI login:
+
+        # Determine and wait for all dependencies of the SSO OAuth login
+        # inside of DC/OS. This should include Admin Router, ZooKeeper and
+        # the DC/OS OAuth login service. Note that this may only guarantee
+        # that the login could work, however not that is actually works.
+
+        # In order to fully replace this method one would need to have
+        # DC/OS checks for every HTTP endpoint exposed by Admin Router.
+
         any_master = next(iter(self.masters))
 
         api_session = DcosApiSession(
@@ -127,6 +176,30 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
+        self._wait_for_dcos_diagnostics()
+
+        # The dcos-diagnostics check is not yet sufficient to determine
+        # when a CLI login would be possible with Enterprise DC/OS. It only
+        # checks the healthy state of the systemd units, not reachability
+        # of services through HTTP.
+
+        # In the case of Enterprise DC/OS this method uses dcos-test-utils
+        # and superuser credentials to perform a superuser login that
+        # assure authenticating via CLI is working.
+
+        # Suggestion for replacing this with a DC/OS check for CLI login:
+
+        # In Enterprise DC/OS this could be replace by polling the login
+        # endpoint with random login credentials until it returns 401. In
+        # that case the guarantees would be the same as with the OSS
+        # suggestion.
+
+        # The progress on a partial replacement can be followed here:
+        # https://jira.mesosphere.com/browse/DCOS_OSS-1313
+
+        # In order to fully replace this method one would need to have
+        # DC/OS checks for every HTTP endpoint exposed by Admin Router.
+
         credentials = {
             'uid': superuser_username,
             'password': superuser_password,
@@ -134,7 +207,7 @@ class Cluster(ContextDecorator):
 
         any_master = next(iter(self.masters))
 
-        api_session = DcosApiSession(
+        enterprise_session = EnterpriseApiSession(
             dcos_url='https://{ip}'.format(ip=any_master.ip_address),
             masters=[str(n.ip_address) for n in self.masters],
             slaves=[str(n.ip_address) for n in self.agents],
@@ -142,21 +215,17 @@ class Cluster(ContextDecorator):
             auth_user=DcosUser(credentials=credentials),
         )
 
-        warnings.simplefilter('ignore', InsecureRequestWarning)
-
-        ca_cert = api_session.get(
-            # We wait up to 30 minutes which is extraordinarily large
-            # but should avoid problems with 3 or 5 master counts.
+        response = enterprise_session.get(
+            # We wait for 10 minutes which is arbitrary but should
+            # be more than enough after all systemd units are healthy.
             '/ca/dcos-ca.crt',
-            retry_timeout=60 * 30,
-            verify=False
+            retry_timeout=60 * 10,
+            verify=False,
         )
-        ca_cert.raise_for_status()
-        api_session.session.verify = session_tempfile(ca_cert.content)
+        response.raise_for_status()
 
-        warnings.simplefilter('default', InsecureRequestWarning)
-
-        api_session.wait_for_dcos()
+        enterprise_session.set_ca_cert()
+        enterprise_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
         """
