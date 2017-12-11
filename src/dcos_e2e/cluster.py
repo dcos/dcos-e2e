@@ -95,10 +95,7 @@ class Cluster(ContextDecorator):
         tries=500,
         delay=5,
     )
-    def _wait_for_dcos_diagnostics(
-        self,
-        log_output_live: bool = False,
-    ) -> None:
+    def _wait_for_dcos_diagnostics(self) -> None:
         """
         Wait until all DC/OS systemd units are healthy.
 
@@ -113,7 +110,7 @@ class Cluster(ContextDecorator):
                 args=['/opt/mesosphere/bin/dcos-diagnostics', '--diag'],
                 # Keep in mind this must be run as privileged user.
                 user=self.default_ssh_user,
-                log_output_live=log_output_live,
+                log_output_live=True,
                 env={
                     'LC_ALL': 'en_US.UTF-8',
                     'LANG': 'en_US.UTF-8',
@@ -198,10 +195,10 @@ class Cluster(ContextDecorator):
 
         # Suggestion for replacing this with a DC/OS check for CLI login:
 
-        # In Enterprise
-        # DC/OS this could be replace by polling the login endpoint with
-        # random login credentials until it returns 401. In that case
-        # the guarantees would be the same as with the OSS suggestion.
+        # In Enterprise DC/OS this could be replace by polling the login
+        # endpoint with random login credentials until it returns 401. In
+        # that case the guarantees would be the same as with the OSS
+        # suggestion.
 
         # The progress on a partial replacement can be followed here:
         # https://jira.mesosphere.com/browse/DCOS_OSS-1313
