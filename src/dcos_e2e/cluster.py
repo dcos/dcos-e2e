@@ -265,7 +265,7 @@ class Cluster(ContextDecorator):
     def install_dcos_from_url(
         self,
         build_artifact: str,
-        extra_config: Dict[str, Any] = None,
+        extra_config: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
     ) -> None:
         """
@@ -292,7 +292,7 @@ class Cluster(ContextDecorator):
     def install_dcos_from_path(
         self,
         build_artifact: Path,
-        extra_config: Dict[str, Any] = None,
+        extra_config: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
     ) -> None:
         """
