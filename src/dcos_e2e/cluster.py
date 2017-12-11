@@ -93,7 +93,7 @@ class Cluster(ContextDecorator):
     @retry(
         exceptions=(subprocess.CalledProcessError),
         tries=500,
-        delay=5,
+        delay=10,
     )
     def _wait_for_dcos_diagnostics(self) -> None:
         """
@@ -140,7 +140,7 @@ class Cluster(ContextDecorator):
         # Suggestion for replacing this with a DC/OS check for CLI login:
 
         # Determine and wait for all dependencies of the SSO OAuth login
-        # inside of DC/OS. This should include Admin Router, Zookeeper and
+        # inside of DC/OS. This should include Admin Router, ZooKeeper and
         # the DC/OS OAuth login service. Note that this may only guarantee
         # that the login could work, however not that is actually works.
 
