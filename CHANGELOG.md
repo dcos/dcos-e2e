@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+- [2017.12.11.0](#201712110)
 - [2017.12.08.0](#201712080)
   - [2017.11.29.0](#201711290)
   - [2017.11.21.0](#201711210)
@@ -28,6 +29,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+# 2017.12.11.0
+
+* Replace the extended `wait_for_dcos_ee` timeout with a preceding dcos-diagnostics check.
 
 # 2017.12.08.0
 
