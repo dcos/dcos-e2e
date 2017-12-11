@@ -32,6 +32,8 @@
 
 # 2017.12.11.0
 
+* Replace the extended `wait_for_dcos_ee` timeout with a preceding dcos-diagnostics check.
+
 # 2017.12.08.0
 
 * Extend `wait_for_dcos_ee` timeout for waiting until the DC/OS CA cert can be fetched.
