@@ -98,12 +98,6 @@ class Cluster(ContextDecorator):
     def _wait_for_dcos_diagnostics(self) -> None:
         """
         Wait until all DC/OS systemd units are healthy.
-
-        Args:
-            log_output_live: If `True`, log output of the diagnostics check
-                live. If `True`, stderr is merged into stdout in the return
-                value.
-
         """
         for node in self.masters:
             node.run(
