@@ -10,7 +10,7 @@ pip_check_reqs==2.0.1
 pydocstyle==2.1.1
 pyenchant==1.6.11
 py==1.5.2
-pylint==1.7.4
+pylint==1.7.5
 pyroma==2.3
 pytest==3.3.1
 pytest-catchlog==1.2.2
