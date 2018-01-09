@@ -643,14 +643,19 @@ class DockerCluster(ClusterManager):
         filters = {'name': container_base_name}
         containers = client.containers.list(filters=filters)
 
-        return set(
-            Node(
-                ip_address=IPv4Address(
-                    container.attrs['NetworkSettings']['IPAddress']
-                ),
-                ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
-            ) for container in containers
-        )
+        nodes = set([])
+        for container in containers:
+            ip_address = IPv4Address(
+                container.attrs['NetworkSettings']['IPAddress']
+            )
+            nodes.add(
+                Node(
+                    ip_address=ip_address,
+                    private_ip_address=ip_address,
+                    ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
+                )
+            )
+        return nodes
 
     @property
     def masters(self) -> Set[Node]:
