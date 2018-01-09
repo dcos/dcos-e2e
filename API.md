@@ -33,14 +33,15 @@
     - [`default_ssh_user`](#default_ssh_user)
 - [`dcos_e2e.node.Node`](#dcos_e2enodenode)
   - [Parameters](#parameters-1)
-    - [`ip_address`](#ip_address)
+    - [`host_ip_address`](#host_ip_address)
+    - [`dcos_ip_address`](#dcos_ip_address)
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
     - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
     - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
     - [`node.send_file(local_path, remote_path, user) -> None`](#nodesend_filelocal_path-remote_path-user---none)
   - [Attributes](#attributes-1)
-    - [`ip_address`](#ip_address-1)
+    - [`ip_address`](#ip_address)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 <!--lint enable list-item-indent-->
@@ -198,14 +199,18 @@ The default SSH user to access cluster nodes.
 Commands can be run on nodes in clusters.
 
 ```python
-Node(ip_address, ssh_key_path)
+Node(host_ip_address, dcos_ip_address, ssh_key_path)
 ```
 
 ### Parameters
 
-#### `ip_address`
+#### `host_ip_address`
 
-The IP address of the node.
+The public IP address of the host represented by this node.
+
+#### `dcos_ip_address`
+
+The IP address that the DC/OS component on this node uses.
 
 #### `ssh_key_path`
 
@@ -241,4 +246,4 @@ Copy a file to the node via SSH as the given user.
 
 #### `ip_address`
 
-The IP address of the node.
+The IP address that the DC/OS component on this node uses.

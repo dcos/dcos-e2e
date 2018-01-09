@@ -645,13 +645,13 @@ class DockerCluster(ClusterManager):
 
         nodes = set([])
         for container in containers:
-            ip_address = IPv4Address(
+            container_ip_address = IPv4Address(
                 container.attrs['NetworkSettings']['IPAddress']
             )
             nodes.add(
                 Node(
-                    ip_address=ip_address,
-                    private_ip_address=ip_address,
+                    host_ip_address=container_ip_address,
+                    dcos_ip_address=container_ip_address,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
                 )
             )
