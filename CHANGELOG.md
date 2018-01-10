@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+- [Next](#next)
 - [2017.12.11.0](#201712110)
 - [2017.12.08.0](#201712080)
   - [2017.11.29.0](#201711290)
@@ -29,6 +30,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+# Next
+
+* Distinguish between host IP for SSH connection and DC/OS IP address when creating a Node.
 
 # 2017.12.11.0
 
