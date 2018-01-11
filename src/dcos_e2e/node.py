@@ -18,17 +18,26 @@ class Node:
     A record of a DC/OS cluster node.
     """
 
-    def __init__(self, ip_address: IPv4Address, ssh_key_path: Path) -> None:
+    def __init__(
+        self,
+        host_ip_address: IPv4Address,
+        dcos_ip_address: IPv4Address,
+        ssh_key_path: Path,
+    ) -> None:
         """
         Args:
-            ip_address: The IP address of the node.
+            host_ip_address: The public IP address of the node.
+            dcos_ip_address: The IP address used by the DC/OS component
+                running on this node.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the `root` user.
 
         Attributes:
-            ip_address: The IP address of the node.
+            ip_address: The IP address used by the DC/OS component
+                running on this node.
         """
-        self.ip_address = ip_address
+        self.ip_address = dcos_ip_address
+        self._host_ip_address = host_ip_address
         self._ssh_key_path = ssh_key_path
 
     def _compose_ssh_command(
@@ -85,7 +94,7 @@ class Node:
             # Bypass password checking.
             '-o',
             'PreferredAuthentications=publickey',
-            str(self.ip_address),
+            str(self._host_ip_address),
         ] + command
 
         return ssh_args
@@ -158,7 +167,7 @@ class Node:
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(
-            str(self.ip_address),
+            str(self._host_ip_address),
             username=user,
             key_filename=str(self._ssh_key_path),
         )
