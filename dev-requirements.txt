@@ -1,4 +1,4 @@
-autoflake==1.0
+autoflake==1.1
 check-manifest==0.36
 dcoscli==0.5.7
 flake8==3.5.0
