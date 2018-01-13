@@ -4,11 +4,13 @@
 
 [![Updates](https://pyup.io/repos/github/mesosphere/dcos-e2e/shield.svg)](https://pyup.io/repos/github/mesosphere/dcos-e2e/)
 
-# DC/OS End to End tests
+# DC/OS E2E
 
-End to end tests are tests which require a DC/OS cluster to run against.
-Each test spins up at least one cluster, and has the choice of configuring this cluster as appropriate.
-For example, a test may require a cluster with a certain number of agents, or certain configuration options.
+Spin up DC/OS clusters with various configurations and run tests using those clusters.
+
+Interactions can be "end to end", meaning that you can test start up and shut down of clusters.
+
+Requires Python 3.5.2+.
 
 <!--lint disable list-item-indent-->
 <!--lint disable list-item-bullet-indent-->
