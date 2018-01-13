@@ -11,6 +11,7 @@ These backend classes allow backend-specific configuration of the cluster.
 
 
 - [`dcos_e2e.backend.Docker`](#dcos_e2ebackenddocker)
+  - [Requirements](#requirements)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
     - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
@@ -31,6 +32,20 @@ These backend classes allow backend-specific configuration of the cluster.
 ```python
 Docker(workspace_dir=None, master_mounts=None, agent_mounts=None, public_agent_mounts)
 ```
+
+### Requirements
+
+* Docker
+
+Plenty of memory must be given to Docker.
+On Docker for Mac, this can be done from Docker > Preferences > Advanced.
+This backend has been tested with a four node cluster with 9 GB memory given to Docker.
+
+* IP routing set up for Docker
+
+On Docker for Mac this requires a tool such as [docker-mac-network](https://github.com/wojas/docker-mac-network).
+
+* `ssh`
 
 ### Parameters
 
