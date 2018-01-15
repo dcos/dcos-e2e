@@ -17,4 +17,4 @@ pytest-catchlog==1.2.2
 pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1
 vulture==0.26
-yapf==0.20.0
+yapf==0.20.1
