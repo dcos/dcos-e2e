@@ -1,62 +1,41 @@
-sudo: "required"
-
+sudo: required
 services:
-    - "docker"
-
-language: "python"
-
+- docker
+language: python
 python:
-    - "3.5"
-
+- '3.5'
 env:
-  # Travis has a maximum test run time of 50 minutes.
-  # In order to avoid this and to see failures faster, we run multiple builds
-  # per commit.
-  # We run almost one builder per test.
   matrix:
-      - "TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest"
-      - "TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli"
-      - "TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer"
-      # This test class uses one scoped cluster so we run it on one builder.
-      - "TEST_PATTERN=tests/test_node.py::TestNode"
-      - "TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest"
-      - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config"
-      - "TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/test_cluster.py::TestClusterSize"
-      - "TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging"
-      - "TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes"
-      # Clusters in this class do not require DC/OS so we can run multiple tests on one builder.
-      - "TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend"
+  - TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest
+  - TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
+  - TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
+  - TEST_PATTERN=tests/test_node.py::TestNode
+  - TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest
+  - TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config
+  - TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config
+  - TEST_PATTERN=tests/test_cluster.py::TestClusterSize
+  - TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging
+  - TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters
+  - TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes
+  - TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend
   global:
-    # The encrypted URL for a DC/OS Enterprise artifact.
-    # Generate this by running:
-    #     travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL"
-    secure: "DCA/nGUV8IUrFg7SmL8K2WvLd3V/6JD7RINUyzBoKoADmJ9xvcQOI8Zm91//fJtiTNpEZOfOkFXYVQwGHAoPlgaS5/ENqbCV+4zn4RoS3q+WvuAaRR/mXj+z2Jzbgp+x9Pe1FTJroY521+Qqj1sjl9nQK24WOUPhlXe9bdFiRCNAK49r+dxa7dURVq0WyOcBk22psTxXpuBRfciV/dzun2llfdL0Ur9+enlMwj13HByMxR+TOPcsZ6ZXC4A8SxKKSpkT19lCTmfW34Ks0N6Gfqaad46eqfc97mwTyIaGW73iVLRsiI5sjBlXTlsdp2qPmn7WJih7BNOFdcoLNmqHW72akon+z5On2K5kwUqvobtrJ+d0n8hf+5HozZz4Tl6glByeMcWlcQgOqLZuH5scZK3U0rHOqeTsEDBlg45Y1CrTOCHWvetFgMwa9QQlmVNmnkWQ0B5fDuspW+sjqbeTMwwQk/2+eWYgi8vaR9N6gEouqUg5nZmpk3ppmY8NxHaVe1w5WWMOJyyws3T4f78eubGs3KLL2fcgLVhCWQNYa5zXXZRPG9d+kJsCCJFK7Bj8cIva31zbLTkTlA80xDxRYw33PvkWRKMP08zkyoo4MiYKvq42fpLuv7BbOksK1GosX+YvxyRK+yr0Uix62vNc4c6MwwLmtxWzJQEjOLEl4FU="
-
+    secure: DCA/nGUV8IUrFg7SmL8K2WvLd3V/6JD7RINUyzBoKoADmJ9xvcQOI8Zm91//fJtiTNpEZOfOkFXYVQwGHAoPlgaS5/ENqbCV+4zn4RoS3q+WvuAaRR/mXj+z2Jzbgp+x9Pe1FTJroY521+Qqj1sjl9nQK24WOUPhlXe9bdFiRCNAK49r+dxa7dURVq0WyOcBk22psTxXpuBRfciV/dzun2llfdL0Ur9+enlMwj13HByMxR+TOPcsZ6ZXC4A8SxKKSpkT19lCTmfW34Ks0N6Gfqaad46eqfc97mwTyIaGW73iVLRsiI5sjBlXTlsdp2qPmn7WJih7BNOFdcoLNmqHW72akon+z5On2K5kwUqvobtrJ+d0n8hf+5HozZz4Tl6glByeMcWlcQgOqLZuH5scZK3U0rHOqeTsEDBlg45Y1CrTOCHWvetFgMwa9QQlmVNmnkWQ0B5fDuspW+sjqbeTMwwQk/2+eWYgi8vaR9N6gEouqUg5nZmpk3ppmY8NxHaVe1w5WWMOJyyws3T4f78eubGs3KLL2fcgLVhCWQNYa5zXXZRPG9d+kJsCCJFK7Bj8cIva31zbLTkTlA80xDxRYw33PvkWRKMP08zkyoo4MiYKvq42fpLuv7BbOksK1GosX+YvxyRK+yr0Uix62vNc4c6MwwLmtxWzJQEjOLEl4FU=
 before_install:
-    - "travis_retry pip install --upgrade pip setuptools codecov"
-    - "travis_retry sudo apt-get update"
-      # Ideally we would use `addons.apt.packages` for enchant but this is not
-      # supported by the linter.
-    - "travis_retry sudo apt-get install docker-ce enchant"
-    - "travis_retry npm -g install npm@latest"
-
+- openssl aes-256-cbc -K $encrypted_0ff8d3358b65_key -iv $encrypted_0ff8d3358b65_iv
+  -in license-key.txt.enc -out license-key.txt -d
+- travis_retry pip install --upgrade pip setuptools codecov
+- travis_retry sudo apt-get update
+- travis_retry sudo apt-get install docker-ce enchant
+- travis_retry npm -g install npm@latest
 install:
-    - "travis_retry pip install --upgrade --process-dependency-links --editable .[dev]"
-    - "travis_retry npm install"
-
-cache: "pip"
-
+- travis_retry pip install --upgrade --process-dependency-links --editable .[dev]
+- travis_retry npm install
+cache: pip
 before_script:
-    - "make clean"
-    - "make lint"
-    - 'travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts'
-
+- make clean
+- make lint
+- travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
 script:
-    - 'pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests'
-
+- pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests
 after_success:
-    - "codecov"
+- codecov
