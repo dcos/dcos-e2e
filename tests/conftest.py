@@ -43,6 +43,6 @@ def oss_artifact_url() -> str:
 @pytest.fixture(scope='session')
 def license_key_contents() -> str:
     """
-    Return a license key suitable for use with DC/OS 1.11.
+    Return a license key suitable for use with the latest version of DC/OS.
     """
     return Path('/tmp/license-key.txt').read_text()

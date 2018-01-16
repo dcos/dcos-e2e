@@ -36,7 +36,7 @@ Install dependencies in a virtual environment.
 pip install --process-dependency-links --editable .[dev]
 ```
 
-Optionally install the following lint tools:
+Optionally install the following tools for linting and interacting with Travis CI:
 
 ```sh
 gem install travis --no-rdoc --no-ri
@@ -241,4 +241,11 @@ make update-dcos-docker
 
 ## Rotating license keys
 
-DC/OS Enterprise require
+DC/OS Enterprise requires license key
+Rotates
+Add with travis
+
+travis encrypt-file license-key.txt --add --force
+git add secrets.tar.enc .travis.yml
+git commit -m 'Update secret archive'
+git push
