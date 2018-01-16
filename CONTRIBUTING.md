@@ -272,4 +272,3 @@ To update DC/OS Docker, use the following command:
 ```sh
 make update-dcos-docker
 ```
-
