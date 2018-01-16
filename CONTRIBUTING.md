@@ -86,17 +86,23 @@ See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/RE
 
 Download dependencies which are used by the tests:
 
-```
+```sh
 make download-artifacts
 ```
 
 or, to additionally download a DC/OS Enterprise artifact, run the following:
 
-```
+```sh
 make EE_ARTIFACT_URL=<http://...> download-artifacts
 ```
 
 The DC/OS Enterprise artifact is required for some tests.
+
+A license key is required for some tests:
+
+```sh
+cp /path/to/license-key.txt /tmp/license-key.txt
+```
 
 Run `pytest`:
 
@@ -232,3 +238,7 @@ To update DC/OS Docker, use the following command:
 ```sh
 make update-dcos-docker
 ```
+
+## Rotating license keys
+
+DC/OS Enterprise require
