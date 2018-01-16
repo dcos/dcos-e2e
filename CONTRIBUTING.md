@@ -135,6 +135,33 @@ Linting and some tests are run on Travis CI.
 See `.travis.yml` for details on the limitations.
 To check if a new change works on CI, unfortunately it is necessary to change `.travis.yml` to run the desired tests.
 
+### Rotating license keys
+
+DC/OS Enterprise requires a license key.
+Mesosphere uses license keys internally for testing, and these expire regularly.
+A license key is encrypted and used by the Travis CI tests.
+
+To update the license key, put a file with the contents to use at `license-key.txt` in the root directory of a clone of this repository.
+Do not share this file or push it to GitHub.
+Encrypt this file and push the encrypted file to GitHub.
+
+```sh
+travis encrypt-file license-key.txt --add --force
+git add license-key.txt.enc .travis.yml
+git commit -m 'Update license key'
+git push
+```
+
+### Updating the DC/OS Enterprise build artifact link
+
+A private link to DC/OS Enterprise is used by Travis CI.
+
+To update this link use the following command, after setting the `EE_ARTIFACT_URL` environment variable.
+
+```sh
+travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL" --add
+```
+
 ## New Backends
 
 Currently only DC/OS Docker is supported.
@@ -239,19 +266,3 @@ To update DC/OS Docker, use the following command:
 make update-dcos-docker
 ```
 
-## Rotating license keys
-
-DC/OS Enterprise requires a license key.
-Mesosphere uses license keys internally for testing, and these expire regularly.
-A license key is encrypted and used by the Travis CI tests.
-
-To update the license key, put a file with the contents to use at `license-key.txt` in the root directory of a clone of this repository.
-Do not share this file or push it to GitHub.
-Encrypt this file and push the encrypted file to GitHub.
-
-```sh
-travis encrypt-file license-key.txt --add --force
-git add license-key.txt.enc .travis.yml
-git commit -m 'Update license key'
-git push
-```
