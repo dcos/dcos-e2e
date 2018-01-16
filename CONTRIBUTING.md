@@ -162,6 +162,13 @@ To update this link use the following command, after setting the `EE_ARTIFACT_UR
 travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL" --add
 ```
 
+### Parallel builders
+
+Travis CI has a maximum test run time of 50 minutes.
+In order to avoid this and to see failures faster, we run multiple builds per commit.
+We run almost one builder per test.
+Some tests are grouped as they can run quickly.
+
 ## New Backends
 
 Currently only DC/OS Docker is supported.
