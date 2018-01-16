@@ -150,10 +150,12 @@ class Cluster(ContextDecorator):
         any_master = next(iter(self.masters))
 
         api_session = DcosApiSession(
-            dcos_url='http://{ip}'.format(ip=any_master.ip_address),
-            masters=[str(n.ip_address) for n in self.masters],
-            slaves=[str(n.ip_address) for n in self.agents],
-            public_slaves=[str(n.ip_address) for n in self.public_agents],
+            dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
+            masters=[str(n.public_ip_address) for n in self.masters],
+            slaves=[str(n.public_ip_address) for n in self.agents],
+            public_slaves=[
+                str(n.public_ip_address) for n in self.public_agents
+            ],
             auth_user=DcosUser(credentials=CI_CREDENTIALS),
         )
 
@@ -208,10 +210,12 @@ class Cluster(ContextDecorator):
         any_master = next(iter(self.masters))
 
         enterprise_session = EnterpriseApiSession(
-            dcos_url='https://{ip}'.format(ip=any_master.ip_address),
-            masters=[str(n.ip_address) for n in self.masters],
-            slaves=[str(n.ip_address) for n in self.agents],
-            public_slaves=[str(n.ip_address) for n in self.public_agents],
+            dcos_url='https://{ip}'.format(ip=any_master.public_ip_address),
+            masters=[str(n.public_ip_address) for n in self.masters],
+            slaves=[str(n.public_ip_address) for n in self.agents],
+            public_slaves=[
+                str(n.public_ip_address) for n in self.public_agents
+            ],
             auth_user=DcosUser(credentials=credentials),
         )
 
@@ -353,7 +357,9 @@ class Cluster(ContextDecorator):
         env = env or {}
 
         def ip_addresses(nodes: Iterable[Node]) -> str:
-            return ','.join(map(lambda node: str(node.ip_address), nodes))
+            return ','.join(
+                map(lambda node: str(node.public_ip_address), nodes)
+            )
 
         environment_variables = {
             'MASTER_HOSTS': ip_addresses(self.masters),

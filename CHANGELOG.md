@@ -33,7 +33,7 @@
 
 # Next
 
-* Distinguish between host IP for SSH connection and DC/OS IP address when creating a Node.
+* Expose the `public_ip_address` of the SSH connection and the `private_ip_address` of its DC/OS component on `Node` objects.
 
 # 2017.12.11.0
 
