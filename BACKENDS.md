@@ -63,6 +63,7 @@ See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io
 ### DC/OS Installation
 
 `Cluster`s created by the Docker backend only support installing DC/OS via `install_dcos_from_path`.
+`Node`s of `Cluster`s created by the Docker backend do not distinguish between `public_ip_address` and `private_ip_address`.
 
 ### Troubleshooting
 
