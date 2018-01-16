@@ -479,7 +479,7 @@ class DockerCluster(ClusterManager):
         ssh_user = self._default_ssh_user
 
         def ip_list(nodes: Set[Node]) -> List[str]:
-            return list(map(lambda node: str(node.ip_address), nodes))
+            return list(map(lambda node: str(node.public_ip_address), nodes))
 
         config = {
             'agent_list': ip_list(nodes=self.agents),
@@ -578,7 +578,7 @@ class DockerCluster(ClusterManager):
         registry_host = 'registry.local'
         if self.masters:
             first_master = next(iter(self.masters))
-            extra_host_ip_address = str(first_master.ip_address)
+            extra_host_ip_address = str(first_master.public_ip_address)
         else:
             extra_host_ip_address = '127.0.0.1'
         hostname = container_base_name + str(container_number)
@@ -650,8 +650,8 @@ class DockerCluster(ClusterManager):
             )
             nodes.add(
                 Node(
-                    host_ip_address=container_ip_address,
-                    dcos_ip_address=container_ip_address,
+                    public_ip_address=container_ip_address,
+                    private_ip_address=container_ip_address,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
                 )
             )
