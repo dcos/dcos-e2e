@@ -23,6 +23,7 @@ env:
 before_install:
 - openssl aes-256-cbc -K $encrypted_0ff8d3358b65_key -iv $encrypted_0ff8d3358b65_iv
   -in license-key.txt.enc -out license-key.txt -d
+- cp license-key.txt /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
 - travis_retry sudo apt-get update
 - travis_retry sudo apt-get install docker-ce enchant

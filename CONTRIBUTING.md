@@ -251,7 +251,7 @@ Encrypt this file and push the encrypted file to GitHub.
 
 ```sh
 travis encrypt-file license-key.txt --add --force
-git add license-key.text.enc .travis.yml
+git add license-key.txt.enc .travis.yml
 git commit -m 'Update license key'
 git push
 ```
