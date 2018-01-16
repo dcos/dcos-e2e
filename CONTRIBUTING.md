@@ -241,11 +241,17 @@ make update-dcos-docker
 
 ## Rotating license keys
 
-DC/OS Enterprise requires license key
-Rotates
-Add with travis
+DC/OS Enterprise requires a license key.
+Mesosphere uses license keys internally for testing, and these expire regularly.
+A license key is encrypted and used by the Travis CI tests.
 
+To update the license key, put a file with the contents to use at `license-key.txt` in the root directory of a clone of this repository.
+Do not share this file or push it to GitHub.
+Encrypt this file and push the encrypted file to GitHub.
+
+```sh
 travis encrypt-file license-key.txt --add --force
-git add secrets.tar.enc .travis.yml
-git commit -m 'Update secret archive'
+git add license-key.text.enc .travis.yml
+git commit -m 'Update license key'
 git push
+```
