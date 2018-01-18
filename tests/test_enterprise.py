@@ -22,6 +22,7 @@ class TestEnterpriseIntegrationTests:
         self,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
+        license_key_contents: str,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -33,6 +34,7 @@ class TestEnterpriseIntegrationTests:
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
@@ -145,6 +147,7 @@ class TestWaitForDCOS:
         self,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
+        license_key_contents: str,
     ) -> None:
         """
         After `Cluster.wait_for_dcos_ee`, the DC/OS Enterprise cluster can
@@ -157,6 +160,7 @@ class TestWaitForDCOS:
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:

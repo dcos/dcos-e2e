@@ -73,6 +73,7 @@ def test_oss_example():
 def test_ee_example():
 
     ee_artifact = Path('/tmp/dcos_generate_config.ee.sh')
+    license_key_contents = Path('/tmp/license-key.txt').read_text()
 
     superuser_username = str(uuid.uuid4())
     superuser_password = str(uuid.uuid4())
@@ -83,6 +84,7 @@ def test_ee_example():
         'superuser_username': superuser_username,
         'superuser_password_hash': sha512_crypt.hash(superuser_password),
         'fault_domain_enabled': False,
+        'license_key_contents': license_key_contents,
     }
 
     with Cluster(cluster_backend=Docker()) as cluster:

@@ -14,6 +14,9 @@ Contributions to this repository must pass tests and linting.
 - [Documentation](#documentation)
 - [Reviews](#reviews)
 - [CI](#ci)
+  - [Rotating license keys](#rotating-license-keys)
+  - [Updating the DC/OS Enterprise build artifact link](#updating-the-dcos-enterprise-build-artifact-link)
+  - [Parallel builders](#parallel-builders)
 - [New Backends](#new-backends)
 - [Goals](#goals)
   - [Avoid flakiness](#avoid-flakiness)
@@ -36,7 +39,7 @@ Install dependencies in a virtual environment.
 pip install --process-dependency-links --editable .[dev]
 ```
 
-Optionally install the following lint tools:
+Optionally install the following tools for linting and interacting with Travis CI:
 
 ```sh
 gem install travis --no-rdoc --no-ri
@@ -86,17 +89,23 @@ See the [DC/OS Docker README](https://github.com/dcos/dcos-docker/blob/master/RE
 
 Download dependencies which are used by the tests:
 
-```
+```sh
 make download-artifacts
 ```
 
 or, to additionally download a DC/OS Enterprise artifact, run the following:
 
-```
+```sh
 make EE_ARTIFACT_URL=<http://...> download-artifacts
 ```
 
 The DC/OS Enterprise artifact is required for some tests.
+
+A license key is required for some tests:
+
+```sh
+cp /path/to/license-key.txt /tmp/license-key.txt
+```
 
 Run `pytest`:
 
@@ -128,6 +137,41 @@ Ask Adam Dangoor if you are unsure who to ask for help from.
 Linting and some tests are run on Travis CI.
 See `.travis.yml` for details on the limitations.
 To check if a new change works on CI, unfortunately it is necessary to change `.travis.yml` to run the desired tests.
+
+### Rotating license keys
+
+DC/OS Enterprise requires a license key.
+Mesosphere uses license keys internally for testing, and these expire regularly.
+A license key is encrypted and used by the Travis CI tests.
+
+To update this link use the following command, after setting the `LICENSE_KEY_CONTENTS` environment variable.
+
+This command will affect all builds and not just the current branch.
+
+We do not use [encrypted secret files](https://docs.travis-ci.com/user/encrypting-files/#Caveat) in case the contents are shown in the logs.
+
+We do not add an encrypted environment variable to `.travis.yml` because the license is too large.
+
+```sh
+travis env set --repo mesosphere/dcos-e2e LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
+```
+
+### Updating the DC/OS Enterprise build artifact link
+
+A private link to DC/OS Enterprise is used by Travis CI.
+
+To update this link use the following command, after setting the `EE_ARTIFACT_URL` environment variable.
+
+```sh
+travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL" --add
+```
+
+### Parallel builders
+
+Travis CI has a maximum test run time of 50 minutes.
+In order to avoid this and to see failures faster, we run multiple builds per commit.
+We run almost one builder per test.
+Some tests are grouped as they can run quickly.
 
 ## New Backends
 

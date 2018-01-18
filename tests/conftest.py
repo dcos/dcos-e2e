@@ -38,3 +38,11 @@ def oss_artifact_url() -> str:
     Return the url to a build artifact for DC/OS OSS.
     """
     return 'https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh'
+
+
+@pytest.fixture(scope='session')
+def license_key_contents() -> str:
+    """
+    Return a license key suitable for use with the latest version of DC/OS.
+    """
+    return Path('/tmp/license-key.txt').read_text()

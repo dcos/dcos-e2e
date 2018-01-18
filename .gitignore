@@ -102,3 +102,6 @@ node_modules/
 
 # NPM
 package-lock.json
+
+# DC/OS License
+license-key.txt
