@@ -144,15 +144,16 @@ DC/OS Enterprise requires a license key.
 Mesosphere uses license keys internally for testing, and these expire regularly.
 A license key is encrypted and used by the Travis CI tests.
 
-To update the license key, put a file with the contents to use at `license-key.txt` in the root directory of a clone of this repository.
-Do not share this file or push it to GitHub.
-Encrypt this file and push the encrypted file to GitHub.
+To update this link use the following command, after setting the `LICENSE_KEY_CONTENTS` environment variable.
+
+This command will affect all builds and not just the current branch.
+
+We do not use [encrypted secret files](https://docs.travis-ci.com/user/encrypting-files/#Caveat) in case the contents are shown in the logs.
+
+We do not add an encrypted environment variable to `.travis.yml` because the license is too large.
 
 ```sh
-travis encrypt-file license-key.txt --add --force
-git add license-key.txt.enc .travis.yml
-git commit -m 'Update license key'
-git push
+travis env set --repo mesosphere/dcos-e2e LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
 ```
 
 ### Updating the DC/OS Enterprise build artifact link

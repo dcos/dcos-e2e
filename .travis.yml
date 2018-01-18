@@ -19,12 +19,8 @@ env:
   - TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters
   - TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes
   - TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend
-  global:
-    secure: DCA/nGUV8IUrFg7SmL8K2WvLd3V/6JD7RINUyzBoKoADmJ9xvcQOI8Zm91//fJtiTNpEZOfOkFXYVQwGHAoPlgaS5/ENqbCV+4zn4RoS3q+WvuAaRR/mXj+z2Jzbgp+x9Pe1FTJroY521+Qqj1sjl9nQK24WOUPhlXe9bdFiRCNAK49r+dxa7dURVq0WyOcBk22psTxXpuBRfciV/dzun2llfdL0Ur9+enlMwj13HByMxR+TOPcsZ6ZXC4A8SxKKSpkT19lCTmfW34Ks0N6Gfqaad46eqfc97mwTyIaGW73iVLRsiI5sjBlXTlsdp2qPmn7WJih7BNOFdcoLNmqHW72akon+z5On2K5kwUqvobtrJ+d0n8hf+5HozZz4Tl6glByeMcWlcQgOqLZuH5scZK3U0rHOqeTsEDBlg45Y1CrTOCHWvetFgMwa9QQlmVNmnkWQ0B5fDuspW+sjqbeTMwwQk/2+eWYgi8vaR9N6gEouqUg5nZmpk3ppmY8NxHaVe1w5WWMOJyyws3T4f78eubGs3KLL2fcgLVhCWQNYa5zXXZRPG9d+kJsCCJFK7Bj8cIva31zbLTkTlA80xDxRYw33PvkWRKMP08zkyoo4MiYKvq42fpLuv7BbOksK1GosX+YvxyRK+yr0Uix62vNc4c6MwwLmtxWzJQEjOLEl4FU=
 before_install:
-- openssl aes-256-cbc -K $encrypted_0ff8d3358b65_key -iv $encrypted_0ff8d3358b65_iv
-  -in license-key.txt.enc -out license-key.txt -d
-- cp license-key.txt /tmp/license-key.txt
+- echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
 - travis_retry sudo apt-get update
 - travis_retry sudo apt-get install docker-ce enchant
