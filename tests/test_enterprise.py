@@ -67,6 +67,7 @@ class TestCopyFiles:
         self,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
+        license_key_contents: str,
     ) -> None:
         """
         Files can be copied from the host to the installer node at creation
@@ -103,6 +104,7 @@ class TestCopyFiles:
             'ca_certificate_path': str(installer_cert_path),
             'ca_certificate_key_path': str(installer_key_path),
             'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
         }
 
         files_to_copy_to_installer = {
