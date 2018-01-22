@@ -4,7 +4,7 @@ Setup script for DC/OS End to End tests.
 
 from setuptools import find_packages, setup
 
-VERSION = '2017.12.11.0'
+VERSION = '2018.01.22.0'
 
 DEPENDENCY_LINKS = []
 

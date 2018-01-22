@@ -5,7 +5,7 @@
 
 
 - [Changelog](#changelog)
-- [Next](#next)
+- [2018.01.22.0](#201801220)
 - [2017.12.11.0](#201712110)
 - [2017.12.08.0](#201712080)
   - [2017.11.29.0](#201711290)
@@ -31,9 +31,10 @@
 
 # Changelog
 
-# Next
+# 2018.01.22.0
 
 * Expose the `public_ip_address` of the SSH connection and the `private_ip_address` of its DC/OS component on `Node` objects.
+* Bump `dcos-test-utils` for better diagnostics reports.
 
 # 2017.12.11.0
 
