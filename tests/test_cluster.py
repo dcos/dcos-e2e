@@ -11,7 +11,7 @@ from subprocess import CalledProcessError
 from typing import List
 
 import pytest
-from pytest_catchlog import CompatLogCaptureFixture
+from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -202,7 +202,7 @@ class TestInstallDcosFromPathLogging:
 
     def test_live_logging(
         self,
-        caplog: CompatLogCaptureFixture,
+        caplog: LogCaptureFixture,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
     ) -> None:
@@ -225,7 +225,7 @@ class TestInstallDcosFromPathLogging:
 
     def test_no_live_logging(
         self,
-        caplog: CompatLogCaptureFixture,
+        caplog: LogCaptureFixture,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
     ) -> None:

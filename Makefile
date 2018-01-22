@@ -33,9 +33,6 @@ lint-docs:
 # Run various linting tools.
 .PHONY: lint
 lint: lint-python-only lint-docs
-	# Don't lint travis.yml on Travis.
-	if [ "${TRAVIS}" != "true" ] ; then travis lint --exit-code .travis.yml; fi
-
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean

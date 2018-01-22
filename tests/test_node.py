@@ -9,10 +9,10 @@ from subprocess import CalledProcessError
 from typing import Iterator
 
 import pytest
+from _pytest.logging import LogCaptureFixture
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
-from pytest_catchlog import CompatLogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -49,7 +49,7 @@ class TestNode:
 
     def test_run(
         self,
-        caplog: CompatLogCaptureFixture,
+        caplog: LogCaptureFixture,
         dcos_cluster: Cluster,
     ) -> None:
         """
