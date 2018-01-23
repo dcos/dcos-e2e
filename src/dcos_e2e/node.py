@@ -2,8 +2,10 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import itertools
 from ipaddress import IPv4Address
 from pathlib import Path
+from shlex import quote
 from subprocess import PIPE, CompletedProcess, Popen
 from typing import Dict, List, Optional
 
@@ -72,14 +74,12 @@ class Node:
         """
         env = dict(env or {})
 
-        command = []
-
-        for key, value in env.items():
-            export = "export {key}='{value}'".format(key=key, value=value)
-            command.append(export)
-            command.append('&&')
-
-        command += args
+        # The remote command line arguments must be quoted to ensure
+        # they create the right arguments on the remote node.
+        command = [quote(s) for s in itertools.chain(
+            ('{key}={value}'.format(key=k, value=v) for k, v in env.items()),
+            args
+        )]
 
         ssh_args = [
             'ssh',
