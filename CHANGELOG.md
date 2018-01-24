@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+- [2018.01.24.0](#201801240)
 - [2018.01.22.0](#201801220)
 - [2017.12.11.0](#201712110)
 - [2017.12.08.0](#201712080)
@@ -30,6 +31,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+# 2018.01.24.0
+
+* Bump `dcos-test-utils` for better diagnostics reports.
 
 # 2018.01.22.0
 
