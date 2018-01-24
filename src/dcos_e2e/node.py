@@ -41,7 +41,11 @@ class Node:
         self._ssh_key_path = ssh_key_path
 
     def __str__(self) -> str:
-        """Convert a `Node` object to string listing its IP addresses."""
+        """
+        Convert a `Node` object to string listing only its IP addresses.
+
+        Returns the custom string representation of a `Node` object.
+        """
         return 'Node(public_ip={public_ip}, private_ip={private_ip})'.format(
             public_ip=self.public_ip_address,
             private_ip=self.private_ip_address,

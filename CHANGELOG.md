@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+- [Next](#next)
 - [2018.01.22.0](#201801220)
 - [2017.12.11.0](#201712110)
 - [2017.12.08.0](#201712080)
@@ -30,6 +31,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+# Next
+
+* Add custom string representation for `Node` object.
 
 # 2018.01.22.0
 
