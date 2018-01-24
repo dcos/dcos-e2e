@@ -2,7 +2,6 @@
 Tools for managing DC/OS cluster nodes.
 """
 
-import itertools
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
@@ -58,6 +57,7 @@ class Node:
         args: List[str],
         user: str,
         env: Optional[Dict] = None,
+        shell: bool = False,
     ) -> List[str]:
         """
         Return a command to run `args` on this node over SSH.
@@ -68,18 +68,20 @@ class Node:
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
+            shell: If False (the default), each argument is passed as a
+                literal value to the command.  If True, the command line is
+                interpreted as a shell command, with a special meaning applied
+                to some characters (e.g. $, &&, >). This means the caller must
+                quote arguments if they may contain these special characters,
+                including whitespace.
 
         Returns:
             The full SSH command to be run.
         """
         env = dict(env or {})
 
-        # The remote command line arguments must be quoted to ensure
-        # they create the right arguments on the remote node.
-        command = [quote(s) for s in itertools.chain(
-            ('{key}={value}'.format(key=k, value=v) for k, v in env.items()),
-            args
-        )]
+        if shell:
+            args = ['/bin/sh', '-c', ' '.join(args)]
 
         ssh_args = [
             'ssh',
@@ -106,7 +108,10 @@ class Node:
             '-o',
             'PreferredAuthentications=publickey',
             str(self.public_ip_address),
-        ] + command
+        ] + [
+            '{key}={value}'.format(key=k, value=quote(v))
+            for k, v in env.items()
+        ] + [quote(arg) for arg in args]
 
         return ssh_args
 
@@ -116,6 +121,7 @@ class Node:
         user: str,
         log_output_live: bool = False,
         env: Optional[Dict] = None,
+        shell: bool = False,
     ) -> CompletedProcess:
         """
         Run a command on this node the given user.
@@ -128,6 +134,12 @@ class Node:
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
+            shell: If False (the default), each argument is passed as a
+                literal value to the command.  If True, the command line is
+                interpreted as a shell command, with a special meaning applied
+                to some characters (e.g. $, &&, >). This means the caller must
+                quote arguments if they may contain these special characters,
+                including whitespace.
 
         Returns:
             The representation of the finished process.
@@ -135,7 +147,9 @@ class Node:
         Raises:
             CalledProcessError: The process exited with a non-zero code.
         """
-        ssh_args = self._compose_ssh_command(args=args, user=user, env=env)
+        ssh_args = self._compose_ssh_command(
+            args=args, user=user, env=env, shell=shell
+        )
         return run_subprocess(args=ssh_args, log_output_live=log_output_live)
 
     def popen(
@@ -143,6 +157,7 @@ class Node:
         args: List[str],
         user: str,
         env: Optional[Dict] = None,
+        shell: bool = False,
     ) -> Popen:
         """
         Open a pipe to a command run on a node as the given user.
@@ -153,11 +168,19 @@ class Node:
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
+            shell: If False (the default), each argument is passed as a
+                literal value to the command.  If True, the command line is
+                interpreted as a shell command, with a special meaning applied
+                to some characters (e.g. $, &&, >). This means the caller must
+                quote arguments if they may contain these special characters,
+                including whitespace.
 
         Returns:
             The pipe object attached to the specified process.
         """
-        ssh_args = self._compose_ssh_command(args=args, user=user, env=env)
+        ssh_args = self._compose_ssh_command(
+            args=args, user=user, env=env, shell=shell
+        )
         return Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
 
     def send_file(

@@ -58,9 +58,42 @@ class TestNode:
         (master, ) = dcos_cluster.masters
         default = dcos_cluster.default_ssh_user
 
-        echo_result = master.run(args=['echo', '$USER'], user=default)
+        # Arguments are quoted - spaces and special characters are preserved
+        # as literal values
+        echo_result = master.run(
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!'], user=default
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip() == b'Hello,  && echo World!'
+        assert echo_result.stderr == b''
+
+        # ...unless shell=True, where spaces and special characters are
+        # interpreted.
+        echo_result = master.run(
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
+            user=default,
+            shell=True
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip() == b'Hello,\nWorld!'
+        assert echo_result.stderr == b''
+
+        echo_result = master.run(
+            args=['echo', '$USER'], user=default, shell=True
+        )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'root'
+        assert echo_result.stderr == b''
+
+        # Environment variables are passed to the remote execution
+        echo_result = master.run(
+            args=['echo', '$MYVAR'],
+            user=default,
+            env={'MYVAR': 'hello, world'},
+            shell=True
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip() == b'hello, world'
         assert echo_result.stderr == b''
 
         # Commands which return a non-0 code raise a
@@ -113,6 +146,7 @@ class TestNode:
         popen_1 = master.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
             user=default,
+            shell=True,
         )
 
         popen_2 = master.popen(
@@ -122,6 +156,7 @@ class TestNode:
                 '(echo $USER > /tmp/pipe)',
             ],
             user=default,
+            shell=True,
         )
 
         stdout, _ = popen_1.communicate()
