@@ -156,3 +156,17 @@ class TestNode:
         args = ['cat', str(master_destination_path)]
         result = master.run(args=args, user=dcos_cluster.default_ssh_user)
         assert result.stdout.decode() == content
+
+    def test_string_representation(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        The string representation has the expected format.
+        """
+        (master, ) = dcos_cluster.masters
+        string = 'Node(public_ip={public_ip}, private_ip={private_ip})'.format(
+            public_ip=master.public_ip_address,
+            private_ip=master.private_ip_address,
+        )
+        assert string == str(master)
