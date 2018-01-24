@@ -37,8 +37,8 @@
     - [`private_ip_address`](#private_ip_address)
     - [`ssh_key_path`](#ssh_key_path)
   - [Methods](#methods-1)
-    - [`node.run(args, user, log_output_live=False, env=None)`](#noderunargs-user-log_output_livefalse-envnone)
-    - [`node.popen(args, user, env=None) -> Popen`](#nodepopenargs-user-envnone---popen)
+    - [`node.run(args, user, log_output_live=False, env=None, shell=False) -> CompletedProcess`](#noderunargs-user-log_output_livefalse-envnone-shellfalse---completedprocess)
+    - [`node.popen(args, user, env=None, shell=False) -> Popen`](#nodepopenargs-user-envnone-shellfalse---popen)
     - [`node.send_file(local_path, remote_path, user) -> None`](#nodesend_filelocal_path-remote_path-user---none)
   - [Attributes](#attributes-1)
     - [`public_ip_address`](#public_ip_address-1)
@@ -219,7 +219,7 @@ The path to an SSH key which can be used to SSH to the node as the cluster's `de
 
 ### Methods
 
-#### `node.run(args, user, log_output_live=False, env=None)`
+#### `node.run(args, user, log_output_live=False, env=None, shell=False) -> CompletedProcess`
 
 `user` specifies the user that the given command will be run for over SSH.
 
@@ -230,12 +230,22 @@ To see these logs in `pytest` tests, use the `-s` flag.
 `env` is an optional mapping of environment variable names to values.
 These environment variables will be set on the node before running the command specified in `args`.
 
-#### `node.popen(args, user, env=None) -> Popen`
+`shell` is a boolean controlling whether the command args should be interpreted as a sequence of literals or as parts of a shell command.
+If `shell=False` (the default), each argument is passed as a literal value to the command.
+If `shell=True`, the command line is interpreted as a shell command, with a special meaning applied to some characters (e.g. $, &&, >).
+This means the caller must quote arguments if they may contain these special characters, including whitespace.
+
+#### `node.popen(args, user, env=None, shell=False) -> Popen`
 
 `user` specifies the user that the given command will be run for over SSH.
 
 `env` is an optional mapping of environment variable names to values.
 These environment variables will be set on the node before running the command specified in `args`.
+
+`shell` is a boolean controlling whether the command args should be interpreted as a sequence of literals or as parts of a shell command.
+If `shell=False` (the default), each argument is passed as a literal value to the command.
+If `shell=True`, the command line is interpreted as a shell command, with a special meaning applied to some characters (e.g. $, &&, >).
+This means the caller must quote arguments if they may contain these special characters, including whitespace.
 
 The method returns a `Popen` object that can be used to communicate to the underlying subprocess.
 

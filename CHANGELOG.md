@@ -35,6 +35,8 @@
 # Next
 
 * Add custom string representation for `Node` object.
+* Change the default behavior of `Node.run` and `Node.popen` to quote arguments, unless a new `shell` parameter is `True`.
+These methods now behave similarly to `subprocess.run`.
 
 # 2018.01.22.0
 
