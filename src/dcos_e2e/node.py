@@ -40,6 +40,13 @@ class Node:
         self.private_ip_address = private_ip_address
         self._ssh_key_path = ssh_key_path
 
+    def __str__(self) -> str:
+        """Convert a `Node` object to string listing its IP addresses."""
+        return 'Node(public_ip={public_ip}, private_ip={private_ip})'.format(
+            public_ip=self.public_ip_address,
+            private_ip=self.private_ip_address,
+        )
+
     def _compose_ssh_command(
         self,
         args: List[str],
