@@ -232,7 +232,7 @@ These environment variables will be set on the node before running the command s
 
 `shell` is a boolean controlling whether the command args should be interpreted as a sequence of literals or as parts of a shell command.
 If `shell=False` (the default), each argument is passed as a literal value to the command.
-If `shell=True`, the command line is interpreted as a shell command, with a special meaning applied to some characters (e.g. $, &&, >).
+If `shell=True`, the command line is interpreted as a shell command, with a special meaning applied to some characters (e.g. `$`, `&&`, `>`).
 This means the caller must quote arguments if they may contain these special characters, including whitespace.
 
 #### `node.popen(args, user, env=None, shell=False) -> Popen`
@@ -244,7 +244,7 @@ These environment variables will be set on the node before running the command s
 
 `shell` is a boolean controlling whether the command args should be interpreted as a sequence of literals or as parts of a shell command.
 If `shell=False` (the default), each argument is passed as a literal value to the command.
-If `shell=True`, the command line is interpreted as a shell command, with a special meaning applied to some characters (e.g. $, &&, >).
+If `shell=True`, the command line is interpreted as a shell command, with a special meaning applied to some characters (e.g. `$`, `&&`, `>`).
 This means the caller must quote arguments if they may contain these special characters, including whitespace.
 
 The method returns a `Popen` object that can be used to communicate to the underlying subprocess.

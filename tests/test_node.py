@@ -47,19 +47,16 @@ class TestNode:
     Tests for interacting with cluster nodes.
     """
 
-    def test_run(
+    def test_run_literal(
         self,
-        caplog: LogCaptureFixture,
         dcos_cluster: Cluster,
     ) -> None:
         """
-        It is possible to run commands as the given user and see their output.
+        When shell=False, preserve arguments as literal values.
         """
         (master, ) = dcos_cluster.masters
         default = dcos_cluster.default_ssh_user
 
-        # Arguments are quoted - spaces and special characters are preserved
-        # as literal values
         echo_result = master.run(
             args=['echo', 'Hello, ', '&&', 'echo', 'World!'], user=default
         )
@@ -67,16 +64,34 @@ class TestNode:
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
         assert echo_result.stderr == b''
 
-        # ...unless shell=True, where spaces and special characters are
-        # interpreted.
+    def test_run_shell(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        When shell=True, interpret spaces and special characters.
+        """
+        (master, ) = dcos_cluster.masters
+        default = dcos_cluster.default_ssh_user
+
         echo_result = master.run(
             args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
             user=default,
-            shell=True
+            shell=True,
         )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'Hello,\nWorld!'
         assert echo_result.stderr == b''
+
+    def test_run_remote_env(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        Remote environment variables are available.
+        """
+        (master, ) = dcos_cluster.masters
+        default = dcos_cluster.default_ssh_user
 
         echo_result = master.run(
             args=['echo', '$USER'], user=default, shell=True
@@ -85,19 +100,37 @@ class TestNode:
         assert echo_result.stdout.strip() == b'root'
         assert echo_result.stderr == b''
 
-        # Environment variables are passed to the remote execution
+    def test_run_pass_env(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        Environment variables can be passed to the remote execution
+        """
+        (master, ) = dcos_cluster.masters
+        default = dcos_cluster.default_ssh_user
+
         echo_result = master.run(
             args=['echo', '$MYVAR'],
             user=default,
             env={'MYVAR': 'hello, world'},
-            shell=True
+            shell=True,
         )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'hello, world'
         assert echo_result.stderr == b''
 
-        # Commands which return a non-0 code raise a
-        # ``CalledProcessError``.
+    def test_run_error(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        Commands which return a non-0 code raise a ``CalledProcessError``.
+        """
+        (master, ) = dcos_cluster.masters
+        default = dcos_cluster.default_ssh_user
+
         with pytest.raises(CalledProcessError) as excinfo:
             master.run(args=['unset_command'], user=default)
 
@@ -110,6 +143,41 @@ class TestNode:
             # log output.
             if record.levelno == logging.DEBUG:
                 assert 'unset_command' not in record.getMessage()
+
+    def test_run_error_shell(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        Commands which return a non-0 code raise a ``CalledProcessError``.
+        """
+        (master, ) = dcos_cluster.masters
+        default = dcos_cluster.default_ssh_user
+
+        with pytest.raises(CalledProcessError) as excinfo:
+            master.run(args=['unset_command'], user=default, shell=True)
+
+        exception = excinfo.value
+        assert exception.returncode == 127
+        assert exception.stdout == b''
+        assert b'command not found' in exception.stderr
+        for record in caplog.records:
+            # The error which caused this exception is not in the debug
+            # log output.
+            if record.levelno == logging.DEBUG:
+                assert 'unset_command' not in record.getMessage()
+
+    def test_run_log_output_live(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        With `log_output_live`, stdout and stderr are merged and logged.
+        """
+        (master, ) = dcos_cluster.masters
+        default = dcos_cluster.default_ssh_user
 
         # With `log_output_live`, output is logged and stderr is merged
         # into stdout.
