@@ -5,7 +5,7 @@
 
 
 - [Changelog](#changelog)
-- [Next](#next)
+- [2018.01.25.0](#201801250)
 - [2018.01.22.0](#201801220)
 - [2017.12.11.0](#201712110)
 - [2017.12.08.0](#201712080)
@@ -32,11 +32,12 @@
 
 # Changelog
 
-# Next
+# 2018.01.25.0
 
-* Add custom string representation for `Node` object.
-* Change the default behavior of `Node.run` and `Node.popen` to quote arguments, unless a new `shell` parameter is `True`.
+* Backwards incompatible change: Change the default behavior of `Node.run` and `Node.popen` to quote arguments, unless a new `shell` parameter is `True`.
 These methods now behave similarly to `subprocess.run`.
+* Add custom string representation for `Node` object.
+* Bump `dcos-test-utils` for better diagnostics reports.
 
 # 2018.01.22.0
 
