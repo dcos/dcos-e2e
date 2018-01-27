@@ -140,12 +140,17 @@ class TestNode:
         assert b'command not found' in exception.stderr
         # The error which caused this exception is not in the debug log output.
         error_message = 'unset_command'
-        debug_messages = set(filter(
-            lambda record: record.levelno == logging.DEBUG, caplog.records
-        ))
-        matching_messages = set(filter(
-            lambda record: error_message in record.getMessage(), caplog.records
-        ))
+        debug_messages = set(
+            filter(
+                lambda record: record.levelno == logging.DEBUG, caplog.records
+            )
+        )
+        matching_messages = set(
+            filter(
+                lambda record: error_message in record.getMessage(),
+                caplog.records
+            )
+        )
         assert not bool(len(debug_messages & matching_messages))
 
     def test_run_error_shell(
@@ -167,12 +172,17 @@ class TestNode:
         assert exception.stdout == b''
         assert b'command not found' in exception.stderr
         error_message = 'unset_command'
-        debug_messages = set(filter(
-            lambda record: record.levelno == logging.DEBUG, caplog.records
-        ))
-        matching_messages = set(filter(
-            lambda record: error_message in record.getMessage(), caplog.records
-        ))
+        debug_messages = set(
+            filter(
+                lambda record: record.levelno == logging.DEBUG, caplog.records
+            )
+        )
+        matching_messages = set(
+            filter(
+                lambda record: error_message in record.getMessage(),
+                caplog.records
+            )
+        )
         assert not bool(len(debug_messages & matching_messages))
 
     def test_run_log_output_live(
@@ -199,12 +209,17 @@ class TestNode:
         assert exception.stderr == b''
         assert b'command not found' in exception.stdout
         error_message = 'unset_command'
-        debug_messages = set(filter(
-            lambda record: record.levelno == logging.DEBUG, caplog.records
-        ))
-        matching_messages = set(filter(
-            lambda record: error_message in record.getMessage(), caplog.records
-        ))
+        debug_messages = set(
+            filter(
+                lambda record: record.levelno == logging.DEBUG, caplog.records
+            )
+        )
+        matching_messages = set(
+            filter(
+                lambda record: error_message in record.getMessage(),
+                caplog.records
+            )
+        )
         assert bool(len(debug_messages & matching_messages))
 
     # An arbitrary time limit to avoid infinite wait times.

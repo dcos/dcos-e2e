@@ -194,12 +194,14 @@ class TestInstallDcosFromPathLogging:
             Whether a particular error is logged as a DEBUG message.
         """
         message = 'Must have 1, 3, 5, 7, or 9 masters'
-        debug_messages = set(filter(
-            lambda record: record.levelno == logging.DEBUG, log_records
-        ))
-        matching_messages = set(filter(
-            lambda record: message in record.getMessage(), log_records
-        ))
+        debug_messages = set(
+            filter(
+                lambda record: record.levelno == logging.DEBUG, log_records
+            )
+        )
+        matching_messages = set(
+            filter(lambda record: message in record.getMessage(), log_records)
+        )
         return bool(len(debug_messages & matching_messages))
 
     def test_live_logging(
