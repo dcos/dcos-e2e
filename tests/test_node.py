@@ -138,11 +138,14 @@ class TestNode:
         assert exception.returncode == 127
         assert exception.stdout == b''
         assert b'command not found' in exception.stderr
-        for record in caplog.records:
-            # The error which caused this exception is not in the debug
-            # log output.
-            if record.levelno == logging.DEBUG:
-                assert 'unset_command' not in record.getMessage()
+        # The error which caused this exception is not in the debug log output.
+        assert not (
+            [
+                record for record in caplog.records
+                if record.levelno == logging.DEBUG
+                and 'unset_command' in record.getMessage()
+            ]
+        )
 
     def test_run_error_shell(
         self,
@@ -162,11 +165,13 @@ class TestNode:
         assert exception.returncode == 127
         assert exception.stdout == b''
         assert b'command not found' in exception.stderr
-        for record in caplog.records:
-            # The error which caused this exception is not in the debug
-            # log output.
-            if record.levelno == logging.DEBUG:
-                assert 'unset_command' not in record.getMessage()
+        assert not (
+            [
+                record for record in caplog.records
+                if record.levelno == logging.DEBUG
+                and 'unset_command' in record.getMessage()
+            ]
+        )
 
     def test_run_log_output_live(
         self,
@@ -191,13 +196,13 @@ class TestNode:
         exception = excinfo.value
         assert exception.stderr == b''
         assert b'command not found' in exception.stdout
-        expected_error_substring = 'unset_command'
-        found_expected_error = False
-        for record in caplog.records:
-            if expected_error_substring in record.getMessage():
-                if record.levelno == logging.DEBUG:
-                    found_expected_error = True
-        assert found_expected_error
+        assert (
+            [
+                record for record in caplog.records
+                if record.levelno == logging.DEBUG
+                and 'unset_command' in record.getMessage()
+            ]
+        )
 
     # An arbitrary time limit to avoid infinite wait times.
     @pytest.mark.timeout(60)
