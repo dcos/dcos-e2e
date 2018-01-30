@@ -409,30 +409,23 @@ class TestDistributions:
         distro: Distribution,
     ) -> None:
 
-        expected_names = {
-            Distribution.CENTOS_7: 'CentOS Linux',
-            Distribution.UBUNTU_16_04: 'Ubuntu',
-            Distribution.COREOS: 'python',
-            Distribution.FEDORA_23: 'python',
-            Distribution.DEBIAN_8: 'python',
+        distro_ids = {
+            Distribution.CENTOS_7: '"centos"',
+            Distribution.UBUNTU_16_04: 'ubuntu',
+            Distribution.COREOS: 'coreos',
+            Distribution.FEDORA_23: 'fedora',
+            Distribution.DEBIAN_8: 'debian',
         }
 
-        expected_versions_prefix = {
-            Distribution.CENTOS_7: '7',
-            Distribution.UBUNTU_16_04: '16.04',
-            Distribution.COREOS: '',
+        distro_versions = {
+            Distribution.CENTOS_7: '"7"',
+            Distribution.UBUNTU_16_04: '"16.04"',
+            Distribution.COREOS: '1298.7.0',
             Distribution.FEDORA_23: '23',
-            Distribution.DEBIAN_8: '8',
+            Distribution.DEBIAN_8: '"8"',
         }
 
-        expected_python_version = {
-            Distribution.CENTOS_7: 'python2',
-            Distribution.UBUNTU_16_04: 'python3.5',
-            Distribution.COREOS: 'python',
-            Distribution.FEDORA_23: 'python',
-            Distribution.DEBIAN_8: 'python',
-        }
-
+        args = ['cat /etc/*-release']
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
@@ -442,21 +435,34 @@ class TestDistributions:
         ) as cluster:
 
             (master, ) = cluster.masters
-            import pdb; pdb.set_trace()
-            master.run(
-                args=[
-                    expected_python_version[distro], '-c', 'import platform; '
-                    'distribution = platform.linux_distribution(); '
-                    'assert distribution[0] == "{expected_name}" and '
-                    'distribution[1].startswith("{expected_version_prefix}"), '
-                    'distribution'.format(
-                        expected_name=expected_names[distro],
-                        expected_version_prefix=expected_versions_prefix[distro
-                                                                         ],
-                    )
-                ],
+            cat_cmd = master.run(
+                args=args,
                 user=cluster.default_ssh_user,
+                shell=True,
             )
+
+        version_info = cat_cmd.stdout
+        [id_line] = [line for line in version_info.decode().split('\n') if line.startswith('ID=')]
+        [version_id_line] = [line for line in version_info.decode().split('\n') if line.startswith('VERSION_ID=')]
+        distro_id = id_line.split('ID=')[1]
+        distro_version = version_id_line.split('VERSION_ID=')[1]
+        assert distro_id == distro_ids[distro]
+        assert distro_version == distro_versions[distro]
+        # import pdb; pdb.set_trace()
+        # master.run(
+        #     args=[
+        #         expected_python_version[distro], '-c', 'import platform; '
+        #         'distribution = platform.linux_distribution(); '
+        #         'assert distribution[0] == "{expected_name}" and '
+        #         'distribution[1].startswith("{expected_version_prefix}"), '
+        #         'distribution'.format(
+        #             expected_name=expected_names[distro],
+        #             expected_version_prefix=expected_versions_prefix[distro
+        #                                                              ],
+        #         )
+        #     ],
+        #     user=cluster.default_ssh_user,
+        # )
 
         # This shows that the cluster can be started with this distribution.
         # cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
