@@ -425,7 +425,7 @@ class TestDistributions:
             Distribution.DEBIAN_8: '"8"',
         }
 
-        distro = Distribution.CENTOS_7
+        distro = Distribution.UBUNTU_16_04
 
         args = ['cat /etc/*-release']
         with Cluster(
@@ -442,6 +442,9 @@ class TestDistributions:
                 user=cluster.default_ssh_user,
                 shell=True,
             )
+            import pdb; pdb.set_trace()
+            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
+            cluster.wait_for_dcos_oss()
 
         version_info = cat_cmd.stdout
         [id_line] = [line for line in version_info.decode().split('\n') if line.startswith('ID=')]
@@ -467,5 +470,3 @@ class TestDistributions:
         # )
 
         # This shows that the cluster can be started with this distribution.
-        cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-        cluster.wait_for_dcos_oss()
