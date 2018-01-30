@@ -19,6 +19,7 @@ import yaml
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
+from retry import retry
 
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -299,22 +300,35 @@ class DockerCluster(ClusterManager):
         docker_version = '1.13.1'
         distro = 'centos-7'
 
-        client.images.build(
-            path=str(self._path),
-            rm=True,
-            forcerm=True,
-            tag=base_tag,
-            dockerfile=str(Path('build') / 'base' / distro / 'Dockerfile'),
+        @retry(
+            docker.errors.BuildError, delay=1, backoff=2, max_delay=4, tries=3
+        )
+        def build(
+            client: docker.DockerClient,
+            path: Path,
+            tag: str,
+            dockerfile: Path
+        ) -> docker.models.images.Image:
+            return client.images.build(
+                path=str(path),
+                rm=True,
+                forcerm=True,
+                tag=tag,
+                dockerfile=str(dockerfile),
+            )
+
+        build(
+            client,
+            self._path,
+            base_tag,
+            Path('build') / 'base' / distro / 'Dockerfile',
         )
 
-        client.images.build(
-            path=str(self._path),
-            rm=True,
-            forcerm=True,
-            tag=base_docker_tag,
-            dockerfile=str(
-                Path('build') / 'base-docker' / docker_version / 'Dockerfile'
-            ),
+        build(
+            client,
+            self._path,
+            base_docker_tag,
+            Path('build') / 'base-docker' / docker_version / 'Dockerfile',
         )
 
         client.images.build(
