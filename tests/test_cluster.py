@@ -403,7 +403,7 @@ class TestDistributions:
             )
 
     @pytest.mark.parametrize('distro', list(Distribution))
-    def test_custom(
+    def test_custom_choice(
         self,
         oss_artifact: Path,
         oss_artifact_url: str,
@@ -428,7 +428,6 @@ class TestDistributions:
         # TODO: Remove this but for now we already know it works
         if distro == Distribution.CENTOS_7:
             return
-
 
         distro_ids = {
             Distribution.CENTOS_7: '"centos"',
@@ -494,3 +493,5 @@ class TestDistributions:
         # )
 
         # This shows that the cluster can be started with this distribution.
+
+    def test_custom_works
