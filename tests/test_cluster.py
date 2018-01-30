@@ -360,6 +360,15 @@ class TestClusterFromNodes:
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
+# More distros
+# Which backends support which distros - nice error
+# Test with wait_for_dcos = slow test - should fail for Ubuntu on EE, needs
+#   to be tested on OSS and EE
+# Work out how to split tests on Travis
+# General cleanup
+# Documentation
+# Test in DC/OS Enterprise
+# Do a release
 
 class TestDistributions:
     """
@@ -426,9 +435,11 @@ class TestDistributions:
             (master, ) = cluster.masters
             master.run(
                 args=[
-                    expected_python_version[distro], '-c',
-                    'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "{expected_name}" and distribution[1].startswith("{expected_version_prefix}"), distribution'.
-                    format(
+                    expected_python_version[distro], '-c', 'import platform; '
+                    'distribution = platform.linux_distribution(); '
+                    'assert distribution[0] == "{expected_name}" and '
+                    'distribution[1].startswith("{expected_version_prefix}"), '
+                    'distribution'.format(
                         expected_name=expected_names[distro],
                         expected_version_prefix=expected_versions_prefix[distro
                                                                          ],
