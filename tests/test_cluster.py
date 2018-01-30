@@ -412,12 +412,18 @@ class TestDistributions:
     ) -> None:
 
         # TODO: Fix ubuntu - doesn't work on OSS
+        # Missing getenforce
+        # Then dcos link error
         if distro == Distribution.UBUNTU_16_04:
+            return
+
+        # TODO: /sbin/ip missing -> should be from iproute2 package
+        if distro == Distribution.COREOS:
             return
 
         # TODO: Remove this but for now we already know it works
         if distro == Distribution.CENTOS_7:
-            return
+            pass
 
         distro_ids = {
             Distribution.CENTOS_7: '"centos"',
