@@ -143,8 +143,15 @@ class DockerCluster(ClusterManager):
         # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        self._path = cluster_backend.workspace_dir / str(uuid.uuid4()
-                                                         ) / self._cluster_id
+        self._path = Path(
+            TemporaryDirectory(
+                suffix=self._cluster_id,
+                dir=(
+                    str(cluster_backend.workspace_dir)
+                    if cluster_backend.workspace_dir else None
+                ),
+            ).name
+        )
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
