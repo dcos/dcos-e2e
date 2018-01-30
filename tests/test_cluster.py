@@ -398,13 +398,18 @@ class TestDistributions:
     ) -> None:
 
         expected_names = {
-            Distribution.UBUNTU_14_04: 'Ubuntu',
+            Distribution.UBUNTU_16_04: 'Ubuntu',
             Distribution.CENTOS_7: 'CentOS Linux',
         }
 
         expected_versions_prefix = {
-            Distribution.UBUNTU_14_04: '14.04',
+            Distribution.UBUNTU_16_04: '16.04',
             Distribution.CENTOS_7: '7',
+        }
+
+        expected_python_version = {
+            Distribution.UBUNTU_16_04: 'python3.5',
+            Distribution.CENTOS_7: 'python',
         }
 
         with Cluster(
@@ -417,7 +422,7 @@ class TestDistributions:
 
             (master, ) = cluster.masters
             master.run(
-                args=['python2', '-c', 'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "{expected_name}"; assert distribution[1].startswith("{expected_version_prefix}")'.format(
+                args=[expected_python_version[distro], '-c', 'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "{expected_name}" and distribution[1].startswith("{expected_version_prefix}"), distribution'.format(
                     expected_name=expected_names[distro],
                     expected_version_prefix=expected_versions_prefix[distro],
                 )],

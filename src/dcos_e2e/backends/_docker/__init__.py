@@ -23,6 +23,7 @@ from cryptography.hazmat.backends import default_backend
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
+from dcos_e2e.distributions import Distribution
 
 
 def _get_open_port() -> int:
@@ -113,8 +114,10 @@ class DockerCluster(ClusterManager):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: Docker,
+        distro: Distribution,
     ) -> None:
         """
+        TODO: This distribution is not supported on this backend.
         Create a Docker cluster.
 
         Args:
@@ -297,7 +300,12 @@ class DockerCluster(ClusterManager):
         base_docker_tag = base_tag + '-docker'
         # This version of Docker supports `overlay2`.
         docker_version = '1.13.1'
-        distro = 'centos-7'
+        dcos_docker_distros = {
+            Distribution.CENTOS_7: 'centos-7',
+            Distribution.UBUNTU_16_04: 'ubuntu-xenial',
+        }
+
+        distro = dcos_docker_distros[distro]
 
         client.images.build(
             path=str(self._path),

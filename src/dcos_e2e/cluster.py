@@ -54,7 +54,7 @@ class Cluster(ContextDecorator):
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            #  distro=distro,
+            distro=distro,
         )  # type: ClusterManager
 
     @classmethod
