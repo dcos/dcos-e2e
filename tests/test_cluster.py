@@ -453,8 +453,6 @@ class TestDistributions:
             Distribution.DEBIAN_8: '"8"',
         }
 
-        args = ['cat /etc/*-release']
-
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
@@ -462,26 +460,21 @@ class TestDistributions:
             public_agents=0,
             distro=distro,
         ) as cluster:
-
             (master, ) = cluster.masters
             cat_cmd = master.run(
-                args=args,
+                args=['cat /etc/*-release'],
                 user=cluster.default_ssh_user,
                 shell=True,
             )
-            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-            cluster.wait_for_dcos_oss()
 
         version_info = cat_cmd.stdout
-        [id_line] = [
-            line for line in version_info.decode().split('\n')
-            if line.startswith('ID=')
+        version_info_lines = [
+            line for line in version_info.decode().split('\n') if '=' in line
         ]
-        [version_id_line] = [
-            line for line in version_info.decode().split('\n')
-            if line.startswith('VERSION_ID=')
-        ]
-        distro_id = id_line.split('ID=')[1]
-        distro_version = version_id_line.split('VERSION_ID=')[1]
-        assert distro_id == distro_ids[distro]
-        assert distro_version == distro_versions[distro]
+        version_data = {
+            item.split('=')[0]: item.split('=')[1]
+            for item in version_info_lines
+        }
+
+        assert version_data['ID'] == distro_ids[distro]
+        assert version_data['VERSION_ID'] == distro_versions[distro]
