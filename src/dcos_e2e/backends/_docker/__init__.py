@@ -304,10 +304,7 @@ class DockerCluster(ClusterManager):
             docker.errors.BuildError, delay=1, backoff=2, max_delay=4, tries=3
         )
         def build(
-            client: docker.DockerClient,
-            path: Path,
-            tag: str,
-            dockerfile: Path
+            client: docker.DockerClient, path: Path, tag: str, dockerfile: Path
         ) -> docker.models.images.Image:
             return client.images.build(
                 path=str(path),
