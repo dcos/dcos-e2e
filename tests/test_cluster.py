@@ -17,6 +17,15 @@ from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
 
+
+from enum import Enum
+
+class Distribution(Enum):
+
+    CENTOS_7 = 1
+    UBUNTU_14_04 = 2
+
+
 class TestIntegrationTests:
     """
     Tests for running integration tests on a node.
@@ -388,7 +397,8 @@ class TestDistributions:
             )
 
 
-    @pytest.mark.parametrize('distro', distributions.enumerate())
+
+    @pytest.mark.parametrize('distro', list(Distribution))
     def test_custom(
         self,
         oss_artifact: Path,
@@ -398,14 +408,15 @@ class TestDistributions:
     ) -> None:
 
         expected_names = {
-            distributions.UBUNTU_14_04: 'Ubuntu',
-            distributions.CENTOS_7: 'CentOS Linux',
+            Distribution.UBUNTU_14_04: 'Ubuntu',
+            Distribution.CENTOS_7: 'CentOS Linux',
         }
 
         expected_versions_prefix = {
-            distributions.UBUNTU_14_04: '14.04',
-            distributions.CENTOS_7: '7',
+            Distribution.UBUNTU_14_04: '14.04',
+            Distribution.CENTOS_7: '7',
         }
+
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
@@ -426,3 +437,4 @@ class TestDistributions:
         # This shows that the cluster can be started with this distribution.
         # cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
         # cluster.wait_for_dcos_oss()
+
