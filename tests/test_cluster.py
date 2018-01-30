@@ -15,15 +15,7 @@ from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
-
-
-
-from enum import Enum
-
-class Distribution(Enum):
-
-    CENTOS_7 = 1
-    UBUNTU_14_04 = 2
+from dcos_e2e.distributions import Distribution
 
 
 class TestIntegrationTests:
@@ -395,8 +387,6 @@ class TestDistributions:
                 args=['python2', '-c', 'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "CentOS Linux"; assert distribution[1].startswith("7.4")'],
                 user=cluster.default_ssh_user,
             )
-
-
 
     @pytest.mark.parametrize('distro', list(Distribution))
     def test_custom(

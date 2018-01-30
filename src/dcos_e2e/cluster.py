@@ -16,7 +16,7 @@ from retry import retry
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
 from .node import Node
-
+from .distributions import Distribution
 
 class Cluster(ContextDecorator):
     """
@@ -32,6 +32,7 @@ class Cluster(ContextDecorator):
         agents: int = 1,
         public_agents: int = 1,
         files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
+        distro: Distribution = Distribution.CENTOS_7,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -44,6 +45,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
+            TODO: Distro
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
         self._cluster = cluster_backend.cluster_cls(
@@ -52,6 +54,7 @@ class Cluster(ContextDecorator):
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
+            #  distro=distro,
         )  # type: ClusterManager
 
     @classmethod
