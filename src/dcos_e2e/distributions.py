@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Distribution(Enum):
 
     CENTOS_7 = 1

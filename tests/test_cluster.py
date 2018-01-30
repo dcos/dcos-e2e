@@ -384,7 +384,10 @@ class TestDistributions:
 
             (master, ) = cluster.masters
             master.run(
-                args=['python2', '-c', 'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "CentOS Linux"; assert distribution[1].startswith("7.4")'],
+                args=[
+                    'python2', '-c',
+                    'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "CentOS Linux"; assert distribution[1].startswith("7.4")'
+                ],
                 user=cluster.default_ssh_user,
             )
 
@@ -422,14 +425,18 @@ class TestDistributions:
 
             (master, ) = cluster.masters
             master.run(
-                args=[expected_python_version[distro], '-c', 'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "{expected_name}" and distribution[1].startswith("{expected_version_prefix}"), distribution'.format(
-                    expected_name=expected_names[distro],
-                    expected_version_prefix=expected_versions_prefix[distro],
-                )],
+                args=[
+                    expected_python_version[distro], '-c',
+                    'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "{expected_name}" and distribution[1].startswith("{expected_version_prefix}"), distribution'.
+                    format(
+                        expected_name=expected_names[distro],
+                        expected_version_prefix=expected_versions_prefix[distro
+                                                                         ],
+                    )
+                ],
                 user=cluster.default_ssh_user,
             )
 
         # This shows that the cluster can be started with this distribution.
         # cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
         # cluster.wait_for_dcos_oss()
-

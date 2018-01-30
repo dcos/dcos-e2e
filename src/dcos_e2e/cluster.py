@@ -15,8 +15,9 @@ from retry import retry
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-from .node import Node
 from .distributions import Distribution
+from .node import Node
+
 
 class Cluster(ContextDecorator):
     """
