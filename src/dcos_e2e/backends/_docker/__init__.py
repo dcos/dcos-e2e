@@ -10,7 +10,7 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from tempfile import TemporaryDirectory, gettempdir
+from tempfile import TemporaryDirectory
 from textwrap import dedent
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
@@ -78,7 +78,7 @@ class Docker(ClusterBackend):
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
-        self.workspace_dir = workspace_dir if workspace_dir else Path(gettempdir())
+        self.workspace_dir = workspace_dir
         self.custom_master_mounts = dict(custom_master_mounts or {})
         self.custom_agent_mounts = dict(custom_agent_mounts or {})
         self.custom_public_agent_mounts = dict(
@@ -130,6 +130,7 @@ class DockerCluster(ClusterManager):
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
             cluster_backend: Details of the specific Docker backend to use.
+            distro: The Linux distribution to boot DC/OS on.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -142,7 +143,8 @@ class DockerCluster(ClusterManager):
         # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        self._path = cluster_backend.workspace_dir / str(uuid.uuid4()) / self._cluster_id
+        self._path = cluster_backend.workspace_dir / str(uuid.uuid4()
+                                                         ) / self._cluster_id
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
@@ -166,7 +168,6 @@ class DockerCluster(ClusterManager):
         # https://github.com/PyCQA/pylint/issues/224.
         Path(self._genconf_dir).mkdir(exist_ok=True)
         self._genconf_dir = Path(self._genconf_dir).resolve()
-        Path(self._genconf_dir).mkdir(exist_ok=True)
         self._genconf_dir_src = self._path / 'genconf.src'
         include_dir = self._path / 'include'
         include_dir_src = self._path / 'include.src'

@@ -46,7 +46,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            TODO: Distro
+            distro: The Linux distribution to boot DC/OS on.
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
         self._cluster = cluster_backend.cluster_cls(

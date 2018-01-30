@@ -360,6 +360,7 @@ class TestClusterFromNodes:
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
+
 # More distros - needs refactor
 # Which backends support which distros - nice error
 # Test with wait_for_dcos = slow test - should fail for Ubuntu on EE, needs
@@ -369,6 +370,7 @@ class TestClusterFromNodes:
 # Documentation
 # Test in DC/OS Enterprise
 # Do a release
+
 
 class TestDistributions:
     """
@@ -433,7 +435,6 @@ class TestDistributions:
             Distribution.DEBIAN_8: '"8"',
         }
 
-
         args = ['cat /etc/*-release']
         with Cluster(
             cluster_backend=cluster_backend,
@@ -449,13 +450,18 @@ class TestDistributions:
                 user=cluster.default_ssh_user,
                 shell=True,
             )
-            import pdb; pdb.set_trace()
             cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
             cluster.wait_for_dcos_oss()
 
         version_info = cat_cmd.stdout
-        [id_line] = [line for line in version_info.decode().split('\n') if line.startswith('ID=')]
-        [version_id_line] = [line for line in version_info.decode().split('\n') if line.startswith('VERSION_ID=')]
+        [id_line] = [
+            line for line in version_info.decode().split('\n')
+            if line.startswith('ID=')
+        ]
+        [version_id_line] = [
+            line for line in version_info.decode().split('\n')
+            if line.startswith('VERSION_ID=')
+        ]
         distro_id = id_line.split('ID=')[1]
         distro_version = version_id_line.split('VERSION_ID=')[1]
         assert distro_id == distro_ids[distro]
