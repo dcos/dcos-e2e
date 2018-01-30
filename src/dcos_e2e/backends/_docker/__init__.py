@@ -3,6 +3,7 @@ Helpers for creating and interacting with clusters on Docker.
 """
 
 import inspect
+import logging
 import os
 import socket
 import stat
@@ -24,6 +25,10 @@ from retry import retry
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
+
+
+logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 
 def _get_open_port() -> int:
@@ -306,13 +311,18 @@ class DockerCluster(ClusterManager):
         def build(
             client: docker.DockerClient, path: Path, tag: str, dockerfile: Path
         ) -> docker.models.images.Image:
-            return client.images.build(
-                path=str(path),
-                rm=True,
-                forcerm=True,
-                tag=tag,
-                dockerfile=str(dockerfile),
-            )
+            try:
+                LOGGER.debug('Build {}'.format(str(dockerfile)))
+                return client.images.build(
+                    path=str(path),
+                    rm=True,
+                    forcerm=True,
+                    tag=tag,
+                    dockerfile=str(dockerfile),
+                )
+            except docker.errors.BuildError:
+                LOGGER.exception('Failed to build')
+                raise
 
         build(
             client,
