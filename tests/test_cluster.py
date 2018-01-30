@@ -23,7 +23,9 @@ class TestIntegrationTests:
     """
 
     def test_run_pytest(
-        self, cluster_backend: ClusterBackend, oss_artifact: Path
+        self,
+        cluster_backend: ClusterBackend,
+        oss_artifact: Path,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -356,3 +358,37 @@ class TestClusterFromNodes:
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
+
+
+class TestDistributions:
+    """
+    XXX
+    """
+
+    def test_default(
+        self,
+        oss_artifact: Path,
+        oss_artifact_url: str,
+        cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        By default, CentOS
+        """
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+
+            (master, ) = cluster.masters
+            master.run(
+                args=['python2', '-c', 'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "CentOS Linux"; assert distribution[1].startswith("7.4")'],
+                user=cluster.default_ssh_user,
+            )
+            # This shows that the CentOS cluster can be started.
+            # cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
+            # cluster.wait_for_dcos_oss()
+
+    def test_custom(self):
+        pass
