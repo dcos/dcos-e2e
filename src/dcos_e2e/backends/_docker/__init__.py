@@ -117,6 +117,8 @@ class DockerCluster(ClusterManager):
         linux_distribution: Distribution,
     ) -> None:
         """
+        Create a Docker cluster.
+
         Args:
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
