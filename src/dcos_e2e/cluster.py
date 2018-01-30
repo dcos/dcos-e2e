@@ -15,6 +15,7 @@ from retry import retry
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
+from .distributions import Distribution
 from .node import Node
 
 
@@ -52,6 +53,7 @@ class Cluster(ContextDecorator):
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
+            linux_distribution=Distribution.CENTOS_7,
         )  # type: ClusterManager
 
     @classmethod
