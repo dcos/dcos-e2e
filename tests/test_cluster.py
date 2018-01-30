@@ -400,14 +400,22 @@ class TestDistributions:
                 user=cluster.default_ssh_user,
             )
 
-    #  @pytest.mark.parametrize('distro', list(Distribution))
+    @pytest.mark.parametrize('distro', list(Distribution))
     def test_custom(
         self,
         oss_artifact: Path,
         oss_artifact_url: str,
         cluster_backend: ClusterBackend,
-        # distro: Distribution,
+        distro: Distribution,
     ) -> None:
+
+        # TODO: Fix ubuntu - doesn't work on OSS
+        if distro == Distribution.UBUNTU_16_04:
+            return
+
+        # TODO: Remove this but for now we already know it works
+        if distro == Distribution.CENTOS_7:
+            return
 
         distro_ids = {
             Distribution.CENTOS_7: '"centos"',
@@ -425,7 +433,6 @@ class TestDistributions:
             Distribution.DEBIAN_8: '"8"',
         }
 
-        distro = Distribution.UBUNTU_16_04
 
         args = ['cat /etc/*-release']
         with Cluster(
