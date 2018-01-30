@@ -23,7 +23,9 @@ class TestIntegrationTests:
     """
 
     def test_run_pytest(
-        self, cluster_backend: ClusterBackend, oss_artifact: Path
+        self,
+        cluster_backend: ClusterBackend,
+        oss_artifact: Path,
     ) -> None:
         """
         Integration tests can be run with `pytest`.
@@ -356,3 +358,46 @@ class TestClusterFromNodes:
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
+
+
+class TestDistributions:
+    """
+    Tests for setting distributions.
+    """
+
+    def test_default(
+        self,
+        cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        Default Linux distribution for `Node`s is CentOS.
+        """
+
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+
+            (master, ) = cluster.masters
+            cat_cmd = master.run(
+                args=['cat /etc/*-release'],
+                user=cluster.default_ssh_user,
+                shell=True,
+            )
+
+        version_info = cat_cmd.stdout
+        [id_line] = [
+            line for line in version_info.decode().split('\n')
+            if line.startswith('ID=')
+        ]
+        [version_id_line] = [
+            line for line in version_info.decode().split('\n')
+            if line.startswith('VERSION_ID=')
+        ]
+        distro_id = id_line.split('ID=')[1]
+        distro_version = version_id_line.split('VERSION_ID=')[1]
+
+        assert distro_id == '"centos"'
+        assert distro_version == '"7"'
