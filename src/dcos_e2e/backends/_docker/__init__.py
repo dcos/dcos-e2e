@@ -23,6 +23,7 @@ from cryptography.hazmat.backends import default_backend
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
+from dcos_e2e.distributions import Distribution
 
 
 def _get_open_port() -> int:
@@ -113,8 +114,10 @@ class DockerCluster(ClusterManager):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: Docker,
+        distro: Distribution,
     ) -> None:
         """
+        TODO: This distribution is not supported on this backend.
         Create a Docker cluster.
 
         Args:
@@ -127,6 +130,7 @@ class DockerCluster(ClusterManager):
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
             cluster_backend: Details of the specific Docker backend to use.
+            distro: The Linux distribution to boot DC/OS on.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -297,7 +301,15 @@ class DockerCluster(ClusterManager):
         base_docker_tag = base_tag + '-docker'
         # This version of Docker supports `overlay2`.
         docker_version = '1.13.1'
-        distro = 'centos-7'
+        dcos_docker_distros = {
+            Distribution.CENTOS_7: 'centos-7',
+            Distribution.UBUNTU_16_04: 'ubuntu-xenial',
+            Distribution.FEDORA_23: 'fedora-23',
+            Distribution.COREOS: 'coreos',
+            Distribution.DEBIAN_8: 'debian-jessie',
+        }
+
+        distro = dcos_docker_distros[distro]
 
         client.images.build(
             path=str(self._path),
