@@ -388,16 +388,13 @@ class TestDistributions:
             )
 
         version_info = cat_cmd.stdout
-        [id_line] = [
-            line for line in version_info.decode().split('\n')
-            if line.startswith('ID=')
+        version_info_lines = [
+            line for line in version_info.decode().split('\n') if '=' in line
         ]
-        [version_id_line] = [
-            line for line in version_info.decode().split('\n')
-            if line.startswith('VERSION_ID=')
-        ]
-        distro_id = id_line.split('ID=')[1]
-        distro_version = version_id_line.split('VERSION_ID=')[1]
+        version_data = {
+            item.split('=')[0]: item.split('=')[1]
+            for item in version_info_lines
+        }
 
-        assert distro_id == '"centos"'
-        assert distro_version == '"7"'
+        assert version_data['ID'] == '"centos"'
+        assert version_data['VERSION_ID'] == '"7"'
