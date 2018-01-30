@@ -361,7 +361,7 @@ class TestClusterFromNodes:
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
 
-# More distros - needs refactor
+# More distros - needs refactor, also test wait_for_dcos
 # Which backends support which distros - nice error
 # Test with wait_for_dcos = slow test - should fail for Ubuntu on EE, needs
 #   to be tested on OSS and EE
@@ -380,11 +380,10 @@ class TestDistributions:
     def test_default(
         self,
         oss_artifact: Path,
-        oss_artifact_url: str,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
-        By default, CentOS
+        Default Linux distribution for `Node`s is CentOS.
         """
         with Cluster(
             cluster_backend=cluster_backend,
@@ -394,19 +393,28 @@ class TestDistributions:
         ) as cluster:
 
             (master, ) = cluster.masters
-            master.run(
-                args=[
-                    'python2', '-c',
-                    'import platform; distribution = platform.linux_distribution(); assert distribution[0] == "CentOS Linux"; assert distribution[1].startswith("7.4")'
-                ],
+            cat_cmd = master.run(
+                args=['cat /etc/*-release'],
                 user=cluster.default_ssh_user,
+                shell=True,
             )
+
+        version_info = cat_cmd.stdout
+        version_info_lines = [
+            line for line in version_info.decode().split('\n') if '=' in line
+        ]
+        version_data = {
+            item.split('=')[0]: item.split('=')[1]
+            for item in version_info_lines
+        }
+
+        assert version_data['ID'] == '"centos"'
+        assert version_data['VERSION_ID'] == '"7"'
 
     @pytest.mark.parametrize('distro', list(Distribution))
     def test_custom_choice(
         self,
         oss_artifact: Path,
-        oss_artifact_url: str,
         cluster_backend: ClusterBackend,
         distro: Distribution,
     ) -> None:
@@ -446,6 +454,7 @@ class TestDistributions:
         }
 
         args = ['cat /etc/*-release']
+
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
@@ -476,22 +485,3 @@ class TestDistributions:
         distro_version = version_id_line.split('VERSION_ID=')[1]
         assert distro_id == distro_ids[distro]
         assert distro_version == distro_versions[distro]
-        # import pdb; pdb.set_trace()
-        # master.run(
-        #     args=[
-        #         expected_python_version[distro], '-c', 'import platform; '
-        #         'distribution = platform.linux_distribution(); '
-        #         'assert distribution[0] == "{expected_name}" and '
-        #         'distribution[1].startswith("{expected_version_prefix}"), '
-        #         'distribution'.format(
-        #             expected_name=expected_names[distro],
-        #             expected_version_prefix=expected_versions_prefix[distro
-        #                                                              ],
-        #         )
-        #     ],
-        #     user=cluster.default_ssh_user,
-        # )
-
-        # This shows that the cluster can be started with this distribution.
-
-    def test_custom_works

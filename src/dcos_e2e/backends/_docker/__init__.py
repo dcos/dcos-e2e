@@ -114,7 +114,7 @@ class DockerCluster(ClusterManager):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: Docker,
-        distro: Distribution,
+        linux_distribution: Distribution,
     ) -> None:
         """
         TODO: This distribution is not supported on this backend.
@@ -130,7 +130,7 @@ class DockerCluster(ClusterManager):
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
             cluster_backend: Details of the specific Docker backend to use.
-            distro: The Linux distribution to boot DC/OS on.
+            linux_distribution: The Linux distribution to boot DC/OS on.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -309,14 +309,16 @@ class DockerCluster(ClusterManager):
             Distribution.DEBIAN_8: 'debian-jessie',
         }
 
-        distro = dcos_docker_distros[distro]
+        distro_path_segment = dcos_docker_distros[linux_distribution]
 
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
             tag=base_tag,
-            dockerfile=str(Path('build') / 'base' / distro / 'Dockerfile'),
+            dockerfile=str(
+                Path('build') / 'base' / distro_path_segment / 'Dockerfile'
+            ),
         )
 
         client.images.build(
