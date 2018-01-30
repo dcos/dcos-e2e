@@ -372,7 +372,7 @@ class TestClusterFromNodes:
 
 class TestDistributions:
     """
-    XXX
+    Tests for setting distributions.
     """
 
     def test_default(
@@ -410,18 +410,27 @@ class TestDistributions:
     ) -> None:
 
         expected_names = {
-            Distribution.UBUNTU_16_04: 'Ubuntu',
             Distribution.CENTOS_7: 'CentOS Linux',
+            Distribution.UBUNTU_16_04: 'Ubuntu',
+            Distribution.COREOS: 'python',
+            Distribution.FEDORA_23: 'python',
+            Distribution.DEBIAN_8: 'python',
         }
 
         expected_versions_prefix = {
-            Distribution.UBUNTU_16_04: '16.04',
             Distribution.CENTOS_7: '7',
+            Distribution.UBUNTU_16_04: '16.04',
+            Distribution.COREOS: '',
+            Distribution.FEDORA_23: '23',
+            Distribution.DEBIAN_8: '8',
         }
 
         expected_python_version = {
+            Distribution.CENTOS_7: 'python2',
             Distribution.UBUNTU_16_04: 'python3.5',
-            Distribution.CENTOS_7: 'python',
+            Distribution.COREOS: 'python',
+            Distribution.FEDORA_23: 'python',
+            Distribution.DEBIAN_8: 'python',
         }
 
         with Cluster(
@@ -433,6 +442,7 @@ class TestDistributions:
         ) as cluster:
 
             (master, ) = cluster.masters
+            import pdb; pdb.set_trace()
             master.run(
                 args=[
                     expected_python_version[distro], '-c', 'import platform; '
