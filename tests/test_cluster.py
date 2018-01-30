@@ -360,7 +360,7 @@ class TestClusterFromNodes:
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
-# More distros
+# More distros - needs refactor
 # Which backends support which distros - nice error
 # Test with wait_for_dcos = slow test - should fail for Ubuntu on EE, needs
 #   to be tested on OSS and EE
@@ -400,13 +400,13 @@ class TestDistributions:
                 user=cluster.default_ssh_user,
             )
 
-    @pytest.mark.parametrize('distro', list(Distribution))
+    #  @pytest.mark.parametrize('distro', list(Distribution))
     def test_custom(
         self,
         oss_artifact: Path,
         oss_artifact_url: str,
         cluster_backend: ClusterBackend,
-        distro: Distribution,
+        # distro: Distribution,
     ) -> None:
 
         distro_ids = {
@@ -424,6 +424,8 @@ class TestDistributions:
             Distribution.FEDORA_23: '23',
             Distribution.DEBIAN_8: '"8"',
         }
+
+        distro = Distribution.CENTOS_7
 
         args = ['cat /etc/*-release']
         with Cluster(
@@ -465,5 +467,5 @@ class TestDistributions:
         # )
 
         # This shows that the cluster can be started with this distribution.
-        # cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-        # cluster.wait_for_dcos_oss()
+        cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
+        cluster.wait_for_dcos_oss()
