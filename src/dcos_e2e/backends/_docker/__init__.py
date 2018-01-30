@@ -312,7 +312,7 @@ class DockerCluster(ClusterManager):
             client: docker.DockerClient, path: Path, tag: str, dockerfile: Path
         ) -> docker.models.images.Image:
             try:
-                LOGGER.debug('Build {}'.format(str(dockerfile)))
+                LOGGER.debug('Build %s', str(dockerfile))
                 return client.images.build(
                     path=str(path),
                     rm=True,
