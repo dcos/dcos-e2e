@@ -117,7 +117,6 @@ class DockerCluster(ClusterManager):
         linux_distribution: Distribution,
     ) -> None:
         """
-        TODO: This distribution is not supported on this backend.
         Create a Docker cluster.
 
         Args:
