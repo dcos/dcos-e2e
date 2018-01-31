@@ -6,24 +6,6 @@ language: python
 python:
 - '3.5'
 env:
-  matrix:
-  - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_coreos_enterprise
-  - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_coreos_oss
-  - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_custom_choice
-  - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_default
-  - TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend
-  - TEST_PATTERN=tests/backends/test_docker.py::TestDockerVersion
-  - TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes
-  - TEST_PATTERN=tests/test_cluster.py::TestClusterSize
-  - TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config
-  - TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config
-  - TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging
-  - TEST_PATTERN=tests/test_cluster.py::TestIntegrationTests::test_run_pytest
-  - TEST_PATTERN=tests/test_cluster.py::TestMultipleClusters::test_two_clusters
-  - TEST_PATTERN=tests/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
-  - TEST_PATTERN=tests/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest
-  - TEST_PATTERN=tests/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
-  - TEST_PATTERN=tests/test_node.py::TestNode
   global:
     secure: CurioLUfLTTBDFdw/+bj9GGHJsjypp/PmU7WRPbGwqeCzM4+LxIkfNmoLMnRVjzhnK3V7W8ZG2WU4BPS51SRljfVl5yJMgsUBf74dY6iHCzcEPQ9diDVuI0idEBR4QI7H9myAbUnc7+wfvzRoRiGDsHkcoDAXQR04B88CmbzSwD/AKu4FW83QJbpcsGyUICcQOgXULqnEB4IIZjrxSEqgX/YN+tinxAi0lr4R5KUNwyiOgBx2XZPRPhikYmuh/eFADGZR2wD0+BxQQK1Bg4vrgbNyP24MFisN8nb1p2spgnIpboNVyhzZwxKUNmDZaQpOHlazv6PkZBZI1lJ0pb1Z+YdyR7Pe2r/S0BiqNyrbBMStlHtmqbyE/P/iFJQ9MZ+R3xn96qRfQuBf+LaGMeEhUUPVD8NMqOY2rgYoJ3btsEZsS0x+2LHsHCaQp4ht36s30NrOcRx7tbq508b2s/AUEIESyolHD29mGlCWXcZyj8A+V+9Aj5YyCGwC76zm/OkAvIJfqpW7UCCzcc5yTXhLF1LsfI4vNzsY1lv3X2B6lYfnGrLJnnOWlJlGfPl/Ns06FFgX0X1myxTa85z9aZIFPvcF0fKImxTi6Bezw0YvNO00Pr/vTVZpkUKjaspNiGSRDcFM01QVl69QN6Zc3nsAwY4owbhdK7ZrBLS0TkwaUQ=
 before_install:
@@ -38,9 +20,5 @@ install:
 cache: pip
 before_script:
 - make clean
-- make lint
-- travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
 script:
-- pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests
-after_success:
-- codecov
+- python pulltest.py
