@@ -412,11 +412,14 @@ class TestDistributions:
         oss_artifact: Path,
         cluster_backend: ClusterBackend,
     ) -> None:
+        """
+        DC/OS can start up on CoreOS.
+        """
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
-            agents=0,
-            public_agents=0,
+            agents=1,
+            public_agents=1,
             linux_distribution=Distribution.COREOS,
         ) as cluster:
             cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
@@ -429,17 +432,9 @@ class TestDistributions:
         cluster_backend: ClusterBackend,
         linux_distribution: Distribution,
     ) -> None:
-
-        # Ubuntu, Debian:
-        # Missing getenforce, then dcos-link error
-
-        # CoreOS:
-        # /sbin/ip missing
-        # This is possibly fixable by installing the iproute2 package
-
-        # Fedora:
-        # dcos-signal does not start
-
+        """
+        It is possible to start a cluster with various Linux distributions.
+        """
         ids = {
             Distribution.CENTOS_7: '"centos"',
             Distribution.UBUNTU_16_04: 'ubuntu',
