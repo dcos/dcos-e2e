@@ -33,7 +33,7 @@ class Cluster(ContextDecorator):
         agents: int = 1,
         public_agents: int = 1,
         files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
-        distro: Distribution = Distribution.CENTOS_7,
+        linux_distribution: Distribution = Distribution.CENTOS_7,
     ) -> None:
         """
         Create a DC/OS cluster.
