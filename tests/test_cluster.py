@@ -361,17 +361,6 @@ class TestClusterFromNodes:
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
 
-# More linux_distributions - needs refactor, also test wait_for_dcos
-# Which backends support which linux_distributions - nice error
-# Test with wait_for_dcos = slow test - should fail for Ubuntu on EE, needs
-#   to be tested on OSS and EE
-# Work out how to split tests on Travis
-# General cleanup
-# Documentation
-# Test in DC/OS Enterprise
-# Do a release
-
-
 class TestDistributions:
     """
     Tests for setting distributions.
@@ -407,11 +396,9 @@ class TestDistributions:
         assert version_data['ID'] == '"centos"'
         assert version_data['VERSION_ID'] == '"7"'
 
-
     @pytest.mark.parametrize('linux_distribution', list(Distribution))
     def test_custom_choice(
         self,
-        oss_artifact: Path,
         cluster_backend: ClusterBackend,
         linux_distribution: Distribution,
     ) -> None:

@@ -8,8 +8,8 @@ from pathlib import Path
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 import pytest
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 from passlib.hash import sha512_crypt
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
