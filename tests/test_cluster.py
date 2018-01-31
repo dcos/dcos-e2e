@@ -407,23 +407,6 @@ class TestDistributions:
         assert version_data['ID'] == '"centos"'
         assert version_data['VERSION_ID'] == '"7"'
 
-    def test_coreos(
-        self,
-        oss_artifact: Path,
-        cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        DC/OS can start up on CoreOS.
-        """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=1,
-            public_agents=1,
-            linux_distribution=Distribution.COREOS,
-        ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-            cluster.wait_for_dcos_oss()
 
     @pytest.mark.parametrize('linux_distribution', list(Distribution))
     def test_custom_choice(

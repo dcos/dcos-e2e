@@ -9,9 +9,11 @@ from pathlib import Path
 # are disabled.
 import pytest
 from py.path import local  # pylint: disable=no-name-in-module, import-error
+from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
 
 
 class TestDockerBackend:
@@ -94,7 +96,7 @@ class TestDockerBackend:
             public_agents=0,
         ) as cluster:
             with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_url(oss_artifact_url)
+                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
 
         expected_error = (
             'The Docker backend does not support the installation of DC/OS '
@@ -103,3 +105,63 @@ class TestDockerBackend:
         )
 
         assert str(excinfo.value) == expected_error
+
+
+class TestDistributions:
+    """
+    Tests for setting distributions.
+    """
+
+    def test_coreos_oss(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        DC/OS OSS can start up on CoreOS.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=1,
+            public_agents=1,
+            linux_distribution=Distribution.COREOS,
+        ) as cluster:
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                log_output_live=True,
+            )
+            cluster.wait_for_dcos_oss()
+
+    def test_coreos_enterprise(
+        self,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on CoreOS.
+        """
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+        config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
+        }
+
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=1,
+            public_agents=1,
+            linux_distribution=Distribution.COREOS,
+        ) as cluster:
+            cluster.install_dcos_from_path(
+                build_artifact=enterprise_artifact,
+                extra_config=config,
+                log_output_live=True,
+            )
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
