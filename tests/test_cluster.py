@@ -361,8 +361,8 @@ class TestClusterFromNodes:
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
 
-# More distros - needs refactor, also test wait_for_dcos
-# Which backends support which distros - nice error
+# More linux_distributions - needs refactor, also test wait_for_dcos
+# Which backends support which linux_distributions - nice error
 # Test with wait_for_dcos = slow test - should fail for Ubuntu on EE, needs
 #   to be tested on OSS and EE
 # Work out how to split tests on Travis
@@ -408,33 +408,33 @@ class TestDistributions:
         assert version_data['ID'] == '"centos"'
         assert version_data['VERSION_ID'] == '"7"'
 
-    @pytest.mark.parametrize('distro', list(Distribution))
+    @pytest.mark.parametrize('linux_distribution', list(Distribution))
     def test_custom_choice(
         self,
         oss_artifact: Path,
         cluster_backend: ClusterBackend,
-        distro: Distribution,
+        linux_distribution: Distribution,
     ) -> None:
 
         # TODO: Fix ubuntu - doesn't work on OSS
         # Missing getenforce
         # Then dcos link error
-        if distro == Distribution.UBUNTU_16_04:
+        if linux_distribution == Distribution.UBUNTU_16_04:
             return
 
         # TODO: /sbin/ip missing -> should be from iproute2 package
-        if distro == Distribution.COREOS:
+        if linux_distribution == Distribution.COREOS:
             return
 
         # Skip because DC/OS Signal does not start
-        if distro == Distribution.FEDORA_23:
+        if linux_distribution == Distribution.FEDORA_23:
             return
 
         # TODO: Remove this but for now we already know it works
-        if distro == Distribution.CENTOS_7:
+        if linux_distribution == Distribution.CENTOS_7:
             return
 
-        distro_ids = {
+        ids = {
             Distribution.CENTOS_7: '"centos"',
             Distribution.UBUNTU_16_04: 'ubuntu',
             Distribution.COREOS: 'coreos',
@@ -442,7 +442,7 @@ class TestDistributions:
             Distribution.DEBIAN_8: 'debian',
         }
 
-        distro_versions = {
+        version_ids = {
             Distribution.CENTOS_7: '"7"',
             Distribution.UBUNTU_16_04: '"16.04"',
             Distribution.COREOS: '1298.7.0',
@@ -455,7 +455,7 @@ class TestDistributions:
             masters=1,
             agents=0,
             public_agents=0,
-            distro=distro,
+            linux_distribution=linux_distribution,
         ) as cluster:
             (master, ) = cluster.masters
             cat_cmd = master.run(
@@ -470,5 +470,5 @@ class TestDistributions:
         ]
         version_data = dict(item.split('=') for item in version_info_lines)
 
-        assert version_data['ID'] == distro_ids[distro]
-        assert version_data['VERSION_ID'] == distro_versions[distro]
+        assert version_data['ID'] == ids[linux_distribution]
+        assert version_data['VERSION_ID'] == version_ids[linux_distribution]
