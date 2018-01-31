@@ -27,10 +27,10 @@ RUN apt-get update \
 		sudo \
 		systemd \
 		tar \
+		tree \
 		unzip \
 		vim-nox \
 		xz-utils \
-	&& apt-get install -y selinux || true \
 	&& rm -rf /var/lib/apt/lists/* \
 && ( \
 cd /lib/systemd/system/sysinit.target.wants/; \
@@ -48,9 +48,7 @@ done \
 && rm -f /lib/systemd/system/anaconda.target.wants/* \
 && rm -f /lib/systemd/system/basic.target.wants/* \
 && rm -f /lib/systemd/system/graphical.target.wants/* \
-&& ln -vf /lib/systemd/system/multi-user.target /lib/systemd/system/default.target \
-&& sysctl net.bridge.bridge-nf-call-iptables=1 \
-&& sysctl net.bridge.bridge-nf-call-ip6tables=1
+&& ln -vf /lib/systemd/system/multi-user.target /lib/systemd/system/default.target
 
 COPY include/systemd/systemd-journald-init.service /lib/systemd/system/
 RUN systemctl enable systemd-journald-init.service || true
