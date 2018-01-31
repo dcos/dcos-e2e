@@ -468,10 +468,7 @@ class TestDistributions:
         version_info_lines = [
             line for line in version_info.decode().split('\n') if '=' in line
         ]
-        version_data = {
-            item.split('=')[0]: item.split('=')[1]
-            for item in version_info_lines
-        }
+        version_data = dict(item.split('=') for item in version_info_lines)
 
         assert version_data['ID'] == distro_ids[distro]
         assert version_data['VERSION_ID'] == distro_versions[distro]
