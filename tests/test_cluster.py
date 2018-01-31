@@ -416,23 +416,15 @@ class TestDistributions:
         linux_distribution: Distribution,
     ) -> None:
 
-        # TODO: Fix ubuntu - doesn't work on OSS
-        # Missing getenforce
-        # Then dcos link error
-        if linux_distribution == Distribution.UBUNTU_16_04:
-            return
+        # Ubuntu, Debian:
+        # Missing getenforce, then dcos-link error
 
-        # TODO: /sbin/ip missing -> should be from iproute2 package
-        if linux_distribution == Distribution.COREOS:
-            return
+        # CoreOS:
+        # /sbin/ip missing
+        # This is possibly fixable by installing the iproute2 package
 
-        # Skip because DC/OS Signal does not start
-        if linux_distribution == Distribution.FEDORA_23:
-            return
-
-        # TODO: Remove this but for now we already know it works
-        if linux_distribution == Distribution.CENTOS_7:
-            return
+        # Fedora:
+        # dcos-signal does not start
 
         ids = {
             Distribution.CENTOS_7: '"centos"',
