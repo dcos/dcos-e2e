@@ -379,7 +379,6 @@ class TestDistributions:
 
     def test_default(
         self,
-        oss_artifact: Path,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
