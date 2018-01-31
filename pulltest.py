@@ -3,7 +3,7 @@ import traceback
 
 import docker
 
-image = 'mesosphere/dcos-docker:base-docker'
+image = 'alpine'
 count = 0
 
 for i in range(100):
