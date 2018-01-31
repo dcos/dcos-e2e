@@ -15,7 +15,6 @@ from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.distributions import Distribution
 
 
 class TestIntegrationTests:
@@ -359,88 +358,3 @@ class TestClusterFromNodes:
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
-
-
-class TestDistributions:
-    """
-    Tests for setting distributions.
-    """
-
-    # TODO: Backends can specify their default Linux distros
-    def test_default(
-        self,
-        cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        Default Linux distribution for `Node`s is CentOS.
-        """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-
-            (master, ) = cluster.masters
-            cat_cmd = master.run(
-                args=['cat /etc/*-release'],
-                user=cluster.default_ssh_user,
-                shell=True,
-            )
-
-        version_info = cat_cmd.stdout
-        version_info_lines = [
-            line for line in version_info.decode().split('\n') if '=' in line
-        ]
-        version_data = dict(item.split('=') for item in version_info_lines)
-
-        assert version_data['ID'] == '"centos"'
-        assert version_data['VERSION_ID'] == '"7"'
-
-    @pytest.mark.parametrize('linux_distribution', list(Distribution))
-    def test_custom_choice(
-        self,
-        cluster_backend: ClusterBackend,
-        linux_distribution: Distribution,
-    ) -> None:
-        """
-        It is possible to start a cluster with various Linux distributions.
-        """
-        ids = {
-            Distribution.CENTOS_7: '"centos"',
-            Distribution.UBUNTU_16_04: 'ubuntu',
-            Distribution.COREOS: 'coreos',
-            Distribution.FEDORA_23: 'fedora',
-            Distribution.DEBIAN_8: 'debian',
-        }
-
-        version_ids = {
-            Distribution.CENTOS_7: '"7"',
-            Distribution.UBUNTU_16_04: '"16.04"',
-            Distribution.COREOS: '1298.7.0',
-            Distribution.FEDORA_23: '23',
-            Distribution.DEBIAN_8: '"8"',
-        }
-
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=0,
-            public_agents=0,
-            linux_distribution=linux_distribution,
-        ) as cluster:
-            (master, ) = cluster.masters
-            cat_cmd = master.run(
-                args=['cat /etc/*-release'],
-                user=cluster.default_ssh_user,
-                shell=True,
-            )
-
-        version_info = cat_cmd.stdout
-        version_info_lines = [
-            line for line in version_info.decode().split('\n') if '=' in line
-        ]
-        version_data = dict(item.split('=') for item in version_info_lines)
-
-        assert version_data['ID'] == ids[linux_distribution]
-        assert version_data['VERSION_ID'] == version_ids[linux_distribution]
