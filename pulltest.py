@@ -2,20 +2,19 @@ import sys
 import traceback
 
 import docker
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.backends import Docker
 
-image = 'alpine'
 count = 0
 
-for i in range(100):
-    sys.stderr.write('%2d...' % i)
+for i in range(200):
+    sys.stderr.write('%3d...\n' % i)
     client = docker.from_env(version='auto')
     try:
-        client.images.pull(image)
-        sys.stderr.write('OK\n')
+        with Cluster(cluster_backend=Docker, agents=0, public_agents=1):
+            pass
     except Exception:
         count += 1
-        sys.stderr.write('ERROR\n')
         traceback.print_exc()
-    client.images.remove(image)
 
 sys.exit(count)
