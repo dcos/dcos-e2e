@@ -197,7 +197,7 @@ class TestDistributions:
             cluster_backend=Docker(),
             masters=1,
             agents=1,
-            public_agents=1,
+            public_agents=0,
             linux_distribution=Distribution.COREOS,
         ) as cluster:
             cluster.install_dcos_from_path(
@@ -227,7 +227,7 @@ class TestDistributions:
             cluster_backend=Docker(),
             masters=1,
             agents=1,
-            public_agents=1,
+            public_agents=0,
             linux_distribution=Distribution.COREOS,
         ) as cluster:
             cluster.install_dcos_from_path(
