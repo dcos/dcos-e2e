@@ -226,7 +226,7 @@ class TestDistributions:
         with Cluster(
             cluster_backend=Docker(),
             masters=1,
-            agents=1,
+            agents=0,
             public_agents=0,
             linux_distribution=Distribution.COREOS,
         ) as cluster:
