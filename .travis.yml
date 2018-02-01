@@ -7,7 +7,6 @@ python:
 - '3.5'
 env:
   matrix:
-<<<<<<< HEAD
   - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_coreos_enterprise
   - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_coreos_oss
   - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_custom_choice
