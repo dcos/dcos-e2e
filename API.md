@@ -139,7 +139,7 @@ Run integration tests on the cluster.
 To run integration tests on an enterprise cluster, an administrator's username and password must be set as environment variables.
 For example:
 
-```
+```python
 pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_tls.py']
 
 environment_variables = {
