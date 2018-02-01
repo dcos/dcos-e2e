@@ -78,9 +78,7 @@ class Docker(ClusterBackend):
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
-        self.workspace_dir = (
-            workspace_dir if workspace_dir else Path(gettempdir())
-        )
+        self.workspace_dir = workspace_dir or Path(gettempdir())
         self.custom_master_mounts = dict(custom_master_mounts or {})
         self.custom_agent_mounts = dict(custom_agent_mounts or {})
         self.custom_public_agent_mounts = dict(
