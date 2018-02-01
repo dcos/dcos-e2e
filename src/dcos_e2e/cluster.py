@@ -47,13 +47,14 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
+        linux_distribution = cluster_backend.default_linux_distribution
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            linux_distribution=Distribution.CENTOS_7,
+            linux_distribution=linux_distribution,
         )  # type: ClusterManager
 
     @classmethod
