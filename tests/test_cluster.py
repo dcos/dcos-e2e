@@ -418,3 +418,26 @@ class TestDistributions:
             )
 
         assert node_distribution == cluster_backend.default_linux_distribution
+
+    @pytest.mark.parametrize('linux_distribution', list(Distribution))
+    def test_custom_choice(
+        self,
+        linux_distribution: Distribution,
+        cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        Starting a cluster with a non-default Linux distribution raises a
+        `NotImplementedError`.
+        """
+        default = cluster_backend.default_linux_distribution
+        try:
+            with Cluster(
+                cluster_backend=cluster_backend,
+                masters=1,
+                agents=0,
+                public_agents=0,
+                linux_distribution=linux_distribution,
+            ):
+                assert linux_distribution == default
+        except NotImplementedError:
+            assert linux_distribution != default

@@ -33,6 +33,7 @@ class Cluster(ContextDecorator):
         agents: int = 1,
         public_agents: int = 1,
         files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
+        linux_distribution: Optional[Distribution] = None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -45,16 +46,23 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer: A mapping of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
+            linux_distribution: The Linux distribution to boot DC/OS on. By
+                default this is the cluster's default backend.
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
-        linux_distribution = cluster_backend.default_linux_distribution
+        if linux_distribution is None:
+            linux_distribution = cluster_backend.default_linux_distribution
+
+        if linux_distribution != cluster_backend.default_linux_distribution:
+            raise NotImplementedError
+
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            linux_distribution=linux_distribution,
+            linux_distribution=cluster_backend.default_linux_distribution,
         )  # type: ClusterManager
 
     @classmethod
@@ -91,6 +99,7 @@ class Cluster(ContextDecorator):
             public_agents=len(public_agents),
             files_to_copy_to_installer=None,
             cluster_backend=backend,
+            linux_distribution=None,
         )
 
     @retry(
