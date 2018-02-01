@@ -162,6 +162,21 @@ class TestDistributions:
 
         assert node_distribution == Distribution.CENTOS_7
 
+    @pytest.mark.parametrize(
+        'unsupported_linux_distribution',
+        set(Distribution) - {Distribution.CENTOS_7}
+    )
+    def test_custom_choice(
+        self,
+        unsupported_linux_distribution: Distribution,
+    ) -> None:
+        """
+        Starting a cluster with a non-default Linux distribution raises a
+        `NotImplementedError`.
+        """
+        with pytest.raises(NotImplementedError):
+            Docker(linux_distribution=unsupported_linux_distribution)
+
     def test_coreos_oss(
         self,
         oss_artifact: Path,
@@ -170,11 +185,10 @@ class TestDistributions:
         DC/OS OSS can start up on CoreOS.
         """
         with Cluster(
-            cluster_backend=Docker(),
+            cluster_backend=Docker(linux_distribution=Distribution.COREOS),
             masters=1,
-            agents=1,
+            agents=0,
             public_agents=0,
-            linux_distribution=Distribution.COREOS,
         ) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
@@ -200,11 +214,10 @@ class TestDistributions:
         }
 
         with Cluster(
-            cluster_backend=Docker(),
+            cluster_backend=Docker(linux_distribution=Distribution.COREOS),
             masters=1,
             agents=0,
             public_agents=0,
-            linux_distribution=Distribution.COREOS,
         ) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
