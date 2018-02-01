@@ -4,8 +4,6 @@ set -o errexit -o nounset -o pipefail
 
 # Generates config.mk to avoid having to specify make configuration on every use.
 
-source vendor/semver_bash/semver.sh
-
 if [[ "${1:-}" == "--auto" ]]; then
   echo >&2 "Auto Mode Enabled"
   AUTO_DEFAULTS='true'
@@ -77,30 +75,6 @@ function download_installer() {
   DCOS_INSTALLER_PATH="${1}"
   echo "Downloading installer..."
   curl --fail --location --show-error -o "${DCOS_INSTALLER_PATH}" "${DCOS_GENERATE_CONFIG_URL}"
-}
-
-function validate_installer_path() {
-  DCOS_INSTALLER_PATH="${1}"
-  echo "Validating installer path..."
-  if [[ -L "${DCOS_INSTALLER_PATH}" ]]; then
-    #symlink
-    installer_link_path="$(readlink "${DCOS_INSTALLER_PATH}")"
-    installer_dir="$(dirname "${installer_link_path}")"
-  else
-    installer_dir="$(dirname "${DCOS_INSTALLER_PATH}")"
-  fi
-  if [[ -L "${installer_dir}" ]]; then
-    installer_dir="$(readlink "${installer_dir}")"
-  fi
-  installer_dir="$(cd "${installer_dir}" && pwd -P)"
-
-  #echo "Installer Dir: ${installer_dir}"
-  #echo "dcos-docker Dir: $(pwd -P)"
-
-  if ! [[ "${installer_dir}/" =~ "$(pwd -P)/"* ]]; then
-    echo >&2 "Installer must be in or under the dcos-docker directory!"
-    exit 2
-  fi
 }
 
 function unpack_installer() {
@@ -344,6 +318,10 @@ function docker_kernel_version() {
   docker info | grep "^Kernel Version" | sed 's/.*: //'
 }
 
+function docker_operating_system() {
+  docker info | grep "^Operating System" | sed 's/.*: //'
+}
+
 function docker_available_memory() {
   docker run --rm ${INTERACTIVE} alpine cat /proc/meminfo | grep MemAvailable | awk '{print $2}'
 }
@@ -382,13 +360,13 @@ function docker_nameservers() {
 
 while true; do
   echo
-  DCOS_INSTALLER_PATH='dcos_generate_config.sh'
-  prompt_custom "Enter DC/OS installer path" "DCOS_INSTALLER_PATH"
+  DCOS_INSTALLER_PATH="${PWD}/dcos_generate_config.sh"
+  prompt_custom "Enter the DC/OS installer absolute path" "DCOS_INSTALLER_PATH"
   if [[ -f "${DCOS_INSTALLER_PATH}" ]]; then
     break
   fi
   echo "Installer not found."
-  DCOS_INSTALLER_PATH='dcos_generate_config.sh'
+  DCOS_INSTALLER_PATH="${PWD}/dcos_generate_config.sh"
 
   echo
   CONFIRM_DOWNLOAD='yes'
@@ -400,7 +378,6 @@ while true; do
   break
 done
 
-validate_installer_path "${DCOS_INSTALLER_PATH}"
 auto_patch_installer "${DCOS_INSTALLER_PATH}"
 unpack_installer "${DCOS_INSTALLER_PATH}"
 
@@ -411,17 +388,16 @@ DCOS_VARIANT="$(echo "${DCOS_VERSION_META}" | grep 'variant' | cut -d ':' -f 2 |
 echo "Version: ${DCOS_VERSION}"
 echo "Variant: ${DCOS_VARIANT:-oss}"
 
+# Strip suffix, if present, and add patch version segment, if missing.
+DCOS_VERSION_SEMVER="$(echo "${DCOS_VERSION}" | sed -e 's/-.*$//' -e 's/^\([^.]*\.[^.]*\)$/\1.0/')"
+
 echo
 echo "Detecting Docker server version..."
 DOCKER_SERVER_VERSION="$(docker_server_version)"
 echo "Server Version: ${DOCKER_SERVER_VERSION}"
 
-# Parse Docker server version
-# Strip suffix (it breaks semver comparisons)
-DOCKER_SERVER_VERSION="$(
-  semverParseInto "${DOCKER_SERVER_VERSION}" DSV_MAJOR DSV_MINOR DSV_PATCH DSV_SPECIAL
-  echo "${DSV_MAJOR}.${DSV_MINOR}.${DSV_PATCH}"
-)"
+# Strip suffix (it breaks semver comparisons).
+DOCKER_SERVER_VERSION="${DOCKER_SERVER_VERSION%%-*}"
 
 echo
 echo "Detecting Docker kernel version..."
@@ -429,19 +405,31 @@ DOCKER_KERNEL_VERSION="$(docker_kernel_version)"
 echo "Kernel Version: ${DOCKER_KERNEL_VERSION}"
 
 echo
+echo "Detecting Docker operating system..."
+DOCKER_OPERATING_SYSTEM="$(docker_operating_system)"
+echo "Operating System: ${DOCKER_OPERATING_SYSTEM}"
+
+echo
 echo "Detecting Docker for Mac..."
-DOCKER_FOR_MAC="$([[ "$(uname)" == 'Darwin' ]] && [[ "${DOCKER_KERNEL_VERSION}" == *"-moby" ]] && echo 'true' || echo 'false')"
+DOCKER_FOR_MAC='false'
+if [[ "$(uname)" == 'Darwin' ]]; then
+  if [[ "${DOCKER_OPERATING_SYSTEM}" == 'Docker for Mac' ]]; then
+    DOCKER_FOR_MAC='true'
+  elif [[ "${DOCKER_KERNEL_VERSION}" == *"-moby" ]]; then
+    DOCKER_FOR_MAC='true'
+  fi
+fi
 echo "Docker for Mac: ${DOCKER_FOR_MAC}"
 
 if [[ "${DOCKER_FOR_MAC}" == 'true' ]]; then
   # Docker 1.13.1 required (1.11.2 has a Docker-for-Mac-specific bug)
-  if semverLT "${DOCKER_SERVER_VERSION}" "1.13.1"; then
+  if vendor/semver_bash/testver.sh "${DOCKER_SERVER_VERSION}" -lt "1.13.1"; then
     echo >&2 "Unsupported Docker server version! Requires 1.13.1 or greater."
     exit 2
   fi
 else
   # Docker 1.11.2 required
-  if semverLT "${DOCKER_SERVER_VERSION}" "1.11.2"; then
+  if vendor/semver_bash/testver.sh "${DOCKER_SERVER_VERSION}" -lt "1.11.2"; then
     echo >&2 "Unsupported Docker server version! Requires 1.11.2 or greater."
     exit 2
   fi
@@ -580,10 +568,27 @@ if [[ "${DCOS_VARIANT}" == "ee" ]]; then
     HASH_RESPONSE="$(bash dcos_generate_config.sh --hash-password "${SUPERUSER_PASSWORD}")"
     SUPERUSER_PASSWORD_HASH="$(echo "${HASH_RESPONSE}" | tail -1)"
     if [[ "${SUPERUSER_PASSWORD_HASH}" != '$6$'* ]]; then
-      echo "Failed to hash password!"
-      echo "${HASH_RESPONSE}"
+      echo >&2 "Failed to hash password!"
+      echo >&2 "${HASH_RESPONSE}"
       exit 2
     fi
+  fi
+
+  if vendor/semver_bash/testver.sh "${DCOS_VERSION_SEMVER}" -ge "1.11.0"; then
+    while true; do
+      echo
+      LICENSE_KEY_PATH="${PWD}/license.txt"
+      prompt_custom "Enter license key absolute file path" "LICENSE_KEY_PATH"
+      if [[ -f "${LICENSE_KEY_PATH}" ]]; then
+        break
+      fi
+      if [[ "${AUTO_DEFAULTS:-}" == 'true' ]]; then
+        echo >&2 "License key not found."
+        exit 2
+      else
+        echo "License key not found."
+      fi
+    done
   fi
 fi
 
@@ -591,7 +596,7 @@ echo
 CONFIG_PATH='make-config.mk'
 echo "Generating dcos-docker config..."
 cat > "${CONFIG_PATH}" << EOM
-DCOS_GENERATE_CONFIG_PATH := \$(CURDIR)/${DCOS_INSTALLER_PATH}
+DCOS_GENERATE_CONFIG_PATH := ${DCOS_INSTALLER_PATH}
 DOCKER_VERSION := ${DOCKER_VERSION}
 DOCKER_STORAGEDRIVER := ${DOCKER_STORAGEDRIVER}
 MESOS_SYSTEMD_ENABLE_SUPPORT := ${MESOS_SYSTEMD_ENABLE_SUPPORT}
@@ -606,6 +611,11 @@ if [[ "${DCOS_VARIANT}" == "ee" ]]; then
 SUPERUSER_USERNAME := ${SUPERUSER_USERNAME}
 SUPERUSER_PASSWORD_HASH := $(escape_for_makefile "${SUPERUSER_PASSWORD_HASH}")
 EOM
+  if [[ -n "${LICENSE_KEY_PATH:-}" ]]; then
+    cat >> "${CONFIG_PATH}" << EOM
+LICENSE_KEY := $(escape_for_makefile "$(cat "${LICENSE_KEY_PATH}" | sed -e 's/[[:space:]]*$//')")
+EOM
+  fi
 fi
 cat "${CONFIG_PATH}"
 
