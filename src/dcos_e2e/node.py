@@ -2,6 +2,7 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import stat
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
@@ -39,6 +40,7 @@ class Node:
         """
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address
+        ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
 
     def __str__(self) -> str:
