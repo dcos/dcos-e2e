@@ -358,3 +358,43 @@ class TestClusterFromNodes:
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
+
+
+class TestDistributions:
+    """
+    Tests for setting distributions.
+    """
+
+    def test_default(
+        self,
+        cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        Default Linux distribution for `Node`s is CentOS.
+        """
+
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+
+            (master, ) = cluster.masters
+            cat_cmd = master.run(
+                args=['cat /etc/*-release'],
+                user=cluster.default_ssh_user,
+                shell=True,
+            )
+
+        version_info = cat_cmd.stdout
+        version_info_lines = [
+            line for line in version_info.decode().split('\n') if '=' in line
+        ]
+        version_data = {
+            item.split('=')[0]: item.split('=')[1]
+            for item in version_info_lines
+        }
+
+        assert version_data['ID'] == '"centos"'
+        assert version_data['VERSION_ID'] == '"7"'
