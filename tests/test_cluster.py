@@ -15,8 +15,6 @@ from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
 
 
 class TestIntegrationTests:
@@ -360,84 +358,3 @@ class TestClusterFromNodes:
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)
-
-
-class TestDistributions:
-    """
-    Tests for setting distributions.
-    """
-
-    def _get_node_distribution(
-        self,
-        node: Node,
-        default_ssh_user: str,
-    ) -> Distribution:
-        """
-        Given a `Node`, return the `Distribution` on that node.
-        """
-        cat_cmd = node.run(
-            args=['cat /etc/*-release'],
-            user=default_ssh_user,
-            shell=True,
-        )
-
-        version_info = cat_cmd.stdout
-        version_info_lines = [
-            line for line in version_info.decode().split('\n') if '=' in line
-        ]
-        version_data = dict(item.split('=') for item in version_info_lines)
-
-        distributions = {
-            ('"centos"', '"7"'): Distribution.CENTOS_7,
-            ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
-            ('coreos', '12.98.7.0'): Distribution.COREOS,
-            ('fedora', '23'): Distribution.FEDORA_23,
-            ('debian', '"8"'): Distribution.DEBIAN_8,
-        }
-
-        return distributions[(version_data['ID'], version_data['VERSION_ID'])]
-
-    def test_default(
-        self,
-        cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        The default Linux distribution for a `Node`s is the default Linux
-        distribution of the backend.
-        """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
-
-        assert node_distribution == cluster_backend.default_linux_distribution
-
-    @pytest.mark.parametrize('linux_distribution', list(Distribution))
-    def test_custom_choice(
-        self,
-        linux_distribution: Distribution,
-        cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        Starting a cluster with a non-default Linux distribution raises a
-        `NotImplementedError`.
-        """
-        default = cluster_backend.default_linux_distribution
-        try:
-            with Cluster(
-                cluster_backend=cluster_backend,
-                masters=1,
-                agents=0,
-                public_agents=0,
-                linux_distribution=linux_distribution,
-            ):
-                assert linux_distribution == default
-        except NotImplementedError:
-            assert linux_distribution != default

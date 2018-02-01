@@ -35,8 +35,7 @@
 
 ## Next
 
-* Backwards incompatible change: `ClusterBackend`s now require a `default_linux_distribution`.
-* Add `linux_distribution` parameter to `Cluster`.
+* Add `linux_distribution` parameter to the `Docker` backend.
 
 ## 2018.01.25.0
 
