@@ -103,3 +103,35 @@ class TestDockerBackend:
         )
 
         assert str(excinfo.value) == expected_error
+
+
+class TestDistributions:
+    """
+    Tests for setting the Linux distribution.
+    """
+
+    def test_default(self) -> None:
+        """
+        The default Linux distribution for a `Node`s is CentOS.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            cat_cmd = master.run(
+                args=['cat /etc/*-release'],
+                user=cluster.default_ssh_user,
+                shell=True,
+            )
+
+        version_info = cat_cmd.stdout
+        version_info_lines = [
+            line for line in version_info.decode().split('\n') if '=' in line
+        ]
+        version_data = dict(item.split('=') for item in version_info_lines)
+
+        assert version_data['ID'] == '"centos"'
+        assert version_data['VERSION_ID'] == '"7"'
