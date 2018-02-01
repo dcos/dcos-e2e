@@ -125,3 +125,10 @@ class ClusterBackend(abc.ABC):
         """
         Return the default SSH user as a string.
         """
+
+    @property
+    @abc.abstractmethod
+    def default_linux_distribution(self) -> Distribution:
+        """
+        Return the default Linux distribution for this backend.
+        """
