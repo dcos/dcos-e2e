@@ -387,8 +387,15 @@ class TestDistributions:
         ]
         version_data = dict(item.split('=') for item in version_info_lines)
 
-        assert version_data['ID'] == '"centos"'
-        assert version_data['VERSION_ID'] == '"7"'
+        distributions = {
+            ('"centos"', '"7"'): Distribution.CENTOS_7,
+            ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
+            ('coreos', '12.98.7.0'): Distribution.COREOS,
+            ('fedora', '23'): Distribution.FEDORA_23,
+            ('debian', '"8"'): Distribution.DEBIAN_8,
+        }
+
+        return distributions[(version_data['ID'], version_data['VERSION_ID'])]
 
     def test_default(
         self,
