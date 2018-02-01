@@ -15,7 +15,6 @@ from retry import retry
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-from .distributions import Distribution
 from .node import Node
 
 
@@ -33,7 +32,6 @@ class Cluster(ContextDecorator):
         agents: int = 1,
         public_agents: int = 1,
         files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
-        linux_distribution: Distribution = Distribution.CENTOS_7,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -49,13 +47,13 @@ class Cluster(ContextDecorator):
             linux_distribution: The Linux distribution to boot DC/OS on.
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
+
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            linux_distribution=linux_distribution,
         )  # type: ClusterManager
 
     @classmethod

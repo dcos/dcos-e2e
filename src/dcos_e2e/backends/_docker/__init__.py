@@ -10,7 +10,7 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from tempfile import TemporaryDirectory
+from tempfile import gettempdir
 from textwrap import dedent
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
@@ -48,6 +48,7 @@ class Docker(ClusterBackend):
         custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        linux_distribution: Distribution = Distribution.CENTOS_7,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -61,6 +62,7 @@ class Docker(ClusterBackend):
             custom_agent_mounts: Custom mounts add to agent node containers.
             custom_public_agent_mounts: Custom mounts add to public agent node
                 containers.
+            linux_distribution: The Linux distribution to boot DC/OS on.
 
             For details about mount arguments, see `volumes` on
                 http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
@@ -74,16 +76,24 @@ class Docker(ClusterBackend):
                 See `volumes` on
                 http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
                 for details.
+            linux_distribution: The Linux distribution to boot DC/OS on.
+
+        Raises:
+            NotImplementedError: The `linux_distribution` is not supported by
+                this backend.
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
-        self.workspace_dir = workspace_dir
-        self.custom_master_mounts = dict(custom_master_mounts or {})
-        self.custom_agent_mounts = dict(custom_agent_mounts or {})
-        self.custom_public_agent_mounts = dict(
-            custom_public_agent_mounts or {}
-        )
+        self.workspace_dir = workspace_dir or Path(gettempdir())
+        self.custom_master_mounts = custom_master_mounts or {}
+        self.custom_agent_mounts = custom_agent_mounts or {}
+        self.custom_public_agent_mounts = custom_public_agent_mounts or {}
+        supported_distributions = {Distribution.CENTOS_7}
+        if linux_distribution not in supported_distributions:
+            raise NotImplementedError
+
+        self.linux_distribution = linux_distribution
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -100,13 +110,6 @@ class Docker(ClusterBackend):
         """
         return 'root'
 
-    @property
-    def default_linux_distribution(self) -> Distribution:
-        """
-        Return the default Linux distribution for this backend.
-        """
-        return Distribution.CENTOS_7
-
 
 class DockerCluster(ClusterManager):
     # pylint: disable=too-many-instance-attributes
@@ -121,7 +124,6 @@ class DockerCluster(ClusterManager):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: Docker,
-        linux_distribution: Distribution,
     ) -> None:
         """
         Create a Docker cluster.
@@ -136,7 +138,6 @@ class DockerCluster(ClusterManager):
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
             cluster_backend: Details of the specific Docker backend to use.
-            linux_distribution: The Linux distribution to boot DC/OS on.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -149,15 +150,8 @@ class DockerCluster(ClusterManager):
         # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        self._path = Path(
-            TemporaryDirectory(
-                suffix=self._cluster_id,
-                dir=(
-                    str(cluster_backend.workspace_dir)
-                    if cluster_backend.workspace_dir else None
-                ),
-            ).name
-        )
+        workspace_dir = cluster_backend.workspace_dir
+        self._path = Path(workspace_dir) / uuid.uuid4().hex / self._cluster_id
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
@@ -239,7 +233,6 @@ class DockerCluster(ClusterManager):
         private_key_file = ssh_dir / 'id_rsa'
         public_key_file.write_bytes(data=public_key)
         private_key_file.write_bytes(data=private_key)
-        private_key_file.chmod(mode=stat.S_IRUSR)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
@@ -315,6 +308,7 @@ class DockerCluster(ClusterManager):
             Distribution.DEBIAN_8: 'debian-jessie',
         }
 
+        linux_distribution = cluster_backend.linux_distribution
         distro_path_segment = dcos_docker_distros[linux_distribution]
 
         client.images.build(

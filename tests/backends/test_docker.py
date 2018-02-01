@@ -14,6 +14,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e.node import Node
 
 
 class TestDockerBackend:
@@ -112,51 +113,19 @@ class TestDistributions:
     Tests for setting the Linux distribution.
     """
 
-    def test_default(self) -> None:
-        """
-        The default distribution is CentOS 7.
-        """
-        cluster_backend = Docker()
-        default_distribution = cluster_backend.default_linux_distribution
-        assert default_distribution == Distribution.CENTOS_7
-
-    @pytest.mark.parametrize('linux_distribution', list(Distribution))
-    def test_custom_choice(
+    def _get_node_distribution(
         self,
-        linux_distribution: Distribution,
-    ) -> None:
+        node: Node,
+        default_ssh_user: str,
+    ) -> Distribution:
         """
-        It is possible to start a cluster with various Linux distributions.
+        Given a `Node`, return the `Distribution` on that node.
         """
-        ids = {
-            Distribution.CENTOS_7: '"centos"',
-            Distribution.UBUNTU_16_04: 'ubuntu',
-            Distribution.COREOS: 'coreos',
-            Distribution.FEDORA_23: 'fedora',
-            Distribution.DEBIAN_8: 'debian',
-        }
-
-        version_ids = {
-            Distribution.CENTOS_7: '"7"',
-            Distribution.UBUNTU_16_04: '"16.04"',
-            Distribution.COREOS: '1298.7.0',
-            Distribution.FEDORA_23: '23',
-            Distribution.DEBIAN_8: '"8"',
-        }
-
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-            linux_distribution=linux_distribution,
-        ) as cluster:
-            (master, ) = cluster.masters
-            cat_cmd = master.run(
-                args=['cat /etc/*-release'],
-                user=cluster.default_ssh_user,
-                shell=True,
-            )
+        cat_cmd = node.run(
+            args=['cat /etc/*-release'],
+            user=default_ssh_user,
+            shell=True,
+        )
 
         version_info = cat_cmd.stdout
         version_info_lines = [
@@ -164,8 +133,34 @@ class TestDistributions:
         ]
         version_data = dict(item.split('=') for item in version_info_lines)
 
-        assert version_data['ID'] == ids[linux_distribution]
-        assert version_data['VERSION_ID'] == version_ids[linux_distribution]
+        distributions = {
+            ('"centos"', '"7"'): Distribution.CENTOS_7,
+            ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
+            ('coreos', '12.98.7.0'): Distribution.COREOS,
+            ('fedora', '23'): Distribution.FEDORA_23,
+            ('debian', '"8"'): Distribution.DEBIAN_8,
+        }
+
+        return distributions[(version_data['ID'], version_data['VERSION_ID'])]
+
+    def test_default(self) -> None:
+        """
+        The default Linux distribution for a `Node`s is the default Linux
+        distribution of the backend.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node_distribution = self._get_node_distribution(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert node_distribution == Distribution.CENTOS_7
 
     def test_coreos_oss(
         self,
