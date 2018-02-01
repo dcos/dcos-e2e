@@ -164,7 +164,7 @@ class TestDistributions:
 
     @pytest.mark.parametrize(
         'unsupported_linux_distribution',
-        set(Distribution) - {Distribution.CENTOS_7}
+        set(Distribution) - {Distribution.CENTOS_7, Distribution.COREOS}
     )
     def test_custom_choice(
         self,
