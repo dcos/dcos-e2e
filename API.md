@@ -31,8 +31,14 @@
     - [`agents`](#agents-1)
     - [`public_agents`](#public_agents-1)
     - [`default_ssh_user`](#default_ssh_user)
-- [`dcos_e2e.node.Node`](#dcos_e2enodenode)
+- [Creating a cluster from existing nodes](#creating-a-cluster-from-existing-nodes)
   - [Parameters](#parameters-1)
+    - [`masters`](#masters-2)
+    - [`agents`](#agents-2)
+    - [`public_agents`](#public_agents-2)
+    - [`default_ssh_user`](#default_ssh_user-1)
+- [`dcos_e2e.node.Node`](#dcos_e2enodenode)
+  - [Parameters](#parameters-2)
     - [`public_ip_address`](#public_ip_address)
     - [`private_ip_address`](#private_ip_address)
     - [`ssh_key_path`](#ssh_key_path)
@@ -58,17 +64,6 @@ Cluster(
     agents=1,
     public_agents=1,
     files_to_copy_to_installer=None,
-)
-```
-
-or
-
-```python
-Cluster.from_nodes(
-    masters,
-    agents,
-    public_agents,
-    default_ssh_user,
 )
 ```
 
@@ -190,6 +185,35 @@ The agent nodes in the cluster.
 #### `public_agents`
 
 The public agent nodes in the cluster.
+
+#### `default_ssh_user`
+
+The default SSH user to access cluster nodes.
+
+## Creating a cluster from existing nodes
+
+```python
+Cluster.from_nodes(
+    masters,
+    agents,
+    public_agents,
+    default_ssh_user,
+)
+```
+
+### Parameters
+
+#### `masters`
+
+A `set` of master `Node`s in an existing cluster.
+
+#### `agents`
+
+A `set` of agent `Node`s in an existing cluster.
+
+#### `public_agents`
+
+A `set` of public agent `Node`s in an existing cluster.
 
 #### `default_ssh_user`
 
