@@ -5,10 +5,10 @@
 
 
 - [Changelog](#changelog)
-- [2018.01.25.0](#201801250)
-- [2018.01.22.0](#201801220)
-- [2017.12.11.0](#201712110)
-- [2017.12.08.0](#201712080)
+  - [2018.01.25.0](#201801250)
+  - [2018.01.22.0](#201801220)
+  - [2017.12.11.0](#201712110)
+  - [2017.12.08.0](#201712080)
   - [2017.11.29.0](#201711290)
   - [2017.11.21.0](#201711210)
   - [2017.11.15.0](#201711150)
@@ -32,23 +32,23 @@
 
 # Changelog
 
-# 2018.01.25.0
+## 2018.01.25.0
 
 * Backwards incompatible change: Change the default behavior of `Node.run` and `Node.popen` to quote arguments, unless a new `shell` parameter is `True`.
 These methods now behave similarly to `subprocess.run`.
 * Add custom string representation for `Node` object.
 * Bump `dcos-test-utils` for better diagnostics reports.
 
-# 2018.01.22.0
+## 2018.01.22.0
 
 * Expose the `public_ip_address` of the SSH connection and the `private_ip_address` of its DC/OS component on `Node` objects.
 * Bump `dcos-test-utils` for better diagnostics reports.
 
-# 2017.12.11.0
+## 2017.12.11.0
 
 * Replace the extended `wait_for_dcos_ee` timeout with a preceding dcos-diagnostics check.
 
-# 2017.12.08.0
+## 2017.12.08.0
 
 * Extend `wait_for_dcos_ee` timeout for waiting until the DC/OS CA cert can be fetched.
 
