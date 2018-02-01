@@ -32,6 +32,11 @@
 
 # Changelog
 
+## Next
+
+* Backwards incompatible change: `ClusterBackend`s now require a `default_linux_distribution`.
+* Add `linux_distribution` parameter to `Cluster`.
+
 ## 2018.01.25.0
 
 * Backwards incompatible change: Change the default behavior of `Node.run` and `Node.popen` to quote arguments, unless a new `shell` parameter is `True`.
