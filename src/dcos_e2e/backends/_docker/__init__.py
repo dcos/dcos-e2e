@@ -77,6 +77,10 @@ class Docker(ClusterBackend):
                 http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
                 for details.
             linux_distribution: The Linux distribution to boot DC/OS on.
+
+        Raises:
+            NotImplementedError: The `linux_distribution` is not supported by
+                this backend.
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
@@ -85,6 +89,9 @@ class Docker(ClusterBackend):
         self.custom_master_mounts = custom_master_mounts or {}
         self.custom_agent_mounts = custom_agent_mounts or {}
         self.custom_public_agent_mounts = custom_public_agent_mounts or {}
+        if linux_distribution != Distribution.CENTOS_7:
+            raise NotImplementedError
+
         self.linux_distribution = linux_distribution
 
     @property
