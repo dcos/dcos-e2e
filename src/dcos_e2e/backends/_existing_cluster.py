@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, Set, Type
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
-from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
 
 
@@ -46,14 +45,6 @@ class ExistingCluster(ClusterBackend):
         """
         return self._default_ssh_user
 
-    @property
-    def default_linux_distribution(self) -> Distribution:
-        """
-        Return the default Linux distribution for this backend.
-        This is meaningless for this backend and therefore arbitrary.
-        """
-        return Distribution.CENTOS_7
-
 
 class ExistingClusterManager(ClusterManager):
     """
@@ -67,7 +58,6 @@ class ExistingClusterManager(ClusterManager):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: ExistingCluster,
-        linux_distribution: Distribution,
     ) -> None:
         """
         Create a manager for an existing DC/OS cluster.
@@ -84,7 +74,6 @@ class ExistingClusterManager(ClusterManager):
                 paths on the installer node.
             cluster_backend: Details of the specific existing cluster backend
                 to use.
-            linux_distribution: An ignored Linux distribution.
         """
         self._masters = cluster_backend.masters
         self._agents = cluster_backend.agents

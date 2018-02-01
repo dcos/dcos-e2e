@@ -5,6 +5,7 @@
 
 
 - [Changelog](#changelog)
+  - [Next](#next)
   - [2018.01.25.0](#201801250)
   - [2018.01.22.0](#201801220)
   - [2017.12.11.0](#201712110)
@@ -31,6 +32,10 @@
 <!--lint enable list-item-bullet-indent-->
 
 # Changelog
+
+## Next
+
+* Add `linux_distribution` parameter to the `Docker` backend.
 
 ## 2018.01.25.0
 

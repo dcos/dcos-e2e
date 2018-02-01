@@ -15,6 +15,7 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
     - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
+    - [`linux_distribution`](#linux_distribution)
   - [DC/OS Installation](#dcos-installation)
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
@@ -30,7 +31,13 @@ These backend classes allow backend-specific configuration of the cluster.
 ## `dcos_e2e.backend.Docker`
 
 ```python
-Docker(workspace_dir=None, master_mounts=None, agent_mounts=None, public_agent_mounts)
+Docker(
+    workspace_dir=None,
+    master_mounts=None,
+    agent_mounts=None,
+    public_agent_mounts=None,
+    linux_distribution=dcos_e2e.distributions.Distributions,
+)
 ```
 
 ### Requirements
@@ -59,6 +66,11 @@ This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/li
 
 Mounts to add to node containers.
 See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
+
+#### `linux_distribution`
+
+Linux distribution to use.
+Currently only `dcos_e2e.distributions.CENTOS_7` is supported.
 
 ### DC/OS Installation
 

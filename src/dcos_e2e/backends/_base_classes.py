@@ -6,7 +6,6 @@ import abc
 from pathlib import Path
 from typing import Any, Dict, Set, Type
 
-from ..distributions import Distribution
 from ..node import Node
 
 
@@ -23,7 +22,6 @@ class ClusterManager(abc.ABC):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
-        linux_distribution: Distribution,
     ) -> None:
         """
         Create a DC/OS cluster with the given `cluster_backend`.
@@ -37,7 +35,6 @@ class ClusterManager(abc.ABC):
                 the installer node before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
-            linux_distribution: The Linux distribution to boot DC/OS on.
         """
 
     @abc.abstractmethod
@@ -124,11 +121,4 @@ class ClusterBackend(abc.ABC):
     def default_ssh_user(self) -> str:
         """
         Return the default SSH user as a string.
-        """
-
-    @property
-    @abc.abstractmethod
-    def default_linux_distribution(self) -> Distribution:
-        """
-        Return the default Linux distribution for this backend.
         """
