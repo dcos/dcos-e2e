@@ -100,6 +100,13 @@ class Docker(ClusterBackend):
         """
         return 'root'
 
+    @property
+    def default_linux_distribution(self) -> Distribution:
+        """
+        Return the default Linux distribution for this backend.
+        """
+        return Distribution.CENTOS_7
+
 
 class DockerCluster(ClusterManager):
     # pylint: disable=too-many-instance-attributes

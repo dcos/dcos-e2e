@@ -46,6 +46,14 @@ class ExistingCluster(ClusterBackend):
         """
         return self._default_ssh_user
 
+    @property
+    def default_linux_distribution(self) -> Distribution:
+        """
+        Return the default Linux distribution for this backend.
+        This is meaningless for this backend and therefore arbitrary.
+        """
+        return Distribution.CENTOS_7
+
 
 class ExistingClusterManager(ClusterManager):
     """

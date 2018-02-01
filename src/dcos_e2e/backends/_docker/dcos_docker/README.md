@@ -39,6 +39,7 @@ Because containerization does not affect resource detection tools, each DC/OS no
 
 ## Requirements
 
+- Docker or both Vagrant and VirtualBox
 - git
 - make
 - bash
@@ -135,11 +136,13 @@ See [make-defaults.mk](make-defaults.mk) for a full list of manually configurabl
 
 Official releases of DC/OS can be found at <http://dcos.io/releases/>.
 
-By default, DC/OS Docker (`./configure`) downloads the latest **stable** version of DC/OS.
+By default, `./configure` downloads the latest **stable** version of DC/OS.
 
-To use a different version, specify the path to the installer interactively when running `./configure` or manually in `make-config.mk` by setting `DCOS_GENERATE_CONFIG_PATH`.
+To use a different version, run `./configure` and specify the absolute file path to the installer when prompted.
 
-[Enterprise DC/OS](https://mesosphere.com/product/) is also supported. Ask your sales representative for release artifacts.
+Alternatively, once `make_config.mk` has been created (manually or by running `./configure`), a different installer can be specified by setting `DCOS_GENERATE_CONFIG_PATH` in `make_config.mk` or by passing a make variable on command execution (ex: `make DCOS_GENERATE_CONFIG_PATH=<INSTALLER-PATH>`).
+
+[DC/OS Enterprise](https://mesosphere.com/product/) is also supported. Ask your sales representative for release artifacts.
 
 ## DC/OS Login
 
@@ -147,14 +150,26 @@ DC/OS uses OAuth for authentication, configured through [Auth0](https://auth0.co
 
 Use a Google, Github, Microsoft email account to authenticate.
 
-### Enterprise DC/OS Login
+### DC/OS Enterprise Login
 
-Enterprise DC/OS uses built-in identity and access management (IAM), instead of OAuth.
+DC/OS Enterprise uses built-in identity and access management (IAM), instead of OAuth.
 
 For dcos-docker, the superuser account is pre-configured:
 
 - Username: `admin`
 - Password: `admin`
+
+## DC/OS Enterprise License
+
+DC/OS Enterprise 1.11 and later require a license key to install and operate.
+
+By default, `./configure` looks for the license key at `license.txt` in the root of the repo.
+
+To use a different license file, run `./configure` and specify the absolute file path to the installer when prompted.
+
+Alternatively, once `make_config.mk` has been created (manually or by running `./configure`), a different license (file contents, not path) can be specified by setting `LICENSE_KEY` in `make_config.mk` or by passing a make variable on command execution (ex: `make LICENSE_KEY=<LICENSE-STRING>`).
+
+Ask your sales representative for a license file, if you don't already have one.
 
 ## Network Routing
 
