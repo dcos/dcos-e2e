@@ -418,4 +418,3 @@ class TestDistributions:
             )
 
         assert node_distribution == cluster_backend.default_linux_distribution
->>>>>>> origin/master
