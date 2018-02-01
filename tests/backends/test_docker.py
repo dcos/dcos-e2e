@@ -12,6 +12,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
 
 
 class TestDockerBackend:
@@ -103,3 +104,17 @@ class TestDockerBackend:
         )
 
         assert str(excinfo.value) == expected_error
+
+
+class TestDistributions:
+    """
+    Tests for setting distributions.
+    """
+
+    def test_default(self) -> None:
+        """
+        The default distribution is CentOS 7.
+        """
+        cluster_backend = Docker()
+        default_distribution = cluster_backend.default_linux_distribution
+        assert default_distribution == Distribution.CENTOS_7

@@ -370,16 +370,15 @@ class TestDistributions:
         cluster_backend: ClusterBackend,
     ) -> None:
         """
-        Default Linux distribution for `Node`s is CentOS.
+        The default Linux distribution for a `Node`s is the default Linux
+        distribution of the backend.
         """
-
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
-
             (master, ) = cluster.masters
             cat_cmd = master.run(
                 args=['cat /etc/*-release'],
