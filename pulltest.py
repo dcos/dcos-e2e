@@ -11,7 +11,7 @@ for i in range(200):
     sys.stderr.write('%3d...\n' % i)
     client = docker.from_env(version='auto')
     try:
-        with Cluster(cluster_backend=Docker, agents=0, public_agents=1):
+        with Cluster(cluster_backend=Docker(), agents=0, public_agents=1):
             pass
     except Exception:
         count += 1
