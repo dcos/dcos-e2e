@@ -89,7 +89,7 @@ class Docker(ClusterBackend):
         self.custom_master_mounts = custom_master_mounts or {}
         self.custom_agent_mounts = custom_agent_mounts or {}
         self.custom_public_agent_mounts = custom_public_agent_mounts or {}
-        supported_distributions = {Distribution.CENTOS_7}
+        supported_distributions = {Distribution.CENTOS_7, Distribution.COREOS}
         if linux_distribution not in supported_distributions:
             raise NotImplementedError
 
