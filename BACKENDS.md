@@ -15,6 +15,7 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
     - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
+    - [`linux_distribution`](#linux_distribution)
   - [DC/OS Installation](#dcos-installation)
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
