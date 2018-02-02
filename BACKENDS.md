@@ -70,7 +70,7 @@ See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io
 #### `linux_distribution`
 
 Linux distribution to use.
-Currently only `dcos_e2e.distributions.CENTOS_7` is supported.
+Currently only `dcos_e2e.distributions.CENTOS_7` and `dcos_e2e.distributions.COREOS` are supported.
 
 ### DC/OS Installation
 

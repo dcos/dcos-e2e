@@ -7,11 +7,13 @@ python:
 - '3.5'
 env:
   matrix:
-  - TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend
+  - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_coreos_enterprise
+  - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_coreos_oss
+  - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_custom_choice
   - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_default
+  - TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend
   - TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes
   - TEST_PATTERN=tests/test_cluster.py::TestClusterSize
-  - TEST_PATTERN=tests/test_cluster.py::TestDistributions
   - TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config
   - TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_extend_config
   - TEST_PATTERN=tests/test_cluster.py::TestInstallDcosFromPathLogging
