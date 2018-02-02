@@ -195,6 +195,13 @@ class TestDistributions:
                 log_output_live=True,
             )
             cluster.wait_for_dcos_oss()
+            (master, ) = cluster.masters
+            node_distribution = self._get_node_distribution(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert node_distribution == Distribution.COREOS
 
     def test_coreos_enterprise(
         self,
@@ -228,3 +235,10 @@ class TestDistributions:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            (master, ) = cluster.masters
+            node_distribution = self._get_node_distribution(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert node_distribution == Distribution.COREOS
