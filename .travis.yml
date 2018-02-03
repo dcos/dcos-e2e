@@ -12,6 +12,7 @@ env:
   - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_custom_choice
   - TEST_PATTERN=tests/backends/test_docker.py::TestDistributions::test_default
   - TEST_PATTERN=tests/backends/test_docker.py::TestDockerBackend
+  - TEST_PATTERN=tests/backends/test_docker.py::TestDockerVersion
   - TEST_PATTERN=tests/test_cluster.py::TestClusterFromNodes
   - TEST_PATTERN=tests/test_cluster.py::TestClusterSize
   - TEST_PATTERN=tests/test_cluster.py::TestExtendConfig::test_default_config
