@@ -14,6 +14,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
 
@@ -136,7 +137,7 @@ class TestDistributions:
         distributions = {
             ('"centos"', '"7"'): Distribution.CENTOS_7,
             ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
-            ('coreos', '12.98.7.0'): Distribution.COREOS,
+            ('coreos', '1298.7.0'): Distribution.COREOS,
             ('fedora', '23'): Distribution.FEDORA_23,
             ('debian', '"8"'): Distribution.DEBIAN_8,
         }
@@ -195,6 +196,13 @@ class TestDistributions:
                 log_output_live=True,
             )
             cluster.wait_for_dcos_oss()
+            (master, ) = cluster.masters
+            node_distribution = self._get_node_distribution(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert node_distribution == Distribution.COREOS
 
     def test_coreos_enterprise(
         self,
@@ -228,6 +236,13 @@ class TestDistributions:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            (master, ) = cluster.masters
+            node_distribution = self._get_node_distribution(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert node_distribution == Distribution.COREOS
 
 
 class TestDockerVersion:
@@ -244,10 +259,7 @@ class TestDockerVersion:
         Given a `Node`, return the `DockerVersion` on that node.
         """
 
-    def test_default(
-        self,
-        oss_artifact: Path,
-    ):
+    def test_default(self) -> None:
         with Cluster(
             cluster_backend=Docker(),
             masters=1,
@@ -260,9 +272,12 @@ class TestDockerVersion:
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert docker_version == DockerVersion.11_2_0
+        assert docker_version == DockerVersion.v11_0_2
 
-    def test_custom(self):
+    def test_custom(
+        self,
+        oss_artifact: Path,
+    ) -> None:
         """
         It is possible to set a custom Docker version.
         """
@@ -272,11 +287,15 @@ class TestDockerVersion:
             agents=0,
             public_agents=0,
         ) as cluster:
-            (master, ) = cluster.masters
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                log_output_live=True,
+            )
             cluster.wait_for_dcos_oss()
+            (master, ) = cluster.masters
             docker_version = self._get_docker_version(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert docker_version == DockerVersion.11_2_0
+        assert docker_version == DockerVersion.v11_0_2
