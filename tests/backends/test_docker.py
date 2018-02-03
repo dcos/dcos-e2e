@@ -228,3 +228,55 @@ class TestDistributions:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+
+
+class TestDockerVersion:
+    """
+    Tests for setting the version of Docker on the nodes.
+    """
+
+    def _get_docker_version(
+        self,
+        node: Node,
+        default_ssh_user: str,
+    ) -> Distribution:
+        """
+        Given a `Node`, return the `DockerVersion` on that node.
+        """
+
+    def test_default(
+        self,
+        oss_artifact: Path,
+    ):
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            docker_version = self._get_docker_version(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert docker_version == DockerVersion.11_2_0
+
+    def test_custom(self):
+        """
+        It is possible to set a custom Docker version.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            cluster.wait_for_dcos_oss()
+            docker_version = self._get_docker_version(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert docker_version == DockerVersion.11_2_0

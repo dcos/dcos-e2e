@@ -37,6 +37,7 @@
 
 * Add `linux_distribution` parameter to the `Docker` backend.
 * Add support for CoreOS in the `Docker` backend.
+* Add `docker_version` parameter to the `Docker` backend.
 
 ## 2018.01.25.0
 
