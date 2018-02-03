@@ -100,6 +100,17 @@ class Docker(ClusterBackend):
 
         self.linux_distribution = linux_distribution
 
+        client = docker.from_env(version='auto')
+        host_driver = client.info()['Driver']
+        # This chooses the overlay2 driver if the host's driver is not
+        # supported for speed reasons.
+        default_driver = 'overlay2'
+        supported_drivers = ('aufs', 'overlay', 'overlay2')
+        fallback_driver = (
+            host_driver if host_driver in supported_drivers else default_driver
+        )
+        self.docker_storage_driver = fallback_driver
+
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
         """
@@ -117,12 +128,11 @@ class Docker(ClusterBackend):
 
 
 class DockerCluster(ClusterManager):
-    # pylint: disable=too-many-instance-attributes
     """
     A record of a Docker cluster.
     """
 
-    def __init__(  # pylint: disable=super-init-not-called,too-many-statements
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         masters: int,
         agents: int,
@@ -244,14 +254,7 @@ class DockerCluster(ClusterManager):
             destination_path = self._genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        # Only overlay, overlay2, and aufs storage drivers are supported.
-        # This chooses the overlay2 driver if the host's driver is not
-        # supported for speed reasons.
         client = docker.from_env(version='auto')
-        host_driver = client.info()['Driver']
-        storage_driver = host_driver if host_driver in (
-            'overlay', 'overlay2', 'aufs'
-        ) else 'overlay2'
 
         docker_service_body = dedent(
             """\
@@ -272,7 +275,9 @@ class DockerCluster(ClusterManager):
 
             [Install]
             WantedBy=default.target
-            """.format(docker_storage_driver=storage_driver)
+            """.format(
+                docker_storage_driver=cluster_backend.docker_storage_driver,
+            )
         )
 
         self._master_prefix = self._cluster_id + '-master-'
