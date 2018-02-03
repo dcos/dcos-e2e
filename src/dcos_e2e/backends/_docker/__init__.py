@@ -50,6 +50,7 @@ class Docker(ClusterBackend):
         custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
+        docker_version: DockerVersion = DockerVersion.v1_13_1,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -64,6 +65,7 @@ class Docker(ClusterBackend):
             custom_public_agent_mounts: Custom mounts add to public agent node
                 containers.
             linux_distribution: The Linux distribution to boot DC/OS on.
+            docker_version: The Docker version to install on the cluster nodes.
 
             For details about mount arguments, see `volumes` on
                 http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
@@ -78,6 +80,7 @@ class Docker(ClusterBackend):
                 http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
                 for details.
             linux_distribution: The Linux distribution to boot DC/OS on.
+            docker_version: The Docker version to install on the cluster nodes.
 
         Raises:
             NotImplementedError: The `linux_distribution` is not supported by
@@ -86,6 +89,7 @@ class Docker(ClusterBackend):
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
+        self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.custom_master_mounts = custom_master_mounts or {}
         self.custom_agent_mounts = custom_agent_mounts or {}

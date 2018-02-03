@@ -258,8 +258,20 @@ class TestDockerVersion:
         """
         Given a `Node`, return the `DockerVersion` on that node.
         """
+        result = node.run(
+            args=['docker', 'version', '--format', '{{.Server.Version}}'],
+            user=default_ssh_user,
+        )
+        docker_versions = {
+            '1.13.1': DockerVersion.v1_13_1,
+        }
+
+        return docker_versions[result.stdout.decode().strip()]
 
     def test_default(self) -> None:
+        """
+        By default, the Docker version is 1.13.1.
+        """
         with Cluster(
             cluster_backend=Docker(),
             masters=1,
