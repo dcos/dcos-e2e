@@ -272,30 +272,4 @@ class TestDockerVersion:
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert docker_version == DockerVersion.v11_0_2
-
-    def test_custom(
-        self,
-        oss_artifact: Path,
-    ) -> None:
-        """
-        It is possible to set a custom Docker version.
-        """
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            cluster.install_dcos_from_path(
-                build_artifact=oss_artifact,
-                log_output_live=True,
-            )
-            cluster.wait_for_dcos_oss()
-            (master, ) = cluster.masters
-            docker_version = self._get_docker_version(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
-
-        assert docker_version == DockerVersion.v11_0_2
+        assert docker_version == DockerVersion.v1_13_1

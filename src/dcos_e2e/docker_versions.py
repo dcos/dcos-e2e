@@ -13,5 +13,4 @@ class DockerVersion(Enum):
     Supported versions of Docker for DC/OS.
     """
 
-    v1_11_2 = 1
-    v1_13_1 = 2
+    v1_13_1 = 1
