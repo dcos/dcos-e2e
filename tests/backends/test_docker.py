@@ -136,7 +136,7 @@ class TestDistributions:
         distributions = {
             ('"centos"', '"7"'): Distribution.CENTOS_7,
             ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
-            ('coreos', '12.98.7.0'): Distribution.COREOS,
+            ('coreos', '1298.7.0'): Distribution.COREOS,
             ('fedora', '23'): Distribution.FEDORA_23,
             ('debian', '"8"'): Distribution.DEBIAN_8,
         }
