@@ -16,6 +16,7 @@ These backend classes allow backend-specific configuration of the cluster.
     - [`workspace_dir`](#workspace_dir)
     - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
     - [`linux_distribution`](#linux_distribution)
+    - [`docker_version`](#docker_version)
   - [DC/OS Installation](#dcos-installation)
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
@@ -37,6 +38,7 @@ Docker(
     agent_mounts=None,
     public_agent_mounts=None,
     linux_distribution=dcos_e2e.distributions.Distributions,
+    docker_version=dcos_e2e.docker_versions.DockerVersion,
 )
 ```
 
@@ -70,7 +72,12 @@ See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io
 #### `linux_distribution`
 
 Linux distribution to use.
-Currently only `dcos_e2e.distributions.CENTOS_7` and `dcos_e2e.distributions.COREOS` are supported.
+Currently only `dcos_e2e.distributions.Distribution.CENTOS_7` and `dcos_e2e.distributions.Distribution.COREOS` are supported.
+
+#### `docker_version`
+
+The Docker version to use.
+Currently only `dcos_e2e.docker_versions.DockerVersion.v1_13_1` is supported..
 
 ### DC/OS Installation
 

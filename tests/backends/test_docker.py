@@ -14,6 +14,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
 
@@ -242,3 +243,45 @@ class TestDistributions:
             )
 
         assert node_distribution == Distribution.COREOS
+
+
+class TestDockerVersion:
+    """
+    Tests for setting the version of Docker on the nodes.
+    """
+
+    def _get_docker_version(
+        self,
+        node: Node,
+        default_ssh_user: str,
+    ) -> DockerVersion:
+        """
+        Given a `Node`, return the `DockerVersion` on that node.
+        """
+        result = node.run(
+            args=['docker', 'version', '--format', '{{.Server.Version}}'],
+            user=default_ssh_user,
+        )
+        docker_versions = {
+            '1.13.1': DockerVersion.v1_13_1,
+        }
+
+        return docker_versions[result.stdout.decode().strip()]
+
+    def test_default(self) -> None:
+        """
+        By default, the Docker version is 1.13.1.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            docker_version = self._get_docker_version(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert docker_version == DockerVersion.v1_13_1
