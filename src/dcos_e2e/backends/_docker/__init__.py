@@ -275,15 +275,9 @@ class DockerCluster(ClusterManager):
             """.format(docker_storage_driver=storage_driver)
         )
 
-        self._master_prefix = '{cluster_id}-master-'.format(
-            cluster_id=self._cluster_id
-        )
-        self._agent_prefix = '{cluster_id}-agent-'.format(
-            cluster_id=self._cluster_id
-        )
-        self._public_agent_prefix = '{cluster_id}-pub-agent-'.format(
-            cluster_id=self._cluster_id
-        )
+        self._master_prefix = self._cluster_id + '-master-'
+        self._agent_prefix = self._cluster_id + '-agent-'
+        self._public_agent_prefix = self._cluster_id + '-public_agent-'
 
         bootstrap_genconf_path = self._genconf_dir / 'serve'
         # We wrap this in `Path` to work around
