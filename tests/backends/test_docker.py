@@ -254,7 +254,7 @@ class TestDockerVersion:
         self,
         node: Node,
         default_ssh_user: str,
-    ) -> Distribution:
+    ) -> DockerVersion:
         """
         Given a `Node`, return the `DockerVersion` on that node.
         """

@@ -305,7 +305,8 @@ class DockerCluster(ClusterManager):
         base_docker_tag = base_tag + '-docker'
         docker_versions = {
             # This version of Docker supports `overlay2`.
-            DockerVersion.v1_13_1: '1.13.1',
+            DockerVersion.v1_13_1:
+            '1.13.1',
         }
 
         dcos_docker_distros = {
