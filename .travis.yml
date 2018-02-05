@@ -1,4 +1,4 @@
-group: deprecated-2017Q4
+dist: trusty
 sudo: required
 services:
 - docker
