@@ -58,7 +58,9 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    LOGGER.debug(line.rstrip().decode('ascii', 'backslashreplace'))
+                    LOGGER.debug(
+                        line.rstrip().decode('ascii', 'backslashreplace')
+                    )
                     stdout += line
                 # Without this, `.poll()` will return None on some
                 # systems.
