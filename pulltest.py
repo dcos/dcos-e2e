@@ -9,8 +9,8 @@ count = 0
 
 for i in range(200):
     sys.stderr.write('%3d...\n' % i)
-    docker.images.prune()
     client = docker.from_env(version='auto')
+    client.images.prune()
     try:
         with Cluster(cluster_backend=Docker(), agents=0, public_agents=1):
             pass
