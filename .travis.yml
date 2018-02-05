@@ -1,7 +1,11 @@
-group: deprecated-2017Q4
 sudo: required
 services:
 - docker
+addons:
+  apt:
+    packages:
+    - docker-ce
+    - enchant
 language: python
 python:
 - '3.5'
@@ -29,8 +33,6 @@ env:
 before_install:
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
-- travis_retry sudo apt-get update
-- travis_retry sudo apt-get install docker-ce enchant
 - travis_retry npm -g install npm@latest
 install:
 - travis_retry pip install --upgrade --process-dependency-links --editable .[dev]
