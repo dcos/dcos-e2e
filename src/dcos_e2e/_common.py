@@ -78,7 +78,7 @@ def run_subprocess(
         if stderr:
             if retcode == 0:
                 log = LOGGER.warning
-                log(args)
+                log(repr(args))
             else:
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
