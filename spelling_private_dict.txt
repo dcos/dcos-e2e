@@ -18,6 +18,7 @@ genconf
 hwclock
 init
 ip
+login
 mesos
 noqa
 os
@@ -30,6 +31,7 @@ sshd
 stderr
 stdout
 str
+subprocess
 systemd
 tmp
 tmpfs
@@ -42,4 +44,5 @@ vm
 xfail
 sso
 oauth
+whitespace
 zookeeper
