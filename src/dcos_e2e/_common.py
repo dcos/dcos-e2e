@@ -58,7 +58,9 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    LOGGER.debug(line)
+                    LOGGER.debug(
+                        line.rstrip().decode('ascii', 'backslashreplace')
+                    )
                     stdout += line
                 # Without this, `.poll()` will return None on some
                 # systems.
@@ -73,8 +75,15 @@ def run_subprocess(
             process.wait()
             raise
         retcode = process.poll()
+        if stderr:
+            if retcode == 0:
+                log = LOGGER.warning
+                log(repr(args))
+            else:
+                log = LOGGER.error
+            for line in stderr.rstrip().split(b'\n'):
+                log(line.rstrip().decode('ascii', 'backslashreplace'))
         if retcode > 0:
-            LOGGER.info(str(stderr))
             raise CalledProcessError(
                 retcode, args, output=stdout, stderr=stderr
             )
