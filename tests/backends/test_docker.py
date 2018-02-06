@@ -2,8 +2,6 @@
 Tests for the Docker backend.
 """
 
-import copy
-import json
 import uuid
 from pathlib import Path
 
@@ -345,15 +343,10 @@ class TestDockerStorageDriver:
         XXX
         """
         client = docker.from_env(version='auto')
-        info = {**client.info(), **{'Driver': 'foo'}}
+        info = {**client.info(), **{'Driver': 'not_supported'}}
 
         with Mocker(real_http=True) as mock:
-            mock.register_uri(
-                method='GET',
-                url='http+docker://localunixsocket/v1.35/info',
-                json=info,
-            )
-
+            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
             cluster_backend = Docker()
 
         with Cluster(
@@ -368,6 +361,4 @@ class TestDockerStorageDriver:
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        client = docker.from_env(version='auto')
-        host_driver = client.info()['Driver']
-        assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
+        assert storage_driver == DockerStorageDriver.OVERLAY_2
