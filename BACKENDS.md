@@ -39,6 +39,8 @@ Docker(
     public_agent_mounts=None,
     linux_distribution=dcos_e2e.distributions.Distributions,
     docker_version=dcos_e2e.docker_versions.DockerVersion,
+    # The storage driver is the host's driver by default.
+    storage_driver=...,
 )
 ```
 
@@ -77,7 +79,14 @@ Currently only `dcos_e2e.distributions.Distribution.CENTOS_7` and `dcos_e2e.dist
 #### `docker_version`
 
 The Docker version to use.
-Currently only `dcos_e2e.docker_versions.DockerVersion.v1_13_1` is supported..
+See `list(dcos_e2e.docker_versions)` for available versions.
+
+#### `storage_driver`
+
+The Docker storage driver to use.
+The storage driver is the host's driver by default.
+If this is not a supported driver, `aufs` is used.
+See `list(dcos_e2e.docker_storage_drivers)` for available storage drivers.
 
 ### DC/OS Installation
 
