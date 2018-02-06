@@ -285,3 +285,46 @@ class TestDockerVersion:
             )
 
         assert docker_version == DockerVersion.v1_13_1
+
+
+class TestDockerStorageDriver:
+    """
+    Tests for setting the Docker storage driver.
+    """
+
+    def _get_storage_driver(
+        self,
+        node: Node,
+        default_ssh_user: str,
+    ) -> DockerStorageDriver:
+        """
+        Given a `Node`, return the `DockerStorageDriver` on that node.
+        """
+        result = node.run(
+            args=['docker', 'version', '--format', '{{.Server.Version}}'],
+            user=default_ssh_user,
+        )
+        docker_versions = {
+            '1.13.1': DockerVersion.v1_13_1,
+        }
+
+        return docker_versions[result.stdout.decode().strip()]
+
+    def test_default(self) -> None:
+        """
+        By default, the Docker storage driver is the same as the host's
+        storage driver.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            storage_driver = self._get_storage_driver(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert docker_version == 'foo'
