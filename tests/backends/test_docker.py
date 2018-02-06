@@ -7,6 +7,7 @@ from pathlib import Path
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
+import docker
 import pytest
 from passlib.hash import sha512_crypt
 from py.path import local  # pylint: disable=no-name-in-module, import-error
@@ -293,6 +294,12 @@ class TestDockerStorageDriver:
     Tests for setting the Docker storage driver.
     """
 
+    DOCKER_STORAGE_DRIVERS = {
+        'overlay': DockerStorageDriver.OVERLAY,
+        'overlay2': DockerStorageDriver.OVERLAY_2,
+        'aufs': DockerStorageDriver.OVERLAY,
+    }
+
     def _get_storage_driver(
         self,
         node: Node,
@@ -305,11 +312,8 @@ class TestDockerStorageDriver:
             args=['docker', 'info', '--format', '{{.Driver}}'],
             user=default_ssh_user,
         )
-        docker_versions = {
-            '1.13.1': DockerVersion.v1_13_1,
-        }
 
-        return docker_versions[result.stdout.decode().strip()]
+        return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 
     def test_default(self) -> None:
         """
@@ -328,4 +332,6 @@ class TestDockerStorageDriver:
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert docker_version == 'foo'
+        client = docker.from_env(version='auto')
+        host_driver = client.info()['Driver']
+        assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
