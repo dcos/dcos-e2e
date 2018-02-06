@@ -39,7 +39,7 @@ def _get_open_port() -> int:
         return int(new_socket.getsockname()[1])
 
 
-def _get_fallback_storage_driver() -> int:
+def _get_fallback_storage_driver() -> DockerStorageDriver:
     """
     Return
     """
@@ -91,8 +91,8 @@ class Docker(ClusterBackend):
             docker_version: The Docker version to install on the cluster nodes.
 
             For details about mount arguments, see `volumes` on
-                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
-            docker_storage_driver: The storage driver to use for Docker on the
+                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
+            storage_driver: The storage driver to use for Docker on the
                 cluster nodes. By default, this is the host's storage driver.
                 If this is not one of `aufs`, `overlay` or `overlay2`, `aufs`
                 is used.
@@ -104,7 +104,7 @@ class Docker(ClusterBackend):
                 created. These files will be deleted at the end of a test run.
             custom_master_mounts: Custom mounts add to master node containers.
                 See `volumes` on
-                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
+                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
                 for details.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
