@@ -17,8 +17,8 @@ from requests_mock import Mocker
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
+from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
 
