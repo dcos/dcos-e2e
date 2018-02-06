@@ -316,14 +316,21 @@ class TestDockerStorageDriver:
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 
-    # @pytest.mark.parametrize('aufs', 'overlay', 'overlay2')
-    def test_default(self) -> None:
+    @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
+    def test_default(self, host_driver: str) -> None:
         """
         By default, the Docker storage driver is the same as the host's
-        storage driver.
+        storage driver, if that driver is supported.
         """
+        client = docker.from_env(version='auto')
+        info = {**client.info(), **{'Driver': host_driver}}
+
+        with Mocker(real_http=True) as mock:
+            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            cluster_backend = Docker()
+
         with Cluster(
-            cluster_backend=Docker(),
+            cluster_backend=cluster_backend,
             masters=1,
             agents=0,
             public_agents=0,
@@ -334,8 +341,6 @@ class TestDockerStorageDriver:
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        client = docker.from_env(version='auto')
-        host_driver = client.info()['Driver']
         assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
 
     def test_host_driver_not_supported(self) -> None:
