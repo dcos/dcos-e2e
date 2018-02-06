@@ -335,3 +335,17 @@ class TestDockerStorageDriver:
         client = docker.from_env(version='auto')
         host_driver = client.info()['Driver']
         assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
+
+    def test_host_driver_not_supported(self, monkeypatch) -> None:
+        from requests_mock import Mocker
+        client = docker.from_env(version='auto')
+
+        with Mocker() as mock:
+            url = 'http+docker://localunixsocket/v1.35/info'
+            mock.register_uri(
+                method='GET',
+                url=url,
+                text='{"Driver": "foo"}',
+            )
+            host_driver = client.info()['Driver']
+            import pdb; pdb.set_trace()
