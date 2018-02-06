@@ -2,6 +2,7 @@
 Tests for the Docker backend.
 """
 
+import subprocess
 import uuid
 from pathlib import Path
 
@@ -12,6 +13,7 @@ import pytest
 from passlib.hash import sha512_crypt
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker
+from retry import retry
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -301,6 +303,12 @@ class TestDockerStorageDriver:
         'overlay2': DockerStorageDriver.OVERLAY_2,
     }
 
+    # Retry because Docker may not be up.
+    @retry(
+        exceptions=(subprocess.CalledProcessError),
+        tries=5,
+        delay=10,
+    )
     def _get_storage_driver(
         self,
         node: Node,
