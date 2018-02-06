@@ -295,10 +295,12 @@ class TestDockerVersion:
         """
         It is possible to set a custom version of Docker.
         """
+        # We specify the storage driver because `overlay2` is not compatible
+        # with old versions of Docker.
         with Cluster(
             cluster_backend=Docker(
                 docker_version=docker_version,
-                storage_driver=DockerStorageDriver.OVERLAY,
+                storage_driver=DockerStorageDriver.AUFS,
             ),
             masters=1,
             agents=0,
