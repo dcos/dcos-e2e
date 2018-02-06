@@ -2,6 +2,7 @@
 Tests for the Docker backend.
 """
 
+import copy
 import json
 import uuid
 from pathlib import Path
@@ -297,9 +298,9 @@ class TestDockerStorageDriver:
     """
 
     DOCKER_STORAGE_DRIVERS = {
+        'aufs': DockerStorageDriver.AUFS,
         'overlay': DockerStorageDriver.OVERLAY,
         'overlay2': DockerStorageDriver.OVERLAY_2,
-        'aufs': DockerStorageDriver.OVERLAY,
     }
 
     def _get_storage_driver(
@@ -317,6 +318,7 @@ class TestDockerStorageDriver:
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 
+    @pytest.mark.parametrize('aufs', 'overlay', 'overlay2')
     def test_default(self) -> None:
         """
         By default, the Docker storage driver is the same as the host's
@@ -338,7 +340,10 @@ class TestDockerStorageDriver:
         host_driver = client.info()['Driver']
         assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
 
-    def test_host_driver_not_supported(self, monkeypatch) -> None:
+    def test_host_driver_not_supported(self) -> None:
+        """
+        XXX
+        """
         client = docker.from_env(version='auto')
         real_info = client.info()
         fake_info = copy.deepcopy(real_info)
@@ -350,3 +355,20 @@ class TestDockerStorageDriver:
                 url='http+docker://localunixsocket/v1.35/info',
                 text=json.dumps(fake_info),
             )
+            cluster_backend=Docker()
+
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            storage_driver = self._get_storage_driver(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        client = docker.from_env(version='auto')
+        host_driver = client.info()['Driver']
+        assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
