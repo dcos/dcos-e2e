@@ -310,13 +310,6 @@ class TestDockerStorageDriver:
         Given a `Node`, return the `DockerStorageDriver` on that node.
         """
         result = node.run(
-            args=['docker', 'info'],
-            user=default_ssh_user,
-        )
-
-        print(result.stdout)
-
-        result = node.run(
             args=['docker', 'info', '--format', '{{.Driver}}'],
             user=default_ssh_user,
         )
