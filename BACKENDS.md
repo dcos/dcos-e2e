@@ -17,6 +17,7 @@ These backend classes allow backend-specific configuration of the cluster.
     - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
     - [`linux_distribution`](#linux_distribution)
     - [`docker_version`](#docker_version)
+    - [`storage_driver`](#storage_driver)
   - [DC/OS Installation](#dcos-installation)
   - [Troubleshooting](#troubleshooting)
     - [Cleaning Up and Fixing "Out of Space" Errors](#cleaning-up-and-fixing-out-of-space-errors)
