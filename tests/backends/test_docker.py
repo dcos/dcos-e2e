@@ -7,13 +7,16 @@ from pathlib import Path
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
+import docker
 import pytest
 from passlib.hash import sha512_crypt
 from py.path import local  # pylint: disable=no-name-in-module, import-error
+from requests_mock import Mocker
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
@@ -285,3 +288,82 @@ class TestDockerVersion:
             )
 
         assert docker_version == DockerVersion.v1_13_1
+
+
+class TestDockerStorageDriver:
+    """
+    Tests for setting the Docker storage driver.
+    """
+
+    DOCKER_STORAGE_DRIVERS = {
+        'aufs': DockerStorageDriver.AUFS,
+        'overlay': DockerStorageDriver.OVERLAY,
+        'overlay2': DockerStorageDriver.OVERLAY_2,
+    }
+
+    def _get_storage_driver(
+        self,
+        node: Node,
+        default_ssh_user: str,
+    ) -> DockerStorageDriver:
+        """
+        Given a `Node`, return the `DockerStorageDriver` on that node.
+        """
+        result = node.run(
+            args=['docker', 'info'],
+            user=default_ssh_user,
+        )
+
+        print(result.stdout)
+
+        result = node.run(
+            args=['docker', 'info', '--format', '{{.Driver}}'],
+            user=default_ssh_user,
+        )
+
+        return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
+
+    @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
+    def test_default(self, host_driver: str) -> None:
+        """
+        By default, the Docker storage driver is the same as the host's
+        storage driver, if that driver is supported.
+        """
+        client = docker.from_env(version='auto')
+        info = {**client.info(), **{'Driver': host_driver}}
+
+        with Mocker(real_http=True) as mock:
+            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            cluster_backend = Docker()
+
+        storage_driver = cluster_backend.docker_storage_driver
+        assert storage_driver == host_driver
+
+    def test_host_driver_not_supported(self) -> None:
+        """
+        If the host's storage driver is not supported, `aufs` is used.
+        """
+        client = docker.from_env(version='auto')
+        info = {**client.info(), **{'Driver': 'not_supported'}}
+
+        with Mocker(real_http=True) as mock:
+            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            cluster_backend = Docker()
+
+        backend_driver_name = cluster_backend.docker_storage_driver
+        backend_driver = self.DOCKER_STORAGE_DRIVERS[backend_driver_name]
+        assert backend_driver == DockerStorageDriver.AUFS
+
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node_driver = self._get_storage_driver(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert node_driver == DockerStorageDriver.AUFS

@@ -15,5 +15,6 @@ pyroma==2.3
 pytest==3.4.0
 pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1
+requests-mock==1.4.0
 vulture==0.26
 yapf==0.20.1
