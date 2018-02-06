@@ -330,16 +330,17 @@ class TestDockerStorageDriver:
         By default, the Docker storage driver is the same as the host's
         storage driver, if that driver is supported.
         """
-        client = docker.from_env(version='auto')
-        print('OLD_INFO')
-        print(client.info())
-        print('NEW_INFO')
-        info = {**client.info(), **{'Driver': host_driver}}
-        print(info)
-
-        with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
-            cluster_backend = Docker()
+        # client = docker.from_env(version='auto')
+        # print('OLD_INFO')
+        # print(client.info())
+        # print('NEW_INFO')
+        # info = {**client.info(), **{'Driver': host_driver}}
+        # print(info)
+        #
+        # with Mocker(real_http=True) as mock:
+        #     mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+        #     cluster_backend = Docker()
+        cluster_backend = Docker()
 
         with Cluster(
             cluster_backend=cluster_backend,
