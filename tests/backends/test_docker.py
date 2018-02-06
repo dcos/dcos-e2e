@@ -318,7 +318,7 @@ class TestDockerStorageDriver:
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 
-    @pytest.mark.parametrize('aufs', 'overlay', 'overlay2')
+    # @pytest.mark.parametrize('aufs', 'overlay', 'overlay2')
     def test_default(self) -> None:
         """
         By default, the Docker storage driver is the same as the host's
@@ -345,17 +345,16 @@ class TestDockerStorageDriver:
         XXX
         """
         client = docker.from_env(version='auto')
-        real_info = client.info()
-        fake_info = copy.deepcopy(real_info)
-        fake_info['Driver'] = 'foo'
+        info = {**client.info(), **{'Driver': 'foo'}}
 
-        with Mocker() as mock:
+        with Mocker(real_http=True) as mock:
             mock.register_uri(
                 method='GET',
                 url='http+docker://localunixsocket/v1.35/info',
-                text=json.dumps(fake_info),
+                json=info,
             )
-            cluster_backend=Docker()
+
+            cluster_backend = Docker()
 
         with Cluster(
             cluster_backend=cluster_backend,
