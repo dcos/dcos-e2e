@@ -324,32 +324,32 @@ class TestDockerStorageDriver:
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 
-    @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
-    def test_default(self, host_driver: str) -> None:
-        """
-        By default, the Docker storage driver is the same as the host's
-        storage driver, if that driver is supported.
-        """
-        client = docker.from_env(version='auto')
-        info = {**client.info(), **{'Driver': 'not_supported'}}
-
-        with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
-            cluster_backend = Docker()
-
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            storage_driver = self._get_storage_driver(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
-
-        assert storage_driver == DockerStorageDriver.OVERLAY_2
+    # @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
+    # def test_default(self, host_driver: str) -> None:
+    #     """
+    #     By default, the Docker storage driver is the same as the host's
+    #     storage driver, if that driver is supported.
+    #     """
+    #     client = docker.from_env(version='auto')
+    #     info = {**client.info(), **{'Driver': 'not_supported'}}
+    #
+    #     with Mocker(real_http=True) as mock:
+    #         mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+    #         cluster_backend = Docker()
+    #
+    #     with Cluster(
+    #         cluster_backend=cluster_backend,
+    #         masters=1,
+    #         agents=0,
+    #         public_agents=0,
+    #     ) as cluster:
+    #         (master, ) = cluster.masters
+    #         storage_driver = self._get_storage_driver(
+    #             node=master,
+    #             default_ssh_user=cluster.default_ssh_user,
+    #         )
+    #
+    #     assert storage_driver == DockerStorageDriver.OVERLAY_2
 
     def test_host_driver_not_supported(self) -> None:
         """
@@ -362,6 +362,7 @@ class TestDockerStorageDriver:
             mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
             cluster_backend = Docker()
 
+        assert cluster_backend.docker_storage_driver == 'overlay2'
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
