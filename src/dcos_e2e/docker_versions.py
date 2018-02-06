@@ -14,3 +14,4 @@ class DockerVersion(Enum):
     """
 
     v1_13_1 = 1
+    v1_11_2 = 2
