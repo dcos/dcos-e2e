@@ -25,6 +25,7 @@ from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_versions import DockerVersion
+from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 
 
 def _get_open_port() -> int:
@@ -36,6 +37,27 @@ def _get_open_port() -> int:
         new_socket.bind((host, 0))
         new_socket.listen(1)
         return int(new_socket.getsockname()[1])
+
+
+def _get_fallback_storage_driver() -> int:
+    """
+    Return
+    """
+    storage_drivers = {
+        'aufs': DockerStorageDriver.AUFS,
+        'overlay': DockerStorageDriver.OVERLAY,
+        'overlay2': DockerStorageDriver.OVERLAY_2,
+    }
+
+    client = docker.from_env(version='auto')
+    host_driver = client.info()['Driver']
+
+    try:
+        return storage_drivers[host_driver]
+    except KeyError:
+        # This chooses the aufs driver if the host's driver is not
+        # supported because this is widely supported.
+        return DockerStorageDriver.AUFS
 
 
 class Docker(ClusterBackend):
@@ -51,6 +73,7 @@ class Docker(ClusterBackend):
         custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
+        storage_driver: DockerStorageDriver = _get_fallback_storage_driver(),
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -99,17 +122,7 @@ class Docker(ClusterBackend):
             raise NotImplementedError
 
         self.linux_distribution = linux_distribution
-
-        client = docker.from_env(version='auto')
-        host_driver = client.info()['Driver']
-        # This chooses the aufs driver if the host's driver is not
-        # supported because this is widely supported.
-        default_driver = 'aufs'
-        supported_drivers = ('aufs', 'overlay', 'overlay2')
-        fallback_driver = (
-            host_driver if host_driver in supported_drivers else default_driver
-        )
-        self.docker_storage_driver = fallback_driver
+        self.docker_storage_driver = storage_driver
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -254,7 +267,11 @@ class DockerCluster(ClusterManager):
             destination_path = self._genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        client = docker.from_env(version='auto')
+        storage_driver_name = {
+            DockerStorageDriver.AUFS: 'aufs',
+            DockerStorageDriver.OVERLAY: 'overlay',
+            DockerStorageDriver.OVERLAY_2: 'overlay2',
+        }[cluster_backend.storage_driver]
 
         docker_service_body = dedent(
             """\
@@ -275,9 +292,7 @@ class DockerCluster(ClusterManager):
 
             [Install]
             WantedBy=default.target
-            """.format(
-                docker_storage_driver=cluster_backend.docker_storage_driver,
-            )
+            """.format(docker_storage_driver=storage_driver_name)
         )
 
         self._master_prefix = self._cluster_id + '-master-'
@@ -320,6 +335,7 @@ class DockerCluster(ClusterManager):
         distro_path_segment = dcos_docker_distros[linux_distribution]
         docker_version = docker_versions[cluster_backend.docker_version]
 
+        client = docker.from_env(version='auto')
         client.images.build(
             path=str(self._path),
             rm=True,
