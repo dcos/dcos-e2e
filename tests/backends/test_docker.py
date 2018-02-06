@@ -267,6 +267,7 @@ class TestDockerVersion:
         )
         docker_versions = {
             '1.13.1': DockerVersion.v1_13_1,
+            '1.11.2': DockerVersion.v1_13_1,
         }
 
         return docker_versions[result.stdout.decode().strip()]
@@ -288,6 +289,30 @@ class TestDockerVersion:
             )
 
         assert docker_version == DockerVersion.v1_13_1
+
+    @pytest.mark.parametrize('docker_version', list(DockerVersion))
+    def test_custom_version(self, docker_version: DockerVersion) -> None:
+        """
+        It is possible to set a custom version of Docker.
+        """
+        # We specify the storage driver because `overlay2` is not compatible
+        # with old versions of Docker.
+        with Cluster(
+            cluster_backend=Docker(
+                docker_version=docker_version,
+                storage_driver=DockerStorageDriver.AUFS,
+            ),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            docker_version = self._get_docker_version(
+                node=master,
+                default_ssh_user=cluster.default_ssh_user,
+            )
+
+        assert docker_version == docker_version
 
 
 class TestDockerStorageDriver:

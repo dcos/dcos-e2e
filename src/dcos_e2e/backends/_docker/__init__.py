@@ -128,9 +128,8 @@ class Docker(ClusterBackend):
             raise NotImplementedError
 
         self.linux_distribution = linux_distribution
-        self.docker_storage_driver = (
-            storage_driver or _get_fallback_storage_driver()
-        )
+        fallback_driver = _get_fallback_storage_driver()
+        self.docker_storage_driver = storage_driver or fallback_driver
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -326,9 +325,8 @@ class DockerCluster(ClusterManager):
         base_tag = docker_image_tag + ':base'
         base_docker_tag = base_tag + '-docker'
         docker_versions = {
-            # This version of Docker supports `overlay2`.
-            DockerVersion.v1_13_1:
-            '1.13.1',
+            DockerVersion.v1_13_1: '1.13.1',
+            DockerVersion.v1_11_2: '1.11.2',
         }
 
         dcos_docker_distros = {

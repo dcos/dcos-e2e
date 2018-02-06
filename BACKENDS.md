@@ -80,6 +80,7 @@ Currently only `dcos_e2e.distributions.Distribution.CENTOS_7` and `dcos_e2e.dist
 
 The Docker version to use.
 See `list(dcos_e2e.docker_versions)` for available versions.
+Be sure to use a `storage_driver` which is compatible with the version of Docker that you are using.
 
 #### `storage_driver`
 
