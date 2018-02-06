@@ -367,3 +367,23 @@ class TestDockerStorageDriver:
             )
 
         assert node_driver == DockerStorageDriver.AUFS
+
+    @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
+    @pytest.mark.parametrize('custom_driver', list(DockerStorageDriver))
+    def test_custom(
+        self,
+        host_driver: str,
+        custom_driver: DockerStorageDriver,
+    ) -> None:
+        """
+        A custom storage driver can be used.
+        """
+        client = docker.from_env(version='auto')
+        info = {**client.info(), **{'Driver': host_driver}}
+
+        with Mocker(real_http=True) as mock:
+            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            cluster_backend = Docker(storage_driver=custom_driver)
+
+        storage_driver = cluster_backend.docker_storage_driver
+        assert storage_driver == custom_driver
