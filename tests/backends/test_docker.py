@@ -362,7 +362,7 @@ class TestDockerStorageDriver:
             mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
             cluster_backend = Docker()
 
-        assert cluster_backend.docker_storage_driver == 'overlay2'
+        assert cluster_backend.docker_storage_driver == 'aufs'
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
@@ -375,4 +375,4 @@ class TestDockerStorageDriver:
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert storage_driver == DockerStorageDriver.OVERLAY_2
+        assert storage_driver == DockerStorageDriver.AUFS
