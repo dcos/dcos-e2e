@@ -73,7 +73,7 @@ class Docker(ClusterBackend):
         custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
-        storage_driver: DockerStorageDriver = _get_fallback_storage_driver(),
+        storage_driver: Optional[DockerStorageDriver] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -92,6 +92,10 @@ class Docker(ClusterBackend):
 
             For details about mount arguments, see `volumes` on
                 http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
+            docker_storage_driver: The storage driver to use for Docker on the
+                cluster nodes. By default, this is the host's storage driver.
+                If this is not one of `aufs`, `overlay` or `overlay2`, `aufs`
+                is used.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -104,6 +108,8 @@ class Docker(ClusterBackend):
                 for details.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
+            docker_storage_driver: The storage driver to use for Docker on the
+                cluster nodes.
 
         Raises:
             NotImplementedError: The `linux_distribution` is not supported by
@@ -122,7 +128,9 @@ class Docker(ClusterBackend):
             raise NotImplementedError
 
         self.linux_distribution = linux_distribution
-        self.docker_storage_driver = storage_driver
+        self.docker_storage_driver = (
+            storage_driver or _get_fallback_storage_driver()
+        )
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -271,7 +279,7 @@ class DockerCluster(ClusterManager):
             DockerStorageDriver.AUFS: 'aufs',
             DockerStorageDriver.OVERLAY: 'overlay',
             DockerStorageDriver.OVERLAY_2: 'overlay2',
-        }[cluster_backend.storage_driver]
+        }[cluster_backend.docker_storage_driver]
 
         docker_service_body = dedent(
             """\

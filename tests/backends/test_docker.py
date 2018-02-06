@@ -330,7 +330,7 @@ class TestDockerStorageDriver:
             cluster_backend = Docker()
 
         storage_driver = cluster_backend.docker_storage_driver
-        assert storage_driver == host_driver
+        assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
 
     def test_host_driver_not_supported(self) -> None:
         """
@@ -341,14 +341,12 @@ class TestDockerStorageDriver:
 
         with Mocker(real_http=True) as mock:
             mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
-            cluster_backend = Docker()
+            backend = Docker()
 
-        backend_driver_name = cluster_backend.docker_storage_driver
-        backend_driver = self.DOCKER_STORAGE_DRIVERS[backend_driver_name]
-        assert backend_driver == DockerStorageDriver.AUFS
+        assert backend.docker_storage_driver == DockerStorageDriver.AUFS
 
         with Cluster(
-            cluster_backend=cluster_backend,
+            cluster_backend=backend,
             masters=1,
             agents=0,
             public_agents=0,

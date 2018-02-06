@@ -39,8 +39,7 @@ Docker(
     public_agent_mounts=None,
     linux_distribution=dcos_e2e.distributions.Distributions,
     docker_version=dcos_e2e.docker_versions.DockerVersion,
-    # The storage driver is the host's driver by default.
-    storage_driver=...,
+    storage_driver=None,
 )
 ```
 
