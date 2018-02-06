@@ -310,13 +310,6 @@ class TestDockerStorageDriver:
         Given a `Node`, return the `DockerStorageDriver` on that node.
         """
         result = node.run(
-            args=['docker', 'info'],
-            user=default_ssh_user,
-        )
-
-        print(result.stdout)
-
-        result = node.run(
             args=['docker', 'info', '--format', '{{.Driver}}'],
             user=default_ssh_user,
         )
@@ -337,7 +330,7 @@ class TestDockerStorageDriver:
             cluster_backend = Docker()
 
         storage_driver = cluster_backend.docker_storage_driver
-        assert storage_driver == host_driver
+        assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
 
     def test_host_driver_not_supported(self) -> None:
         """
@@ -348,14 +341,12 @@ class TestDockerStorageDriver:
 
         with Mocker(real_http=True) as mock:
             mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
-            cluster_backend = Docker()
+            backend = Docker()
 
-        backend_driver_name = cluster_backend.docker_storage_driver
-        backend_driver = self.DOCKER_STORAGE_DRIVERS[backend_driver_name]
-        assert backend_driver == DockerStorageDriver.AUFS
+        assert backend.docker_storage_driver == DockerStorageDriver.AUFS
 
         with Cluster(
-            cluster_backend=cluster_backend,
+            cluster_backend=backend,
             masters=1,
             agents=0,
             public_agents=0,
@@ -367,3 +358,25 @@ class TestDockerStorageDriver:
             )
 
         assert node_driver == DockerStorageDriver.AUFS
+
+    @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
+    @pytest.mark.parametrize('custom_driver', list(DockerStorageDriver))
+    def test_custom(
+        self,
+        host_driver: str,
+        custom_driver: DockerStorageDriver,
+    ) -> None:
+        """
+        A custom storage driver can be used.
+        """
+        client = docker.from_env(version='auto')
+        info = {**client.info(), **{'Driver': host_driver}}
+
+        with Mocker(real_http=True) as mock:
+            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            cluster_backend = Docker(storage_driver=custom_driver)
+
+        storage_driver = cluster_backend.docker_storage_driver
+        assert storage_driver == custom_driver
+        # We do not test actually changing the storage driver because only
+        # `aufs` is supported on Travis CI.

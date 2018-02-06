@@ -38,6 +38,9 @@
 * Add `linux_distribution` parameter to the `Docker` backend.
 * Add support for CoreOS in the `Docker` backend.
 * Add `docker_version` parameter to the `Docker` backend.
+* The fallback Docker storage driver for the `Docker` backend is now `aufs`.
+* Add `storage_driver` parameter to the `Docker` backend.
+* Logs are now less cluttered with escape characters.
 
 ## 2018.01.25.0
 
