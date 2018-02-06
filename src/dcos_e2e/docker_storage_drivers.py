@@ -1,5 +1,5 @@
 """
-XXX
+Supported Docker storage drivers.
 """
 
 from enum import Enum
@@ -7,7 +7,7 @@ from enum import Enum
 
 class DockerStorageDriver(Enum):
     """
-    XXX
+    Supported Docker storage drivers.
     """
 
     AUFS = 1

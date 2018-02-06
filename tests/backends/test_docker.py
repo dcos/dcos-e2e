@@ -345,7 +345,7 @@ class TestDockerStorageDriver:
 
     def test_host_driver_not_supported(self) -> None:
         """
-        XXX
+        If the host's storage driver is not supported, `overlay2` is used.
         """
         client = docker.from_env(version='auto')
         info = {**client.info(), **{'Driver': 'not_supported'}}
