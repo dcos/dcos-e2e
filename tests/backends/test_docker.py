@@ -304,11 +304,11 @@ class TestDockerStorageDriver:
     }
 
     # Retry because Docker may not be up.
-    @retry(
-        exceptions=(subprocess.CalledProcessError),
-        tries=5,
-        delay=10,
-    )
+    # @retry(
+    #     exceptions=(subprocess.CalledProcessError),
+    #     tries=5,
+    #     delay=10,
+    # )
     def _get_storage_driver(
         self,
         node: Node,
