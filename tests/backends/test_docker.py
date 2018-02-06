@@ -2,6 +2,7 @@
 Tests for the Docker backend.
 """
 
+import json
 import uuid
 from pathlib import Path
 
@@ -11,6 +12,7 @@ import docker
 import pytest
 from passlib.hash import sha512_crypt
 from py.path import local  # pylint: disable=no-name-in-module, import-error
+from requests_mock import Mocker
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -337,15 +339,14 @@ class TestDockerStorageDriver:
         assert storage_driver == self.DOCKER_STORAGE_DRIVERS[host_driver]
 
     def test_host_driver_not_supported(self, monkeypatch) -> None:
-        from requests_mock import Mocker
         client = docker.from_env(version='auto')
+        real_info = client.info()
+        fake_info = copy.deepcopy(real_info)
+        fake_info['Driver'] = 'foo'
 
         with Mocker() as mock:
-            url = 'http+docker://localunixsocket/v1.35/info'
             mock.register_uri(
                 method='GET',
-                url=url,
-                text='{"Driver": "foo"}',
+                url='http+docker://localunixsocket/v1.35/info',
+                text=json.dumps(fake_info),
             )
-            host_driver = client.info()['Driver']
-            import pdb; pdb.set_trace()
