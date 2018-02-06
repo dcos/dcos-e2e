@@ -378,3 +378,5 @@ class TestDockerStorageDriver:
 
         storage_driver = cluster_backend.docker_storage_driver
         assert storage_driver == custom_driver
+        # We do not test actually changing the storage driver because only
+        # `aufs` is supported on Travis CI.

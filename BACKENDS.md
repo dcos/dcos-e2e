@@ -87,6 +87,8 @@ The storage driver is the host's driver by default.
 If this is not a supported driver, `aufs` is used.
 See `list(dcos_e2e.docker_storage_drivers)` for available storage drivers.
 
+On some platforms, Docker will fail to start up with certain storage drivers.
+
 ### DC/OS Installation
 
 `Cluster`s created by the Docker backend only support installing DC/OS via `install_dcos_from_path`.
