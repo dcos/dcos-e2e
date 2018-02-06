@@ -2,7 +2,6 @@
 Tests for the Docker backend.
 """
 
-import subprocess
 import uuid
 from pathlib import Path
 
@@ -13,7 +12,6 @@ import pytest
 from passlib.hash import sha512_crypt
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker
-from retry import retry
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -303,12 +301,6 @@ class TestDockerStorageDriver:
         'overlay2': DockerStorageDriver.OVERLAY_2,
     }
 
-    # Retry because Docker may not be up.
-    # @retry(
-    #     exceptions=(subprocess.CalledProcessError),
-    #     tries=5,
-    #     delay=10,
-    # )
     def _get_storage_driver(
         self,
         node: Node,
@@ -331,36 +323,25 @@ class TestDockerStorageDriver:
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 
-    # @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
-    # def test_default(self, host_driver: str) -> None:
-    #     """
-    #     By default, the Docker storage driver is the same as the host's
-    #     storage driver, if that driver is supported.
-    #     """
-    #     client = docker.from_env(version='auto')
-    #     info = {**client.info(), **{'Driver': 'not_supported'}}
-    #
-    #     with Mocker(real_http=True) as mock:
-    #         mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
-    #         cluster_backend = Docker()
-    #
-    #     with Cluster(
-    #         cluster_backend=cluster_backend,
-    #         masters=1,
-    #         agents=0,
-    #         public_agents=0,
-    #     ) as cluster:
-    #         (master, ) = cluster.masters
-    #         storage_driver = self._get_storage_driver(
-    #             node=master,
-    #             default_ssh_user=cluster.default_ssh_user,
-    #         )
-    #
-    #     assert storage_driver == DockerStorageDriver.OVERLAY_2
+    @pytest.mark.parametrize('host_driver', DOCKER_STORAGE_DRIVERS.keys())
+    def test_default(self, host_driver: str) -> None:
+        """
+        By default, the Docker storage driver is the same as the host's
+        storage driver, if that driver is supported.
+        """
+        client = docker.from_env(version='auto')
+        info = {**client.info(), **{'Driver': host_driver}}
+
+        with Mocker(real_http=True) as mock:
+            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            cluster_backend = Docker()
+
+        storage_driver = cluster_backend.docker_storage_driver
+        assert storage_driver == host_driver
 
     def test_host_driver_not_supported(self) -> None:
         """
-        If the host's storage driver is not supported, `overlay2` is used.
+        If the host's storage driver is not supported, `aufs` is used.
         """
         client = docker.from_env(version='auto')
         info = {**client.info(), **{'Driver': 'not_supported'}}
@@ -369,7 +350,10 @@ class TestDockerStorageDriver:
             mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
             cluster_backend = Docker()
 
-        assert cluster_backend.docker_storage_driver == 'aufs'
+        backend_driver_name = cluster_backend.docker_storage_driver
+        backend_driver = self.DOCKER_STORAGE_DRIVERS[backend_driver_name]
+        assert backend_driver == DockerStorageDriver.AUFS
+
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
@@ -377,9 +361,9 @@ class TestDockerStorageDriver:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            storage_driver = self._get_storage_driver(
+            node_driver = self._get_storage_driver(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert storage_driver == DockerStorageDriver.AUFS
+        assert node_driver == DockerStorageDriver.AUFS

@@ -102,8 +102,8 @@ class Docker(ClusterBackend):
 
         client = docker.from_env(version='auto')
         host_driver = client.info()['Driver']
-        # This chooses the overlay2 driver if the host's driver is not
-        # supported for speed reasons.
+        # This chooses the aufs driver if the host's driver is not
+        # supported because this is widely supported.
         default_driver = 'aufs'
         supported_drivers = ('aufs', 'overlay', 'overlay2')
         fallback_driver = (
