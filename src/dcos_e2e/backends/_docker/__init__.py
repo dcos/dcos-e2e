@@ -2,6 +2,7 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
+import configparser
 import inspect
 import os
 import socket
@@ -11,7 +12,6 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import gettempdir
-from textwrap import dedent
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
 import docker
@@ -26,6 +26,56 @@ from dcos_e2e.node import Node
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
+
+
+def _write_docker_service_file(
+    service_file_path: Path,
+    storage_driver: DockerStorageDriver,
+) -> None:
+    """
+    Write a systemd unit for a Docker service.
+
+    service_file_path: The path to a file to write to.
+    storage_driver: The Docker storage driver to use.
+    """
+    storage_driver_name = {
+        DockerStorageDriver.AUFS: 'aufs',
+        DockerStorageDriver.OVERLAY: 'overlay',
+        DockerStorageDriver.OVERLAY_2: 'overlay2',
+    }[storage_driver]
+
+    docker_cmd = (
+        '/usr/bin/docker daemon '
+        '-D '
+        '-s {storage_driver_name} '
+        '--disable-legacy-registry=true '
+        '--exec-opt=native.cgroupdriver=cgroupfs'
+    ).format(storage_driver_name=storage_driver_name)
+
+    docker_service_contents = {
+        'Unit': {
+            'Description': 'Docker Appkication Container Engine',
+            'Documentation': 'https://docs.docker.com',
+            'After': 'dbus.service',
+        },
+        'Service': {
+            'ExecStart': docker_cmd,
+            'LimitNOFILE': '1048576',
+            'LimitNPROC': '1048576',
+            'LimitCORE': 'infinity',
+            'Delegate': 'yes',
+            'TimeoutStartSec': '0',
+        },
+        'Install': {
+            'WantedBy': 'default.target',
+        },
+    }
+    config = configparser.ConfigParser()
+    # Ignore erroneous error https://github.com/python/typeshed/issues/1857.
+    config.optionxform = str  # type: ignore
+    config.read_dict(docker_service_contents)
+    with service_file_path.open(mode='w') as service_file:
+        config.write(service_file)
 
 
 def _get_open_port() -> int:
@@ -274,32 +324,9 @@ class DockerCluster(ClusterManager):
             destination_path = self._genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        storage_driver_name = {
-            DockerStorageDriver.AUFS: 'aufs',
-            DockerStorageDriver.OVERLAY: 'overlay',
-            DockerStorageDriver.OVERLAY_2: 'overlay2',
-        }[cluster_backend.docker_storage_driver]
-
-        docker_service_body = dedent(
-            """\
-            [Unit]
-            Description=Docker Application Container Engine
-            Documentation=https://docs.docker.com
-            After=dbus.service
-
-            [Service]
-            ExecStart=/usr/bin/docker daemon -D -s {docker_storage_driver} \
-            --disable-legacy-registry=true \
-            --exec-opt=native.cgroupdriver=cgroupfs
-            LimitNOFILE=1048576
-            LimitNPROC=1048576
-            LimitCORE=infinity
-            Delegate=yes
-            TimeoutStartSec=0
-
-            [Install]
-            WantedBy=default.target
-            """.format(docker_storage_driver=storage_driver_name)
+        _write_docker_service_file(
+            service_file_path=service_dir / 'docker.service',
+            storage_driver=cluster_backend.docker_storage_driver,
         )
 
         self._master_prefix = self._cluster_id + '-master-'
@@ -318,8 +345,6 @@ class DockerCluster(ClusterManager):
             '/run': 'rw,exec,nosuid,size=2097152k',
             '/tmp': 'rw,exec,nosuid,size=2097152k',
         }
-
-        (service_dir / 'docker.service').write_text(docker_service_body)
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_tag = docker_image_tag + ':base'
