@@ -2,6 +2,7 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
+import configparser
 import inspect
 import os
 import socket
@@ -11,7 +12,6 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import gettempdir
-from textwrap import dedent
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
 import docker
@@ -44,29 +44,36 @@ def _write_docker_service_file(
         DockerStorageDriver.OVERLAY_2: 'overlay2',
     }[storage_driver]
 
-    docker_service_body = dedent(
-        """\
-        [Unit]
-        Description=Docker Application Container Engine
-        Documentation=https://docs.docker.com
-        After=dbus.service
+    docker_cmd = (
+        '/usr/bin/docker daemon '
+        '-D '
+        '-s {storage_driver_name} '
+        '--disable-legacy-registry=true '
+        '--exec-opt=native.cgroupdriver=cgroupfs'
+    ).format(storage_driver_name=storage_driver_name)
 
-        [Service]
-        ExecStart=/usr/bin/docker daemon -D -s {docker_storage_driver} \
-        --disable-legacy-registry=true \
-        --exec-opt=native.cgroupdriver=cgroupfs
-        LimitNOFILE=1048576
-        LimitNPROC=1048576
-        LimitCORE=infinity
-        Delegate=yes
-        TimeoutStartSec=0
-
-        [Install]
-        WantedBy=default.target
-        """.format(docker_storage_driver=storage_driver_name)
-    )
-
-    service_file_path.write_text(docker_service_body)
+    docker_service_contents = {
+        'Unit': {
+            'Description': 'Docker Appkication Container Engine',
+            'Documentation': 'https://docs.docker.com',
+            'After': 'dbus.service',
+        },
+        'Service': {
+            'ExecStart': docker_cmd,
+            'LimitNOFILE': '1048576',
+            'LimitNPROC': '1048576',
+            'LimitCORE': 'infinity',
+            'Delegate': 'yes',
+            'TimeoutStartSec': '0',
+        },
+        'Install': {
+            'WantedBy': 'default.target',
+        },
+    }
+    config = configparser.ConfigParser()
+    config.read_dict(docker_service_contents)
+    with service_file_path.open(mode='w') as service_file:
+        config.write(service_file)
 
 
 def _get_open_port() -> int:
