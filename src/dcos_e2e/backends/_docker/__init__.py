@@ -28,6 +28,31 @@ from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 
 
+def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
+    """
+    XXX
+    """
+    rsa_key_pair = rsa.generate_private_key(
+        backend=default_backend(),
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    public_key = rsa_key_pair.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH,
+    )
+
+    private_key = rsa_key_pair.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+
+    public_key_path.write_bytes(data=public_key)
+    private_key_path.write_bytes(data=private_key)
+
+
 def _write_docker_service_file(
     service_file_path: Path,
     storage_driver: DockerStorageDriver,
@@ -297,27 +322,10 @@ class DockerCluster(ClusterManager):
             dst=str(service_dir / 'systemd-journald-init.service'),
         )
 
-        rsa_key_pair = rsa.generate_private_key(
-            backend=default_backend(),
-            public_exponent=65537,
-            key_size=2048,
+        _write_key_pair(
+            public_key_path=ssh_dir / 'id_rsa.pub',
+            private_key_path=ssh_dir / 'id_rsa',
         )
-
-        public_key = rsa_key_pair.public_key().public_bytes(
-            serialization.Encoding.OpenSSH,
-            serialization.PublicFormat.OpenSSH,
-        )
-
-        private_key = rsa_key_pair.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption(),
-        )
-
-        public_key_file = ssh_dir / 'id_rsa.pub'
-        private_key_file = ssh_dir / 'id_rsa'
-        public_key_file.write_bytes(data=public_key)
-        private_key_file.write_bytes(data=private_key)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
