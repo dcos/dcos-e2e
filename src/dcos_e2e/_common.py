@@ -64,7 +64,7 @@ def run_subprocess(
                     stdout += line
                 # stderr/stdout are not readable anymore which usually means
                 # that the child process has exited. However, the child
-                # process has not been wait()et for yet, i.e. it has not yet
+                # process has not been wait()ed for yet, i.e. it has not yet
                 # been reaped. That is, its exit status is unknown. Read its
                 # exit status.
                 process.wait()
