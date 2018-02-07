@@ -71,6 +71,7 @@ def _write_docker_service_file(
         },
     }
     config = configparser.ConfigParser()
+    config.optionxform = str
     config.read_dict(docker_service_contents)
     with service_file_path.open(mode='w') as service_file:
         config.write(service_file)
