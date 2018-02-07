@@ -84,7 +84,7 @@ def run_subprocess(
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
                 log(line.rstrip().decode('ascii', 'backslashreplace'))
-        if process.returncode > 0:
+        if process.returncode != 0:
             raise CalledProcessError(
                 process.returncode, args, output=stdout, stderr=stderr
             )
