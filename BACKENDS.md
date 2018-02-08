@@ -14,7 +14,7 @@ These backend classes allow backend-specific configuration of the cluster.
   - [Requirements](#requirements)
   - [Parameters](#parameters)
     - [`workspace_dir`](#workspace_dir)
-    - [`master_mounts`, `agent_mounts`, `public_agent_mounts`](#master_mounts-agent_mounts-public_agent_mounts)
+    - [`custom_master_mounts`, `custom_agent_mounts`, `custom_public_agent_mounts`](#custom_master_mounts-custom_agent_mounts-custom_public_agent_mounts)
     - [`linux_distribution`](#linux_distribution)
     - [`docker_version`](#docker_version)
     - [`storage_driver`](#storage_driver)
@@ -35,9 +35,9 @@ These backend classes allow backend-specific configuration of the cluster.
 ```python
 Docker(
     workspace_dir=None,
-    master_mounts=None,
-    agent_mounts=None,
-    public_agent_mounts=None,
+    custom_master_mounts=None,
+    custom_agent_mounts=None,
+    custom_public_agent_mounts=None,
     linux_distribution=dcos_e2e.distributions.Distributions,
     docker_version=dcos_e2e.docker_versions.DockerVersion,
     storage_driver=None,
@@ -66,7 +66,7 @@ The directory in which large temporary files will be created.
 These files will be deleted at the end of a test run.
 This is equivalent to `dir` in [TemporaryDirectory](https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory).
 
-#### `master_mounts`, `agent_mounts`, `public_agent_mounts`
+#### `custom_master_mounts`, `custom_agent_mounts`, `custom_public_agent_mounts`
 
 Mounts to add to node containers.
 See `volumes` in [the `docker-py` documentation](http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run) for details.
