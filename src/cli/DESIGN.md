@@ -41,7 +41,7 @@ Commands:
 
 ### doctor
 
-Tells you about e.g. RAM and Docker for Mac network
+Tells you about e.g. RAM and Docker for Mac network issues.
 
 ### Create
 
@@ -106,4 +106,10 @@ $ dcos-docker wait 151531
 $ dcos-docker inspect 151531
 ...
 ... Details like the web address
+... format = set env vars, like source-cluster.sh
+... also ship a generic run-master as a command
 ```
+
+### Ideas
+
+Some way to synt
