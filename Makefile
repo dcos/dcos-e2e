@@ -27,9 +27,6 @@ clean:
 	# Ignore errors in case there are no containers to remove.
 	- docker stop $$(docker ps -a -q --filter="name=dcos-e2e") | :
 	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-e2e") | :
-	# We skip errors because this does not exist in legacy versions of
-	# Docker
-	- docker volume prune --force | :
 
 # Fix some linting errors.
 .PHONY: fix-lint
