@@ -19,3 +19,4 @@ requests-mock==1.4.0
 sphinx==1.6.7
 vulture==0.26
 yapf==0.20.1
+sphinxcontrib-napoleon

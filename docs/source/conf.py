@@ -3,6 +3,8 @@
 
 # pylint: disable=invalid-name
 
+extensions = ['sphinx.ext.autodoc', 'sphinxcontrib.napoleon']
+
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
