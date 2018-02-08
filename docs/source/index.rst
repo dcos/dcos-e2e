@@ -12,6 +12,5 @@ DC/OS E2E
 Indices and tables
 ==================
 
-* :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
