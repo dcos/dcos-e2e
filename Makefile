@@ -14,7 +14,7 @@ lint-python-only:
 	pip-extra-reqs src/
 	pip-missing-reqs src/
 	pydocstyle
-	pylint *.py src/dcos_e2e/ tests/
+	pylint *.py src/ tests/
 	pyroma .
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
