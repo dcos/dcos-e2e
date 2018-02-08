@@ -19,10 +19,6 @@ Travis CI:
 
     gem install travis --no-rdoc --no-ri
 
-.. code:: sh
-
-    npm install
-
 Spell checking requires ``enchant``. This can be installed on macOS, for
 example, with `Homebrew <http://brew.sh>`__:
 
@@ -248,17 +244,11 @@ with the latest version of DC/OS OSS or DC/OS Enterprise, as this is
 implied. If this is the only change, add an empty entry to the
 changelog.
 
-4. Update the changelog Table of Contents.
-
-.. code:: sh
-
-    make toc
-
-5. Bump the version of the software.
+4. Bump the version of the software.
 
 Change ``VERSION`` in ``setup.py``.
 
-6. Commit and push changes.
+5. Commit and push changes.
 
 .. code:: sh
 

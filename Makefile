@@ -30,7 +30,7 @@ clean:
 
 # Fix some linting errors.
 .PHONY: fix-lint
-fix-lint: toc
+fix-lint:
 	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
 	yapf --in-place --recursive .
 	isort --recursive --apply
@@ -44,10 +44,6 @@ clean-artifacts:
 download-artifacts:
 	curl -o $(ARTIFACT_PATH) $(ARTIFACT_URL)
 	if [ -n "$(EE_ARTIFACT_URL)" ]; then curl -o $(EE_ARTIFACT_PATH) $(EE_ARTIFACT_URL); fi
-
-.PHONY: toc
-toc:
-	npm run doctoc *.md --github --notitle
 
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.
