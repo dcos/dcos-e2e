@@ -100,4 +100,5 @@ $ dcos-docker wait 151531
 ```
 $ dcos-docker inspect 151531
 ...
+... Details like the web address
 ```
