@@ -1,6 +1,7 @@
 import click
 
 
-@click.command()
+@click.group()
 def dcos_docker():
-    click.echo('Hello')
+    """
+    """
