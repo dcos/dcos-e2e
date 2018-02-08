@@ -31,12 +31,17 @@ Develop in this repository, then we can decide between:
 $ dcos-docker --help
 
 Commands:
+  doctor
   create
   destroy
   list
   wait
   inspect
 ```
+
+### doctor
+
+Tells you about e.g. RAM and Docker for Mac network
 
 ### Create
 
