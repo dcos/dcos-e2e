@@ -9,7 +9,7 @@ def dcos_docker():
 
 
 @dcos_docker.command('create')
-@click.argument('artifact')
+@click.argument('artifact', type=click.Path(exists=True))
 def create(artifact):
     """
     Create a DC/OS cluster.

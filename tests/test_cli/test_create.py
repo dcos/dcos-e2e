@@ -15,8 +15,12 @@ def test_invalid_artifact_path():
     """
     runner = CliRunner()
     result = runner.invoke(dcos_docker, ['create', '/not/a/path'])
-    assert result.exit_code == 0
-    assert result.output == 'XXX\n'
+    assert result.exit_code == 2
+    expected_error = (
+        'Error: Invalid value for "artifact": '
+        'Path "/not/a/path" does not exist.'
+    )
+    assert expected_error in result.output
 
 
 def test_create(oss_artifact: Path):
