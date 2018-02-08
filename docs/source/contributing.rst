@@ -206,8 +206,7 @@ part of that.
 Untied to a particular backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Currently only DC/OS Docker is supported. However, it is intended that
-multiple backends can be supported. See “New Backends” for details.
+Tests written with DC/OS E2E should have easily swappable backends.
 
 Release Process
 ---------------
