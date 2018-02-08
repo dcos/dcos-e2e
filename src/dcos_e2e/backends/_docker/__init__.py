@@ -30,7 +30,11 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
-    XXX
+    Write an RSA key pair for connecting to nodes via SSH.
+
+    Args:
+        public_key_path: Path to write public key to.
+        private_key_path: Path to a private key file to write.
     """
     rsa_key_pair = rsa.generate_private_key(
         backend=default_backend(),
@@ -60,8 +64,9 @@ def _write_docker_service_file(
     """
     Write a systemd unit for a Docker service.
 
-    service_file_path: The path to a file to write to.
-    storage_driver: The Docker storage driver to use.
+    Args:
+        service_file_path: The path to a file to write to.
+        storage_driver: The Docker storage driver to use.
     """
     storage_driver_name = {
         DockerStorageDriver.AUFS: 'aufs',
