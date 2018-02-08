@@ -9,9 +9,9 @@ from click.testing import CliRunner
 from cli import dcos_docker
 
 
-def test_invalid_artifact_path():
+def test_invalid_artifact_path() -> None:
     """
-    XXX
+    An error is shown if an invalid artifact path is given.
     """
     runner = CliRunner()
     result = runner.invoke(dcos_docker, ['create', '/not/a/path'])
@@ -23,7 +23,7 @@ def test_invalid_artifact_path():
     assert expected_error in result.output
 
 
-def test_create(oss_artifact: Path):
+def test_create(oss_artifact: Path) -> None:
     """
     XXX
     """

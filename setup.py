@@ -53,8 +53,8 @@ setup(
         'License :: OSI Approved :: Apache License 2.0',
     ],
     dependency_links=DEPENDENCY_LINKS,
-    entry_points='''
+    entry_points="""
         [console_scripts]
         dcos_docker=cli:dcos_docker
-    ''',
+    """,
 )

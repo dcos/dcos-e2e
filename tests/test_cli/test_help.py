@@ -3,6 +3,7 @@ XXX
 """
 
 from textwrap import dedent
+from typing import List
 
 import pytest
 from click.testing import CliRunner
@@ -14,9 +15,9 @@ from cli import dcos_docker
     [],
     ['--help'],
 ])
-def test_help(arguments):
+def test_help(arguments: List[str]) -> None:
     """
-    XXX
+    Help test is shown with `dcos_docker` and `dcos_docker --hlp`.
     """
     runner = CliRunner()
     result = runner.invoke(dcos_docker, arguments)
