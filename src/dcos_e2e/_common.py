@@ -62,10 +62,12 @@ def run_subprocess(
                         line.rstrip().decode('ascii', 'backslashreplace')
                     )
                     stdout += line
-                # Without this, `.poll()` will return None on some
-                # systems.
-                # See https://stackoverflow.com/a/33563376.
-                process.communicate()
+                # stderr/stdout are not readable anymore which usually means
+                # that the child process has exited. However, the child
+                # process has not been wait()ed for yet, i.e. it has not yet
+                # been reaped. That is, its exit status is unknown. Read its
+                # exit status.
+                process.wait()
             else:
                 stdout, stderr = process.communicate()
         except:  # noqa: B001 pragma: no cover
@@ -74,17 +76,16 @@ def run_subprocess(
             process.kill()
             process.wait()
             raise
-        retcode = process.poll()
         if stderr:
-            if retcode == 0:
+            if process.returncode == 0:
                 log = LOGGER.warning
                 log(repr(args))
             else:
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
                 log(line.rstrip().decode('ascii', 'backslashreplace'))
-        if retcode > 0:
+        if process.returncode != 0:
             raise CalledProcessError(
-                retcode, args, output=stdout, stderr=stderr
+                process.returncode, args, output=stdout, stderr=stderr
             )
-    return CompletedProcess(args, retcode, stdout, stderr)
+    return CompletedProcess(args, process.returncode, stdout, stderr)
