@@ -6,6 +6,7 @@ DC/OS E2E
    :caption: Contents:
 
    contributing
+   modules
 
 
 
