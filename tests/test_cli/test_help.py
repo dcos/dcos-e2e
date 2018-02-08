@@ -28,7 +28,7 @@ def test_help(arguments):
         """\
         Usage: dcos_docker [OPTIONS] COMMAND [ARGS]...
 
-
+          Manage DC/OS clusters on Docker.
 
         Options:
           --help  Show this message and exit.
