@@ -1,16 +1,13 @@
-
 """
 XXX
 """
 
-from pathlib import Path
 from textwrap import dedent
 
 import pytest
-
-import cli
-from cli import dcos_docker
 from click.testing import CliRunner
+
+from cli import dcos_docker
 
 
 @pytest.mark.parametrize('arguments', [

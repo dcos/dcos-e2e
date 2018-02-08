@@ -4,9 +4,9 @@ XXX
 
 from pathlib import Path
 
-import cli
-from cli import dcos_docker
 from click.testing import CliRunner
+
+from cli import dcos_docker
 
 
 def test_invalid_artifact_path():
