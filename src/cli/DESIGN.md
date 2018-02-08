@@ -51,6 +51,7 @@ Options:
   --extra-config
   --masters
   --agents
+  --public-agents
   --docker-storage-driver
   --docker-version
   --linux-distribution
@@ -59,6 +60,15 @@ Options:
 ```
 $ dcos-docker create /path/to/build/artifact.sh
 385171
+```
+
+```
+$ dcos-docker download-oss --pr 1235
+$ dcos-docker download-oss --master
+```
+
+```
+$ dcos-docker create /path/to/artifact.sh
 ```
 
 ### Destroy
