@@ -53,6 +53,7 @@ Options:
   --agents
   --docker-storage-driver
   --docker-version
+  --linux-distribution
 ```
 
 ```
