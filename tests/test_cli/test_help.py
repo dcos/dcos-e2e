@@ -32,6 +32,9 @@ def test_help(arguments):
 
         Options:
           --help  Show this message and exit.
+
+        Commands:
+          create  Create a DC/OS cluster.
         """
     )
     assert result.output == expected_help
