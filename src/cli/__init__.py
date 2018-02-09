@@ -25,6 +25,7 @@ _DOCKER_VERSIONS = {
     '1.11.2': DockerVersion.v1_11_2,
 }
 
+
 @click.group()
 def dcos_docker() -> None:
     """
@@ -47,6 +48,7 @@ def dcos_docker() -> None:
 def create(
     artifact: str,
     linux_distribution: str,
+    docker_version: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -56,7 +58,7 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     linux_distribution = _LINUX_DISTRIBUTIONS[linux_distribution]
-    docker_version = DockerVersion.v1_13_1
+    docker_version = _DOCKER_VERSIONS[docker_version]
     docker_storage_driver = None
     # If someone wants to see no output, they can pipe stdout/stderr somewhere
     log_output_live = True
