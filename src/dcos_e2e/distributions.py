@@ -3,7 +3,9 @@ Supported distributions for DC/OS.
 """
 
 from enum import Enum
+
 # TODO investigate auto() value
+
 
 class Distribution(Enum):
     """

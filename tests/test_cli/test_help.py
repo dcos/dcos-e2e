@@ -17,7 +17,7 @@ from cli import dcos_docker
 ])
 def test_help(arguments: List[str]) -> None:
     """
-    Help test is shown with `dcos_docker` and `dcos_docker --hlp`.
+    Help test is shown with `dcos_docker` and `dcos_docker --help`.
     """
     runner = CliRunner()
     result = runner.invoke(dcos_docker, arguments)

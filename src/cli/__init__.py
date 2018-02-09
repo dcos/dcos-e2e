@@ -54,6 +54,9 @@ def create(
     # TODO this should also control Docker logs
     log_output_live = not suppress_output
     extra_config = {}  # type: Dict[str, Any]
+    masters = 1
+    agents = 1
+    public_agents = 1
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
@@ -66,9 +69,9 @@ def create(
 
     cluster = Cluster(
         cluster_backend=cluster_backend,
-        masters=1,
-        agents=1,
-        public_agents=1,
+        masters=masters,
+        agents=agents,
+        public_agents=public_agents,
     )
 
     cluster.install_dcos_from_path(
