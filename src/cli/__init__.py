@@ -21,6 +21,8 @@ _LINUX_DISTRIBUTIONS = {
 }
 
 _DOCKER_VERSIONS = {
+    '1.13.1': DockerVersion.v1_13_1,
+    '1.11.2': DockerVersion.v1_11_2,
 }
 
 @click.group()
