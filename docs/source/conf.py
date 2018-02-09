@@ -5,6 +5,7 @@
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinxcontrib.napoleon',
     'sphinx_autodoc_napoleon_typehints',
 ]
 
