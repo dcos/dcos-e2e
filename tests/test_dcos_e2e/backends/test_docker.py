@@ -307,12 +307,12 @@ class TestDockerVersion:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            docker_version = self._get_docker_version(
+            node_docker_version = self._get_docker_version(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert docker_version == docker_version
+        assert node_docker_version == docker_version
 
 
 class TestDockerStorageDriver:
