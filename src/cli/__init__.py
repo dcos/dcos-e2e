@@ -4,6 +4,7 @@
 
 import re
 from pathlib import Path
+from subprocess import CalledProcessError
 from typing import Any, Dict  # noqa: F401
 from typing import Optional, Union
 import logging
@@ -131,7 +132,7 @@ def create(
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     cluster_id = uuid.uuid4().hex
 
-    logging.disable(logging.ERROR)
+    logging.disable(logging.WARNING)
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
@@ -151,13 +152,14 @@ def create(
         public_agents=num_public_agents,
     )
 
-    cluster.install_dcos_from_path(
-        build_artifact=Path(artifact),
-        extra_config=extra_config,
-        # If someone wants to see no output, they can redirect stdout and
-        # stderr.
-        log_output_live=True,
-    )
+    try:
+        cluster.install_dcos_from_path(
+            build_artifact=Path(artifact),
+            extra_config=extra_config,
+        )
+    except CalledProcessError as exc:
+        cluster.destroy()
+        return
 
     click.echo(cluster_id)
 
