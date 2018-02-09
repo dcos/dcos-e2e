@@ -2,10 +2,10 @@
 
 """
 
-import click
-
 from pathlib import Path
 from typing import Any, Dict  # noqa: F401
+
+import click
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -20,6 +20,8 @@ _LINUX_DISTRIBUTIONS = {
     'debian-8': Distribution.DEBIAN_8,
 }
 
+_DOCKER_VERSIONS = {
+}
 
 @click.group()
 def dcos_docker() -> None:
@@ -35,9 +37,13 @@ def dcos_docker() -> None:
     type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
     default='centos-7',
 )
+@click.option(
+    '--docker-version',
+    type=click.Choice(_DOCKER_VERSIONS.keys()),
+    default='1.13.1',
+)
 def create(
     artifact: str,
-    suppress_output: bool,
     linux_distribution: str,
 ) -> None:
     """
