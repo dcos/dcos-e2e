@@ -112,6 +112,7 @@ $ dcos-docker inspect 151531
 ... also ship a generic run-master as a command
 ```
 
-### Ideas
+### Enterprise ideas
 
-Some way to synt
+License parameter?
+Sync different integration tests?
