@@ -54,6 +54,7 @@ Get a DC/OS Enterprise artifact from...
 
 Options:
   --extra-config
+  # Also mount options, look like Docker -v
   --masters
   --agents
   --public-agents

@@ -31,8 +31,14 @@ def dcos_docker() -> None:
 @dcos_docker.command('create')
 @click.argument('artifact', type=click.Path(exists=True))
 @click.option('--suppress-output', is_flag=True, help='')
-@click.option('--linux-distribution', type=click.Choice(_LINUX_DISTRIBUTIONS.keys()))
-def create(artifact: str, suppress_output: bool) -> None:
+@click.option(
+    '--linux-distribution',
+    type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
+    default='centos-7',
+)
+def create(
+    artifact: str, suppress_output: bool, linux_distribution: str
+) -> None:
     """
     Create a DC/OS cluster.
     """
