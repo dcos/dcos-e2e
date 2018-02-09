@@ -36,14 +36,16 @@ def dcos_docker() -> None:
 @dcos_docker.command('create')
 @click.argument('artifact', type=click.Path(exists=True))
 @click.option(
-    '--linux-distribution',
-    type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
-    default='centos-7',
-)
-@click.option(
     '--docker-version',
     type=click.Choice(_DOCKER_VERSIONS.keys()),
     default='1.13.1',
+    show_default=True,
+)
+@click.option(
+    '--linux-distribution',
+    type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
+    default='centos-7',
+    show_default=True,
 )
 def create(
     artifact: str,

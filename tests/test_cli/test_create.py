@@ -27,7 +27,10 @@ class TestHelp:
               Create a DC/OS cluster.
 
             Options:
+              --docker-version [1.13.1|1.11.2]
+                                              [default: 1.13.1]
               --linux-distribution [centos-7|ubuntu-16.04|coreos|fedora-23|debian-8]
+                                              [default: centos-7]
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )
