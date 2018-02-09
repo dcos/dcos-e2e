@@ -154,6 +154,7 @@ class Docker(ClusterBackend):
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
+        docker_container_labels: Optional[Dict[str, str]],
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -176,6 +177,9 @@ class Docker(ClusterBackend):
                 cluster nodes. By default, this is the host's storage driver.
                 If this is not one of `aufs`, `overlay` or `overlay2`, `aufs`
                 is used.
+            docker_container_labels: XXX Docker labels like
+                `labels` in http://docker-py.readthedocs.io/en/stable/containers.html
+                (Dict only)
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -190,6 +194,9 @@ class Docker(ClusterBackend):
             docker_version: The Docker version to install on the cluster nodes.
             docker_storage_driver: The storage driver to use for Docker on the
                 cluster nodes.
+            docker_container_labels: XXX Docker labels like
+                `labels` in http://docker-py.readthedocs.io/en/stable/containers.html
+                (Dict only)
 
         Raises:
             NotImplementedError: The `linux_distribution` is not supported by
@@ -210,6 +217,7 @@ class Docker(ClusterBackend):
         self.linux_distribution = linux_distribution
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver
+        self.docker_container_labels = docker_container_labels or {}
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -447,6 +455,7 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
+                labels=cluster_backend.docker_container_labels,
             )
 
         for agent_number in range(1, agents + 1):
@@ -477,6 +486,7 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
+                labels=cluster_backend.docker_container_labels,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -507,6 +517,7 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
+                labels=cluster_backend.docker_container_labels,
             )
 
         # Logically a SSH user should be part of a `Node`.
@@ -637,6 +648,7 @@ class DockerCluster(ClusterManager):
         dcos_num_masters: int,
         dcos_num_agents: int,
         docker_image: str,
+        labels: Dict[str, str],
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -657,6 +669,7 @@ class DockerCluster(ClusterManager):
             dcos_num_agents: The number of agent nodes (agent and public
                 agents) expected to be in the cluster once it has been created.
             docker_image: The name of the Docker image to use.
+            labels: XXX
         """
         registry_host = 'registry.local'
         if self.masters:
@@ -684,6 +697,7 @@ class DockerCluster(ClusterManager):
             image=docker_image,
             volumes=volumes,
             tmpfs=tmpfs,
+            labels=labels,
         )
 
         disable_systemd_support_cmd = (

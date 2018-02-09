@@ -53,6 +53,8 @@ Get a DC/OS OSS artifact from...
 Get a DC/OS Enterprise artifact from...
 
 Options:
+  # Should also take optional name, to replace cluster ID
+  # Must be unique (validation)
   --extra-config
   # Also mount options, look like Docker -v
   --masters

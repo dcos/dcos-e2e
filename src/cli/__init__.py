@@ -6,6 +6,8 @@ import re
 from pathlib import Path
 from typing import Any, Dict  # noqa: F401
 from typing import Optional, Union
+import logging
+import uuid
 
 import click
 import yaml
@@ -127,16 +129,10 @@ def create(
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
-    # dcos-checkout
-    # TODO take a name for the cluster? Watch out for conflicts
-    # TODO help texts for all
-    import logging
-    logging.disable(logging.ERROR)
-    # logger = logging.getLogger()
-    # logger.disabled = True
+    cluster_id = uuid.uuid4().hex
 
-    # with contextlib.redirect_stdout(f):
-    #     with contextlib.redirect_stderr(f2):
+    logging.disable(logging.ERROR)
+
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
         custom_agent_mounts=custom_agent_mounts,
@@ -144,6 +140,9 @@ def create(
         linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
         docker_version=_DOCKER_VERSIONS[docker_version],
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
+        docker_container_labels={
+            'dcos_e2e.cluster_id': cluster_id,
+        },
     )
     cluster = Cluster(
         cluster_backend=cluster_backend,
