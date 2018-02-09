@@ -130,7 +130,13 @@ def create(
     # dcos-checkout
     # TODO take a name for the cluster? Watch out for conflicts
     # TODO help texts for all
+    import logging
+    logging.disable(logging.ERROR)
+    # logger = logging.getLogger()
+    # logger.disabled = True
 
+    # with contextlib.redirect_stdout(f):
+    #     with contextlib.redirect_stderr(f2):
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
         custom_agent_mounts=custom_agent_mounts,
@@ -139,7 +145,6 @@ def create(
         docker_version=_DOCKER_VERSIONS[docker_version],
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
     )
-
     cluster = Cluster(
         cluster_backend=cluster_backend,
         masters=num_masters,
@@ -160,8 +165,10 @@ def create(
         str(random_master.public_ip_address)
     ]
 
-    matches = re.search('^dcos-e2e-(.*)-master-\d+$', container.name)
+    matches = re.search('^dcos-e2e-(?P<cluster_id>.*)-master-\d+$', container.name)
     cluster_id = matches.group('cluster_id')
+    click.echo("HELLO")
+    return
 
     cluster.install_dcos_from_path(
         build_artifact=Path(artifact),
