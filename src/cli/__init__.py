@@ -30,7 +30,6 @@ def dcos_docker() -> None:
 
 @dcos_docker.command('create')
 @click.argument('artifact', type=click.Path(exists=True))
-@click.option('--suppress-output', is_flag=True, help='')
 @click.option(
     '--linux-distribution',
     type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
@@ -51,8 +50,8 @@ def create(
     linux_distribution = _LINUX_DISTRIBUTIONS[linux_distribution]
     docker_version = DockerVersion.v1_13_1
     docker_storage_driver = None
-    # TODO this should also control Docker logs
-    log_output_live = not suppress_output
+    # If someone wants to see no output, they can pipe stdout/stderr somewhere
+    log_output_live = True
     extra_config = {}  # type: Dict[str, Any]
     masters = 1
     agents = 1

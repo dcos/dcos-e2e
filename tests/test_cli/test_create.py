@@ -27,11 +27,8 @@ class TestHelp:
 
             Options:
               --linux-distribution [centos-7|ubuntu-16.04|coreos|fedora-23|debian-8]
-              --help  Show this message and exit.
-
-            Commands:
-              create  Create a DC/OS cluster.
-            """# noqa: E501
+              --help                          Show this message and exit.
+            """# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
