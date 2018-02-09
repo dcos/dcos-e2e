@@ -39,6 +39,8 @@ _DOCKER_STORAGE_DRIVERS = {
     'overlay2': DockerStorageDriver.OVERLAY_2,
 }
 
+_CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
+
 
 def _validate_dcos_configuration(
     ctx: click.core.Context,
@@ -141,9 +143,7 @@ def create(
         linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
         docker_version=_DOCKER_VERSIONS[docker_version],
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
-        docker_container_labels={
-            'dcos_e2e.cluster_id': cluster_id,
-        },
+        docker_container_labels={_CLUSTER_ID_LABEL_KEY: cluster_id},
     )
 
     cluster = Cluster(
@@ -166,16 +166,17 @@ def create(
 
 
 @dcos_docker.command('list')
-# TODO quiet vs verbose
-def list():
+def list_clusters() -> None:
     logging.disable(logging.WARNING)
     client = docker.from_env(version='auto')
-    filters = {'label': 'dcos_e2e.cluster_id'}
+    filters = {'label': _CLUSTER_ID_LABEL_KEY}
     containers = client.containers.list(filters=filters)
-    # TODO constant for dcos_e2e.cluster_id
-    cluster_ids = set([container.labels['dcos_e2e.cluster_id'] for container in containers])
+    cluster_ids = set(
+        [container.labels[_CLUSTER_ID_LABEL_KEY] for container in containers]
+    )
     for cluster_id in cluster_ids:
         click.echo(cluster_id)
+
 
 if __name__ == '__main__':
     dcos_docker()
