@@ -55,7 +55,7 @@ Get a DC/OS Enterprise artifact from...
 Options:
   # Should also take optional name, to replace cluster ID
   # Must be unique (validation)
-  --extra-config
+  --extra-config (string or file)
   # Also mount options, look like Docker -v
   --masters
   --agents
@@ -86,7 +86,7 @@ $ dcos-docker create /path/to/artifact.sh
 $ dcos-docker destroy 385171 291288
 385171
 291288
-$ dcos-docker destroy --all
+$ dcos-docker destroy $(dcos-docker list)
 928932
 ```
 
@@ -124,3 +124,15 @@ Sync different integration tests?
 
 A command which basically does `./run-master`.
 
+## Misc ideas
+
+sphinx-click for docs
+document contributing = make -C html
+SSH key location in a label
+sphinx-autodoc-napoleon-typehints
+flake8-rst-docstrings
+Single generated file in Wiki
+
+dcos-docker run 213143 pytest
+
+Label for inspect = bash -> EE?? + version
