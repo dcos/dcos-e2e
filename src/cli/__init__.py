@@ -37,7 +37,9 @@ def dcos_docker() -> None:
     default='centos-7',
 )
 def create(
-    artifact: str, suppress_output: bool, linux_distribution: str
+    artifact: str,
+    suppress_output: bool,
+    linux_distribution: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -46,7 +48,7 @@ def create(
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
-    linux_distribution = Distribution.COREOS
+    linux_distribution = _LINUX_DISTRIBUTIONS[linux_distribution]
     docker_version = DockerVersion.v1_13_1
     docker_storage_driver = None
     # TODO this should also control Docker logs
