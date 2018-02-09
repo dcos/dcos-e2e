@@ -3,6 +3,7 @@ XXX
 """
 
 from textwrap import dedent
+from pathlib import Path
 
 from click.testing import CliRunner
 
@@ -32,10 +33,11 @@ class TestHelp:
               --linux-distribution [centos-7|ubuntu-16.04|coreos|fedora-23|debian-8]
                                               foo  [default: centos-7]
               --docker-storage-driver [aufs|overlay|overlay2]
-                                              by default uses host driver
+                                                by default uses host driver
               --num-masters INTEGER           [default: 1]
               --num-agents INTEGER            [default: 1]
               --num-public-agents INTEGER     [default: 1]
+              --extra-config TEXT
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )
@@ -60,6 +62,29 @@ class TestNoOptions:
             'Path "/not/a/path" does not exist.'
         )
         assert expected_error in result.output
+
+
+class TestExtraConfig:
+    def test_invalid_yaml(self, oss_artifact: Path):
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--extra-config',
+                '@',
+            ],
+        )
+        assert result.exit_code == 2
+        expected_message = dedent(
+           """\
+           Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+           Error: Invalid value for "--extra-config": "@" is not valid YAML
+           """
+        )
+        assert result.output == expected_message
 
     # def test_create(oss_artifact: Path) -> None:
     #     """
