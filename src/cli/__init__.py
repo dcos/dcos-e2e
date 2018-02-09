@@ -7,6 +7,7 @@ from typing import Any, Dict  # noqa: F401
 from typing import Optional
 
 import click
+import yaml
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -33,11 +34,21 @@ _DOCKER_STORAGE_DRIVERS = {
     'overlay2': DockerStorageDriver.OVERLAY_2,
 }
 
-def _validate_yaml(ctx, param, value) -> None:
+
+def _validate_yaml(
+    ctx: click.core.Context,
+    param: click.core.Option,
+    value: str,
+) -> None:
     """
     XXX
     """
-    raise click.BadParameter(message='a')
+    try:
+        yaml.load(value)
+    except Exception as exc:
+        message = '"{value}" is not valid YAML'.format(value=value)
+        raise click.BadParameter(message=message)
+
 
 @click.group()
 def dcos_docker() -> None:
