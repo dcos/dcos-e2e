@@ -2,11 +2,10 @@
 
 """
 
-import re
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict  # noqa: F401
-from typing import Optional, Union
+from typing import Union
 import logging
 import uuid
 

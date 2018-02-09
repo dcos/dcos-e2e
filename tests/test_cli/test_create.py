@@ -2,8 +2,8 @@
 XXX
 """
 
-from textwrap import dedent
 from pathlib import Path
+from textwrap import dedent
 
 from click.testing import CliRunner
 
@@ -65,7 +65,7 @@ class TestNoOptions:
 
 
 class TestExtraConfig:
-    def test_invalid_yaml(self, oss_artifact: Path):
+    def test_invalid_yaml(self, oss_artifact: Path) -> None:
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -78,7 +78,7 @@ class TestExtraConfig:
         )
         assert result.exit_code == 2
         expected_message = dedent(
-           """\
+            """\
            Usage: dcos_docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "@" is not valid YAML
@@ -106,23 +106,7 @@ class TestExtraConfig:
            Usage: dcos_docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "some_key" is not a valid DC/OS configuration
-           """  # noqa: E501
+            """# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_message
-
-    # def test_create(oss_artifact: Path) -> None:
-    #     """
-    #     XXX
-    #     """
-    #     runner = CliRunner()
-    #     result = runner.invoke(dcos_docker, ['create', str(oss_artifact)])
-    #     assert result.exit_code == 0
-    #     assert result.output == ''
-    #     'create --masters=3'
-    #     assert num_masters=3
-
-
-class TestList:
-    def test_list(self):
-        pass
