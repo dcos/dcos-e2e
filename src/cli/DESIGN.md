@@ -60,6 +60,7 @@ Options:
   --docker-storage-driver
   --docker-version
   --linux-distribution
+  --dcos-checkout (syncs bootstrap / tests)
 ```
 
 ```
