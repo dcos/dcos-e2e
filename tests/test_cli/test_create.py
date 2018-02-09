@@ -86,7 +86,7 @@ class TestExtraConfig:
         )
         assert result.output == expected_message
 
-    def test_not_key_value(self, oss_artifact: Path):
+    def test_not_key_value(self, oss_artifact: Path) -> None:
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -98,13 +98,17 @@ class TestExtraConfig:
             ],
         )
         assert result.exit_code == 2
+        # yapf breaks multiline noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_message = dedent(
            """\
            Usage: dcos_docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "some_key" is not a valid DC/OS configuration
-           """
+           """  # noqa: E501
         )
+        # yapf: enable
         assert result.output == expected_message
 
     # def test_create(oss_artifact: Path) -> None:
