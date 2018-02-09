@@ -115,8 +115,10 @@ $ dcos-docker inspect 151531
 ### Enterprise ideas
 
 License parameter?
+Handle custom CA cert?
 Sync different integration tests?
 
 ### Run command
 
 A command which basically does `./run-master`.
+

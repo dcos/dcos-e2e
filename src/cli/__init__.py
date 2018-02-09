@@ -33,6 +33,11 @@ _DOCKER_STORAGE_DRIVERS = {
     'overlay2': DockerStorageDriver.OVERLAY_2,
 }
 
+def _validate_yaml(ctx, param, value) -> None:
+    """
+    XXX
+    """
+    raise click.BadParameter(message='a')
 
 @click.group()
 def dcos_docker() -> None:
@@ -82,6 +87,11 @@ def dcos_docker() -> None:
     default=1,
     show_default=True,
 )
+@click.option(
+    '--extra-config',
+    type=str,
+    callback=_validate_yaml,
+)
 def create(
     artifact: str,
     linux_distribution: str,
@@ -90,6 +100,7 @@ def create(
     num_agents: int,
     num_public_agents: int,
     docker_storage_driver: str,
+    extra_config: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -97,6 +108,7 @@ def create(
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
+    # Load extra conf, error if no YAML
     extra_config = {}  # type: Dict[str, Any]
 
     cluster_backend = Docker(
