@@ -22,7 +22,8 @@ def dcos_docker() -> None:
 
 @dcos_docker.command('create')
 @click.argument('artifact', type=click.Path(exists=True))
-def create(artifact: str) -> None:
+@click.option('--suppress-output', is_flag=True, help='')
+def create(artifact: str, suppress_output: bool) -> None:
     """
     Create a DC/OS cluster.
     """
@@ -33,7 +34,8 @@ def create(artifact: str) -> None:
     linux_distribution = Distribution.COREOS
     docker_version = DockerVersion.v1_13_1
     docker_storage_driver = None
-    log_output_live = True
+    # TODO this should also control Docker logs
+    log_output_live = not suppress_output
     extra_config = {}  # type: Dict[str, Any]
 
     cluster_backend = Docker(

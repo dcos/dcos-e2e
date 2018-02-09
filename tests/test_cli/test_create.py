@@ -37,3 +37,4 @@ class TestNoOptions:
         assert result.output == ''
         'create --masters=3'
         assert num_masters=3
+
