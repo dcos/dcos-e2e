@@ -47,4 +47,5 @@ xfail
 sso
 oauth
 whitespace
+yapf
 zookeeper

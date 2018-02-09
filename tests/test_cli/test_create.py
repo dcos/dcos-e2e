@@ -17,7 +17,8 @@ class TestHelp:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['create', '--help'])
         assert result.exit_code == 0
-        # yapf breaks multiline noqa
+        # yapf breaks multiline noqa, see
+        # https://github.com/google/yapf/issues/524.
         # yapf: disable
         expected_help = dedent(
             """\
