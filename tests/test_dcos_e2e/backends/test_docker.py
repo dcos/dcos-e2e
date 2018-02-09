@@ -267,7 +267,7 @@ class TestDockerVersion:
         )
         docker_versions = {
             '1.13.1': DockerVersion.v1_13_1,
-            '1.11.2': DockerVersion.v1_13_1,
+            '1.11.2': DockerVersion.v1_11_2,
         }
 
         return docker_versions[result.stdout.decode().strip()]
@@ -307,12 +307,12 @@ class TestDockerVersion:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            docker_version = self._get_docker_version(
+            node_docker_version = self._get_docker_version(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert docker_version == docker_version
+        assert docker_version == node_docker_version
 
 
 class TestDockerStorageDriver:
