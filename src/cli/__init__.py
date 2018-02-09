@@ -2,12 +2,14 @@
 
 """
 
+import re
 from pathlib import Path
 from typing import Any, Dict  # noqa: F401
 from typing import Optional, Union
 
 import click
 import yaml
+import docker
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -126,6 +128,8 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     # dcos-checkout
+    # TODO take a name for the cluster? Watch out for conflicts
+    # TODO help texts for all
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
@@ -142,6 +146,22 @@ def create(
         agents=num_agents,
         public_agents=num_public_agents,
     )
+
+    random_master = next(iter(cluster.masters))
+    # Get the Docker container with the same IP as random_master.public_ip
+    # From that, get the UUID from the name of the container
+    # print the uuid
+    client = docker.from_env(version='auto')
+    filters = {'name': 'dcos-e2e'}
+    containers = client.containers.list(filters=filters)
+    [container] = [
+        container for container in containers if
+        container.attrs['NetworkSettings']['IPAddress'] ==
+        str(random_master.public_ip_address)
+    ]
+
+    matches = re.search('^dcos-e2e-(.*)-master-\d+$', container.name)
+    cluster_id = matches.group('cluster_id')
 
     cluster.install_dcos_from_path(
         build_artifact=Path(artifact),

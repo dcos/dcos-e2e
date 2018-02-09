@@ -121,3 +121,8 @@ class TestExtraConfig:
     #     assert result.output == ''
     #     'create --masters=3'
     #     assert num_masters=3
+
+
+class TestList:
+    def test_list(self):
+        pass
