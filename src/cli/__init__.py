@@ -1,5 +1,5 @@
 """
-
+XXX
 """
 
 from pathlib import Path
@@ -50,7 +50,7 @@ def _validate_dcos_configuration(
     XXX
     """
     try:
-        return dict(yaml.load(value) or {})
+        return dict(yaml.load(str(value)) or {})
     except ValueError:
         message = '"{value}" is not a valid DC/OS configuration'.format(
             value=value,
@@ -166,6 +166,9 @@ def create(
 
 @dcos_docker.command('list')
 def list_clusters() -> None:
+    """
+    XXX
+    """
     logging.disable(logging.WARNING)
     client = docker.from_env(version='auto')
     filters = {'label': _CLUSTER_ID_LABEL_KEY}
