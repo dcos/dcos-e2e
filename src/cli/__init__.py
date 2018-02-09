@@ -12,6 +12,14 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_versions import DockerVersion
 
+_LINUX_DISTRIBUTIONS = {
+    'centos-7': Distribution.CENTOS_7,
+    'ubuntu-16.04': Distribution.UBUNTU_16_04,
+    'coreos': Distribution.COREOS,
+    'fedora-23': Distribution.FEDORA_23,
+    'debian-8': Distribution.DEBIAN_8,
+}
+
 
 @click.group()
 def dcos_docker() -> None:
@@ -23,6 +31,7 @@ def dcos_docker() -> None:
 @dcos_docker.command('create')
 @click.argument('artifact', type=click.Path(exists=True))
 @click.option('--suppress-output', is_flag=True, help='')
+@click.option('--linux-distribution', type=click.Choice(_LINUX_DISTRIBUTIONS.keys()))
 def create(artifact: str, suppress_output: bool) -> None:
     """
     Create a DC/OS cluster.
