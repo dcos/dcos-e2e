@@ -4,6 +4,7 @@
 
 from pathlib import Path
 from typing import Any, Dict  # noqa: F401
+from typing import Optional
 
 import click
 
@@ -11,6 +12,7 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_versions import DockerVersion
+from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 
 _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -23,6 +25,12 @@ _LINUX_DISTRIBUTIONS = {
 _DOCKER_VERSIONS = {
     '1.13.1': DockerVersion.v1_13_1,
     '1.11.2': DockerVersion.v1_11_2,
+}
+
+_DOCKER_STORAGE_DRIVERS = {
+    'aufs': DockerStorageDriver.AUFS,
+    'overlay': DockerStorageDriver.OVERLAY,
+    'overlay2': DockerStorageDriver.OVERLAY_2,
 }
 
 
@@ -52,8 +60,9 @@ def dcos_docker() -> None:
 @click.option(
     '--docker-storage-driver',
     type=click.Choice(_DOCKER_STORAGE_DRIVERS.keys()),
-    default=_DOCKER_STORAGE_DRIVERS[_get_host_storage_driver()],
-    show_default=True,
+    default=None,
+    show_default=False,
+    help='by default uses host driver',
 )
 @click.option(
     '--num-masters',
@@ -80,6 +89,7 @@ def create(
     num_masters: int,
     num_agents: int,
     num_public_agents: int,
+    docker_storage_driver: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -87,7 +97,6 @@ def create(
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
-    docker_storage_driver = None
     extra_config = {}  # type: Dict[str, Any]
 
     cluster_backend = Docker(
@@ -96,7 +105,7 @@ def create(
         custom_public_agent_mounts=custom_public_agent_mounts,
         linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
         docker_version=_DOCKER_VERSIONS[docker_version],
-        storage_driver=docker_storage_driver,
+        storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
     )
 
     cluster = Cluster(

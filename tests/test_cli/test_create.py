@@ -28,9 +28,11 @@ class TestHelp:
 
             Options:
               --docker-version [1.13.1|1.11.2]
-                                              [default: 1.13.1]
+                                              foo  [default: 1.13.1]
               --linux-distribution [centos-7|ubuntu-16.04|coreos|fedora-23|debian-8]
-                                              [default: centos-7]
+                                              foo  [default: centos-7]
+              --docker-storage-driver [aufs|overlay|overlay2]
+                                              by default uses host driver
               --num-masters INTEGER           [default: 1]
               --num-agents INTEGER            [default: 1]
               --num-public-agents INTEGER     [default: 1]
