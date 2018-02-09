@@ -145,6 +145,7 @@ def create(
             'dcos_e2e.cluster_id': cluster_id,
         },
     )
+
     cluster = Cluster(
         cluster_backend=cluster_backend,
         masters=num_masters,
@@ -163,6 +164,18 @@ def create(
 
     click.echo(cluster_id)
 
+
+@dcos_docker.command('list')
+# TODO quiet vs verbose
+def list():
+    logging.disable(logging.WARNING)
+    client = docker.from_env(version='auto')
+    filters = {'label': 'dcos_e2e.cluster_id'}
+    containers = client.containers.list(filters=filters)
+    # TODO constant for dcos_e2e.cluster_id
+    cluster_ids = set([container.labels['dcos_e2e.cluster_id'] for container in containers])
+    for cluster_id in cluster_ids:
+        click.echo(cluster_id)
 
 if __name__ == '__main__':
     dcos_docker()
