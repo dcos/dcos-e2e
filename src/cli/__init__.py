@@ -4,7 +4,7 @@
 
 from pathlib import Path
 from typing import Any, Dict  # noqa: F401
-from typing import Optional
+from typing import Optional, Union
 
 import click
 import yaml
@@ -37,8 +37,8 @@ _DOCKER_STORAGE_DRIVERS = {
 
 def _validate_dcos_configuration(
     ctx: click.core.Context,
-    param: click.core.Option,
-    value: str,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Union[int, bool, str],
 ) -> Dict[str, Any]:
     """
     XXX
@@ -125,8 +125,7 @@ def create(
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
-    # Load extra conf, error if no YAML
-    import pdb; pdb.set_trace()
+    # dcos-checkout
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
