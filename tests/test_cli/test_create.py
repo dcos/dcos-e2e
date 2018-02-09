@@ -31,6 +31,9 @@ class TestHelp:
                                               [default: 1.13.1]
               --linux-distribution [centos-7|ubuntu-16.04|coreos|fedora-23|debian-8]
                                               [default: centos-7]
+              --num-masters INTEGER           [default: 1]
+              --num-agents INTEGER            [default: 1]
+              --num-public-agents INTEGER     [default: 1]
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )

@@ -116,3 +116,7 @@ $ dcos-docker inspect 151531
 
 License parameter?
 Sync different integration tests?
+
+### Run command
+
+A command which basically does `./run-master`.
