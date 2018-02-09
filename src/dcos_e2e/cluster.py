@@ -256,7 +256,7 @@ class Cluster(ContextDecorator):
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public_agent ``Node``s.
+        Return all DC/OS public_agent :class:`.node.Node` s.
         """
         return self._cluster.public_agents
 
@@ -333,11 +333,11 @@ class Cluster(ContextDecorator):
         Args:
             pytest_command: The ``pytest`` command to run on the node.
             env: Environment variables to be set on the node before running
-                the `pytest_command`. On enterprise
-                clusters, `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW` must be set.
-            log_output_live: If `True`, log output of the `pytest_command`
-                live. If `True`, stderr is merged into stdout in the return
-                value.
+                the `pytest_command`. On enterprise clusters,
+                ``DCOS_LOGIN_UNAME`` and ``DCOS_LOGIN_PW`` must be set.
+            log_output_live: If ``True``, log output of the ``pytest_command``
+                live. If ``True``, ``stderr`` is merged into ``stdout`` in the
+                return value.
 
         Returns:
             The result of the ``pytest`` command.
