@@ -151,24 +151,6 @@ def create(
         public_agents=num_public_agents,
     )
 
-    random_master = next(iter(cluster.masters))
-    # Get the Docker container with the same IP as random_master.public_ip
-    # From that, get the UUID from the name of the container
-    # print the uuid
-    client = docker.from_env(version='auto')
-    filters = {'name': 'dcos-e2e'}
-    containers = client.containers.list(filters=filters)
-    [container] = [
-        container for container in containers if
-        container.attrs['NetworkSettings']['IPAddress'] ==
-        str(random_master.public_ip_address)
-    ]
-
-    matches = re.search('^dcos-e2e-(?P<cluster_id>.*)-master-\d+$', container.name)
-    cluster_id = matches.group('cluster_id')
-    click.echo("HELLO")
-    return
-
     cluster.install_dcos_from_path(
         build_artifact=Path(artifact),
         extra_config=extra_config,
@@ -176,6 +158,8 @@ def create(
         # stderr.
         log_output_live=True,
     )
+
+    click.echo(cluster_id)
 
 
 if __name__ == '__main__':
