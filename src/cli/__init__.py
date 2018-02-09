@@ -35,19 +35,24 @@ _DOCKER_STORAGE_DRIVERS = {
 }
 
 
-def _validate_yaml(
+def _validate_dcos_configuration(
     ctx: click.core.Context,
     param: click.core.Option,
     value: str,
-) -> None:
+) -> Dict[str, Any]:
     """
     XXX
     """
     try:
-        yaml.load(value)
+        return dict(yaml.load(value) or {})
+    except ValueError:
+        message = '"{value}" is not a valid DC/OS configuration'.format(
+            value=value,
+        )
     except Exception as exc:
         message = '"{value}" is not valid YAML'.format(value=value)
-        raise click.BadParameter(message=message)
+
+    raise click.BadParameter(message=message)
 
 
 @click.group()
@@ -101,7 +106,8 @@ def dcos_docker() -> None:
 @click.option(
     '--extra-config',
     type=str,
-    callback=_validate_yaml,
+    default='{}',
+    callback=_validate_dcos_configuration,
 )
 def create(
     artifact: str,
@@ -111,7 +117,7 @@ def create(
     num_agents: int,
     num_public_agents: int,
     docker_storage_driver: str,
-    extra_config: str,
+    extra_config: Dict[str, Any],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -120,7 +126,7 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     # Load extra conf, error if no YAML
-    extra_config = {}  # type: Dict[str, Any]
+    import pdb; pdb.set_trace()
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,

@@ -33,7 +33,7 @@ class TestHelp:
               --linux-distribution [centos-7|ubuntu-16.04|coreos|fedora-23|debian-8]
                                               foo  [default: centos-7]
               --docker-storage-driver [aufs|overlay|overlay2]
-                                                by default uses host driver
+                                              by default uses host driver
               --num-masters INTEGER           [default: 1]
               --num-agents INTEGER            [default: 1]
               --num-public-agents INTEGER     [default: 1]
@@ -82,6 +82,27 @@ class TestExtraConfig:
            Usage: dcos_docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "@" is not valid YAML
+           """
+        )
+        assert result.output == expected_message
+
+    def test_not_key_value(self, oss_artifact: Path):
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--extra-config',
+                'some_key',
+            ],
+        )
+        assert result.exit_code == 2
+        expected_message = dedent(
+           """\
+           Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+           Error: Invalid value for "--extra-config": "some_key" is not a valid DC/OS configuration
            """
         )
         assert result.output == expected_message
