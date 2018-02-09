@@ -40,11 +40,19 @@ def dcos_docker() -> None:
     type=click.Choice(_DOCKER_VERSIONS.keys()),
     default='1.13.1',
     show_default=True,
+    help='foo',
 )
 @click.option(
     '--linux-distribution',
     type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
     default='centos-7',
+    show_default=True,
+    help='foo',
+)
+@click.option(
+    '--docker-storage-driver',
+    type=click.Choice(_DOCKER_STORAGE_DRIVERS.keys()),
+    default=_DOCKER_STORAGE_DRIVERS[_get_host_storage_driver()],
     show_default=True,
 )
 @click.option(
