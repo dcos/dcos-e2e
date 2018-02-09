@@ -154,7 +154,7 @@ class Docker(ClusterBackend):
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
-        docker_container_labels: Optional[Dict[str, str]],
+        docker_container_labels: Optional[Dict[str, str]] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
