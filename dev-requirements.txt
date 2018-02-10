@@ -1,6 +1,7 @@
 autoflake==1.1
 check-manifest==0.36
 dcoscli==0.5.7
+doc8==0.8.0
 flake8==3.5.0
 flake8-quotes==0.13.0
 isort==4.3.3
