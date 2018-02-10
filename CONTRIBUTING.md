@@ -235,22 +235,16 @@ git fetch origin
 git checkout -b release-$DCOS_E2E_RELEASE origin/master
 ```
 
-3. Add changes in the new release to `CHANGELOG.md`.
+3. Add changes in the new release to `CHANGELOG.rst`.
 
 Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
 If this is the only change, add an empty entry to the changelog.
 
-4. Update the changelog Table of Contents.
-
-```sh
-make toc
-```
-
-5. Bump the version of the software.
+4. Bump the version of the software.
 
 Change `VERSION` in `setup.py`.
 
-6. Commit and push changes.
+5. Commit and push changes.
 
 ```sh
 git commit -am "Bump version"
