@@ -98,13 +98,13 @@ See `CONTRIBUTING.rst`_ for details on how to contribute to this repository.
 Required Environment
 --------------------
 
-See `BACKENDS.md`_ for details on requirements for launching clusters with each backend.
+See `BACKENDS.rst`_ for details on requirements for launching clusters with each backend.
 
 Cleaning Up and Troubleshooting
 -------------------------------
 
 Some backends leave junk around, especially when tests are cancelled.
-See `BACKENDS.md`_ for specifics of dealing with particular backends.
+See `BACKENDS.rst`_ for specifics of dealing with particular backends.
 
 .. |Build Status| image:: https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/mesosphere/dcos-e2e
@@ -113,5 +113,5 @@ See `BACKENDS.md`_ for specifics of dealing with particular backends.
 .. |Updates| image:: https://pyup.io/repos/github/mesosphere/dcos-e2e/shield.svg
    :target: https://pyup.io/repos/github/mesosphere/dcos-e2e/
 .. _API.rst: API.rst
-.. _BACKENDS.md: BACKENDS.md
+.. _BACKENDS.rst: BACKENDS.rst
 .. _CONTRIBUTING.rst: CONTRIBUTING.rst
