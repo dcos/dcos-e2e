@@ -10,6 +10,7 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 lint:
 	check-manifest .
 	doc8 .
+	doc8 docs/source/
 	flake8 .
 	isort --recursive --check-only
 	mypy src/ tests/
@@ -20,7 +21,6 @@ lint:
 	pyroma .
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
-	doc8 docs/source/
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean

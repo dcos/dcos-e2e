@@ -9,26 +9,26 @@
 DC/OS E2E
 =========
 
-Spin up DC/OS clusters with various configurations and run tests using
-those clusters.
+Spin up DC/OS clusters with various configurations and run tests using those clusters.
 
-Interactions can be “end to end”, meaning that you can test start up and
-shut down of clusters.
+Interactions can be "end to end", meaning that you can test start up and shut down of clusters.
 
 Requires Python 3.5.2+.
+
+.. contents::
+   :depth: 2
 
 Usage
 -----
 
-Tests must be run in a supported environment. See “Required
-Environment”.
+Tests must be run in a supported environment.
+See "Required Environment".
 
-To create tests using clusters with custom configurations, first install
-the harness:
+To create tests using clusters with custom configurations, first install the harness:
 
 .. code:: sh
 
-    pip install --process-dependency-links git+https://github.com/mesosphere/dcos-e2e.git@master 
+    pip install --process-dependency-links git+https://github.com/mesosphere/dcos-e2e.git@master
 
 Then, create a test, such as the following:
 
@@ -90,26 +90,23 @@ Then, create a test, such as the following:
                 superuser_password=superuser_password,
             )
 
-See ```API.md`` <./API.md>`__ for details on the API.
+See `API.rst`_ for details on the API.
 
 Contributing
 ------------
 
-See ```CONTRIBUTING.md`` <./CONTRIBUTING.md>`__ for details on how to
-contribute to this repository.
+See `CONTRIBUTING.rst`_ for details on how to contribute to this repository.
 
 Required Environment
 --------------------
 
-See ```BACKENDS.md`` <./BACKENDS.md>`__ for details on requirements for
-launching clusters with each backend.
+See `BACKENDS.rst`_ for details on requirements for launching clusters with each backend.
 
 Cleaning Up and Troubleshooting
 -------------------------------
 
 Some backends leave junk around, especially when tests are cancelled.
-See ```BACKENDS.md`` <./BACKENDS.md>`__ for specifics of dealing with
-particular backends.
+See `BACKENDS.rst`_ for specifics of dealing with particular backends.
 
 .. |Build Status| image:: https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/mesosphere/dcos-e2e
@@ -117,6 +114,9 @@ particular backends.
    :target: https://codecov.io/gh/mesosphere/dcos-e2e
 .. |Updates| image:: https://pyup.io/repos/github/mesosphere/dcos-e2e/shield.svg
    :target: https://pyup.io/repos/github/mesosphere/dcos-e2e/
+.. _API.rst: API.rst
+.. _BACKENDS.rst: BACKENDS.rst
+.. _CONTRIBUTING.rst: CONTRIBUTING.rst
 .. |Documentation Status| .. image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
