@@ -26,7 +26,7 @@ Parameters
 ^^^^^^^^^^^^^^^^^^^
 
 The backend to use for the cluster.
-See ```BACKENDS.md`` <./BACKENDS.md>`__ for details.
+See `BACKENDS.md`_ for details.
 
 ``masters``
 ^^^^^^^^^^^
@@ -278,3 +278,5 @@ The public IP address of the host represented by this node.
 ^^^^^^^^^^^^^^^^^^^^^^
 
 The IP address that the DC/OS component on this node uses.
+
+.. _BACKENDS.md: BACKENDS.md
