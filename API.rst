@@ -2,7 +2,6 @@ API
 ===
 
 .. contents::
-   :depth: 2
 
 ``dcos_e2e.cluster.Cluster``
 ----------------------------
