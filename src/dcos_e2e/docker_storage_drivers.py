@@ -2,7 +2,7 @@
 Supported Docker storage drivers.
 """
 
-from enum import Enum
+from enum import Enum, auto
 
 
 class DockerStorageDriver(Enum):
@@ -10,6 +10,6 @@ class DockerStorageDriver(Enum):
     Supported Docker storage drivers.
     """
 
-    AUFS = 1
-    OVERLAY = 2
-    OVERLAY_2 = 3
+    AUFS = auto()
+    OVERLAY = auto()
+    OVERLAY_2 = auto()
