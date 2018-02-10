@@ -12,7 +12,7 @@ import docker
 import pytest
 from passlib.hash import sha512_crypt
 from py.path import local  # pylint: disable=no-name-in-module, import-error
-from requests_mock import Mocker
+from requests_mock import Mocker, NoMockAddress
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -327,6 +327,22 @@ class TestDockerStorageDriver:
         'overlay2': DockerStorageDriver.OVERLAY_2,
     }
 
+    @property
+    def _docker_info_endpoint(self) -> str:
+        """
+        Return the endpoint used when getting Docker information.
+        """
+        client = docker.from_env(version='auto')
+
+        try:
+            with Mocker() as mock:
+                client.info()
+        except NoMockAddress:
+            pass
+
+        [request] = mock.request_history
+        return str(request).split()[1]
+
     def _get_storage_driver(
         self,
         node: Node,
@@ -352,7 +368,7 @@ class TestDockerStorageDriver:
         info = {**client.info(), **{'Driver': host_driver}}
 
         with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            mock.get(url=self._docker_info_endpoint, json=info)
             cluster_backend = Docker()
 
         storage_driver = cluster_backend.docker_storage_driver
@@ -366,7 +382,7 @@ class TestDockerStorageDriver:
         info = {**client.info(), **{'Driver': 'not_supported'}}
 
         with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            mock.get(url=self._docker_info_endpoint, json=info)
             backend = Docker()
 
         assert backend.docker_storage_driver == DockerStorageDriver.AUFS
@@ -399,7 +415,7 @@ class TestDockerStorageDriver:
         info = {**client.info(), **{'Driver': host_driver}}
 
         with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            mock.get(url=self._docker_info_endpoint, json=info)
             cluster_backend = Docker(storage_driver=custom_driver)
 
         storage_driver = cluster_backend.docker_storage_driver
