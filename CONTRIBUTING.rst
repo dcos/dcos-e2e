@@ -211,43 +211,43 @@ For this reason, `CalVer <http://calver.org/>`__ is used as a date at which the 
 
 The release process is as follows.
 
-1. Choose a new version.
+#. Choose a new version.
 
-This should be today’s date in the format ``YYYY.MM.DD.MICRO``.
-``MICRO`` should refer to the number of releases created on this date, starting from ``0``.
+   This should be today’s date in the format ``YYYY.MM.DD.MICRO``.
+   ``MICRO`` should refer to the number of releases created on this date, starting from ``0``.
 
-.. code:: sh
+   .. code:: sh
 
-    export DCOS_E2E_RELEASE=2017.06.15.0
+       export DCOS_E2E_RELEASE=2017.06.15.0
 
-2. Create a release branch:
+#. Create a release branch:
 
-.. code:: sh
+   .. code:: sh
 
-    git fetch origin
-    git checkout -b release-$DCOS_E2E_RELEASE origin/master
+       git fetch origin
+       git checkout -b release-$DCOS_E2E_RELEASE origin/master
 
-3. Add changes in the new release to ``CHANGELOG.rst``.
+#. Add changes in the new release to ``CHANGELOG.rst``.
 
-Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
-If this is the only change, add an empty entry to the changelog.
+   Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
+   If this is the only change, add an empty entry to the changelog.
 
-4. Bump the version of the software.
+#. Bump the version of the software.
 
-Change ``VERSION`` in ``setup.py``.
+   Change ``VERSION`` in ``setup.py``.
 
-5. Commit and push changes.
+#. Commit and push changes.
 
-.. code:: sh
+   .. code:: sh
 
-    git commit -am "Bump version"
-    git push
+       git commit -am "Bump version"
+       git push
 
-6. Create a Pull Request to merge the ``release`` branch into ``master``.
+#. Create a Pull Request to merge the ``release`` branch into ``master``.
 
-7. Merge the ``release`` Pull Request once CI has passed.
+#. Merge the ``release`` Pull Request once CI has passed.
 
-8. Tag a release.
+#. Tag a release.
 
 Visit https://github.com/mesosphere/dcos-e2e/releases/new.
 Set the "Tag version" to the new version.
