@@ -4,8 +4,6 @@ Supported distributions for DC/OS.
 
 from enum import Enum, auto
 
-# TODO investigate auto() value
-
 
 class Distribution(Enum):
     """
