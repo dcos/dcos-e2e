@@ -131,6 +131,8 @@ def _get_fallback_storage_driver() -> DockerStorageDriver:
 
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
+    print("ADAM CLIENT INFO")
+    print(client.info())
 
     try:
         return storage_drivers[host_driver]
