@@ -426,8 +426,8 @@ class TestLabels:
         containers = client.containers.list()
         [container] = [
             container for container in containers
-            if IPv4Address(container.attrs['NetworkSettings']['IPAddress']) ==
-            node.ip_address
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(node.public_ip_address)
         ]
         return dict(container.labels)
 
