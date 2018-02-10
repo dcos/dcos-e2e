@@ -21,10 +21,6 @@ Optionally install the following tools for linting and interacting with Travis C
 
     gem install travis --no-rdoc --no-ri
 
-.. code:: sh
-
-    npm install
-
 Spell checking requires ``enchant``.
 This can be installed on macOS, for example, with `Homebrew <http://brew.sh>`__:
 
@@ -52,12 +48,6 @@ To fix some lint errors, run the following:
 .. code:: sh
 
     make fix-lint
-
-To run only the lint tools which require Python, run the following:
-
-.. code:: sh
-
-    make lint-python-only
 
 Tests for this package
 ----------------------
