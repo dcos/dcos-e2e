@@ -1,7 +1,7 @@
 Changelog
 =========
 
-.. contents:: Table of Contents
+.. contents::
 
 Next
 ----
