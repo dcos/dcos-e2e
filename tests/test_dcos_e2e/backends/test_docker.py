@@ -4,6 +4,7 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
+from typing import Dict
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
@@ -408,12 +409,50 @@ class TestDockerStorageDriver:
 
 
 class TestLabels:
-
-    def _get_labels(self):
+    def _get_labels(
+        self,
+        node: Node,
+        default_ssh_user: str,
+    ) -> Dict[str, str]:
         pass
 
     def test_default(self):
-        pass
+        """
+        XXX
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=1,
+            public_agents=1,
+        ) as cluster:
+            nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+            for node in nodes:
+                node_labels = _get_labels(
+                    node=node,
+                    default_ssh_user=cluster.default_ssh_user,
+                )
+                assert node_labels == {}
 
     def test_custom(self):
-        pass
+        """
+        XXX
+        """
+        labels = {
+            uid.uuid4().hex: uuid.uuid4().hex,
+            uid.uuid4().hex: uuid.uuid4().hex,
+        }
+
+        with Cluster(
+            cluster_backend=Docker(docker_container_labels=labels),
+            masters=1,
+            agents=1,
+            public_agents=1,
+        ) as cluster:
+            nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+            for node in nodes:
+                node_labels = _get_labels(
+                    node=node,
+                    default_ssh_user=cluster.default_ssh_user,
+                )
+                assert node_labels == labels
