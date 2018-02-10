@@ -418,7 +418,7 @@ class TestLabels:
 
     def test_default(self) -> None:
         """
-        XXX
+        By default, node Docker containers do not have labels.
         """
         with Cluster(
             cluster_backend=Docker(),
@@ -436,7 +436,7 @@ class TestLabels:
 
     def test_custom(self) -> None:
         """
-        XXX
+        It is possible to set node Docker container labels.
         """
         labels = {
             uuid.uuid4().hex: uuid.uuid4().hex,
