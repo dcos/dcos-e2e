@@ -102,7 +102,7 @@ See [`API.md`](./API.md) for details on the API.
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for details on how to contribute to this repository.
+See [`CONTRIBUTING.rst`](./CONTRIBUTING.rst) for details on how to contribute to this repository.
 
 ## Required Environment
 
