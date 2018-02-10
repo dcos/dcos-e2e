@@ -416,7 +416,7 @@ class TestLabels:
     ) -> Dict[str, str]:
         pass
 
-    def test_default(self):
+    def test_default(self) -> None:
         """
         XXX
         """
@@ -428,19 +428,19 @@ class TestLabels:
         ) as cluster:
             nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
             for node in nodes:
-                node_labels = _get_labels(
+                node_labels = self._get_labels(
                     node=node,
                     default_ssh_user=cluster.default_ssh_user,
                 )
                 assert node_labels == {}
 
-    def test_custom(self):
+    def test_custom(self) -> None:
         """
         XXX
         """
         labels = {
-            uid.uuid4().hex: uuid.uuid4().hex,
-            uid.uuid4().hex: uuid.uuid4().hex,
+            uuid.uuid4().hex: uuid.uuid4().hex,
+            uuid.uuid4().hex: uuid.uuid4().hex,
         }
 
         with Cluster(
@@ -451,7 +451,7 @@ class TestLabels:
         ) as cluster:
             nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
             for node in nodes:
-                node_labels = _get_labels(
+                node_labels = self._get_labels(
                     node=node,
                     default_ssh_user=cluster.default_ssh_user,
                 )
