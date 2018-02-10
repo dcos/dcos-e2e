@@ -1,6 +1,8 @@
 Changelog
 =========
 
+.. contents:: Table of Contents
+
 Next
 ----
 
