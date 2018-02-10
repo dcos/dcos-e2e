@@ -3,7 +3,6 @@ Tests for the Docker backend.
 """
 
 import uuid
-from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Dict
 
@@ -411,14 +410,10 @@ class TestDockerStorageDriver:
 
 class TestLabels:
     """
-    XXX
+    Tests for setting labels on Docker containers.
     """
 
-    def _get_labels(
-        self,
-        node: Node,
-        default_ssh_user: str,
-    ) -> Dict[str, str]:
+    def _get_labels(self, node: Node) -> Dict[str, str]:
         """
         Return the labels on the container which maps to ``node``.
         """
@@ -431,32 +426,13 @@ class TestLabels:
         ]
         return dict(container.labels)
 
-    def test_default(self) -> None:
-        """
-        By default, node Docker containers do not have labels.
-        """
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=1,
-            public_agents=1,
-        ) as cluster:
-            nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
-            for node in nodes:
-                node_labels = self._get_labels(
-                    node=node,
-                    default_ssh_user=cluster.default_ssh_user,
-                )
-                assert node_labels == {}
-
     def test_custom(self) -> None:
         """
         It is possible to set node Docker container labels.
         """
-        labels = {
-            uuid.uuid4().hex: uuid.uuid4().hex,
-            uuid.uuid4().hex: uuid.uuid4().hex,
-        }
+        key = uuid.uuid4().hex
+        value = uuid.uuid4().hex
+        labels = {key: value}
 
         with Cluster(
             cluster_backend=Docker(docker_container_labels=labels),
@@ -466,8 +442,5 @@ class TestLabels:
         ) as cluster:
             nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
             for node in nodes:
-                node_labels = self._get_labels(
-                    node=node,
-                    default_ssh_user=cluster.default_ssh_user,
-                )
-                assert node_labels == labels
+                node_labels = self._get_labels(node=node)
+                assert node_labels[key] == value
