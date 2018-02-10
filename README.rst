@@ -88,7 +88,7 @@ Then, create a test, such as the following:
                 superuser_password=superuser_password,
             )
 
-See `API.md`_ for details on the API.
+See `API.rst`_ for details on the API.
 
 Contributing
 ------------
@@ -112,6 +112,6 @@ See `BACKENDS.md`_ for specifics of dealing with particular backends.
    :target: https://codecov.io/gh/mesosphere/dcos-e2e
 .. |Updates| image:: https://pyup.io/repos/github/mesosphere/dcos-e2e/shield.svg
    :target: https://pyup.io/repos/github/mesosphere/dcos-e2e/
-.. _API.md: API.md
+.. _API.rst: API.rst
 .. _BACKENDS.md: BACKENDS.md
 .. _CONTRIBUTING.rst: CONTRIBUTING.rst
