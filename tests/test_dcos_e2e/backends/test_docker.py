@@ -405,3 +405,15 @@ class TestDockerStorageDriver:
         assert storage_driver == custom_driver
         # We do not test actually changing the storage driver because only
         # `aufs` is supported on Travis CI.
+
+
+class TestLabels:
+
+    def _get_labels(self):
+        pass
+
+    def test_default(self):
+        pass
+
+    def test_custom(self):
+        pass
