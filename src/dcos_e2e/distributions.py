@@ -1,5 +1,7 @@
 """
 Supported distributions for DC/OS.
+
+In Python 3.6 this can use `enum.auto()`.
 """
 
 from enum import Enum

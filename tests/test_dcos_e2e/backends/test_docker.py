@@ -4,6 +4,7 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
+from typing import Dict
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
@@ -11,7 +12,7 @@ import docker
 import pytest
 from passlib.hash import sha512_crypt
 from py.path import local  # pylint: disable=no-name-in-module, import-error
-from requests_mock import Mocker
+from requests_mock import Mocker, NoMockAddress
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -267,7 +268,7 @@ class TestDockerVersion:
         )
         docker_versions = {
             '1.13.1': DockerVersion.v1_13_1,
-            '1.11.2': DockerVersion.v1_13_1,
+            '1.11.2': DockerVersion.v1_11_2,
         }
 
         return docker_versions[result.stdout.decode().strip()]
@@ -307,12 +308,12 @@ class TestDockerVersion:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            docker_version = self._get_docker_version(
+            node_docker_version = self._get_docker_version(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert docker_version == docker_version
+        assert docker_version == node_docker_version
 
 
 class TestDockerStorageDriver:
@@ -325,6 +326,22 @@ class TestDockerStorageDriver:
         'overlay': DockerStorageDriver.OVERLAY,
         'overlay2': DockerStorageDriver.OVERLAY_2,
     }
+
+    @property
+    def _docker_info_endpoint(self) -> str:
+        """
+        Return the endpoint used when getting Docker information.
+        """
+        client = docker.from_env(version='auto')
+
+        try:
+            with Mocker() as mock:
+                client.info()
+        except NoMockAddress:
+            pass
+
+        [request] = mock.request_history
+        return str(request).split()[1]
 
     def _get_storage_driver(
         self,
@@ -351,7 +368,7 @@ class TestDockerStorageDriver:
         info = {**client.info(), **{'Driver': host_driver}}
 
         with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            mock.get(url=self._docker_info_endpoint, json=info)
             cluster_backend = Docker()
 
         storage_driver = cluster_backend.docker_storage_driver
@@ -365,7 +382,7 @@ class TestDockerStorageDriver:
         info = {**client.info(), **{'Driver': 'not_supported'}}
 
         with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            mock.get(url=self._docker_info_endpoint, json=info)
             backend = Docker()
 
         assert backend.docker_storage_driver == DockerStorageDriver.AUFS
@@ -398,10 +415,48 @@ class TestDockerStorageDriver:
         info = {**client.info(), **{'Driver': host_driver}}
 
         with Mocker(real_http=True) as mock:
-            mock.get(url='http+docker://localunixsocket/v1.35/info', json=info)
+            mock.get(url=self._docker_info_endpoint, json=info)
             cluster_backend = Docker(storage_driver=custom_driver)
 
         storage_driver = cluster_backend.docker_storage_driver
         assert storage_driver == custom_driver
         # We do not test actually changing the storage driver because only
         # `aufs` is supported on Travis CI.
+
+
+class TestLabels:
+    """
+    Tests for setting labels on Docker containers.
+    """
+
+    def _get_labels(self, node: Node) -> Dict[str, str]:
+        """
+        Return the labels on the container which maps to ``node``.
+        """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(node.public_ip_address)
+        ]
+        return dict(container.labels)
+
+    def test_custom(self) -> None:
+        """
+        It is possible to set node Docker container labels.
+        """
+        key = uuid.uuid4().hex
+        value = uuid.uuid4().hex
+        labels = {key: value}
+
+        with Cluster(
+            cluster_backend=Docker(docker_container_labels=labels),
+            masters=1,
+            agents=1,
+            public_agents=1,
+        ) as cluster:
+            nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+            for node in nodes:
+                node_labels = self._get_labels(node=node)
+                assert node_labels[key] == value

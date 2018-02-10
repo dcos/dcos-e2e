@@ -1,5 +1,7 @@
 """
 Supported Docker storage drivers.
+
+In Python 3.6 this can use `enum.auto()`.
 """
 
 from enum import Enum

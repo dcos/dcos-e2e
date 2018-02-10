@@ -9,6 +9,7 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 .PHONY: lint
 lint:
 	check-manifest .
+	doc8 .
 	flake8 .
 	isort --recursive --check-only
 	mypy src/ tests/

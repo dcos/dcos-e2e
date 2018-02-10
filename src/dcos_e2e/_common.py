@@ -86,6 +86,9 @@ def run_subprocess(
                 log(line.rstrip().decode('ascii', 'backslashreplace'))
         if process.returncode != 0:
             raise CalledProcessError(
-                process.returncode, args, output=stdout, stderr=stderr
+                process.returncode,
+                args,
+                output=stdout,
+                stderr=stderr,
             )
     return CompletedProcess(args, process.returncode, stdout, stderr)

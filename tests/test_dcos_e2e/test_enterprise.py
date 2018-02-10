@@ -86,7 +86,7 @@ class TestCopyFiles:
         installer_cert_path = genconf / cert_filename
         installer_key_path = genconf / key_filename
 
-        cert_dir_on_host = Path('tests/certificates').resolve()
+        cert_dir_on_host = Path('tests/test_dcos_e2e/certificates').resolve()
         cert_path = cert_dir_on_host / cert_filename
         ca_key_path = cert_dir_on_host / key_filename
 
