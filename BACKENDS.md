@@ -41,6 +41,7 @@ Docker(
     linux_distribution=dcos_e2e.distributions.Distributions,
     docker_version=dcos_e2e.docker_versions.DockerVersion,
     storage_driver=None,
+    docker_container_labels=None,
 )
 ```
 
@@ -90,6 +91,11 @@ If this is not a supported driver, `aufs` is used.
 See `list(dcos_e2e.docker_storage_drivers)` for available storage drivers.
 
 On some platforms, Docker will fail to start up with certain storage drivers.
+
+#### `docker_container_labels`
+
+Docker labels to add to the cluster node containers.
+Akin to the dictionary option in [docker-py](http://docker-py.readthedocs.io/en/stable/containers.html).
 
 ### DC/OS Installation
 

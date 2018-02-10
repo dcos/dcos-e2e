@@ -4,6 +4,7 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
+from typing import Dict
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
@@ -312,7 +313,7 @@ class TestDockerVersion:
                 default_ssh_user=cluster.default_ssh_user,
             )
 
-        assert node_docker_version == docker_version
+        assert docker_version == node_docker_version
 
 
 class TestDockerStorageDriver:
@@ -405,3 +406,41 @@ class TestDockerStorageDriver:
         assert storage_driver == custom_driver
         # We do not test actually changing the storage driver because only
         # `aufs` is supported on Travis CI.
+
+
+class TestLabels:
+    """
+    Tests for setting labels on Docker containers.
+    """
+
+    def _get_labels(self, node: Node) -> Dict[str, str]:
+        """
+        Return the labels on the container which maps to ``node``.
+        """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(node.public_ip_address)
+        ]
+        return dict(container.labels)
+
+    def test_custom(self) -> None:
+        """
+        It is possible to set node Docker container labels.
+        """
+        key = uuid.uuid4().hex
+        value = uuid.uuid4().hex
+        labels = {key: value}
+
+        with Cluster(
+            cluster_backend=Docker(docker_container_labels=labels),
+            masters=1,
+            agents=1,
+            public_agents=1,
+        ) as cluster:
+            nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+            for node in nodes:
+                node_labels = self._get_labels(node=node)
+                assert node_labels[key] == value

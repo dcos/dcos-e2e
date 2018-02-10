@@ -177,9 +177,9 @@ class Docker(ClusterBackend):
                 cluster nodes. By default, this is the host's storage driver.
                 If this is not one of `aufs`, `overlay` or `overlay2`, `aufs`
                 is used.
-            docker_container_labels: XXX Docker labels like
-                `labels` in http://docker-py.readthedocs.io/en/stable/containers.html
-                (Dict only)
+            docker_container_labels: Docker labels to add to the cluster node
+                containers. Akin to the dictionary option in
+                http://docker-py.readthedocs.io/en/stable/containers.html.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -194,9 +194,9 @@ class Docker(ClusterBackend):
             docker_version: The Docker version to install on the cluster nodes.
             docker_storage_driver: The storage driver to use for Docker on the
                 cluster nodes.
-            docker_container_labels: XXX Docker labels like
-                `labels` in http://docker-py.readthedocs.io/en/stable/containers.html
-                (Dict only)
+            docker_container_labels: Docker labels to add to the cluster node
+                containers. Akin to the dictionary option in
+                http://docker-py.readthedocs.io/en/stable/containers.html.
 
         Raises:
             NotImplementedError: The `linux_distribution` is not supported by
@@ -669,7 +669,9 @@ class DockerCluster(ClusterManager):
             dcos_num_agents: The number of agent nodes (agent and public
                 agents) expected to be in the cluster once it has been created.
             docker_image: The name of the Docker image to use.
-            labels: XXX
+            labels: Docker labels to add to the cluster node containers. Akin
+                to the dictionary option in
+                http://docker-py.readthedocs.io/en/stable/containers.html.
         """
         registry_host = 'registry.local'
         if self.masters:
