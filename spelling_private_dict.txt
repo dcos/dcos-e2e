@@ -13,6 +13,7 @@ dc
 dcos
 dict
 dir
+enum
 env
 genconf
 hwclock

@@ -1,8 +1,10 @@
 """
 Supported Docker storage drivers.
+
+In Python 3.6 this can use `enum.auto()`.
 """
 
-from enum import Enum, auto
+from enum import Enum
 
 
 class DockerStorageDriver(Enum):
@@ -10,6 +12,6 @@ class DockerStorageDriver(Enum):
     Supported Docker storage drivers.
     """
 
-    AUFS = auto()
-    OVERLAY = auto()
-    OVERLAY_2 = auto()
+    AUFS = 1
+    OVERLAY = 2
+    OVERLAY_2 = 3
