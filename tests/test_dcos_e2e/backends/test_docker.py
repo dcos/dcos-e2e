@@ -3,6 +3,7 @@ Tests for the Docker backend.
 """
 
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Dict
 
@@ -409,12 +410,26 @@ class TestDockerStorageDriver:
 
 
 class TestLabels:
+    """
+    XXX
+    """
+
     def _get_labels(
         self,
         node: Node,
         default_ssh_user: str,
     ) -> Dict[str, str]:
-        pass
+        """
+        Return the labels on the container which maps to ``node``.
+        """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [container] = [
+            container for container in containers
+            if IPv4Address(container.attrs['NetworkSettings']['IPAddress']) ==
+            node.ip_address
+        ]
+        return dict(container.labels)
 
     def test_default(self) -> None:
         """
