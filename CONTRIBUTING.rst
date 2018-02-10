@@ -1,5 +1,5 @@
-Contributing to DC/OS End to End tests
-======================================
+Contributing to DC/OS E2E
+=========================
 
 Contributions to this repository must pass tests and linting.
 
@@ -247,12 +247,12 @@ The release process is as follows.
 
 #. Merge the ``release`` Pull Request once CI has passed.
 
-#. Tag a release.
+#. Tag a release:
 
-Visit https://github.com/mesosphere/dcos-e2e/releases/new.
-Set the "Tag version" to the new version.
-Choose "master" as the target.
-Add the changes from the changelog to the release description.
+   Visit https://github.com/mesosphere/dcos-e2e/releases/new.
+   Set the "Tag version" to the new version.
+   Choose "master" as the target.
+   Add the changes from the changelog to the release description.
 
 Updating DC/OS Docker
 ---------------------
