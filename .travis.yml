@@ -37,10 +37,8 @@ before_install:
 - docker --version
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
-- travis_retry npm -g install npm@latest
 install:
 - travis_retry pip install --upgrade --process-dependency-links --editable .[dev]
-- travis_retry npm install
 cache: pip
 before_script:
 - make clean
