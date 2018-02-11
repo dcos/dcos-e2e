@@ -29,14 +29,14 @@ def run_subprocess(
         args: See :py:func:`subprocess.run`.
         log_output_live: If `True`, log output live. If `True`, stderr is
             merged into stdout in the return value.
-        cwd: See `subprocess.run`.
-        env: See `subprocess.run`.
+        cwd: See :py:func:`subprocess.run`.
+        env: See :py:func:`subprocess.run`.
 
     Returns:
         See `subprocess.run`.
 
     Raises:
-        CalledProcessError: See `subprocess.run`.
+        CalledProcessError: See :py:func`subprocess.run`.
     """
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
