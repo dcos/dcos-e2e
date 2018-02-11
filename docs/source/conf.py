@@ -59,6 +59,7 @@ nitpick_ignore = [
     ('py:exc', 'RetryError'),
 ]
 
+<<<<<<< HEAD
 html_show_copyright = False
 html_show_sphinx = False
 html_theme_options = {
@@ -75,8 +76,8 @@ html_sidebars = {
     ],
 }
 
-spelling_word_list_filename = '../../spelling_private_dict.txt'
-
 # Don't check anchors because many websites use #! for AJAX magic
 # http://sphinx-doc.org/config.html#confval-linkcheck_anchors
 linkcheck_anchors = False
+
+spelling_word_list_filename = '../../spelling_private_dict.txt'

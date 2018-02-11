@@ -5,6 +5,7 @@ ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_conf
 ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 
+# Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
 # Run various linting tools.
