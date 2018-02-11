@@ -242,21 +242,21 @@ class Cluster(ContextDecorator):
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`.node.Node` s.
         """
         return self._cluster.masters
 
     @property
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`.node.Node` s.
         """
         return self._cluster.agents
 
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public_agent :class:`.node.Node` s.
+        Return all DC/OS public agent :class:`.node.Node` s.
         """
         return self._cluster.public_agents
 
