@@ -18,8 +18,8 @@ pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1
 requests-mock==1.4.0
 sphinx==1.6.7
+sphinx-autodoc-napoleon-typehints==2.1.6
 vulture==0.26
 yapf==0.20.1
-sphinx-autodoc-napoleon-typehints
 # We should also use https://github.com/pyga/ebb-lint when it is released for
 # Python 3.6.
