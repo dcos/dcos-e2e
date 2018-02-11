@@ -24,7 +24,7 @@ class ClusterManager(abc.ABC):
         cluster_backend: 'ClusterBackend',
     ) -> None:
         """
-        Create a DC/OS cluster with the given `cluster_backend`.
+        Create a DC/OS cluster with the given ``cluster_backend``.
 
         Args:
             masters: The number of master nodes to create.
@@ -53,7 +53,7 @@ class ClusterManager(abc.ABC):
             extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration for a particular backend.
-            log_output_live: If `True`, log output of the installation live.
+            log_output_live: If ``True``, log output of the installation live.
         """
 
     @abc.abstractmethod
@@ -67,12 +67,11 @@ class ClusterManager(abc.ABC):
         Install DC/OS from a build artifact passed as a file system `Path`.
 
         Args:
-            build_artifact: The `Path` to a build artifact to install DC/OS
-                from.
+            build_artifact: The path to a build artifact to install DC/OS from.
             extra_config: May contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration for a particular backend.
-            log_output_live: If `True`, log output of the installation live.
+            log_output_live: If ``True``, log output of the installation live.
         """
 
     @abc.abstractmethod
@@ -92,7 +91,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`.node.Node`\s.
         """
 
     @property
@@ -112,7 +111,7 @@ class ClusterBackend(abc.ABC):
     @abc.abstractmethod
     def cluster_cls(self) -> Type[ClusterManager]:
         """
-        Return the `ClusterManager` class to use to create and manage a
+        Return the :class:`ClusterManager` class to use to create and manage a
         cluster.
         """
 
