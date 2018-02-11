@@ -147,7 +147,8 @@ class Node:
             The representation of the finished process.
 
         Raises:
-            CalledProcessError: The process exited with a non-zero code.
+            subprocess.CalledProcessError: The process exited with a non-zero
+                code.
         """
         ssh_args = self._compose_ssh_command(
             args=args, user=user, env=env, shell=shell
