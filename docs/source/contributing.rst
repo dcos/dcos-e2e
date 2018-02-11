@@ -168,11 +168,11 @@ For timeouts, err on the side of a much longer timeout than necessary.
 
 Do not access the web while running tests.
 
-Parrallelisable Tests
-~~~~~~~~~~~~~~~~~~~~~
+Parallelizable Tests
+~~~~~~~~~~~~~~~~~~~~
 
 The tests in this repository and using this harness are slow.
-This harness must not get in the way of parallelisation efforts.
+This harness must not get in the way of parallelization efforts.
 
 Logging
 ~~~~~~~

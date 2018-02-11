@@ -9,9 +9,7 @@
 DC/OS E2E
 =========
 
-Spin up DC/OS clusters with various configurations and run tests using those clusters.
-
-Interactions can be "end to end", meaning that you can test start up and shut down of clusters.
+DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environments.
 
 Installation
 ------------

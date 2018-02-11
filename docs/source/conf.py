@@ -74,3 +74,5 @@ html_sidebars = {
         'searchbox.html',
     ],
 }
+
+spelling_word_list_filename = '../../spelling_private_dict.txt'
