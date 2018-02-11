@@ -761,7 +761,7 @@ class DockerCluster(ClusterManager):
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master :class:`.node.Node`\s.
+        Return all DC/OS master :class:`.node.Node` s.
         """
         return self._nodes(container_base_name=self._master_prefix)
 
@@ -775,6 +775,6 @@ class DockerCluster(ClusterManager):
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent :class:`.node.Node`\s.
+        Return all DC/OS public agent :class:`.node.Node` s.
         """
         return self._nodes(container_base_name=self._public_agent_prefix)

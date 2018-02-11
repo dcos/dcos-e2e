@@ -5,8 +5,9 @@ Helpers for interacting with existing clusters.
 from pathlib import Path
 from typing import Any, Dict, Set, Type
 
-from dcos_e2e.backends import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
+
+from ._base_classes import ClusterBackend, ClusterManager
 
 
 class ExistingCluster(ClusterBackend):
@@ -110,21 +111,21 @@ class ExistingClusterManager(ClusterManager):
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master :class:`dcos_e2e.node.Node`\s.
+        Return all DC/OS master :class:`dcos_e2e.node.Node` s.
         """
         return self._masters
 
     @property
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent :class:`dcos_e2e.node.Node`\s.
+        Return all DC/OS agent :class:`dcos_e2e.node.Node` s.
         """
         return self._agents
 
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent :class:`dcos_e2e.node.Node`\s.
+        Return all DC/OS public agent :class:`dcos_e2e.node.Node` s.
         """
         return self._public_agents
 
