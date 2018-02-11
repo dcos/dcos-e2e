@@ -51,6 +51,10 @@ docs:
 	sphinx-apidoc -f -o docs/source src/ --separate;
 	make -C docs html
 
+.PHONY: open-docs
+open-docs:
+	open docs/build/html/index.html
+
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.
 .PHONY: update-dcos-docker
