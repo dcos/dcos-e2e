@@ -61,3 +61,5 @@ nitpick_ignore = [
 ignore_warnings = [
     ('*', 'Field list'),
 ]
+
+napoleon_use_rtype = False

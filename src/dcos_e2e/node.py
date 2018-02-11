@@ -166,7 +166,6 @@ class Node:
         Open a pipe to a command run on a node as the given user.
 
         Args:
-
             args: The command to run on the node.
             user: The user to open a pipe for a command for over SSH.
             env: Environment variables to be set on the node before running
@@ -180,7 +179,6 @@ class Node:
                 including whitespace.
 
         Returns:
-
             The pipe object attached to the specified process.
 
         """
