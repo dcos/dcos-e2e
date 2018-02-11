@@ -5,6 +5,7 @@ ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_conf
 ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 
+# Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
 # Run various linting tools.
@@ -22,6 +23,7 @@ lint:
 	pyroma .
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
+	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
