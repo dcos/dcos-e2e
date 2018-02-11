@@ -57,3 +57,9 @@ nitpick_ignore = [
     ('py:class', 'dcos_e2e.backends._docker.DockerCluster'),
     ('py:exc', 'RetryError'),
 ]
+
+html_show_copyright = False
+html_show_sphinx = False
+html_theme_options = {
+    'show_powered_by': 'false',
+}
