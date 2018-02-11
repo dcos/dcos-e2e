@@ -21,6 +21,7 @@ lint:
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
 	make -C docs linkcheck
+	make -c docs spelling
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean

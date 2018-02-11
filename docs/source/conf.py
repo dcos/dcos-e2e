@@ -11,6 +11,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.spelling',
 ]
 
 templates_path = ['_templates']
