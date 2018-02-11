@@ -162,7 +162,8 @@ class Docker(ClusterBackend):
         Args:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
-                This is equivalent to `dir` in `TemporaryDirectory`_.
+                This is equivalent to `dir` in
+                :py:func:`tempfile.mkstemp`.
             custom_master_mounts: Custom mounts add to master node containers.
                 See `volumes` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
@@ -200,8 +201,6 @@ class Docker(ClusterBackend):
             NotImplementedError: The ``linux_distribution`` is not supported by
                 this backend.
 
-        .. _TemporaryDirectory:
-            https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
         """
