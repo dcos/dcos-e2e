@@ -19,3 +19,5 @@ pytest-timeout==1.2.1
 requests-mock==1.4.0
 vulture==0.26
 yapf==0.20.1
+# We should also use https://github.com/pyga/ebb-lint when it is released for
+# Python 3.6.
