@@ -33,10 +33,10 @@ def run_subprocess(
         env: See :py:func:`subprocess.run`.
 
     Returns:
-        See `subprocess.run`.
+        See :py:func:`subprocess.run`.
 
     Raises:
-        CalledProcessError: See :py:func`subprocess.run`.
+        subprocess.CalledProcessError: See :py:func:`subprocess.run`.
     """
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
