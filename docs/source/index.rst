@@ -5,7 +5,6 @@ DC/OS E2E
    :maxdepth: 2
    :caption: Contents:
 
-   contributing
    modules
 
 
