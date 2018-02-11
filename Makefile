@@ -48,8 +48,12 @@ download-artifacts:
 .PHONY: docs
 docs:
 	make -C docs clean
-	sphinx-apidoc -f -o docs/source src/ --separate;
+	sphinx-apidoc -f -o docs/source src/
 	make -C docs html
+
+.PHONY: open-docs
+open-docs:
+	open docs/build/html/index.html
 
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.

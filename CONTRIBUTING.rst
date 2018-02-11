@@ -91,11 +91,12 @@ For example:
 Documentation
 -------------
 
-Run the following command to update the tables of contents:
+Run the following commands to build and open the documentation:
 
 .. code:: sh
 
-    make toc
+    make docs
+    make open-docs
 
 Reviews
 -------
