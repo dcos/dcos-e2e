@@ -22,7 +22,7 @@ Optionally install the following tools for linting and interacting with Travis C
     gem install travis --no-rdoc --no-ri
 
 Spell checking requires ``enchant``.
-This can be installed on macOS, for example, with `Homebrew <http://brew.sh>`__:
+This can be installed on macOS, for example, with `Homebrew <https://brew.sh>`__:
 
 .. code:: sh
 
@@ -248,7 +248,7 @@ The release process is as follows.
 Updating DC/OS Docker
 ---------------------
 
-`DC/OS Docker <https://github.com/dcos/dcos-docker.git>`__ is vendored in this repository using ``git subtree``.
+`DC/OS Docker <https://github.com/dcos/dcos-docker>`__ is vendored in this repository using ``git subtree``.
 To update DC/OS Docker, use the following command:
 
 .. code:: sh
