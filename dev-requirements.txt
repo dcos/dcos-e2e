@@ -21,4 +21,5 @@ sphinx==1.6.7
 vulture==0.26
 yapf==0.20.1
 sphinx-autodoc-napoleon-typehints
-doc8
+# We should also use https://github.com/pyga/ebb-lint when it is released for
+# Python 3.6.

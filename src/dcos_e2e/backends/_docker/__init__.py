@@ -437,11 +437,11 @@ class DockerCluster(ClusterManager):
             unique_mounts = {
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/docker',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/opt',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
             }
 
@@ -464,15 +464,15 @@ class DockerCluster(ClusterManager):
             unique_mounts = {
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/docker',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/opt',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
             }
 
@@ -495,15 +495,15 @@ class DockerCluster(ClusterManager):
             unique_mounts = {
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/docker',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/opt',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
             }
 

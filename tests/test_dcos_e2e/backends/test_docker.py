@@ -79,8 +79,9 @@ class TestDockerBackend:
                 (cluster.masters, master_path, local_master_file),
                 (cluster.agents, agent_path, local_agent_file),
                 (
-                    cluster.public_agents, public_agent_path,
-                    local_public_agent_file
+                    cluster.public_agents,
+                    public_agent_path,
+                    local_public_agent_file,
                 ),
             ]:
                 for node in nodes:
