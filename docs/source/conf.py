@@ -76,3 +76,7 @@ html_sidebars = {
 }
 
 spelling_word_list_filename = '../../spelling_private_dict.txt'
+
+# Don't check anchors because many websites use #! for AJAX magic
+# http://sphinx-doc.org/config.html#confval-linkcheck_anchors
+linkcheck_anchors = False
