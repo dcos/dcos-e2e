@@ -20,6 +20,7 @@ lint:
 	pyroma .
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
+	make -C docs linkcheck
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
