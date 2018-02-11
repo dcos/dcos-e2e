@@ -62,9 +62,6 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-docs/source/dcos_e2e.*.rst
-docs/source/dcos_e2e.rst
-docs/source/modules.rst
 
 # PyBuilder
 target/
