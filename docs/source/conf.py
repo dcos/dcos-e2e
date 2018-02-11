@@ -28,7 +28,6 @@ language = None
 # The name of the syntax highlighting style to use.
 pygments_style = 'sphinx'
 html_theme = 'alabaster'
-html_static_path = []
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
