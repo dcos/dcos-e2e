@@ -11,6 +11,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.spelling',
 ]
 
 templates_path = ['_templates']
@@ -57,3 +58,5 @@ nitpick_ignore = [
     ('py:class', 'dcos_e2e.backends._docker.DockerCluster'),
     ('py:exc', 'RetryError'),
 ]
+
+spelling_word_list_filename = '../../spelling_private_dict.txt'
