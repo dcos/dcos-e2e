@@ -2,11 +2,12 @@ DC/OS E2E
 =========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    enterprise
    contributing
+   changelog
 
 .. toctree::
    :hidden:
