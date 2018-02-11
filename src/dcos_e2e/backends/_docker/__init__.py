@@ -159,23 +159,22 @@ class Docker(ClusterBackend):
         """
         Create a configuration for a Docker cluster backend.
 
-        For details about mount arguments, see `volumes` in `Containers.run`_.
-
         Args:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in `TemporaryDirectory`_.
             custom_master_mounts: Custom mounts add to master node containers.
+                See `volumes` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
+                See `volumes` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers.
+                containers. See `volumes` in `Containers.run`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
-
             storage_driver: The storage driver to use for Docker on the
                 cluster nodes. By default, this is the host's storage driver.
-                If this is not one of `aufs`, `overlay` or `overlay2`, `aufs`
-                is used.
+                If this is not one of ``aufs``, ``overlay`` or ``overlay2``,
+                `aufs` is used.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
 
