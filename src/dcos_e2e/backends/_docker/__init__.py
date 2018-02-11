@@ -159,6 +159,8 @@ class Docker(ClusterBackend):
         """
         Create a configuration for a Docker cluster backend.
 
+        For details about mount arguments, see `volumes` in `Containers.run`_.
+
         Args:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
@@ -170,15 +172,12 @@ class Docker(ClusterBackend):
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
 
-            For details about mount arguments, see `volumes` on
-                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
             storage_driver: The storage driver to use for Docker on the
                 cluster nodes. By default, this is the host's storage driver.
                 If this is not one of `aufs`, `overlay` or `overlay2`, `aufs`
                 is used.
             docker_container_labels: Docker labels to add to the cluster node
-                containers. Akin to the dictionary option in
-                http://docker-py.readthedocs.io/en/stable/containers.html.
+                containers. Akin to the dictionary option in `Containers.run`_.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -194,8 +193,7 @@ class Docker(ClusterBackend):
             docker_storage_driver: The storage driver to use for Docker on the
                 cluster nodes.
             docker_container_labels: Docker labels to add to the cluster node
-                containers. Akin to the dictionary option in
-                http://docker-py.readthedocs.io/en/stable/containers.html.
+                containers. Akin to the dictionary option in `Containers.run`_.
 
         Raises:
             NotImplementedError: The `linux_distribution` is not supported by
@@ -203,6 +201,8 @@ class Docker(ClusterBackend):
 
         .. _TemporaryDirectory:
             https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory
+        .. _Containers.run:
+            http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
@@ -761,7 +761,7 @@ class DockerCluster(ClusterManager):
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`.node.Node`\s.
         """
         return self._nodes(container_base_name=self._master_prefix)
 
@@ -775,6 +775,6 @@ class DockerCluster(ClusterManager):
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent ``Node``s.
+        Return all DC/OS public agent :class:`.node.Node`\s.
         """
         return self._nodes(container_base_name=self._public_agent_prefix)
