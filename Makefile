@@ -5,6 +5,8 @@ ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_conf
 ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 
+SPHINXOPTS := -W
+
 # Run various linting tools.
 .PHONY: lint
 lint:
@@ -20,8 +22,8 @@ lint:
 	pyroma .
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
-	make -C docs linkcheck
-	make -c docs spelling
+	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
+	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
@@ -49,9 +51,9 @@ download-artifacts:
 
 .PHONY: docs
 docs:
-	make -C docs clean
+	make -C docs clean SPHINXOPTS=$(SPHINXOPTS)
 	sphinx-apidoc -f -o docs/source src/
-	make -C docs html
+	make -C docs html SPHINXOPTS=$(SPHINXOPTS)
 
 .PHONY: open-docs
 open-docs:
