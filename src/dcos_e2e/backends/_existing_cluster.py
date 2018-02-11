@@ -5,8 +5,9 @@ Helpers for interacting with existing clusters.
 from pathlib import Path
 from typing import Any, Dict, Set, Type
 
-from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
+
+from ._base_classes import ClusterBackend, ClusterManager
 
 
 class ExistingCluster(ClusterBackend):
@@ -33,8 +34,8 @@ class ExistingCluster(ClusterBackend):
     @property
     def cluster_cls(self) -> Type['ExistingClusterManager']:
         """
-        Return the `ClusterManager` class to use to create and manage a
-        cluster.
+        Return the :class:`dcos_e2e.backends.ClusterManager` class to use to
+        create and manage a cluster.
         """
         return ExistingClusterManager
 
@@ -88,8 +89,8 @@ class ExistingClusterManager(ClusterManager):
         """
         Raises:
             NotImplementedError: It is assumed that clusters created with the
-                ExistingCluster backend already have an installed instance of
-                DC/OS running on them.
+                :class:`ExistingCluster` backend already have an installed
+                instance of DC/OS running on them.
         """
         raise NotImplementedError
 
@@ -102,29 +103,29 @@ class ExistingClusterManager(ClusterManager):
         """
         Raises:
             NotImplementedError: It is assumed that clusters created with the
-                ExistingCluster backend already have an installed instance of
-                DC/OS running on them.
+                :class:`ExistingCluster` backend already have an installed
+                instance of DC/OS running on them.
         """
         raise NotImplementedError
 
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`dcos_e2e.node.Node` s.
         """
         return self._masters
 
     @property
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`dcos_e2e.node.Node` s.
         """
         return self._agents
 
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent ``Node``s.
+        Return all DC/OS public agent :class:`dcos_e2e.node.Node` s.
         """
         return self._public_agents
 
@@ -132,6 +133,7 @@ class ExistingClusterManager(ClusterManager):
         """
         Destroying an existing cluster is the responsibility of the caller.
 
-        Raises: NotImplementedError when called.
+        Raises:
+            NotImplementedError: When called.
         """
         raise NotImplementedError

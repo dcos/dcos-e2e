@@ -42,6 +42,7 @@ install:
 cache: pip
 before_script:
 - make clean
+- make docs
 - make lint
 - travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
 script:

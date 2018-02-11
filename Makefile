@@ -45,6 +45,12 @@ download-artifacts:
 	curl -o $(ARTIFACT_PATH) $(ARTIFACT_URL)
 	if [ -n "$(EE_ARTIFACT_URL)" ]; then curl -o $(EE_ARTIFACT_PATH) $(EE_ARTIFACT_URL); fi
 
+.PHONY: docs
+docs:
+	make -C docs clean
+	sphinx-apidoc -f -o docs/source src/ --separate;
+	make -C docs html
+
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.
 .PHONY: update-dcos-docker

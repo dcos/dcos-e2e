@@ -4,6 +4,8 @@
 
 |Updates|
 
+|Documentation Status|
+
 DC/OS E2E
 =========
 
@@ -115,3 +117,6 @@ See `BACKENDS.rst`_ for specifics of dealing with particular backends.
 .. _API.rst: API.rst
 .. _BACKENDS.rst: BACKENDS.rst
 .. _CONTRIBUTING.rst: CONTRIBUTING.rst
+.. |Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
+   :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status

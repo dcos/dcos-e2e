@@ -50,7 +50,7 @@ class TestIntegrationTests:
                 )
                 # This result will not be printed if the test passes, but it
                 # may provide useful debugging information.
-                logging.debug(result)  # pragma: no cover
+                logging.debug(str(result))  # pragma: no cover
 
             # `pytest` results in an exit code of 4 when no tests are
             # collected.
