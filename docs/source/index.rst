@@ -5,14 +5,11 @@ DC/OS E2E
    :maxdepth: 2
    :caption: Contents:
 
-   modules
    enterprise
    contributing
 
+.. toctree::
+   :hidden:
 
-
-Indices and tables
-==================
-
-* :ref:`modindex`
-* :ref:`search`
+   modules
+   dcos_e2e
