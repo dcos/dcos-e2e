@@ -48,7 +48,7 @@ download-artifacts:
 .PHONY: docs
 docs:
 	make -C docs clean
-	sphinx-apidoc -f -o docs/source src/ --separate;
+	sphinx-apidoc -f -o docs/source src/
 	make -C docs html
 
 .PHONY: open-docs

@@ -180,7 +180,6 @@ class Node:
 
         Returns:
             The pipe object attached to the specified process.
-
         """
         ssh_args = self._compose_ssh_command(
             args=args, user=user, env=env, shell=shell
