@@ -85,7 +85,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`.node.Node`\s.
         """
 
     @property
@@ -99,7 +99,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent ``Node``s.
+        Return all DC/OS public agent :class:`.node.Node`\s.
         """
 
 
