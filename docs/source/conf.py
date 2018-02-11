@@ -49,3 +49,5 @@ html_sidebars = {
 htmlhelp_basename = 'DCOSE2Edoc'
 autoclass_content = 'init'
 intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
+nitpicky = True
+warning_is_error = True
