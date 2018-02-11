@@ -13,10 +13,10 @@ Spin up DC/OS clusters with various configurations and run tests using those clu
 
 Interactions can be "end to end", meaning that you can test start up and shut down of clusters.
 
-Requires Python 3.5.2+.
-
 Installation
 ------------
+
+Requires Python 3.5.2+.
 
 .. code:: sh
 

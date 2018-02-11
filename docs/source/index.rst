@@ -5,6 +5,8 @@ DC/OS E2E
    :maxdepth: 1
    :caption: Contents:
 
+   getting-started
+   docker-backend
    enterprise
    contributing
    changelog
