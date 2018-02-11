@@ -62,17 +62,14 @@ html_show_copyright = False
 html_show_sphinx = False
 html_theme_options = {
     'show_powered_by': 'false',
-    'description': 'XXXXX',
     'fixed_sidebar': True,
     'sidebar_includehidden': False,
 }
 
 html_sidebars = {
     '**': [
-            'about.html',
-            'navigation.html',
-            'relations.html',
-            'searchbox.html',
-            'donate.html',
-        ]
+        'about.html',
+        'globaltoc.html',
+        'searchbox.html',
+    ],
 }
