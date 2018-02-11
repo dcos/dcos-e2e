@@ -26,7 +26,7 @@ def run_subprocess(
     Run a command in a subprocess.
 
     Args:
-        args: See `subprocess.run`.
+        args: See :py:func:`subprocess.run`.
         log_output_live: If `True`, log output live. If `True`, stderr is
             merged into stdout in the return value.
         cwd: See `subprocess.run`.

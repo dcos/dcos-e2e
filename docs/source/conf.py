@@ -7,6 +7,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx_autodoc_napoleon_typehints',
+    'sphinx.ext.intersphinx',
 ]
 
 templates_path = ['_templates']
@@ -45,3 +46,4 @@ html_sidebars = {
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'DCOSE2Edoc'
 autoclass_content = 'init'
+intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
