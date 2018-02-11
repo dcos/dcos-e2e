@@ -2,8 +2,7 @@ DC/OS E2E
 =========
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Contents:
+   :caption: Documentation Contents:
 
    getting-started
    docker-backend
