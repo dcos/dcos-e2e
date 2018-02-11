@@ -57,8 +57,3 @@ nitpick_ignore = [
     ('py:class', 'dcos_e2e.backends._docker.DockerCluster'),
     ('py:exc', 'RetryError'),
 ]
-ignore_warnings = [
-    ('*', 'Field list'),
-]
-
-napoleon_use_rtype = False
