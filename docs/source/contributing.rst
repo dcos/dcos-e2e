@@ -1,5 +1,5 @@
-Contributing to DC/OS E2E
-=========================
+Contributing
+============
 
 Contributions to this repository must pass tests and linting.
 
