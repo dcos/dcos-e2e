@@ -72,6 +72,7 @@ See :doc:`the Cluster reference <cluster>` for more.
    docker-backend
    node
    enterprise
+   from-nodes
    custom-backend
    contributing
 
