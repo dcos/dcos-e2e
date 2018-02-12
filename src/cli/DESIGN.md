@@ -141,3 +141,5 @@ dcos-docker run 213143 pytest
 Label for inspect = bash -> EE?? + version
 
 Should `destroy` be called `rm`?
+
+autocomplete container id

@@ -22,6 +22,9 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 
+logging.disable(logging.WARNING)
+
+
 _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
     'ubuntu-16.04': Distribution.UBUNTU_16_04,
@@ -211,7 +214,6 @@ def create(
 
 
 def _existing_cluster_ids() -> Set[str]:
-    logging.disable(logging.WARNING)
     client = docker.from_env(version='auto')
     filters = {'label': _CLUSTER_ID_LABEL_KEY}
     containers = client.containers.list(filters=filters)
@@ -245,17 +247,16 @@ def destroy(cluster_names: List[str]) -> None:
     for cluster_name in cluster_names:
         filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
         containers = client.containers.list(filters=filters)
-        # Get the containers with the ID label cluster_name
-        containers = []
         if not containers:
-            # Some warning
-            pass
-        # containers = client.containers.list(filters={'name': prefix})
+            print('SOME WARNING')
+            continue
+
         for container in containers:
             workspace_dir = container.labels[_WORKSPACE_DIR_LABEL_KEY]
             container.remove(v=True, force=True)
-
             rmtree(path=str(workspace_dir), ignore_errors=True)
+
+        click.echo(cluster_name)
 
 
 
