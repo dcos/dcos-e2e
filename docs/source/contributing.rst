@@ -148,15 +148,6 @@ In order to avoid this and to see failures faster, we run multiple builds per co
 We run almost one builder per test.
 Some tests are grouped as they can run quickly.
 
-New Backends
-------------
-
-Currently only DC/OS Docker is supported.
-However, it is intended that a ``Cluster`` can take a number of backends.
-
-To create a cluster backend to pass as the ``cluster_backend`` parameter to a ``Cluster``, create a ``ClusterManager`` and ``ClusterBackend`` in ``src/dcos_e2e/backends``.
-
-To run tests against this backend, modify ``cluster_backend`` in ``tests/conftest.py`` to provide this backend.
 
 Goals
 -----

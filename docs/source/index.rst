@@ -42,7 +42,7 @@ In this example we will use a open source DC/OS artifact downloaded to :file:`/t
    oss_artifact = Path('/tmp/dcos_generate_config.sh')
 
 There is much more that you can do with a cluster, and there are other ways to create a cluster.
-See :doc:`the reference <cluster>` for more.
+See :doc:`the Cluster reference <cluster>` for more.
 
 .. toctree::
    :hidden:
