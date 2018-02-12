@@ -51,5 +51,6 @@ See :doc:`the reference <cluster>` for more.
    docker-backend
    node
    enterprise
+   custom-backend
    contributing
    changelog
