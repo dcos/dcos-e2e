@@ -46,6 +46,7 @@ stderr
 stdout
 str
 subpackages
+submodules
 subprocess
 systemd
 tempfile
