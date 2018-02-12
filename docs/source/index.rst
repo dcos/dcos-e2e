@@ -41,11 +41,32 @@ In this example we will use a open source DC/OS artifact downloaded to :file:`/t
 
    oss_artifact = Path('/tmp/dcos_generate_config.sh')
 
-There is much more that you can do with a cluster, and there are other ways to create a cluster.
+   cluster.install_dcos_from_path(
+       build_artifact=oss_artifact,
+       extra_config={
+            'resolvers': ['8.8.8.8'],
+       }
+   )
+
+   cluster.wait_for_dcos_oss()
+
+With a :py:class:`dcos_e2e.cluster.Cluster` you can then run commands on arbitrary :py:class:`dcos_e2e.node.Node`\s.
+
+.. code:: python
+
+    for master in cluster.masters:
+        result = master.run(
+            args=['test', '-f', path],
+            user=cluster.default_ssh_user,
+        )
+        print(result.stdout)
+
+There is much more that you can do with :py:class:`dcos_e2e.cluster.Cluster`\s and :py:class:`dcos_e2e.node.Node`\s, and there are other ways to create a cluster.
+
 See :doc:`the Cluster reference <cluster>` for more.
 
 .. toctree::
-   :hidden:
+   :maxdepth: 2
 
    cluster
    docker-backend
@@ -53,4 +74,8 @@ See :doc:`the Cluster reference <cluster>` for more.
    enterprise
    custom-backend
    contributing
+
+.. toctree::
+   :hidden:
+
    changelog
