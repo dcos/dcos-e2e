@@ -1,5 +1,5 @@
-dcos\_e2e\.backends package
-===========================
+dcos\_e2e.backends package
+==========================
 
 Module contents
 ---------------
