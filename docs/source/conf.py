@@ -8,6 +8,7 @@ Configuration for Sphinx.
 
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath('.'))
 
 extensions = [
@@ -69,14 +70,12 @@ html_show_sourcelink = False
 
 html_theme_options = {
     'show_powered_by': 'false',
-    'fixed_sidebar': True,
-    'sidebar_includehidden': True,
 }
 
 html_sidebars = {
     '**': [
         'about.html',
-        'globaltoc.html',
+        'navigation.html',
         'searchbox.html',
     ],
 }
