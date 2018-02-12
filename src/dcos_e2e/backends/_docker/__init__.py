@@ -16,16 +16,16 @@ from typing import Any, Dict, List, Optional, Set, Type, Union
 
 import docker
 import yaml
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend
 
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
-from dcos_e2e.node import Node
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
+from dcos_e2e.docker_versions import DockerVersion
+from dcos_e2e.node import Node
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
