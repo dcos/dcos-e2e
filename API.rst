@@ -54,9 +54,6 @@ Methods
 ``install_dcos_from_url(build_artifact, extra_config=None, log_output_live=False)``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Installs DC/OS on the given cluster using the DC/OS advanced installation method if supported by the backend.
-This method spins up a persistent bootstrap host that supplies all dedicated DC/OS hosts with the necessary installation files.
-Since the bootstrap host is different from the host initating the cluster creation passing the ``build_artifact`` via URL string saves the time of copying the ``build_artifact`` to the boostrap host.
 
 ``build_artifact``
 ''''''''''''''''''
