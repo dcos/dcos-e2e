@@ -25,7 +25,7 @@ with open('dev-requirements.txt') as dev_requirements:
         if not line.startswith('#'):
             DEV_REQUIRES.append(line)
 
-with open('README.md') as f:
+with open('README.rst') as f:
     LONG_DESCRIPTION = f.read()
 
 setup(

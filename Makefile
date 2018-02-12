@@ -5,8 +5,12 @@ ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_conf
 ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 
-.PHONY: lint-python-only
-lint-python-only:
+# Treat Sphinx warnings as errors
+SPHINXOPTS := -W
+
+# Run various linting tools.
+.PHONY: lint
+lint:
 	check-manifest .
 	doc8 .
 	flake8 .
@@ -19,21 +23,8 @@ lint-python-only:
 	pyroma .
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
-
-.PHONY: lint-docs
-lint-docs:
-	npm run lint-md *.md 2>&1 | \
-	    python -c 'import sys; result = sys.stdin.read(); assert "warning" not in result, result'
-	# Add ToCs and if there is a diff on Travis, error because we don't
-	# want to ship docs without an up to date ToC
-	if [ "${TRAVIS}" = "true" ] ; then \
-	    $(MAKE) toc; \
-	    git diff --exit-code ; \
-	fi
-
-# Run various linting tools.
-.PHONY: lint
-lint: lint-python-only lint-docs
+	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
+	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
@@ -41,13 +32,10 @@ clean:
 	# Ignore errors in case there are no containers to remove.
 	- docker stop $$(docker ps -a -q --filter="name=dcos-e2e") | :
 	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-e2e") | :
-	# We skip errors because this does not exist in legacy versions of
-	# Docker
-	- docker volume prune --force | :
 
 # Fix some linting errors.
 .PHONY: fix-lint
-fix-lint: toc
+fix-lint:
 	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
 	yapf --in-place --recursive .
 	isort --recursive --apply
@@ -62,9 +50,15 @@ download-artifacts:
 	curl -o $(ARTIFACT_PATH) $(ARTIFACT_URL)
 	if [ -n "$(EE_ARTIFACT_URL)" ]; then curl -o $(EE_ARTIFACT_PATH) $(EE_ARTIFACT_URL); fi
 
-.PHONY: toc
-toc:
-	npm run doctoc *.md --github --notitle
+.PHONY: docs
+docs:
+	make -C docs clean SPHINXOPTS=$(SPHINXOPTS)
+	sphinx-apidoc -f -o docs/source src/
+	make -C docs html SPHINXOPTS=$(SPHINXOPTS)
+
+.PHONY: open-docs
+open-docs:
+	open docs/build/html/index.html
 
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.

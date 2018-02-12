@@ -1,5 +1,5 @@
-Contributing to DC/OS E2E
-=========================
+Contributing
+============
 
 Contributions to this repository must pass tests and linting.
 
@@ -21,12 +21,8 @@ Optionally install the following tools for linting and interacting with Travis C
 
     gem install travis --no-rdoc --no-ri
 
-.. code:: sh
-
-    npm install
-
 Spell checking requires ``enchant``.
-This can be installed on macOS, for example, with `Homebrew <http://brew.sh>`__:
+This can be installed on macOS, for example, with `Homebrew <https://brew.sh>`__:
 
 .. code:: sh
 
@@ -52,12 +48,6 @@ To fix some lint errors, run the following:
 .. code:: sh
 
     make fix-lint
-
-To run only the lint tools which require Python, run the following:
-
-.. code:: sh
-
-    make lint-python-only
 
 Tests for this package
 ----------------------
@@ -101,11 +91,12 @@ For example:
 Documentation
 -------------
 
-Run the following command to update the tables of contents:
+Run the following commands to build and open the documentation:
 
 .. code:: sh
 
-    make toc
+    make docs
+    make open-docs
 
 Reviews
 -------
@@ -177,11 +168,11 @@ For timeouts, err on the side of a much longer timeout than necessary.
 
 Do not access the web while running tests.
 
-Parrallelisable Tests
-~~~~~~~~~~~~~~~~~~~~~
+Parallelizable Tests
+~~~~~~~~~~~~~~~~~~~~
 
 The tests in this repository and using this harness are slow.
-This harness must not get in the way of parallelisation efforts.
+This harness must not get in the way of parallelization efforts.
 
 Logging
 ~~~~~~~
@@ -257,7 +248,7 @@ The release process is as follows.
 Updating DC/OS Docker
 ---------------------
 
-`DC/OS Docker <https://github.com/dcos/dcos-docker.git>`__ is vendored in this repository using ``git subtree``.
+`DC/OS Docker <https://github.com/dcos/dcos-docker>`__ is vendored in this repository using ``git subtree``.
 To update DC/OS Docker, use the following command:
 
 .. code:: sh

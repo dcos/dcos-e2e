@@ -3,13 +3,8 @@ Common utilities for end to end tests.
 """
 
 import logging
-from subprocess import (
-    PIPE,
-    STDOUT,
-    CalledProcessError,
-    CompletedProcess,
-    Popen,
-)
+import subprocess
+from subprocess import PIPE, STDOUT, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
@@ -26,17 +21,18 @@ def run_subprocess(
     Run a command in a subprocess.
 
     Args:
-        args: See `subprocess.run`.
+        args: See :py:func:`subprocess.run`.
         log_output_live: If `True`, log output live. If `True`, stderr is
             merged into stdout in the return value.
-        cwd: See `subprocess.run`.
-        env: See `subprocess.run`.
+        cwd: See :py:func:`subprocess.run`.
+        env: See :py:func:`subprocess.run`.
 
     Returns:
-        See `subprocess.run`.
+        See :py:func:`subprocess.run`.
 
     Raises:
-        CalledProcessError: See `subprocess.run`.
+        subprocess.CalledProcessError: See :py:func:`subprocess.run`.
+        Exception: An exception was raised in getting the output from the call.
     """
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
@@ -70,7 +66,7 @@ def run_subprocess(
                 process.wait()
             else:
                 stdout, stderr = process.communicate()
-        except:  # noqa: B001 pragma: no cover
+        except Exception:  # pragma: no cover
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
             process.kill()
@@ -85,7 +81,7 @@ def run_subprocess(
             for line in stderr.rstrip().split(b'\n'):
                 log(line.rstrip().decode('ascii', 'backslashreplace'))
         if process.returncode != 0:
-            raise CalledProcessError(
+            raise subprocess.CalledProcessError(
                 process.returncode,
                 args,
                 output=stdout,

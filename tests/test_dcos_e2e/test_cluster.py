@@ -50,7 +50,7 @@ class TestIntegrationTests:
                 )
                 # This result will not be printed if the test passes, but it
                 # may provide useful debugging information.
-                print(result)  # pragma: no cover
+                logging.debug(str(result))  # pragma: no cover
 
             # `pytest` results in an exit code of 4 when no tests are
             # collected.
@@ -88,7 +88,7 @@ class TestExtendConfig:
             'cluster_docker_credentials': {
                 'auths': {
                     'https://index.docker.io/v1/': {
-                        'auth': 'redacted'
+                        'auth': 'redacted',
                     },
                 },
             },
