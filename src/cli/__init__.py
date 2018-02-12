@@ -2,10 +2,12 @@
 XXX
 """
 
+import string
+import re
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict  # noqa: F401
-from typing import Union
+from typing import Set, Union
 import logging
 import uuid
 
@@ -61,6 +63,35 @@ def _validate_dcos_configuration(
     raise click.BadParameter(message=message)
 
 
+def _validate_cluster_name(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Union[int, bool, str],
+) -> str:
+    """
+    XXX
+    """
+    if value in _existing_cluster_ids():
+        message = 'A cluster with the name {value} already exists'.format(
+            value=value,
+        )
+        raise click.BadParameter(message=message)
+
+    # This matches the Docker ID regex.
+    # Can be seen by running:
+    # > docker run -it --rm --name=' WAT ? I DUNNO ! ' alpine
+    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]?$', str(value)):
+        message = (
+            'Invalid cluster name "{value}", '
+            'only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed.'.format(
+                value=value
+            )
+        )
+        raise click.BadParameter(message)
+
+    return str(value)
+
+
 @click.group()
 def dcos_docker() -> None:
     """
@@ -92,19 +123,19 @@ def dcos_docker() -> None:
     help='by default uses host driver',
 )
 @click.option(
-    '--num-masters',
+    '--masters',
     type=click.INT,
     default=1,
     show_default=True,
 )
 @click.option(
-    '--num-agents',
+    '--agents',
     type=click.INT,
     default=1,
     show_default=True,
 )
 @click.option(
-    '--num-public-agents',
+    '--public-agents',
     type=click.INT,
     default=1,
     show_default=True,
@@ -115,15 +146,22 @@ def dcos_docker() -> None:
     default='{}',
     callback=_validate_dcos_configuration,
 )
+@click.option(
+    '--name',
+    type=str,
+    default=uuid.uuid4().hex,
+    callback=_validate_cluster_name,
+)
 def create(
     artifact: str,
     linux_distribution: str,
     docker_version: str,
-    num_masters: int,
-    num_agents: int,
-    num_public_agents: int,
+    masters: int,
+    agents: int,
+    public_agents: int,
     docker_storage_driver: str,
     extra_config: Dict[str, Any],
+    name: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -131,7 +169,6 @@ def create(
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
-    cluster_id = uuid.uuid4().hex
 
     logging.disable(logging.WARNING)
 
@@ -142,14 +179,14 @@ def create(
         linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
         docker_version=_DOCKER_VERSIONS[docker_version],
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
-        docker_container_labels={_CLUSTER_ID_LABEL_KEY: cluster_id},
+        docker_container_labels={_CLUSTER_ID_LABEL_KEY: name},
     )
 
     cluster = Cluster(
         cluster_backend=cluster_backend,
-        masters=num_masters,
-        agents=num_agents,
-        public_agents=num_public_agents,
+        masters=masters,
+        agents=agents,
+        public_agents=public_agents,
     )
 
     try:
@@ -157,18 +194,14 @@ def create(
             build_artifact=Path(artifact),
             extra_config=extra_config,
         )
-    except CalledProcessError as exc:
+    except CalledProcessError:
         cluster.destroy()
         return
 
-    click.echo(cluster_id)
+    click.echo(name)
 
 
-@dcos_docker.command('list')
-def list_clusters() -> None:
-    """
-    XXX
-    """
+def _existing_cluster_ids() -> Set[str]:
     logging.disable(logging.WARNING)
     client = docker.from_env(version='auto')
     filters = {'label': _CLUSTER_ID_LABEL_KEY}
@@ -176,7 +209,15 @@ def list_clusters() -> None:
     cluster_ids = set(
         [container.labels[_CLUSTER_ID_LABEL_KEY] for container in containers]
     )
-    for cluster_id in cluster_ids:
+    return cluster_ids
+
+
+@dcos_docker.command('list')
+def list_clusters() -> None:
+    """
+    XXX
+    """
+    for cluster_id in _existing_cluster_ids():
         click.echo(cluster_id)
 
 

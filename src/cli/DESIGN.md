@@ -64,9 +64,12 @@ Options:
   --docker-version
   --linux-distribution
   --dcos-checkout (syncs bootstrap / tests)
+  --name
 ```
 
 ```
+# Maybe docker-machine like - without name is 'default' then you never
+# need the name - uses `default` everywhere
 $ dcos-docker create /path/to/build/artifact.sh
 385171
 ```
@@ -93,6 +96,7 @@ $ dcos-docker destroy $(dcos-docker list)
 ### List
 
 ```
+# Should list be called ps
 $ dcos-docker list
 832532
 151531
