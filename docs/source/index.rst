@@ -12,6 +12,10 @@ DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environm
    changelog
 
 .. toctree::
+
+   changelog
+
+.. toctree::
    :hidden:
 
    modules
