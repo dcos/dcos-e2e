@@ -72,7 +72,7 @@ def _validate_cluster_name(
     XXX
     """
     if value in _existing_cluster_ids():
-        message = 'A cluster with the name {value} already exists'.format(
+        message = 'A cluster with the name "{value}" already exists'.format(
             value=value,
         )
         raise click.BadParameter(message=message)
@@ -80,7 +80,7 @@ def _validate_cluster_name(
     # This matches the Docker ID regex.
     # Can be seen by running:
     # > docker run -it --rm --name=' WAT ? I DUNNO ! ' alpine
-    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]?$', str(value)):
+    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
         message = (
             'Invalid cluster name "{value}", '
             'only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed.'.format(
@@ -220,6 +220,12 @@ def list_clusters() -> None:
     for cluster_id in _existing_cluster_ids():
         click.echo(cluster_id)
 
+
+@dcos_docker.command('destroy')
+def destroy() -> None:
+    """
+    XXX
+    """
 
 if __name__ == '__main__':
     dcos_docker()

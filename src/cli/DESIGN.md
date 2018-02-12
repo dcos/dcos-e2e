@@ -133,10 +133,11 @@ A command which basically does `./run-master`.
 sphinx-click for docs
 document contributing = make -C html
 SSH key location in a label
-sphinx-autodoc-napoleon-typehints
 flake8-rst-docstrings
 Single generated file in Wiki
 
 dcos-docker run 213143 pytest
 
 Label for inspect = bash -> EE?? + version
+
+Should `destroy` be called `rm`?
