@@ -6,11 +6,10 @@ import os
 import uuid
 from pathlib import Path
 
+from passlib.hash import sha512_crypt
+
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.distributions import Distribution
-
-from passlib.hash import sha512_crypt
 
 
 class TestAWSBackend:
@@ -34,7 +33,10 @@ class TestAWSBackend:
             ssh_key_path=Path('/Users/tim/.ssh/default'),
         )
 
-        with Cluster(cluster_backend=aws_backend, masters=1) as cluster:
+        with Cluster(
+            cluster_backend=aws_backend,
+            masters=1,
+        ) as cluster:
             cluster.install_dcos_from_url(
                 build_artifact=os.environ['INSTALLER_URL'],
                 extra_config=config,

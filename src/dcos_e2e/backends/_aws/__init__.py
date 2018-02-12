@@ -14,6 +14,7 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
 from dcos_launch.util import AbstractLauncher  # noqa: F401
 from dcos_launch import config, get_launcher
+
 # try:
 #     from dcos_launch import config, get_launcher
 # except ImportError:
@@ -33,6 +34,7 @@ class AWS(ClusterBackend):
         ssh_key_path: Path,
         aws_region: str = 'us-west-2',
         instance_type: str = 'm4.large',
+        admin_location: str = '0.0.0.0/32',
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -45,6 +47,7 @@ class AWS(ClusterBackend):
             'aws_key_name': aws_key_name,
             'instance_type': instance_type,
             'ssh_private_key_filename': str(ssh_key_path),
+            'admin_location': admin_location,
         }
 
     @property
@@ -93,7 +96,8 @@ class AWSCluster(ClusterManager):
         }
 
         self.ssh_key_path = Path(
-            cluster_backend.config['ssh_private_key_filename'])
+            cluster_backend.config['ssh_private_key_filename']
+        )
 
         self.launch_config = {**cluster_config, **cluster_backend.config}
 
@@ -123,8 +127,7 @@ class AWSCluster(ClusterManager):
 
         cluster_info = launcher.create()
 
-        self.dcos_launcher = get_launcher(
-            cluster_info)
+        self.dcos_launcher = get_launcher(cluster_info)
         self.dcos_launcher.wait()
         self.cluster_info = self.dcos_launcher.describe()
 
