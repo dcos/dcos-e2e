@@ -44,22 +44,22 @@ In this example we will use a open source DC/OS artifact downloaded to :file:`/t
 There is much more that you can do with a cluster, and there are other ways to create a cluster.
 See :doc:`the reference <cluster>` for more.
 
-.. autoclass:: cluster.Cluster
+.. autoclass:: dcos_e2e.node.Node
    :members:
    :private-members:
    :special-members:
 
+.. autoclass:: dcos_e2e.cluster.Cluster
+   :members:
+   :private-members:
+   :special-members:
+
+.. node
+
 .. toctree::
 
    cluster
-   node
    docker-backend
    enterprise
    contributing
    changelog
-
-.. toctree::
-   :hidden:
-
-   modules
-   dcos_e2e
