@@ -52,8 +52,8 @@ To fix some lint errors, run the following:
 Tests for this package
 ----------------------
 
-Tests for this package must be run on a host which is supported by DC/OS Docker.
-See the `DC/OS Docker README <https://github.com/dcos/dcos-docker/blob/master/README.md>`__.
+See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
+These requirements also apply to the tests.
 
 Download dependencies which are used by the tests:
 

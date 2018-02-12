@@ -20,6 +20,9 @@ Getting Started
 
 To create a DC/OS cluster, you need a backend.
 Backends are customizable, but for now let's use a standard :doc:`Docker backend <docker-backend>`.
+Each backend has different system requirements.
+See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
+
 
 .. code:: python
 
