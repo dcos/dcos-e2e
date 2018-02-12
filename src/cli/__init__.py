@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict  # noqa: F401
-from typing import Set, Union
+from typing import Set, Union, List
 import logging
 import uuid
 
@@ -172,6 +172,9 @@ def create(
 
     logging.disable(logging.WARNING)
 
+    # TODO some random path within TMPDIR
+    workspace_dir = uuid()
+
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
         custom_agent_mounts=custom_agent_mounts,
@@ -179,7 +182,11 @@ def create(
         linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
         docker_version=_DOCKER_VERSIONS[docker_version],
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
-        docker_container_labels={_CLUSTER_ID_LABEL_KEY: name},
+        docker_container_labels={
+            _CLUSTER_ID_LABEL_KEY: name,
+            'workspace_dir': str(workspace_dir),
+        },
+        workspace_dir=workspace_dir,
     )
 
     cluster = Cluster(
@@ -222,10 +229,28 @@ def list_clusters() -> None:
 
 
 @dcos_docker.command('destroy')
-def destroy() -> None:
+@click.argument(
+    'cluster_names',
+    nargs=-1,
+    type=str,
+)
+def destroy(cluster_names: List[str]) -> None:
     """
     XXX
     """
+    client = docker.from_env(version='auto')
+
+    for cluster_name in cluster_names:
+        # Get the containers with the ID label cluster_name
+        containers = []
+        # containers = client.containers.list(filters={'name': prefix})
+        for container in containers:
+            container.remove(v=True, force=True)
+            cluster_path = '...'
+
+            rmtree(path=str(cluster_path), ignore_errors=True)
+
+
 
 if __name__ == '__main__':
     dcos_docker()
