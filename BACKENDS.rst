@@ -68,11 +68,6 @@ On some platforms, Docker will fail to start up with certain storage drivers.
 Docker labels to add to the cluster node containers.
 Akin to the dictionary option in `docker-py <http://docker-py.readthedocs.io/en/stable/containers.html>`__.
 
-DC/OS Installation
-~~~~~~~~~~~~~~~~~~
-
-``Cluster``\ s created by the Docker backend only support installing DC/OS via ``install_dcos_from_path``.
-``Node``\ s of ``Cluster``\ s created by the Docker backend do not distinguish between ``public_ip_address`` and ``private_ip_address``.
 
 Troubleshooting
 ~~~~~~~~~~~~~~~
