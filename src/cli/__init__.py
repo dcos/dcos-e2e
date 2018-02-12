@@ -243,6 +243,8 @@ def destroy(cluster_names: List[str]) -> None:
     client = docker.from_env(version='auto')
 
     for cluster_name in cluster_names:
+        filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
+        containers = client.containers.list(filters=filters)
         # Get the containers with the ID label cluster_name
         containers = []
         if not containers:
