@@ -2,7 +2,7 @@
 XXX
 """
 
-import string
+from tempfile import gettempdir
 import re
 from pathlib import Path
 from subprocess import CalledProcessError
@@ -41,6 +41,7 @@ _DOCKER_STORAGE_DRIVERS = {
 }
 
 _CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
+_WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 
 
 def _validate_dcos_configuration(
@@ -173,7 +174,7 @@ def create(
     logging.disable(logging.WARNING)
 
     # TODO some random path within TMPDIR
-    workspace_dir = uuid()
+    workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
@@ -184,7 +185,7 @@ def create(
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
         docker_container_labels={
             _CLUSTER_ID_LABEL_KEY: name,
-            'workspace_dir': str(workspace_dir),
+            _WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
         },
         workspace_dir=workspace_dir,
     )
@@ -243,12 +244,15 @@ def destroy(cluster_names: List[str]) -> None:
     for cluster_name in cluster_names:
         # Get the containers with the ID label cluster_name
         containers = []
+        if not containers:
+            # Some warning
+            pass
         # containers = client.containers.list(filters={'name': prefix})
         for container in containers:
-            container.remove(v=True, force=True)
             cluster_path = '...'
+            container.remove(v=True, force=True)
 
-            rmtree(path=str(cluster_path), ignore_errors=True)
+            rmtree(path=str(workspace_dir), ignore_errors=True)
 
 
 
