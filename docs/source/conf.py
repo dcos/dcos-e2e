@@ -85,3 +85,5 @@ html_sidebars = {
 linkcheck_anchors = False
 
 spelling_word_list_filename = '../../spelling_private_dict.txt'
+
+autodoc_member_order = 'bysource'
