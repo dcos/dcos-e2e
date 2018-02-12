@@ -8,6 +8,7 @@ from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict  # noqa: F401
 from typing import Set, Union, List
+from shutil import rmtree
 import logging
 import uuid
 
@@ -249,7 +250,7 @@ def destroy(cluster_names: List[str]) -> None:
             pass
         # containers = client.containers.list(filters={'name': prefix})
         for container in containers:
-            cluster_path = '...'
+            workspace_dir = container.labels[_WORKSPACE_DIR_LABEL_KEY]
             container.remove(v=True, force=True)
 
             rmtree(path=str(workspace_dir), ignore_errors=True)
