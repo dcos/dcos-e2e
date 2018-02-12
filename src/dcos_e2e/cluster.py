@@ -324,7 +324,7 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
     ) -> subprocess.CompletedProcess:
         """
