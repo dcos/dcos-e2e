@@ -23,6 +23,7 @@ lint:
 	pyroma .
 	vulture . --min-confidence 100
 	yapf --diff --recursive src/ tests/
+	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
 # Attempt to clean leftovers by the test suite.

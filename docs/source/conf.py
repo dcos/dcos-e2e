@@ -59,4 +59,26 @@ nitpick_ignore = [
     ('py:exc', 'RetryError'),
 ]
 
+html_show_copyright = False
+html_show_sphinx = False
+html_show_sourcelink = False
+
+html_theme_options = {
+    'show_powered_by': 'false',
+    'fixed_sidebar': True,
+    'sidebar_includehidden': False,
+}
+
+html_sidebars = {
+    '**': [
+        'about.html',
+        'globaltoc.html',
+        'searchbox.html',
+    ],
+}
+
+# Don't check anchors because many websites use #! for AJAX magic
+# http://sphinx-doc.org/config.html#confval-linkcheck_anchors
+linkcheck_anchors = False
+
 spelling_word_list_filename = '../../spelling_private_dict.txt'
