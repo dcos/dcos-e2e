@@ -11,6 +11,7 @@ from typing import Set, Union, List
 from shutil import rmtree
 import logging
 import uuid
+import json
 
 import click
 import yaml
@@ -23,7 +24,6 @@ from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 
 logging.disable(logging.WARNING)
-
 
 _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -88,9 +88,7 @@ def _validate_cluster_name(
     if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
         message = (
             'Invalid cluster name "{value}", '
-            'only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed.'.format(
-                value=value
-            )
+            'only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed.'.format(value=value)
         )
         raise click.BadParameter(message)
 
@@ -260,6 +258,21 @@ def destroy(cluster_names: List[str]) -> None:
             rmtree(path=str(workspace_dir), ignore_errors=True)
 
         click.echo(cluster_name)
+
+
+@dcos_docker.command('inspect')
+@click.argument('cluster_name', type=str)
+def inspect(cluster_name: str) -> None:
+    client = docker.from_env(version='auto')
+    filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
+    containers = client.containers.list(filters=filters)
+
+    # Web address
+    # All IPs
+    # DC/OS version (e.g. EE 1.11)
+    data = {}
+    click.echo(json.dump(data))
+
 
 if __name__ == '__main__':
     dcos_docker()
