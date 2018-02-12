@@ -248,7 +248,10 @@ def destroy(cluster_names: List[str]) -> None:
         filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
         containers = client.containers.list(filters=filters)
         if not containers:
-            print('SOME WARNING')
+            warning = 'No such cluster "{cluster_name}"'.format(
+                cluster_name=cluster_name,
+            )
+            click.echo(warning, err=True)
             continue
 
         for container in containers:
@@ -257,8 +260,6 @@ def destroy(cluster_names: List[str]) -> None:
             rmtree(path=str(workspace_dir), ignore_errors=True)
 
         click.echo(cluster_name)
-
-
 
 if __name__ == '__main__':
     dcos_docker()
