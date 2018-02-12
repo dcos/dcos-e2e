@@ -343,7 +343,7 @@ class Cluster(ContextDecorator):
             The result of the ``pytest`` command.
 
         Raises:
-            ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
+            subprocess.CalledProcessError: If the ``pytest`` command fails.
         """
 
         args = [
