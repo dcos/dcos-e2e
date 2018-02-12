@@ -58,8 +58,6 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
 nitpicky = True
 warning_is_error = True
 nitpick_ignore = [
-    ('py:class', 'dcos_e2e.backends._base_classes.ClusterBackend'),
-    ('py:class', 'dcos_e2e.backends._base_classes.ClusterManager'),
     ('py:class', 'dcos_e2e.backends._docker.DockerCluster'),
     ('py:exc', 'RetryError'),
 ]
