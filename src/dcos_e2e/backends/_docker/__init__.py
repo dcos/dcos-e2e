@@ -431,7 +431,7 @@ class DockerCluster(ClusterManager):
         agent_mounts = {
             '/sys/fs/cgroup': {
                 'bind': '/sys/fs/cgroup',
-                'mode': 'ro'
+                'mode': 'ro',
             },
             **common_mounts,
         }
