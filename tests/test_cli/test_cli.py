@@ -1,5 +1,9 @@
 """
-XXX
+Tests for the CLI.
+
+This mostly provides error case coverage.
+We rely mostly on manual testing.
+This is because automated tests for this would be very slow.
 """
 
 from pathlib import Path

@@ -1,5 +1,5 @@
 """
-XXX
+A CLI for controlling DC/OS clusters on Docker.
 """
 
 import json
@@ -47,6 +47,18 @@ _CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 _WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 
 
+def _existing_cluster_ids() -> Set[str]:
+    """
+    Return the IDs of existing clusters.
+    """
+    client = docker.from_env(version='auto')
+    filters = {'label': _CLUSTER_ID_LABEL_KEY}
+    containers = client.containers.list(filters=filters)
+    return set(
+        [container.labels[_CLUSTER_ID_LABEL_KEY] for container in containers]
+    )
+
+
 def _validate_dcos_configuration(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
@@ -55,13 +67,17 @@ def _validate_dcos_configuration(
     """
     Validate that a given value is a YAML map.
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
     try:
         return dict(yaml.load(str(value)) or {})
     except ValueError:
         message = '"{value}" is not a valid DC/OS configuration'.format(
             value=value,
         )
-    except Exception as exc:
+    except yaml.YAMLError:
         message = '"{value}" is not valid YAML'.format(value=value)
 
     raise click.BadParameter(message=message)
@@ -75,6 +91,10 @@ def _validate_cluster_id(
     """
     Validate that a given value is a YAML map.
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
     if value in _existing_cluster_ids():
         message = 'A cluster with the id "{value}" already exists'.format(
             value=value,
@@ -99,6 +119,10 @@ def _validate_cluster_exists(
     param: Union[click.core.Option, click.core.Parameter],
     value: Union[int, bool, str],
 ) -> str:
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
     cluster_id = str(value)
     if cluster_id not in _existing_cluster_ids():
         message = 'Cluster "{value}" does not exist'.format(value=value)
@@ -185,8 +209,6 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
-    logging.disable(logging.WARNING)
-
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
 
     cluster_backend = Docker(
@@ -222,18 +244,6 @@ def create(
     click.echo(cluster_id)
 
 
-def _existing_cluster_ids() -> Set[str]:
-    """
-    Return the IDs of existing clusters.
-    """
-    client = docker.from_env(version='auto')
-    filters = {'label': _CLUSTER_ID_LABEL_KEY}
-    containers = client.containers.list(filters=filters)
-    return set(
-        [container.labels[_CLUSTER_ID_LABEL_KEY] for container in containers]
-    )
-
-
 @dcos_docker.command('list')
 def list_clusters() -> None:
     """
@@ -260,6 +270,7 @@ def destroy(cluster_ids: List[str]) -> None:
         containers = client.containers.list(filters=filters)
         if not containers:
             warning = 'No such cluster "{cluster_id}"'.format(
+                cluster_id=cluster_id,
             )
             click.echo(warning, err=True)
             continue
@@ -283,9 +294,11 @@ def inspect(cluster_id: str) -> None:
     # containers = client.containers.list(filters=filters)
 
     # Web address
-    # All IPs
-    # DC/OS version (e.g. EE 1.11)
-    data = {}  # type: Dict[Any, Any]
+    # All IP addresses
+    # DC/OS version (e.g. Enterprise 1.11)
+    data = {
+        'Cluster ID': cluster_id,
+    }  # type: Dict[Any, Any]
     click.echo(json.dumps(data))
 
 
