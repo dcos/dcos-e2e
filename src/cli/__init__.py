@@ -220,7 +220,7 @@ def dcos_docker() -> None:
     help='A unique identifier for the cluster. Defaults to a random value.',
 )
 @click.option(
-    '--license-path',
+    '--license-key-path',
     type=click.Path(exists=True),
     envvar='DCOS_LICENSE_KEY_PATH',
     help='If using DC/OS Enterprise, this defaults',
@@ -235,7 +235,7 @@ def create(
     linux_distribution: str,
     masters: int,
     public_agents: int,
-    license_path: str,
+    license_key_path: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -262,7 +262,7 @@ def create(
             This is set to one of the following, in order:
 
             * The `license_key_contents` set in `extra_config`.
-            * The contents of the path given with `--license-path`.
+            * The contents of the path given with `--license-key-path`.
             * The contents of the path set in the `DCOS_LICENSE_KEY_PATH` environment variable.
 
             If none of these are set, `license_key_contents` is not given.
@@ -285,8 +285,8 @@ def create(
             'fault_domain_enabled': False,
         }
 
-        if license_path is not None:
-            key_contents = Path(license_path).read_text()
+        if license_key_path is not None:
+            key_contents = Path(license_key_path).read_text()
             enterprise_extra_config['license_key_contents'] = key_contents
 
         extra_config = {**enterprise_extra_config, **extra_config}
