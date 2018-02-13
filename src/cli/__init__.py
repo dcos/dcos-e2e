@@ -409,12 +409,16 @@ def destroy(cluster_ids: List[str]) -> None:
             click.echo(warning, err=True)
             continue
 
-        filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_id}
+        cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+        containers = {
+            *cluster_containers.masters,
+            *cluster_containers.agents,
+            *cluster_containers.public_agents,
+        }
         containers = client.containers.list(filters=filters)
+        rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
         for container in containers:
-            workspace_dir = container.labels[_WORKSPACE_DIR_LABEL_KEY]
             container.remove(v=True, force=True)
-            rmtree(path=str(workspace_dir), ignore_errors=True)
 
         click.echo(cluster_id)
 
@@ -474,8 +478,14 @@ class _ClusterContainers:
 
     @property
     def cluster(self) -> Cluster:
-        master_container = next(iter(self.masters))
+        ssh_dir = workspace_dir / 'ssh'
 
+
+    @property
+    def workspace_dir(self) -> Path:
+        container = next(iter(self.masters))
+        workspace_dir = container.labels[_WORKSPACE_DIR_LABEL_KEY]
+        return Path(workspace_dir)
 
 
 @dcos_docker.command('wait')
@@ -500,30 +510,17 @@ def wait(
             )
             raise click.BadOptionUsage(message=message)
 
+        cluster_containers.cluster.wait_for_dcos_oss()
+
     superuser_username = superuser_username or 'admin'
     superuser_password = superuser_password or 'admin'
 
     if cluster_containers.is_ee:
-        cluster.wait_for_dcos_ee(
+        cluster_containers.cluster.wait_for_dcos_ee(
             superuser_username=superuser_username or 'admin',
             superuser_password=superuser_password or 'admin',
         )
 
-    # cluster = Cluster.from_nodes(
-    #     masters=masters,
-    #     agents=agents,
-    #     public_agents=public_agents,
-    #     default_ssh_user='root',
-    # )
-
-
-# Store initial
-# Take options, default to admin/admin
-# Store whether EE or not
-# - you say this
-# - inspect build artifact
-# wait, wait_ee
-# Take options, default to nothing
 
 
 @dcos_docker.command('inspect')
