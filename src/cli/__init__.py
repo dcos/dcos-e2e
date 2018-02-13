@@ -6,6 +6,7 @@ import json
 import logging
 import re
 import uuid
+from passlib.hash import sha512_crypt
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
@@ -241,6 +242,21 @@ def create(
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
+
+    enterprise = False
+    if enterprise:
+        superuser_username = 'admin'
+        superuser_password = 'admin'
+
+        license_key_contents = Path(license_path).read_text()
+
+        enterprise_extra_config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
+        }
+        config = {**enterprise_extra_config, **extra_config}
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
