@@ -639,7 +639,7 @@ class DockerCluster(ClusterManager):
             ]
 
             for node in nodes:
-                node.run(args=dcos_install_args, user=ssh_user)
+                node.run(args=dcos_install_args)
 
     def _start_dcos_container(
         self,
@@ -753,6 +753,7 @@ class DockerCluster(ClusterManager):
                 Node(
                     public_ip_address=container_ip_address,
                     private_ip_address=container_ip_address,
+                    default_ssh_user=self._default_ssh_user,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
                 )
             )

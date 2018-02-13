@@ -128,7 +128,6 @@ class TestCopyFiles:
             master.send_file(
                 local_path=ca_key_path,
                 remote_path=master_key_path,
-                user=cluster.default_ssh_user
             )
 
             cluster.wait_for_dcos_ee(

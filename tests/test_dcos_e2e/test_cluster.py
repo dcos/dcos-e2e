@@ -106,9 +106,7 @@ class TestExtendConfig:
             )
             cluster.wait_for_dcos_oss()
             (master, ) = cluster.masters
-            master.run(
-                args=['test', '-f', path], user=cluster.default_ssh_user
-            )
+            master.run(args=['test', '-f', path])
 
     def test_default_config(
         self,
@@ -130,9 +128,7 @@ class TestExtendConfig:
             (master, ) = cluster.masters
             cluster.wait_for_dcos_oss()
             with pytest.raises(CalledProcessError):
-                master.run(
-                    args=['test', '-f', path], user=cluster.default_ssh_user
-                )
+                master.run(args=['test', '-f', path])
 
 
 class TestClusterSize:
@@ -299,31 +295,15 @@ class TestClusterFromNodes:
             (duplicate_agent, ) = duplicate_cluster.agents
             (duplicate_public_agent, ) = duplicate_cluster.public_agents
 
-            duplicate_master.run(
-                args=['touch', 'example_master_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-            duplicate_agent.run(
-                args=['touch', 'example_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
+            duplicate_master.run(args=['touch', 'example_master_file'])
+            duplicate_agent.run(args=['touch', 'example_agent_file'])
             duplicate_public_agent.run(
-                args=['touch', 'example_public_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
+                args=['touch', 'example_public_agent_file']
             )
 
-            master.run(
-                args=['test', '-f', 'example_master_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-            agent.run(
-                args=['test', '-f', 'example_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
-            public_agent.run(
-                args=['test', '-f', 'example_public_agent_file'],
-                user=duplicate_cluster.default_ssh_user,
-            )
+            master.run(args=['test', '-f', 'example_master_file'])
+            agent.run(args=['test', '-f', 'example_agent_file'])
+            public_agent.run(args=['test', '-f', 'example_public_agent_file'])
 
         with pytest.raises(NotImplementedError):
             duplicate_cluster.destroy()

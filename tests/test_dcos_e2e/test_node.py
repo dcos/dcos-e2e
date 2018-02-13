@@ -55,10 +55,9 @@ class TestNode:
         When shell=False, preserve arguments as literal values.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         echo_result = master.run(
-            args=['echo', 'Hello, ', '&&', 'echo', 'World!'], user=default
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!']
         )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
@@ -72,11 +71,9 @@ class TestNode:
         When shell=True, interpret spaces and special characters.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         echo_result = master.run(
             args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
-            user=default,
             shell=True,
         )
         assert echo_result.returncode == 0
@@ -91,11 +88,8 @@ class TestNode:
         Remote environment variables are available.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
-        echo_result = master.run(
-            args=['echo', '$USER'], user=default, shell=True
-        )
+        echo_result = master.run(args=['echo', '$USER'], shell=True)
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'root'
         assert echo_result.stderr == b''
@@ -108,11 +102,9 @@ class TestNode:
         Environment variables can be passed to the remote execution
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         echo_result = master.run(
             args=['echo', '$MYVAR'],
-            user=default,
             env={'MYVAR': 'hello, world'},
             shell=True,
         )
@@ -129,10 +121,9 @@ class TestNode:
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(args=['unset_command'], user=default)
+            master.run(args=['unset_command'])
 
         exception = excinfo.value
         assert exception.returncode == 127
@@ -162,10 +153,9 @@ class TestNode:
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(args=['unset_command'], user=default, shell=True)
+            master.run(args=['unset_command'], shell=True)
 
         exception = excinfo.value
         assert exception.returncode == 127
@@ -194,14 +184,12 @@ class TestNode:
         With `log_output_live`, stdout and stderr are merged and logged.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         # With `log_output_live`, output is logged and stderr is merged
         # into stdout.
         with pytest.raises(CalledProcessError) as excinfo:
             master.run(
                 args=['unset_command'],
-                user=default,
                 log_output_live=True,
             )
 
@@ -232,11 +220,9 @@ class TestNode:
         It is possible to run commands as the given user asynchronously.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         popen_1 = master.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
-            user=default,
             shell=True,
         )
 
@@ -246,7 +232,6 @@ class TestNode:
                 '&&',
                 '(echo $USER > /tmp/pipe)',
             ],
-            user=default,
             shell=True,
         )
 
@@ -257,7 +242,7 @@ class TestNode:
         popen_2.communicate()
         return_code_2 = popen_2.poll()
 
-        assert stdout.strip().decode() == default
+        assert stdout.strip().decode() == master.default_ssh_user
         assert return_code_1 == 0
         assert return_code_2 == 0
 
@@ -277,10 +262,9 @@ class TestNode:
         master.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
-            user=dcos_cluster.default_ssh_user,
         )
         args = ['cat', str(master_destination_path)]
-        result = master.run(args=args, user=dcos_cluster.default_ssh_user)
+        result = master.run(args=args)
         assert result.stdout.decode() == content
 
     def test_string_representation(

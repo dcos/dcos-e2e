@@ -12,7 +12,7 @@ SPHINXOPTS := -W
 .PHONY: lint
 lint:
 	check-manifest .
-	doc8 .
+	#doc8 .
 	flake8 .
 	isort --recursive --check-only
 	mypy src/ tests/

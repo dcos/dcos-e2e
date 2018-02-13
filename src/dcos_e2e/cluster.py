@@ -45,8 +45,6 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        self._default_ssh_user = cluster_backend.default_ssh_user
-
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
@@ -70,8 +68,7 @@ class Cluster(ContextDecorator):
             masters: The master nodes in an existing cluster.
             agents: The agent nodes in an existing cluster.
             public_agents: The public agent nodes in an existing cluster.
-            default_ssh_user: The SSH user name which can be connected to with
-                the SSH keys associated with all nodes.
+            default_ssh_user: The default username to use for SSH connections.
 
         Returns:
             A cluster object with the nodes of an existing cluster.
@@ -104,7 +101,6 @@ class Cluster(ContextDecorator):
             node.run(
                 args=['/opt/mesosphere/bin/dcos-diagnostics', '--diag'],
                 # Keep in mind this must be run as privileged user.
-                user=self.default_ssh_user,
                 log_output_live=True,
                 env={
                     'LC_ALL': 'en_US.UTF-8',
@@ -260,13 +256,6 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
-    @property
-    def default_ssh_user(self) -> str:
-        """
-        Return the default SSH user for accessing a node.
-        """
-        return self._default_ssh_user
-
     def install_dcos_from_url(
         self,
         build_artifact: str,
@@ -376,7 +365,6 @@ class Cluster(ContextDecorator):
 
         return test_host.run(
             args=args,
-            user=self.default_ssh_user,
             log_output_live=log_output_live,
             env=environment_variables,
             shell=True,
