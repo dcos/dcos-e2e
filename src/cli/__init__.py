@@ -307,10 +307,18 @@ def inspect(cluster_id: str) -> None:
     # Web address
     # All IP addresses
     # DC/OS version (e.g. Enterprise 1.11)
+    web_ui = 'xxx'
+    # nodes = {
+    #     'masters': [
+    #             'docker_container_name': 'xxx',
+    #         }
+    #     ]
+    # }
     data = {
         'Cluster ID': cluster_id,
+        'Web UI': web_ui,
     }  # type: Dict[Any, Any]
-    click.echo(json.dumps(data))
+    click.echo(json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True))
 
 
 if __name__ == '__main__':
