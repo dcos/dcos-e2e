@@ -154,3 +154,5 @@ Document multiple ways to use --license,
 e.g. use case of set env var once
 
 Design logging system (wait?)
+
+pip install click-spinner
