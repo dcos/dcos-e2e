@@ -494,22 +494,27 @@ def inspect(cluster_id: str, env: bool) -> None:
                 click.echo(message)
         return
 
+    class InspectView(dict):
+        def __init__(self, container):
+            self._container = container
+
+        def to_dict(self):
+            return {'docker_container_name': self._container.name}
+
+    
     masters = [
-        {
-            'docker_container_name': container.name
-        } for container in cluster_containers.masters
+        InspectView(container).to_dict()
+        for container in cluster_containers.masters
     ]
 
     agents = [
-        {
-            'docker_container_name': container.name
-        } for container in cluster_containers.agents
+        InspectView(container).to_dict()
+        for container in cluster_containers.agents
     ]
 
     public_agents = [
-        {
-            'docker_container_name': container.name
-        } for container in cluster_containers.public_agents
+        InspectView(container).to_dict()
+        for container in cluster_containers.public_agents
     ]
 
     # DC/OS version (e.g. Enterprise 1.11)?
