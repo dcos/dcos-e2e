@@ -365,8 +365,54 @@ def destroy(cluster_ids: List[str]) -> None:
         click.echo(cluster_id)
 
 
+class _ClusterContainers:
+    """
+    XXX
+    """
+
+    def __init__(self, cluster_id: str) -> None:
+        self._cluster_id_label = _CLUSTER_ID_LABEL_KEY + '=' + cluster_id
+
+    def _containers_by_node_type(
+        self,
+        node_type: str,
+    ) -> List[docker.models.containers.Container]:
+        """
+        XXX
+        """
+        client = docker.from_env(version='auto')
+        filters = {
+            'label': [
+                self._cluster_id_label,
+                'node_type={node_type}'.format(node_type=node_type),
+            ]
+        }
+        return client.containers.list(filters=filters)
+
+    @property
+    def masters(self) -> List[docker.models.containers.Container]:
+        """
+        XXX
+        """
+        return self._containers_by_node_type(node_type='master')
+
+    @property
+    def agents(self) -> List[docker.models.containers.Container]:
+        """
+        XXX
+        """
+        return self._containers_by_node_type(node_type='agent')
+
+    @property
+    def public_agents(self) -> List[docker.models.containers.Container]:
+        """
+        XXX
+        """
+        return self._containers_by_node_type(node_type='public_agent')
+
+
 @dcos_docker.command('wait')
-@click.argument('cluster_id', type=str)#, callback=_validate_cluster_exists)
+@click.argument('cluster_id', type=str)  #, callback=_validate_cluster_exists)
 @click.option('--superuser-username', type=str)
 @click.option('--superuser-password', type=str)
 def wait(
@@ -398,7 +444,12 @@ def wait(
         )
         raise click.BadOptionUsage(message=message)
 
-    pass
+    cluster = Cluster.from_nodes(
+        masters=masters,
+        agents=agents,
+        public_agents=public_agents,
+        default_ssh_user='root',
+    )
 
 
 # Store initial
