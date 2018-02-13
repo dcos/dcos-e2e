@@ -465,7 +465,7 @@ class _ClusterContainers:
         XXXX
         """
         master_container = next(iter(self.masters))
-        return master_container.labels[_VARIANT_LABEL_KEY] == 'ee'
+        return bool(master_container.labels[_VARIANT_LABEL_KEY] == 'ee')
 
 
 @dcos_docker.command('wait')

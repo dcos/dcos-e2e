@@ -8,6 +8,7 @@ cryptography==2.1.4
 dcos-test-utils==0.1
 docker==3.0.1
 paramiko==2.4.0
+passlib==1.7.1
 PyYAML==3.12
 retry==0.9.2
 scp==0.10.2
