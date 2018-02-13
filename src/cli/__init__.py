@@ -7,6 +7,7 @@ import logging
 import re
 import subprocess
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
@@ -27,6 +28,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
+from dcos_e2e.node import Node
 
 logging.disable(logging.WARNING)
 
@@ -458,6 +460,15 @@ class _ClusterContainers:
         }
         return set(client.containers.list(filters=filters))
 
+    def _to_node(self, container: Container) -> Node:
+        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
+        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
+        return Node(
+            public_ip_address=address,
+            private_ip_address=address,
+            ssh_key_path=ssh_key_path,
+        )
+
     @property
     def masters(self) -> Set[Container]:
         """
@@ -492,24 +503,11 @@ class _ClusterContainers:
         """
         Return a ``Cluster`` constructed from the containers.
         """
-        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
-        masters = set([])
-        for container in self.masters:
-            container_ip_address = IPv4Address(
-                container.attrs['NetworkSettings']['IPAddress']
-            )
-            masters.add(
-                Node(
-                    public_ip_address=container_ip_address,
-                    private_ip_address=container_ip_address,
-                    ssh_key_path=ssh_key_path,
-                )
-            )
-
         return Cluster.from_nodes(
-            masters=masters,
-            agents=agents,
-            public_agents=public_agents,
+            masters=set(map(self._to_node, self.masters)),
+            agents=set(map(self._to_node, self.agents)),
+            public_agents=set(map(self._to_node, self.public_agents)),
+            default_ssh_user='root',
         )
 
     @property

@@ -122,7 +122,6 @@ $ dcos-docker inspect 151531
 
 ### Enterprise ideas
 
-License parameter?
 Handle custom CA cert?
 Sync different integration tests?
 
@@ -133,12 +132,8 @@ A command which basically does `./run-master`.
 ## Misc ideas
 
 sphinx-click for docs
-SSH key location in a label
-Single generated file in Wiki
 
 dcos-docker run 213143 pytest
-
-Label for inspect = bash -> EE?? + version
 
 Should `destroy` be called `rm`?
 
