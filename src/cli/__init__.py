@@ -316,6 +316,7 @@ def create(
 
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
     ssh_keypair_dir = workspace_dir / 'ssh'
+    ssh_keypair_dir.mkdir(parents=True)
     _write_key_pair(
         public_key_path=ssh_keypair_dir / 'id_rsa.pub',
         private_key_path=ssh_keypair_dir / 'id_rsa',
