@@ -519,15 +519,29 @@ class _ClusterContainers:
 
 @dcos_docker.command('wait')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
-@click.option('--superuser-username', type=str)
-@click.option('--superuser-password', type=str)
+@click.option(
+    '--superuser-username',
+    type=str,
+    help=(
+        'The superuser username is needed only on DC/OS Enterprise clusters. '
+        'By default, on a DC/OS Enterprise cluster, `admin` is used.'
+    ),
+)
+@click.option(
+    '--superuser-password',
+    type=str,
+    help=(
+        'The superuser password is needed only on DC/OS Enterprise clusters. '
+        'By default, on a DC/OS Enterprise cluster, `admin` is used.'
+    ),
+)
 def wait(
     cluster_id: str,
     superuser_username: Optional[str],
     superuser_password: Optional[str],
 ) -> None:
     """
-    If Enterprise, uses admin admin like the default...
+    Wait for DC/OS to start.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
