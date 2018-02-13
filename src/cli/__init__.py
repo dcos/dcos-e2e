@@ -299,6 +299,18 @@ def destroy(cluster_ids: List[str]) -> None:
 def wait(cluster_id: str) -> None:
     pass
 
+# Store initial
+# Take options, default to admin/admin
+# Store whether EE or not
+# - you say this
+# - inspect build artifact
+# wait, wait_ee
+# Take options, default to nothing
+
+# We store if cluster is EE, put that in a label
+# We also give the cluster a default uname/pw (admin/admin)?
+# Error if OSS and you give uname / pw
+
 
 @dcos_docker.command('inspect')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
