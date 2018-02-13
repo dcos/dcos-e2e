@@ -444,7 +444,10 @@ class DockerCluster(ClusterManager):
         }
 
         agent_mounts = {
-            '/sys/fs/cgroup': {'bind': '/sys/fs/cgroup', 'mode': 'ro'},
+            '/sys/fs/cgroup': {
+                'bind': '/sys/fs/cgroup',
+                'mode': 'ro'
+            },
             **common_mounts,
         }
 
@@ -474,7 +477,9 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{'node_type': 'master'},
+                    **{
+                        'node_type': 'master'
+                    },
                 },
             )
 
@@ -508,7 +513,9 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{'node_type': 'agent'},
+                    **{
+                        'node_type': 'agent'
+                    },
                 },
             )
 
@@ -542,7 +549,9 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{'node_type': 'public_agent'},
+                    **{
+                        'node_type': 'public_agent'
+                    },
                 },
             )
 

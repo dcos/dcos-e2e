@@ -478,8 +478,7 @@ class _ClusterContainers:
 
     @property
     def cluster(self) -> Cluster:
-        ssh_dir = workspace_dir / 'ssh'
-
+        workspace_dir / 'ssh'
 
     @property
     def workspace_dir(self) -> Path:
@@ -520,7 +519,6 @@ def wait(
             superuser_username=superuser_username or 'admin',
             superuser_password=superuser_password or 'admin',
         )
-
 
 
 @dcos_docker.command('inspect')

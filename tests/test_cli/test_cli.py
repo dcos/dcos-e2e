@@ -214,9 +214,8 @@ class TestDestroy:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['destroy', unique])
         assert result.exit_code == 0
-        expected_error = (
-            'Cluster "{unique}" does not exist'
-        ).format(unique=unique)
+        expected_error = ('Cluster "{unique}" does not exist'
+                          ).format(unique=unique)
         assert expected_error in result.output
 
 
@@ -277,7 +276,6 @@ class TestInspect:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['inspect', unique])
         assert result.exit_code == 2
-        expected_error = (
-            'Cluster "{unique}" does not exist'
-        ).format(unique=unique)
+        expected_error = ('Cluster "{unique}" does not exist'
+                          ).format(unique=unique)
         assert expected_error in result.output
