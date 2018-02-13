@@ -264,6 +264,8 @@ class DockerCluster(ClusterManager):
                 `/genconf` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
+        self._default_ssh_user = cluster_backend.default_ssh_user
+
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
@@ -524,8 +526,6 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels=cluster_backend.docker_container_labels,
             )
-
-        self._default_ssh_user = cluster_backend.default_ssh_user
 
     def install_dcos_from_url(
         self,
