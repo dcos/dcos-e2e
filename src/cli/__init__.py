@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Set, Union, Optional  # noqa: F401
 import click
 import docker
 import yaml
+from docker.models.containers import Container
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -48,6 +49,14 @@ _DOCKER_STORAGE_DRIVERS = {
 _CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 _WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 _VARIANT_LABEL_KEY = 'dcos_e2e.variant'
+
+
+class _InspectView:
+    def __init__(self, container: Container) -> None:
+        self._container = container
+
+    def to_dict(self) -> Dict[str, str]:
+        return {'docker_container_name': self._container.name}
 
 
 def _existing_cluster_ids() -> Set[str]:
@@ -376,7 +385,7 @@ class _ClusterContainers:
     def _containers_by_node_type(
         self,
         node_type: str,
-    ) -> Set[docker.models.containers.Container]:
+    ) -> Set[Container]:
         """
         XXX
         """
@@ -390,21 +399,21 @@ class _ClusterContainers:
         return set(client.containers.list(filters=filters))
 
     @property
-    def masters(self) -> Set[docker.models.containers.Container]:
+    def masters(self) -> Set[Container]:
         """
         XXX
         """
         return self._containers_by_node_type(node_type='master')
 
     @property
-    def agents(self) -> Set[docker.models.containers.Container]:
+    def agents(self) -> Set[Container]:
         """
         XXX
         """
         return self._containers_by_node_type(node_type='agent')
 
     @property
-    def public_agents(self) -> Set[docker.models.containers.Container]:
+    def public_agents(self) -> Set[Container]:
         """
         XXX
         """
@@ -494,26 +503,18 @@ def inspect(cluster_id: str, env: bool) -> None:
                 click.echo(message)
         return
 
-    class InspectView(dict):
-        def __init__(self, container):
-            self._container = container
-
-        def to_dict(self):
-            return {'docker_container_name': self._container.name}
-
-    
     masters = [
-        InspectView(container).to_dict()
+        _InspectView(container).to_dict()
         for container in cluster_containers.masters
     ]
 
     agents = [
-        InspectView(container).to_dict()
+        _InspectView(container).to_dict()
         for container in cluster_containers.agents
     ]
 
     public_agents = [
-        InspectView(container).to_dict()
+        _InspectView(container).to_dict()
         for container in cluster_containers.public_agents
     ]
 
