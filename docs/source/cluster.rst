@@ -56,6 +56,13 @@ Depending on the hardware and the backend, DC/OS can take some time to install.
 The methods to wait for DC/OS repeatedly poll the cluster until services are up.
 Choose the :py:meth:`~dcos_e2e.cluster.Cluster.wait_for_dcos_oss` or :py:meth:`~dcos_e2e.cluster.Cluster.wait_for_dcos_ee` as appropriate.
 
+Running Integration Tests
+-------------------------
+
+It is possible to easily run DC/OS integration tests on a cluster.
+
+.. cluster
+
 Reference
 ---------
 
