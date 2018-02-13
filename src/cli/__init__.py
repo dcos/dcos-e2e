@@ -2,22 +2,26 @@
 A CLI for controlling DC/OS clusters on Docker.
 """
 
+import inspect
 import json
 import logging
 import re
-import uuid
 import subprocess
-from passlib.hash import sha512_crypt
+import uuid
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
 from tempfile import gettempdir
-from typing import Any, Dict, List, Set, Union, Optional  # noqa: F401
+from typing import Any, Dict, List, Optional, Set, Union  # noqa: F401
 
 import click
 import docker
 import yaml
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.models.containers import Container
+from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -49,6 +53,35 @@ _DOCKER_STORAGE_DRIVERS = {
 _CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 _WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 _VARIANT_LABEL_KEY = 'dcos_e2e.variant'
+
+
+def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
+    """
+    Write an RSA key pair for connecting to nodes via SSH.
+
+    Args:
+        public_key_path: Path to write public key to.
+        private_key_path: Path to a private key file to write.
+    """
+    rsa_key_pair = rsa.generate_private_key(
+        backend=default_backend(),
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    public_key = rsa_key_pair.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH,
+    )
+
+    private_key = rsa_key_pair.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+
+    public_key_path.write_bytes(data=public_key)
+    private_key_path.write_bytes(data=private_key)
 
 
 class _InspectView:
@@ -282,6 +315,7 @@ def create(
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
+    workspace_dir / 'ssh'
 
     enterprise = _is_enterprise(build_artifact=Path(artifact))
 
