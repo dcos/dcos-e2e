@@ -12,6 +12,7 @@ python:
 - '3.5'
 env:
   matrix:
+  - TEST_PATTERN=tests/test_cli
   - TEST_PATTERN=tests/test_dcos_e2e/backends/test_docker.py::TestDistributions::test_coreos_enterprise
   - TEST_PATTERN=tests/test_dcos_e2e/backends/test_docker.py::TestDistributions::test_coreos_oss
   - TEST_PATTERN=tests/test_dcos_e2e/backends/test_docker.py::TestDistributions::test_custom_choice
