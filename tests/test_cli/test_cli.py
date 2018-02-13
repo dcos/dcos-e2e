@@ -269,8 +269,6 @@ class TestDestroy:
         assert expected_error in result.output
 
 
-
-
 class TestList:
     """
     Tests for the `list` subcommand.
