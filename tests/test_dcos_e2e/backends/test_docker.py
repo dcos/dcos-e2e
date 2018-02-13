@@ -372,7 +372,7 @@ class TestDockerStorageDriver:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            node_driver = self._get_storage_driver(node=master, )
+            node_driver = self._get_storage_driver(node=master)
 
         assert node_driver == DockerStorageDriver.AUFS
 
