@@ -274,6 +274,16 @@ class Cluster(ContextDecorator):
         log_output_live: bool = False,
     ) -> None:
         """
+        Installs DC/OS using the DC/OS advanced installation method if
+        supported by the backend.
+
+        This method spins up a persistent bootstrap host that supplies all
+        dedicated DC/OS hosts with the necessary installation files.
+
+        Since the bootstrap host is different from the host initiating the
+        cluster creation passing the ``build_artifact`` via URL string
+        saves the time of copying the ``build_artifact`` to the bootstrap host.
+
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
@@ -324,7 +334,7 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
     ) -> subprocess.CompletedProcess:
         """
@@ -343,7 +353,7 @@ class Cluster(ContextDecorator):
             The result of the ``pytest`` command.
 
         Raises:
-            ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
+            subprocess.CalledProcessError: If the ``pytest`` command fails.
         """
 
         args = [
