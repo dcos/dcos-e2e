@@ -330,3 +330,42 @@ class TestInspect:
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
         assert expected_error in result.output
+
+
+class TestWait:
+    """
+    Tests for the `wait` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker inspect --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['wait', '--help'])
+        assert result.exit_code == 0
+        expected_help = dedent(
+            """\
+            Usage: dcos_docker wait [OPTIONS] CLUSTER_ID
+
+              If Enterprise, uses admin admin like the default...
+
+            Options:
+              --superuser-username TEXT
+              --superuser-password TEXT
+              --help                     Show this message and exit.
+            """
+        )
+        assert result.output == expected_help
+
+    def test_cluster_does_not_exist(self) -> None:
+        """
+        An error is shown if the given cluster does not exist.
+        """
+        unique = uuid.uuid4().hex
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['wait', unique])
+        assert result.exit_code == 2
+        expected_error = 'Cluster "{unique}" does not exist'
+        expected_error = expected_error.format(unique=unique)
+        assert expected_error in result.output
