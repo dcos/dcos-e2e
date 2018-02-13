@@ -154,7 +154,7 @@ class Node:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
         """
-        if not user:
+        if user is None:
             user = self.default_ssh_user
 
         ssh_args = self._compose_ssh_command(
@@ -189,7 +189,7 @@ class Node:
         Returns:
             The pipe object attached to the specified process.
         """
-        if not user:
+        if user is None:
             user = self.default_ssh_user
 
         ssh_args = self._compose_ssh_command(
@@ -213,7 +213,7 @@ class Node:
                 secure copy. If unset the `default_ssh_user` is
                 used instead.
         """
-        if not user:
+        if user is None:
             user = self.default_ssh_user
 
         ssh_client = paramiko.SSHClient()
