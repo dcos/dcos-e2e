@@ -12,34 +12,43 @@ from click.testing import CliRunner
 from cli import dcos_docker
 
 
-@pytest.mark.parametrize('arguments', [
-    [],
-    ['--help'],
-])
-def test_help(arguments: List[str]) -> None:
+class TestDcosDocker:
     """
-    Help test is shown with `dcos_docker` and `dcos_docker --help`.
+    Tests for the top level `dcos_docker` command.
     """
-    runner = CliRunner()
-    result = runner.invoke(dcos_docker, arguments)
-    assert result.exit_code == 0
-    expected_help = dedent(
-        """\
-        Usage: dcos_docker [OPTIONS] COMMAND [ARGS]...
 
-          Manage DC/OS clusters on Docker.
-
-        Options:
-          --help  Show this message and exit.
-
-        Commands:
-          create  Create a DC/OS cluster.
+    @pytest.mark.parametrize('arguments', [
+        [],
+        ['--help'],
+    ])
+    def test_help(self, arguments: List[str]) -> None:
         """
-    )
-    assert result.output == expected_help
+        Help test is shown with `dcos_docker` and `dcos_docker --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, arguments)
+        assert result.exit_code == 0
+        expected_help = dedent(
+            """\
+            Usage: dcos_docker [OPTIONS] COMMAND [ARGS]...
+
+              Manage DC/OS clusters on Docker.
+
+            Options:
+              --help  Show this message and exit.
+
+            Commands:
+              create  Create a DC/OS cluster.
+            """
+        )
+        assert result.output == expected_help
 
 
 class TestCreate:
+    """
+    Tests for the `create` subcommand.
+    """
+
     def test_help(self) -> None:
         """
         Help test is shown with `dcos_docker create --help`.
@@ -47,7 +56,7 @@ class TestCreate:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['create', '--help'])
         assert result.exit_code == 0
-        # yapf breaks multiline noqa, see
+        # yapf breaks multi-line noqa, see
         # https://github.com/google/yapf/issues/524.
         # yapf: disable
         expected_help = dedent(
@@ -87,6 +96,9 @@ class TestCreate:
         assert expected_error in result.output
 
     def test_invalid_yaml(self, oss_artifact: Path) -> None:
+        """
+        An error is shown if invalid YAML is given for `--extra-config`.
+        """
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -108,6 +120,10 @@ class TestCreate:
         assert result.output == expected_message
 
     def test_not_key_value(self, oss_artifact: Path) -> None:
+        """
+        An error is shown if YAML is given for `--extra-config` which is not
+        a key-value mapping.
+        """
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -119,7 +135,7 @@ class TestCreate:
             ],
         )
         assert result.exit_code == 2
-        # yapf breaks multiline noqa, see
+        # yapf breaks multi-line noqa, see
         # https://github.com/google/yapf/issues/524.
         # yapf: disable
         expected_message = dedent(
