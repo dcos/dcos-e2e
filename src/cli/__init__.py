@@ -432,11 +432,8 @@ def wait(
     """
     If Enterprise, uses admin admin like ...
     """
-    client = docker.from_env(version='auto')
-    cluster_id_label = _CLUSTER_ID_LABEL_KEY + '=' + cluster_id
-    master_filters = {'label': [cluster_id_label, 'node_type=master']}
-    master_containers = client.containers.list(filters=master_filters)
-    master_container = master_containers[0]
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    master_container = next(iter(cluster_containers.masters))
     is_enterprise = master_container.labels[_VARIANT_LABEL_KEY] == 'ee'
 
     if is_enterprise:
