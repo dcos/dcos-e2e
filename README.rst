@@ -27,7 +27,7 @@ Usage
 -----
 
 Below is a small example with a Docker backend.
-See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=latest>`_ for more details.
+See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=latest>`_ for more details on these and other features.
 
 .. code:: python
 
