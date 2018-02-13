@@ -394,7 +394,7 @@ class _ClusterContainers:
             'label': [
                 self._cluster_id_label,
                 'node_type={node_type}'.format(node_type=node_type),
-            ]
+            ],
         }
         return set(client.containers.list(filters=filters))
 
