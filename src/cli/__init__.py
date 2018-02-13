@@ -334,10 +334,9 @@ def inspect(cluster_id: str) -> None:
             for container in public_agent_containers
         },
     ]
-    # Web address
-    # All IP addresses
-    # DC/OS version (e.g. Enterprise 1.11)
-    web_ui = 'xxx'
+    # DC/OS version (e.g. Enterprise 1.11)?
+    master = master_containers[0]
+    web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
     nodes = {
         'masters': masters,
         'agents': agents,

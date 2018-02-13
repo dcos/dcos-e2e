@@ -142,3 +142,11 @@ Should `destroy` be called `rm`?
 
 autocomplete container id
 https://github.com/click-contrib/click-completion
+
+# dcos_docker foo 2194312531
+export MASTER_0=<docker_id>
+export MASTER_1=<docker_id_>
+export AGENT_0=<docker_id_>
+
+source $(dcos_docker foo 2321431)
+docker exec -it $MASTER_0 /bin/bash
