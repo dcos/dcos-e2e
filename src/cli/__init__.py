@@ -384,13 +384,19 @@ def wait(
     master_container = master_containers[0]
     is_enterprise = master_container.labels[_VARIANT_LABEL_KEY] == 'ee'
 
-    if not is_enterprise:
-        if superuser_username or superuser_password:
+    if is_enterprise:
+        if not superuser_username or not superuser_password:
             message = (
-                '`--superuser-username` and `--superuser-password` must not '
-                'be set for open source DC/OS clusters.'
+                '`--superuser-username` and `--superuser-password` must be '
+                'set for an DC/OS Enterprise cluster.'
             )
             raise click.BadOptionUsage(message=message)
+    elif superuser_username or superuser_password:
+        message = (
+            '`--superuser-username` and `--superuser-password` must not '
+            'be set for an open source DC/OS cluster.'
+        )
+        raise click.BadOptionUsage(message=message)
 
     pass
 
