@@ -51,9 +51,10 @@ class TestDcosDocker:
 
             Commands:
               create   Create a DC/OS cluster.
-              destroy  Destroy a cluster.
+              destroy  Destroy clusters.
               inspect  Show cluster details.
               list     List all clusters.
+              wait     If Enterprise, uses admin admin like the...
             """
         )
         assert result.output == expected_help
@@ -80,6 +81,32 @@ class TestCreate:
 
               Create a DC/OS cluster.
 
+                  DC/OS Enterprise
+
+                              DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
+                              For example, enterprise clusters require the following configuration parameters:
+
+                              * `superuser_username`
+                              * `superuser_password_hash`
+                              * `fault_domain_enabled`
+                              * `license_key_contents`
+
+                              These can all be set in `extra_config`.
+                              However, some defaults are provided for all but the license key.
+
+                              The default superuser username is `admin`.
+                              The default superuser password is `admin`.
+                              The default `fault_domain_enabled` is `false`.
+
+                              `license_key_contents` must be set for DC/OS Enterprise 1.11 and above.
+                              This is set to one of the following, in order:
+
+                              * The `license_key_contents` set in `extra_config`.
+                              * The contents of the path given with `--license-key-path`.
+                              * The contents of the path set in the `DCOS_LICENSE_KEY_PATH` environment variable.
+
+                              If none of these are set, `license_key_contents` is not given.
+
             Options:
               --docker-version [1.13.1|1.11.2]
                                               The Docker version to install on the nodes.
@@ -99,6 +126,10 @@ class TestCreate:
                                               default configuration.
               --cluster-id TEXT               A unique identifier for the cluster. Defaults
                                               to a random value.
+              --license-key-path PATH         This is ignored if using open source DC/OS. If
+                                              using DC/OS Enterprise, this defaults to the
+                                              value of the `DCOS_LICENSE_KEY_PATH`
+                                              environment variable.
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )
@@ -198,7 +229,11 @@ class TestDestroy:
             """\
             Usage: dcos_docker destroy [OPTIONS] [CLUSTER_IDS]...
 
-              Destroy a cluster.
+              Destroy clusters.
+
+              This takes >= 1 cluster IDs. To destroy all clusters, run:
+
+              dcos_docker destroy $(dcos_docker list)
 
             Options:
               --help  Show this message and exit.
@@ -208,15 +243,32 @@ class TestDestroy:
 
     def test_cluster_does_not_exist(self) -> None:
         """
-        XXX
+        An error is shown if the given cluster does not exist.
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['destroy', unique])
         assert result.exit_code == 0
-        expected_error = ('Cluster "{unique}" does not exist'
-                          ).format(unique=unique)
+        expected_error = 'Cluster "{unique}" does not exist'
+        expected_error = expected_error.format(unique=unique)
         assert expected_error in result.output
+
+    def test_multiple_clusters(self) -> None:
+        """
+        It is possible to give multiple cluster IDs.
+        """
+        unique = uuid.uuid4().hex
+        unique_2 = uuid.uuid4().hex
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['destroy', unique, unique_2])
+        assert result.exit_code == 0
+        expected_error = 'Cluster "{unique}" does not exist'
+        expected_error = expected_error.format(unique=unique)
+        assert expected_error in result.output
+        expected_error = expected_error.format(unique=unique_2)
+        assert expected_error in result.output
+
+
 
 
 class TestList:
@@ -263,6 +315,7 @@ class TestInspect:
               Show cluster details.
 
             Options:
+              --env   Show details in an environment variable format to eval.
               --help  Show this message and exit.
             """
         )
@@ -270,12 +323,12 @@ class TestInspect:
 
     def test_cluster_does_not_exist(self) -> None:
         """
-        XXX
+        An error is shown if the given cluster does not exist.
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['inspect', unique])
         assert result.exit_code == 2
-        expected_error = ('Cluster "{unique}" does not exist'
-                          ).format(unique=unique)
+        expected_error = 'Cluster "{unique}" does not exist'
+        expected_error = expected_error.format(unique=unique)
         assert expected_error in result.output
