@@ -422,10 +422,14 @@ def destroy(cluster_ids: List[str]) -> None:
 
 class _ClusterContainers:
     """
-    XXX
+    A representation of a cluster constructed from Docker nodes.
     """
 
     def __init__(self, cluster_id: str) -> None:
+        """
+        Args:
+            cluster_id: The ID of the cluster.
+        """
         self._cluster_id_label = _CLUSTER_ID_LABEL_KEY + '=' + cluster_id
 
     def _containers_by_node_type(
@@ -433,7 +437,7 @@ class _ClusterContainers:
         node_type: str,
     ) -> Set[Container]:
         """
-        XXX
+        Return all containers in this cluster of a particular node type.
         """
         client = docker.from_env(version='auto')
         filters = {
@@ -447,35 +451,39 @@ class _ClusterContainers:
     @property
     def masters(self) -> Set[Container]:
         """
-        XXX
+        Docker containers which represent master nodes.
         """
         return self._containers_by_node_type(node_type='master')
 
     @property
     def agents(self) -> Set[Container]:
         """
-        XXX
+        Docker containers which represent agent nodes.
         """
         return self._containers_by_node_type(node_type='agent')
 
     @property
     def public_agents(self) -> Set[Container]:
         """
-        XXX
+        Docker containers which represent public agent nodes.
         """
         return self._containers_by_node_type(node_type='public_agent')
 
     @property
-    def is_ee(self) -> bool:
+    def is_enterprise(self) -> bool:
         """
-        XXXX
+        Return whether the cluster is a DC/OS Enterprise cluster.
         """
         master_container = next(iter(self.masters))
         return bool(master_container.labels[_VARIANT_LABEL_KEY] == 'ee')
 
     @property
     def cluster(self) -> Cluster:
-        ssh_dir = workspace_dir / 'ssh'
+        """
+        Return a ``Cluster`` constructed from the containers.
+        """
+        # _ = self.workspace_dir / 'ssh'
+        #
 
     @property
     def workspace_dir(self) -> Path:
@@ -498,7 +506,7 @@ def wait(
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
-    if not cluster_containers.is_ee:
+    if not cluster_containers.is_enterprise:
         if superuser_username or superuser_password:
             message = (
                 '`--superuser-username` and `--superuser-password` must not '
@@ -511,7 +519,7 @@ def wait(
     superuser_username = superuser_username or 'admin'
     superuser_password = superuser_password or 'admin'
 
-    if cluster_containers.is_ee:
+    if cluster_containers.is_enterprise:
         cluster_containers.cluster.wait_for_dcos_ee(
             superuser_username=superuser_username or 'admin',
             superuser_password=superuser_password or 'admin',

@@ -478,7 +478,7 @@ class DockerCluster(ClusterManager):
                 labels={
                     **cluster_backend.docker_container_labels,
                     **{
-                        'node_type': 'master'
+                        'node_type': 'master',
                     },
                 },
             )
@@ -514,7 +514,7 @@ class DockerCluster(ClusterManager):
                 labels={
                     **cluster_backend.docker_container_labels,
                     **{
-                        'node_type': 'agent'
+                        'node_type': 'agent',
                     },
                 },
             )
@@ -550,7 +550,7 @@ class DockerCluster(ClusterManager):
                 labels={
                     **cluster_backend.docker_container_labels,
                     **{
-                        'node_type': 'public_agent'
+                        'node_type': 'public_agent',
                     },
                 },
             )
