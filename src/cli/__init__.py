@@ -203,6 +203,12 @@ def dcos_docker() -> None:
     callback=_validate_cluster_id,
     help='A unique identifier for the cluster. Defaults to a random value.',
 )
+@click.option(
+    '--license-path',
+    type=click.Path(exists=True),
+    envvar='DCOS_LICENSE_KEY_PATH',
+    help='If using DC/OS Enterprise, this defaults',
+)
 def create(
     agents: int,
     artifact: str,
@@ -213,6 +219,7 @@ def create(
     linux_distribution: str,
     masters: int,
     public_agents: int,
+    license_path: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -235,7 +242,14 @@ def create(
 
             The default `fault_domain_enabled` is `false`.
 
-            --license-path, (path to file), defaults to /tmp/license-key.txt
+            `license_key_contents` must be set for DC/OS Enterprise 1.11 and above.
+            This is set to one of the following, in order:
+
+            * The `license_key_contents` set in `extra_config`.
+            * The contents of the path given with `--license-path`.
+            * The contents of the path set in the `DCOS_LICENSE_KEY_PATH` environment variable.
+
+            If none of these are set, `license_key_contents` is not given.
     """
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]

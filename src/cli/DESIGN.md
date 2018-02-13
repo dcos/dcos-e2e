@@ -152,3 +152,6 @@ eval $(dcos_docker inspect 2321431 --env)
 docker exec -it $MASTER_0 /bin/bash
 
 --wait on `create`
+
+Document multiple ways to use --license,
+e.g. use case of set env var once
