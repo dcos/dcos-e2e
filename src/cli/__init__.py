@@ -503,29 +503,20 @@ def inspect(cluster_id: str, env: bool) -> None:
                 click.echo(message)
         return
 
-    masters = [
-        _InspectView(container).to_dict()
-        for container in cluster_containers.masters
-    ]
+    keys = {
+        'masters': cluster_containers.masters,
+        'agents': cluster_containers.agents,
+        'public_agents': cluster_containers.public_agents,
+    }
 
-    agents = [
-        _InspectView(container).to_dict()
-        for container in cluster_containers.agents
-    ]
-
-    public_agents = [
-        _InspectView(container).to_dict()
-        for container in cluster_containers.public_agents
-    ]
+    nodes = {
+        key: [_InspectView(container).to_dict() for container in containers]
+        for key, containers in keys.items()
+    }
 
     # DC/OS version (e.g. Enterprise 1.11)?
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
-    nodes = {
-        'masters': masters,
-        'agents': agents,
-        'public_agents': public_agents,
-    }
 
     data = {
         'Cluster ID': cluster_id,
