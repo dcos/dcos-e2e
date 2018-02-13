@@ -13,6 +13,7 @@ Next
 -  Add ``storage_driver`` parameter to the ``Docker`` backend.
 -  Add ``docker_container_labels`` parameter to the ``Docker`` backend.
 -  Logs are now less cluttered with escape characters.
+-  Documentation is now on Read The Docs.
 
 2018.01.25.0
 ------------

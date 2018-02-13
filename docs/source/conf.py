@@ -6,6 +6,11 @@ Configuration for Sphinx.
 
 # pylint: disable=invalid-name
 
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath('.'))
+
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
@@ -53,9 +58,6 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
 nitpicky = True
 warning_is_error = True
 nitpick_ignore = [
-    ('py:class', 'dcos_e2e.backends._base_classes.ClusterBackend'),
-    ('py:class', 'dcos_e2e.backends._base_classes.ClusterManager'),
-    ('py:class', 'dcos_e2e.backends._docker.DockerCluster'),
     ('py:exc', 'RetryError'),
 ]
 
@@ -65,14 +67,12 @@ html_show_sourcelink = False
 
 html_theme_options = {
     'show_powered_by': 'false',
-    'fixed_sidebar': True,
-    'sidebar_includehidden': False,
 }
 
 html_sidebars = {
     '**': [
         'about.html',
-        'globaltoc.html',
+        'navigation.html',
         'searchbox.html',
     ],
 }
@@ -82,3 +82,5 @@ html_sidebars = {
 linkcheck_anchors = False
 
 spelling_word_list_filename = '../../spelling_private_dict.txt'
+
+autodoc_member_order = 'bysource'
