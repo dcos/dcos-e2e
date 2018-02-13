@@ -1,3 +1,4 @@
+-e .
 autoflake==1.1
 check-manifest==0.36
 dcoscli==0.5.7
