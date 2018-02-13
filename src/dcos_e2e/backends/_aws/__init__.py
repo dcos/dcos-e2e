@@ -2,18 +2,21 @@
 A DC/OS Launch backend for DC/OS E2E.
 """
 import uuid
-# import sys
-
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Any, Dict, Set, Type
 from typing import Optional  # noqa: F401
+from typing import Any, Dict, Set, Type
+
+from dcos_launch import config, get_launcher
+from dcos_launch.util import AbstractLauncher  # noqa: F401
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
-from dcos_launch.util import AbstractLauncher  # noqa: F401
-from dcos_launch import config, get_launcher
+
+# import sys
+
+
 
 # try:
 #     from dcos_launch import config, get_launcher
@@ -35,11 +38,23 @@ class AWS(ClusterBackend):
         aws_region: str = 'us-west-2',
         instance_type: str = 'm4.large',
         admin_location: str = '0.0.0.0/32',
+        linux_distribution: Distribution = Distribution.CENTOS_7,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
 
         """
+        supported_distributions = {Distribution.CENTOS_7, Distribution.COREOS}
+        if linux_distribution not in supported_distributions:
+            raise NotImplementedError
+
+        aws_ssh_user = {
+            Distribution.CENTOS_7: 'centos',
+            Distribution.CENTOS_7: 'coreos',
+        }
+
+        self._default_ssh_user = aws_ssh_user[linux_distribution]
+
         self.config = {
             'platform': 'aws',
             'provider': 'onprem',
@@ -56,11 +71,7 @@ class AWS(ClusterBackend):
 
     @property
     def default_ssh_user(self) -> str:
-        return 'centos'
-
-    @property
-    def default_linux_distribution(self) -> Distribution:
-        return Distribution.CENTOS_7
+        return self._default_ssh_user
 
 
 class AWSCluster(ClusterManager):
@@ -100,6 +111,7 @@ class AWSCluster(ClusterManager):
         )
 
         self.launch_config = {**cluster_config, **cluster_backend.config}
+        self._default_ssh_user = cluster_backend.default_ssh_user
 
     def install_dcos_from_url(
         self,
@@ -156,6 +168,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(master.get('public_ip')),
                 private_ip_address=IPv4Address(master.get('private_ip')),
+                default_ssh_user=self._default_ssh_user,
                 ssh_key_path=self.ssh_key_path,
             )
             nodes.add(node)
@@ -170,6 +183,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(priv_agent.get('public_ip')),
                 private_ip_address=IPv4Address(priv_agent.get('private_ip')),
+                default_ssh_user=self._default_ssh_user,
                 ssh_key_path=self.ssh_key_path,
             )
             nodes.add(node)
@@ -184,6 +198,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(pub_agent.get('public_ip')),
                 private_ip_address=IPv4Address(pub_agent.get('private_ip')),
+                default_ssh_user=self._default_ssh_user,
                 ssh_key_path=self.ssh_key_path,
             )
             nodes.add(node)
