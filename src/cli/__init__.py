@@ -12,7 +12,7 @@ from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
 from tempfile import gettempdir
-from typing import Any, Dict, List, Set, Union  # noqa: F401
+from typing import Any, Dict, List, Set, Union, Optional  # noqa: F401
 
 import click
 import docker
@@ -47,6 +47,7 @@ _DOCKER_STORAGE_DRIVERS = {
 
 _CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 _WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
+_VARIANT_LABEL_KEY = 'dcos_e2e.variant'
 
 
 def _existing_cluster_ids() -> Set[str]:
@@ -301,6 +302,7 @@ def create(
         docker_container_labels={
             _CLUSTER_ID_LABEL_KEY: cluster_id,
             _WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
+            _VARIANT_LABEL_KEY: 'ee' if enterprise else '',
         },
         workspace_dir=workspace_dir,
     )
@@ -364,13 +366,13 @@ def destroy(cluster_ids: List[str]) -> None:
 
 
 @dcos_docker.command('wait')
-@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+@click.argument('cluster_id', type=str)#, callback=_validate_cluster_exists)
 @click.option('--superuser-username', type=str)
 @click.option('--superuser-password', type=str)
 def wait(
     cluster_id: str,
-    superuser_username: str,
-    superuser_password: str,
+    superuser_username: Optional[str],
+    superuser_password: Optional[str],
 ) -> None:
     """
     If Enterprise, uses admin admin like ...
@@ -380,6 +382,15 @@ def wait(
     master_filters = {'label': [cluster_id_label, 'node_type=master']}
     master_containers = client.containers.list(filters=master_filters)
     master_container = master_containers[0]
+    is_enterprise = master_container.labels[_VARIANT_LABEL_KEY] == 'ee'
+
+    if not is_enterprise:
+        if superuser_username or superuser_password:
+            message = (
+                '`--superuser-username` and `--superuser-password` must not '
+                'be set for open source DC/OS clusters.'
+            )
+            raise click.BadOptionUsage(message=message)
 
     pass
 
