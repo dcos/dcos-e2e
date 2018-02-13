@@ -280,7 +280,7 @@ def destroy(cluster_ids: List[str]) -> None:
         filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_id}
         containers = client.containers.list(filters=filters)
         if not containers:
-            warning = 'No such cluster "{cluster_id}"'.format(
+            warning = 'Cluster "{cluster_id}" does not exist'.format(
                 cluster_id=cluster_id,
             )
             click.echo(warning, err=True)

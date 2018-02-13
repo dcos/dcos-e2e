@@ -203,7 +203,17 @@ class TestDestroy:
         assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
-        pass
+        """
+        XXX
+        """
+        unique = uuid.uuid4().hex
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['destroy', unique])
+        assert result.exit_code == 0
+        expected_error = (
+            'Cluster "{unique}" does not exist'
+        ).format(unique=unique)
+        assert expected_error in result.output
 
 
 class TestList:
