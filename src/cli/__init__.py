@@ -467,6 +467,12 @@ class _ClusterContainers:
         master_container = next(iter(self.masters))
         return bool(master_container.labels[_VARIANT_LABEL_KEY] == 'ee')
 
+    @property
+    def ssh_private_key_path(self) -> Path:
+        """
+        XXX
+        """
+
 
 @dcos_docker.command('wait')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
@@ -478,24 +484,22 @@ def wait(
     superuser_password: Optional[str],
 ) -> None:
     """
-    If Enterprise, uses admin admin like ...
+    If Enterprise, uses admin admin like the default...
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
-    if cluster_containers.is_ee:
-        if not superuser_username or not superuser_password:
+    if not cluster_containers.is_ee:
+        if superuser_username or superuser_password:
             message = (
-                '`--superuser-username` and `--superuser-password` must be '
-                'set for an DC/OS Enterprise cluster.'
+                '`--superuser-username` and `--superuser-password` must not '
+                'be set for an open source DC/OS cluster.'
             )
             raise click.BadOptionUsage(message=message)
-    elif superuser_username or superuser_password:
-        message = (
-            '`--superuser-username` and `--superuser-password` must not '
-            'be set for an open source DC/OS cluster.'
-        )
-        raise click.BadOptionUsage(message=message)
 
+    superuser_username = superuser_username or 'admin'
+    superuser_password = superuser_password or 'admin'
+
+    master_container = next(iter(cluster_containers.masters))
     # cluster = Cluster.from_nodes(
     #     masters=masters,
     #     agents=agents,
@@ -511,10 +515,6 @@ def wait(
 # - inspect build artifact
 # wait, wait_ee
 # Take options, default to nothing
-
-# We store if cluster is EE, put that in a label
-# We also give the cluster a default uname/pw (admin/admin)?
-# Error if OSS and you give uname / pw
 
 
 @dcos_docker.command('inspect')
