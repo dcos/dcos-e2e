@@ -179,7 +179,7 @@ class TestCreate:
 
 class TestDestroy:
     """
-    XXX
+    Tests for the `destroy` subcommand.
     """
 
     def test_help(self):
@@ -191,7 +191,7 @@ class TestDestroy:
 
 class TestList:
     """
-    XXX
+    Tests for the `list` subcommand.
     """
 
     def test_help(self):
@@ -200,7 +200,7 @@ class TestList:
 
 class TestInspect:
     """
-    XXX
+    Tests for the `inspect` subcommand.
     """
 
     def test_help(self):
