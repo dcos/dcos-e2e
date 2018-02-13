@@ -81,17 +81,29 @@ def _validate_cluster_name(
         )
         raise click.BadParameter(message=message)
 
-    # This matches the Docker ID regex.
-    # Can be seen by running:
+    # This matches the Docker ID regular expression.
+    # This regular expression can be seen by running:
     # > docker run -it --rm --name=' WAT ? I DUNNO ! ' alpine
     if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
         message = (
-            'Invalid cluster name "{value}", '
-            'only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed.'.format(value=value)
-        )
+            'Invalid cluster name "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
+            'are allowed and the cluster name cannoy be empty'
+        ).format(value=value)
         raise click.BadParameter(message)
 
     return str(value)
+
+def _validate_cluster_exists(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Union[int, bool, str],
+) -> str:
+    cluster_id = str(value)
+    if cluster_id not in _existing_cluster_ids():
+        message = 'Cluster "{value}" does not exist'.format(value=value)
+        raise click.BadParameter(message)
+
+    return cluster_id
 
 
 @click.group()
@@ -174,7 +186,6 @@ def create(
 
     logging.disable(logging.WARNING)
 
-    # TODO some random path within TMPDIR
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
 
     cluster_backend = Docker(
@@ -260,17 +271,17 @@ def destroy(cluster_names: List[str]) -> None:
 
 
 @dcos_docker.command('inspect')
-@click.argument('cluster_name', type=str)
+@click.argument('cluster_name', type=str, callback=_validate_cluster_exists)
 def inspect(cluster_name: str) -> None:
-    client = docker.from_env(version='auto')
-    filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
-    containers = client.containers.list(filters=filters)
+    # client = docker.from_env(version='auto')
+    # filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
+    # containers = client.containers.list(filters=filters)
 
     # Web address
     # All IPs
     # DC/OS version (e.g. EE 1.11)
     data = {}
-    click.echo(json.dump(data))
+    click.echo(json.dumps(data))
 
 
 if __name__ == '__main__':
