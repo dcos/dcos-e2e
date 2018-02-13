@@ -2,6 +2,7 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
+import configparser
 import inspect
 import os
 import socket
@@ -10,20 +11,101 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
-from tempfile import TemporaryDirectory
-from textwrap import dedent
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
 import docker
 import yaml
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend
 
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
-from dcos_e2e.node import Node
 from dcos_e2e.distributions import Distribution
+from dcos_e2e.docker_storage_drivers import DockerStorageDriver
+from dcos_e2e.docker_versions import DockerVersion
+from dcos_e2e.node import Node
+
+
+def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
+    """
+    Write an RSA key pair for connecting to nodes via SSH.
+
+    Args:
+        public_key_path: Path to write public key to.
+        private_key_path: Path to a private key file to write.
+    """
+    rsa_key_pair = rsa.generate_private_key(
+        backend=default_backend(),
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    public_key = rsa_key_pair.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH,
+    )
+
+    private_key = rsa_key_pair.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+
+    public_key_path.write_bytes(data=public_key)
+    private_key_path.write_bytes(data=private_key)
+
+
+def _write_docker_service_file(
+    service_file_path: Path,
+    storage_driver: DockerStorageDriver,
+) -> None:
+    """
+    Write a systemd unit for a Docker service.
+
+    Args:
+        service_file_path: The path to a file to write to.
+        storage_driver: The Docker storage driver to use.
+    """
+    storage_driver_name = {
+        DockerStorageDriver.AUFS: 'aufs',
+        DockerStorageDriver.OVERLAY: 'overlay',
+        DockerStorageDriver.OVERLAY_2: 'overlay2',
+    }[storage_driver]
+
+    docker_cmd = (
+        '/usr/bin/docker daemon '
+        '-D '
+        '-s {storage_driver_name} '
+        '--disable-legacy-registry=true '
+        '--exec-opt=native.cgroupdriver=cgroupfs'
+    ).format(storage_driver_name=storage_driver_name)
+
+    docker_service_contents = {
+        'Unit': {
+            'Description': 'Docker Appkication Container Engine',
+            'Documentation': 'https://docs.docker.com',
+            'After': 'dbus.service',
+        },
+        'Service': {
+            'ExecStart': docker_cmd,
+            'LimitNOFILE': '1048576',
+            'LimitNPROC': '1048576',
+            'LimitCORE': 'infinity',
+            'Delegate': 'yes',
+            'TimeoutStartSec': '0',
+        },
+        'Install': {
+            'WantedBy': 'default.target',
+        },
+    }
+    config = configparser.ConfigParser()
+    # Ignore erroneous error https://github.com/python/typeshed/issues/1857.
+    config.optionxform = str  # type: ignore
+    config.read_dict(docker_service_contents)
+    with service_file_path.open(mode='w') as service_file:
+        config.write(service_file)
 
 
 def _get_open_port() -> int:
@@ -37,6 +119,27 @@ def _get_open_port() -> int:
         return int(new_socket.getsockname()[1])
 
 
+def _get_fallback_storage_driver() -> DockerStorageDriver:
+    """
+    Return
+    """
+    storage_drivers = {
+        'aufs': DockerStorageDriver.AUFS,
+        'overlay': DockerStorageDriver.OVERLAY,
+        'overlay2': DockerStorageDriver.OVERLAY_2,
+    }
+
+    client = docker.from_env(version='auto')
+    host_driver = client.info()['Driver']
+
+    try:
+        return storage_drivers[host_driver]
+    except KeyError:
+        # This chooses the aufs driver if the host's driver is not
+        # supported because this is widely supported.
+        return DockerStorageDriver.AUFS
+
+
 class Docker(ClusterBackend):
     """
     A record of a Docker backend which can be used to create clusters.
@@ -48,6 +151,10 @@ class Docker(ClusterBackend):
         custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        linux_distribution: Distribution = Distribution.CENTOS_7,
+        docker_version: DockerVersion = DockerVersion.v1_13_1,
+        storage_driver: Optional[DockerStorageDriver] = None,
+        docker_container_labels: Optional[Dict[str, str]] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -56,14 +163,21 @@ class Docker(ClusterBackend):
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
-                https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory  # noqa
+                :py:func:`tempfile.mkstemp`.
             custom_master_mounts: Custom mounts add to master node containers.
+                See `volumes` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
+                See `volumes` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers.
-
-            For details about mount arguments, see `volumes` on
-                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
+                containers. See `volumes` in `Containers.run`_.
+            linux_distribution: The Linux distribution to boot DC/OS on.
+            docker_version: The Docker version to install on the cluster nodes.
+            storage_driver: The storage driver to use for Docker on the
+                cluster nodes. By default, this is the host's storage driver.
+                If this is not one of ``aufs``, ``overlay`` or ``overlay2``,
+                ``aufs`` is used.
+            docker_container_labels: Docker labels to add to the cluster node
+                containers. Akin to the dictionary option in `Containers.run`_.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -71,19 +185,41 @@ class Docker(ClusterBackend):
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` on
-                http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run  # noqa: E501
-                for details.
+                See `volumes` in `Containers.run`_.
+            custom_agent_mounts: Custom mounts add to agent node containers.
+                See `volumes` in `Containers.run`_.
+            custom_public_agent_mounts: Custom mounts add to public agent node
+                containers. See `volumes` in `Containers.run`_.
+            linux_distribution: The Linux distribution to boot DC/OS on.
+            docker_version: The Docker version to install on the cluster nodes.
+            docker_storage_driver: The storage driver to use for Docker on the
+                cluster nodes.
+            docker_container_labels: Docker labels to add to the cluster node
+                containers. Akin to the dictionary option in `Containers.run`_.
+
+        Raises:
+            NotImplementedError: The ``linux_distribution`` is not supported by
+                this backend.
+
+        .. _Containers.run:
+            http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
         """
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         self.dcos_docker_path = current_parent / 'dcos_docker'
-        self.workspace_dir = workspace_dir
-        self.custom_master_mounts = dict(custom_master_mounts or {})
-        self.custom_agent_mounts = dict(custom_agent_mounts or {})
-        self.custom_public_agent_mounts = dict(
-            custom_public_agent_mounts or {}
-        )
+        self.docker_version = docker_version
+        self.workspace_dir = workspace_dir or Path(gettempdir())
+        self.custom_master_mounts = custom_master_mounts or {}
+        self.custom_agent_mounts = custom_agent_mounts or {}
+        self.custom_public_agent_mounts = custom_public_agent_mounts or {}
+        supported_distributions = {Distribution.CENTOS_7, Distribution.COREOS}
+        if linux_distribution not in supported_distributions:
+            raise NotImplementedError
+
+        self.linux_distribution = linux_distribution
+        fallback_driver = _get_fallback_storage_driver()
+        self.docker_storage_driver = storage_driver or fallback_driver
+        self.docker_container_labels = docker_container_labels or {}
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -100,28 +236,19 @@ class Docker(ClusterBackend):
         """
         return 'root'
 
-    @property
-    def default_linux_distribution(self) -> Distribution:
-        """
-        Return the default Linux distribution for this backend.
-        """
-        return Distribution.CENTOS_7
-
 
 class DockerCluster(ClusterManager):
-    # pylint: disable=too-many-instance-attributes
     """
     A record of a Docker cluster.
     """
 
-    def __init__(  # pylint: disable=super-init-not-called,too-many-statements
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         masters: int,
         agents: int,
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: Docker,
-        linux_distribution: Distribution,
     ) -> None:
         """
         Create a Docker cluster.
@@ -136,7 +263,6 @@ class DockerCluster(ClusterManager):
                 Docker the only supported paths on the installer are in the
                 `/genconf` directory.
             cluster_backend: Details of the specific Docker backend to use.
-            linux_distribution: The Linux distribution to boot DC/OS on.
         """
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -149,15 +275,8 @@ class DockerCluster(ClusterManager):
         # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
         # reduces the chance of side-effects affecting sequential tests.
-        self._path = Path(
-            TemporaryDirectory(
-                suffix=self._cluster_id,
-                dir=(
-                    str(cluster_backend.workspace_dir)
-                    if cluster_backend.workspace_dir else None
-                ),
-            ).name
-        )
+        workspace_dir = cluster_backend.workspace_dir
+        self._path = Path(workspace_dir) / uuid.uuid4().hex / self._cluster_id
 
         copytree(
             src=str(cluster_backend.dcos_docker_path),
@@ -218,74 +337,24 @@ class DockerCluster(ClusterManager):
             dst=str(service_dir / 'systemd-journald-init.service'),
         )
 
-        rsa_key_pair = rsa.generate_private_key(
-            backend=default_backend(),
-            public_exponent=65537,
-            key_size=2048,
+        _write_key_pair(
+            public_key_path=ssh_dir / 'id_rsa.pub',
+            private_key_path=ssh_dir / 'id_rsa',
         )
-
-        public_key = rsa_key_pair.public_key().public_bytes(
-            serialization.Encoding.OpenSSH,
-            serialization.PublicFormat.OpenSSH,
-        )
-
-        private_key = rsa_key_pair.private_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.NoEncryption(),
-        )
-
-        public_key_file = ssh_dir / 'id_rsa.pub'
-        private_key_file = ssh_dir / 'id_rsa'
-        public_key_file.write_bytes(data=public_key)
-        private_key_file.write_bytes(data=private_key)
-        private_key_file.chmod(mode=stat.S_IRUSR)
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))
 
-        # Only overlay, overlay2, and aufs storage drivers are supported.
-        # This chooses the overlay2 driver if the host's driver is not
-        # supported for speed reasons.
-        client = docker.from_env(version='auto')
-        host_driver = client.info()['Driver']
-        storage_driver = host_driver if host_driver in (
-            'overlay', 'overlay2', 'aufs'
-        ) else 'overlay2'
-
-        docker_service_body = dedent(
-            """\
-            [Unit]
-            Description=Docker Application Container Engine
-            Documentation=https://docs.docker.com
-            After=dbus.service
-
-            [Service]
-            ExecStart=/usr/bin/docker daemon -D -s {docker_storage_driver} \
-            --disable-legacy-registry=true \
-            --exec-opt=native.cgroupdriver=cgroupfs
-            LimitNOFILE=1048576
-            LimitNPROC=1048576
-            LimitCORE=infinity
-            Delegate=yes
-            TimeoutStartSec=0
-
-            [Install]
-            WantedBy=default.target
-            """.format(docker_storage_driver=storage_driver)
+        _write_docker_service_file(
+            service_file_path=service_dir / 'docker.service',
+            storage_driver=cluster_backend.docker_storage_driver,
         )
 
-        self._master_prefix = '{cluster_id}-master-'.format(
-            cluster_id=self._cluster_id
-        )
-        self._agent_prefix = '{cluster_id}-agent-'.format(
-            cluster_id=self._cluster_id
-        )
-        self._public_agent_prefix = '{cluster_id}-pub-agent-'.format(
-            cluster_id=self._cluster_id
-        )
+        self._master_prefix = self._cluster_id + '-master-'
+        self._agent_prefix = self._cluster_id + '-agent-'
+        self._public_agent_prefix = self._cluster_id + '-public_agent-'
 
         bootstrap_genconf_path = self._genconf_dir / 'serve'
         # We wrap this in `Path` to work around
@@ -300,13 +369,14 @@ class DockerCluster(ClusterManager):
             '/tmp': 'rw,exec,nosuid,size=2097152k',
         }
 
-        (service_dir / 'docker.service').write_text(docker_service_body)
-
         docker_image_tag = 'mesosphere/dcos-docker'
         base_tag = docker_image_tag + ':base'
         base_docker_tag = base_tag + '-docker'
-        # This version of Docker supports `overlay2`.
-        docker_version = '1.13.1'
+        docker_versions = {
+            DockerVersion.v1_13_1: '1.13.1',
+            DockerVersion.v1_11_2: '1.11.2',
+        }
+
         dcos_docker_distros = {
             Distribution.CENTOS_7: 'centos-7',
             Distribution.UBUNTU_16_04: 'ubuntu-xenial',
@@ -315,8 +385,11 @@ class DockerCluster(ClusterManager):
             Distribution.DEBIAN_8: 'debian-jessie',
         }
 
+        linux_distribution = cluster_backend.linux_distribution
         distro_path_segment = dcos_docker_distros[linux_distribution]
+        docker_version = docker_versions[cluster_backend.docker_version]
 
+        client = docker.from_env(version='auto')
         client.images.build(
             path=str(self._path),
             rm=True,
@@ -356,7 +429,10 @@ class DockerCluster(ClusterManager):
         }
 
         agent_mounts = {
-            '/sys/fs/cgroup': {'bind': '/sys/fs/cgroup', 'mode': 'ro'},
+            '/sys/fs/cgroup': {
+                'bind': '/sys/fs/cgroup',
+                'mode': 'ro',
+            },
             **common_mounts,
         }
 
@@ -364,11 +440,11 @@ class DockerCluster(ClusterManager):
             unique_mounts = {
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/docker',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/opt',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
             }
 
@@ -384,21 +460,22 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
+                labels=cluster_backend.docker_container_labels,
             )
 
         for agent_number in range(1, agents + 1):
             unique_mounts = {
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/docker',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/opt',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
             }
 
@@ -414,21 +491,22 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
+                labels=cluster_backend.docker_container_labels,
             )
 
         for public_agent_number in range(1, public_agents + 1):
             unique_mounts = {
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/docker',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/opt',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw'
+                    'mode': 'rw',
                 },
             }
 
@@ -444,14 +522,9 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
+                labels=cluster_backend.docker_container_labels,
             )
 
-        # Logically a SSH user should be part of a `Node`.
-        # However with the DC/OS config there is a notion of a SSH user for
-        # an entire DC/OS cluster, which in our case maps to a single SSH user
-        # for every cluster created with the corresponding backend. Maybe
-        # we're better off making this a `default_ssh_user` of a
-        # `ClusterManager` instead.
         self._default_ssh_user = cluster_backend.default_ssh_user
 
     def install_dcos_from_url(
@@ -563,7 +636,7 @@ class DockerCluster(ClusterManager):
             ]
 
             for node in nodes:
-                node.run(args=dcos_install_args, user=ssh_user)
+                node.run(args=dcos_install_args)
 
     def _start_dcos_container(
         self,
@@ -574,6 +647,7 @@ class DockerCluster(ClusterManager):
         dcos_num_masters: int,
         dcos_num_agents: int,
         docker_image: str,
+        labels: Dict[str, str],
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -594,6 +668,9 @@ class DockerCluster(ClusterManager):
             dcos_num_agents: The number of agent nodes (agent and public
                 agents) expected to be in the cluster once it has been created.
             docker_image: The name of the Docker image to use.
+            labels: Docker labels to add to the cluster node containers. Akin
+                to the dictionary option in
+                http://docker-py.readthedocs.io/en/stable/containers.html.
         """
         registry_host = 'registry.local'
         if self.masters:
@@ -621,6 +698,7 @@ class DockerCluster(ClusterManager):
             image=docker_image,
             volumes=volumes,
             tmpfs=tmpfs,
+            labels=labels,
         )
 
         disable_systemd_support_cmd = (
@@ -672,6 +750,7 @@ class DockerCluster(ClusterManager):
                 Node(
                     public_ip_address=container_ip_address,
                     private_ip_address=container_ip_address,
+                    default_ssh_user=self._default_ssh_user,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
                 )
             )
@@ -680,7 +759,7 @@ class DockerCluster(ClusterManager):
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`.node.Node` s.
         """
         return self._nodes(container_base_name=self._master_prefix)
 
@@ -694,6 +773,6 @@ class DockerCluster(ClusterManager):
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent ``Node``s.
+        Return all DC/OS public agent :class:`.node.Node` s.
         """
         return self._nodes(container_base_name=self._public_agent_prefix)

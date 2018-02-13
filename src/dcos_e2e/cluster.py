@@ -15,7 +15,6 @@ from retry import retry
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-from .distributions import Distribution
 from .node import Node
 
 
@@ -46,14 +45,12 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        self._default_ssh_user = cluster_backend.default_ssh_user
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
             files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
             cluster_backend=cluster_backend,
-            linux_distribution=Distribution.CENTOS_7,
         )  # type: ClusterManager
 
     @classmethod
@@ -71,8 +68,7 @@ class Cluster(ContextDecorator):
             masters: The master nodes in an existing cluster.
             agents: The agent nodes in an existing cluster.
             public_agents: The public agent nodes in an existing cluster.
-            default_ssh_user: The SSH user name which can be connected to with
-                the SSH keys associated with all nodes.
+            default_ssh_user: The default username to use for SSH connections.
 
         Returns:
             A cluster object with the nodes of an existing cluster.
@@ -105,7 +101,6 @@ class Cluster(ContextDecorator):
             node.run(
                 args=['/opt/mesosphere/bin/dcos-diagnostics', '--diag'],
                 # Keep in mind this must be run as privileged user.
-                user=self.default_ssh_user,
                 log_output_live=True,
                 env={
                     'LC_ALL': 'en_US.UTF-8',
@@ -243,30 +238,23 @@ class Cluster(ContextDecorator):
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`.node.Node` s.
         """
         return self._cluster.masters
 
     @property
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`.node.Node` s.
         """
         return self._cluster.agents
 
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public_agent ``Node``s.
+        Return all DC/OS public agent :class:`.node.Node` s.
         """
         return self._cluster.public_agents
-
-    @property
-    def default_ssh_user(self) -> str:
-        """
-        Return the default SSH user for accessing a node.
-        """
-        return self._default_ssh_user
 
     def install_dcos_from_url(
         self,
@@ -275,6 +263,16 @@ class Cluster(ContextDecorator):
         log_output_live: bool = False,
     ) -> None:
         """
+        Installs DC/OS using the DC/OS advanced installation method if
+        supported by the backend.
+
+        This method spins up a persistent bootstrap host that supplies all
+        dedicated DC/OS hosts with the necessary installation files.
+
+        Since the bootstrap host is different from the host initiating the
+        cluster creation passing the ``build_artifact`` via URL string
+        saves the time of copying the ``build_artifact`` to the bootstrap host.
+
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
@@ -325,7 +323,7 @@ class Cluster(ContextDecorator):
     def run_integration_tests(
         self,
         pytest_command: List[str],
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
     ) -> subprocess.CompletedProcess:
         """
@@ -334,17 +332,17 @@ class Cluster(ContextDecorator):
         Args:
             pytest_command: The ``pytest`` command to run on the node.
             env: Environment variables to be set on the node before running
-                the `pytest_command`. On enterprise
-                clusters, `DCOS_LOGIN_UNAME` and `DCOS_LOGIN_PW` must be set.
-            log_output_live: If `True`, log output of the `pytest_command`
-                live. If `True`, stderr is merged into stdout in the return
-                value.
+                the `pytest_command`. On enterprise clusters,
+                ``DCOS_LOGIN_UNAME`` and ``DCOS_LOGIN_PW`` must be set.
+            log_output_live: If ``True``, log output of the ``pytest_command``
+                live. If ``True``, ``stderr`` is merged into ``stdout`` in the
+                return value.
 
         Returns:
             The result of the ``pytest`` command.
 
         Raises:
-            ``subprocess.CalledProcessError`` if the ``pytest`` command fails.
+            subprocess.CalledProcessError: If the ``pytest`` command fails.
         """
 
         args = [
@@ -377,7 +375,6 @@ class Cluster(ContextDecorator):
 
         return test_host.run(
             args=args,
-            user=self.default_ssh_user,
             log_output_live=log_output_live,
             env=environment_variables,
             shell=True,

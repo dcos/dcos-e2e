@@ -2,11 +2,12 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import stat
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
 from subprocess import PIPE, CompletedProcess, Popen
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import paramiko
 from scp import SCPClient
@@ -23,6 +24,7 @@ class Node:
         self,
         public_ip_address: IPv4Address,
         private_ip_address: IPv4Address,
+        default_ssh_user: str,
         ssh_key_path: Path,
     ) -> None:
         """
@@ -30,8 +32,9 @@ class Node:
             public_ip_address: The public IP address of the node.
             private_ip_address: The IP address used by the DC/OS component
                 running on this node.
+            default_ssh_user: The default username to use for SSH connections.
             ssh_key_path: The path to an SSH key which can be used to SSH to
-                the node as the `root` user.
+                the node as the `default_ssh_user` user.
 
         Attributes:
             ip_address: The IP address used by the DC/OS component
@@ -39,6 +42,8 @@ class Node:
         """
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address
+        self.default_ssh_user = default_ssh_user
+        ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
 
     def __str__(self) -> str:
@@ -56,7 +61,7 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
     ) -> List[str]:
         """
@@ -118,9 +123,9 @@ class Node:
     def run(
         self,
         args: List[str],
-        user: str,
+        user: Optional[str] = None,
         log_output_live: bool = False,
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
     ) -> CompletedProcess:
         """
@@ -128,7 +133,8 @@ class Node:
 
         Args:
             args: The command to run on the node.
-            user: The username to SSH as.
+            user: The username to SSH as. If `None` then the `default_ssh_user`
+                is used instead.
             log_output_live: If `True`, log output live. If `True`, stderr is
                 merged into stdout in the return value.
             env: Environment variables to be set on the node before running
@@ -145,8 +151,12 @@ class Node:
             The representation of the finished process.
 
         Raises:
-            CalledProcessError: The process exited with a non-zero code.
+            subprocess.CalledProcessError: The process exited with a non-zero
+                code.
         """
+        if user is None:
+            user = self.default_ssh_user
+
         ssh_args = self._compose_ssh_command(
             args=args, user=user, env=env, shell=shell
         )
@@ -155,8 +165,8 @@ class Node:
     def popen(
         self,
         args: List[str],
-        user: str,
-        env: Optional[Dict] = None,
+        user: Optional[str] = None,
+        env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
     ) -> Popen:
         """
@@ -165,6 +175,7 @@ class Node:
         Args:
             args: The command to run on the node.
             user: The user to open a pipe for a command for over SSH.
+                If `None` the `default_ssh_user` is used instead.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
@@ -178,6 +189,9 @@ class Node:
         Returns:
             The pipe object attached to the specified process.
         """
+        if user is None:
+            user = self.default_ssh_user
+
         ssh_args = self._compose_ssh_command(
             args=args, user=user, env=env, shell=shell
         )
@@ -187,7 +201,7 @@ class Node:
         self,
         local_path: Path,
         remote_path: Path,
-        user: str,
+        user: Optional[str] = None,
     ) -> None:
         """
         Copy a file to this node.
@@ -196,8 +210,12 @@ class Node:
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
             user: The name of the remote user to send the file via
-                secure copy.
+                secure copy. If `None` the `default_ssh_user` is
+                used instead.
         """
+        if user is None:
+            user = self.default_ssh_user
+
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(

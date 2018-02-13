@@ -7,7 +7,7 @@
 cryptography==2.1.4
 dcos-launch==0.1.0
 dcos-test-utils==0.1
-docker==2.7.0
+docker==3.0.1
 paramiko==2.4.0
 PyYAML==3.12
 retry==0.9.2

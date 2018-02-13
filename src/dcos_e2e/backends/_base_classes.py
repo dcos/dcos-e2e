@@ -6,7 +6,6 @@ import abc
 from pathlib import Path
 from typing import Any, Dict, Set, Type
 
-from ..distributions import Distribution
 from ..node import Node
 
 
@@ -23,10 +22,9 @@ class ClusterManager(abc.ABC):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: 'ClusterBackend',
-        linux_distribution: Distribution,
     ) -> None:
         """
-        Create a DC/OS cluster with the given `cluster_backend`.
+        Create a DC/OS cluster with the given ``cluster_backend``.
 
         Args:
             masters: The number of master nodes to create.
@@ -37,7 +35,6 @@ class ClusterManager(abc.ABC):
                 the installer node before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
-            linux_distribution: The Linux distribution to boot DC/OS on.
         """
 
     @abc.abstractmethod
@@ -56,7 +53,7 @@ class ClusterManager(abc.ABC):
             extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration for a particular backend.
-            log_output_live: If `True`, log output of the installation live.
+            log_output_live: If ``True``, log output of the installation live.
         """
 
     @abc.abstractmethod
@@ -70,12 +67,11 @@ class ClusterManager(abc.ABC):
         Install DC/OS from a build artifact passed as a file system `Path`.
 
         Args:
-            build_artifact: The `Path` to a build artifact to install DC/OS
-                from.
+            build_artifact: The path to a build artifact to install DC/OS from.
             extra_config: May contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration for a particular backend.
-            log_output_live: If `True`, log output of the installation live.
+            log_output_live: If ``True``, log output of the installation live.
         """
 
     @abc.abstractmethod
@@ -88,21 +84,21 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`.node.Node` s.
         """
 
     @property
     @abc.abstractmethod
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`.node.Node` s.
         """
 
     @property
     @abc.abstractmethod
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent ``Node``s.
+        Return all DC/OS public agent :class:`.node.Node` s.
         """
 
 
@@ -115,7 +111,7 @@ class ClusterBackend(abc.ABC):
     @abc.abstractmethod
     def cluster_cls(self) -> Type[ClusterManager]:
         """
-        Return the `ClusterManager` class to use to create and manage a
+        Return the :class:`ClusterManager` class to use to create and manage a
         cluster.
         """
 
@@ -124,11 +120,4 @@ class ClusterBackend(abc.ABC):
     def default_ssh_user(self) -> str:
         """
         Return the default SSH user as a string.
-        """
-
-    @property
-    @abc.abstractmethod
-    def default_linux_distribution(self) -> Distribution:
-        """
-        Return the default Linux distribution for this backend.
         """

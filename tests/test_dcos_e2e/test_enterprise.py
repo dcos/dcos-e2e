@@ -86,7 +86,7 @@ class TestCopyFiles:
         installer_cert_path = genconf / cert_filename
         installer_key_path = genconf / key_filename
 
-        cert_dir_on_host = Path('tests/certificates').resolve()
+        cert_dir_on_host = Path('tests/test_dcos_e2e/certificates').resolve()
         cert_path = cert_dir_on_host / cert_filename
         ca_key_path = cert_dir_on_host / key_filename
 
@@ -128,7 +128,6 @@ class TestCopyFiles:
             master.send_file(
                 local_path=ca_key_path,
                 remote_path=master_key_path,
-                user=cluster.default_ssh_user
             )
 
             cluster.wait_for_dcos_ee(

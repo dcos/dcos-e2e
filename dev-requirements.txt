@@ -1,9 +1,10 @@
 autoflake==1.1
 check-manifest==0.36
 dcoscli==0.5.7
+doc8==0.8.0
 flake8==3.5.0
 flake8-quotes==0.13.0
-isort==4.3.0
+isort==4.3.4
 mypy==0.560
 passlib==1.7.1
 pip_check_reqs==2.0.1
@@ -15,5 +16,11 @@ pyroma==2.3
 pytest==3.4.0
 pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1
+requests-mock==1.4.0
+sphinx==1.7.0
+sphinx-autodoc-typehints==1.2.5
+sphinxcontrib-spelling==4.0.1
 vulture==0.26
-yapf==0.20.1
+yapf==0.20.2
+# We should also use https://github.com/pyga/ebb-lint when it is released for
+# Python 3.6.

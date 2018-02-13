@@ -5,9 +5,9 @@ Helpers for interacting with existing clusters.
 from pathlib import Path
 from typing import Any, Dict, Set, Type
 
-from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
-from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
+
+from ._base_classes import ClusterBackend, ClusterManager
 
 
 class ExistingCluster(ClusterBackend):
@@ -34,8 +34,8 @@ class ExistingCluster(ClusterBackend):
     @property
     def cluster_cls(self) -> Type['ExistingClusterManager']:
         """
-        Return the `ClusterManager` class to use to create and manage a
-        cluster.
+        Return the :class:`dcos_e2e.backends.ClusterManager` class to use to
+        create and manage a cluster.
         """
         return ExistingClusterManager
 
@@ -45,14 +45,6 @@ class ExistingCluster(ClusterBackend):
         Return the default SSH user for this backend.
         """
         return self._default_ssh_user
-
-    @property
-    def default_linux_distribution(self) -> Distribution:
-        """
-        Return the default Linux distribution for this backend.
-        This is meaningless for this backend and therefore arbitrary.
-        """
-        return Distribution.CENTOS_7
 
 
 class ExistingClusterManager(ClusterManager):
@@ -67,7 +59,6 @@ class ExistingClusterManager(ClusterManager):
         public_agents: int,
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: ExistingCluster,
-        linux_distribution: Distribution,
     ) -> None:
         """
         Create a manager for an existing DC/OS cluster.
@@ -84,7 +75,6 @@ class ExistingClusterManager(ClusterManager):
                 paths on the installer node.
             cluster_backend: Details of the specific existing cluster backend
                 to use.
-            linux_distribution: An ignored Linux distribution.
         """
         self._masters = cluster_backend.masters
         self._agents = cluster_backend.agents
@@ -99,8 +89,8 @@ class ExistingClusterManager(ClusterManager):
         """
         Raises:
             NotImplementedError: It is assumed that clusters created with the
-                ExistingCluster backend already have an installed instance of
-                DC/OS running on them.
+                :class:`ExistingCluster` backend already have an installed
+                instance of DC/OS running on them.
         """
         raise NotImplementedError
 
@@ -113,29 +103,29 @@ class ExistingClusterManager(ClusterManager):
         """
         Raises:
             NotImplementedError: It is assumed that clusters created with the
-                ExistingCluster backend already have an installed instance of
-                DC/OS running on them.
+                :class:`ExistingCluster` backend already have an installed
+                instance of DC/OS running on them.
         """
         raise NotImplementedError
 
     @property
     def masters(self) -> Set[Node]:
         """
-        Return all DC/OS master ``Node``s.
+        Return all DC/OS master :class:`dcos_e2e.node.Node` s.
         """
         return self._masters
 
     @property
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`dcos_e2e.node.Node` s.
         """
         return self._agents
 
     @property
     def public_agents(self) -> Set[Node]:
         """
-        Return all DC/OS public agent ``Node``s.
+        Return all DC/OS public agent :class:`dcos_e2e.node.Node` s.
         """
         return self._public_agents
 
@@ -143,6 +133,7 @@ class ExistingClusterManager(ClusterManager):
         """
         Destroying an existing cluster is the responsibility of the caller.
 
-        Raises: NotImplementedError when called.
+        Raises:
+            NotImplementedError: When called.
         """
         raise NotImplementedError
