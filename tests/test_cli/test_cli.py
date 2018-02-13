@@ -65,7 +65,7 @@ class TestCreate:
 
     def test_help(self) -> None:
         """
-        Help test is shown with `dcos_docker create --help`.
+        Help text is shown with `dcos_docker create --help`.
         """
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['create', '--help'])
@@ -182,10 +182,24 @@ class TestDestroy:
     Tests for the `destroy` subcommand.
     """
 
-    def test_help(self):
-        pass
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker destroy --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['destroy', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            """# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
 
-    def test_cluster_does_not_exist(self):
+    def test_cluster_does_not_exist(self) -> None:
         pass
 
 
@@ -194,8 +208,22 @@ class TestList:
     Tests for the `list` subcommand.
     """
 
-    def test_help(self):
-        pass
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker list --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['list', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            """# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
 
 
 class TestInspect:
@@ -203,8 +231,22 @@ class TestInspect:
     Tests for the `inspect` subcommand.
     """
 
-    def test_help(self):
-        pass
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker inspect --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['inspect', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            """# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
 
-    def test_cluster_does_not_exist(self):
+    def test_cluster_does_not_exist(self) -> None:
         pass
