@@ -22,7 +22,7 @@ with open('requirements.txt') as requirements:
 with open('dev-requirements.txt') as dev_requirements:
     DEV_REQUIRES = []
     for line in dev_requirements.readlines():
-        if not line.startswith('#') and not line == '-e .':
+        if not line.startswith('#') and line != '-e .':
             DEV_REQUIRES.append(line)
 
 with open('README.rst') as f:
