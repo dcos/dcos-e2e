@@ -13,6 +13,7 @@ to capture what the help text actually is with:
        import pyperclip; pyperclip.copy(result.output)
 """
 
+import uuid
 from pathlib import Path
 from textwrap import dedent
 from typing import List
@@ -189,9 +190,6 @@ class TestDestroy:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['destroy', '--help'])
         assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker destroy [OPTIONS] [CLUSTER_IDS]...
@@ -200,9 +198,8 @@ class TestDestroy:
 
             Options:
               --help  Show this message and exit.
-            """# noqa: E501,E261
+            """
         )
-        # yapf: enable
         assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
@@ -221,9 +218,6 @@ class TestList:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['list', '--help'])
         assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker list [OPTIONS]
@@ -232,9 +226,8 @@ class TestList:
 
             Options:
               --help  Show this message and exit.
-            """# noqa: E501,E261
+            """
         )
-        # yapf: enable
         assert result.output == expected_help
 
 
@@ -250,9 +243,6 @@ class TestInspect:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['inspect', '--help'])
         assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker inspect [OPTIONS] CLUSTER_ID
@@ -261,10 +251,19 @@ class TestInspect:
 
             Options:
               --help  Show this message and exit.
-            """# noqa: E501,E261
+            """
         )
-        # yapf: enable
         assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
-        pass
+        """
+        XXX
+        """
+        unique = uuid.uuid4().hex
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['inspect', unique])
+        assert result.exit_code == 2
+        expected_error = (
+            'Cluster "{unique}" does not exist'
+        ).format(unique=unique)
+        assert expected_error in result.output
