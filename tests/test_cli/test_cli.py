@@ -194,6 +194,12 @@ class TestDestroy:
         # yapf: disable
         expected_help = dedent(
             """\
+            Usage: dcos_docker destroy [OPTIONS] [CLUSTER_IDS]...
+
+              Destroy a cluster.
+
+            Options:
+              --help  Show this message and exit.
             """# noqa: E501,E261
         )
         # yapf: enable
@@ -220,6 +226,12 @@ class TestList:
         # yapf: disable
         expected_help = dedent(
             """\
+            Usage: dcos_docker list [OPTIONS]
+
+              List all clusters.
+
+            Options:
+              --help  Show this message and exit.
             """# noqa: E501,E261
         )
         # yapf: enable
@@ -243,6 +255,12 @@ class TestInspect:
         # yapf: disable
         expected_help = dedent(
             """\
+            Usage: dcos_docker inspect [OPTIONS] CLUSTER_ID
+
+              Show cluster details.
+
+            Options:
+              --help  Show this message and exit.
             """# noqa: E501,E261
         )
         # yapf: enable
