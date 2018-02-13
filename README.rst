@@ -25,8 +25,8 @@ Requires Python 3.5.2+.
 Usage
 -----
 
-Below is an example test with a Docker backend.
-See the full documentation for mode details.
+Below is a small example with a Docker backend.
+See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=latest>`_ for more details.
 
 .. code:: python
 
@@ -50,8 +50,6 @@ See the full documentation for mode details.
         print(result.stdout)
         cluster.wait_for_dcos_oss()
         cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
-
-See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=latest>`_ for more details.
 
 .. |Build Status| image:: https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/mesosphere/dcos-e2e

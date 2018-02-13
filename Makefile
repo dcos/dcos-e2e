@@ -52,9 +52,7 @@ download-artifacts:
 
 .PHONY: docs
 docs:
-	make -C docs clean SPHINXOPTS=$(SPHINXOPTS)
-	# sphinx-apidoc -f -o docs/source src/
-	make -C docs html SPHINXOPTS=$(SPHINXOPTS)
+	make -C docs clean html SPHINXOPTS=$(SPHINXOPTS)
 
 .PHONY: open-docs
 open-docs:
