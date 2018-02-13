@@ -399,8 +399,6 @@ def destroy(cluster_ids: List[str]) -> None:
 
     dcos_docker destroy $(dcos_docker list)
     """
-    client = docker.from_env(version='auto')
-
     for cluster_id in cluster_ids:
         if cluster_id not in _existing_cluster_ids():
             warning = 'Cluster "{cluster_id}" does not exist'.format(
@@ -415,7 +413,6 @@ def destroy(cluster_ids: List[str]) -> None:
             *cluster_containers.agents,
             *cluster_containers.public_agents,
         }
-        containers = client.containers.list(filters=filters)
         rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
         for container in containers:
             container.remove(v=True, force=True)
@@ -478,7 +475,7 @@ class _ClusterContainers:
 
     @property
     def cluster(self) -> Cluster:
-        workspace_dir / 'ssh'
+        ssh_dir = workspace_dir / 'ssh'
 
     @property
     def workspace_dir(self) -> Path:
