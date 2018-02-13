@@ -2,6 +2,7 @@
 XXX
 """
 
+from pathlib import Path
 from textwrap import dedent
 from typing import List
 
@@ -10,13 +11,6 @@ from click.testing import CliRunner
 
 from cli import dcos_docker
 
-
-from pathlib import Path
-from textwrap import dedent
-
-from click.testing import CliRunner
-
-from cli import dcos_docker
 
 @pytest.mark.parametrize('arguments', [
     [],
@@ -43,6 +37,7 @@ def test_help(arguments: List[str]) -> None:
         """
     )
     assert result.output == expected_help
+
 
 class TestCreate:
     def test_help(self) -> None:
