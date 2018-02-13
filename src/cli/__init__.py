@@ -62,6 +62,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         public_key_path: Path to write public key to.
         private_key_path: Path to a private key file to write.
     """
+    # TODO move this function to dcos_e2e.common
     rsa_key_pair = rsa.generate_private_key(
         backend=default_backend(),
         public_exponent=65537,
@@ -314,7 +315,11 @@ def create(
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
-    workspace_dir / 'ssh'
+    ssh_keypair_dir = workspace_dir / 'ssh'
+    _write_key_pair(
+        public_key_path=ssh_keypair_dir / 'id_rsa.pub',
+        private_key_path=ssh_keypair_dir / 'id_rsa',
+    )
 
     enterprise = _is_enterprise(build_artifact=Path(artifact))
 
@@ -340,6 +345,7 @@ def create(
         custom_public_agent_mounts=custom_public_agent_mounts,
         linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
         docker_version=_DOCKER_VERSIONS[docker_version],
+        ssh_keypair_dir=ssh_keypair_dir,
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
         docker_container_labels={
             _CLUSTER_ID_LABEL_KEY: cluster_id,

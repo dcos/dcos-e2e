@@ -154,6 +154,7 @@ class Docker(ClusterBackend):
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
+        ssh_keypair_dir: Optional[Path] = None,
         docker_container_labels: Optional[Dict[str, str]] = None,
     ) -> None:
         """
@@ -178,6 +179,7 @@ class Docker(ClusterBackend):
                 ``aufs`` is used.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
+            ssh_keypair_dir: XXX
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -196,6 +198,7 @@ class Docker(ClusterBackend):
                 cluster nodes.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
+            ssh_keypair_dir: XXX
 
         Raises:
             NotImplementedError: The ``linux_distribution`` is not supported by
@@ -220,6 +223,7 @@ class Docker(ClusterBackend):
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver
         self.docker_container_labels = docker_container_labels or {}
+        self.ssh_keypair_dir = ssh_keypair_dir
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -337,10 +341,21 @@ class DockerCluster(ClusterManager):
             dst=str(service_dir / 'systemd-journald-init.service'),
         )
 
-        _write_key_pair(
-            public_key_path=ssh_dir / 'id_rsa.pub',
-            private_key_path=ssh_dir / 'id_rsa',
-        )
+        if cluster_backend.ssh_keypair_dir is None:
+            _write_key_pair(
+                public_key_path=ssh_dir / 'id_rsa.pub',
+                private_key_path=ssh_dir / 'id_rsa',
+            )
+        else:
+            copyfile(
+                src=str(cluster_backend.ssh_keypair_dir / 'id_rsa.pub'),
+                dst=str(ssh_dir / 'id_rsa.pub'),
+            )
+
+            copyfile(
+                src=str(cluster_backend.ssh_keypair_dir / 'id_rsa'),
+                dst=str(ssh_dir / 'id_rsa'),
+            )
 
         for host_path, installer_path in files_to_copy_to_installer.items():
             relative_installer_path = installer_path.relative_to('/genconf')
