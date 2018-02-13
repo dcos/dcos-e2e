@@ -131,9 +131,7 @@ A command which basically does `./run-master`.
 ## Misc ideas
 
 sphinx-click for docs
-document contributing = make -C html
 SSH key location in a label
-flake8-rst-docstrings
 Single generated file in Wiki
 
 dcos-docker run 213143 pytest
@@ -143,3 +141,4 @@ Label for inspect = bash -> EE?? + version
 Should `destroy` be called `rm`?
 
 autocomplete container id
+https://github.com/click-contrib/click-completion
