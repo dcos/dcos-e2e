@@ -172,9 +172,15 @@ class TestCreate:
         assert result.output == expected_message
 
     def test_empty_cluster_name(self, oss_artifact: Path) -> None:
+        """
+        XXX
+        """
         pass
 
     def test_invalid_cluster_name(self, oss_artifact: Path) -> None:
+        """
+        XXX
+        """
         pass
 
 
