@@ -53,7 +53,7 @@ def _validate_dcos_configuration(
     value: Union[int, bool, str],
 ) -> Dict[str, Any]:
     """
-    XXX
+    Validate that a given value is a YAML map.
     """
     try:
         return dict(yaml.load(str(value)) or {})
@@ -67,27 +67,27 @@ def _validate_dcos_configuration(
     raise click.BadParameter(message=message)
 
 
-def _validate_cluster_name(
+def _validate_cluster_id(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Union[int, bool, str],
 ) -> str:
     """
-    XXX
+    Validate that a given value is a YAML map.
     """
     if value in _existing_cluster_ids():
-        message = 'A cluster with the name "{value}" already exists'.format(
+        message = 'A cluster with the id "{value}" already exists'.format(
             value=value,
         )
         raise click.BadParameter(message=message)
 
     # This matches the Docker ID regular expression.
     # This regular expression can be seen by running:
-    # > docker run -it --rm --name=' WAT ? I DUNNO ! ' alpine
+    # > docker run -it --rm --id=' WAT ? I DUNNO ! ' alpine
     if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
         message = (
-            'Invalid cluster name "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-            'are allowed and the cluster name cannoy be empty'
+            'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
+            'are allowed and the cluster id cannoy be empty'
         ).format(value=value)
         raise click.BadParameter(message)
 
@@ -162,21 +162,21 @@ def dcos_docker() -> None:
     callback=_validate_dcos_configuration,
 )
 @click.option(
-    '--name',
+    '--cluster-id',
     type=str,
     default=uuid.uuid4().hex,
-    callback=_validate_cluster_name,
+    callback=_validate_cluster_id,
 )
 def create(
-    artifact: str,
-    linux_distribution: str,
-    docker_version: str,
-    masters: int,
     agents: int,
-    public_agents: int,
+    artifact: str,
+    cluster_id: str,
     docker_storage_driver: str,
+    docker_version: str,
     extra_config: Dict[str, Any],
-    name: str,
+    linux_distribution: str,
+    masters: int,
+    public_agents: int,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -197,7 +197,7 @@ def create(
         docker_version=_DOCKER_VERSIONS[docker_version],
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
         docker_container_labels={
-            _CLUSTER_ID_LABEL_KEY: name,
+            _CLUSTER_ID_LABEL_KEY: cluster_id,
             _WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
         },
         workspace_dir=workspace_dir,
@@ -219,23 +219,25 @@ def create(
         cluster.destroy()
         return
 
-    click.echo(name)
+    click.echo(cluster_id)
 
 
 def _existing_cluster_ids() -> Set[str]:
+    """
+    Return the IDs of existing clusters.
+    """
     client = docker.from_env(version='auto')
     filters = {'label': _CLUSTER_ID_LABEL_KEY}
     containers = client.containers.list(filters=filters)
-    cluster_ids = set(
+    return set(
         [container.labels[_CLUSTER_ID_LABEL_KEY] for container in containers]
     )
-    return cluster_ids
 
 
 @dcos_docker.command('list')
 def list_clusters() -> None:
     """
-    XXX
+    List all clusters.
     """
     for cluster_id in _existing_cluster_ids():
         click.echo(cluster_id)
@@ -243,22 +245,21 @@ def list_clusters() -> None:
 
 @dcos_docker.command('destroy')
 @click.argument(
-    'cluster_names',
+    'cluster_ids',
     nargs=-1,
     type=str,
 )
-def destroy(cluster_names: List[str]) -> None:
+def destroy(cluster_ids: List[str]) -> None:
     """
-    XXX
+    Destroy a cluster.
     """
     client = docker.from_env(version='auto')
 
-    for cluster_name in cluster_names:
-        filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
+    for cluster_id in cluster_ids:
+        filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_id}
         containers = client.containers.list(filters=filters)
         if not containers:
-            warning = 'No such cluster "{cluster_name}"'.format(
-                cluster_name=cluster_name,
+            warning = 'No such cluster "{cluster_id}"'.format(
             )
             click.echo(warning, err=True)
             continue
@@ -268,20 +269,23 @@ def destroy(cluster_names: List[str]) -> None:
             container.remove(v=True, force=True)
             rmtree(path=str(workspace_dir), ignore_errors=True)
 
-        click.echo(cluster_name)
+        click.echo(cluster_id)
 
 
 @dcos_docker.command('inspect')
-@click.argument('cluster_name', type=str, callback=_validate_cluster_exists)
-def inspect(cluster_name: str) -> None:
+@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+def inspect(cluster_id: str) -> None:
+    """
+    Show cluster details.
+    """
     # client = docker.from_env(version='auto')
-    # filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_name}
+    # filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_id}
     # containers = client.containers.list(filters=filters)
 
     # Web address
     # All IPs
     # DC/OS version (e.g. EE 1.11)
-    data = {}
+    data = {}  # type: Dict[Any, Any]
     click.echo(json.dumps(data))
 
 
