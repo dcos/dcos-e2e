@@ -492,8 +492,25 @@ class _ClusterContainers:
         """
         Return a ``Cluster`` constructed from the containers.
         """
-        # _ = self.workspace_dir / 'ssh'
-        #
+        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
+        masters = set([])
+        for container in self.masters:
+            container_ip_address = IPv4Address(
+                container.attrs['NetworkSettings']['IPAddress']
+            )
+            masters.add(
+                Node(
+                    public_ip_address=container_ip_address,
+                    private_ip_address=container_ip_address,
+                    ssh_key_path=ssh_key_path,
+                )
+            )
+
+        return Cluster.from_nodes(
+            masters=masters,
+            agents=agents,
+            public_agents=public_agents,
+        )
 
     @property
     def workspace_dir(self) -> Path:
