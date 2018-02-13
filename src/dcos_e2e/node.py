@@ -32,7 +32,7 @@ class Node:
             private_ip_address: The IP address used by the DC/OS component
                 running on this node.
             ssh_key_path: The path to an SSH key which can be used to SSH to
-                the node as the `root` user.
+                the node as the ``Cluster.default_ssh_user``.
 
         Attributes:
             ip_address: The IP address used by the DC/OS component
