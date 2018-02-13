@@ -215,6 +215,26 @@ def create(
 ) -> None:
     """
     Create a DC/OS cluster.
+
+        DC/OS Enterprise
+
+            DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
+            For example, enterprise clusters require the following configuration parameters:
+
+            * `superuser_username`
+            * `superuser_password_hash`
+            * `fault_domain_enabled`
+            * `license_key_contents`
+
+            These can all be set in `extra_config`.
+            However, some defaults are provided for all but the license key.
+
+            The default superuser username is `admin`.
+            The default superuser password is `admin`.
+
+            The default `fault_domain_enabled` is `false`.
+
+            --license-path, (path to file), defaults to /tmp/license-key.txt
     """
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]

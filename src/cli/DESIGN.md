@@ -150,3 +150,5 @@ export AGENT_0=<docker_id_>
 
 eval $(dcos_docker inspect 2321431 --env)
 docker exec -it $MASTER_0 /bin/bash
+
+--wait on `create`
