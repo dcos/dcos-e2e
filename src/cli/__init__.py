@@ -93,6 +93,7 @@ def _validate_cluster_name(
 
     return str(value)
 
+
 def _validate_cluster_exists(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
