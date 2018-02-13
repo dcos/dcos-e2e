@@ -112,7 +112,7 @@ class AWSCluster(ClusterManager):
 
         dcos_config = {
             'cluster_name': self.launch_config['deployment_name'],
-            'resolvers': ['10.10.0.2'],
+            'resolvers': ['10.10.0.2', '8.8.8.8'],
             'master_discovery': 'static',
             'exhibitor_storage_backend': 'static',
         }
