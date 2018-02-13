@@ -525,12 +525,6 @@ class DockerCluster(ClusterManager):
                 labels=cluster_backend.docker_container_labels,
             )
 
-        # Logically a SSH user should be part of a `Node`.
-        # However with the DC/OS config there is a notion of a SSH user for
-        # an entire DC/OS cluster, which in our case maps to a single SSH user
-        # for every cluster created with the corresponding backend. Maybe
-        # we're better off making this a `default_ssh_user` of a
-        # `ClusterManager` instead.
         self._default_ssh_user = cluster_backend.default_ssh_user
 
     def install_dcos_from_url(

@@ -133,7 +133,7 @@ class Node:
 
         Args:
             args: The command to run on the node.
-            user: The username to SSH as. If unset then the `default_ssh_user`
+            user: The username to SSH as. If `None` then the `default_ssh_user`
                 is used instead.
             log_output_live: If `True`, log output live. If `True`, stderr is
                 merged into stdout in the return value.
@@ -175,7 +175,7 @@ class Node:
         Args:
             args: The command to run on the node.
             user: The user to open a pipe for a command for over SSH.
-                If unset the `default_ssh_user` is used instead.
+                If `None` the `default_ssh_user` is used instead.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
@@ -210,7 +210,7 @@ class Node:
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
             user: The name of the remote user to send the file via
-                secure copy. If unset the `default_ssh_user` is
+                secure copy. If `None` the `default_ssh_user` is
                 used instead.
         """
         if user is None:

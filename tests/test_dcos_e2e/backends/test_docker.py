@@ -159,7 +159,7 @@ class TestDistributions:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(node=master, )
+            node_distribution = self._get_node_distribution(node=master)
 
         assert node_distribution == Distribution.CENTOS_7
 
@@ -197,7 +197,7 @@ class TestDistributions:
             )
             cluster.wait_for_dcos_oss()
             (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(node=master, )
+            node_distribution = self._get_node_distribution(node=master)
 
         assert node_distribution == Distribution.COREOS
 
@@ -234,7 +234,7 @@ class TestDistributions:
                 superuser_password=superuser_password,
             )
             (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(node=master, )
+            node_distribution = self._get_node_distribution(node=master)
 
         assert node_distribution == Distribution.COREOS
 
@@ -272,7 +272,7 @@ class TestDockerVersion:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            docker_version = self._get_docker_version(node=master, )
+            docker_version = self._get_docker_version(node=master)
 
         assert docker_version == DockerVersion.v1_13_1
 
@@ -293,7 +293,7 @@ class TestDockerVersion:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            node_docker_version = self._get_docker_version(node=master, )
+            node_docker_version = self._get_docker_version(node=master)
 
         assert docker_version == node_docker_version
 
