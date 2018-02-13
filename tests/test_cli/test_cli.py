@@ -175,13 +175,11 @@ class TestCreate:
         """
         XXX
         """
-        pass
 
     def test_invalid_cluster_name(self, oss_artifact: Path) -> None:
         """
         XXX
         """
-        pass
 
 
 class TestDestroy:
