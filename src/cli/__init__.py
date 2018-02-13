@@ -2,7 +2,6 @@
 A CLI for controlling DC/OS clusters on Docker.
 """
 
-import inspect
 import json
 import logging
 import re
@@ -512,7 +511,7 @@ def wait(
     is_flag=True,
     help='Show details in an environment variable format to eval.',
 )
-def inspect(cluster_id: str, env: bool) -> None:
+def inspect_cluster(cluster_id: str, env: bool) -> None:
     """
     Show cluster details.
     """
