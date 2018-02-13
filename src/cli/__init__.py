@@ -257,7 +257,7 @@ def create(
 
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
 
-    enterprise = False
+    enterprise = True
     if enterprise:
         superuser_username = 'admin'
         superuser_password = 'admin'
@@ -270,7 +270,8 @@ def create(
             'fault_domain_enabled': False,
             'license_key_contents': license_key_contents,
         }
-        config = {**enterprise_extra_config, **extra_config}
+
+        extra_config = {**enterprise_extra_config, **extra_config}
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
