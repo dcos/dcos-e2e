@@ -376,7 +376,7 @@ class _ClusterContainers:
     def _containers_by_node_type(
         self,
         node_type: str,
-    ) -> List[docker.models.containers.Container]:
+    ) -> Set[docker.models.containers.Container]:
         """
         XXX
         """
@@ -387,24 +387,24 @@ class _ClusterContainers:
                 'node_type={node_type}'.format(node_type=node_type),
             ]
         }
-        return client.containers.list(filters=filters)
+        return set(client.containers.list(filters=filters))
 
     @property
-    def masters(self) -> List[docker.models.containers.Container]:
+    def masters(self) -> Set[docker.models.containers.Container]:
         """
         XXX
         """
         return self._containers_by_node_type(node_type='master')
 
     @property
-    def agents(self) -> List[docker.models.containers.Container]:
+    def agents(self) -> Set[docker.models.containers.Container]:
         """
         XXX
         """
         return self._containers_by_node_type(node_type='agent')
 
     @property
-    def public_agents(self) -> List[docker.models.containers.Container]:
+    def public_agents(self) -> Set[docker.models.containers.Container]:
         """
         XXX
         """
@@ -412,7 +412,7 @@ class _ClusterContainers:
 
 
 @dcos_docker.command('wait')
-@click.argument('cluster_id', type=str)  #, callback=_validate_cluster_exists)
+@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.option('--superuser-username', type=str)
 @click.option('--superuser-password', type=str)
 def wait(
@@ -444,12 +444,12 @@ def wait(
         )
         raise click.BadOptionUsage(message=message)
 
-    cluster = Cluster.from_nodes(
-        masters=masters,
-        agents=agents,
-        public_agents=public_agents,
-        default_ssh_user='root',
-    )
+    # cluster = Cluster.from_nodes(
+    #     masters=masters,
+    #     agents=agents,
+    #     public_agents=public_agents,
+    #     default_ssh_user='root',
+    # )
 
 
 # Store initial
@@ -476,25 +476,13 @@ def inspect(cluster_id: str, env: bool) -> None:
     """
     Show cluster details.
     """
-    client = docker.from_env(version='auto')
-    cluster_id_label = _CLUSTER_ID_LABEL_KEY + '=' + cluster_id
-    master_filters = {'label': [cluster_id_label, 'node_type=master']}
-    agent_filters = {'label': [cluster_id_label, 'node_type=agent']}
-    public_agent_filters = {
-        'label': [cluster_id_label, 'node_type=public_agent'],
-    }
-
-    master_containers = client.containers.list(filters=master_filters)
-    agent_containers = client.containers.list(filters=agent_filters)
-    public_agent_containers = client.containers.list(
-        filters=public_agent_filters
-    )
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
     if env:
         prefixes = {
-            'MASTER': master_containers,
-            'AGENT': agent_containers,
-            'PUBLIC_AGENT': public_agent_containers,
+            'MASTER': cluster_containers.masters,
+            'AGENT': cluster_containers.agents,
+            'PUBLIC_AGENT': cluster_containers.public_agents,
         }
         for prefix, containers in prefixes.items():
             for index, container in enumerate(containers):
@@ -509,25 +497,23 @@ def inspect(cluster_id: str, env: bool) -> None:
     masters = [
         {
             'docker_container_name': container.name
-            for container in master_containers
-        },
+        } for container in cluster_containers.masters
     ]
 
     agents = [
         {
             'docker_container_name': container.name
-            for container in agent_containers
-        },
+        } for container in cluster_containers.agents
     ]
 
     public_agents = [
         {
             'docker_container_name': container.name
-            for container in public_agent_containers
-        },
+        } for container in cluster_containers.public_agents
     ]
+
     # DC/OS version (e.g. Enterprise 1.11)?
-    master = master_containers[0]
+    master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
     nodes = {
         'masters': masters,
