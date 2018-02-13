@@ -300,25 +300,58 @@ def inspect(cluster_id: str) -> None:
     """
     Show cluster details.
     """
-    # client = docker.from_env(version='auto')
-    # filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_id}
-    # containers = client.containers.list(filters=filters)
+    client = docker.from_env(version='auto')
+    cluster_id_label = _CLUSTER_ID_LABEL_KEY + '=' + cluster_id
+    master_filters = {'label': [cluster_id_label, 'node_type=master']}
+    agent_filters = {'label': [cluster_id_label, 'node_type=agent']}
+    public_agent_filters = {
+        'label': [cluster_id_label, 'node_type=public_agent'],
+    }
 
+    master_containers = client.containers.list(filters=master_filters)
+    agent_containers = client.containers.list(filters=agent_filters)
+    public_agent_containers = client.containers.list(
+        filters=public_agent_filters
+    )
+
+    masters = [
+        {
+            'docker_container_name': container.name
+            for container in master_containers
+        },
+    ]
+
+    agents = [
+        {
+            'docker_container_name': container.name
+            for container in agent_containers
+        },
+    ]
+
+    public_agents = [
+        {
+            'docker_container_name': container.name
+            for container in public_agent_containers
+        },
+    ]
     # Web address
     # All IP addresses
     # DC/OS version (e.g. Enterprise 1.11)
     web_ui = 'xxx'
-    # nodes = {
-    #     'masters': [
-    #             'docker_container_name': 'xxx',
-    #         }
-    #     ]
-    # }
+    nodes = {
+        'masters': masters,
+        'agents': agents,
+        'public_agents': public_agents,
+    }
+
     data = {
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
+        'Nodes': nodes,
     }  # type: Dict[Any, Any]
-    click.echo(json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True))
+    click.echo(
+        json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True)
+    )
 
 
 if __name__ == '__main__':
