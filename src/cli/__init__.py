@@ -115,6 +115,9 @@ def _validate_cluster_id(
 
 
 def _validate_cluster_exists(
+    """
+    Validate that a cluster exists with the given name.
+    """
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Union[int, bool, str],

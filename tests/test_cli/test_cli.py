@@ -169,3 +169,42 @@ class TestCreate:
         )
         # yapf: enable
         assert result.output == expected_message
+
+    def test_empty_cluster_name(self, oss_artifact: Path) -> None:
+        pass
+
+    def test_invalid_cluster_name(self, oss_artifact: Path) -> None:
+        pass
+
+
+class TestDestroy:
+    """
+    XXX
+    """
+
+    def test_help(self):
+        pass
+
+    def test_cluster_does_not_exist(self):
+        pass
+
+
+class TestList:
+    """
+    XXX
+    """
+
+    def test_help(self):
+        pass
+
+
+class TestInspect:
+    """
+    XXX
+    """
+
+    def test_help(self):
+        pass
+
+    def test_cluster_does_not_exist(self):
+        pass
