@@ -18,7 +18,7 @@ The latest release is |release|.
 Getting Started
 ---------------
 
-To create a DC/OS cluster, you need a backend.
+To create a DC/OS :py:class:`~dcos_e2e.cluster.Cluster`, you need a backend.
 Backends are customizable, but for now let's use a standard :doc:`Docker backend <docker-backend>`.
 Each backend has different system requirements.
 See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
@@ -31,7 +31,7 @@ See the :doc:`Docker backend documentation <docker-backend>` for details of what
 
     cluster = Cluster(cluster_backend=Docker())
 
-It is also possible to use ``Cluster`` as a context manager.
+It is also possible to use :py:class:`~dcos_e2e.cluster.Cluster` as a context manager.
 Doing this means that the cluster is destroyed on exit.
 
 To install DC/OS on a cluster, you need a DC/OS build artifact.
@@ -53,7 +53,7 @@ In this example we will use a open source DC/OS artifact downloaded to :file:`/t
 
    cluster.wait_for_dcos_oss()
 
-With a :py:class:`dcos_e2e.cluster.Cluster` you can then run commands on arbitrary :py:class:`dcos_e2e.node.Node`\s.
+With a :py:class:`~dcos_e2e.cluster.Cluster` you can then run commands on arbitrary :py:class:`~dcos_e2e.node.Node`\s.
 
 .. code:: python
 
@@ -64,9 +64,10 @@ With a :py:class:`dcos_e2e.cluster.Cluster` you can then run commands on arbitra
         )
         print(result.stdout)
 
-There is much more that you can do with :py:class:`dcos_e2e.cluster.Cluster`\s and :py:class:`dcos_e2e.node.Node`\s, and there are other ways to create a cluster.
+There is much more that you can do with :py:class:`~dcos_e2e.cluster.Cluster`\s and :py:class:`~dcos_e2e.node.Node`\s, and there are other ways to create a cluster.
 
-See :doc:`the Cluster reference <cluster>` for more.
+Reference
+---------
 
 .. toctree::
    :maxdepth: 2
