@@ -7,7 +7,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
 from subprocess import PIPE, CompletedProcess, Popen
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import paramiko
 from scp import SCPClient
@@ -58,7 +58,7 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
     ) -> List[str]:
         """
@@ -122,7 +122,7 @@ class Node:
         args: List[str],
         user: str,
         log_output_live: bool = False,
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
     ) -> CompletedProcess:
         """
@@ -159,7 +159,7 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict] = None,
+        env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
     ) -> Popen:
         """

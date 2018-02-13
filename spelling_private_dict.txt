@@ -4,6 +4,7 @@ args
 aufs
 backend
 backends
+bootstrap
 calledprocesserror
 changelog
 ci
@@ -48,6 +49,7 @@ str
 subpackages
 submodules
 subprocess
+symlink
 systemd
 tempfile
 tmp

@@ -280,9 +280,9 @@ class Cluster(ContextDecorator):
         This method spins up a persistent bootstrap host that supplies all
         dedicated DC/OS hosts with the necessary installation files.
 
-        Since the bootstrap host is different from the host initating the
+        Since the bootstrap host is different from the host initiating the
         cluster creation passing the ``build_artifact`` via URL string
-        saves the time of copying the ``build_artifact`` to the boostrap host.
+        saves the time of copying the ``build_artifact`` to the bootstrap host.
 
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
