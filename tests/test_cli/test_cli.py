@@ -4,6 +4,13 @@ Tests for the CLI.
 This mostly provides error case coverage.
 We rely mostly on manual testing.
 This is because automated tests for this would be very slow.
+
+For developing help texts, it is useful to add a breakpoint on failure and then
+to capture what the help text actually is with:
+
+  .. code: python
+
+       import pyperclip; pyperclip.copy(result.output)
 """
 
 from pathlib import Path
@@ -42,7 +49,10 @@ class TestDcosDocker:
               --help  Show this message and exit.
 
             Commands:
-              create  Create a DC/OS cluster.
+              create   Create a DC/OS cluster.
+              destroy  Destroy a cluster.
+              inspect  Show cluster details.
+              list     List all clusters.
             """
         )
         assert result.output == expected_help
@@ -71,15 +81,23 @@ class TestCreate:
 
             Options:
               --docker-version [1.13.1|1.11.2]
-                                              foo  [default: 1.13.1]
+                                              The Docker version to install on the nodes.
+                                              [default: 1.13.1]
               --linux-distribution [centos-7|ubuntu-16.04|coreos|fedora-23|debian-8]
-                                              foo  [default: centos-7]
+                                              The Linux distribution to use on the nodes.
+                                              [default: centos-7]
               --docker-storage-driver [aufs|overlay|overlay2]
-                                              by default uses host driver
-              --num-masters INTEGER           [default: 1]
-              --num-agents INTEGER            [default: 1]
-              --num-public-agents INTEGER     [default: 1]
-              --extra-config TEXT
+                                              The storage driver to use for Docker in
+                                              Docker. By default this uses the host's
+                                              driver.
+              --masters INTEGER               The number of master nodes.  [default: 1]
+              --agents INTEGER                The number of agent nodes.  [default: 1]
+              --public-agents INTEGER         The number of public agent nodes.  [default:
+                                              1]
+              --extra-config TEXT             Extra DC/OS configuration YAML to add to a
+                                              default configuration.
+              --cluster-id TEXT               A unique identifier for the cluster. Defaults
+                                              to a random value.
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )

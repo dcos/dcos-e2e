@@ -145,51 +145,59 @@ def dcos_docker() -> None:
     type=click.Choice(_DOCKER_VERSIONS.keys()),
     default='1.13.1',
     show_default=True,
-    help='foo',
+    help='The Docker version to install on the nodes.',
 )
 @click.option(
     '--linux-distribution',
     type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
     default='centos-7',
     show_default=True,
-    help='foo',
+    help='The Linux distribution to use on the nodes.',
 )
 @click.option(
     '--docker-storage-driver',
     type=click.Choice(_DOCKER_STORAGE_DRIVERS.keys()),
     default=None,
     show_default=False,
-    help='by default uses host driver',
+    help=(
+        'The storage driver to use for Docker in Docker. '
+        'By default this uses the host\'s driver.'
+    ),
 )
 @click.option(
     '--masters',
     type=click.INT,
     default=1,
     show_default=True,
+    help='The number of master nodes.'
 )
 @click.option(
     '--agents',
     type=click.INT,
     default=1,
     show_default=True,
+    help='The number of agent nodes.'
 )
 @click.option(
     '--public-agents',
     type=click.INT,
     default=1,
     show_default=True,
+    help='The number of public agent nodes.'
 )
 @click.option(
     '--extra-config',
     type=str,
     default='{}',
     callback=_validate_dcos_configuration,
+    help='Extra DC/OS configuration YAML to add to a default configuration.'
 )
 @click.option(
     '--cluster-id',
     type=str,
     default=uuid.uuid4().hex,
     callback=_validate_cluster_id,
+    help='A unique identifier for the cluster. Defaults to a random value.',
 )
 def create(
     agents: int,
