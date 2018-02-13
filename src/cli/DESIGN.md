@@ -37,6 +37,8 @@ Commands:
   list
   wait
   inspect
+  sync
+  pytest
 ```
 
 ### doctor

@@ -468,10 +468,9 @@ class _ClusterContainers:
         return bool(master_container.labels[_VARIANT_LABEL_KEY] == 'ee')
 
     @property
-    def ssh_private_key_path(self) -> Path:
-        """
-        XXX
-        """
+    def cluster(self) -> Cluster:
+        master_container = next(iter(self.masters))
+
 
 
 @dcos_docker.command('wait')
@@ -499,7 +498,12 @@ def wait(
     superuser_username = superuser_username or 'admin'
     superuser_password = superuser_password or 'admin'
 
-    master_container = next(iter(cluster_containers.masters))
+    if cluster_containers.is_ee:
+        cluster.wait_for_dcos_ee(
+            superuser_username=superuser_username or 'admin',
+            superuser_password=superuser_password or 'admin',
+        )
+
     # cluster = Cluster.from_nodes(
     #     masters=masters,
     #     agents=agents,
