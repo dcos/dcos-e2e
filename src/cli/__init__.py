@@ -294,6 +294,12 @@ def destroy(cluster_ids: List[str]) -> None:
         click.echo(cluster_id)
 
 
+@dcos_docker.command('wait')
+@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+def wait(cluster_id: str) -> None:
+    pass
+
+
 @dcos_docker.command('inspect')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.option(
