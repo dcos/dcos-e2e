@@ -392,20 +392,25 @@ def list_clusters() -> None:
 )
 def destroy(cluster_ids: List[str]) -> None:
     """
-    Destroy a cluster.
+    Destroy clusters.
+
+    This takes >= 1 cluster IDs.
+    To destroy all clusters, run:
+
+    dcos_docker destroy $(dcos_docker list)
     """
     client = docker.from_env(version='auto')
 
     for cluster_id in cluster_ids:
-        filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_id}
-        containers = client.containers.list(filters=filters)
-        if not containers:
+        if cluster_id not in _existing_cluster_ids():
             warning = 'Cluster "{cluster_id}" does not exist'.format(
                 cluster_id=cluster_id,
             )
             click.echo(warning, err=True)
             continue
 
+        filters = {'label': _CLUSTER_ID_LABEL_KEY + '=' + cluster_id}
+        containers = client.containers.list(filters=filters)
         for container in containers:
             workspace_dir = container.labels[_WORKSPACE_DIR_LABEL_KEY]
             container.remove(v=True, force=True)
