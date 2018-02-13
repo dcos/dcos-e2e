@@ -365,8 +365,24 @@ def destroy(cluster_ids: List[str]) -> None:
 
 @dcos_docker.command('wait')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
-def wait(cluster_id: str) -> None:
+@click.option('--superuser-username', type=str)
+@click.option('--superuser-password', type=str)
+def wait(
+    cluster_id: str,
+    superuser_username: str,
+    superuser_password: str,
+) -> None:
+    """
+    If Enterprise, uses admin admin like ...
+    """
+    client = docker.from_env(version='auto')
+    cluster_id_label = _CLUSTER_ID_LABEL_KEY + '=' + cluster_id
+    master_filters = {'label': [cluster_id_label, 'node_type=master']}
+    master_containers = client.containers.list(filters=master_filters)
+    master_container = master_containers[0]
+
     pass
+
 
 # Store initial
 # Take options, default to admin/admin
