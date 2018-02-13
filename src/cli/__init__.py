@@ -298,12 +298,10 @@ def destroy(cluster_ids: List[str]) -> None:
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.option(
     '--env',
-    type=bool,
-    default=False,
-    show_default=True,
-    help='Show details in an environment variable format to source.',
+    is_flag=True,
+    help='Show details in an environment variable format to eval.',
 )
-def inspect(cluster_id: str) -> None:
+def inspect(cluster_id: str, env: bool) -> None:
     """
     Show cluster details.
     """
@@ -320,6 +318,22 @@ def inspect(cluster_id: str) -> None:
     public_agent_containers = client.containers.list(
         filters=public_agent_filters
     )
+
+    if env:
+        prefixes = {
+            'MASTER': master_containers,
+            'AGENT': agent_containers,
+            'PUBLIC_AGENT': public_agent_containers,
+        }
+        for prefix, containers in prefixes.items():
+            for index, container in enumerate(containers):
+                message = 'export {prefix}_{index}={container_id}'.format(
+                    prefix=prefix,
+                    index=index,
+                    container_id=container.id,
+                )
+                click.echo(message)
+        return
 
     masters = [
         {
