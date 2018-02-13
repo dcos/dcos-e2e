@@ -452,6 +452,14 @@ class _ClusterContainers:
         """
         return self._containers_by_node_type(node_type='public_agent')
 
+    @property
+    def is_ee(self) -> bool:
+        """
+        XXXX
+        """
+        master_container = next(iter(self.masters))
+        return master_container.labels[_VARIANT_LABEL_KEY] == 'ee'
+
 
 @dcos_docker.command('wait')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
@@ -466,10 +474,8 @@ def wait(
     If Enterprise, uses admin admin like ...
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    master_container = next(iter(cluster_containers.masters))
-    is_enterprise = master_container.labels[_VARIANT_LABEL_KEY] == 'ee'
 
-    if is_enterprise:
+    if cluster_containers.is_ee:
         if not superuser_username or not superuser_password:
             message = (
                 '`--superuser-username` and `--superuser-password` must be '
