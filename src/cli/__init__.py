@@ -296,6 +296,13 @@ def destroy(cluster_ids: List[str]) -> None:
 
 @dcos_docker.command('inspect')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+@click.option(
+    '--env',
+    type=bool,
+    default=False,
+    show_default=True,
+    help='Show details in an environment variable format to source.',
+)
 def inspect(cluster_id: str) -> None:
     """
     Show cluster details.
