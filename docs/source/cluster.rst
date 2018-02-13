@@ -6,7 +6,7 @@ A cluster is created using a "backend", which might be Docker or a cloud provide
 It is also possible to point DC/OS E2E to existing nodes.
 A ``Cluster`` object is then used to interact with the DC/OS cluster.
 
-.. automethod:: dcos_e2e.cluster.Cluster.__init__
+.. autoclass:: dcos_e2e.cluster.Cluster
 
 Choosing a Backend
 ------------------
@@ -56,15 +56,19 @@ Depending on the hardware and the backend, DC/OS can take some time to install.
 The methods to wait for DC/OS repeatedly poll the cluster until services are up.
 Choose the :py:meth:`~dcos_e2e.cluster.Cluster.wait_for_dcos_oss` or :py:meth:`~dcos_e2e.cluster.Cluster.wait_for_dcos_ee` as appropriate.
 
+.. automethod:: dcos_e2e.cluster.Cluster.wait_for_dcos_oss
+
+.. automethod:: dcos_e2e.cluster.Cluster.wait_for_dcos_ee
+
 Running Integration Tests
 -------------------------
 
 It is possible to easily run DC/OS integration tests on a cluster.
+See :doc:`how to run tests on DC/OS Enterprise <enterprise>`.
 
-.. cluster
+.. code:: python
 
-Reference
----------
+    with Cluster(backend=Docker()):
+        cluster.run_integration_tests(pytest_command=['pytest', '-k', 'mesos'])
 
-.. autoclass:: dcos_e2e.cluster.Cluster
-   :members:
+.. automethod:: dcos_e2e.cluster.Cluster.run_integration_tests
