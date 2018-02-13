@@ -52,8 +52,8 @@ To fix some lint errors, run the following:
 Tests for this package
 ----------------------
 
-Tests for this package must be run on a host which is supported by DC/OS Docker.
-See the `DC/OS Docker README <https://github.com/dcos/dcos-docker/blob/master/README.md>`__.
+See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
+These requirements also apply to the tests.
 
 Download dependencies which are used by the tests:
 
@@ -148,15 +148,6 @@ In order to avoid this and to see failures faster, we run multiple builds per co
 We run almost one builder per test.
 Some tests are grouped as they can run quickly.
 
-New Backends
-------------
-
-Currently only DC/OS Docker is supported.
-However, it is intended that a ``Cluster`` can take a number of backends.
-
-To create a cluster backend to pass as the ``cluster_backend`` parameter to a ``Cluster``, create a ``ClusterManager`` and ``ClusterBackend`` in ``src/dcos_e2e/backends``.
-
-To run tests against this backend, modify ``cluster_backend`` in ``tests/conftest.py`` to provide this backend.
 
 Goals
 -----
