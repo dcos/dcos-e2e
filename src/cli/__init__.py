@@ -23,8 +23,6 @@ For run:
 * dcos_docker run bash - document that this gets you into a random master
 
 * run --node_type=agent, --all
-
-* create --security-mode
 """
 
 import io
@@ -174,7 +172,7 @@ def _validate_dcos_configuration(
 def _validate_cluster_id(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Union[int, bool, str],
+    value: Optional[Union[int, bool, str]],
 ) -> str:
     """
     Validate that a given value is a YAML map.
@@ -205,7 +203,7 @@ def _validate_cluster_id(
 def _validate_cluster_exists(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Union[int, bool, str],
+    value: Optional[Union[int, bool, str]],
 ) -> str:
     """
     Validate that a cluster exists with the given name.
@@ -213,6 +211,12 @@ def _validate_cluster_exists(
     # We "use" variables to satisfy linting tools.
     for _ in (ctx, param):
         pass
+
+    if value is None:
+        if 'default' in _existing_cluster_ids():
+            return 'default'
+        message = '--cluster-id was not given and no cluster "default" exists.'
+        raise click.BadParameter(message)
 
     cluster_id = str(value)
     if cluster_id not in _existing_cluster_ids():
@@ -569,7 +573,8 @@ class _ClusterContainers:
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
-    default='default',
+    default=None,
+    help='If not given, "default" is used.'
 )
 @click.option(
     '--superuser-username',
@@ -625,13 +630,15 @@ def wait(
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
-    default='default',
+    default=None,
+    help='If not given, "default" is used.'
 )
 @click.option(
     '--env',
     is_flag=True,
     help='Show details in an environment variable format to eval.',
 )
+@click.pass_context
 def inspect_cluster(cluster_id: str, env: bool) -> None:
     """
     Show cluster details.
@@ -690,7 +697,8 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
-    default='default',
+    default=None,
+    help='If not given, "default" is used.'
 )
 @click.option(
     '--dcos-login-uname',
@@ -823,7 +831,8 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
-    default='default'
+    default=None,
+    help='If not given, "default" is used.'
 )
 @click.argument(
     'checkout',
