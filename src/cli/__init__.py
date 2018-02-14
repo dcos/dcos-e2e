@@ -299,6 +299,14 @@ def dcos_docker() -> None:
     help='Extra DC/OS configuration YAML to add to a default configuration.'
 )
 @click.option(
+    '--security-mode',
+    type=click.Choice(['disabled', 'permissive', 'strict']),
+    help=(
+        'The security mode to use for a DC/OS Enterprise cluster. '
+        'This overrides any security mode set in ``extra_config``.'
+    ),
+)
+@click.option(
     '--cluster-id',
     type=str,
     default=uuid.uuid4().hex,
@@ -325,7 +333,8 @@ def create(
     linux_distribution: str,
     masters: int,
     public_agents: int,
-    license_key_path: str,
+    license_key_path: Optional[str],
+    security_mode: Optional[str],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -382,12 +391,13 @@ def create(
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'fault_domain_enabled': False,
         }
-
         if license_key_path is not None:
             key_contents = Path(license_key_path).read_text()
             enterprise_extra_config['license_key_contents'] = key_contents
 
         extra_config = {**enterprise_extra_config, **extra_config}
+        if security_mode is not None:
+            extra_config['security'] = security_mode
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
