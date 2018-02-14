@@ -443,6 +443,25 @@ class TestLabels:
         ]
         return dict(container.labels)
 
+    def test_default(self) -> None:
+        """
+        The node type is stored in a label.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=1,
+            public_agents=1,
+        ) as cluster:
+            (master, ) = cluster.masters
+            (agent, ) = cluster.agents
+            (public_agent, ) = cluster.public_agents
+            assert self._get_labels(master)['node_type'] == 'master'
+            assert self._get_labels(agent)['node_type'] == 'agent'
+            assert (
+                self._get_labels(public_agent)['node_type'] == 'public_agent'
+            )
+
     def test_custom(self) -> None:
         """
         It is possible to set node Docker container labels.
