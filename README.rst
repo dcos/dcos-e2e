@@ -54,7 +54,7 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
 CLI
 ---
 
-There is ...
+There is also a CLI tool.
 
 .. |Build Status| image:: https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/mesosphere/dcos-e2e

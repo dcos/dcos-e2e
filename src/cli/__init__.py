@@ -21,6 +21,8 @@ Docker for Mac network not set up
 * Add sync to docs
 * Add tests for sync
 * Run - use username and password from options
+* Idea for default - if you use the word "default" this returns the one and only one cluster
+    - or maybe if no Cluster ID uses the one cluster, if there is only one
 """
 
 import io
@@ -38,6 +40,7 @@ from subprocess import CalledProcessError
 from tempfile import gettempdir
 from typing import (  # noqa: F401
     Any,
+    Callable,
     Dict,
     Iterable,
     List,
@@ -713,6 +716,26 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
     os.system(joined)
 
 
+def tar_with_filter(
+    path: Path, filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
+) -> io.BytesIO:
+
+    tarstream = io.BytesIO()
+    with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
+        tar.add(name=str(path), arcname='/', filter=filter)
+    tarstream.seek(0)
+
+    return tarstream
+
+
+def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
+    if '__pycache__' in tar_info.name:
+        return None
+    if tar_info.name.endswith('.pyc'):
+        return None
+    return tar_info
+
+
 @dcos_docker.command('sync')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.argument(
@@ -729,28 +752,16 @@ def sync(cluster_id: str, checkout: str) -> None:
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'
-    node_bootstrap_dir = node_active_dir / 'bootstrap'
-    node_test_dir = (
-        node_bootstrap_dir / 'lib/python3.6/site-packages/dcos_internal_utils/'
+    node_bootstrap_dir = (
+        node_active_dir / 'bootstrap' / 'lib' /
+        'python3.6/site-packages/dcos_internal_utils/'
     )
 
     local_packages = Path(checkout) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
+    local_bootstrap_dir = local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
+
     node_test_py_pattern = node_test_dir / '*.py'
-
-    def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
-        if '__pycache__' in tar_info.name:
-            return None
-        if tar_info.name.endswith('.pyc'):
-            return None
-        return tar_info
-
-    tarstream = io.BytesIO()
-    tar = tarfile.TarFile(fileobj=tarstream, mode='w')
-    tar.add(name=str(local_test_dir), arcname='/', filter=cache_filter)
-    tar.close()
-    tarstream.seek(0)
-
     for master in cluster.masters:
         master.run(
             args=['rm', '-rf', str(node_test_py_pattern)],
@@ -758,10 +769,23 @@ def sync(cluster_id: str, checkout: str) -> None:
             shell=True,
         )
 
+    test_tarstream = tar_with_filter(
+        path=local_test_dir,
+        filter=cache_filter,
+    )
+    bootstrap_tarstream = tar_with_filter(
+        path=local_bootstrap_dir,
+        filter=cache_filter,
+    )
     for master_container in cluster_containers.masters:
         master_container.put_archive(
             path=str(node_test_dir),
-            data=tarstream,
+            data=test_tarstream,
+        )
+
+        master_container.put_archive(
+            path=str(node_bootstrap_dir),
+            data=bootstrap_tarstream,
         )
 
 
