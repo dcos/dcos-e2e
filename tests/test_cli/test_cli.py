@@ -202,15 +202,39 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_empty_cluster_name(self, oss_artifact: Path) -> None:
+    @pytest.mark.parametrize('invalid_id', ['@', ''])
+    def test_invalid_cluster_id(
+        self,
+        oss_artifact: Path,
+        invalid_id: str,
+    ) -> None:
         """
-        XXX
+        Cluster IDs must match a certain pattern.
         """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--cluster-id',
+                invalid_id,
+            ],
+        )
 
-    def test_invalid_cluster_name(self, oss_artifact: Path) -> None:
-        """
-        XXX
-        """
+        assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_message = dedent(
+           """\
+            Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
+            """# noqa: E501,E261
+        ).format(cluster_id=invalid_id)
+        # yapf: enable
+        assert result.output == expected_message
 
 
 class TestDestroy:

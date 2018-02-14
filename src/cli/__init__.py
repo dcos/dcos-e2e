@@ -15,6 +15,12 @@ Docker for Mac network not set up
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Add tests for sync
 * Handle Custom CA Cert case, with mounts (and copy to installer)
+
+* 1.10 sync support - bootstrap isn't 3.6
+
+For run:
+
+-e COLUMNS=$COLUMNS -e LINES=$LINES -e TERM=$TERM
 """
 
 import io
@@ -184,7 +190,7 @@ def _validate_cluster_id(
     if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
         message = (
             'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-            'are allowed and the cluster id cannoy be empty'
+            'are allowed and the cluster ID cannot be empty.'
         ).format(value=value)
         raise click.BadParameter(message)
 
