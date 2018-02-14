@@ -14,6 +14,7 @@ Docker for Mac network not set up
 * Does wait for OSS work?
 * Use a `default` name if there exist no cluster IDs?
 * Describe this in README
+* Genconf in checkout
 """
 
 import json
@@ -704,14 +705,24 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
 
 @dcos_docker.command('sync')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
-@click.argument('checkout')
+# @click.argument('checkout')
 def sync(cluster_id: str):
-    # on all masters
-    # empty test dir
-    # copy files to test dir
-    # copy files to bootstrap dir
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
+    node_test_dir = Path('/opt/mesosphere/active/dcos-integration-test')
+    node_bootstrap_dir = Path('/opt/mesosphere/active/bootstrap/lib/python3.6/site-packages/dcos_internal_utils/')
+    node_test_py_pattern = node_test_dir / '*tls.py'
+    print(str(node_test_py_pattern))
+    print('----')
+    for master in cluster.masters:
+        master.run(
+            args=['rm', '-rf', str(node_test_py_pattern)],
+            user=cluster.default_ssh_user,
+            shell=True,
+        )
+        # empty test dir
+        # copy files to test dir
+        # copy files to bootstrap dir
     pass
 
 
