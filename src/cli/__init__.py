@@ -470,6 +470,7 @@ def create(
                 extra_config=extra_config,
             )
     except CalledProcessError as exc:
+        click.echo('Error creating cluster:', err=True)
         click.echo(str(exc), err=True)
         cluster.destroy()
         return
