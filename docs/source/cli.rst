@@ -19,11 +19,11 @@ An typical CLI workflow may look like this:
    work
    9452525358324
    $ dcos_docker wait work
-   $ dcos_docker run work pytest -k test_tls
-   ...
    $ eval $(dcos_docker inspect --env)
    $ docker exec -it $MASTER_0 /bin/bash
    [root@dcos-e2e-5253252]# exit
+   $ dcos_docker run --sync /path/to/dcos-enteprise work pytest -k test_tls
+   ...
    $ dcos_docker destroy $(dcos_docker list)
 
 Any command which takes exactly one cluster ID defaults to using the "default" if no cluster ID is given.
@@ -47,6 +47,12 @@ CLI Reference
 
 .. click:: cli:inspect_cluster
   :prog: dcos_docker inspect
+
+.. click:: cli:sync_code
+  :prog: dcos_docker sync
+
+.. click:: cli:destroy
+  :prog: dcos_docker destroy
 
 .. click:: cli:destroy
   :prog: dcos_docker destroy

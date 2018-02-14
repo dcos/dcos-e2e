@@ -13,8 +13,6 @@ Docker for Mac network not set up
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Does wait for OSS work? run? sync?
 * Genconf in checkout
-
-* Add sync to docs
 * Add tests for sync
 * Run - use username and password from options
 """
