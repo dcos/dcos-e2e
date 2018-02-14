@@ -18,13 +18,13 @@ SPHINXOPTS := -W
 .PHONY: yapf
 yapf:
 	yapf \
-	    --diff \
-	    --recursive \
-	    --exclude src/dcos_e2e/_vendor \
-	    --exclude src/dcos_e2e/_version.py \
-	    --exclude release/ \
-	    --exclude versioneer.py \
-	    .
+			--diff \
+			--recursive \
+			--exclude src/dcos_e2e/_vendor \
+			--exclude src/dcos_e2e/_version.py \
+			--exclude release/ \
+			--exclude versioneer.py \
+			.
 
 .PHONY: mypy
 mypy:
@@ -83,20 +83,20 @@ spelling:
 # We put each one in a different target so that we can run these in parallel with --jobs
 .PHONY: lint
 lint: \
-    check-manifest \
-    doc8 \
-    flake8 \
-    isort \
-    linkcheck \
-    mypy \
-    pip-extra-reqs \
-    pip-missing-reqs \
-    pydocstyle \
-    pylint \
-    pyroma \
-    spelling \
-    vulture \
-    yapf
+		check-manifest \
+		doc8 \
+		flake8 \
+		isort \
+		linkcheck \
+		mypy \
+		pip-extra-reqs \
+		pip-missing-reqs \
+		pydocstyle \
+		pylint \
+		pyroma \
+		spelling \
+		vulture \
+		yapf
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
@@ -109,20 +109,20 @@ clean:
 .PHONY: fix-lint
 fix-lint:
 	autoflake \
-	    --in-place \
-	    --recursive \
-	    --remove-all-unused-imports \
-	    --remove-unused-variables \
-	    --expand-star-imports \
-	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py,release \
-	    .
+			--in-place \
+			--recursive \
+			--remove-all-unused-imports \
+			--remove-unused-variables \
+			--expand-star-imports \
+			--exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py,release \
+			.
 	yapf \
-	    --in-place \
-	    --recursive \
-	    --exclude src/dcos_e2e/_vendor \
-	    --exclude src/dcos_e2e/_version.py \
-	    --exclude versioneer.py \
-	    .
+			--in-place \
+			--recursive \
+			--exclude src/dcos_e2e/_vendor \
+			--exclude src/dcos_e2e/_version.py \
+			--exclude versioneer.py \
+			.
 	isort --recursive --apply
 
 .PHONY: clean-artifacts

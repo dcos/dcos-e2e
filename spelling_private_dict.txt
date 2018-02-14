@@ -104,3 +104,5 @@ xfail
 yapf
 yml
 zookeeper
+AbstractLauncher
+AWS

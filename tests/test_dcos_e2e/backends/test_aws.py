@@ -29,8 +29,7 @@ class TestAWSBackend:
         }
 
         aws_backend = AWS(
-            aws_key_name='default',
-            ssh_key_path=Path('/Users/tim/.ssh/default'),
+                workspace_dir=Path('/tmp')
         )
 
         with Cluster(
