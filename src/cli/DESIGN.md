@@ -32,11 +32,7 @@ $ dcos-docker --help
 
 Commands:
   doctor
-  create
   destroy
-  list
-  wait
-  inspect
   sync
   pytest
 ```

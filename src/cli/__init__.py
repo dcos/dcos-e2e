@@ -295,7 +295,7 @@ def create(
             DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
             For example, enterprise clusters require the following configuration parameters:
 
-			``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
+            ``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
 
             \b
             These can all be set in ``extra_config``.
@@ -402,10 +402,7 @@ def destroy(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
 
-    This takes >= 1 cluster IDs.
-    To destroy all clusters, run:
-
-    dcos_docker destroy $(dcos_docker list)
+    To destroy all clusters, run ``dcos_docker destroy $(dcos_docker list)``.
     """
     for cluster_id in cluster_ids:
         if cluster_id not in _existing_cluster_ids():
