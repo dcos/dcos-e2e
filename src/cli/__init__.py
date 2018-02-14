@@ -22,7 +22,7 @@ For run:
 
 * dcos_docker run bash - document that this gets you into a random master
 
-* run --node_type=agent
+* run --node_type=agent, --all
 """
 
 import io
@@ -30,6 +30,7 @@ import json
 import logging
 import os
 import re
+import shutil
 import subprocess
 import tarfile
 import uuid
@@ -740,6 +741,8 @@ def run(
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
+
+    terminal_size = shutil.get_terminal_size()
 
     environment = {
         'MASTER_HOSTS': ip_addresses(cluster.masters),
