@@ -263,8 +263,8 @@ class TestDestroy:
             Options:
               --help  Show this message and exit.
             """# noqa: E501,E261
-            # yapf: enable
         )
+        # yapf: enable
         assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
