@@ -8,13 +8,13 @@ $ dcos_docker doctor
 Not enough RAM allocated to Docker
 Docker for Mac network not set up
 
-* Handle Custom CA Cert case, with mounts
-* Customizable logging system
-* Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Does wait for OSS work? run? sync?
 * Genconf in checkout
+
+* Customizable logging system
+* Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Add tests for sync
-* Run - use username and password from options
+* Handle Custom CA Cert case, with mounts (and copy to installer)
 """
 
 import io
@@ -671,6 +671,18 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     callback=_validate_cluster_exists,
     default='default',
 )
+@click.option(
+    '--dcos-login-uname',
+    type=str,
+    default='admin',
+    help='The username to set the ``DCOS_LOGIN_UNAME`` as.'
+)
+@click.option(
+    '--dcos-login-pw',
+    type=str,
+    default='admin',
+    help='The password to set the ``DCOS_LOGIN_PW`` as.'
+)
 @click.argument('node_args', type=str, nargs=-1)
 @click.option(
     '--sync',
@@ -688,6 +700,8 @@ def run(
     cluster_id: str,
     node_args: Tuple[str],
     sync: bool,
+    dcos_login_uname: str,
+    dcos_login_pw: str,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -723,8 +737,8 @@ def run(
         'MASTER_HOSTS': ip_addresses(cluster.masters),
         'SLAVE_HOSTS': ip_addresses(cluster.agents),
         'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster.public_agents),
-        'DCOS_LOGIN_UNAME': 'admin',
-        'DCOS_LOGIN_PW': 'admin',
+        'DCOS_LOGIN_UNAME': dcos_login_uname,
+        'DCOS_LOGIN_PW': dcos_login_pw,
     }
 
     docker_env_vars = []
