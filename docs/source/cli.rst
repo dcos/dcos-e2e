@@ -7,6 +7,26 @@ The CLI is limited to the Docker backend and it is intented for use in developin
 It allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters.
 Each cluster node is emulated by a Docker container.
 
+An typical CLI workflow may look like this:
+
+.. code:: console
+
+   > dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id work
+   work
+   > dcos_docker create /tmp/dcos_generate_config.sh --agents 0
+   9452525358324
+   > dcos_docker list
+   work
+   9452525358324
+   > dcos_docker wait work
+   > eval $(dcos_docker inspect --env)
+   > docker exec -it $MASTER_0 /bin/bash
+   [root@dcos-e2e-5253252]# exit
+   > dcos_docker destroy $(dcos_docker list)
+
+CLI Reference
+-------------
+
 .. click:: cli:create
   :prog: dcos_docker create
 

@@ -30,7 +30,7 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
-logging.disable(logging.WARNING)
+logging.disable(logging.DEBUG)
 
 _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -568,6 +568,9 @@ def wait(
 def inspect_cluster(cluster_id: str, env: bool) -> None:
     """
     Show cluster details.
+
+    To quickly get variables to use with Docker tooling, use the ``--env``
+    flag.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
