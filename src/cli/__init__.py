@@ -844,10 +844,10 @@ def sync_code(cluster_id: str, checkout: str) -> None:
         args=['ls', str(node_lib_dir)],
         user=cluster.default_ssh_user,
     )
-    import pdb; pdb.set_trace()
+    python_version = ls_result.stdout.decode().strip()
+    node_python_dir = node_lib_dir / python_version
     node_bootstrap_dir = (
-        node_active_dir / 'bootstrap' / 'lib' /
-        'python3.6/site-packages/dcos_internal_utils/'
+        node_python_dir / 'site-packages' / 'dcos_internal_utils'
     )
 
     local_packages = Path(checkout) / 'packages'
