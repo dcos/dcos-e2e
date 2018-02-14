@@ -731,15 +731,11 @@ def sync(cluster_id: str, checkout: str) -> None:
             return None
         return tar_info
 
-    pw_tarstream = io.BytesIO()
-    pw_tar = tarfile.TarFile(
-        fileobj=pw_tarstream,
-        mode='w',
-    )
-    pw_tar.add(name=str(local_test_dir), arcname='/', filter=file_filter)
-    pw_tar.list()
-    pw_tar.close()
-    pw_tarstream.seek(0)
+    tarstream = io.BytesIO()
+    tar = tarfile.TarFile(fileobj=tarstream, mode='w')
+    tar.add(name=str(local_test_dir), arcname='/', filter=file_filter)
+    tar.close()
+    tarstream.seek(0)
 
     for master in cluster.masters:
         master.run(
@@ -751,7 +747,7 @@ def sync(cluster_id: str, checkout: str) -> None:
     for master_container in cluster_containers.masters:
         master_container.put_archive(
             path=str(node_test_dir),
-            data=pw_tarstream,
+            data=tarstream,
         )
 
 if __name__ == '__main__':
