@@ -5,7 +5,7 @@ Ideas for improvements
 ----------------------
 
 $ dcos_docker doctor
-Not enought RAM allocated to Docker
+Not enough RAM allocated to Docker
 Docker for Mac network not set up
 
 * Sync bootstrap dir in sync
@@ -662,7 +662,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @click.argument('node_args', type=str, nargs=-1)
 def run(cluster_id: str, node_args: Tuple[str]) -> None:
     """
-    XXX
+    Run an arbitrary command on a node.
     """
     args = [
         'source',

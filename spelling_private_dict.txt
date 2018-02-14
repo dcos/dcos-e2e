@@ -37,6 +37,7 @@ parallelizable
 postflight
 pragma
 py
+pyperclip
 pytest
 reachability
 rsa
