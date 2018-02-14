@@ -23,6 +23,8 @@ For run:
 * dcos_docker run bash - document that this gets you into a random master
 
 * run --node_type=agent, --all
+
+* create --security-mode
 """
 
 import io
