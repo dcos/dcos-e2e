@@ -121,10 +121,21 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
 
 class _InspectView:
+    """
+    Details of a node to show in the inspect view.
+    """
+
     def __init__(self, container: Container) -> None:
+        """
+        Args:
+            container: The Docker container which represents the node.
+        """
         self._container = container
 
     def to_dict(self) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
         return {'docker_container_name': self._container.name}
 
 
