@@ -8,6 +8,7 @@ $ dcos_docker doctor
 Not enought RAM allocated to Docker
 Docker for Mac network not set up
 
+* Sync bootstrap dir in sync
 * Handle Custom CA Cert case, with mounts
 * Customisable logging system
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
@@ -20,13 +21,12 @@ Docker for Mac network not set up
 """
 
 import io
-import tarfile
-import time
 import json
 import logging
 import os
 import re
 import subprocess
+import tarfile
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -47,6 +47,7 @@ from typing import (  # noqa: F401
 import click
 import click_spinner
 import docker
+import urllib3
 import yaml
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -60,8 +61,6 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
-
-import urllib3
 
 logging.disable(logging.WARNING)
 
@@ -726,7 +725,7 @@ def sync(cluster_id: str, checkout: str) -> None:
 
     local_packages = Path(checkout) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
-    node_test_py_pattern = node_test_dir / '*tls.py'
+    node_test_py_pattern = node_test_dir / '*.py'
 
     def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
         if '__pycache__' in tar_info.name:
