@@ -780,7 +780,7 @@ def _tar_with_filter(
 
 def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     """
-    A filter for ``tarfile.Tarfile.add`` which removes Python and pytest cache
+    Filter for ``tarfile.Tarfile.add`` which removes Python and pytest cache
     files.
     """
     if '__pycache__' in tar_info.name:
@@ -847,13 +847,13 @@ def sync_code(cluster_id: str, checkout: str) -> None:
             shell=True,
         )
 
-    test_tarstream = tar_with_filter(
+    test_tarstream = _tar_with_filter(
         path=local_test_dir,
-        filter=cache_filter,
+        filter=_cache_filter,
     )
-    bootstrap_tarstream = tar_with_filter(
+    bootstrap_tarstream = _tar_with_filter(
         path=local_bootstrap_dir,
-        filter=cache_filter,
+        filter=_cache_filter,
     )
     for master_container in cluster_containers.masters:
         master_container.put_archive(
