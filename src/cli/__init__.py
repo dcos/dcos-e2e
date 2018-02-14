@@ -221,7 +221,7 @@ def _is_enterprise(build_artifact: Path) -> bool:
         '--version',
     ]
     result = subprocess.check_output(args=get_version_args)
-    version_info = json.loads(result)
+    version_info = json.loads(result.decode())
     variant = version_info['variant']
     return bool(variant == 'ee')
 
@@ -811,7 +811,9 @@ def sync_code(cluster_id: str, checkout: str) -> None:
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
 
-    local_bootstrap_dir = local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
+    local_bootstrap_dir = (
+        local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
+    )
 
     node_test_py_pattern = node_test_dir / '*.py'
     for master in cluster.masters:
