@@ -8,7 +8,6 @@ $ dcos_docker doctor
 Not enough RAM allocated to Docker
 Docker for Mac network not set up
 
-* Sync bootstrap dir in sync
 * Handle Custom CA Cert case, with mounts
 * Customizable logging system
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
@@ -17,13 +16,11 @@ Docker for Mac network not set up
 * Describe this in README
 * Genconf in checkout
 
-* Add --sync flag to run which uses env var for checkout location
 * Add sync to docs
 * Add tests for sync
 * Run - use username and password from options
 * Idea for default - if you use the word "default" this returns the one and only one cluster
     - or maybe if no Cluster ID uses the one cluster, if there is only one
-* Default checkout dir = .
 """
 
 import io
