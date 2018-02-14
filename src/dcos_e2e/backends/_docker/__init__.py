@@ -460,7 +460,12 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
-                labels=cluster_backend.docker_container_labels,
+                labels={
+                    **cluster_backend.docker_container_labels,
+                    **{
+                        'node_type': 'master',
+                    },
+                },
             )
 
         for agent_number in range(1, agents + 1):
@@ -491,7 +496,12 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
-                labels=cluster_backend.docker_container_labels,
+                labels={
+                    **cluster_backend.docker_container_labels,
+                    **{
+                        'node_type': 'agent',
+                    },
+                },
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -522,7 +532,12 @@ class DockerCluster(ClusterManager):
                 },
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
-                labels=cluster_backend.docker_container_labels,
+                labels={
+                    **cluster_backend.docker_container_labels,
+                    **{
+                        'node_type': 'public_agent',
+                    },
+                },
             )
 
         # Logically a SSH user should be part of a `Node`.
