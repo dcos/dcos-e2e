@@ -99,7 +99,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         public_key_path: Path to write public key to.
         private_key_path: Path to a private key file to write.
     """
-    # TODO move this function to dcos_e2e.common
     rsa_key_pair = rsa.generate_private_key(
         backend=default_backend(),
         public_exponent=65537,
@@ -256,6 +255,10 @@ def _set_logging(
     """
     Set logging level depending on the chosen verbosity.
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
     value = min(value, 2)
     value = max(value, 0)
     verbosity_map = {
