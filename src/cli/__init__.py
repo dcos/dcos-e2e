@@ -245,12 +245,35 @@ def _is_enterprise(build_artifact: Path) -> bool:
     return bool(variant == 'ee')
 
 
+def _set_logging(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> None:
+    """
+    Set logging level depending on the chosen verbosity.
+    """
+    value = min(value, 2)
+    value = max(value, 0)
+    verbosity_map = {
+        0: logging.WARNING,
+        1: logging.DEBUG,
+        2: logging.INFO,
+    }
+    logging.disable(verbosity_map[int(value or 0)])
+
+
+@click.option(
+    '-v',
+    '--verbose',
+    count=True,
+    callback=_set_logging,
+)
 @click.group()
-def dcos_docker() -> None:
+def dcos_docker(verbose: None) -> None:
     """
     Manage DC/OS clusters on Docker.
     """
-    logging.disable(logging.WARNING)
 
 
 @dcos_docker.command('create')
