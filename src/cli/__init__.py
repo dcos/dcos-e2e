@@ -10,7 +10,7 @@ Docker for Mac network not set up
 
 * Sync bootstrap dir in sync
 * Handle Custom CA Cert case, with mounts
-* Customisable logging system
+* Customizable logging system
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Does wait for OSS work?
 * Use a `default` name if there exist no cluster IDs?
@@ -20,6 +20,7 @@ Docker for Mac network not set up
 * Add --sync flag to run which uses env var for checkout location
 * Add sync to docs
 * Add tests for sync
+* Run - use username and password from options
 """
 
 import io
@@ -663,6 +664,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 def run(cluster_id: str, node_args: Tuple[str]) -> None:
     """
     Run an arbitrary command on a node.
+
+    This command sets up the environment so that ``pytest`` can be run.
+
+    For example, run ``dcos_docker run 1231599 pytest -k test_tls.py``.
     """
     args = [
         'source',
@@ -679,7 +684,6 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
 
-    # TODO DC/OS login uname etc from options
     environment = {
         'MASTER_HOSTS': ip_addresses(cluster.masters),
         'SLAVE_HOSTS': ip_addresses(cluster.agents),
