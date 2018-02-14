@@ -707,6 +707,7 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
     joined = ' '.join(system_cmd)
     os.system(joined)
 
+
 @dcos_docker.command('sync')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.argument(
@@ -716,15 +717,18 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
 def sync(cluster_id: str, checkout: str) -> None:
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
-    node_test_dir = Path('/opt/mesosphere/active/dcos-integration-test')
-    node_bootstrap_dir = Path('/opt/mesosphere/active/bootstrap/lib/python3.6/site-packages/dcos_internal_utils/')
+    node_active_dir = Path('/opt/mesosphere/active')
+    node_test_dir = node_active_dir / 'dcos-integration-test'
+    node_bootstrap_dir = node_active_dir / 'bootstrap'
+    node_test_dir = (
+        node_bootstrap_dir / 'lib/python3.6/site-packages/dcos_internal_utils/'
+    )
 
     local_packages = Path(checkout) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
-    # local_test_files_pattern = local_test_dir / '*'
     node_test_py_pattern = node_test_dir / '*tls.py'
 
-    def file_filter(tar_info):
+    def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
         if '__pycache__' in tar_info.name:
             return None
         if tar_info.name.endswith('.pyc'):
@@ -733,7 +737,7 @@ def sync(cluster_id: str, checkout: str) -> None:
 
     tarstream = io.BytesIO()
     tar = tarfile.TarFile(fileobj=tarstream, mode='w')
-    tar.add(name=str(local_test_dir), arcname='/', filter=file_filter)
+    tar.add(name=str(local_test_dir), arcname='/', filter=cache_filter)
     tar.close()
     tarstream.seek(0)
 
@@ -749,6 +753,7 @@ def sync(cluster_id: str, checkout: str) -> None:
             path=str(node_test_dir),
             data=tarstream,
         )
+
 
 if __name__ == '__main__':
     dcos_docker()
