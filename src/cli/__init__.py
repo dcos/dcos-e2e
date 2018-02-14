@@ -665,8 +665,8 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 
 
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
-@click.argument(
-    'cluster_id',
+@click.option(
+    '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
     default='default',
@@ -694,9 +694,11 @@ def run(
 
     This command sets up the environment so that ``pytest`` can be run.
 
-    For example, run ``dcos_docker run 1231599 pytest -k test_tls.py``.
+    For example, run
+    ``dcos_docker run --cluster-id 1231599 pytest -k test_tls.py``.
 
-    Or, with sync: ``dcos_docker run --sync 1231599 pytest -k test_tls.py``.
+    Or, with sync:
+    ``dcos_docker run --sync --cluster-id 1231599 pytest -k test_tls.py``.
     """
     if sync:
         checkout = os.environ.get('DCOS_CHECKOUT_PATH', '.')
