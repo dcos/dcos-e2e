@@ -570,10 +570,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     Show cluster details.
 
     To quickly get environment variables to use with Docker tooling, use the
-	``--env`` flag.
+    ``--env`` flag.
 
-	Run ``eval (dcos_docker inspect <CLUSTER_ID> --env)``, then run
-	``docker exec -it $MASTER_0`` to enter the first master, for example.
+    Run ``eval (dcos_docker inspect <CLUSTER_ID> --env)``, then run
+    ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
