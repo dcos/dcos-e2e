@@ -280,7 +280,8 @@ def dcos_docker(verbose: None) -> None:
     """
     Manage DC/OS clusters on Docker.
     """
-    for _ in(verbose, ):
+    # We "use" variables to satisfy linting tools.
+    for _ in (verbose, ):
         pass
 
 
