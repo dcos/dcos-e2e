@@ -64,8 +64,6 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
-logging.disable(logging.WARNING)
-
 _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
     'ubuntu-16.04': Distribution.UBUNTU_16_04,
@@ -252,6 +250,7 @@ def dcos_docker() -> None:
     """
     Manage DC/OS clusters on Docker.
     """
+    logging.disable(logging.WARNING)
 
 
 @dcos_docker.command('create')
