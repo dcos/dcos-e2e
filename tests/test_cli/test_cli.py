@@ -306,19 +306,20 @@ class TestInspect:
         assert result.exit_code == 0
         expected_help = dedent(
             """\
-            Usage: dcos_docker inspect [OPTIONS] [CLUSTER_ID]
+            Usage: dcos_docker inspect [OPTIONS]
 
-  Show cluster details.
+              Show cluster details.
 
-  To quickly get environment variables to use with Docker tooling, use the
-  ``--env`` flag.
+              To quickly get environment variables to use with Docker tooling, use the
+              ``--env`` flag.
 
-  Run ``eval (dcos_docker inspect <CLUSTER_ID> --env)``, then run ``docker
-  exec -it $MASTER_0`` to enter the first master, for example.
+              Run ``eval (dcos_docker inspect <CLUSTER_ID> --env)``, then run ``docker
+              exec -it $MASTER_0`` to enter the first master, for example.
 
-Options:
-  --env   Show details in an environment variable format to eval.
-  --help  Show this message and exit.
+            Options:
+              --cluster-id TEXT
+              --env              Show details in an environment variable format to eval.
+              --help             Show this message and exit.
             """
         )
         assert result.output == expected_help
@@ -329,7 +330,7 @@ Options:
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['inspect', unique])
+        result = runner.invoke(dcos_docker, ['inspect', '--cluster-id', unique])
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
@@ -350,13 +351,18 @@ class TestWait:
         assert result.exit_code == 0
         expected_help = dedent(
             """\
-            Usage: dcos_docker wait [OPTIONS] CLUSTER_ID
+            Usage: dcos_docker wait [OPTIONS]
 
-              If Enterprise, uses admin admin like the default...
+              Wait for DC/OS to start.
 
             Options:
-              --superuser-username TEXT
-              --superuser-password TEXT
+              --cluster-id TEXT
+              --superuser-username TEXT  The superuser username is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
+              --superuser-password TEXT  The superuser password is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
               --help                     Show this message and exit.
             """
         )
@@ -368,7 +374,7 @@ class TestWait:
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['wait', unique])
+        result = runner.invoke(dcos_docker, ['wait', '--cluster-id', unique])
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
