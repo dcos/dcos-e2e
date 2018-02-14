@@ -15,6 +15,8 @@ Docker for Mac network not set up
 * Use a `default` name if there exist no cluster IDs?
 * Describe this in README
 * Genconf in checkout
+
+* Add --sync flag to run which uses env var for checkout location
 """
 
 import io
@@ -735,15 +737,9 @@ def sync(cluster_id: str, checkout: str) -> None:
         mode='w',
     )
     pw_tar.add(name=str(local_test_dir), arcname='/', filter=file_filter)
-    print('----')
     pw_tar.list()
     pw_tar.close()
-    print(len(pw_tarstream.getbuffer()))
     pw_tarstream.seek(0)
-    # return
-    # for test_file in local_test_dir.glob('*.py'):
-    #     archive.add_text_file(str(test_file), test_file.read_text())
-
 
     for master in cluster.masters:
         master.run(
