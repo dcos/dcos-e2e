@@ -407,7 +407,8 @@ def create(
                 build_artifact=Path(artifact),
                 extra_config=extra_config,
             )
-    except CalledProcessError:
+    except CalledProcessError as exc:
+        click.echo(str(exc), err=True)
         cluster.destroy()
         return
 
