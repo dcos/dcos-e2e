@@ -837,6 +837,14 @@ def sync_code(cluster_id: str, checkout: str) -> None:
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'
+    node_lib_dir = node_active_dir / 'boostrap' / 'lib'
+    # Different versions of DC/OS have different versions of Python.
+    master = next(iter(cluster.masters))
+    ls_result = master.run(
+        args=['ls', str(node_lib_dir)],
+        user=cluster.default_ssh_user,
+    )
+    import pdb; pdb.set_trace()
     node_bootstrap_dir = (
         node_active_dir / 'bootstrap' / 'lib' /
         'python3.6/site-packages/dcos_internal_utils/'
@@ -860,7 +868,6 @@ def sync_code(cluster_id: str, checkout: str) -> None:
         master.run(
             args=['rm', '-rf', str(node_test_py_pattern)],
             user=cluster.default_ssh_user,
-            shell=True,
         )
 
     test_tarstream = _tar_with_filter(
