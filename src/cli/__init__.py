@@ -620,13 +620,15 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 
 @dcos_docker.command('run')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
-def run(cluster_id: str) -> None:
+@click.argument('args', type=str, nargs=-1)
+def run(cluster_id: str, args: List[str]) -> None:
     """
     XXX
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    cluster_containers.cluster.run_integration_tests(py
-
+    master = next(iter(cluster_containers.masters))
+    master.exec_run
+    # docker exec
 
 if __name__ == '__main__':
     dcos_docker()

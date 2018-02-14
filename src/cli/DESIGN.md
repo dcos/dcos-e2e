@@ -62,12 +62,10 @@ Sync different integration tests?
 ### Run command
 
 A command which basically does `./run-master`.
+dcos-docker run 213143 pytest
 
 ## Misc ideas
 
-dcos-docker run 213143 pytest
-
-Should `destroy` be called `rm`?
 
 autocomplete container id
 https://github.com/click-contrib/click-completion
@@ -80,3 +78,4 @@ e.g. use case of set env var once
 Customisable logging system (wait?)
 
 pip install click-spinner
+Are dangling volumes left
