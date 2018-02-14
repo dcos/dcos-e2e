@@ -1,5 +1,18 @@
 """
 A CLI for controlling DC/OS clusters on Docker.
+
+Ideas for improvements
+----------------------
+
+$ dcos_docker doctor
+Not enought RAM allocated to Docker
+Docker for Mac network not set up
+
+* Handle Custom CA Cert case, with mounts
+* Customisable logging system
+* Create a cluster, destroy a cluster, there are dangling volumes, why?
+* Does wait for OSS work?
+* Use a `default` name if there exist no cluster IDs?
 """
 
 import json
