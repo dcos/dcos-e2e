@@ -12,7 +12,7 @@ from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Union  # noqa: F401
+from typing import Any, Dict, List, Optional, Set, Union, Iterable  # noqa: F401
 
 import click
 import docker
@@ -621,14 +621,56 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @dcos_docker.command('run')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.argument('args', type=str, nargs=-1)
+# TODO actually a tuple
 def run(cluster_id: str, args: List[str]) -> None:
     """
     XXX
     """
+    args = list(args)
+
+    # args = [
+    #     'source',
+    #     '/opt/mesosphere/environment.export',
+    #     '&&',
+    #     'cd',
+    #     '/opt/mesosphere/active/dcos-integration-test/',
+    #     '&&',
+    # ] + list(args)
+
+    # cmd = '/bin/bash -c "' + ' '.join(args) + '"'
+
+    def ip_addresses(nodes: Iterable[Node]) -> str:
+        return ','.join(map(lambda node: str(node.public_ip_address), nodes))
+
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster = cluster_containers.cluster
+
+    environment = {
+        'MASTER_HOSTS': ip_addresses(cluster.masters),
+        'SLAVE_HOSTS': ip_addresses(cluster.agents),
+        'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster.public_agents),
+    }
+
     master = next(iter(cluster_containers.masters))
-    master.exec_run
-    # docker exec
+    import subprocess
+    import os
+    import pexpect
+    args = [
+        'docker',
+        'exec',
+        '-it',
+        master.id,
+        '/bin/bash',
+        '-c',
+        '"{stuff}"'.format(stuff=' '.join(args)),
+    ]
+
+    joined = ' '.join(args)
+    os.system(joined)
+    #
+    #
+    # child = pexpect.popen_spawn(' '.join(args))
+
 
 if __name__ == '__main__':
     dcos_docker()
