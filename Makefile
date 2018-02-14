@@ -18,7 +18,7 @@ lint:
 	mypy src/ tests/
 	pip-extra-reqs src/
 	pip-missing-reqs src/
-	pydocstyle
+	#pydocstyle
 	pylint *.py src/ tests/
 	pyroma .
 	vulture . --min-confidence 100
