@@ -26,13 +26,15 @@ An typical CLI workflow may look like this:
    ...
    $ dcos_docker destroy $(dcos_docker list)
 
+Each of these commands is described in detail below.
 
 Default Cluster Name
 --------------------
 
-Any command which takes exactly one cluster ID defaults to using the "default" if no cluster ID is given.
-Therefore, for the simple case of using one cluster at a time, use ``--cluster-id=default`` on ``create`` to save having to type the cluster ID repeatedly.
-Each of these commands is described in detail below.
+It can become tedious repeatly typing the cluster ID, particularly if you only have one cluster.
+As a convenience, any command which takes exactly one cluster ID defaults to using the "default" if no cluster ID is given.
+
+This means that you can use ``--cluster-id=default`` and then use ``dcos_docker wait`` with no arguments to wait for the ``default`` cluster.
 
 CLI Reference
 -------------
