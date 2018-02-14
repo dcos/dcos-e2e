@@ -25,6 +25,7 @@ from typing import (  # noqa: F401
 )
 
 import click
+import click_spinner
 import docker
 import yaml
 from cryptography.hazmat.backends import default_backend
@@ -39,6 +40,8 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
+
+import urllib3
 
 logging.disable(logging.WARNING)
 
@@ -546,6 +549,7 @@ def wait(
     """
     Wait for DC/OS to start.
     """
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
     if not cluster_containers.is_enterprise:
@@ -562,10 +566,11 @@ def wait(
     superuser_password = superuser_password or 'admin'
 
     if cluster_containers.is_enterprise:
-        cluster_containers.cluster.wait_for_dcos_ee(
-            superuser_username=superuser_username or 'admin',
-            superuser_password=superuser_password or 'admin',
-        )
+        with click_spinner.spinner():
+            cluster_containers.cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username or 'admin',
+                superuser_password=superuser_password or 'admin',
+            )
 
 
 @dcos_docker.command('inspect')

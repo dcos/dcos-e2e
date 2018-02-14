@@ -41,10 +41,6 @@ Sync different integration tests?
 
 ## Misc ideas
 
-
-autocomplete container id
-https://github.com/click-contrib/click-completion
-
 Customisable logging system (wait?)
 
 pip install click-spinner
