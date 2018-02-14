@@ -23,6 +23,7 @@ Docker for Mac network not set up
 * Run - use username and password from options
 * Idea for default - if you use the word "default" this returns the one and only one cluster
     - or maybe if no Cluster ID uses the one cluster, if there is only one
+* Default checkout dir = .
 """
 
 import io
@@ -664,7 +665,16 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.argument('node_args', type=str, nargs=-1)
-def run(cluster_id: str, node_args: Tuple[str]) -> None:
+@click.option(
+    '--sync',
+    is_flag=True,
+    help='XXX',
+)
+@click.pass_context
+def run(
+    ctx: click.core.Context, cluster_id: str, node_args: Tuple[str],
+    sync: Optional[str],
+) -> None:
     """
     Run an arbitrary command on a node.
 
@@ -672,6 +682,10 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
 
     For example, run ``dcos_docker run 1231599 pytest -k test_tls.py``.
     """
+    if sync is not None:
+        checkout = os.environ['DCOS_CHECKOUT_PATH']
+        ctx.invoke(sync_code, cluster_id=cluster_id, checkout=checkout)
+
     args = [
         'source',
         '/opt/mesosphere/environment.export',
@@ -717,7 +731,8 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
 
 
 def tar_with_filter(
-    path: Path, filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
+    path: Path,
+    filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
 ) -> io.BytesIO:
 
     tarstream = io.BytesIO()
@@ -743,7 +758,7 @@ def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     type=click.Path(exists=True),
     envvar='DCOS_CHECKOUT_PATH',
 )
-def sync(cluster_id: str, checkout: str) -> None:
+def sync_code(cluster_id: str, checkout: str) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
 
