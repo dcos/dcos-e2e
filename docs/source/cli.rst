@@ -18,11 +18,11 @@ An typical CLI workflow may look like this:
    $ dcos_docker list
    work
    9452525358324
-   $ dcos_docker wait work
-   $ eval $(dcos_docker inspect --env)
+   $ dcos_docker wait --cluster-id work
+   $ eval $(dcos_docker inspect --cluster-id work --env)
    $ docker exec -it $MASTER_0 /bin/bash
    [root@dcos-e2e-5253252]# exit
-   $ dcos_docker run --sync /path/to/dcos-enteprise work pytest -k test_tls
+   $ dcos_docker run --sync /path/to/dcos-enteprise --cluster-id work pytest -k test_tls
    ...
    $ dcos_docker destroy $(dcos_docker list)
 
@@ -32,7 +32,9 @@ Default Cluster Name
 --------------------
 
 It can become tedious repeatly typing the cluster ID, particularly if you only have one cluster.
-As a convenience, any command which takes exactly one cluster ID defaults to using the "default" if no cluster ID is given.
+As a convenience, any command which takes a ``cluster-id`` option,
+apart from ``create``,
+defaults to using "default" if no cluster ID is given.
 
 This means that you can use ``--cluster-id=default`` and then use ``dcos_docker wait`` with no arguments to wait for the ``default`` cluster.
 

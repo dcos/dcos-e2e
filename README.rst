@@ -63,13 +63,16 @@ An typical CLI workflow may look like this:
 
    $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id work
    work
+   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id default
+   default
    $ dcos_docker create /tmp/dcos_generate_config.sh --agents 0
    9452525358324
    $ dcos_docker list
    work
+   default
    9452525358324
-   $ dcos_docker wait work
-   $ dcos_docker run work pytest -k test_tls
+   $ dcos_docker wait --cluster-id work
+   $ dcos_docker wait  # Not specifying a Cluster ID uses "default"
    ...
    $ eval $(dcos_docker inspect --env)
    $ docker exec -it $MASTER_0 /bin/bash
