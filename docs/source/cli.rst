@@ -26,6 +26,8 @@ An typical CLI workflow may look like this:
    [root@dcos-e2e-5253252]# exit
    $ dcos_docker destroy $(dcos_docker list)
 
+Each of these commands is described in detail below.
+
 CLI Reference
 -------------
 
@@ -37,6 +39,9 @@ CLI Reference
 
 .. click:: cli:wait
   :prog: dcos_docker wait
+
+.. click:: cli:run
+  :prog: dcos_docker run
 
 .. click:: cli:inspect_cluster
   :prog: dcos_docker inspect
