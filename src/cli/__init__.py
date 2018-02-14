@@ -642,10 +642,13 @@ def run(cluster_id: str, node_args: List[str]) -> None:
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
 
+    # TODO DC/OS login uname etc from options
     environment = {
         'MASTER_HOSTS': ip_addresses(cluster.masters),
         'SLAVE_HOSTS': ip_addresses(cluster.agents),
         'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster.public_agents),
+        'DCOS_LOGIN_UNAME': 'admin',
+        'DCOS_LOGIN_PW': 'admin',
     }
 
     docker_env_vars = []
