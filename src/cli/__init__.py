@@ -686,7 +686,7 @@ def run(
     ctx: click.core.Context,
     cluster_id: str,
     node_args: Tuple[str],
-    sync: Optional[str],
+    sync: bool,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -697,7 +697,7 @@ def run(
 
     Or, with sync: ``dcos_docker run --sync 1231599 pytest -k test_tls.py``.
     """
-    if sync is not None:
+    if sync:
         checkout = os.environ.get('DCOS_CHECKOUT_PATH', '.')
         ctx.invoke(sync_code, cluster_id=cluster_id, checkout=checkout)
 

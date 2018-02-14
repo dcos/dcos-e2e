@@ -54,7 +54,9 @@ class TestDcosDocker:
               destroy  Destroy clusters.
               inspect  Show cluster details.
               list     List all clusters.
-              wait     If Enterprise, uses admin admin like the...
+              run      Run an arbitrary command on a node.
+              sync     Sync files from a DC/OS checkout to master...
+              wait     Wait for DC/OS to start.
             """
         )
         assert result.output == expected_help
@@ -86,26 +88,24 @@ class TestCreate:
                               DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
                               For example, enterprise clusters require the following configuration parameters:
 
-                              * `superuser_username`
-                              * `superuser_password_hash`
-                              * `fault_domain_enabled`
-                              * `license_key_contents`
+                      ``superuser_username``, ``superuser_password_hash``,
+                      ``fault_domain_enabled``, ``license_key_contents``
 
-                              These can all be set in `extra_config`.
+                              These can all be set in ``extra_config``.
                               However, some defaults are provided for all but the license key.
 
-                              The default superuser username is `admin`.
-                              The default superuser password is `admin`.
-                              The default `fault_domain_enabled` is `false`.
+                              The default superuser username is ``admin``.
+                              The default superuser password is ``admin``.
+                              The default ``fault_domain_enabled`` is ``false``.
 
-                              `license_key_contents` must be set for DC/OS Enterprise 1.11 and above.
+                              ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
                               This is set to one of the following, in order:
 
-                              * The `license_key_contents` set in `extra_config`.
-                              * The contents of the path given with `--license-key-path`.
-                              * The contents of the path set in the `DCOS_LICENSE_KEY_PATH` environment variable.
+                              * The ``license_key_contents`` set in ``extra_config``.
+                              * The contents of the path given with ``--license-key-path``.
+                              * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
 
-                              If none of these are set, `license_key_contents` is not given.
+                              If none of these are set, ``license_key_contents`` is not given.
 
             Options:
               --docker-version [1.13.1|1.11.2]
@@ -231,9 +231,7 @@ class TestDestroy:
 
               Destroy clusters.
 
-              This takes >= 1 cluster IDs. To destroy all clusters, run:
-
-              dcos_docker destroy $(dcos_docker list)
+              To destroy all clusters, run ``dcos_docker destroy $(dcos_docker list)``.
 
             Options:
               --help  Show this message and exit.
@@ -308,13 +306,19 @@ class TestInspect:
         assert result.exit_code == 0
         expected_help = dedent(
             """\
-            Usage: dcos_docker inspect [OPTIONS] CLUSTER_ID
+            Usage: dcos_docker inspect [OPTIONS] [CLUSTER_ID]
 
-              Show cluster details.
+  Show cluster details.
 
-            Options:
-              --env   Show details in an environment variable format to eval.
-              --help  Show this message and exit.
+  To quickly get environment variables to use with Docker tooling, use the
+  ``--env`` flag.
+
+  Run ``eval (dcos_docker inspect <CLUSTER_ID> --env)``, then run ``docker
+  exec -it $MASTER_0`` to enter the first master, for example.
+
+Options:
+  --env   Show details in an environment variable format to eval.
+  --help  Show this message and exit.
             """
         )
         assert result.output == expected_help
