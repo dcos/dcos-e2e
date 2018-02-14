@@ -13,6 +13,7 @@ Docker for Mac network not set up
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Does wait for OSS work?
 * Use a `default` name if there exist no cluster IDs?
+* Describe this in README
 """
 
 import json
