@@ -18,6 +18,8 @@ Docker for Mac network not set up
 * Genconf in checkout
 
 * Add --sync flag to run which uses env var for checkout location
+* Add sync to docs
+* Add tests for sync
 """
 
 import io
@@ -714,6 +716,11 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
     type=click.Path(exists=True),
 )
 def sync(cluster_id: str, checkout: str) -> None:
+    """
+    Sync files from a DC/OS checkout to master nodes.
+
+    This syncs integration test files and bootstrap files.
+    """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
