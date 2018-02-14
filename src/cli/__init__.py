@@ -17,18 +17,21 @@ Docker for Mac network not set up
 * Add sync to docs
 * Add tests for sync
 * Run - use username and password from options
-* Idea for default - if you use the word "default" this returns the one and only one cluster
-    - or maybe if no Cluster ID uses the one cluster, if there is only one
+
+Ideas for Default
+-----------------
 
 Option 1:
+* No defaults - what we have now
+* destroy $(dcos_docker list)
+* wait $(dcos_docker list) > will error if you have multiple
+
+Option 2:
 * create -> name is 'default'
 * create (no name given, default exists) -> error
 * create (name given, default exists) -> fine
 * destroy (looks at default)
 * destroy (error, default does not exist)
-
-Option 2:
-* No defaults
 
 Option 3:
 * create -> name is 3818411
@@ -37,6 +40,10 @@ Option 3:
 * destroy 313211
 * destroy (picks the only cluster)
 * destroy (error, no cluster exists)
+
+Option 4:
+* No default name on create
+* dcos_docker wait > error, no such cluster "default"
 """
 
 import io
