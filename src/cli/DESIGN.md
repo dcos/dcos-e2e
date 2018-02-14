@@ -33,7 +33,7 @@ $ dcos-docker --help
 Commands:
   doctor
   sync
-  pytest
+  run
 ```
 
 ### doctor
@@ -54,17 +54,6 @@ $ dcos-docker create /path/to/build/artifact.sh
 385171
 ```
 
-```
-$ dcos-docker download-oss --pr 1235
-$ dcos-docker download-oss --master
-```
-
-### Wait
-
-```
-$ dcos-docker wait 151531
-```
-
 ### Enterprise ideas
 
 Handle custom CA cert?
@@ -83,19 +72,11 @@ Should `destroy` be called `rm`?
 autocomplete container id
 https://github.com/click-contrib/click-completion
 
-# dcos_docker foo 2194312531
-export MASTER_0=<docker_id>
-export MASTER_1=<docker_id_>
-export AGENT_0=<docker_id_>
-
-eval $(dcos_docker inspect 2321431 --env)
-docker exec -it $MASTER_0 /bin/bash
-
 --wait on `create`
 
 Document multiple ways to use --license,
 e.g. use case of set env var once
 
-Design logging system (wait?)
+Customisable logging system (wait?)
 
 pip install click-spinner

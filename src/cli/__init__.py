@@ -30,7 +30,7 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
-logging.disable(logging.DEBUG)
+logging.disable(logging.WARNING)
 
 _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -616,6 +616,16 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True)
     )
+
+
+@dcos_docker.command('run')
+@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+def run(cluster_id: str) -> None:
+    """
+    XXX
+    """
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers.cluster.run_integration_tests(py
 
 
 if __name__ == '__main__':
