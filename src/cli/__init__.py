@@ -21,6 +21,10 @@ Docker for Mac network not set up
 For run:
 
 -e COLUMNS=$COLUMNS -e LINES=$LINES -e TERM=$TERM
+
+* dcos_docker run bash - document that this gets you into a random master
+
+* run --node_type=agent
 """
 
 import io
@@ -746,6 +750,12 @@ def run(
         'DCOS_LOGIN_UNAME': dcos_login_uname,
         'DCOS_LOGIN_PW': dcos_login_pw,
     }
+
+    # Without this we have display errors.
+    # See https://github.com/moby/moby/issues/25450.
+    for key in ('COLUMNS', 'TERM', 'LINES'):
+        if key in os.environ:
+            environment[key] = os.environ[key]
 
     docker_env_vars = []
     for key, value in environment.items():
