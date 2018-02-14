@@ -32,7 +32,6 @@ $ dcos-docker --help
 
 Commands:
   doctor
-  destroy
   sync
   pytest
 ```
@@ -45,24 +44,7 @@ Tells you about e.g. RAM and Docker for Mac network issues.
 
 ```
 $ dcos-docker create --help
-Usage: dcos-docker create ARTIFACT
-
-Get a DC/OS OSS artifact from...
-Get a DC/OS Enterprise artifact from...
-
-Options:
-  # Should also take optional name, to replace cluster ID
-  # Must be unique (validation)
-  --extra-config (string or file)
-  # Also mount options, look like Docker -v
-  --masters
-  --agents
-  --public-agents
-  --docker-storage-driver
-  --docker-version
-  --linux-distribution
   --dcos-checkout (syncs bootstrap / tests)
-  --name
 ```
 
 ```
@@ -77,43 +59,10 @@ $ dcos-docker download-oss --pr 1235
 $ dcos-docker download-oss --master
 ```
 
-```
-$ dcos-docker create /path/to/artifact.sh
-```
-
-### Destroy
-
-```
-$ dcos-docker destroy 385171 291288
-385171
-291288
-$ dcos-docker destroy $(dcos-docker list)
-928932
-```
-
-### List
-
-```
-# Should list be called ps
-$ dcos-docker list
-832532
-151531
-```
-
 ### Wait
 
 ```
 $ dcos-docker wait 151531
-```
-
-### Inspect
-
-```
-$ dcos-docker inspect 151531
-...
-... Details like the web address
-... format = set env vars, like source-cluster.sh
-... also ship a generic run-master as a command
 ```
 
 ### Enterprise ideas
@@ -126,8 +75,6 @@ Sync different integration tests?
 A command which basically does `./run-master`.
 
 ## Misc ideas
-
-sphinx-click for docs
 
 dcos-docker run 213143 pytest
 
