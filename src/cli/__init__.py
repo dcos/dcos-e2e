@@ -17,6 +17,9 @@ Docker for Mac network not set up
 * Genconf in checkout
 """
 
+import io
+import tarfile
+import time
 import json
 import logging
 import os
@@ -702,24 +705,58 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
     joined = ' '.join(system_cmd)
     os.system(joined)
 
-
 @dcos_docker.command('sync')
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
-# @click.argument('checkout')
-def sync(cluster_id: str):
+@click.argument(
+    'checkout',
+    type=click.Path(exists=True),
+)
+def sync(cluster_id: str, checkout: str) -> None:
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     node_test_dir = Path('/opt/mesosphere/active/dcos-integration-test')
     node_bootstrap_dir = Path('/opt/mesosphere/active/bootstrap/lib/python3.6/site-packages/dcos_internal_utils/')
+
+    local_packages = Path(checkout) / 'packages'
+    local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
+    # local_test_files_pattern = local_test_dir / '*'
     node_test_py_pattern = node_test_dir / '*tls.py'
-    print(str(node_test_py_pattern))
+    pw_tarstream = io.BytesIO()
+    pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
+    pw_tar.add(name=str(local_test_dir), arcname='/')
     print('----')
+    pw_tar.list()
+    pw_tar.close()
+    print(len(pw_tarstream.getbuffer()))
+    pw_tarstream.seek(0)
+    # return
+    # for test_file in local_test_dir.glob('*.py'):
+    #     archive.add_text_file(str(test_file), test_file.read_text())
+
+
     for master in cluster.masters:
         master.run(
             args=['rm', '-rf', str(node_test_py_pattern)],
             user=cluster.default_ssh_user,
             shell=True,
         )
+
+    for master_container in cluster_containers.masters:
+        master_container.put_archive(
+            path=str(node_test_dir),
+            data=pw_tarstream,
+        )
+
+        # paths = []
+        # for test_path in local_test_dir.glob('*.py'):
+        #     paths.append((test_path, node_test_dir))
+
+        # master.send_dir(
+        #     local_path=local_test_dir,
+        #     remote_path=node_test_dir,
+        #     user=cluster.default_ssh_user,
+        # )
+
         # empty test dir
         # copy files to test dir
         # copy files to bootstrap dir

@@ -7,7 +7,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
 from subprocess import PIPE, CompletedProcess, Popen
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Iterable
 
 import paramiko
 from scp import SCPClient
@@ -216,3 +216,36 @@ class Node:
                 user=user,
             )
             scp.put(files=str(local_path), remote_path=str(remote_path))
+
+    def send_dir(
+        self,
+        local_path,
+        remote_path,
+        user: str,
+    ) -> None:
+        """
+        Copy a file to this node.
+
+        Args:
+            local_path: The path on the host of the file to send.
+            remote_path: The path on the node to place the file.
+            user: The name of the remote user to send the file via
+                secure copy.
+        """
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(
+            str(self.public_ip_address),
+            username=user,
+            key_filename=str(self._ssh_key_path),
+        )
+
+        with SCPClient(ssh_client.get_transport()) as scp:
+            self.run(
+                args=['mkdir', '--parents',
+                      str(remote_path.parent)],
+                user=user,
+            )
+            scp.put(files=str(local_path), remote_path=str(remote_path), recursive=True)
+
+
