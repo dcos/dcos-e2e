@@ -668,7 +668,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @click.option(
     '--sync',
     is_flag=True,
-    help='XXX',
+    help=(
+        'Syncs to DC/OS checkout specified in the ``DCOS_CHECKOUT_PATH`` '
+        'before running the command.'
+    ),
 )
 @click.pass_context
 def run(
