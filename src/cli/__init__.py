@@ -574,7 +574,7 @@ class _ClusterContainers:
     type=str,
     callback=_validate_cluster_exists,
     default=None,
-    help='If not given, "default" is used.'
+    help='If not given, "default" is used.',
 )
 @click.option(
     '--superuser-username',
@@ -631,7 +631,7 @@ def wait(
     type=str,
     callback=_validate_cluster_exists,
     default=None,
-    help='If not given, "default" is used.'
+    help='If not given, "default" is used.',
 )
 @click.option(
     '--env',
@@ -698,7 +698,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     type=str,
     callback=_validate_cluster_exists,
     default=None,
-    help='If not given, "default" is used.'
+    help='If not given, "default" is used.',
 )
 @click.option(
     '--dcos-login-uname',
@@ -832,7 +832,7 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     type=str,
     callback=_validate_cluster_exists,
     default=None,
-    help='If not given, "default" is used.'
+    help='If not given, "default" is used.',
 )
 @click.argument(
     'checkout',
