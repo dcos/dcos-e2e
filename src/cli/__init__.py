@@ -868,6 +868,8 @@ def sync_code(cluster_id: str, checkout: str) -> None:
         master.run(
             args=['rm', '-rf', str(node_test_py_pattern)],
             user=cluster.default_ssh_user,
+            # We use a wildcard character, `*`, so we need shell expansion.
+            shell=True,
         )
 
     test_tarstream = _tar_with_filter(
