@@ -12,6 +12,7 @@ CLI
 
 DC/OS E2E also provides a command line interface for the Docker backend.
 It allows you to create, manage and destroy DC/OS clusters.
+See :doc:`cli` for details.
 
 Reference
 ---------

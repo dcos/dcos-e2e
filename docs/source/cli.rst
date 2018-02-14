@@ -19,6 +19,8 @@ An typical CLI workflow may look like this:
    work
    9452525358324
    $ dcos_docker wait work
+   $ dcos_docker run work pytest -k test_tls
+   ...
    $ eval $(dcos_docker inspect --env)
    $ docker exec -it $MASTER_0 /bin/bash
    [root@dcos-e2e-5253252]# exit
