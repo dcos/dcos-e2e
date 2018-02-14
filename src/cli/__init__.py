@@ -17,33 +17,6 @@ Docker for Mac network not set up
 * Add sync to docs
 * Add tests for sync
 * Run - use username and password from options
-
-Ideas for Default
------------------
-
-Option 1:
-* No defaults - what we have now
-* destroy $(dcos_docker list)
-* wait $(dcos_docker list) > will error if you have multiple
-
-Option 2:
-* create -> name is 'default'
-* create (no name given, default exists) -> error
-* create (name given, default exists) -> fine
-* destroy (looks at default)
-* destroy (error, default does not exist)
-
-Option 3:
-* create -> name is 3818411
-* create -> name is 3132111
-* destroy -> error there is more than one cluster, choose to destroy
-* destroy 313211
-* destroy (picks the only cluster)
-* destroy (error, no cluster exists)
-
-Option 4:
-* No default name on create
-* dcos_docker wait > error, no such cluster "default"
 """
 
 import io
@@ -572,7 +545,12 @@ class _ClusterContainers:
 
 
 @dcos_docker.command('wait')
-@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+@click.argument(
+    'cluster_id',
+    type=str,
+    callback=_validate_cluster_exists,
+    default='default',
+)
 @click.option(
     '--superuser-username',
     type=str,
@@ -623,7 +601,12 @@ def wait(
 
 
 @dcos_docker.command('inspect')
-@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+@click.argument(
+    'cluster_id',
+    type=str,
+    callback=_validate_cluster_exists,
+    default='default',
+)
 @click.option(
     '--env',
     is_flag=True,
@@ -683,7 +666,12 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 
 
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
-@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+@click.argument(
+    'cluster_id',
+    type=str,
+    callback=_validate_cluster_exists,
+    default='default',
+)
 @click.argument('node_args', type=str, nargs=-1)
 @click.option(
     '--sync',
@@ -697,7 +685,9 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 )
 @click.pass_context
 def run(
-    ctx: click.core.Context, cluster_id: str, node_args: Tuple[str],
+    ctx: click.core.Context,
+    cluster_id: str,
+    node_args: Tuple[str],
     sync: Optional[str],
 ) -> None:
     """
@@ -779,7 +769,12 @@ def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
 
 
 @dcos_docker.command('sync')
-@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+@click.argument(
+    'cluster_id',
+    type=str,
+    callback=_validate_cluster_exists,
+    default='default'
+)
 @click.argument(
     'checkout',
     type=click.Path(exists=True),

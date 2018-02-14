@@ -26,6 +26,8 @@ An typical CLI workflow may look like this:
    [root@dcos-e2e-5253252]# exit
    $ dcos_docker destroy $(dcos_docker list)
 
+Any command which takes exactly one cluster ID defaults to using the "default" if no cluster ID is given.
+Therefore, for the simple case of using one cluster at a time, use ``--cluster-id=default`` on ``create`` to save having to type the cluster ID repeatedly.
 Each of these commands is described in detail below.
 
 CLI Reference
