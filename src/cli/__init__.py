@@ -721,9 +721,20 @@ def sync(cluster_id: str, checkout: str) -> None:
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
     # local_test_files_pattern = local_test_dir / '*'
     node_test_py_pattern = node_test_dir / '*tls.py'
+
+    def file_filter(tar_info):
+        if '__pycache__' in tar_info.name:
+            return None
+        if tar_info.name.endswith('.pyc'):
+            return None
+        return tar_info
+
     pw_tarstream = io.BytesIO()
-    pw_tar = tarfile.TarFile(fileobj=pw_tarstream, mode='w')
-    pw_tar.add(name=str(local_test_dir), arcname='/')
+    pw_tar = tarfile.TarFile(
+        fileobj=pw_tarstream,
+        mode='w',
+    )
+    pw_tar.add(name=str(local_test_dir), arcname='/', filter=file_filter)
     print('----')
     pw_tar.list()
     pw_tar.close()
@@ -746,22 +757,6 @@ def sync(cluster_id: str, checkout: str) -> None:
             path=str(node_test_dir),
             data=pw_tarstream,
         )
-
-        # paths = []
-        # for test_path in local_test_dir.glob('*.py'):
-        #     paths.append((test_path, node_test_dir))
-
-        # master.send_dir(
-        #     local_path=local_test_dir,
-        #     remote_path=node_test_dir,
-        #     user=cluster.default_ssh_user,
-        # )
-
-        # empty test dir
-        # copy files to test dir
-        # copy files to bootstrap dir
-    pass
-
 
 if __name__ == '__main__':
     dcos_docker()
