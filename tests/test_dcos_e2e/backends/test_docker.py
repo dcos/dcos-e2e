@@ -456,9 +456,9 @@ class TestLabels:
             (master, ) = cluster.masters
             (agent, ) = cluster.agents
             (public_agent, ) = cluster.public_agents
-            assert master.labels['node_type'] = 'master'
-            assert agent.labels['node_type'] = 'agent'
-            assert public_agent.labels['node_type'] = 'public_agent'
+            assert master.labels['node_type'] == 'master'
+            assert agent.labels['node_type'] == 'agent'
+            assert public_agent.labels['node_type'] == 'public_agent'
 
     def test_custom(self) -> None:
         """
