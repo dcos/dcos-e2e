@@ -631,7 +631,6 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.argument('node_args', type=str, nargs=-1)
-# TODO actually a tuple
 def run(cluster_id: str, node_args: Tuple[str]) -> None:
     """
     XXX
