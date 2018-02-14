@@ -6,6 +6,7 @@ import json
 import logging
 import re
 import subprocess
+import os
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -626,18 +627,14 @@ def run(cluster_id: str, args: List[str]) -> None:
     """
     XXX
     """
-    args = list(args)
-
-    # args = [
-    #     'source',
-    #     '/opt/mesosphere/environment.export',
-    #     '&&',
-    #     'cd',
-    #     '/opt/mesosphere/active/dcos-integration-test/',
-    #     '&&',
-    # ] + list(args)
-
-    # cmd = '/bin/bash -c "' + ' '.join(args) + '"'
+    args = [
+        'source',
+        '/opt/mesosphere/environment.export',
+        '&&',
+        'cd',
+        '/opt/mesosphere/active/dcos-integration-test/',
+        '&&',
+    ] + list(args)
 
     def ip_addresses(nodes: Iterable[Node]) -> str:
         return ','.join(map(lambda node: str(node.public_ip_address), nodes))
@@ -651,25 +648,25 @@ def run(cluster_id: str, args: List[str]) -> None:
         'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster.public_agents),
     }
 
+    docker_env_vars = []
+    for key, value in environment.items():
+        docker_env_vars.append('-e')
+        docker_env_vars.append('{key}={value}'.format(key=key, value=value))
+
     master = next(iter(cluster_containers.masters))
-    import subprocess
-    import os
-    import pexpect
-    args = [
+    system_cmd = [
         'docker',
         'exec',
         '-it',
+    ] + docker_env_vars + [
         master.id,
         '/bin/bash',
         '-c',
-        '"{stuff}"'.format(stuff=' '.join(args)),
+        '"{args}"'.format(args=' '.join(args)),
     ]
 
-    joined = ' '.join(args)
+    joined = ' '.join(system_cmd)
     os.system(joined)
-    #
-    #
-    # child = pexpect.popen_spawn(' '.join(args))
 
 
 if __name__ == '__main__':
