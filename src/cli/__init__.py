@@ -4,16 +4,25 @@ A CLI for controlling DC/OS clusters on Docker.
 
 import json
 import logging
+import os
 import re
 import subprocess
-import os
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Union, Iterable  # noqa: F401
+from typing import (  # noqa: F401
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
 
 import click
 import docker
@@ -623,7 +632,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
 @click.argument('node_args', type=str, nargs=-1)
 # TODO actually a tuple
-def run(cluster_id: str, node_args: List[str]) -> None:
+def run(cluster_id: str, node_args: Tuple[str]) -> None:
     """
     XXX
     """
