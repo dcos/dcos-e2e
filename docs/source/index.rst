@@ -20,6 +20,7 @@ Reference
    node
    enterprise
    custom-backend
+   cli
    contributing
 
 .. toctree::

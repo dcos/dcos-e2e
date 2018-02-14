@@ -295,32 +295,28 @@ def create(
             DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
             For example, enterprise clusters require the following configuration parameters:
 
-            \b
-            * `superuser_username`
-            * `superuser_password_hash`
-            * `fault_domain_enabled`
-            * `license_key_contents`
+			``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
 
             \b
-            These can all be set in `extra_config`.
+            These can all be set in ``extra_config``.
             However, some defaults are provided for all but the license key.
 
             \b
-            The default superuser username is `admin`.
-            The default superuser password is `admin`.
-            The default `fault_domain_enabled` is `false`.
+            The default superuser username is ``admin``.
+            The default superuser password is ``admin``.
+            The default ``fault_domain_enabled`` is ``false``.
 
             \b
-            `license_key_contents` must be set for DC/OS Enterprise 1.11 and above.
+            ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
             This is set to one of the following, in order:
 
             \b
-            * The `license_key_contents` set in `extra_config`.
-            * The contents of the path given with `--license-key-path`.
-            * The contents of the path set in the `DCOS_LICENSE_KEY_PATH` environment variable.
+            * The ``license_key_contents`` set in ``extra_config``.
+            * The contents of the path given with ``--license-key-path``.
+            * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
 
             \b
-            If none of these are set, `license_key_contents` is not given.
+            If none of these are set, ``license_key_contents`` is not given.
     """
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
