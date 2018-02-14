@@ -762,11 +762,14 @@ def run(
     os.system(joined)
 
 
-def tar_with_filter(
+def _tar_with_filter(
     path: Path,
     filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
 ) -> io.BytesIO:
-
+    """
+    Return a tar of a files in a given directory, which are not filtered out
+    by the ``filter``.
+    """
     tarstream = io.BytesIO()
     with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
         tar.add(name=str(path), arcname='/', filter=filter)
@@ -775,7 +778,11 @@ def tar_with_filter(
     return tarstream
 
 
-def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
+def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
+    """
+    A filter for ``tarfile.Tarfile.add`` which removes Python and pytest cache
+    files.
+    """
     if '__pycache__' in tar_info.name:
         return None
     if tar_info.name.endswith('.pyc'):

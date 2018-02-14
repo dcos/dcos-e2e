@@ -330,7 +330,10 @@ class TestInspect:
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['inspect', '--cluster-id', unique])
+        result = runner.invoke(
+            dcos_docker,
+            ['inspect', '--cluster-id', unique],
+        )
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
