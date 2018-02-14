@@ -741,6 +741,7 @@ def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
 @click.argument(
     'checkout',
     type=click.Path(exists=True),
+    envvar='DCOS_CHECKOUT_PATH',
 )
 def sync(cluster_id: str, checkout: str) -> None:
     """
