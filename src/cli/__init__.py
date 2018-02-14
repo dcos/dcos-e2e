@@ -670,7 +670,9 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     is_flag=True,
     help=(
         'Syncs to DC/OS checkout specified in the ``DCOS_CHECKOUT_PATH`` '
-        'before running the command.'
+        'environment variable before running the command. '
+        'If the environment variable is not set, the current working '
+        'directory is used.'
     ),
 )
 @click.pass_context
@@ -684,9 +686,11 @@ def run(
     This command sets up the environment so that ``pytest`` can be run.
 
     For example, run ``dcos_docker run 1231599 pytest -k test_tls.py``.
+
+    Or, with sync: ``dcos_docker run --sync 1231599 pytest -k test_tls.py``.
     """
     if sync is not None:
-        checkout = os.environ['DCOS_CHECKOUT_PATH']
+        checkout = os.environ.get('DCOS_CHECKOUT_PATH', '.')
         ctx.invoke(sync_code, cluster_id=cluster_id, checkout=checkout)
 
     args = [
@@ -760,6 +764,7 @@ def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     'checkout',
     type=click.Path(exists=True),
     envvar='DCOS_CHECKOUT_PATH',
+    default='.',
 )
 def sync_code(cluster_id: str, checkout: str) -> None:
     """
@@ -767,11 +772,13 @@ def sync_code(cluster_id: str, checkout: str) -> None:
 
     This syncs integration test files and bootstrap files.
 
-    ``checkout`` should be set to the path of clone of an open source DC/OS
+    ``CHECKOUT`` should be set to the path of clone of an open source DC/OS
     or DC/OS Enterprise repository.
 
-    By default the ``checkout`` argument is set to the value of the
+    By default the ``CHECKOUT`` argument is set to the value of the
     ``DCOS_CHECKOUT_PATH`` environment variable.
+
+    If no ``CHECKOUT`` is given, the current working directory is used.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
@@ -784,6 +791,13 @@ def sync_code(cluster_id: str, checkout: str) -> None:
 
     local_packages = Path(checkout) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
+    if not local_test_dir.exists():
+        message = (
+            'CHECKOUT must be set to the checkout of a DC/OS repository.\n'
+            '"{local_test_dir}" does not exist.'
+        ).format(local_test_dir=local_test_dir)
+        raise click.BadArgumentUsage(message=message)
+
     local_bootstrap_dir = local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
 
     node_test_py_pattern = node_test_dir / '*.py'
