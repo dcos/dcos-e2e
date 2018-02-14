@@ -434,6 +434,7 @@ def destroy(cluster_ids: List[str]) -> None:
         }
         rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
         for container in containers:
+            container.stop()
             container.remove(v=True)
 
         click.echo(cluster_id)

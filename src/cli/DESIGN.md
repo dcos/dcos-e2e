@@ -45,14 +45,7 @@ Customisable logging system (wait?)
 
 Are dangling volumes left
 
-Document this in index
-
 test run on OSS
 does OSS boot?
 
-```
-# Maybe docker-machine like - without name is 'default' then you never
-# need the name - uses `default` everywhere
-$ dcos-docker create /path/to/build/artifact.sh
-385171
-```
+Maybe docker-machine like - without name is 'default' then you never need the name - uses `default` everywhere
