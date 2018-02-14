@@ -638,7 +638,6 @@ def wait(
     is_flag=True,
     help='Show details in an environment variable format to eval.',
 )
-@click.pass_context
 def inspect_cluster(cluster_id: str, env: bool) -> None:
     """
     Show cluster details.
