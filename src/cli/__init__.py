@@ -748,6 +748,12 @@ def sync(cluster_id: str, checkout: str) -> None:
     Sync files from a DC/OS checkout to master nodes.
 
     This syncs integration test files and bootstrap files.
+
+    ``checkout`` should be set to the path of clone of an open source DC/OS
+    or DC/OS Enterprise repository.
+
+    By default the ``checkout`` argument is set to the value of the
+    ``DCOS_CHECKOUT_PATH`` environment variable.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
