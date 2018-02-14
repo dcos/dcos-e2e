@@ -544,8 +544,8 @@ class _ClusterContainers:
 
 
 @dcos_docker.command('wait')
-@click.argument(
-    'cluster_id',
+@click.option(
+    '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
     default='default',
@@ -600,8 +600,8 @@ def wait(
 
 
 @dcos_docker.command('inspect')
-@click.argument(
-    'cluster_id',
+@click.option(
+    '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
     default='default',
@@ -770,8 +770,8 @@ def cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
 
 
 @dcos_docker.command('sync')
-@click.argument(
-    'cluster_id',
+@click.option(
+    '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
     default='default'
