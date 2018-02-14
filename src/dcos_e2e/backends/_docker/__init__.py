@@ -761,6 +761,7 @@ class DockerCluster(ClusterManager):
         ):
             containers = client.containers.list(filters={'name': prefix})
             for container in containers:
+                # TODO Remove force?
                 container.remove(v=True, force=True)
 
         rmtree(path=str(self._path), ignore_errors=True)

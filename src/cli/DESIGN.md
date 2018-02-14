@@ -43,7 +43,6 @@ Sync different integration tests?
 
 Customisable logging system (wait?)
 
-pip install click-spinner
 Are dangling volumes left
 
 Document this in index

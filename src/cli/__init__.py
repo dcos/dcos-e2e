@@ -385,10 +385,11 @@ def create(
     )
 
     try:
-        cluster.install_dcos_from_path(
-            build_artifact=Path(artifact),
-            extra_config=extra_config,
-        )
+        with click_spinner.spinner():
+            cluster.install_dcos_from_path(
+                build_artifact=Path(artifact),
+                extra_config=extra_config,
+            )
     except CalledProcessError:
         cluster.destroy()
         return
@@ -433,7 +434,7 @@ def destroy(cluster_ids: List[str]) -> None:
         }
         rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
         for container in containers:
-            container.remove(v=True, force=True)
+            container.remove(v=True)
 
         click.echo(cluster_id)
 
@@ -560,7 +561,8 @@ def wait(
             )
             raise click.BadOptionUsage(message=message)
 
-        cluster_containers.cluster.wait_for_dcos_oss()
+        with click_spinner.spinner():
+            cluster_containers.cluster.wait_for_dcos_oss()
 
     superuser_username = superuser_username or 'admin'
     superuser_password = superuser_password or 'admin'
