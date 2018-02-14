@@ -11,9 +11,7 @@ Docker for Mac network not set up
 * Handle Custom CA Cert case, with mounts
 * Customizable logging system
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
-* Does wait for OSS work?
-* Use a `default` name if there exist no cluster IDs?
-* Describe this in README
+* Does wait for OSS work? run? sync?
 * Genconf in checkout
 
 * Add sync to docs
@@ -21,6 +19,24 @@ Docker for Mac network not set up
 * Run - use username and password from options
 * Idea for default - if you use the word "default" this returns the one and only one cluster
     - or maybe if no Cluster ID uses the one cluster, if there is only one
+
+Option 1:
+* create -> name is 'default'
+* create (no name given, default exists) -> error
+* create (name given, default exists) -> fine
+* destroy (looks at default)
+* destroy (error, default does not exist)
+
+Option 2:
+* No defaults
+
+Option 3:
+* create -> name is 3818411
+* create -> name is 3132111
+* destroy -> error there is more than one cluster, choose to destroy
+* destroy 313211
+* destroy (picks the only cluster)
+* destroy (error, no cluster exists)
 """
 
 import io

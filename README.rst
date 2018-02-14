@@ -55,6 +55,28 @@ CLI
 ---
 
 There is also a CLI tool.
+This is useful for quickly creating, managing and destroying clusters.
+
+An typical CLI workflow may look like this:
+
+.. code-block:: console
+
+   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id work
+   work
+   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 0
+   9452525358324
+   $ dcos_docker list
+   work
+   9452525358324
+   $ dcos_docker wait work
+   $ dcos_docker run work pytest -k test_tls
+   ...
+   $ eval $(dcos_docker inspect --env)
+   $ docker exec -it $MASTER_0 /bin/bash
+   [root@dcos-e2e-5253252]# exit
+   $ dcos_docker destroy $(dcos_docker list)
+
+Each of these commands and more described in detail in the `full CLI documentation <http://dcos-e2e.readthedocs.io/en/latest/cli.html>`_.
 
 .. |Build Status| image:: https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/mesosphere/dcos-e2e
