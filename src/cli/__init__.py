@@ -18,6 +18,9 @@ Docker for Mac network not set up
 For run:
 
 * run --node_type=agent, --all
+* HTTP address in --env
+
+Document running integration tests
 """
 
 import io
@@ -274,6 +277,8 @@ def dcos_docker(verbose: None) -> None:
     """
     Manage DC/OS clusters on Docker.
     """
+    for _ in(verbose, ):
+        pass
 
 
 @dcos_docker.command('create')
@@ -827,7 +832,7 @@ def run(
 
 def _tar_with_filter(
     path: Path,
-    filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
+    tar_filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
 ) -> io.BytesIO:
     """
     Return a tar of a files in a given directory, which are not filtered out
@@ -835,7 +840,7 @@ def _tar_with_filter(
     """
     tarstream = io.BytesIO()
     with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
-        tar.add(name=str(path), arcname='/', filter=filter)
+        tar.add(name=str(path), arcname='/', filter=tar_filter)
     tarstream.seek(0)
 
     return tarstream
@@ -843,7 +848,7 @@ def _tar_with_filter(
 
 def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     """
-    Filter for ``tarfile.Tarfile.add`` which removes Python and pytest cache
+    Filter for ``tarfile.TarFile.add`` which removes Python and pytest cache
     files.
     """
     if '__pycache__' in tar_info.name:
@@ -922,11 +927,11 @@ def sync_code(cluster_id: str, checkout: str) -> None:
 
     test_tarstream = _tar_with_filter(
         path=local_test_dir,
-        filter=_cache_filter,
+        tar_filter=_cache_filter,
     )
     bootstrap_tarstream = _tar_with_filter(
         path=local_bootstrap_dir,
-        filter=_cache_filter,
+        tar_filter=_cache_filter,
     )
     for master_container in cluster_containers.masters:
         master_container.put_archive(

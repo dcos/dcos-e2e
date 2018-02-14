@@ -249,6 +249,9 @@ class TestDestroy:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['destroy', '--help'])
         assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker destroy [OPTIONS] [CLUSTER_IDS]...
@@ -259,7 +262,8 @@ class TestDestroy:
 
             Options:
               --help  Show this message and exit.
-            """
+            """# noqa: E501,E261
+            # yapf: enable
         )
         assert result.output == expected_help
 

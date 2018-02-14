@@ -53,6 +53,7 @@ submodules
 subprocess
 symlink
 systemd
+tarfile
 tempfile
 tmp
 tmpfs
@@ -69,5 +70,6 @@ sso
 oauth
 versioning
 whitespace
+wildcard
 yapf
 zookeeper
