@@ -688,5 +688,18 @@ def run(cluster_id: str, node_args: Tuple[str]) -> None:
     os.system(joined)
 
 
+@dcos_docker.command('sync')
+@click.argument('cluster_id', type=str, callback=_validate_cluster_exists)
+@click.argument('checkout')
+def sync(cluster_id: str):
+    # on all masters
+    # empty test dir
+    # copy files to test dir
+    # copy files to bootstrap dir
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster = cluster_containers.cluster
+    pass
+
+
 if __name__ == '__main__':
     dcos_docker()
