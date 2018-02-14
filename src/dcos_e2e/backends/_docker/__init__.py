@@ -179,7 +179,7 @@ class Docker(ClusterBackend):
                 ``aufs`` is used.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
-            ssh_keypair_dir: XXX
+            ssh_keypair_dir: A directory with a key pair to use on nodes.
 
         Attributes:
             dcos_docker_path: The path to a clone of DC/OS Docker.
@@ -198,7 +198,7 @@ class Docker(ClusterBackend):
                 cluster nodes.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
-            ssh_keypair_dir: XXX
+            ssh_keypair_dir: A directory with a key pair to use on nodes.
 
         Raises:
             NotImplementedError: The ``linux_distribution`` is not supported by
@@ -761,8 +761,8 @@ class DockerCluster(ClusterManager):
         ):
             containers = client.containers.list(filters={'name': prefix})
             for container in containers:
-                # TODO Remove force?
-                container.remove(v=True, force=True)
+                container.stop()
+                container.remove(v=True)
 
         rmtree(path=str(self._path), ignore_errors=True)
 
