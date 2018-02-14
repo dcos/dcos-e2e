@@ -837,7 +837,7 @@ def sync_code(cluster_id: str, checkout: str) -> None:
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'
-    node_lib_dir = node_active_dir / 'boostrap' / 'lib'
+    node_lib_dir = node_active_dir / 'bootstrap' / 'lib'
     # Different versions of DC/OS have different versions of Python.
     master = next(iter(cluster.masters))
     ls_result = master.run(
