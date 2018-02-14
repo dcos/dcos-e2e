@@ -8,7 +8,6 @@ $ dcos_docker doctor
 Not enough RAM allocated to Docker
 Docker for Mac network not set up
 
-* Does wait for OSS work? run? sync?
 * Genconf in checkout
 
 * Customizable logging system
@@ -16,11 +15,7 @@ Docker for Mac network not set up
 * Add tests for sync
 * Handle Custom CA Cert case, with mounts (and copy to installer)
 
-* 1.10 sync support - bootstrap isn't 3.6
-
 For run:
-
-* dcos_docker run bash - document that this gets you into a random master
 
 * run --node_type=agent, --all
 """

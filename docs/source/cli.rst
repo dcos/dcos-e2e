@@ -19,9 +19,6 @@ An typical CLI workflow may look like this:
    work
    9452525358324
    $ dcos_docker wait --cluster-id work
-   $ eval $(dcos_docker inspect --cluster-id work --env)
-   $ docker exec -it $MASTER_0 /bin/bash
-   [root@dcos-e2e-5253252]# exit
    $ dcos_docker run --sync /path/to/dcos-enteprise --cluster-id work pytest -k test_tls
    ...
    $ dcos_docker destroy $(dcos_docker list)
@@ -37,6 +34,30 @@ apart from ``create``,
 defaults to using "default" if no cluster ID is given.
 
 This means that you can use ``--cluster-id=default`` and then use ``dcos_docker wait`` with no arguments to wait for the ``default`` cluster.
+
+Getting on to a Cluster Node
+----------------------------
+
+Sometimes it is useful to get onto a cluster node.
+As the nodes are all Docker containers, it is possible to use ``docker exec``.
+
+To find the details of the nodes, use ``dcos_docker inspect --cluster-id <your-cluster-id>``.
+Alternatively, use the ``--env`` flag to output commands to be evaluated as such:
+
+.. code-block:: console
+
+   $ eval $(dcos_docker inspect --cluster-id example --env)
+   $ docker exec -it $MASTER_0 /bin/bash
+   [root@dcos-e2e-5253252]# exit
+   $
+
+Which environment variables are available depends on the size of your cluster.
+
+Another option is to run the following to get on to a random master node:
+
+.. code-block:: console
+
+   $ dcos_docker run --cluster-id example bash
 
 CLI Reference
 -------------
@@ -58,9 +79,6 @@ CLI Reference
 
 .. click:: cli:sync_code
   :prog: dcos_docker sync
-
-.. click:: cli:destroy
-  :prog: dcos_docker destroy
 
 .. click:: cli:destroy
   :prog: dcos_docker destroy

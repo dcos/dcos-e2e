@@ -18,6 +18,7 @@ dict
 dir
 enum
 env
+eval
 fallback
 func
 genconf
