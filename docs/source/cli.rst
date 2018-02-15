@@ -7,9 +7,9 @@ An typical CLI workflow may look like this:
 
 .. code-block:: console
 
-   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id default
+   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
-   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 5
+   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 5
    921214100
    $ dcos_docker wait
    $ dcos_docker run --sync . pytest -k test_tls
@@ -37,6 +37,14 @@ The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`the dcos_docker wait <dcos_docker-wait>` command.
 
 To use this cluster, it is useful to find details using the :ref:`the dcos_docker inspect <dcos_docker-inspect>` command.
+
+DC/OS Enterprise
+~~~~~~~~~~~~~~~~
+
+There are multiple DC/OS Enterprise-only features available in :ref:`dcos_docker-create`.
+
+The only extra requirement is to give a valid license key.
+See :ref:`the dcos_docker create reference <dcos_docker-create>` for details on how to provide a license key.
 
 "default" Cluster ID
 --------------------
@@ -142,6 +150,8 @@ CLI Reference
 
 .. click:: cli:destroy
   :prog: dcos_docker destroy
+
+.. _dcos_docker-doctor:
 
 .. click:: cli:doctor
   :prog: dcos_docker doctor
