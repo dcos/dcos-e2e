@@ -67,3 +67,11 @@ update-dcos-docker:
 	    --squash \
 	    git@github.com:dcos/dcos-docker.git \
 	    master
+
+.PHONY: update-dcos-test-utils
+update-dcos-test-utils:
+	git subtree pull \
+	    --prefix src/dcos_e2e/_vendor/dcos_test_utils \
+	    --squash \
+	    git@github.com:dcos/dcos-test-utils.git \
+	    master
