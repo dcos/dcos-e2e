@@ -141,6 +141,10 @@ class TestCreate:
                                               using DC/OS Enterprise, this defaults to the
                                               value of the `DCOS_LICENSE_KEY_PATH`
                                               environment variable.
+              --genconf-path PATH             Path to a directory that contains additional
+                                              files forDC/OS installer. All files from this
+                                              directory will be copied to `genconf`
+                                              directory before running DC/OS installer.
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )
