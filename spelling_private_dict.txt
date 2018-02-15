@@ -10,6 +10,7 @@ changelog
 ci
 cli
 config
+customizable
 cwd
 dangoor
 dc
@@ -35,6 +36,7 @@ noqa
 os
 oss
 parallelizable
+parallelization
 postflight
 pragma
 py
@@ -71,5 +73,6 @@ oauth
 versioning
 whitespace
 wildcard
+workspace
 yapf
 zookeeper
