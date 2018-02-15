@@ -457,7 +457,7 @@ class TestSync:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker inspect --help`.
+        Help text is shown with `dcos_docker sync --help`.
         """
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['sync', '--help'])
@@ -488,12 +488,12 @@ class TestSync:
 
 class TestDoctor:
     """
-    Tests for the ``sync`` subcommand.
+    Tests for the ``doctor`` subcommand.
     """
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker inspect --help`.
+        Help text is shown with `dcos_docker doctor --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -521,3 +521,36 @@ class TestDoctor:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['doctor'], catch_exceptions=False)
         assert result.exit_code == 0
+
+
+class TestWeb:
+    """
+    Tests for the ``web`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker web --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['web', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        expected_help = dedent(
+            """\
+            Usage: dcos_docker web [OPTIONS]
+
+              Open the browser at the web UI.
+
+              Note that the web UI may not be available at first. Consider using
+              ``dcos_docker wait`` before running this command.
+
+            Options:
+              -c, --cluster-id TEXT  If not given, "default" is used.
+              --help                 Show this message and exit.
+            """
+        )
+        assert result.output == expected_help
