@@ -986,6 +986,7 @@ def doctor() -> None:
     # Host storage driver not supported
     # Networking not set up right
     # Mac - /private > /tmp
+    # Missing `ssh` command
     pass
 
 
