@@ -226,6 +226,28 @@ def _validate_cluster_exists(
     return cluster_id
 
 
+def _validate_path_is_directory(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> str:
+    """
+    Validate that a path is a directory.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    if value is None:
+        return
+
+    path = Path(value)
+    if not path.is_dir():
+        message = '"{path}" is not a directory.'.format(path=str(path))
+        raise click.BadParameter(message=message)
+
+    return path
+
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     """
     Return whether the build artifact is an Enterprise artifact.
@@ -369,6 +391,7 @@ def dcos_docker(verbose: None) -> None:
 @click.option(
     '--genconf-path',
     type=click.Path(exists=True),
+    callback=_validate_path_is_directory,
     help=(
         'Path to a directory that contains additional files for '
         'DC/OS installer. All files from this directory will be copied to the '
@@ -459,8 +482,6 @@ def create(
 
     files_to_copy_to_installer = {}
     if genconf_path is not None:
-        genconf_path = Path(genconf_path)
-
         # If a directory is provided copy all files from the directory
         # into installer `/genconf` direcotry.
         if genconf_path.is_dir():
