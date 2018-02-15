@@ -5,12 +5,8 @@ Ideas for improvements
 ----------------------
 
 * Handle Custom CA Cert case, with mounts (and copy to installer)
-* Document Enterprise
 * brew install
 * Windows support
-* Refactor (key creation common)
-* Check if this works on old Docker machine - if not, add to requirements
-* Make sync_code use send_file and then untar
 """
 
 import io
