@@ -1076,13 +1076,15 @@ def doctor() -> None:
             },
         )
     except docker.errors.APIError as exc:
-        # message = 'XXX'
-        if 'Mounts denied' in str(exc):
-            # Show some error
-            pass
-        else:
-            # Unknown error print(exc)
-            pass
+        message = (
+            'There was an error mounting a the temporary directory path '
+            '"{tmp_path}" in container: \n\n'
+            '{exception_detail}'
+        ).format(
+            tmp_path=tmp_path,
+            exception_detail=exc.explanation.decode('ascii', 'backslashreplace'),
+        )
+        _error(message=message)
     else:
         private_mount_container.stop()
         private_mount_container.remove(v=True)

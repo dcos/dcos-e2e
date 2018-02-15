@@ -69,6 +69,7 @@ enable=spelling,
 
 disable=line-too-long,
         too-few-public-methods,
+        too-many-lines,
         too-many-locals,
         too-many-arguments,
         too-many-statements,
