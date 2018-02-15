@@ -249,13 +249,16 @@ def _validate_path_is_directory(
 def _validate_path_pair(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
+    value: Any,
 ) -> List[Tuple[Path, Path]]:
     # We "use" variables to satisfy linting tools.
     for _ in (ctx, param):
         pass
 
-    result = []
+    result = []  # type: List[Tuple[Path, Path]]
+
+    if value is None:
+        return result
 
     for path_pair in value:
         try:
@@ -268,15 +271,15 @@ def _validate_path_pair(
             raise click.BadParameter(message=message)
 
         if not local_path.exists():
-            message = (
-                '"{local_path}" does not exist.'
-            ).format(local_path=local_path)
+            message = '"{local_path}" does not exist.'.format(
+                local_path=local_path,
+            )
             raise click.BadParameter(message=message)
 
         if not remote_path.is_absolute():
-            message = (
-                '"{remote_path} is not an absolute path.'
-            ).format(remote_path=remote_path)
+            message = '"{remote_path} is not an absolute path.'.format(
+                remote_path=remote_path,
+            )
             raise click.BadParameter(message=message)
 
         result.append((local_path, remote_path))
