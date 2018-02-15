@@ -64,6 +64,7 @@ Viewing Debug Information
 -------------------------
 
 The CLI is quiet by default.
+To see more information, use ``-v`` or ``-vv`` after ``dcos_docker``.
 
 CLI Reference
 -------------
