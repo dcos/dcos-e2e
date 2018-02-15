@@ -61,11 +61,11 @@ An typical CLI workflow may look like this:
 
 .. code-block:: console
 
-   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id default
+   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
-   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 5
+   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 5
    921214100
-   $ dcos_docker wait
+   $ dcos_docker wait # Uses "default" by default
    $ dcos_docker run --sync . pytest -k test_tls
    ...
    $ dcos_docker destroy $(dcos_docker list)

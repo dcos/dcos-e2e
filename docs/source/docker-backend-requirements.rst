@@ -4,7 +4,7 @@ Requirements
 ``dcos_docker doctor``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-DC/OS E2E comes with the ``dcos_docker doctor`` command.
+DC/OS E2E comes with the :ref:`dcos_docker-doctor` command.
 Run this command to check your system for common causes of problems.
 
 Docker

@@ -7,9 +7,6 @@ Ideas for improvements
 * Handle Custom CA Cert case, with mounts (and copy to installer)
 * brew install
 * Windows support
-* Refactor (key creation common)
-* Check if this works you're on old Docker machine - if not, add to requirements
-* Make sync_code use send_file and then untar
 """
 
 import io
@@ -230,7 +227,7 @@ def _validate_path_is_directory(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Optional[Union[int, bool, str]],
-) -> Path:
+) -> Optional[Path]:
     """
     Validate that a path is a directory.
     """
@@ -239,9 +236,9 @@ def _validate_path_is_directory(
         pass
 
     if value is None:
-        return
+        return None
 
-    path = Path(value)
+    path = Path(str(value))
     if not path.is_dir():
         message = '"{path}" is not a directory.'.format(path=str(path))
         raise click.BadParameter(message=message)
@@ -366,7 +363,7 @@ def dcos_docker(verbose: None) -> None:
     show_default=False,
     help=(
         'The storage driver to use for Docker in Docker. '
-        'By default this uses the host\'s driver.'
+        "By default this uses the host's driver."
     ),
 )
 @click.option(
@@ -461,8 +458,8 @@ def create(
     public_agents: int,
     license_key_path: Optional[str],
     security_mode: Optional[str],
-    genconf_path: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
+    genconf_path: Optional[Path],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -534,8 +531,8 @@ def create(
 
     files_to_copy_to_installer = {}
     if genconf_path is not None:
-        # If a directory is provided copy all files from the directory
-        # into installer `/genconf` direcotry.
+        # If a directory is provided, copy all files from the directory
+        # into the installer's `/genconf` directory.
         if genconf_path.is_dir():
             container_genconf_path = Path('/genconf')
             for genconf_file in genconf_path.glob('**/*'):
