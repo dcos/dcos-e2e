@@ -1,7 +1,7 @@
 Using DC/OS Enterprise
 ======================
 
-DC/OS Enterprise requirer various configuration variables which are not allowed or required by open source DC/OS.
+DC/OS Enterprise requires various configuration variables which are not allowed or required by open source DC/OS.
 
 The following example shows how to use DC/OS Enterprise with DC/OS E2E.
 
