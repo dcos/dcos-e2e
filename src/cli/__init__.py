@@ -223,6 +223,29 @@ def _validate_cluster_exists(
     return cluster_id
 
 
+def _validate_path_is_directory(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> str:
+    """
+    Validate that a path is a directory.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    if value is None:
+        return
+
+    path = Path(value)
+    if not path.is_dir():
+        message = '"{path}" is not a directory.'.format(path=str(path))
+        raise click.BadParameter(message=message)
+
+    return path
+
+
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     """
     Return whether the build artifact is an Enterprise artifact.
@@ -363,6 +386,16 @@ def dcos_docker(verbose: None) -> None:
         '`DCOS_LICENSE_KEY_PATH` environment variable.'
     ),
 )
+@click.option(
+    '--genconf-path',
+    type=click.Path(exists=True),
+    callback=_validate_path_is_directory,
+    help=(
+        'Path to a directory that contains additional files for '
+        'DC/OS installer. All files from this directory will be copied to the '
+        '`genconf` directory before running DC/OS installer.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -375,6 +408,7 @@ def create(
     public_agents: int,
     license_key_path: Optional[str],
     security_mode: Optional[str],
+    genconf_path: Optional[str],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -444,6 +478,20 @@ def create(
         if security_mode is not None:
             extra_config['security'] = security_mode
 
+    files_to_copy_to_installer = {}
+    if genconf_path is not None:
+        # If a directory is provided copy all files from the directory
+        # into installer `/genconf` direcotry.
+        if genconf_path.is_dir():
+            container_genconf_path = Path('/genconf')
+            for genconf_file in genconf_path.glob('**/*'):
+                if genconf_file.is_dir():
+                    continue
+                relative_path = container_genconf_path / genconf_file.relative_to(
+                    genconf_path
+                )
+                files_to_copy_to_installer[genconf_file] = relative_path
+
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
         custom_agent_mounts=custom_agent_mounts,
@@ -464,6 +512,7 @@ def create(
         masters=masters,
         agents=agents,
         public_agents=public_agents,
+        files_to_copy_to_installer=files_to_copy_to_installer,
     )
 
     nodes = {
