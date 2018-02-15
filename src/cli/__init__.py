@@ -416,9 +416,11 @@ def create(
     workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
+    public_key_path = ssh_keypair_dir / 'id_rsa.pub'
+    private_key_path = ssh_keypair_dir / 'id_rsa'
     _write_key_pair(
-        public_key_path=ssh_keypair_dir / 'id_rsa.pub',
-        private_key_path=ssh_keypair_dir / 'id_rsa',
+        public_key_path=public_key_path,
+        private_key_path=private_key_path,
     )
 
     enterprise = _is_enterprise(build_artifact=Path(artifact))
@@ -446,7 +448,6 @@ def create(
         custom_public_agent_mounts=custom_public_agent_mounts,
         linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
         docker_version=_DOCKER_VERSIONS[docker_version],
-        ssh_keypair_dir=ssh_keypair_dir,
         storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
         docker_container_labels={
             _CLUSTER_ID_LABEL_KEY: cluster_id,
@@ -462,6 +463,29 @@ def create(
         agents=agents,
         public_agents=public_agents,
     )
+
+    nodes = {
+        *cluster.masters,
+        *cluster.agents,
+        *cluster.public_agents,
+    }
+
+    for node in nodes:
+        node.run(
+            args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
+            user=cluster.default_ssh_user,
+            shell=True,
+        )
+        node.run(
+            args=[
+                'echo',
+                public_key_path.read_text(),
+                '>>',
+                '/root/.ssh/authorized_keys',
+            ],
+            user=cluster.default_ssh_user,
+            shell=True,
+        )
 
     try:
         with click_spinner.spinner():
