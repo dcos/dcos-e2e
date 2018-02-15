@@ -13,8 +13,10 @@ to capture what the help text actually is with:
        import pyperclip; pyperclip.copy(result.output)
 """
 
+import os
 import uuid
 from pathlib import Path
+from tempfile import mkstemp
 from textwrap import dedent
 from typing import List
 
@@ -151,11 +153,101 @@ class TestCreate:
                                               files for DC/OS installer. All files from this
                                               directory will be copied to the `genconf`
                                               directory before running DC/OS installer.
+              --copy-to-master TEXT           Files to put on master nodes before installing
+                                              DC/OS. This option can be given multiple
+                                              times. Each option should be in the format
+                                              /absolute/local/path:/remote/path.
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
+
+    def test_copy_to_master_bad_format(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        An error is shown if ``--copy-to-master`` is given a value in an
+        invalid format.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--copy-to-master',
+                '/some/path',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_message = dedent(
+            """\
+            Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "--copy-to-master": "/some/path" is not in the format /absolute/local/path:/remote/path.
+            """
+        )
+        assert result.output == expected_message
+
+    def test_copy_to_master_no_local(self, oss_artifact: Path) -> None:
+        """
+        An error is shown if the given local path does not exist.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--copy-to-master',
+                '/some/path:some/remote',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_message = dedent(
+            """\
+            Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "--copy-to-master": "/some/path" does not exist.
+            """
+        )
+        assert result.output == expected_message
+
+    def test_copy_to_master_relative(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        An error is shown if the given local path is not an absolute path.
+        """
+        _, temporary_file_path = mkstemp(dir='.')
+        relative_path = Path(temporary_file_path).relative_to(os.getcwd())
+
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--copy-to-master',
+                '{relative}:some/remote'.format(relative=relative_path),
+            ],
+            catch_exceptions=False,
+        )
+        Path(relative_path).unlink()
+        assert result.exit_code == 2
+        expected_message = dedent(
+            """\
+            Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "--copy-to-master": "some/remote is not an absolute path.
+            """
+        )
+        assert result.output == expected_message
 
     def test_invalid_artifact_path(self) -> None:
         """

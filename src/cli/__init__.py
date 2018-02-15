@@ -4,7 +4,6 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
-* Handle Custom CA Cert case, with mounts (and copy to installer)
 * brew install
 * Windows support
 """
@@ -246,6 +245,47 @@ def _validate_path_is_directory(
     return path
 
 
+def _validate_path_pair(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> List[Tuple[Path, Path]]:
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    result = []  # type: List[Tuple[Path, Path]]
+
+    if value is None:
+        return result
+
+    for path_pair in value:
+        try:
+            [local_path, remote_path] = list(map(Path, path_pair.split(':')))
+        except ValueError:
+            message = (
+                '"{path_pair}" is not in the format '
+                '/absolute/local/path:/remote/path.'
+            ).format(path_pair=path_pair)
+            raise click.BadParameter(message=message)
+
+        if not local_path.exists():
+            message = '"{local_path}" does not exist.'.format(
+                local_path=local_path,
+            )
+            raise click.BadParameter(message=message)
+
+        if not remote_path.is_absolute():
+            message = '"{remote_path} is not an absolute path.'.format(
+                remote_path=remote_path,
+            )
+            raise click.BadParameter(message=message)
+
+        result.append((local_path, remote_path))
+
+    return result
+
+
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     """
     Return whether the build artifact is an Enterprise artifact.
@@ -399,6 +439,18 @@ def dcos_docker(verbose: None) -> None:
         '`genconf` directory before running DC/OS installer.'
     ),
 )
+@click.option(
+    '--copy-to-master',
+    type=str,
+    callback=_validate_path_pair,
+    multiple=True,
+    help=(
+        'Files to put on master nodes before installing DC/OS. '
+        'This option can be given multiple times. '
+        'Each option should be in the format '
+        '/absolute/local/path:/remote/path.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -411,6 +463,7 @@ def create(
     public_agents: int,
     license_key_path: Optional[str],
     security_mode: Optional[str],
+    copy_to_master: List[Tuple[Path, Path]],
     genconf_path: Optional[Path],
 ) -> None:
     """
@@ -540,6 +593,15 @@ def create(
             user=cluster.default_ssh_user,
             shell=True,
         )
+
+    for node in cluster.masters:
+        for path_pair in copy_to_master:
+            local_path, remote_path = path_pair
+            node.send_file(
+                local_path=local_path,
+                remote_path=remote_path,
+                user=cluster.default_ssh_user,
+            )
 
     try:
         with click_spinner.spinner():
