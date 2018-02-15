@@ -14,7 +14,6 @@ Next
 -  Add ``docker_container_labels`` parameter to the ``Docker`` backend.
 -  Logs are now less cluttered with escape characters.
 -  Documentation is now on Read The Docs.
-- Add ``ssh_keypair_dir`` to the ``Docker`` backend.
 - Add a Command Line Interface.
 
 2018.01.25.0
