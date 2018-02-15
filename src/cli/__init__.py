@@ -1080,7 +1080,10 @@ def doctor() -> None:
             '{exception_detail}'
         ).format(
             tmp_path=tmp_path,
-            exception_detail=exc.explanation.decode('ascii', 'backslashreplace'),
+            exception_detail=exc.explanation.decode(
+                'ascii',
+                'backslashreplace',
+            ),
         )
         _error(message=message)
     else:
