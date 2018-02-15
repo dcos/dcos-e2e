@@ -226,26 +226,27 @@ class TestDistributions:
             'license_key_contents': license_key_contents,
         }
 
-        with Cluster(
+        cluster = Cluster(
             cluster_backend=Docker(linux_distribution=Distribution.FEDORA_23),
             masters=1,
             agents=0,
             public_agents=0,
-        ) as cluster:
-            cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
-                extra_config=config,
-                log_output_live=True,
-            )
-            cluster.wait_for_dcos_eewait_for_dcos_ee(
-                superuser_username=superuser_username,
-                superuser_password=superuser_password,
-            )
-            (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
+        ) 
+        
+        cluster.install_dcos_from_path(
+            build_artifact=enterprise_artifact,
+            extra_config=config,
+            log_output_live=True,
+        )
+        cluster.wait_for_dcos_eewait_for_dcos_ee(
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+        )
+        (master, ) = cluster.masters
+        node_distribution = self._get_node_distribution(
+            node=master,
+            default_ssh_user=cluster.default_ssh_user,
+        )
 
         assert node_distribution == Distribution.COREOS
 
