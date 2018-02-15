@@ -209,7 +209,7 @@ class TestDistributions:
 
         assert node_distribution == Distribution.COREOS
 
-    def test_coreos_enterprise(
+    def test_fedora_enterprise(
         self,
         enterprise_artifact: Path,
         license_key_contents: str,
@@ -227,7 +227,7 @@ class TestDistributions:
         }
 
         with Cluster(
-            cluster_backend=Docker(linux_distribution=Distribution.COREOS),
+            cluster_backend=Docker(linux_distribution=Distribution.FEDORA_23),
             masters=1,
             agents=0,
             public_agents=0,
@@ -237,7 +237,7 @@ class TestDistributions:
                 extra_config=config,
                 log_output_live=True,
             )
-            cluster.wait_for_dcos_ee(
+            cluster.wait_for_dcos_eewait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
