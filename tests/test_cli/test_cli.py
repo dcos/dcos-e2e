@@ -161,6 +161,37 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_help
 
+    def test_copy_to_master_bad_format(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--copy-to-master',
+                '/some/path',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_message = dedent(
+            """\
+            Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "--copy-to-master": "/some/path" is not in the format /absolute/local/path:/remote/path.
+            """
+        )
+        assert result.output == expected_message
+
+    def test_copy_to_master_no_local(self) -> None:
+        pass
+
+    def test_copy_to_master_relative(self) -> None:
+        pass
+
     def test_invalid_artifact_path(self) -> None:
         """
         An error is shown if an invalid artifact path is given.
