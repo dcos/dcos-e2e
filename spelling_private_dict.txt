@@ -37,6 +37,7 @@ os
 oss
 parallelizable
 parallelization
+pluggable
 postflight
 pragma
 py
