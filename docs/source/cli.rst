@@ -1,8 +1,6 @@
 Command Line Interface
 ======================
 
-.. toctreee::
-
 The CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
 An typical CLI workflow may look like this:
@@ -20,10 +18,15 @@ An typical CLI workflow may look like this:
 
 Each of these and more are described in detail below.
 
+.. contents::
+   :local:
+
 Requirements
 ------------
 
 The CLI shares the :ref:`Docker backend requirements <docker-requirements>`.
+
+.. include:: installation.rst
 
 Creating a Cluster
 ------------------
@@ -88,6 +91,8 @@ See :ref:`the dcos_docker run reference <dcos_docker-run>` for more information 
 CLI Reference
 -------------
 
+.. _dcos_docker-create:
+
 .. click:: cli:create
   :prog: dcos_docker create
 
@@ -104,6 +109,8 @@ CLI Reference
 .. click:: cli:run
   :prog: dcos_docker run
 
+.. _dcos_docker-inspect:
+
 .. click:: cli:inspect_cluster
   :prog: dcos_docker inspect
 
@@ -112,3 +119,6 @@ CLI Reference
 
 .. click:: cli:destroy
   :prog: dcos_docker destroy
+
+.. click:: cli:doctor
+  :prog: dcos_docker doctor

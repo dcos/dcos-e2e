@@ -28,6 +28,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 import uuid
 from ipaddress import IPv4Address
@@ -1012,6 +1013,9 @@ def _error(message: str) -> None:
 
 @dcos_docker.command('doctor')
 def doctor() -> None:
+    """
+    Diagnose common issues which stop DC/OS E2E from working correctly.
+    """
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
     storage_driver_url = (
@@ -1030,7 +1034,6 @@ def doctor() -> None:
         _warn(message)
 
     if shutil.which('ssh') is None:
-        # Error, we need SSH
         _error(message='`ssh` must be available on your path.')
 
     ping_container = client.containers.run(
@@ -1049,8 +1052,13 @@ def doctor() -> None:
             stderr=subprocess.DEVNULL,
         )
     except subprocess.CalledProcessError:
-        # Error, network thing
-        click.echo('NETWORK ERROR')
+        message = 'Cannot connect to a Docker container by its IP address.'
+        if client.info()['OperatingSystem'] == 'Docker for Mac':
+            message += (
+                ' We recommend using '
+                'https://github.com/wojas/docker-mac-network. '
+            )
+        _error(message=message)
 
     ping_container.stop()
     ping_container.remove(v=True)
