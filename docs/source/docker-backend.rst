@@ -3,6 +3,8 @@ Docker Backend
 
 The Docker backend is user to spin up clusters on Docker containers, where each container is a DC/OS node.
 
+.. _docker-requirements:
+
 Requirements
 ------------
 

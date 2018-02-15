@@ -1,12 +1,7 @@
 Command Line Interface
 ======================
 
-DC/OS E2E provides a command line interface which includes many of the features of the library.
-The CLI is limited to the Docker backend and it is intented for use in developing and experimenting with DC/OS.
-Therefore, the CLI shares requirements with the :doc:`docker-backend`.
-
-It allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters.
-Each cluster node is emulated by a Docker container.
+The CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
 An typical CLI workflow may look like this:
 
@@ -25,6 +20,21 @@ An typical CLI workflow may look like this:
    $ dcos_docker destroy $(dcos_docker list)
 
 Each of these commands is described in detail below.
+
+Requirements
+------------
+
+The CLI shares the :ref:`Docker backend requirements <docker-requirements>`.
+
+Creating a Cluster
+------------------
+
+XXX
+
+The command returns when the DC/OS installation process has started
+To wait til finished...
+
+To use this cluster, it is useful to find details using inspect.
 
 Default Cluster Name
 --------------------
@@ -66,6 +76,13 @@ Viewing Debug Information
 The CLI is quiet by default.
 To see more information, use ``-v`` or ``-vv`` after ``dcos_docker``.
 
+Running Integration Tests
+-------------------------
+
+The ``dcos_docker run`` command is useful for running integration tests.
+
+See :ref:`the dcos_docker run reference <dcos_docker-run>` for more information on this command.
+
 CLI Reference
 -------------
 
@@ -77,6 +94,8 @@ CLI Reference
 
 .. click:: cli:wait
   :prog: dcos_docker wait
+
+.. _dcos_docker-run:
 
 .. click:: cli:run
   :prog: dcos_docker run

@@ -12,6 +12,7 @@ Ideas for improvements
 * dcos_docker doctor command
     - Network not set up
     - Not enough RAM allocated to Docker
+* dcos_docker create_wizard
 """
 
 import io
