@@ -115,7 +115,8 @@ See :ref:`the dcos_docker run reference <dcos_docker-run>` for more information 
 Viewing the Web UI
 ------------------
 
-To view the web UI of your cluster, use the :ref:`dcos_docker web <dcos_docker-web>` command.
+To view the web UI of your cluster, use the :ref:`dcos_docker-web` command.
+If you instead want to view the web UI URL of your cluster, use the :ref:`dcos_docker-inspect` command.
 
 Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
 
