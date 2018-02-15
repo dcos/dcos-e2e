@@ -1,25 +1,24 @@
 Command Line Interface
 ======================
 
+.. toctreee::
+
 The CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
 An typical CLI workflow may look like this:
 
 .. code-block:: console
 
-   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id work
-   work
-   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 0
-   9452525358324
-   $ dcos_docker list
-   work
-   9452525358324
-   $ dcos_docker wait --cluster-id work
-   $ dcos_docker run --sync /path/to/dcos-enteprise --cluster-id work pytest -k test_tls
+   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 0 --cluster-id default
+   default
+   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --agents 5
+   921214100
+   $ dcos_docker wait
+   $ dcos_docker run --sync . pytest -k test_tls
    ...
    $ dcos_docker destroy $(dcos_docker list)
 
-Each of these commands is described in detail below.
+Each of these and more are described in detail below.
 
 Requirements
 ------------
@@ -29,7 +28,7 @@ The CLI shares the :ref:`Docker backend requirements <docker-requirements>`.
 Creating a Cluster
 ------------------
 
-XXX
+Creating 
 
 The command returns when the DC/OS installation process has started
 To wait til finished...

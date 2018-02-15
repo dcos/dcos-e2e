@@ -4,6 +4,9 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
+--cluster-id arg to destroy
+multiple cluster IDs to wait, sync
+
 * Make tests pass
 * Add tests for sync
 * Merge to master
