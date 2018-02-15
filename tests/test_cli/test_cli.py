@@ -101,7 +101,7 @@ class TestCreate:
                       ``superuser_username``, ``superuser_password_hash``,
                       ``fault_domain_enabled``, ``license_key_contents``
 
-                              These can all be set in ``extra_config``.
+                              These can all be set in ``--extra-config``.
                               However, some defaults are provided for all but the license key.
 
                               The default superuser username is ``admin``.
@@ -111,7 +111,7 @@ class TestCreate:
                               ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
                               This is set to one of the following, in order:
 
-                              * The ``license_key_contents`` set in ``extra_config``.
+                              * The ``license_key_contents`` set in ``--extra-config``.
                               * The contents of the path given with ``--license-key-path``.
                               * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
 
@@ -139,7 +139,7 @@ class TestCreate:
               --security-mode [disabled|permissive|strict]
                                               The security mode to use for a DC/OS
                                               Enterprise cluster. This overrides any
-                                              security mode set in ``extra_config``.
+                                              security mode set in ``--extra-config``.
               -c, --cluster-id TEXT           A unique identifier for the cluster. Defaults
                                               to a random value. Use the value "default" to
                                               use this cluster for other
