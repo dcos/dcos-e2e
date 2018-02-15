@@ -17,6 +17,7 @@ Ideas for improvements
 * dcos_docker create_wizard
 * brew install
 * Windows support
+* Refactor (key creation common)
 """
 
 import io
@@ -26,6 +27,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
 import uuid
 from ipaddress import IPv4Address
@@ -983,13 +985,25 @@ def sync_code(cluster_id: str, checkout: str) -> None:
 
 @dcos_docker.command('doctor')
 def doctor() -> None:
+    mac_os = bool(sys.platform == 'darwin')
+    client = docker.from_env(version='auto')
+    host_driver = client.info()['Driver']
+    if not host_driver in _DOCKER_STORAGE_DRIVERS:
+        # Warning, could be slow
+        # Recommend overlay2
+        pass
+
     # Not enough RAM allocated to Docker
     # Host storage driver not supported
     # Networking not set up right
     # Mac - /private > /tmp
     # Missing `ssh` command
     # Docker 1.13.1 required (1.11.2 has a Docker-for-Mac-specific bug)
-    pass
+    # Check if you're on old Docker machine - not Docker for Mac? Dunno
+    # if this works
+    # Find out Jon Giddy's Linux space issue
+
+    # Click colors
 
 
 if __name__ == '__main__':
