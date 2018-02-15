@@ -4,7 +4,6 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
-* Make tests pass
 * Add tests for sync, doctor
 * Clean docs
 * Document running integration tests
@@ -17,6 +16,8 @@ Ideas for improvements
 * Windows support
 * Refactor (key creation common)
 * Check if this works you're on old Docker machine - if not, add to requirements
+* Make sync_code use send_file and then untar
+* Document using extra config from path
 """
 
 import io

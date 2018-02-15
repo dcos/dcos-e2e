@@ -38,7 +38,7 @@ class TestDcosDocker:
         Help test is shown with `dcos_docker` and `dcos_docker --help`.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, arguments)
+        result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
         assert result.exit_code == 0
         expected_help = dedent(
             """\
@@ -74,7 +74,11 @@ class TestCreate:
         Help text is shown with `dcos_docker create --help`.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['create', '--help'])
+        result = runner.invoke(
+            dcos_docker,
+            ['create', '--help'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
         # yapf breaks multi-line noqa, see
         # https://github.com/google/yapf/issues/524.
@@ -148,7 +152,11 @@ class TestCreate:
         An error is shown if an invalid artifact path is given.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['create', '/not/a/path'])
+        result = runner.invoke(
+            dcos_docker,
+            ['create', '/not/a/path'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 2
         expected_error = (
             'Error: Invalid value for "artifact": '
@@ -169,6 +177,7 @@ class TestCreate:
                 '--extra-config',
                 '@',
             ],
+            catch_exceptions=False,
         )
         assert result.exit_code == 2
         expected_message = dedent(
@@ -194,6 +203,7 @@ class TestCreate:
                 '--extra-config',
                 'some_key',
             ],
+            catch_exceptions=False,
         )
         assert result.exit_code == 2
         # yapf breaks multi-line noqa, see
@@ -227,6 +237,7 @@ class TestCreate:
                 '--cluster-id',
                 invalid_id,
             ],
+            catch_exceptions=False,
         )
 
         assert result.exit_code == 2
@@ -254,7 +265,11 @@ class TestDestroy:
         Help text is shown with `dcos_docker destroy --help`.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['destroy', '--help'])
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy', '--help'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
         # yapf breaks multi-line noqa, see
         # https://github.com/google/yapf/issues/524.
@@ -280,7 +295,11 @@ class TestDestroy:
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['destroy', unique])
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy', unique],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
@@ -293,7 +312,11 @@ class TestDestroy:
         unique = uuid.uuid4().hex
         unique_2 = uuid.uuid4().hex
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['destroy', unique, unique_2])
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy', unique, unique_2],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
@@ -312,7 +335,11 @@ class TestList:
         Help text is shown with `dcos_docker list --help`.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['list', '--help'])
+        result = runner.invoke(
+            dcos_docker,
+            ['list', '--help'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
         expected_help = dedent(
             """\
@@ -337,7 +364,11 @@ class TestInspect:
         Help text is shown with `dcos_docker inspect --help`.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['inspect', '--help'])
+        result = runner.invoke(
+            dcos_docker,
+            ['inspect', '--help'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
         expected_help = dedent(
             """\
@@ -377,7 +408,7 @@ class TestInspect:
 
 class TestWait:
     """
-    Tests for the `wait` subcommand.
+    Tests for the ``wait`` subcommand.
     """
 
     def test_help(self) -> None:
@@ -417,3 +448,76 @@ class TestWait:
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
         assert expected_error in result.output
+
+
+class TestSync:
+    """
+    Tests for the ``sync`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker inspect --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['sync', '--help'])
+        assert result.exit_code == 0
+        expected_help = dedent(
+            """\
+            Usage: dcos_docker sync [OPTIONS] [CHECKOUT]
+
+              Sync files from a DC/OS checkout to master nodes.
+
+              This syncs integration test files and bootstrap files.
+
+              ``CHECKOUT`` should be set to the path of clone of an open source DC/OS or
+              DC/OS Enterprise repository.
+
+              By default the ``CHECKOUT`` argument is set to the value of the
+              ``DCOS_CHECKOUT_PATH`` environment variable.
+
+              If no ``CHECKOUT`` is given, the current working directory is used.
+
+            Options:
+              --cluster-id TEXT  If not given, "default" is used.
+              --help             Show this message and exit.
+            """
+        )
+        assert result.output == expected_help
+
+
+class TestDoctor:
+    """
+    Tests for the ``sync`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker inspect --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['doctor', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        expected_help = dedent(
+            """\
+            Usage: dcos_docker doctor [OPTIONS]
+
+              Diagnose common issues which stop DC/OS E2E from working correctly.
+
+            Options:
+              --help  Show this message and exit.
+            """
+        )
+        assert result.output == expected_help
+
+    def test_doctor(self) -> None:
+        """
+        No exception is raised by the ``doctor`` subcommand.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_docker, ['doctor'], catch_exceptions=False)
+        assert result.exit_code == 0

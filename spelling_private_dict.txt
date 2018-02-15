@@ -65,6 +65,7 @@ tmpfs
 travis
 typeshed
 ubuntu
+untar
 url
 utils
 username
