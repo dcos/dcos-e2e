@@ -10,6 +10,7 @@ RUN dnf install -y \
 		btrfs-progs \
 		ca-certificates \
 		curl \
+		findutils \
 		git \
 		iproute \
 		ipset \
