@@ -5,10 +5,11 @@ Ideas for improvements
 ----------------------
 
 * Make tests pass
-* Add tests for sync
+* Add tests for sync, doctor
 * Clean docs
 * Document running integration tests
 * Merge to master
+* Try doctor on Linux
 * Shortcut for --cluster-id (-c?)
 * Handle Custom CA Cert case, with mounts (and copy to installer)
 * dcos_docker create_wizard

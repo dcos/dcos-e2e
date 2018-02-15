@@ -6,6 +6,7 @@ backend
 backends
 bootstrap
 calledprocesserror
+centos
 changelog
 ci
 cli
@@ -75,6 +76,7 @@ oauth
 versioning
 whitespace
 wildcard
+workflow
 workspace
 yapf
 zookeeper

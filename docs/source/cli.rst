@@ -44,7 +44,7 @@ To use this cluster, it is useful to find details using the :ref:`the dcos_docke
 "default" Cluster ID
 --------------------
 
-It can become tedious repeatly typing the cluster ID, particularly if you only have one cluster.
+It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
 As a convenience, any command which takes a ``cluster-id`` option,
 apart from ``create``,
 defaults to using "default" if no cluster ID is given.
