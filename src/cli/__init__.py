@@ -248,6 +248,7 @@ def _validate_path_is_directory(
 
     return path
 
+
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     """
     Return whether the build artifact is an Enterprise artifact.
@@ -489,7 +490,9 @@ def create(
             for genconf_file in genconf_path.glob('**/*'):
                 if genconf_file.is_dir():
                     continue
-                relative_path = container_genconf_path / genconf_file.relative_to(genconf_path)
+                relative_path = container_genconf_path / genconf_file.relative_to(
+                    genconf_path
+                )
                 files_to_copy_to_installer[genconf_file] = relative_path
 
     cluster_backend = Docker(
