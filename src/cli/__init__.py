@@ -8,17 +8,10 @@ $ dcos_docker doctor
 Not enough RAM allocated to Docker
 Docker for Mac network not set up
 
-* Genconf in checkout
-
 * Customizable logging system
 * Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Add tests for sync
 * Handle Custom CA Cert case, with mounts (and copy to installer)
-
-For run:
-
-* run --node_type=agent, --all
-* HTTP address in --env
 
 Document running integration tests
 """
@@ -232,7 +225,7 @@ def _validate_cluster_exists(
     return cluster_id
 
 
-def _is_enterprise(build_artifact: Path) -> bool:
+def _is_enterprise(build_artifact: Path, workspace_dir) -> bool:
     """
     Return whether the build artifact is an Enterprise artifact.
     """
@@ -241,7 +234,10 @@ def _is_enterprise(build_artifact: Path) -> bool:
         str(build_artifact),
         '--version',
     ]
-    result = subprocess.check_output(args=get_version_args)
+    result = subprocess.check_output(
+        args=get_version_args,
+        cwd=str(workspace_dir),
+    )
     version_info = json.loads(result.decode())
     variant = version_info['variant']
     return bool(variant == 'ee')
@@ -423,7 +419,10 @@ def create(
         private_key_path=private_key_path,
     )
 
-    enterprise = _is_enterprise(build_artifact=Path(artifact))
+    enterprise = _is_enterprise(
+        build_artifact=Path(artifact),
+        workspace_dir=workspace_dir,
+    )
 
     if enterprise:
         superuser_username = 'admin'
@@ -711,6 +710,8 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    master = next(iter(cluster_containers.masters))
+    web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
 
     if env:
         prefixes = {
@@ -726,6 +727,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
                     container_id=container.id,
                 )
                 click.echo(message)
+        click.echo('export WEB_UI={web_ui}'.format(web_ui=web_ui))
         return
 
     keys = {
@@ -738,10 +740,6 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         key: [_InspectView(container).to_dict() for container in containers]
         for key, containers in keys.items()
     }
-
-    # DC/OS version (e.g. Enterprise 1.11)?
-    master = next(iter(cluster_containers.masters))
-    web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
 
     data = {
         'Cluster ID': cluster_id,
