@@ -96,7 +96,6 @@ Running Integration Tests
 
 The ``dcos_docker run`` command is useful for running integration tests.
 
-
 To run integration tests which are developed in the a DC/OS checkout at ``/path/to/dcos``, you can use the following workflow:
 
 .. code-block:: console
@@ -107,6 +106,13 @@ To run integration tests which are developed in the a DC/OS checkout at ``/path/
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`the dcos_docker run reference <dcos_docker-run>` for more information on this command.
+
+Viewing the Web UI
+------------------
+
+To view the web UI of your cluster, use the :ref:`dcos_docker web <dcos_docker-web>` command.
+
+Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
 
 CLI Reference
 -------------
@@ -142,3 +148,8 @@ CLI Reference
 
 .. click:: cli:doctor
   :prog: dcos_docker doctor
+
+.. _dcos_docker-web:
+
+.. click:: cli:web
+  :prog: dcos_docker web

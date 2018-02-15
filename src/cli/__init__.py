@@ -895,6 +895,28 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     return tar_info
 
 
+@dcos_docker.command('web')
+@click.option(
+    '-c',
+    '--cluster-id',
+    type=str,
+    callback=_validate_cluster_exists,
+    default=None,
+    help='If not given, "default" is used.',
+)
+def web(cluster_id: str) -> None:
+    """
+    Open the browser at the web UI.
+
+    Note that the web UI may not be available at first.
+    Consider using ``dcos_docker wait`` before running this command.
+    """
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    master = next(iter(cluster_containers.masters))
+    web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
+    click.launch(web_ui)
+
+
 @dcos_docker.command('sync')
 @click.option(
     '-c',
