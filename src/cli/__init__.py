@@ -18,6 +18,7 @@ Ideas for improvements
 * brew install
 * Windows support
 * Refactor (key creation common)
+* Check if this works you're on old Docker machine - if not, add to requirements
 """
 
 import io
@@ -988,9 +989,10 @@ def doctor() -> None:
     mac_os = bool(sys.platform == 'darwin')
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
-    if not host_driver in _DOCKER_STORAGE_DRIVERS:
+    if host_driver not in _DOCKER_STORAGE_DRIVERS:
         # Warning, could be slow
         # Recommend overlay2
+        # Also try with AUFS? If not work - error
         pass
 
     if shutil.which('ssh') is None:
@@ -1024,18 +1026,29 @@ def doctor() -> None:
 
     tmp_path = Path('/tmp').resolve()
 
-    private_mount_container = client.containers.run(
-        image='alpine',
-        tty=True,
-        detach=True,
-        volumes={str(tmp_path): {'bind': '/test'}},
-    )
+    # This raises some exception, let's catch it and make it nice
+    #
+    try:
+        private_mount_container = client.containers.run(
+            image='alpine',
+            tty=True,
+            detach=True,
+            volumes={str(tmp_path): {'bind': '/test'}},
+        )
+    except docker.errors.APIError as exc:
+        if 'Mounts denied' in str(exc):
+            # Show some error
+            pass
+        else:
+            # Unknown error print(exc)
+            pass
+    else:
+        private_mount_container.stop()
+        private_mount_container.remove(v=True)
+
 
 
     # Not enough RAM allocated to Docker
-    # Mac - /private > /tmp
-    # Check if you're on old Docker machine - not Docker for Mac? Dunno
-    # if this works
     # Find out Jon Giddy's Linux space issue
 
     # Click colors
