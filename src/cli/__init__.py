@@ -4,10 +4,9 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
-* Add tests for sync, doctor
-* Clean docs
-* Document running integration tests
 * Merge to master
+* Document running integration tests
+* Document Doctor
 * Try doctor on Linux
 * Shortcut for --cluster-id (-c?)
 * Handle Custom CA Cert case, with mounts (and copy to installer)
