@@ -993,12 +993,33 @@ def doctor() -> None:
         # Recommend overlay2
         pass
 
+    if shutil.which('ssh') is None:
+        # Error, we need SSH
+        pass
+
+    container = client.containers.run(
+        image='alpine',
+        tty=True,
+        detach=True,
+    )
+
+    container.reload()
+    ip_address = container.attrs['NetworkSettings']['IPAddress']
+    try:
+        subprocess.check_call(
+            args=['ping', ip_address, '-c', '1', '-t', '1'],
+        )
+    except subprocess.CalledProcessError:
+        # Error, network thing
+        print('NETWORK ERROR')
+        pass
+    # if mac_os:
+
+
+
     # Not enough RAM allocated to Docker
-    # Host storage driver not supported
     # Networking not set up right
     # Mac - /private > /tmp
-    # Missing `ssh` command
-    # Docker 1.13.1 required (1.11.2 has a Docker-for-Mac-specific bug)
     # Check if you're on old Docker machine - not Docker for Mac? Dunno
     # if this works
     # Find out Jon Giddy's Linux space issue
