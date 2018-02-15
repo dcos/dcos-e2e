@@ -81,7 +81,7 @@ _DOCKER_VERSIONS = {
 _DOCKER_STORAGE_DRIVERS = {
     'aufs': DockerStorageDriver.AUFS,
     'overlay': DockerStorageDriver.OVERLAY,
-    # 'overlay2': DockerStorageDriver.OVERLAY_2,
+    'overlay2': DockerStorageDriver.OVERLAY_2,
 }
 
 _CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
@@ -1031,9 +1031,7 @@ def doctor() -> None:
 
     if shutil.which('ssh') is None:
         # Error, we need SSH
-        click.echo()
-        click.echo(click.style('Error: ', fg='red'), nl=False)
-        click.echo(message)
+        _error(message='`ssh` must be available on your path.')
 
     ping_container = client.containers.run(
         image='alpine',
@@ -1053,7 +1051,6 @@ def doctor() -> None:
     except subprocess.CalledProcessError:
         # Error, network thing
         click.echo('NETWORK ERROR')
-        pass
 
     ping_container.stop()
     ping_container.remove(v=True)
@@ -1082,7 +1079,7 @@ def doctor() -> None:
         private_mount_container.remove(v=True)
 
 
-    available_memory = client.info()['MemTotal']
+    client.info()['MemTotal']
     # Not enough RAM allocated to Docker
     # Find out Jon Giddy's Linux space issue
     # Check if system time out of sync
