@@ -597,9 +597,10 @@ def create(
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
+            local_path, remote_path = path_pair
             node.send_file(
-                local_path=path_pair[0],
-                remote_path=path_pair[1],
+                local_path=local_path,
+                remote_path=remote_path,
                 user=cluster.default_ssh_user,
             )
 
