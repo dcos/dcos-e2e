@@ -11,9 +11,6 @@ Ideas for improvements
 * Merge to master
 * Shortcut for --cluster-id (-c?)
 * Handle Custom CA Cert case, with mounts (and copy to installer)
-* dcos_docker doctor command
-    - Network not set up
-    - Not enough RAM allocated to Docker
 * dcos_docker create_wizard
 * brew install
 * Windows support
@@ -1017,6 +1014,7 @@ def doctor() -> None:
     """
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
+    docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
     storage_driver_url = (
         'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
     )
@@ -1052,7 +1050,7 @@ def doctor() -> None:
         )
     except subprocess.CalledProcessError:
         message = 'Cannot connect to a Docker container by its IP address.'
-        if client.info()['OperatingSystem'] == 'Docker for Mac':
+        if docker_for_mac:
             message += (
                 ' We recommend using '
                 'https://github.com/wojas/docker-mac-network. '
@@ -1089,11 +1087,26 @@ def doctor() -> None:
         private_mount_container.stop()
         private_mount_container.remove(v=True)
 
-    client.info()['MemTotal']
-    # Not enough RAM allocated to Docker
-    # Check if system time out of sync
+    docker_memory = client.info()['MemTotal']
+    message = (
+        'Docker has approximately {memory:.1f} GB of memory available. '
+        'The amount of memory required depends on the workload. '
+        'For example, creating large clusters or multiple clusters requires '
+        'a lot of memory.\n'
+        'A four node cluster seems to work well on a machine with 9 GB '
+        'of memory available to Docker.'
+    ).format(
+        memory=docker_memory / 1024 / 1024 / 1024,
+    )
+    mac_message = (
+        '\n'
+        'To dedicate more memory to Docker for Mac, go to '
+        'Docker > Preferences > Advanced.'
+    )
+    if docker_for_mac:
+        message += mac_message
 
-    # Click colors
+    _info(message=message)
 
 
 if __name__ == '__main__':
