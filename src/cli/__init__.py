@@ -4,19 +4,17 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
-* Merge to master
 * Document running integration tests
 * Document Doctor
 * Try doctor on Linux
-* Shortcut for --cluster-id (-c?)
 * Handle Custom CA Cert case, with mounts (and copy to installer)
-* dcos_docker create_wizard
 * brew install
 * Windows support
 * Refactor (key creation common)
 * Check if this works you're on old Docker machine - if not, add to requirements
 * Make sync_code use send_file and then untar
 * Document using extra config from path
+* Docker is installed - doctor command
 """
 
 import io
@@ -347,6 +345,7 @@ def dcos_docker(verbose: None) -> None:
     ),
 )
 @click.option(
+    '-c',
     '--cluster-id',
     type=str,
     default=uuid.uuid4().hex,
@@ -640,6 +639,7 @@ class _ClusterContainers:
 
 @dcos_docker.command('wait')
 @click.option(
+    '-c',
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
@@ -697,6 +697,7 @@ def wait(
 
 @dcos_docker.command('inspect')
 @click.option(
+    '-c',
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
@@ -715,7 +716,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     To quickly get environment variables to use with Docker tooling, use the
     ``--env`` flag.
 
-    Run ``eval (dcos_docker inspect <CLUSTER_ID> --env)``, then run
+    Run ``eval $(dcos_docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
@@ -762,6 +763,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
 @click.option(
+    '-c',
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
@@ -896,6 +898,7 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
 
 @dcos_docker.command('sync')
 @click.option(
+    '-c',
     '--cluster-id',
     type=str,
     callback=_validate_cluster_exists,
