@@ -1047,9 +1047,10 @@ def doctor() -> None:
         private_mount_container.remove(v=True)
 
 
-
+    available_memory = client.info()['MemTotal']
     # Not enough RAM allocated to Docker
     # Find out Jon Giddy's Linux space issue
+    # Check if system time out of sync
 
     # Click colors
 
