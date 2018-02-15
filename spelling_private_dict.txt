@@ -6,6 +6,7 @@ backend
 backends
 bootstrap
 calledprocesserror
+centos
 changelog
 ci
 cli
@@ -44,6 +45,7 @@ py
 pyperclip
 pytest
 reachability
+refactor
 rsa
 rtype
 src
@@ -63,6 +65,7 @@ tmpfs
 travis
 typeshed
 ubuntu
+untar
 url
 utils
 username
@@ -74,6 +77,7 @@ oauth
 versioning
 whitespace
 wildcard
+workflow
 workspace
 yapf
 zookeeper

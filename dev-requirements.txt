@@ -6,7 +6,6 @@ flake8-quotes==0.13.0
 flake8==3.5.0
 isort==4.3.4
 mypy==0.560
-passlib==1.7.1
 pip_check_reqs==2.0.1
 py==1.5.2
 pydocstyle==2.1.1
@@ -18,6 +17,7 @@ pytest-timeout==1.2.1
 pytest==3.4.0
 requests-mock==1.4.0
 sphinx-autodoc-typehints==1.2.5
+sphinx-click==1.0.4
 sphinx==1.7.0
 sphinxcontrib-spelling==4.0.1
 vulture==0.26
