@@ -9,6 +9,7 @@ Ideas for improvements
 * Clean docs
 * Document running integration tests
 * Merge to master
+* Shortcut for --cluster-id (-c?)
 * Handle Custom CA Cert case, with mounts (and copy to installer)
 * dcos_docker doctor command
     - Network not set up
@@ -987,6 +988,7 @@ def doctor() -> None:
     # Networking not set up right
     # Mac - /private > /tmp
     # Missing `ssh` command
+    # Docker 1.13.1 required (1.11.2 has a Docker-for-Mac-specific bug)
     pass
 
 
