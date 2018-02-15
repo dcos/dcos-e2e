@@ -230,7 +230,7 @@ def _validate_path_is_directory(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Optional[Union[int, bool, str]],
-) -> str:
+) -> Path:
     """
     Validate that a path is a directory.
     """
@@ -247,6 +247,44 @@ def _validate_path_is_directory(
         raise click.BadParameter(message=message)
 
     return path
+
+
+def _validate_path_pair(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> List[Tuple[Path, Path]]:
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    result = []
+
+    for path_pair in value:
+        try:
+            [local_path, remote_path] = list(map(Path, path_pair.split(':')))
+        except ValueError:
+            message = (
+                'Path pair "{path_pair}" is not in valid format. '
+                'Valid format is [local_path]:[remote_path]'
+            ).format(path_pair=path_pair)
+            raise click.BadParameter(message=message)
+
+        if not local_path.exists():
+            message = (
+                '"{local_path}" does not exist.'
+            ).format(local_path=local_path)
+            raise click.BadParameter(message=message)
+
+        if not remote_path.is_absolute():
+            message = (
+                '"{remote_path} is not an absolute path.'
+            ).format(remote_path=remote_path)
+            raise click.BadParameter(message=message)
+
+        result.append((local_path, remote_path))
+
+    return result
 
 
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
@@ -402,6 +440,15 @@ def dcos_docker(verbose: None) -> None:
         '`genconf` directory before running DC/OS installer.'
     ),
 )
+@click.option(
+    '--copy-to-master',
+    type=str,
+    callback=_validate_path_pair,
+    multiple=True,
+    help=(
+        'XXX'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -415,6 +462,7 @@ def create(
     license_key_path: Optional[str],
     security_mode: Optional[str],
     genconf_path: Optional[str],
+    copy_to_master: List[Tuple[Path, Path]],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -543,6 +591,14 @@ def create(
             user=cluster.default_ssh_user,
             shell=True,
         )
+
+    for node in cluster.masters:
+        for path_pair in copy_to_master:
+            node.send_file(
+                local_path=path_pair[0],
+                remote_path=path_pair[1],
+                user=cluster.default_ssh_user,
+            )
 
     try:
         with click_spinner.spinner():
