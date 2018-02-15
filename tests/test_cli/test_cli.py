@@ -134,7 +134,7 @@ class TestCreate:
                                               The security mode to use for a DC/OS
                                               Enterprise cluster. This overrides any
                                               security mode set in ``extra_config``.
-              --cluster-id TEXT               A unique identifier for the cluster. Defaults
+              -c, --cluster-id TEXT           A unique identifier for the cluster. Defaults
                                               to a random value. Use the value "default" to
                                               use this cluster for other
               --license-key-path PATH         This is ignored if using open source DC/OS. If
@@ -248,7 +248,7 @@ class TestCreate:
            """\
             Usage: dcos_docker create [OPTIONS] ARTIFACT
 
-            Error: Invalid value for "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
+            Error: Invalid value for "-c" / "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
             """# noqa: E501,E261
         ).format(cluster_id=invalid_id)
         # yapf: enable
@@ -379,13 +379,13 @@ class TestInspect:
               To quickly get environment variables to use with Docker tooling, use the
               ``--env`` flag.
 
-              Run ``eval (dcos_docker inspect <CLUSTER_ID> --env)``, then run ``docker
+              Run ``eval $(dcos_docker inspect <CLUSTER_ID> --env)``, then run ``docker
               exec -it $MASTER_0`` to enter the first master, for example.
 
             Options:
-              --cluster-id TEXT  If not given, "default" is used.
-              --env              Show details in an environment variable format to eval.
-              --help             Show this message and exit.
+              -c, --cluster-id TEXT  If not given, "default" is used.
+              --env                  Show details in an environment variable format to eval.
+              --help                 Show this message and exit.
             """
         )
         assert result.output == expected_help
@@ -425,7 +425,7 @@ class TestWait:
               Wait for DC/OS to start.
 
             Options:
-              --cluster-id TEXT          If not given, "default" is used.
+              -c, --cluster-id TEXT      If not given, "default" is used.
               --superuser-username TEXT  The superuser username is needed only on DC/OS
                                          Enterprise clusters. By default, on a DC/OS
                                          Enterprise cluster, `admin` is used.
@@ -479,8 +479,8 @@ class TestSync:
               If no ``CHECKOUT`` is given, the current working directory is used.
 
             Options:
-              --cluster-id TEXT  If not given, "default" is used.
-              --help             Show this message and exit.
+              -c, --cluster-id TEXT  If not given, "default" is used.
+              --help                 Show this message and exit.
             """
         )
         assert result.output == expected_help
