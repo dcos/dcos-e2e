@@ -165,6 +165,10 @@ class TestCreate:
         self,
         oss_artifact: Path,
     ) -> None:
+        """
+        An error is shown if ``--copy-to-master`` is given a value in an
+        invalid format.
+        """
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
