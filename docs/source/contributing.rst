@@ -13,7 +13,7 @@ Install dependencies in a virtual environment.
 
 .. code:: sh
 
-    pip install --process-dependency-links --editable .[dev]
+    pip install --editable .[dev]
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
