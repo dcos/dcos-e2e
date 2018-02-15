@@ -8,6 +8,9 @@ A ``Cluster`` object is then used to interact with the DC/OS cluster.
 
 .. autoclass:: dcos_e2e.cluster.Cluster
 
+.. contents::
+   :local:
+
 Choosing a Backend
 ------------------
 

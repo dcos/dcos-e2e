@@ -28,7 +28,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import tarfile
 import uuid
 from ipaddress import IPv4Address
@@ -1073,7 +1072,9 @@ def doctor() -> None:
             image='alpine',
             tty=True,
             detach=True,
-            volumes={str(tmp_path): {'bind': '/test'}},
+            volumes={str(tmp_path): {
+                         'bind': '/test'
+                     }},
         )
     except docker.errors.APIError as exc:
         if 'Mounts denied' in str(exc):
@@ -1085,7 +1086,6 @@ def doctor() -> None:
     else:
         private_mount_container.stop()
         private_mount_container.remove(v=True)
-
 
     client.info()['MemTotal']
     # Not enough RAM allocated to Docker
