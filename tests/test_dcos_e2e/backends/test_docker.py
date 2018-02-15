@@ -249,6 +249,46 @@ class TestDistributions:
 
         assert node_distribution == Distribution.COREOS
 
+    def test_coreos_enterprise(
+        self,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on CoreOS.
+        """
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+        config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
+        }
+
+        cluster = Cluster(
+            cluster_backend=Docker(linux_distribution=Distribution.COREOS),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        )
+        cluster.install_dcos_from_path(
+            build_artifact=enterprise_artifact,
+            extra_config=config,
+            log_output_live=True,
+        )
+        cluster.wait_for_dcos_ee(
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+        )
+        (master, ) = cluster.masters
+        node_distribution = self._get_node_distribution(
+            node=master,
+            default_ssh_user=cluster.default_ssh_user,
+        )
+
+        assert node_distribution == Distribution.COREOS
+
 
 class TestDockerVersion:
     """
