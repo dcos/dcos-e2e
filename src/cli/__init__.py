@@ -225,7 +225,7 @@ def _validate_cluster_exists(
     return cluster_id
 
 
-def _is_enterprise(build_artifact: Path, workspace_dir) -> bool:
+def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     """
     Return whether the build artifact is an Enterprise artifact.
     """

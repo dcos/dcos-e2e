@@ -3,6 +3,7 @@ Command Line Interface
 
 DC/OS E2E provides a command line interface which includes many of the features of the library.
 The CLI is limited to the Docker backend and it is intented for use in developing and experimenting with DC/OS.
+Therefore, the CLI shares requirements with the :doc:`docker-backend`.
 
 It allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters.
 Each cluster node is emulated by a Docker container.
@@ -58,6 +59,11 @@ Another option is to run the following to get on to a random master node:
 .. code-block:: console
 
    $ dcos_docker run --cluster-id example bash
+
+Viewing Debug Information
+-------------------------
+
+The CLI is quiet by default.
 
 CLI Reference
 -------------
