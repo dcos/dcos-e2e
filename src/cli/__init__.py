@@ -1061,22 +1061,22 @@ def doctor() -> None:
 
     ping_container.stop()
     ping_container.remove(v=True)
-    # if mac_os:
 
     tmp_path = Path('/tmp').resolve()
 
-    # This raises some exception, let's catch it and make it nice
-    #
     try:
         private_mount_container = client.containers.run(
             image='alpine',
             tty=True,
             detach=True,
-            volumes={str(tmp_path): {
-                         'bind': '/test'
-                     }},
+            volumes={
+                str(tmp_path): {
+                    'bind': '/test',
+                },
+            },
         )
     except docker.errors.APIError as exc:
+        # message = 'XXX'
         if 'Mounts denied' in str(exc):
             # Show some error
             pass
@@ -1089,7 +1089,6 @@ def doctor() -> None:
 
     client.info()['MemTotal']
     # Not enough RAM allocated to Docker
-    # Find out Jon Giddy's Linux space issue
     # Check if system time out of sync
 
     # Click colors
