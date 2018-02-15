@@ -62,6 +62,7 @@ class TestDcosDocker:
               run      Run an arbitrary command on a node.
               sync     Sync files from a DC/OS checkout to master...
               wait     Wait for DC/OS to start.
+              web      Open the browser at the web UI.
             """
         )
         assert result.output == expected_help
@@ -100,7 +101,7 @@ class TestCreate:
                       ``superuser_username``, ``superuser_password_hash``,
                       ``fault_domain_enabled``, ``license_key_contents``
 
-                              These can all be set in ``extra_config``.
+                              These can all be set in ``--extra-config``.
                               However, some defaults are provided for all but the license key.
 
                               The default superuser username is ``admin``.
@@ -110,7 +111,7 @@ class TestCreate:
                               ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
                               This is set to one of the following, in order:
 
-                              * The ``license_key_contents`` set in ``extra_config``.
+                              * The ``license_key_contents`` set in ``--extra-config``.
                               * The contents of the path given with ``--license-key-path``.
                               * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
 
@@ -131,12 +132,14 @@ class TestCreate:
               --agents INTEGER                The number of agent nodes.  [default: 1]
               --public-agents INTEGER         The number of public agent nodes.  [default:
                                               1]
-              --extra-config TEXT             Extra DC/OS configuration YAML to add to a
-                                              default configuration.
+              --extra-config PATH             The path to a file including DC/OS
+                                              configuration YAML. The contents of this file
+                                              will be added to add to a default
+                                              configuration.
               --security-mode [disabled|permissive|strict]
                                               The security mode to use for a DC/OS
                                               Enterprise cluster. This overrides any
-                                              security mode set in ``extra_config``.
+                                              security mode set in ``--extra-config``.
               -c, --cluster-id TEXT           A unique identifier for the cluster. Defaults
                                               to a random value. Use the value "default" to
                                               use this cluster for other
@@ -171,10 +174,39 @@ class TestCreate:
         )
         assert expected_error in result.output
 
-    def test_invalid_yaml(self, oss_artifact: Path) -> None:
+    def test_config_does_not_exist(self, oss_artifact: Path) -> None:
         """
-        An error is shown if invalid YAML is given for `--extra-config`.
+        An error is shown if the ``--extra-config`` file does not exist.
         """
+        runner = CliRunner()
+        invalid_path = '/' + uuid.uuid4().hex
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--extra-config',
+                invalid_path,
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_message = dedent(
+            """\
+            Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "--extra-config": Path "{path}" does not exist.
+            """
+        ).format(path=invalid_path)
+        assert result.output == expected_message
+
+    def test_invalid_yaml(self, oss_artifact: Path, tmpdir: local) -> None:
+        """
+        An error is shown if invalid YAML is given in the file given to
+        ``--extra-config``.
+        """
+        invalid_file = tmpdir.join(uuid.uuid4().hex)
+        invalid_file.write('@')
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -182,7 +214,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                '@',
+                invalid_file,
             ],
             catch_exceptions=False,
         )
@@ -196,11 +228,13 @@ class TestCreate:
         )
         assert result.output == expected_message
 
-    def test_not_key_value(self, oss_artifact: Path) -> None:
+    def test_not_key_value(self, oss_artifact: Path, tmpdir: local) -> None:
         """
-        An error is shown if YAML is given for `--extra-config` which is not
+        An error is shown if YAML is given for ``--extra-config`` which is not
         a key-value mapping.
         """
+        invalid_file = tmpdir.join(uuid.uuid4().hex)
+        invalid_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -208,7 +242,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                'some_key',
+                invalid_file,
             ],
             catch_exceptions=False,
         )
@@ -220,7 +254,7 @@ class TestCreate:
            """\
            Usage: dcos_docker create [OPTIONS] ARTIFACT
 
-           Error: Invalid value for "--extra-config": "some_key" is not a valid DC/OS configuration
+           Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
             """# noqa: E501,E261
         )
         # yapf: enable

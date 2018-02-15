@@ -10,8 +10,6 @@ Ideas for improvements
 * Refactor (key creation common)
 * Check if this works you're on old Docker machine - if not, add to requirements
 * Make sync_code use send_file and then untar
-* Document using extra config from path
-* Docker is installed - doctor command
 """
 
 import io
@@ -148,20 +146,25 @@ def _validate_dcos_configuration(
     value: Union[int, bool, str],
 ) -> Dict[str, Any]:
     """
-    Validate that a given value is a YAML map.
+    Validate that a given value is a file containing a YAML map.
     """
     # We "use" variables to satisfy linting tools.
     for _ in (ctx, param):
         pass
 
+    if value is None:
+        return {}
+
+    content = Path(str(value)).read_text()
+
     try:
-        return dict(yaml.load(str(value)) or {})
+        return dict(yaml.load(content) or {})
     except ValueError:
-        message = '"{value}" is not a valid DC/OS configuration'.format(
-            value=value,
+        message = '"{content}" is not a valid DC/OS configuration'.format(
+            content=content,
         )
     except yaml.YAMLError:
-        message = '"{value}" is not valid YAML'.format(value=value)
+        message = '"{content}" is not valid YAML'.format(content=content)
 
     raise click.BadParameter(message=message)
 
@@ -351,17 +354,20 @@ def dcos_docker(verbose: None) -> None:
 )
 @click.option(
     '--extra-config',
-    type=str,
-    default='{}',
+    type=click.Path(exists=True),
     callback=_validate_dcos_configuration,
-    help='Extra DC/OS configuration YAML to add to a default configuration.'
+    help=(
+        'The path to a file including DC/OS configuration YAML. '
+        'The contents of this file will be added to add to a default '
+        'configuration.'
+    ),
 )
 @click.option(
     '--security-mode',
     type=click.Choice(['disabled', 'permissive', 'strict']),
     help=(
         'The security mode to use for a DC/OS Enterprise cluster. '
-        'This overrides any security mode set in ``extra_config``.'
+        'This overrides any security mode set in ``--extra-config``.'
     ),
 )
 @click.option(
@@ -422,7 +428,7 @@ def create(
             ``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
 
             \b
-            These can all be set in ``extra_config``.
+            These can all be set in ``--extra-config``.
             However, some defaults are provided for all but the license key.
 
             \b
@@ -435,7 +441,7 @@ def create(
             This is set to one of the following, in order:
 
             \b
-            * The ``license_key_contents`` set in ``extra_config``.
+            * The ``license_key_contents`` set in ``--extra-config``.
             * The contents of the path given with ``--license-key-path``.
             * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
 
