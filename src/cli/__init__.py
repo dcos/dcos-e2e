@@ -4,14 +4,14 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
-$ dcos_docker doctor
-Not enough RAM allocated to Docker
-Docker for Mac network not set up
-
+* Make tests pass
 * Add tests for sync
+* Merge to master
 * Handle Custom CA Cert case, with mounts (and copy to installer)
-
-Document running integration tests
+* Document running integration tests
+* dcos_docker doctor command
+    - Network not set up
+    - Not enough RAM allocated to Docker
 """
 
 import io
@@ -212,7 +212,7 @@ def _validate_cluster_exists(
     if value is None:
         if 'default' in _existing_cluster_ids():
             return 'default'
-        message = '--cluster-id was not given and no cluster "default" exists.'
+        message = '--cluster-id was not given and no cluster "default" exists'
         raise click.BadParameter(message)
 
     cluster_id = str(value)
