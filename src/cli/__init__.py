@@ -8,8 +8,6 @@ $ dcos_docker doctor
 Not enough RAM allocated to Docker
 Docker for Mac network not set up
 
-* Customizable logging system
-* Create a cluster, destroy a cluster, there are dangling volumes, why?
 * Add tests for sync
 * Handle Custom CA Cert case, with mounts (and copy to installer)
 
@@ -541,6 +539,8 @@ def destroy(cluster_ids: List[str]) -> None:
             container.stop()
             container.remove(v=True)
 
+        client = docker.from_env(version='auto')
+        client.volumes.prune()
         click.echo(cluster_id)
 
 
