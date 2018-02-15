@@ -21,10 +21,7 @@ Each of these and more are described in detail below.
 .. contents::
    :local:
 
-Requirements
-------------
-
-The CLI shares the :ref:`Docker backend requirements <docker-requirements>`.
+.. include:: docker-backend-requirements.rst
 
 .. include:: installation.rst
 
