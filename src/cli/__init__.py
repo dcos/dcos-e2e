@@ -998,14 +998,15 @@ def doctor() -> None:
         print('No SSH')
         pass
 
-    container = client.containers.run(
+    ping_container = client.containers.run(
         image='alpine',
         tty=True,
         detach=True,
     )
 
-    container.reload()
-    ip_address = container.attrs['NetworkSettings']['IPAddress']
+    ping_container.reload()
+    ip_address = ping_container.attrs['NetworkSettings']['IPAddress']
+
     try:
         subprocess.check_call(
             args=['ping', ip_address, '-c', '1', '-t', '1'],
@@ -1016,8 +1017,19 @@ def doctor() -> None:
         # Error, network thing
         print('NETWORK ERROR')
         pass
+
+    ping_container.stop()
+    ping_container.remove(v=True)
     # if mac_os:
 
+    tmp_path = Path('/tmp').resolve()
+
+    private_mount_container = client.containers.run(
+        image='alpine',
+        tty=True,
+        detach=True,
+        volumes={str(tmp_path): {'bind': '/test'}},
+    )
 
 
     # Not enough RAM allocated to Docker
