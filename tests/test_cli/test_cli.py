@@ -20,6 +20,9 @@ from typing import List
 
 import pytest
 from click.testing import CliRunner
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from cli import dcos_docker
 
@@ -59,6 +62,7 @@ class TestDcosDocker:
               run      Run an arbitrary command on a node.
               sync     Sync files from a DC/OS checkout to master...
               wait     Wait for DC/OS to start.
+              web      Open the browser at the web UI.
             """
         )
         assert result.output == expected_help
@@ -128,8 +132,10 @@ class TestCreate:
               --agents INTEGER                The number of agent nodes.  [default: 1]
               --public-agents INTEGER         The number of public agent nodes.  [default:
                                               1]
-              --extra-config TEXT             Extra DC/OS configuration YAML to add to a
-                                              default configuration.
+              --extra-config PATH             The path to a file including DC/OS
+                                              configuration YAML. The contents of this file
+                                              will be added to add to a default
+                                              configuration.
               --security-mode [disabled|permissive|strict]
                                               The security mode to use for a DC/OS
                                               Enterprise cluster. This overrides any
@@ -164,10 +170,39 @@ class TestCreate:
         )
         assert expected_error in result.output
 
-    def test_invalid_yaml(self, oss_artifact: Path) -> None:
+    def test_config_does_not_exist(self, oss_artifact: Path) -> None:
         """
-        An error is shown if invalid YAML is given for `--extra-config`.
+        An error is shown if the ``--extra-config`` file does not exist.
         """
+        runner = CliRunner()
+        invalid_path = '/' + uuid.uuid4().hex
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--extra-config',
+                invalid_path,
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_message = dedent(
+            """\
+            Usage: dcos_docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "--extra-config": Path "{path}" does not exist.
+            """
+        ).format(path=invalid_path)
+        assert result.output == expected_message
+
+    def test_invalid_yaml(self, oss_artifact: Path, tmpdir: local) -> None:
+        """
+        An error is shown if invalid YAML is given in the file given to
+        ``--extra-config``.
+        """
+        invalid_file = tmpdir.join(uuid.uuid4().hex)
+        invalid_file.write('@')
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -175,7 +210,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                '@',
+                invalid_file,
             ],
             catch_exceptions=False,
         )
@@ -189,11 +224,13 @@ class TestCreate:
         )
         assert result.output == expected_message
 
-    def test_not_key_value(self, oss_artifact: Path) -> None:
+    def test_not_key_value(self, oss_artifact: Path, tmpdir: local) -> None:
         """
-        An error is shown if YAML is given for `--extra-config` which is not
+        An error is shown if YAML is given for ``--extra-config`` which is not
         a key-value mapping.
         """
+        invalid_file = tmpdir.join(uuid.uuid4().hex)
+        invalid_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
@@ -201,7 +238,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                'some_key',
+                invalid_file,
             ],
             catch_exceptions=False,
         )
@@ -213,7 +250,7 @@ class TestCreate:
            """\
            Usage: dcos_docker create [OPTIONS] ARTIFACT
 
-           Error: Invalid value for "--extra-config": "some_key" is not a valid DC/OS configuration
+           Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
             """# noqa: E501,E261
         )
         # yapf: enable

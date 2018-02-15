@@ -148,20 +148,22 @@ def _validate_dcos_configuration(
     value: Union[int, bool, str],
 ) -> Dict[str, Any]:
     """
-    Validate that a given value is a YAML map.
+    Validate that a given value is a file containing a YAML map.
     """
     # We "use" variables to satisfy linting tools.
     for _ in (ctx, param):
         pass
 
+    content = Path(str(value)).read_text()
+
     try:
-        return dict(yaml.load(str(value)) or {})
+        return dict(yaml.load(content) or {})
     except ValueError:
-        message = '"{value}" is not a valid DC/OS configuration'.format(
-            value=value,
+        message = '"{content}" is not a valid DC/OS configuration'.format(
+            content=content,
         )
     except yaml.YAMLError:
-        message = '"{value}" is not valid YAML'.format(value=value)
+        message = '"{content}" is not valid YAML'.format(content=content)
 
     raise click.BadParameter(message=message)
 
@@ -328,10 +330,13 @@ def dcos_docker(verbose: None) -> None:
 )
 @click.option(
     '--extra-config',
-    type=str,
-    default='{}',
+    type=click.Path(exists=True),
     callback=_validate_dcos_configuration,
-    help='Extra DC/OS configuration YAML to add to a default configuration.'
+    help=(
+        'The path to a file including DC/OS configuration YAML. '
+        'The contents of this file will be added to add to a default '
+        'configuration.'
+    ),
 )
 @click.option(
     '--security-mode',
