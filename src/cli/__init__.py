@@ -983,7 +983,7 @@ def sync_code(cluster_id: str, checkout: str) -> None:
         )
 
 
-def _note(message: str):
+def _info(message: str) -> None:
     """
     Show a warning message.
     """
@@ -991,38 +991,43 @@ def _note(message: str):
     click.echo(click.style('Note: ', fg='blue'), nl=False)
     click.echo(message)
 
-def _warn(message: str):
+
+def _warn(message: str) -> None:
     """
     Show a warning message.
+    """
+    click.echo()
+    click.echo(click.style('Warning: ', fg='yellow'), nl=False)
+    click.echo(message)
+
+
+def _error(message: str) -> None:
+    """
+    Show an error message.
     """
     click.echo()
     click.echo(click.style('Error: ', fg='red'), nl=False)
     click.echo(message)
 
-def _error(message: str):
-    """
-    Show an error message.
-    """
 
 @dcos_docker.command('doctor')
 def doctor() -> None:
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
+    storage_driver_url = (
+        'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
+    )
     if host_driver not in _DOCKER_STORAGE_DRIVERS:
-        # Warning, could be slow
-        # Recommend overlay2
-        # Also try with AUFS? If not work - error
         message = (
             "The host's Docker storage driver is \"{host_driver}\". "
-            'We recommend that you use one of: {supported_drivers}.'
+            'We recommend that you use one of: {supported_drivers}. '
+            'See {help_url}.'
         ).format(
             host_driver=host_driver,
             supported_drivers=', '.join(_DOCKER_STORAGE_DRIVERS.keys()),
+            help_url=storage_driver_url,
         )
         _warn(message)
-        click.echo()
-        click.echo(click.style('Warning: ', fg='yellow'), nl=False)
-        click.echo(message)
 
     if shutil.which('ssh') is None:
         # Error, we need SSH
