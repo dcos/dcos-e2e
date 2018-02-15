@@ -891,6 +891,15 @@ def sync_code(cluster_id: str, checkout: str) -> None:
 
     If no ``CHECKOUT`` is given, the current working directory is used.
     """
+    local_packages = Path(checkout) / 'packages'
+    local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
+    if not local_test_dir.exists():
+        message = (
+            'CHECKOUT must be set to the checkout of a DC/OS repository.\n'
+            '"{local_test_dir}" does not exist.'
+        ).format(local_test_dir=local_test_dir)
+        raise click.BadArgumentUsage(message=message)
+
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
@@ -907,15 +916,6 @@ def sync_code(cluster_id: str, checkout: str) -> None:
     node_bootstrap_dir = (
         node_python_dir / 'site-packages' / 'dcos_internal_utils'
     )
-
-    local_packages = Path(checkout) / 'packages'
-    local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
-    if not local_test_dir.exists():
-        message = (
-            'CHECKOUT must be set to the checkout of a DC/OS repository.\n'
-            '"{local_test_dir}" does not exist.'
-        ).format(local_test_dir=local_test_dir)
-        raise click.BadArgumentUsage(message=message)
 
     local_bootstrap_dir = (
         local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
