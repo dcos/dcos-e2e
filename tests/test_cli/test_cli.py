@@ -47,11 +47,13 @@ class TestDcosDocker:
               Manage DC/OS clusters on Docker.
 
             Options:
-              --help  Show this message and exit.
+              -v, --verbose
+              --help         Show this message and exit.
 
             Commands:
               create   Create a DC/OS cluster.
               destroy  Destroy clusters.
+              doctor   Diagnose common issues which stop DC/OS E2E...
               inspect  Show cluster details.
               list     List all clusters.
               run      Run an arbitrary command on a node.
@@ -124,8 +126,13 @@ class TestCreate:
                                               1]
               --extra-config TEXT             Extra DC/OS configuration YAML to add to a
                                               default configuration.
+              --security-mode [disabled|permissive|strict]
+                                              The security mode to use for a DC/OS
+                                              Enterprise cluster. This overrides any
+                                              security mode set in ``extra_config``.
               --cluster-id TEXT               A unique identifier for the cluster. Defaults
-                                              to a random value.
+                                              to a random value. Use the value "default" to
+                                              use this cluster for other
               --license-key-path PATH         This is ignored if using open source DC/OS. If
                                               using DC/OS Enterprise, this defaults to the
                                               value of the `DCOS_LICENSE_KEY_PATH`
@@ -345,7 +352,7 @@ class TestInspect:
               exec -it $MASTER_0`` to enter the first master, for example.
 
             Options:
-              --cluster-id TEXT
+              --cluster-id TEXT  If not given, "default" is used.
               --env              Show details in an environment variable format to eval.
               --help             Show this message and exit.
             """
@@ -387,7 +394,7 @@ class TestWait:
               Wait for DC/OS to start.
 
             Options:
-              --cluster-id TEXT
+              --cluster-id TEXT          If not given, "default" is used.
               --superuser-username TEXT  The superuser username is needed only on DC/OS
                                          Enterprise clusters. By default, on a DC/OS
                                          Enterprise cluster, `admin` is used.
