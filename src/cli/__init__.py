@@ -350,7 +350,11 @@ def dcos_docker(verbose: None) -> None:
     type=str,
     default=uuid.uuid4().hex,
     callback=_validate_cluster_id,
-    help='A unique identifier for the cluster. Defaults to a random value.',
+    help=(
+        'A unique identifier for the cluster. '
+        'Defaults to a random value. '
+        'Use the value "default" to use this cluster for other'
+    ),
 )
 @click.option(
     '--license-key-path',

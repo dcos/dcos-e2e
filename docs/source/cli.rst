@@ -28,14 +28,17 @@ The CLI shares the :ref:`Docker backend requirements <docker-requirements>`.
 Creating a Cluster
 ------------------
 
-Creating 
+Creating a cluster is possible with the ``dcos_docker create`` command.
+This command allows you to customize the cluster in many ways.
 
-The command returns when the DC/OS installation process has started
-To wait til finished...
+See :ref:`the dcos_docker create reference <dcos_docker-create>` for details on this command and its options.
 
-To use this cluster, it is useful to find details using inspect.
+The command returns when the DC/OS installation process has started.
+To wait until DC/OS has finished installing, use the :ref:`the dcos_docker wait <dcos_docker-wait>` command.
 
-Default Cluster Name
+To use this cluster, it is useful to find details using the :ref:`the dcos_docker inspect <dcos_docker-inspect>` command.
+
+"default" Cluster ID
 --------------------
 
 It can become tedious repeatly typing the cluster ID, particularly if you only have one cluster.
@@ -90,6 +93,8 @@ CLI Reference
 
 .. click:: cli:list_clusters
   :prog: dcos_docker list
+
+.. _dcos_docker-wait:
 
 .. click:: cli:wait
   :prog: dcos_docker wait
