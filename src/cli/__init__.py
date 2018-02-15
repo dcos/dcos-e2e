@@ -4,18 +4,18 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
---cluster-id arg to destroy
-multiple cluster IDs to wait, sync
-
 * Make tests pass
 * Add tests for sync
+* Clean docs
+* Document running integration tests
 * Merge to master
 * Handle Custom CA Cert case, with mounts (and copy to installer)
-* Document running integration tests
 * dcos_docker doctor command
     - Network not set up
     - Not enough RAM allocated to Docker
 * dcos_docker create_wizard
+* brew install
+* Windows support
 """
 
 import io
@@ -978,6 +978,15 @@ def sync_code(cluster_id: str, checkout: str) -> None:
             path=str(node_bootstrap_dir),
             data=bootstrap_tarstream,
         )
+
+
+@dcos_docker.command('doctor')
+def doctor() -> None:
+    # Not enough RAM allocated to Docker
+    # Host storage driver not supported
+    # Networking not set up right
+    # Mac - /private > /tmp
+    pass
 
 
 if __name__ == '__main__':
