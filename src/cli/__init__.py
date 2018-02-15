@@ -995,6 +995,7 @@ def doctor() -> None:
 
     if shutil.which('ssh') is None:
         # Error, we need SSH
+        print('No SSH')
         pass
 
     container = client.containers.run(
@@ -1008,6 +1009,8 @@ def doctor() -> None:
     try:
         subprocess.check_call(
             args=['ping', ip_address, '-c', '1', '-t', '1'],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
     except subprocess.CalledProcessError:
         # Error, network thing
@@ -1018,7 +1021,6 @@ def doctor() -> None:
 
 
     # Not enough RAM allocated to Docker
-    # Networking not set up right
     # Mac - /private > /tmp
     # Check if you're on old Docker machine - not Docker for Mac? Dunno
     # if this works
