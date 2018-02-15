@@ -370,8 +370,8 @@ def dcos_docker(verbose: None) -> None:
     '--genconf-path',
     type=click.Path(exists=True),
     help=(
-        'Path to a directory that contains additional files for'
-        'DC/OS installer. All files from this directory will be copied to '
+        'Path to a directory that contains additional files for '
+        'DC/OS installer. All files from this directory will be copied to the '
         '`genconf` directory before running DC/OS installer.'
     ),
 )
