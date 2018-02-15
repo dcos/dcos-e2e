@@ -20,6 +20,9 @@ from typing import List
 
 import pytest
 from click.testing import CliRunner
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from cli import dcos_docker
 
@@ -257,6 +260,57 @@ class TestCreate:
         ).format(cluster_id=invalid_id)
         # yapf: enable
         assert result.output == expected_message
+
+    def test_genconf_path_does_not_exist(self, oss_artifact: Path) -> None:
+        """
+        Genconf path must exist.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--genconf-path',
+                'non-existing',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_error = (
+            'Error: Invalid value for "--genconf-path": '
+            'Path "non-existing" does not exist.'
+        )
+        assert expected_error in result.output
+
+    def test_genconf_path_is_file(
+        self,
+        oss_artifact: Path,
+        tmpdir: local,
+    ) -> None:
+        """
+        Genconf path must be a directory.
+        """
+        file = tmpdir.join('testfile')
+        file.write("test")
+
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--genconf-path',
+                str(file),
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_error = (
+            'Error: Invalid value for "--genconf-path": '
+            '"{path}" is not a directory.'
+        ).format(path=str(file))
+        assert expected_error in result.output
 
 
 class TestDestroy:
