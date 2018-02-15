@@ -295,7 +295,7 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_genconf_path_does_not_exist(self, oss_artifact: Path) -> None:
+    def test_genconf_path_not_exist(self, oss_artifact: Path) -> None:
         """
         Genconf path must exist.
         """
@@ -325,8 +325,8 @@ class TestCreate:
         """
         Genconf path must be a directory.
         """
-        file = tmpdir.join('testfile')
-        file.write("test")
+        genconf_file = tmpdir.join('testfile')
+        genconf_file.write('test')
 
         runner = CliRunner()
         result = runner.invoke(
@@ -335,7 +335,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--genconf-path',
-                str(file),
+                str(genconf_file),
             ],
             catch_exceptions=False,
         )
@@ -343,7 +343,7 @@ class TestCreate:
         expected_error = (
             'Error: Invalid value for "--genconf-path": '
             '"{path}" is not a directory.'
-        ).format(path=str(file))
+        ).format(path=str(genconf_file))
         assert expected_error in result.output
 
 
