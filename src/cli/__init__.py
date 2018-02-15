@@ -4,8 +4,6 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
-* dcos_docker web
-* Document Doctor
 * Handle Custom CA Cert case, with mounts (and copy to installer)
 * brew install
 * Windows support
