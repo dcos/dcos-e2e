@@ -28,7 +28,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import tarfile
 import uuid
 from ipaddress import IPv4Address
@@ -82,7 +81,7 @@ _DOCKER_VERSIONS = {
 _DOCKER_STORAGE_DRIVERS = {
     'aufs': DockerStorageDriver.AUFS,
     'overlay': DockerStorageDriver.OVERLAY,
-    'overlay2': DockerStorageDriver.OVERLAY_2,
+    # 'overlay2': DockerStorageDriver.OVERLAY_2,
 }
 
 _CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
@@ -984,21 +983,52 @@ def sync_code(cluster_id: str, checkout: str) -> None:
         )
 
 
+def _note(message: str):
+    """
+    Show a warning message.
+    """
+    click.echo()
+    click.echo(click.style('Note: ', fg='blue'), nl=False)
+    click.echo(message)
+
+def _warn(message: str):
+    """
+    Show a warning message.
+    """
+    click.echo()
+    click.echo(click.style('Error: ', fg='red'), nl=False)
+    click.echo(message)
+
+def _error(message: str):
+    """
+    Show an error message.
+    """
+
 @dcos_docker.command('doctor')
 def doctor() -> None:
-    mac_os = bool(sys.platform == 'darwin')
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
     if host_driver not in _DOCKER_STORAGE_DRIVERS:
         # Warning, could be slow
         # Recommend overlay2
         # Also try with AUFS? If not work - error
-        pass
+        message = (
+            "The host's Docker storage driver is \"{host_driver}\". "
+            'We recommend that you use one of: {supported_drivers}.'
+        ).format(
+            host_driver=host_driver,
+            supported_drivers=', '.join(_DOCKER_STORAGE_DRIVERS.keys()),
+        )
+        _warn(message)
+        click.echo()
+        click.echo(click.style('Warning: ', fg='yellow'), nl=False)
+        click.echo(message)
 
     if shutil.which('ssh') is None:
         # Error, we need SSH
-        print('No SSH')
-        pass
+        click.echo()
+        click.echo(click.style('Error: ', fg='red'), nl=False)
+        click.echo(message)
 
     ping_container = client.containers.run(
         image='alpine',
@@ -1017,7 +1047,7 @@ def doctor() -> None:
         )
     except subprocess.CalledProcessError:
         # Error, network thing
-        print('NETWORK ERROR')
+        click.echo('NETWORK ERROR')
         pass
 
     ping_container.stop()
