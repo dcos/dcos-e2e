@@ -75,6 +75,16 @@ Another option is to run the following to get on to a random master node:
 
    $ dcos_docker run --cluster-id example bash
 
+However, it is often not necessary to get on to a cluster node.
+A shortcut is instead to run a command like the following:
+
+.. code-block:: console
+
+   $ dcos_docker run systemctl list-units
+
+This is run on a random master node.
+See :ref:`the dcos_docker run reference <dcos_docker-run>` for more information on this command.
+
 Viewing Debug Information
 -------------------------
 
@@ -86,6 +96,16 @@ Running Integration Tests
 
 The ``dcos_docker run`` command is useful for running integration tests.
 
+
+To run integration tests which are developed in the a DC/OS checkout at ``/path/to/dcos``, you can use the following workflow:
+
+.. code-block:: console
+
+   $ dcos_docker create /tmp/dcos_generate_config.ee.sh --cluster-id default
+   $ dcos_docker wait
+   $ dcos_docker run --sync /path/to/dcos pytest -k test_tls.py
+
+There are multiple options and shortcuts for using these commands.
 See :ref:`the dcos_docker run reference <dcos_docker-run>` for more information on this command.
 
 CLI Reference
