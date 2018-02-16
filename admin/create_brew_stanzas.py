@@ -1,15 +1,12 @@
 import subprocess
 from pathlib import Path
 from textwrap import dedent
-from typing import List
 
 
-def get_requirements(requirements_file: Path) -> List[str]:
+def get_formula() -> str:
+    requirements_file = Path(__file__).parent.parent / 'requirements.txt'
     lines = requirements_file.read_text().strip().split('\n')
-    return [line for line in lines if not line.startswith('#')]
-
-
-def get_resource_stanzas(requirements: List[str]) -> str:
+    requirements = [line for line in lines if not line.startswith('#')]
     first = requirements[0]
 
     args = ['poet', first]
@@ -18,10 +15,7 @@ def get_resource_stanzas(requirements: List[str]) -> str:
         args.append(requirement)
 
     result = subprocess.run(args=args, stdout=subprocess.PIPE)
-    return str(result.stdout.decode())
-
-
-def get_formula(resource_stanzas: str) -> str:
+    resource_stanzas = str(result.stdout.decode())
 
     pattern = dedent(
         """\
@@ -51,12 +45,5 @@ def get_formula(resource_stanzas: str) -> str:
     return pattern.format(resource_stanzas=resource_stanzas)
 
 
-def main() -> str:
-    requirements_file = Path(__file__).parent.parent / 'requirements.txt'
-    requirements = get_requirements(requirements_file=requirements_file)
-    resource_stanzas = get_resource_stanzas(requirements=requirements)
-    return get_formula(resource_stanzas=resource_stanzas)
-
-
 if __name__ == '__main__':
-    print(main())
+    print(get_formula)
