@@ -901,7 +901,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     default='admin',
     help='The password to set the ``DCOS_LOGIN_PW`` as.'
 )
-@click.argument('node_args', type=str, nargs=-1)
+@click.argument('node_args', type=str, nargs=-1, required=True)
 @click.option(
     '--sync',
     is_flag=True,
