@@ -14,14 +14,8 @@ DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environm
 .. contents::
    :local:
 
-Installation
-------------
 
-Requires Python 3.5.2+.
-
-.. code:: sh
-
-    pip install git+https://github.com/mesosphere/dcos-e2e.git@master
+.. include:: docs/source/installation.rst
 
 Python Library
 --------------
