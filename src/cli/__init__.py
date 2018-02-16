@@ -5,8 +5,8 @@ Ideas for improvements
 ----------------------
 
 * brew install
-* change path to dir
-* Windows support
+* change path to dir in create options
+* Windows support - Vagrant?
 """
 
 import io
@@ -921,21 +921,17 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 )
 @click.argument('node_args', type=str, nargs=-1, required=True)
 @click.option(
-    '--sync',
-    is_flag=True,
-    help=(
-        'Syncs to DC/OS checkout specified in the ``DCOS_CHECKOUT_PATH`` '
-        'environment variable before running the command. '
-        'If the environment variable is not set, the current working '
-        'directory is used.'
-    ),
+    '--sync-dir',
+    type=click.Path(exists=True),
+    help='Syncs to DC/OS checkout specified before running the command.',
+    callback=_validate_path_is_directory,
 )
 @click.pass_context
 def run(
     ctx: click.core.Context,
     cluster_id: str,
     node_args: Tuple[str],
-    sync: bool,
+    sync_dir: Optional[Path],
     dcos_login_uname: str,
     dcos_login_pw: str,
 ) -> None:
@@ -948,11 +944,10 @@ def run(
     ``dcos_docker run --cluster-id 1231599 pytest -k test_tls.py``.
 
     Or, with sync:
-    ``dcos_docker run --sync --cluster-id 1231599 pytest -k test_tls.py``.
-    """
-    if sync:
-        checkout = os.environ.get('DCOS_CHECKOUT_PATH', '.')
-        ctx.invoke(sync_code, cluster_id=cluster_id, checkout=checkout)
+    ``dcos_docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
+    """  # noqa: E501
+    if sync_dir is not None:
+        ctx.invoke(sync_code, cluster_id=cluster_id, checkout=str(sync_dir))
 
     args = [
         'source',
