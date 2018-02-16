@@ -245,3 +245,13 @@ To update DC/OS Docker, use the following command:
 .. code:: sh
 
     make update-dcos-docker
+
+Updating DC/OS Test Utils
+-------------------------
+
+`DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ is vendored in this repository using `python-vendorize <https://github.com/mwilliamson/python-vendorize>`__.
+To update DC/OS Test Utils, use the following commands:
+
+.. code:: sh
+
+    make update-dcos-docker
