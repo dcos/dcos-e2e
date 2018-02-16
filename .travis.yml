@@ -46,6 +46,8 @@ before_script:
 - make docs
 - make lint
 - travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
+- python admin/homebrew_recipe.py > new_recipe.rb
+- diff new_recipe.rb dcosdocker.rb
 script:
 - pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests
 after_success:
