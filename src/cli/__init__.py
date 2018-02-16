@@ -497,7 +497,7 @@ def create(
 
             \b
             If none of these are set, ``license_key_contents`` is not given.
-    """
+    """  # noqa: E501
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
@@ -543,9 +543,8 @@ def create(
             for genconf_file in genconf_path.glob('**/*'):
                 if genconf_file.is_dir():
                     continue
-                relative_path = container_genconf_path / genconf_file.relative_to(
-                    genconf_path
-                )
+                genconf_relative = genconf_file.relative_to(genconf_path)
+                relative_path = container_genconf_path / genconf_relative
                 files_to_copy_to_installer[genconf_file] = relative_path
 
     cluster_backend = Docker(
