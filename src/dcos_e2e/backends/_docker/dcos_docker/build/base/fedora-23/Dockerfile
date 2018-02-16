@@ -11,6 +11,7 @@ RUN dnf install -y \
 		ca-certificates \
 		curl \
 		findutils \
+		procps-ng \
 		git \
 		iproute \
 		ipset \
