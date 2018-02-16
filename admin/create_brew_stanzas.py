@@ -9,7 +9,7 @@ def get_requirements(requirements_file: Path) -> List[str]:
     return [line for line in lines if not line.startswith('#')]
 
 
-def get_resource_stanzas(requirements: List[str]):
+def get_resource_stanzas(requirements: List[str]) -> str:
     first = requirements[0]
 
     args = ['poet', first]
@@ -18,10 +18,10 @@ def get_resource_stanzas(requirements: List[str]):
         args.append(requirement)
 
     result = subprocess.run(args=args, stdout=subprocess.PIPE)
-    return result.stdout.decode()
+    return str(result.stdout.decode())
 
 
-def get_formula(resource_stanzas: str):
+def get_formula(resource_stanzas: str) -> str:
 
     pattern = dedent(
         """\
@@ -51,12 +51,12 @@ def get_formula(resource_stanzas: str):
     return pattern.format(resource_stanzas=resource_stanzas)
 
 
-def main():
+def main() -> str:
     requirements_file = Path(__file__).parent.parent / 'requirements.txt'
     requirements = get_requirements(requirements_file=requirements_file)
     resource_stanzas = get_resource_stanzas(requirements=requirements)
     return get_formula(resource_stanzas=resource_stanzas)
 
+
 if __name__ == '__main__':
-    FORMULA = main()
-    print(FORMULA)
+    print(main())
