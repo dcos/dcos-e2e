@@ -17,7 +17,23 @@ DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environm
 Installation
 ------------
 
+CLI macOS With Homebrew
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To install the CLI on macOS, install `Homebrew`_.
+
+.. code:: sh
+
+    brew install https://github.com/mesosphere/dcos-e2e/blob/master/dcosdocker.rb
+
+.. _Homebrew: https://brew.sh
+
+Library and CLI with Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Requires Python 3.5.2+.
+
+Optionally replace ``master`` with a particular version of DC/OS E2E.
 
 .. code:: sh
 

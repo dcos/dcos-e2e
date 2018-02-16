@@ -10,7 +10,7 @@ To install the CLI on macOS, install `Homebrew`_.
 
 .. code:: sh
 
-    brew install --HEAD https://github.com/mesosphere/dcos-e2e/blob/master/dcosdocker.rb
+    brew install https://github.com/mesosphere/dcos-e2e/blob/master/dcosdocker.rb
 
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
