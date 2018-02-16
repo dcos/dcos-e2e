@@ -25,6 +25,7 @@ eval
 fallback
 func
 genconf
+homebrew
 hwclock
 init
 ip
