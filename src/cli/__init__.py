@@ -4,10 +4,11 @@ A CLI for controlling DC/OS clusters on Docker.
 Ideas for improvements
 ----------------------
 
-* brew install
-* change path to dir in create options
 * Windows support - Vagrant?
 * dcos_docker run -—no-set-env
+* Script
+* A mac builder which installs the Homebrew thing
+    - TRAVIS_OS_NAME
 """
 
 import io
