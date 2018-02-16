@@ -27,19 +27,17 @@ class SshdManager():
         self.tmpdir = tmpdir
         self.sshd_config_path = str(tmpdir.join('sshd_config'))
         self.key_path = str(tmpdir.join('host_key'))
-        subprocess.check_call(
-            ['ssh-keygen', '-f', self.key_path, '-t', 'rsa', '-N', '']
-        )
+        subprocess.check_call(['ssh-keygen', '-f', self.key_path, '-t', 'rsa', '-N', ''])
         with open(self.key_path, 'r') as f:
             self.key = f.read().strip()
 
         config = [
-            'Protocol 1,2', 'RSAAuthentication yes',
-            'PubkeyAuthentication yes', 'StrictModes no', 'LogLevel DEBUG'
-        ]
-        config.append(
-            'AuthorizedKeysFile {}'.format(tmpdir.join('host_key.pub'))
-        )
+            'Protocol 1,2',
+            'RSAAuthentication yes',
+            'PubkeyAuthentication yes',
+            'StrictModes no',
+            'LogLevel DEBUG']
+        config.append('AuthorizedKeysFile {}'.format(tmpdir.join('host_key.pub')))
         config.append('HostKey {}'.format(self.key_path))
 
         with open(self.sshd_config_path, 'w') as f:
@@ -62,15 +60,9 @@ class SshdManager():
         # Run sshd servers in parallel, cleaning up when the yield returns.
         subprocesses = []
         for port in sshd_ports:
-            subprocesses.append(
-                subprocess.Popen(
-                    [
-                        '/usr/sbin/sshd', '-p{}'.format(port),
-                        '-f{}'.format(self.sshd_config_path), '-e', '-D'
-                    ],
-                    cwd=str(self.tmpdir)
-                )
-            )
+            subprocesses.append(subprocess.Popen(
+                ['/usr/sbin/sshd', '-p{}'.format(port), '-f{}'.format(self.sshd_config_path), '-e', '-D'],
+                cwd=str(self.tmpdir)))
 
         # Wait for the ssh servers to come up
         @retry(stop_max_delay=1000, retry_on_result=lambda x: x is False)
@@ -98,12 +90,10 @@ def tunnel_args(sshd_manager, tmpdir):
     with sshd_manager.run(1) as sshd_ports:
         yield {
             'user': getpass.getuser(),
-            'control_path':
-            str(tmpdir.join('x')),  # use as short a name as possible
+            'control_path': str(tmpdir.join('x')),  # use as short a name as possible
             'key_path': helpers.session_tempfile(sshd_manager.key),
             'host': '127.0.0.1',
-            'port': sshd_ports[0]
-        }
+            'port': sshd_ports[0]}
 
 
 def test_ssh_client_file_copy(tunnel_args, tmpdir, sshd_manager):
@@ -121,9 +111,7 @@ def test_ssh_client_file_copy(tunnel_args, tmpdir, sshd_manager):
     assert dst_text == src_text, 'retrieved destination file did not match source!'
 
     ssh = ssh_client.SshClient(tunnel_args['user'], sshd_manager.key)
-    ssh_client_out = ssh.command(
-        tunnel_args['host'], read_cmd, port=tunnel_args['port']
-    ).decode().strip()
+    ssh_client_out = ssh.command(tunnel_args['host'], read_cmd, port=tunnel_args['port']).decode().strip()
     assert ssh_client_out == src_text, 'SshClient did not produce the expected result!'
 
 
@@ -146,9 +134,7 @@ def test_ssh_client_directory_copy(tunnel_args, tmpdir, sshd_manager):
     assert dst_text == src_text, 'retrieved destination file did not match source!'
 
     ssh = ssh_client.SshClient(tunnel_args['user'], sshd_manager.key)
-    ssh_client_out = ssh.command(
-        tunnel_args['host'], read_cmd, port=tunnel_args['port']
-    ).decode().strip()
+    ssh_client_out = ssh.command(tunnel_args['host'], read_cmd, port=tunnel_args['port']).decode().strip()
     assert ssh_client_out == src_text, 'SshClient did not produce the expected result!'
 
 
@@ -162,11 +148,10 @@ def test_multi_runner(mock_targets, tmpdir, sshd_manager):
     """ sanity checks that a remote command can be run
     """
     runner = ssh_client.AsyncSshClient(
-        getpass.getuser(), sshd_manager.key, mock_targets
-    )
-    result = runner.run_command(
-        'run', ['touch', os.path.join(str(tmpdir), '$RANDOM')]
-    )
+        getpass.getuser(),
+        sshd_manager.key,
+        mock_targets)
+    result = runner.run_command('run', ['touch', os.path.join(str(tmpdir), '$RANDOM')])
     for cmd in result:
         assert cmd['returncode'] == 0
 
@@ -175,9 +160,9 @@ def test_scp(tunnel_args, sshd_manager, tmpdir):
     """ tests that recursive copy works by chaining commands that will fail if copy doesnt work
     """
     runner = ssh_client.AsyncSshClient(
-        tunnel_args['user'], sshd_manager.key,
-        ['127.0.0.1:' + str(tunnel_args['port'])]
-    )
+        tunnel_args['user'],
+        sshd_manager.key,
+        ['127.0.0.1:' + str(tunnel_args['port'])])
     local_path = tmpdir.join('scp_input_files')
     local_path.ensure(dir=True)
     nested_dir = local_path.join('nested')

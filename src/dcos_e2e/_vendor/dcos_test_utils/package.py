@@ -3,9 +3,8 @@
 
 import logging
 
-from ..dcos_test_utils.helpers import (
-    ApiClientSession, RetryCommonHttpErrorsMixin
-)
+from ..dcos_test_utils.helpers import (ApiClientSession,
+                                     RetryCommonHttpErrorsMixin)
 
 log = logging.getLogger(__name__)
 
@@ -16,9 +15,7 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
         if session is not None:
             self.session = session
 
-    def _update_headers(
-        self, endpoint, request_version='1', response_version='1'
-    ):
+    def _update_headers(self, endpoint, request_version='1', response_version='1'):
         """Set the Content-type and Accept headers
 
         Args:
@@ -31,14 +28,10 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
         media_type = "application/vnd.dcos.package." + endpoint + \
             "-{action}+json;charset=utf-8;" + \
             "version=v{version}"
-        self.session.headers.update(
-            {
-                'Content-type':
-                media_type.format(action="request", version=request_version),
-                'Accept':
-                media_type.format(action="response", version=response_version)
-            }
-        )
+        self.session.headers.update({
+            'Content-type': media_type.format(action="request", version=request_version),
+            'Accept': media_type.format(action="response", version=response_version)
+        })
 
     def _post(self, endpoint, data):
         response = self.post(endpoint, json=data)
@@ -46,9 +39,7 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
         response.raise_for_status()
         return response
 
-    def install_package(
-        self, package_name, package_version=None, options=None, app_id=None
-    ):
+    def install_package(self, package_name, package_version=None, options=None, app_id=None):
         """Install a package using the cosmos packaging API
 
         Args:
@@ -65,7 +56,9 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
             successfully (Need the appId from the response)
         """
         self._update_headers('install', response_version='2')
-        package = {'packageName': package_name}
+        package = {
+            'packageName': package_name
+        }
         if package_version is not None:
             package.update({'packageVersion': package_version})
         if options is not None:
@@ -85,7 +78,9 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
             requests.response object
         """
         self._update_headers('uninstall')
-        package = {'packageName': package_name}
+        package = {
+            'packageName': package_name
+        }
         if app_id is not None:
             package.update({'appId': app_id})
         return self._post('uninstall', package)

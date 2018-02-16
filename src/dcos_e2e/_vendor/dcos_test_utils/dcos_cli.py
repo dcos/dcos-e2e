@@ -10,33 +10,32 @@ import requests
 
 log = logging.getLogger(__name__)
 
-DCOS_CLI_URL = os.getenv(
-    'DCOS_CLI_URL',
-    'https://downloads.dcos.io/binaries/cli/linux/x86-64/dcos-1.11/dcos'
-)
+DCOS_CLI_URL = os.getenv('DCOS_CLI_URL', 'https://downloads.dcos.io/binaries/cli/linux/x86-64/dcos-1.11/dcos')
 
 
 class DcosCli():
+
     def __init__(self, cli_path):
         self.path = os.path.abspath(os.path.expanduser(cli_path))
         updated_env = os.environ.copy()
         # make sure the designated CLI is on top of the PATH
-        updated_env.update(
-            {
-                'PATH':
-                "{}:{}".format(os.path.dirname(self.path), os.environ['PATH']),
-                'PYTHONIOENCODING':
-                'utf-8',
-                'PYTHONUNBUFFERED':
-                'x',
-            }
-        )
+        updated_env.update({
+            'PATH': "{}:{}".format(
+                os.path.dirname(self.path),
+                os.environ['PATH']),
+            'PYTHONIOENCODING': 'utf-8',
+            'PYTHONUNBUFFERED': 'x',
+        })
 
         if 'coreos' in platform.platform():
-            updated_env.update({'LC_ALL': 'C.UTF-8'})
+            updated_env.update({
+                'LC_ALL': 'C.UTF-8'
+            })
 
         if 'LANG' not in updated_env:
-            updated_env.update({'LANG': 'C.UTF-8'})
+            updated_env.update({
+                'LANG': 'C.UTF-8'
+            })
 
         self.env = updated_env
 
@@ -81,12 +80,9 @@ class DcosCli():
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             env=self.env,
-            check=True
-        )
+            check=True)
 
-        stdout, stderr = process.stdout.decode('utf-8'), process.stderr.decode(
-            'utf-8'
-        )
+        stdout, stderr = process.stdout.decode('utf-8'), process.stderr.decode('utf-8')
 
         log.info('STDOUT: {}'.format(stdout))
         log.info('STDERR: {}'.format(stderr))
@@ -99,20 +95,12 @@ class DcosCli():
         if not password:
             password = os.environ['DCOS_LOGIN_PW']
         stdout, stderr = self.exec_command(
-            [
-                "dcos", "cluster", "setup",
-                str(url), "--no-check", "--username={}".format(username),
-                "--password={}".format(password)
-            ]
-        )
+            ["dcos", "cluster", "setup", str(url), "--no-check",
+             "--username={}".format(username), "--password={}".format(password)])
         assert stdout == ''
         assert stderr == ''
         self.exec_command(
-            [
-                "dcos", "package", "install", "dcos-enterprise-cli", "--cli",
-                "--global", "--yes"
-            ]
-        )
+            ["dcos", "package", "install", "dcos-enterprise-cli", "--cli", "--global", "--yes"])
 
     def login_enterprise(self, username=None, password=None):
         if not username:
@@ -120,11 +108,7 @@ class DcosCli():
         if not password:
             password = os.environ['DCOS_LOGIN_PW']
         stdout, stderr = self.exec_command(
-            [
-                "dcos", "auth", "login", "--username={}".format(username),
-                "--password={}".format(password)
-            ]
-        )
+            ["dcos", "auth", "login", "--username={}".format(username), "--password={}".format(password)])
         assert stdout == 'Login successful!\n'
         assert stderr == ''
 
@@ -141,7 +125,8 @@ class DcosCliConfiguration:
         """Retrieves configuration value from CLI"""
 
         try:
-            stdout, _ = self.cli.exec_command(["dcos", "config", "show", key])
+            stdout, _ = self.cli.exec_command(
+                ["dcos", "config", "show", key])
             return stdout.strip("\n ")
         except subprocess.CalledProcessError as e:
             if self.NOT_FOUND_MSG.format(key) in e.stderr.decode('utf-8'):
@@ -151,7 +136,8 @@ class DcosCliConfiguration:
 
     def set(self, name, value):
         """Sets configuration option"""
-        self.cli.exec_command(["dcos", "config", "set", name, value])
+        self.cli.exec_command(
+            ["dcos", "config", "set", name, value])
 
     def __getitem__(self, key: str):
         value = self.get(key)
