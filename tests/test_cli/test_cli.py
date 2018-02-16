@@ -161,6 +161,13 @@ class TestCreate:
                                               installing DC/OS. This option can be given
                                               multiple times. Each option should be in the
                                               format /absolute/local/path:/remote/path.
+              --workspace-path PATH           Creating a cluster can use approximately 2 GB
+                                              of temporary storage. Set this option to use a
+                                              custom "workspace" for this temporary storage.
+                                              See https://docs.python.org/3/library/tempfile
+                                              .html#tempfile.gettempdir for details on the
+                                              temporary directory location if this option is
+                                              not set.
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )
