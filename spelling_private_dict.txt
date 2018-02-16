@@ -33,6 +33,7 @@ macOS
 macos
 mesos
 mkstemp
+multi
 noqa
 os
 oss
@@ -53,6 +54,7 @@ sshd
 stderr
 stdout
 str
+subcommand
 subpackages
 submodules
 subprocess
@@ -63,6 +65,7 @@ tempfile
 tmp
 tmpfs
 travis
+tuple
 typeshed
 ubuntu
 ui
