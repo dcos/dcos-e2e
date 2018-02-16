@@ -118,7 +118,7 @@ class TestCreate:
                               This is set to one of the following, in order:
 
                               * The ``license_key_contents`` set in ``--extra-config``.
-                              * The contents of the path given with ``--license-key-path``.
+                              * The contents of the path given with ``--license-key``.
                               * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
 
                               If none of these are set, ``license_key_contents`` is not given.
@@ -149,11 +149,11 @@ class TestCreate:
               -c, --cluster-id TEXT           A unique identifier for the cluster. Defaults
                                               to a random value. Use the value "default" to
                                               use this cluster for other
-              --license-key-path PATH         This is ignored if using open source DC/OS. If
+              --license-key PATH              This is ignored if using open source DC/OS. If
                                               using DC/OS Enterprise, this defaults to the
                                               value of the `DCOS_LICENSE_KEY_PATH`
                                               environment variable.
-              --genconf-path PATH             Path to a directory that contains additional
+              --genconf-dir PATH              Path to a directory that contains additional
                                               files for DC/OS installer. All files from this
                                               directory will be copied to the `genconf`
                                               directory before running DC/OS installer.
@@ -161,7 +161,7 @@ class TestCreate:
                                               installing DC/OS. This option can be given
                                               multiple times. Each option should be in the
                                               format /absolute/local/path:/remote/path.
-              --workspace-path PATH           Creating a cluster can use approximately 2 GB
+              --workspace-dir PATH            Creating a cluster can use approximately 2 GB
                                               of temporary storage. Set this option to use a
                                               custom "workspace" for this temporary storage.
                                               See https://docs.python.org/3/library/tempfile
@@ -428,14 +428,14 @@ class TestCreate:
             [
                 'create',
                 str(oss_artifact),
-                '--genconf-path',
+                '--genconf-dir',
                 'non-existing',
             ],
             catch_exceptions=False,
         )
         assert result.exit_code == 2
         expected_error = (
-            'Error: Invalid value for "--genconf-path": '
+            'Error: Invalid value for "--genconf-dir": '
             'Path "non-existing" does not exist.'
         )
         assert expected_error in result.output
@@ -457,21 +457,21 @@ class TestCreate:
             [
                 'create',
                 str(oss_artifact),
-                '--genconf-path',
+                '--genconf-dir',
                 str(genconf_file),
             ],
             catch_exceptions=False,
         )
         assert result.exit_code == 2
         expected_error = (
-            'Error: Invalid value for "--genconf-path": '
+            'Error: Invalid value for "--genconf-dir": '
             '"{path}" is not a directory.'
         ).format(path=str(genconf_file))
         assert expected_error in result.output
 
     def test_workdir_path_not_exist(self, oss_artifact: Path) -> None:
         """
-        ``--workspace-path`` must exist.
+        ``--workspace-dir`` must exist.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -479,14 +479,14 @@ class TestCreate:
             [
                 'create',
                 str(oss_artifact),
-                '--workspace-path',
+                '--workspace-dir',
                 'non-existing',
             ],
             catch_exceptions=False,
         )
         assert result.exit_code == 2
         expected_error = (
-            'Error: Invalid value for "--workspace-path": '
+            'Error: Invalid value for "--workspace-dir": '
             'Path "non-existing" does not exist.'
         )
         assert expected_error in result.output
@@ -497,7 +497,7 @@ class TestCreate:
         tmpdir: local,
     ) -> None:
         """
-        ``--workspace-path`` must be a directory.
+        ``--workspace-dir`` must be a directory.
         """
         workspace_file = tmpdir.join('testfile')
         workspace_file.write('test')
@@ -508,14 +508,14 @@ class TestCreate:
             [
                 'create',
                 str(oss_artifact),
-                '--workspace-path',
+                '--workspace-dir',
                 str(workspace_file),
             ],
             catch_exceptions=False,
         )
         assert result.exit_code == 2
         expected_error = (
-            'Error: Invalid value for "--workspace-path": '
+            'Error: Invalid value for "--workspace-dir": '
             '"{path}" is not a directory.'
         ).format(path=str(workspace_file))
         assert expected_error in result.output
@@ -741,19 +741,19 @@ class TestSync:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker sync [OPTIONS] [CHECKOUT]
+            Usage: dcos_docker sync [OPTIONS] [DCOS_CHECKOUT_DIR]
 
               Sync files from a DC/OS checkout to master nodes.
 
               This syncs integration test files and bootstrap files.
 
-              ``CHECKOUT`` should be set to the path of clone of an open source DC/OS or
-              DC/OS Enterprise repository.
+              ``DCOS_CHECKOUT_DIR`` should be set to the path of clone of an open source
+              DC/OS or DC/OS Enterprise repository.
 
-              By default the ``CHECKOUT`` argument is set to the value of the
-              ``DCOS_CHECKOUT_PATH`` environment variable.
+              By default the ``DCOS_CHECKOUT_DIR`` argument is set to the value of the
+              ``DCOS_CHECKOUT_DIR`` environment variable.
 
-              If no ``CHECKOUT`` is given, the current working directory is used.
+              If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
 
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.

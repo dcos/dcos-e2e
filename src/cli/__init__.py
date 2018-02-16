@@ -7,6 +7,7 @@ Ideas for improvements
 * brew install
 * change path to dir in create options
 * Windows support - Vagrant?
+* dcos_docker run -—no-set-env
 """
 
 import io
@@ -426,7 +427,7 @@ def dcos_docker(verbose: None) -> None:
     ),
 )
 @click.option(
-    '--license-key-path',
+    '--license-key',
     type=click.Path(exists=True),
     envvar='DCOS_LICENSE_KEY_PATH',
     help=(
@@ -436,7 +437,7 @@ def dcos_docker(verbose: None) -> None:
     ),
 )
 @click.option(
-    '--genconf-path',
+    '--genconf-dir',
     type=click.Path(exists=True),
     callback=_validate_path_is_directory,
     help=(
@@ -458,7 +459,7 @@ def dcos_docker(verbose: None) -> None:
     ),
 )
 @click.option(
-    '--workspace-path',
+    '--workspace-dir',
     type=click.Path(exists=True),
     callback=_validate_path_is_directory,
     help=(
@@ -481,11 +482,11 @@ def create(
     linux_distribution: str,
     masters: int,
     public_agents: int,
-    license_key_path: Optional[str],
+    license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    genconf_path: Optional[Path],
-    workspace_path: Optional[Path],
+    genconf_dir: Optional[Path],
+    workspace_dir: Optional[Path],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -513,7 +514,7 @@ def create(
 
             \b
             * The ``license_key_contents`` set in ``--extra-config``.
-            * The contents of the path given with ``--license-key-path``.
+            * The contents of the path given with ``--license-key``.
             * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
 
             \b
@@ -523,7 +524,7 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
-    base_workspace_dir = workspace_path or Path(gettempdir())
+    base_workspace_dir = workspace_dir or Path(gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
     ssh_keypair_dir = workspace_dir / 'ssh'
@@ -553,8 +554,8 @@ def create(
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'fault_domain_enabled': False,
         }
-        if license_key_path is not None:
-            key_contents = Path(license_key_path).read_text()
+        if license_key is not None:
+            key_contents = Path(license_key).read_text()
             enterprise_extra_config['license_key_contents'] = key_contents
 
         extra_config = {**enterprise_extra_config, **extra_config}
@@ -562,17 +563,14 @@ def create(
             extra_config['security'] = security_mode
 
     files_to_copy_to_installer = {}
-    if genconf_path is not None:
-        # If a directory is provided, copy all files from the directory
-        # into the installer's `/genconf` directory.
-        if genconf_path.is_dir():
-            container_genconf_path = Path('/genconf')
-            for genconf_file in genconf_path.glob('**/*'):
-                if genconf_file.is_dir():
-                    continue
-                genconf_relative = genconf_file.relative_to(genconf_path)
-                relative_path = container_genconf_path / genconf_relative
-                files_to_copy_to_installer[genconf_file] = relative_path
+    if genconf_dir is not None:
+        container_genconf_path = Path('/genconf')
+        for genconf_file in genconf_dir.glob('**/*'):
+            if genconf_file.is_dir():
+                continue
+            genconf_relative = genconf_file.relative_to(genconf_dir)
+            relative_path = container_genconf_path / genconf_relative
+            files_to_copy_to_installer[genconf_file] = relative_path
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
@@ -947,7 +945,11 @@ def run(
     ``dcos_docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
     """  # noqa: E501
     if sync_dir is not None:
-        ctx.invoke(sync_code, cluster_id=cluster_id, checkout=str(sync_dir))
+        ctx.invoke(
+            sync_code,
+            cluster_id=cluster_id,
+            dcos_checkout_dir=str(sync_dir),
+        )
 
     args = [
         'source',
@@ -1060,30 +1062,32 @@ def web(cluster_id: str) -> None:
     help='If not given, "default" is used.',
 )
 @click.argument(
-    'checkout',
+    'dcos_checkout_dir',
     type=click.Path(exists=True),
-    envvar='DCOS_CHECKOUT_PATH',
+    envvar='DCOS_CHECKOUT_DIR',
     default='.',
 )
-def sync_code(cluster_id: str, checkout: str) -> None:
+def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
 
     This syncs integration test files and bootstrap files.
 
-    ``CHECKOUT`` should be set to the path of clone of an open source DC/OS
-    or DC/OS Enterprise repository.
+    ``DCOS_CHECKOUT_DIR`` should be set to the path of clone of an open source
+    DC/OS or DC/OS Enterprise repository.
 
-    By default the ``CHECKOUT`` argument is set to the value of the
-    ``DCOS_CHECKOUT_PATH`` environment variable.
+    By default the ``DCOS_CHECKOUT_DIR`` argument is set to the value of the
+    ``DCOS_CHECKOUT_DIR`` environment variable.
 
-    If no ``CHECKOUT`` is given, the current working directory is used.
+    If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is
+    used.
     """
-    local_packages = Path(checkout) / 'packages'
+    local_packages = Path(dcos_checkout_dir) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
     if not local_test_dir.exists():
         message = (
-            'CHECKOUT must be set to the checkout of a DC/OS repository.\n'
+            'DCOS_CHECKOUT_DIR must be set to the checkout of a DC/OS '
+            'repository.\n'
             '"{local_test_dir}" does not exist.'
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
