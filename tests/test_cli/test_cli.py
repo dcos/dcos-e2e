@@ -45,6 +45,9 @@ class TestDcosDocker:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
         assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker [OPTIONS] COMMAND [ARGS]...
@@ -65,8 +68,9 @@ class TestDcosDocker:
               sync     Sync files from a DC/OS checkout to master...
               wait     Wait for DC/OS to start.
               web      Open the browser at the web UI.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_help
 
 
@@ -183,13 +187,17 @@ class TestCreate:
             catch_exceptions=False,
         )
         assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_message = dedent(
             """\
             Usage: dcos_docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" is not in the format /absolute/local/path:/remote/path.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_message
 
     def test_copy_to_master_no_local(self, oss_artifact: Path) -> None:
@@ -208,13 +216,17 @@ class TestCreate:
             catch_exceptions=False,
         )
         assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_message = dedent(
             """\
             Usage: dcos_docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" does not exist.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_message
 
     def test_copy_to_master_relative(
@@ -240,13 +252,17 @@ class TestCreate:
         )
         Path(relative_path).unlink()
         assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_message = dedent(
             """\
             Usage: dcos_docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "some/remote is not an absolute path.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_message
 
     def test_invalid_artifact_path(self) -> None:
@@ -283,13 +299,17 @@ class TestCreate:
             catch_exceptions=False,
         )
         assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_message = dedent(
             """\
             Usage: dcos_docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
-            """
+            """# noqa: E501,E261
         ).format(path=invalid_path)
+        # yapf: enable
         assert result.output == expected_message
 
     def test_invalid_yaml(self, oss_artifact: Path, tmpdir: local) -> None:
@@ -311,13 +331,17 @@ class TestCreate:
             catch_exceptions=False,
         )
         assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_message = dedent(
             """\
            Usage: dcos_docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "@" is not valid YAML
-           """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_message
 
     def test_not_key_value(self, oss_artifact: Path, tmpdir: local) -> None:
