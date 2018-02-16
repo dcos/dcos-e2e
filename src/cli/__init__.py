@@ -945,7 +945,11 @@ def run(
     ``dcos_docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
     """  # noqa: E501
     if sync_dir is not None:
-        ctx.invoke(sync_code, cluster_id=cluster_id, checkout=str(sync_dir))
+        ctx.invoke(
+            sync_code,
+            cluster_id=cluster_id,
+            dcos_checkout_dir=str(sync_dir),
+        )
 
     args = [
         'source',
@@ -1058,30 +1062,32 @@ def web(cluster_id: str) -> None:
     help='If not given, "default" is used.',
 )
 @click.argument(
-    'checkout',
+    'dcos_checkout_dir',
     type=click.Path(exists=True),
-    envvar='DCOS_CHECKOUT_PATH',
+    envvar='DCOS_CHECKOUT_DIR',
     default='.',
 )
-def sync_code(cluster_id: str, checkout: str) -> None:
+def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
 
     This syncs integration test files and bootstrap files.
 
-    ``CHECKOUT`` should be set to the path of clone of an open source DC/OS
-    or DC/OS Enterprise repository.
+    ``DCOS_CHECKOUT_DIR`` should be set to the path of clone of an open source
+    DC/OS or DC/OS Enterprise repository.
 
-    By default the ``CHECKOUT`` argument is set to the value of the
-    ``DCOS_CHECKOUT_PATH`` environment variable.
+    By default the ``DCOS_CHECKOUT_DIR`` argument is set to the value of the
+    ``DCOS_CHECKOUT_DIR`` environment variable.
 
-    If no ``CHECKOUT`` is given, the current working directory is used.
+    If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is
+    used.
     """
-    local_packages = Path(checkout) / 'packages'
+    local_packages = Path(dcos_checkout_dir) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
     if not local_test_dir.exists():
         message = (
-            'CHECKOUT must be set to the checkout of a DC/OS repository.\n'
+            'DCOS_CHECKOUT_DIR must be set to the checkout of a DC/OS '
+            'repository.\n'
             '"{local_test_dir}" does not exist.'
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
