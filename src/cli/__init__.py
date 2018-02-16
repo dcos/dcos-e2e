@@ -5,6 +5,7 @@ Ideas for improvements
 ----------------------
 
 * brew install
+* change path to dir
 * Windows support
 """
 
@@ -457,8 +458,9 @@ def dcos_docker(verbose: None) -> None:
     ),
 )
 @click.option(
-    '--workspace-dir',
+    '--workspace-path',
     type=click.Path(exists=True),
+    callback=_validate_path_is_directory,
     help=(
         'Creating a cluster can use approximately 2 GB of temporary storage. '
         'Set this option to use a custom "workspace" for this temporary '
@@ -483,7 +485,7 @@ def create(
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     genconf_path: Optional[Path],
-    workspace_dir: Optional[Union[str, Path]],
+    workspace_path: Optional[Path],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -521,8 +523,8 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
-    base_workspace_dir = workspace_dir or gettempdir()
-    workspace_dir = Path(base_workspace_dir) / uuid.uuid4().hex
+    base_workspace_dir = workspace_path or Path(gettempdir())
+    workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
