@@ -1164,7 +1164,12 @@ def doctor() -> None:
         message = (
             'The default temporary directory ("{tmp_prefix}") has'
             '{free_space:.1f} GB of free space available. '
-            'Creating a cluster typically takes'
+            'Creating a cluster typically takes approximately 2 GB of '
+            'temporary storage. '
+            'If you encounter problems with disk space usage, set the '
+            '``TMPDIR`` environment variable to a suitable temporary '
+            'directory or use the ``--workspace-dir`` option on the '
+            '``dcos_docker create`` command.'
         )
 
     import pdb; pdb.set_trace()
