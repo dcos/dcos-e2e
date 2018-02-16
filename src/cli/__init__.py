@@ -483,6 +483,7 @@ def create(
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     genconf_path: Optional[Path],
+    workspace_dir: Optional[Union[str, Path]],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -520,7 +521,9 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
-    workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
+    base_workspace_dir = workspace_dir or gettempdir()
+    workspace_dir = Path(base_workspace_dir) / uuid.uuid4().hex
+
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
