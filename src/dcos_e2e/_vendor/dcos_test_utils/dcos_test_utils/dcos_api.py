@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 class DcosUser:
     """A lightweight user representation for grabbing the auth info and stashing it"""
+
     def __init__(self, credentials: dict):
         self.credentials = credentials
         self.auth_token = None
@@ -43,19 +44,36 @@ class DcosAuth(requests.auth.AuthBase):
 
 
 class Exhibitor(RetryCommonHttpErrorsMixin, ApiClientSession):
-    def __init__(self, default_url: Url, session: Optional[requests.Session]=None,
-                 exhibitor_admin_password: Optional[str]=None):
+    def __init__(
+        self,
+        default_url: Url,
+        session: Optional[requests.Session] = None,
+        exhibitor_admin_password: Optional[str] = None
+    ):
         super().__init__(default_url)
         if session is not None:
             self.session = session
         if exhibitor_admin_password is not None:
             # Override auth to use HTTP basic auth with the provided admin password.
-            self.session.auth = requests.auth.HTTPBasicAuth('admin', exhibitor_admin_password)
+            self.session.auth = requests.auth.HTTPBasicAuth(
+                'admin', exhibitor_admin_password
+            )
 
 
 class ARNodeApiClientMixin:
-    def api_request(self, method, path_extension, *, scheme=None, host=None, query=None,
-                    fragment=None, port=None, node=None, **kwargs):
+    def api_request(
+        self,
+        method,
+        path_extension,
+        *,
+        scheme=None,
+        host=None,
+        query=None,
+        fragment=None,
+        port=None,
+        node=None,
+        **kwargs
+    ):
         """ Communicating with a DC/OS cluster is done by default through Admin Router.
         Use this Mixin with an ApiClientSession that requires distinguishing between nodes.
         Admin Router has both a master and agent process and so this wrapper accepts a
@@ -75,21 +93,35 @@ class ARNodeApiClientMixin:
                 if scheme == 'https':
                     port = 61002
             else:
-                raise Exception('Node {} is not recognized within the DC/OS cluster'.format(node))
+                raise Exception(
+                    'Node {} is not recognized within the DC/OS cluster'.
+                    format(node)
+                )
             host = node
-        return super().api_request(method, path_extension, scheme=scheme, host=host,
-                                   query=query, fragment=fragment, port=port, **kwargs)
+        return super().api_request(
+            method,
+            path_extension,
+            scheme=scheme,
+            host=host,
+            query=query,
+            fragment=fragment,
+            port=port,
+            **kwargs
+        )
 
 
-class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSession):
+class DcosApiSession(
+    ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSession
+):
     def __init__(
-            self,
-            dcos_url: str,
-            masters: Optional[List[str]],
-            slaves: Optional[List[str]],
-            public_slaves: Optional[List[str]],
-            auth_user: Optional[DcosUser],
-            exhibitor_admin_password: Optional[str]=None):
+        self,
+        dcos_url: str,
+        masters: Optional[List[str]],
+        slaves: Optional[List[str]],
+        public_slaves: Optional[List[str]],
+        auth_user: Optional[DcosUser],
+        exhibitor_admin_password: Optional[str] = None
+    ):
         """Proxy class for DC/OS clusters. If any of the host lists (masters,
         slaves, public_slaves) are provided, the wait_for_dcos function of this
         class will wait until provisioning is complete. If these lists are not
@@ -122,7 +154,9 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             'dcos_url': os.getenv('DCOS_DNS_ADDRESS', 'http://leader.mesos'),
             'masters': masters.split(',') if masters else None,
             'slaves': slaves.split(',') if slaves else None,
-            'public_slaves': public_slaves.split(',') if public_slaves else None}
+            'public_slaves': public_slaves.split(',')
+            if public_slaves else None
+        }
 
     @property
     def masters(self):
@@ -157,14 +191,24 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         r.raise_for_status()
         slaves_json = r.json()['slaves']
         if self.slave_list is None:
-            log.debug('Private slave list not provided; fetching from mesos...')
+            log.debug(
+                'Private slave list not provided; fetching from mesos...'
+            )
             self.slave_list = sorted(
-                [s['hostname'] for s in slaves_json if s['attributes'].get('public_ip') != 'true'])
+                [
+                    s['hostname'] for s in slaves_json
+                    if s['attributes'].get('public_ip') != 'true'
+                ]
+            )
             log.info('Private slave list set as: {}'.format(self.slaves))
         if self.public_slave_list is None:
             log.debug('Public slave list not provided; fetching from mesos...')
             self.public_slave_list = sorted(
-                [s['hostname'] for s in slaves_json if s['attributes'].get('public_ip') == 'true'])
+                [
+                    s['hostname'] for s in slaves_json
+                    if s['attributes'].get('public_ip') == 'true'
+                ]
+            )
             log.info('Public slave list set as: {}'.format(self.public_slaves))
 
     @retrying.retry(wait_fixed=2000, stop_max_delay=120 * 1000)
@@ -178,7 +222,11 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             return
         log.info('Attempting authentication')
         # explicitly use a session with no user authentication for requesting auth headers
-        r = self.post('/acs/api/v1/auth/login', json=self.auth_user.credentials, auth=None)
+        r = self.post(
+            '/acs/api/v1/auth/login',
+            json=self.auth_user.credentials,
+            auth=None
+        )
         r.raise_for_status()
         log.info('Received authentication blob: {}'.format(r.json()))
         self.auth_user.auth_token = r.json()['token']
@@ -187,9 +235,11 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         # Set requests auth
         self.session.auth = DcosAuth(self.auth_user.auth_token)
 
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
+    @retrying.retry(
+        wait_fixed=1000,
+        retry_on_result=lambda ret: ret is False,
+        retry_on_exception=lambda x: False
+    )
     def _wait_for_marathon_up(self):
         r = self.get('/marathon/v2/info')
         # http://mesosphere.github.io/marathon/api-console/index.html
@@ -214,11 +264,15 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         log.info('Exhibitor cluster status: {}'.format(status))
         zk_nodes = sorted([n['hostname'] for n in status])
         # zk nodes will be private but masters can be public
-        assert len(zk_nodes) == len(self.masters), 'ZooKeeper has not formed the expected quorum'
+        assert len(zk_nodes) == len(
+            self.masters
+        ), 'ZooKeeper has not formed the expected quorum'
 
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
+    @retrying.retry(
+        wait_fixed=1000,
+        retry_on_result=lambda ret: ret is False,
+        retry_on_exception=lambda x: False
+    )
     def _wait_for_slaves_to_join(self):
         r = self.get('/mesos/master/slaves')
         if r.status_code != 200:
@@ -239,9 +293,11 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             log.info(msg.format(num_slaves, self.all_slaves))
             return False
 
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
+    @retrying.retry(
+        wait_fixed=1000,
+        retry_on_result=lambda ret: ret is False,
+        retry_on_exception=lambda x: False
+    )
     def _wait_for_dcos_history_up(self):
         r = self.get('/dcos-history-service/ping')
         # resp_code >= 500 -> backend is still down probably
@@ -253,9 +309,11 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             log.info(msg.format(r.status_code))
             return False
 
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
+    @retrying.retry(
+        wait_fixed=1000,
+        retry_on_result=lambda ret: ret is False,
+        retry_on_exception=lambda x: False
+    )
     def _wait_for_dcos_history_data(self):
         ro = self.get('/dcos-history-service/history/last')
         # resp_code >= 500 -> backend is still down probably
@@ -271,9 +329,12 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
                 if len(json['slaves']) >= len(self.all_slaves):
                     return True
                 slaves_from_history_service = set(
-                    map(lambda x: x['hostname'], json['slaves']))
-                log.info('Still waiting for agents to join. Expected: {}, present: {}'.format(
-                    self.all_slaves, slaves_from_history_service))
+                    map(lambda x: x['hostname'], json['slaves'])
+                )
+                log.info(
+                    'Still waiting for agents to join. Expected: {}, present: {}'.
+                    format(self.all_slaves, slaves_from_history_service)
+                )
                 return False
 
             log.info(
@@ -285,9 +346,11 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         log.info(msg.format(ro.status_code))
         return False
 
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
+    @retrying.retry(
+        wait_fixed=1000,
+        retry_on_result=lambda ret: ret is False,
+        retry_on_exception=lambda x: False
+    )
     def _wait_for_adminrouter_up(self):
         try:
             # Yeah, we can also put it in retry_on_exception, but
@@ -302,9 +365,11 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             return True
 
     # Retry if returncode is False, do not retry on exceptions.
-    @retrying.retry(wait_fixed=2000,
-                    retry_on_result=lambda r: r is False,
-                    retry_on_exception=lambda _: False)
+    @retrying.retry(
+        wait_fixed=2000,
+        retry_on_result=lambda r: r is False,
+        retry_on_exception=lambda _: False
+    )
     def _wait_for_srouter_slaves_endpoints(self):
         # Get currently known agents. This request is served straight from
         # Mesos (no AdminRouter-based caching is involved).
@@ -315,7 +380,9 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         # only check against the slaves we expect to be in the cluster
         # so we can check that cluster has returned after a failure
         # in which case will will have new slaves and dead slaves
-        slaves_ids = sorted(x['id'] for x in data['slaves'] if x['hostname'] in self.all_slaves)
+        slaves_ids = sorted(
+            x['id'] for x in data['slaves'] if x['hostname'] in self.all_slaves
+        )
 
         for slave_id in slaves_ids:
             # AdminRouter's slave endpoint internally uses cached Mesos
@@ -332,19 +399,25 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             assert "id" in data
             assert data["id"] == slave_id
 
-    @retrying.retry(wait_fixed=2000,
-                    retry_on_result=lambda r: r is False,
-                    retry_on_exception=lambda _: False)
+    @retrying.retry(
+        wait_fixed=2000,
+        retry_on_result=lambda r: r is False,
+        retry_on_exception=lambda _: False
+    )
     def _wait_for_metronome(self):
         # Although this is named `wait_for_metronome`, some of the waiting
         # done in this function is, implicitly, for Admin Router.
         r = self.get('/service/metronome/v1/jobs')
         expected_error_codes = {
-            404: ('It may be the case that Admin Router is returning a 404 '
-                  'despite the Metronome service existing because it uses a cache. '
-                  'This cache is updated periodically.'),
-            504: ('Metronome is returning a Gateway Timeout Error.'
-                  'It may be that the service is still starting up.')
+            404: (
+                'It may be the case that Admin Router is returning a 404 '
+                'despite the Metronome service existing because it uses a cache. '
+                'This cache is updated periodically.'
+            ),
+            504: (
+                'Metronome is returning a Gateway Timeout Error.'
+                'It may be that the service is still starting up.'
+            )
         }
         log.info('Metronome status code:')
         log.info(r.status_code)
@@ -368,14 +441,17 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         master_list_set = self.master_list is not None
         slave_list_set = self.slave_list is not None
         public_slave_list_set = self.public_slave_list is not None
-        node_lists_set = all([master_list_set, slave_list_set, public_slave_list_set])
+        node_lists_set = all(
+            [master_list_set, slave_list_set, public_slave_list_set]
+        )
         if wait_for_hosts and not node_lists_set:
             raise Exception(
                 'This cluster is set to wait for hosts, however, not all host lists '
                 'were suppplied. Please set all three environment variables of MASTER_HOSTS, '
                 'SLAVE_HOSTS, and PUBLIC_SLAVE_HOSTS to the appropriate cluster IPs (comma separated). '
                 'Alternatively, set WAIT_FOR_HOSTS=false in the environment to use whichever hosts '
-                'are currently registered.')
+                'are currently registered.'
+            )
         self.set_node_lists_if_unset()
         self._wait_for_marathon_up()
         self._wait_for_zk_quorum()
@@ -411,18 +487,22 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         else:
             # Exhibitor is protected with HTTP basic auth, which conflicts with adminrouter's auth. We must bypass
             # the adminrouter and access Exhibitor directly.
-            default_url = Url.from_string('http://{}:8181'.format(self.masters[0]))
+            default_url = Url.from_string(
+                'http://{}:8181'.format(self.masters[0])
+            )
 
         return Exhibitor(
             default_url=default_url,
             session=self.copy().session,
-            exhibitor_admin_password=self.exhibitor_admin_password)
+            exhibitor_admin_password=self.exhibitor_admin_password
+        )
 
     @property
     def marathon(self):
         return dcos_test_utils.marathon.Marathon(
             default_url=self.default_url.copy(path='marathon'),
-            session=self.copy().session)
+            session=self.copy().session
+        )
 
     @property
     def metronome(self):
@@ -434,12 +514,15 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
     def cosmos(self):
         return dcos_test_utils.package.Cosmos(
             default_url=self.default_url.copy(path="package"),
-            session=self.copy().session)
+            session=self.copy().session
+        )
 
     @property
     def health(self):
         new = self.copy()
-        new.default_url = self.default_url.copy(query='cache=0', path='system/health/v1')
+        new.default_url = self.default_url.copy(
+            query='cache=0', path='system/health/v1'
+        )
         return new
 
     @property
@@ -454,16 +537,23 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         new.default_url = self.default_url.copy(path='/system/v1/metrics/v0')
         return new
 
-    def metronome_one_off(self, job_definition, timeout=300, ignore_failures=False):
+    def metronome_one_off(
+        self, job_definition, timeout=300, ignore_failures=False
+    ):
         """Run a job on metronome and block until it returns success
         """
         job_id = job_definition['id']
 
-        @retrying.retry(wait_fixed=2000, stop_max_delay=timeout * 1000,
-                        retry_on_result=lambda ret: not ret,
-                        retry_on_exception=lambda x: False)
+        @retrying.retry(
+            wait_fixed=2000,
+            stop_max_delay=timeout * 1000,
+            retry_on_result=lambda ret: not ret,
+            retry_on_exception=lambda x: False
+        )
         def wait_for_completion():
-            r = self.metronome.get('jobs/' + job_id, params={'embed': 'history'})
+            r = self.metronome.get(
+                'jobs/' + job_id, params={'embed': 'history'}
+            )
             r.raise_for_status()
             out = r.json()
             if not ignore_failures and (out['history']['failureCount'] != 0):
@@ -473,6 +563,7 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
                 return False
             log.info('Metronome one-off successful')
             return True
+
         log.info('Creating metronome job: ' + repr(job_definition))
         r = self.metronome.post('jobs', json=job_definition)
         assert_response_ok(r)
@@ -490,21 +581,37 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         agent_state = r.json()
 
         try:
-            framework = next(f for f in agent_state['frameworks'] if f['id'] == framework_id)
+            framework = next(
+                f for f in agent_state['frameworks'] if f['id'] == framework_id
+            )
         except StopIteration:
-            raise Exception('Framework {} not found on agent {}'.format(framework_id, slave_id))
+            raise Exception(
+                'Framework {} not found on agent {}'.format(
+                    framework_id, slave_id
+                )
+            )
 
         try:
-            executor = next(e for e in framework['executors'] if e['id'] == task_id)
+            executor = next(
+                e for e in framework['executors'] if e['id'] == task_id
+            )
         except StopIteration:
-            raise Exception('Executor {} not found on framework {} on agent {}'.format(task_id, framework_id, slave_id))
+            raise Exception(
+                'Executor {} not found on framework {} on agent {}'.format(
+                    task_id, framework_id, slave_id
+                )
+            )
 
         return executor['directory']
 
     def mesos_sandbox_file(self, slave_id, framework_id, task_id, filename):
         r = self.get(
             '/agent/{}/files/download'.format(slave_id),
-            params={'path': self.mesos_sandbox_directory(slave_id, framework_id, task_id) + '/' + filename}
+            params={
+                'path':
+                self.mesos_sandbox_directory(slave_id, framework_id, task_id) +
+                '/' + filename
+            }
         )
         r.raise_for_status()
         return r.text

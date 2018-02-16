@@ -9,12 +9,10 @@ import logging
 
 LOGGING_FORMAT = '[%(asctime)s|%(name)s|%(levelname)s]: %(message)s'
 
-MODULE_BROWN_LIST = [
-    'botocore',
-    'boto3']
+MODULE_BROWN_LIST = ['botocore', 'boto3']
 
 
-def setup(log_level_str: str, noisy_modules: list=None):
+def setup(log_level_str: str, noisy_modules: list = None):
     """ Handles the builtin python log levels and adds level below
     debug (trace) which dampened modules will log debug at
     Args:

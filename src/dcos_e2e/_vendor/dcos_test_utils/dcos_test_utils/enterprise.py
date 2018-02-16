@@ -12,8 +12,20 @@ class MesosNodeClientMixin:
     does not have to specify the master/agent port or which arbitrary host
     in the cluster meeting that role
     """
-    def api_request(self, method, path_extension, *, scheme=None, host=None, query=None,
-                    fragment=None, port=None, mesos_node=None, **kwargs):
+
+    def api_request(
+        self,
+        method,
+        path_extension,
+        *,
+        scheme=None,
+        host=None,
+        query=None,
+        fragment=None,
+        port=None,
+        mesos_node=None,
+        **kwargs
+    ):
         if mesos_node is not None:
             assert port is None, 'Usage error: mesos_node keyword will set port'
             assert host is None, 'Usage error: mesos_node keyword will set host'
@@ -24,9 +36,19 @@ class MesosNodeClientMixin:
                 port = 5051
                 host = self.slaves[0]
             else:
-                raise AssertionError('Mesos node type not recognized: {}'.format(mesos_node))
-        return super().api_request(method, path_extension, scheme=scheme, host=host, query=query,
-                                   fragment=fragment, port=port, **kwargs)
+                raise AssertionError(
+                    'Mesos node type not recognized: {}'.format(mesos_node)
+                )
+        return super().api_request(
+            method,
+            path_extension,
+            scheme=scheme,
+            host=host,
+            query=query,
+            fragment=fragment,
+            port=port,
+            **kwargs
+        )
 
 
 class EnterpriseUser(dcos_api.DcosUser):
@@ -43,7 +65,10 @@ class EnterpriseUser(dcos_api.DcosUser):
 class EnterpriseApiSession(MesosNodeClientMixin, dcos_api.DcosApiSession):
     @property
     def iam(self):
-        return iam.Iam(self.default_url.copy(path='acs/api/v1'), session=self.copy().session)
+        return iam.Iam(
+            self.default_url.copy(path='acs/api/v1'),
+            session=self.copy().session
+        )
 
     @property
     def secrets(self):

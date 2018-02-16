@@ -17,7 +17,6 @@ SshInfo = namedtuple('SshInfo', ['user', 'home_dir'])
 
 log = logging.getLogger(__name__)
 
-
 # Token valid until 2036 for user albert@bekstil.net
 #    {
 #        "email": "albert@bekstil.net",
@@ -29,7 +28,10 @@ log = logging.getLogger(__name__)
 #        "iat": 1460164974
 #    }
 
-CI_CREDENTIALS = {'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik9UQkVOakZFTWtWQ09VRTRPRVpGTlRNMFJrWXlRa015Tnprd1JrSkVRemRCTWpBM1FqYzVOZyJ9.eyJlbWFpbCI6ImFsYmVydEBiZWtzdGlsLm5ldCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczovL2Rjb3MuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTA5OTY0NDk5MDExMTA4OTA1MDUwIiwiYXVkIjoiM3lGNVRPU3pkbEk0NVExeHNweHplb0dCZTlmTnhtOW0iLCJleHAiOjIwOTA4ODQ5NzQsImlhdCI6MTQ2MDE2NDk3NH0.OxcoJJp06L1z2_41_p65FriEGkPzwFB_0pA9ULCvwvzJ8pJXw9hLbmsx-23aY2f-ydwJ7LSibL9i5NbQSR2riJWTcW4N7tLLCCMeFXKEK4hErN2hyxz71Fl765EjQSO5KD1A-HsOPr3ZZPoGTBjE0-EFtmXkSlHb1T2zd0Z8T5Z2-q96WkFoT6PiEdbrDA-e47LKtRmqsddnPZnp0xmMQdTr2MjpVgvqG7TlRvxDcYc-62rkwQXDNSWsW61FcKfQ-TRIZSf2GS9F9esDF4b5tRtrXcBNaorYa9ql0XAWH5W_ct4ylRNl3vwkYKWa4cmPvOqT5Wlj9Tf0af4lNO40PQ'}     # noqa
+CI_CREDENTIALS = {
+    'token':
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik9UQkVOakZFTWtWQ09VRTRPRVpGTlRNMFJrWXlRa015Tnprd1JrSkVRemRCTWpBM1FqYzVOZyJ9.eyJlbWFpbCI6ImFsYmVydEBiZWtzdGlsLm5ldCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczovL2Rjb3MuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTA5OTY0NDk5MDExMTA4OTA1MDUwIiwiYXVkIjoiM3lGNVRPU3pkbEk0NVExeHNweHplb0dCZTlmTnhtOW0iLCJleHAiOjIwOTA4ODQ5NzQsImlhdCI6MTQ2MDE2NDk3NH0.OxcoJJp06L1z2_41_p65FriEGkPzwFB_0pA9ULCvwvzJ8pJXw9hLbmsx-23aY2f-ydwJ7LSibL9i5NbQSR2riJWTcW4N7tLLCCMeFXKEK4hErN2hyxz71Fl765EjQSO5KD1A-HsOPr3ZZPoGTBjE0-EFtmXkSlHb1T2zd0Z8T5Z2-q96WkFoT6PiEdbrDA-e47LKtRmqsddnPZnp0xmMQdTr2MjpVgvqG7TlRvxDcYc-62rkwQXDNSWsW61FcKfQ-TRIZSf2GS9F9esDF4b5tRtrXcBNaorYa9ql0XAWH5W_ct4ylRNl3vwkYKWa4cmPvOqT5Wlj9Tf0af4lNO40PQ'
+}  # noqa
 
 
 def path_join(p1: str, p2: str):
@@ -41,8 +43,11 @@ class Url:
     """URL abstraction to allow convenient substitution of URL anatomy
     without having to copy and dissect the entire original URL
     """
-    def __init__(self, scheme: str, host: str, path: str, query: str,
-                 fragment: str, port: Union[str, int]):
+
+    def __init__(
+        self, scheme: str, host: str, path: str, query: str, fragment: str,
+        port: Union[str, int]
+    ):
         """{scheme}://{host}:{port}/{path}?{query}#{fragment}
         """
         self.scheme = scheme
@@ -67,23 +72,32 @@ class Url:
         return '{}:{}'.format(self.host, self.port) if self.port else self.host
 
     def __str__(self):
-        return urlunsplit((
-            self.scheme,
-            self.netloc,
-            self.path,
-            self.query if self.query else '',
-            self.fragment if self.fragment else ''))
+        return urlunsplit(
+            (
+                self.scheme, self.netloc, self.path, self.query
+                if self.query else '', self.fragment if self.fragment else ''
+            )
+        )
 
-    def copy(self, scheme=None, host=None, path=None, query=None, fragment=None, port=None):
+    def copy(
+        self,
+        scheme=None,
+        host=None,
+        path=None,
+        query=None,
+        fragment=None,
+        port=None
+    ):
         """return new Url with any component replaced
         """
         return Url(
-            scheme if scheme is not None else self.scheme,
-            host if host is not None else self.host,
-            path if path is not None else self.path,
-            query if query is not None else self.query,
-            fragment if fragment is not None else self.fragment,
-            port if port is not None else self.port)
+            scheme if scheme is not None else self.scheme, host
+            if host is not None else self.host, path
+            if path is not None else self.path, query
+            if query is not None else self.query, fragment
+            if fragment is not None else self.fragment, port
+            if port is not None else self.port
+        )
 
 
 class ApiClientSession:
@@ -92,6 +106,7 @@ class ApiClientSession:
     in that the cookies are cleared after each request (but not purged from the response)
     so that the request state may be more well-defined betweens tests sharing this object
     """
+
     def __init__(self, default_url: Url):
         """
         Args:
@@ -100,8 +115,18 @@ class ApiClientSession:
         self.default_url = default_url
         self.session = requests.Session()
 
-    def api_request(self, method, path_extension, *, scheme=None, host=None, query=None,
-                    fragment=None, port=None, **kwargs) -> requests.Response:
+    def api_request(
+        self,
+        method,
+        path_extension,
+        *,
+        scheme=None,
+        host=None,
+        query=None,
+        fragment=None,
+        port=None,
+        **kwargs
+    ) -> requests.Response:
         """ Direct wrapper for requests.session.request. This method is kept deliberatly
         simple so that child classes can alter this behavior without much copying
 
@@ -123,15 +148,22 @@ class ApiClientSession:
 
         final_path = path_join(self.default_url.path, path_extension)
 
-        request_url = str(self.default_url.copy(
-            scheme=scheme,
-            host=host,
-            path=final_path,
-            query=query,
-            fragment=fragment,
-            port=port))
+        request_url = str(
+            self.default_url.copy(
+                scheme=scheme,
+                host=host,
+                path=final_path,
+                query=query,
+                fragment=fragment,
+                port=port
+            )
+        )
 
-        log.debug('Request method {}: {}. Arguments: {}'.format(method, request_url, repr(kwargs)))
+        log.debug(
+            'Request method {}: {}. Arguments: {}'.format(
+                method, request_url, repr(kwargs)
+            )
+        )
         r = self.session.request(method, request_url, **kwargs)
         self.session.cookies.clear()
         return r
@@ -170,7 +202,9 @@ def is_retryable_exception(exception: Exception) -> bool:
     Args:
         exception: exception raised from ApiClientSession.api_request instance
     """
-    for ex in [requests.exceptions.ConnectionError, requests.exceptions.Timeout]:
+    for ex in [
+        requests.exceptions.ConnectionError, requests.exceptions.Timeout
+    ]:
         if isinstance(exception, ex):
             log.debug('Retrying common HTTP error: {}'.format(repr(exception)))
             return True
@@ -182,7 +216,10 @@ class RetryCommonHttpErrorsMixin:
     instability do not derail entire scripts. This functionality is configured
     through the retry_timeout keyword
     """
-    def api_request(self, *args, retry_timeout: int=60, **kwargs) -> requests.Response:
+
+    def api_request(
+        self, *args, retry_timeout: int = 60, **kwargs
+    ) -> requests.Response:
         """ Adds 'retry_timeout' keyword to API requests.
         Args:
             *args: args to be passed to super()'s api_request method
@@ -190,12 +227,15 @@ class RetryCommonHttpErrorsMixin:
             retry_timeout: total number of seconds to keep retrying after
                 the initial exception was raised
         """
+
         @retrying.retry(
             wait_fixed=1000,
             stop_max_delay=retry_timeout * 1000,
-            retry_on_exception=is_retryable_exception)
+            retry_on_exception=is_retryable_exception
+        )
         def retry_errors():
-            return super(RetryCommonHttpErrorsMixin, self).api_request(*args, **kwargs)
+            return super(RetryCommonHttpErrorsMixin,
+                         self).api_request(*args, **kwargs)
 
         return retry_errors()
 

@@ -9,9 +9,14 @@ from typing import Any, Dict, Iterable, List, Optional, Set
 
 from retry import retry
 
-from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
-from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
-from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
+from ._vendor.dcos_test_utils.dcos_test_utils.dcos_api import (
+    DcosApiSession,
+    DcosUser,
+)
+from ._vendor.dcos_test_utils.dcos_test_utils.enterprise import (
+    EnterpriseApiSession,
+)
+from ._vendor.dcos_test_utils.dcos_test_utils.helpers import CI_CREDENTIALS
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster

@@ -15,10 +15,7 @@ class Iam(helpers.ApiClientSession):
             self.session = session
 
     def create_service(self, uid, pubkey, description):
-        data = {
-            'description': description,
-            'public_key': pubkey
-        }
+        data = {'description': description, 'public_key': pubkey}
         r = self.put('/users/{}'.format(uid), json=data)
         assert r.status_code == 201
 
@@ -43,14 +40,18 @@ class Iam(helpers.ApiClientSession):
     def grant_user_permission(self, uid, action, rid):
         rid = rid.replace('/', '%252F')
         r = self.put('/acls/{}/users/{}/{}'.format(rid, uid, action))
-        assert r.status_code == 204, ('Permission was not granted. Code: {}. '
-                                      'Content {}'.format(r.status_code, r.content.decode()))
+        assert r.status_code == 204, (
+            'Permission was not granted. Code: {}. '
+            'Content {}'.format(r.status_code, r.content.decode())
+        )
 
     def create_user_permission(self, uid, action, rid, description):
         rid = rid.replace('/', '%252F')
         r = self.put('/acls/{}'.format(rid), json={'description': description})
-        assert r.status_code == 201, ('Permission was not created. Code {}. '
-                                      'Content {}'.format(r.status_code, r.content.decode()))
+        assert r.status_code == 201, (
+            'Permission was not created. Code {}. '
+            'Content {}'.format(r.status_code, r.content.decode())
+        )
 
     def delete_user_permission(self, uid, action, rid):
         rid = rid.replace('/', '%252F')

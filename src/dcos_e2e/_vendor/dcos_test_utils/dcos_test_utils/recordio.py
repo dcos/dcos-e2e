@@ -57,7 +57,9 @@ class Encoder():
         s = self.serialize(message)
 
         if not isinstance(s, bytes):
-            raise Exception("Calling 'serialize(message)' must return a 'bytes' object")
+            raise Exception(
+                "Calling 'serialize(message)' must return a 'bytes' object"
+            )
 
         return bytes(str(len(s)) + "\n", "UTF-8") + s
 
@@ -123,11 +125,15 @@ class Decoder():
 
                 try:
                     self.length = int(self.buffer.decode("UTF-8"))
-                    assert self.length >= 0, "Negative record length '{length}'".format(length=self.length)
+                    assert self.length >= 0, "Negative record length '{length}'".format(
+                        length=self.length
+                    )
                 except Exception as exception:
                     self.state = self.FAILED
-                    raise Exception("Failed to decode length '{buffer}': {error}"
-                                    .format(buffer=self.buffer, error=exception)) from exception
+                    raise Exception(
+                        "Failed to decode length '{buffer}': {error}"
+                        .format(buffer=self.buffer, error=exception)
+                    ) from exception
 
                 self.buffer = bytes("", "UTF-8")
                 self.state = self.RECORD

@@ -19,13 +19,10 @@ def log_and_raise_if_not_ok(response: requests.Response):
 
 
 class OnpremCluster:
-
     def __init__(
-            self,
-            masters: List[Host],
-            private_agents: List[Host],
-            public_agents: List[Host],
-            bootstrap_host: Host):
+        self, masters: List[Host], private_agents: List[Host],
+        public_agents: List[Host], bootstrap_host: Host
+    ):
         """ An abstration for an arbitrary group of servers to be used
         as bootstrapping node and deployment nodes for DC/OS
         Args:
@@ -40,7 +37,9 @@ class OnpremCluster:
         self.public_agents = public_agents
         self.bootstrap_host = bootstrap_host
         assert all(h.private_ip for h in self.hosts), (
-            'All cluster hosts require a private IP. hosts: {}'.format(repr(self.hosts))
+            'All cluster hosts require a private IP. hosts: {}'.format(
+                repr(self.hosts)
+            )
         )
 
     def get_master_ips(self):
@@ -53,9 +52,16 @@ class OnpremCluster:
         return copy.copy(self.public_agents)
 
     @classmethod
-    def from_hosts(cls, bootstrap_host, cluster_hosts, num_masters, num_private_agents, num_public_agents):
+    def from_hosts(
+        cls, bootstrap_host, cluster_hosts, num_masters, num_private_agents,
+        num_public_agents
+    ):
         masters, private_agents, public_agents = (
-            cls.partition_cluster(cluster_hosts, num_masters, num_private_agents, num_public_agents))
+            cls.partition_cluster(
+                cluster_hosts, num_masters, num_private_agents,
+                num_public_agents
+            )
+        )
         return cls(
             masters=masters,
             private_agents=private_agents,
@@ -75,10 +81,9 @@ class OnpremCluster:
 
     @staticmethod
     def partition_cluster(
-            cluster_hosts: List[Host],
-            num_masters: int,
-            num_agents: int,
-            num_public_agents: int):
+        cluster_hosts: List[Host], num_masters: int, num_agents: int,
+        num_public_agents: int
+    ):
         """Return (masters, agents, public_agents) from hosts."""
         hosts_iter = iter(sorted(cluster_hosts))
         return (

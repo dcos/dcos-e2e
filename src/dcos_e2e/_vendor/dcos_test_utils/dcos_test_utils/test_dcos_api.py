@@ -25,8 +25,12 @@ def mock_dcos_client(monkeypatch):
     monkeypatch.setenv('SLAVE_HOSTS', '127.0.0.1,123.123.123.123')
     monkeypatch.setenv('PUBLIC_SLAVE_HOSTS', '127.0.0.1,0.0.0.0')
     # covers any request made via the ApiClientSession
-    monkeypatch.setattr(requests.Session, 'request', lambda *args, **kwargs: MockResponse())
-    monkeypatch.setattr(dcos_api.DcosApiSession, 'wait_for_dcos', lambda self: True)
+    monkeypatch.setattr(
+        requests.Session, 'request', lambda *args, **kwargs: MockResponse()
+    )
+    monkeypatch.setattr(
+        dcos_api.DcosApiSession, 'wait_for_dcos', lambda self: True
+    )
     args = dcos_api.DcosApiSession.get_args_from_env()
     args['auth_user'] = None
     return dcos_api.DcosApiSession(**args)
