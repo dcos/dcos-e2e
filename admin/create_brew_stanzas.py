@@ -4,6 +4,9 @@ from textwrap import dedent
 
 
 def get_formula() -> str:
+    """
+    Return the contents of a Homebrew formula for the DC/OS E2E CLI.
+    """
     requirements_file = Path(__file__).parent.parent / 'requirements.txt'
     lines = requirements_file.read_text().strip().split('\n')
     requirements = [line for line in lines if not line.startswith('#')]
