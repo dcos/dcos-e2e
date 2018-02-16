@@ -257,5 +257,6 @@ Update the SHA in ``src/vendorize.toml``.
 .. code:: sh
 
     pip install https://github.com/mwilliamson/python-vendorize.git
+    git rm -r src/dcos_e2e/_vendor/
     cd src/
     python-vendorize
