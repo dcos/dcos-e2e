@@ -1153,6 +1153,8 @@ def doctor() -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
+    free_space = shutil.disk_usage(gettempdir()).free
+
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
     docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
