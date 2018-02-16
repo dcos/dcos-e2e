@@ -257,4 +257,5 @@ Update the SHA in ``src/vendorize.toml``.
 .. code:: sh
 
     pip install https://github.com/mwilliamson/python-vendorize.git
-    make update-dcos-docker
+    cd src/
+    python-vendorize
