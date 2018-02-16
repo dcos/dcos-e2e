@@ -49,4 +49,4 @@ def get_formula() -> str:
 
 
 if __name__ == '__main__':
-    print(get_formula)
+    print(get_formula())
