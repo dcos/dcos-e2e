@@ -5,6 +5,7 @@ Ideas for improvements
 ----------------------
 
 * brew install
+* change path to dir
 * Windows support
 """
 
@@ -21,7 +22,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
-from tempfile import gettempdir
+from tempfile import gettempdir, gettempprefix
 from typing import (  # noqa: F401
     Any,
     Callable,
@@ -450,10 +451,24 @@ def dcos_docker(verbose: None) -> None:
     callback=_validate_path_pair,
     multiple=True,
     help=(
-        'Files to put on master nodes before installing DC/OS. '
+        'Files to copy to master nodes before installing DC/OS. '
         'This option can be given multiple times. '
         'Each option should be in the format '
         '/absolute/local/path:/remote/path.'
+    ),
+)
+@click.option(
+    '--workspace-path',
+    type=click.Path(exists=True),
+    callback=_validate_path_is_directory,
+    help=(
+        'Creating a cluster can use approximately 2 GB of temporary storage. '
+        'Set this option to use a custom "workspace" for this temporary '
+        'storage. '
+        'See '
+        'https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir '
+        'for details on the temporary directory location if this option is '
+        'not set.'
     ),
 )
 def create(
@@ -470,6 +485,7 @@ def create(
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     genconf_path: Optional[Path],
+    workspace_path: Optional[Path],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -507,7 +523,9 @@ def create(
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
 
-    workspace_dir = Path(gettempdir()) / uuid.uuid4().hex
+    base_workspace_dir = workspace_path or Path(gettempdir())
+    workspace_dir = base_workspace_dir / uuid.uuid4().hex
+
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
@@ -517,10 +535,14 @@ def create(
         private_key_path=private_key_path,
     )
 
-    enterprise = _is_enterprise(
-        build_artifact=Path(artifact),
-        workspace_dir=workspace_dir,
-    )
+    try:
+        enterprise = _is_enterprise(
+            build_artifact=Path(artifact),
+            workspace_dir=workspace_dir,
+        )
+    except subprocess.CalledProcessError:
+        rmtree(path=str(workspace_dir), ignore_errors=True)
+        raise
 
     if enterprise:
         superuser_username = 'admin'
@@ -897,7 +919,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     default='admin',
     help='The password to set the ``DCOS_LOGIN_PW`` as.'
 )
-@click.argument('node_args', type=str, nargs=-1)
+@click.argument('node_args', type=str, nargs=-1, required=True)
 @click.option(
     '--sync',
     is_flag=True,
@@ -1153,6 +1175,26 @@ def doctor() -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
+    free_space = shutil.disk_usage(gettempdir()).free
+    free_space_gb = free_space / 1024 / 1024 / 1024
+
+    low_space_message = (
+        'The default temporary directory ("{tmp_prefix}") has '
+        '{free_space:.1f} GB of free space available. '
+        'Creating a cluster typically takes approximately 2 GB of '
+        'temporary storage. '
+        'If you encounter problems with disk space usage, set the '
+        '``TMPDIR`` environment variable to a suitable temporary '
+        'directory or use the ``--workspace-dir`` option on the '
+        '``dcos_docker create`` command.'
+    ).format(
+        tmp_prefix=Path('/') / gettempprefix(),
+        free_space=free_space_gb,
+    )
+
+    if free_space_gb < 5:
+        _warn(message=low_space_message)
+
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
     docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')

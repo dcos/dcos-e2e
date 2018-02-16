@@ -157,10 +157,17 @@ class TestCreate:
                                               files for DC/OS installer. All files from this
                                               directory will be copied to the `genconf`
                                               directory before running DC/OS installer.
-              --copy-to-master TEXT           Files to put on master nodes before installing
-                                              DC/OS. This option can be given multiple
-                                              times. Each option should be in the format
-                                              /absolute/local/path:/remote/path.
+              --copy-to-master TEXT           Files to copy to master nodes before
+                                              installing DC/OS. This option can be given
+                                              multiple times. Each option should be in the
+                                              format /absolute/local/path:/remote/path.
+              --workspace-path PATH           Creating a cluster can use approximately 2 GB
+                                              of temporary storage. Set this option to use a
+                                              custom "workspace" for this temporary storage.
+                                              See https://docs.python.org/3/library/tempfile
+                                              .html#tempfile.gettempdir for details on the
+                                              temporary directory location if this option is
+                                              not set.
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )
@@ -460,6 +467,57 @@ class TestCreate:
             'Error: Invalid value for "--genconf-path": '
             '"{path}" is not a directory.'
         ).format(path=str(genconf_file))
+        assert expected_error in result.output
+
+    def test_workdir_path_not_exist(self, oss_artifact: Path) -> None:
+        """
+        ``--workspace-path`` must exist.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--workspace-path',
+                'non-existing',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_error = (
+            'Error: Invalid value for "--workspace-path": '
+            'Path "non-existing" does not exist.'
+        )
+        assert expected_error in result.output
+
+    def test_workspace_path_is_file(
+        self,
+        oss_artifact: Path,
+        tmpdir: local,
+    ) -> None:
+        """
+        ``--workspace-path`` must be a directory.
+        """
+        workspace_file = tmpdir.join('testfile')
+        workspace_file.write('test')
+
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--workspace-path',
+                str(workspace_file),
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_error = (
+            'Error: Invalid value for "--workspace-path": '
+            '"{path}" is not a directory.'
+        ).format(path=str(workspace_file))
         assert expected_error in result.output
 
 
