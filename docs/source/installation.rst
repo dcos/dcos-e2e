@@ -8,4 +8,4 @@ The latest release is |release|.
 
 .. code:: sh
 
-    pip install --process-dependency-links git+https://github.com/mesosphere/dcos-e2e.git@master
+    pip install git+https://github.com/mesosphere/dcos-e2e.git@master
