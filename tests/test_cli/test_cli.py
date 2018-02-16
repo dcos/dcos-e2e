@@ -157,10 +157,10 @@ class TestCreate:
                                               files for DC/OS installer. All files from this
                                               directory will be copied to the `genconf`
                                               directory before running DC/OS installer.
-              --copy-to-master TEXT           Files to put on master nodes before installing
-                                              DC/OS. This option can be given multiple
-                                              times. Each option should be in the format
-                                              /absolute/local/path:/remote/path.
+              --copy-to-master TEXT           Files to copy to master nodes before
+                                              installing DC/OS. This option can be given
+                                              multiple times. Each option should be in the
+                                              format /absolute/local/path:/remote/path.
               --help                          Show this message and exit.
             """# noqa: E501,E261
         )

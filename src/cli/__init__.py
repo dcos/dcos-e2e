@@ -450,7 +450,7 @@ def dcos_docker(verbose: None) -> None:
     callback=_validate_path_pair,
     multiple=True,
     help=(
-        'Files to put on master nodes before installing DC/OS. '
+        'Files to copy to master nodes before installing DC/OS. '
         'This option can be given multiple times. '
         'Each option should be in the format '
         '/absolute/local/path:/remote/path.'
