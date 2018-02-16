@@ -39,7 +39,7 @@ before_install:
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
 install:
-- travis_retry pip install --upgrade --process-dependency-links --editable .[dev]
+- travis_retry pip install --upgrade --editable .[dev]
 cache: pip
 before_script:
 - make clean
