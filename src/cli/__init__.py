@@ -21,7 +21,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
-from tempfile import gettempdir
+from tempfile import gettempdir, gettempprefix
 from typing import (  # noqa: F401
     Any,
     Callable,
@@ -517,10 +517,13 @@ def create(
         private_key_path=private_key_path,
     )
 
-    enterprise = _is_enterprise(
-        build_artifact=Path(artifact),
-        workspace_dir=workspace_dir,
-    )
+    try:
+        enterprise = _is_enterprise(
+            build_artifact=Path(artifact),
+            workspace_dir=workspace_dir,
+        )
+    except subprocess.CalledProcessError:
+        rmtree(path=str(workspace_dir), ignore_errors=True)
 
     if enterprise:
         superuser_username = 'admin'
@@ -1154,6 +1157,16 @@ def doctor() -> None:
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     free_space = shutil.disk_usage(gettempdir()).free
+    free_space_gb = free_space / 1024 / 1024 / 1024
+
+    if free_space_gb < 10:
+        message = (
+            'The default temporary directory ("{tmp_prefix}") has'
+            '{free_space:.1f} GB of free space available. '
+            'Creating a cluster typically takes'
+        )
+
+    import pdb; pdb.set_trace()
 
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
