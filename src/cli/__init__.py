@@ -299,7 +299,12 @@ def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
         args=get_version_args,
         cwd=str(workspace_dir),
     )
-    version_info = json.loads(result.decode())
+
+    # In some cases, the name of the generated file is included in the output.
+    result = result.decode()
+    if '.tar\n' in result:
+        result = result.split('.tar\n')[1]
+    version_info = json.loads(result)
     variant = version_info['variant']
     return bool(variant == 'ee')
 
