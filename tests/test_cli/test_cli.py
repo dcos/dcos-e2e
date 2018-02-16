@@ -840,3 +840,49 @@ class TestWeb:
         )
         # yapf: enable
         assert result.output == expected_help
+
+
+class TestRun:
+    """
+    Tests for the ``run`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos_docker run --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['run', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos_docker run [OPTIONS] NODE_ARGS...
+
+              Run an arbitrary command on a node.
+
+              This command sets up the environment so that ``pytest`` can be run.
+
+              For example, run ``dcos_docker run --cluster-id 1231599 pytest -k
+              test_tls.py``.
+
+              Or, with sync: ``dcos_docker run --sync-dir . --cluster-id 1231599 pytest -k
+              test_tls.py``.
+
+            Options:
+              -c, --cluster-id TEXT    If not given, "default" is used.
+              --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME`` as.
+              --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` as.
+              --sync-dir PATH          Syncs to DC/OS checkout specified before running the
+                                       command.
+              --help                   Show this message and exit.
+            """# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
