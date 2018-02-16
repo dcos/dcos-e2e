@@ -185,7 +185,7 @@ def _validate_cluster_id(
 
     # This matches the Docker ID regular expression.
     # This regular expression can be seen by running:
-    # > docker run -it --rm --id=' WAT ? I DUNNO ! ' alpine
+    # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
     if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
         message = (
             'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
