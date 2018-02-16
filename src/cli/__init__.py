@@ -346,21 +346,21 @@ def dcos_docker(verbose: None) -> None:
 @click.argument('artifact', type=click.Path(exists=True))
 @click.option(
     '--docker-version',
-    type=click.Choice(_DOCKER_VERSIONS.keys()),
+    type=click.Choice(sorted(_DOCKER_VERSIONS.keys())),
     default='1.13.1',
     show_default=True,
     help='The Docker version to install on the nodes.',
 )
 @click.option(
     '--linux-distribution',
-    type=click.Choice(_LINUX_DISTRIBUTIONS.keys()),
+    type=click.Choice(sorted(_LINUX_DISTRIBUTIONS.keys())),
     default='centos-7',
     show_default=True,
     help='The Linux distribution to use on the nodes.',
 )
 @click.option(
     '--docker-storage-driver',
-    type=click.Choice(_DOCKER_STORAGE_DRIVERS.keys()),
+    type=click.Choice(sorted(_DOCKER_STORAGE_DRIVERS.keys())),
     default=None,
     show_default=False,
     help=(
@@ -1161,7 +1161,9 @@ def doctor() -> None:
             'See {help_url}.'
         ).format(
             host_driver=host_driver,
-            supported_drivers=', '.join(_DOCKER_STORAGE_DRIVERS.keys()),
+            supported_drivers=', '.join(
+                sorted(_DOCKER_STORAGE_DRIVERS.keys())
+            ),
             help_url=storage_driver_url,
         )
         _warn(message)
