@@ -469,6 +469,57 @@ class TestCreate:
         ).format(path=str(genconf_file))
         assert expected_error in result.output
 
+    def test_workdir_path_not_exist(self, oss_artifact: Path) -> None:
+        """
+        ``--workspace-path`` must exist.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--workspace-path',
+                'non-existing',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_error = (
+            'Error: Invalid value for "--workspace-path": '
+            'Path "non-existing" does not exist.'
+        )
+        assert expected_error in result.output
+
+    def test_workspace_path_is_file(
+        self,
+        oss_artifact: Path,
+        tmpdir: local,
+    ) -> None:
+        """
+        ``--workspace-path`` must be a directory.
+        """
+        workspace_file = tmpdir.join('testfile')
+        workspace_file.write('test')
+
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                '--workspace-path',
+                str(workspace_file),
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        expected_error = (
+            'Error: Invalid value for "--workspace-path": '
+            '"{path}" is not a directory.'
+        ).format(path=str(workspace_file))
+        assert expected_error in result.output
+
 
 class TestDestroy:
     """
