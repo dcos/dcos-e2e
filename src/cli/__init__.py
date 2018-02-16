@@ -524,6 +524,7 @@ def create(
         )
     except subprocess.CalledProcessError:
         rmtree(path=str(workspace_dir), ignore_errors=True)
+        raise
 
     if enterprise:
         superuser_username = 'admin'
