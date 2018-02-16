@@ -15,7 +15,7 @@ lint:
 	doc8 .
 	flake8 .
 	isort --recursive --check-only
-	mypy src/ tests/
+	mypy src/cli src/dcos_e2e/backends src/dcos_e2e/*.py tests/
 	pip-extra-reqs src/
 	pip-missing-reqs src/
 	pydocstyle

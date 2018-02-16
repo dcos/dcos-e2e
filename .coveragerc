@@ -1,5 +1,6 @@
 [run]
 branch = True
+omit = *_vendor*
 
 [report]
 exclude_lines =
