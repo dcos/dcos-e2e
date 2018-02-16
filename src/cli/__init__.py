@@ -9,6 +9,9 @@ Ideas for improvements
 * Script
 * A mac builder which installs the Homebrew thing
     - TRAVIS_OS_NAME
+* brew test
+* --version option
+* Linuxbrew
 """
 
 import io

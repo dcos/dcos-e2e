@@ -1,7 +1,9 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
+  url "https://github.com/mesosphere/dcos-e2e.git"
   head "https://github.com/mesosphere/dcos-e2e.git"
+  homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
 
   resource "asn1crypto" do
     url "https://files.pythonhosted.org/packages/fc/f1/8db7daa71f414ddabfa056c4ef792e1461ff655c2ae2928a2b675bfed6b4/asn1crypto-0.24.0.tar.gz"
@@ -152,6 +154,11 @@ class Dcosdocker < Formula
   depends_on "python3"
   def install
     virtualenv_install_with_resources
-    # system "python3", *Language::Python.setup_install_args(libexec/"dcos-e2e-master")
+  end
+
+  test do
+      ENV["LC_ALL"] = "en_US.utf-8"
+      ENV["LANG"] = "en_US.utf-8"
+      system "#{bin}/dcos_docker", "--help"
   end
 end
