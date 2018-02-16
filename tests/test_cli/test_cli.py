@@ -578,6 +578,9 @@ class TestInspect:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker inspect [OPTIONS]
@@ -594,8 +597,9 @@ class TestInspect:
               -c, --cluster-id TEXT  If not given, "default" is used.
               --env                  Show details in an environment variable format to eval.
               --help                 Show this message and exit.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
@@ -626,6 +630,9 @@ class TestWait:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['wait', '--help'])
         assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker wait [OPTIONS]
@@ -641,8 +648,9 @@ class TestWait:
                                          Enterprise clusters. By default, on a DC/OS
                                          Enterprise cluster, `admin` is used.
               --help                     Show this message and exit.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
@@ -670,6 +678,9 @@ class TestSync:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['sync', '--help'])
         assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker sync [OPTIONS] [CHECKOUT]
@@ -689,8 +700,9 @@ class TestSync:
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.
               --help                 Show this message and exit.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_help
 
 
@@ -710,6 +722,9 @@ class TestDoctor:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker doctor [OPTIONS]
@@ -718,8 +733,9 @@ class TestDoctor:
 
             Options:
               --help  Show this message and exit.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_help
 
     def test_doctor(self) -> None:
@@ -747,6 +763,9 @@ class TestWeb:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
         expected_help = dedent(
             """\
             Usage: dcos_docker web [OPTIONS]
@@ -759,6 +778,7 @@ class TestWeb:
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.
               --help                 Show this message and exit.
-            """
+            """# noqa: E501,E261
         )
+        # yapf: enable
         assert result.output == expected_help
