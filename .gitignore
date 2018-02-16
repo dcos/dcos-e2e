@@ -106,3 +106,5 @@ package-lock.json
 
 # DC/OS License
 license-key.txt
+.pytest_cache
+/e2e
