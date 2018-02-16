@@ -1160,19 +1160,22 @@ def doctor() -> None:
     free_space = shutil.disk_usage(gettempdir()).free
     free_space_gb = free_space / 1024 / 1024 / 1024
 
-    if free_space_gb < 10:
-        message = (
-            'The default temporary directory ("{tmp_prefix}") has'
-            '{free_space:.1f} GB of free space available. '
-            'Creating a cluster typically takes approximately 2 GB of '
-            'temporary storage. '
-            'If you encounter problems with disk space usage, set the '
-            '``TMPDIR`` environment variable to a suitable temporary '
-            'directory or use the ``--workspace-dir`` option on the '
-            '``dcos_docker create`` command.'
-        )
+    low_space_message = (
+        'The default temporary directory ("{tmp_prefix}") has '
+        '{free_space:.1f} GB of free space available. '
+        'Creating a cluster typically takes approximately 2 GB of '
+        'temporary storage. '
+        'If you encounter problems with disk space usage, set the '
+        '``TMPDIR`` environment variable to a suitable temporary '
+        'directory or use the ``--workspace-dir`` option on the '
+        '``dcos_docker create`` command.'
+    ).format(
+        tmp_prefix=Path('/') / gettempprefix(),
+        free_space=free_space_gb,
+    )
 
-    import pdb; pdb.set_trace()
+    if free_space_gb < 5:
+        _warn(message=low_space_message)
 
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
