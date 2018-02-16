@@ -18,6 +18,6 @@ class Dcosdocker < Formula
   depends_on "python3"
   def install
     virtualenv_install_with_resources
-    system "python3", *Language::Python.setup_install_args(libexec)
+    system "python3", *Language::Python.setup_install_args(libexec/"dcos-e2e-master")
   end
 end
