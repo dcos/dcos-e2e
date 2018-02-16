@@ -250,8 +250,11 @@ Updating DC/OS Test Utils
 -------------------------
 
 `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ is vendored in this repository using `python-vendorize <https://github.com/mwilliamson/python-vendorize>`__.
-To update DC/OS Test Utils, use the following commands:
+To update DC/OS Test Utils:
+
+Update the SHA in ``src/vendorize.toml``.
 
 .. code:: sh
 
+    pip install https://github.com/mwilliamson/python-vendorize.git
     make update-dcos-docker
