@@ -1,4 +1,4 @@
 target = "dcos_e2e/_vendor"
 requires = [
-    "git+https://github.com/dcos/dcos-test-utils",
+    "git+https://github.com/dcos/dcos-test-utils@c9a4fc583a4a0bca18040ad4c7772e187e51aa74",
 ]
