@@ -1,7 +1,9 @@
-class Homebrew < Formula
+class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://nofile.io/g/fE8wkd1eztIVUvciIUBy6FpmJNLTG7UT6kEJTWTHU1H7D2NXUHWrwHdE3zL359XL/dcos-e2e.tar/"
+  url "https://s3.eu-central-1.amazonaws.com/mhrabovcin/dcos-e2e.tar"
+  sha256 "ad0e722bb9b2765667d9b2acfe99a92b670c77fc9d3f41a2eda776c2b2f1ea00"
+
   #
   # resource "six" do
   #   url "https://pypi.python.org/packages/source/s/six/six-1.9.0.tar.gz"
@@ -16,6 +18,6 @@ class Homebrew < Formula
   depends_on "python3"
   def install
     virtualenv_install_with_resources
-    system "python", *Language::Python.setup_install_args(libexec/"dcos-e2e-master")
+    system "python3", *Language::Python.setup_install_args(libexec)
   end
 end
