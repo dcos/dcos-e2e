@@ -22,7 +22,7 @@ lint:
 	pylint *.py src/ tests/
 	pyroma .
 	vulture . --min-confidence 100
-	yapf --diff --recursive src/ tests/
+	yapf --diff --recursive --exclude src/dcos_e2e/_vendor src/ tests/
 	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
@@ -37,7 +37,7 @@ clean:
 .PHONY: fix-lint
 fix-lint:
 	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
-	yapf --in-place --recursive .
+	yapf --in-place --exclude src/dcos_e2e/_vendor --recursive .
 	isort --recursive --apply
 
 .PHONY: clean-artifacts
