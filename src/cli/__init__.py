@@ -456,6 +456,19 @@ def dcos_docker(verbose: None) -> None:
         '/absolute/local/path:/remote/path.'
     ),
 )
+@click.option(
+    '--workspace-dir',
+    type=click.Path(exists=True),
+    help=(
+        'Creating a cluster can use approximately 2 GB of temporary storage. '
+        'Set this option to use a custom "workspace" for this temporary '
+        'storage. '
+        'See '
+        'https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir '
+        'for details on the temporary directory location if this option is '
+        'not set.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
