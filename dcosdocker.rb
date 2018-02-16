@@ -4,6 +4,7 @@ class Dcosdocker < Formula
   url "https://github.com/mesosphere/dcos-e2e.git"
   head "https://github.com/mesosphere/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
+  depends_on "python3"
 
   resource "asn1crypto" do
     url "https://files.pythonhosted.org/packages/fc/f1/8db7daa71f414ddabfa056c4ef792e1461ff655c2ae2928a2b675bfed6b4/asn1crypto-0.24.0.tar.gz"
@@ -151,7 +152,6 @@ class Dcosdocker < Formula
   end
 
 
-  depends_on "python3"
   def install
     virtualenv_install_with_resources
   end

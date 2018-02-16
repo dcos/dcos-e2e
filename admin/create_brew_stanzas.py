@@ -1,11 +1,13 @@
 import subprocess
 from pathlib import Path
+from textwrap import dedent
 from typing import List
 
 
 def get_requirements(requirements_file: Path) -> List[str]:
-    requirements_file = requirements_file.read_text().strip().split('\n')
-    return [line for line in requirements_file if not line.startswith('#')]
+    lines = requirements_file.read_text().strip().split('\n')
+    return [line for line in lines if not line.startswith('#')]
+
 
 def get_resource_stanzas(requirements: List[str]):
     first = requirements[0]
@@ -16,20 +18,45 @@ def get_resource_stanzas(requirements: List[str]):
         args.append(requirement)
 
     result = subprocess.run(args=args, stdout=subprocess.PIPE)
-    return result.stdout
+    return result.stdout.decode()
 
 
-def  get_formula(resource_stanzas: str):
-    import pdb; pdb.set_trace()
-    return (
-        ''
-        '{resource_stanzas}'
-        ''
-    ).format(resource_stanzas=resource_stanzas)
+def get_formula(resource_stanzas: str):
 
-if __name__ == '__main__':
+    pattern = dedent(
+        """\
+        class Dcosdocker < Formula
+          include Language::Python::Virtualenv
+
+          url "https://github.com/mesosphere/dcos-e2e.git"
+          head "https://github.com/mesosphere/dcos-e2e.git"
+          homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
+          depends_on "python3"
+
+        {resource_stanzas}
+
+          def install
+            virtualenv_install_with_resources
+          end
+
+          test do
+              ENV["LC_ALL"] = "en_US.utf-8"
+              ENV["LANG"] = "en_US.utf-8"
+              system "#{{bin}}/dcos_docker", "--help"
+          end
+        end
+        """
+    )
+
+    return pattern.format(resource_stanzas=resource_stanzas)
+
+
+def main():
     requirements_file = Path(__file__).parent.parent / 'requirements.txt'
     requirements = get_requirements(requirements_file=requirements_file)
     resource_stanzas = get_resource_stanzas(requirements=requirements)
-    formula = get_formula(resource_stanzas=resource_stanzas)
-    print(formula)
+    return get_formula(resource_stanzas=resource_stanzas)
+
+if __name__ == '__main__':
+    FORMULA = main()
+    print(FORMULA)
