@@ -4,6 +4,7 @@ dcoscli==0.5.7
 doc8==0.8.0
 flake8-quotes==0.13.0
 flake8==3.5.0
+homebrew-pypi-poet==0.9.0
 isort==4.3.4
 mypy==0.560
 pip_check_reqs==2.0.1

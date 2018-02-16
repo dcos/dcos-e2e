@@ -10,7 +10,8 @@ Ideas for improvements
 * A mac builder which installs the Homebrew thing
     - TRAVIS_OS_NAME
     - brew install, brew audit, brew test
-* Linuxbrew
+* Linuxbrew - test that - good enough?
+* dcos_docker --version
 """
 
 import io
