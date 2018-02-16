@@ -13,7 +13,7 @@ Install dependencies in a virtual environment.
 
 .. code:: sh
 
-    pip install --process-dependency-links --editable .[dev]
+    pip install --editable .[dev]
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
@@ -236,12 +236,13 @@ The release process is as follows.
    Choose "master" as the target.
    Add the changes from the changelog to the release description.
 
-Updating DC/OS Docker
----------------------
+Updating Vendored Tools
+-----------------------
 
-`DC/OS Docker <https://github.com/dcos/dcos-docker>`__ is vendored in this repository using ``git subtree``.
-To update DC/OS Docker, use the following command:
+`DC/OS Docker <https://github.com/dcos/dcos-docker>`__ and `dcos-test-utils <https://github.com/dcos/dcos-test-utils>`__ are is vendored in this repository using ``git subtree``.
+To update these, use the following commands:
 
 .. code:: sh
 
     make update-dcos-docker
+    make update-dcos-test-utils
