@@ -78,14 +78,14 @@ An typical CLI workflow may look like this:
 
 .. code-block:: console
 
-   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
+   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
-   $ dcos_docker create /tmp/dcos_generate_config.sh --agents 5
+   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 5
    921214100
-   $ dcos_docker wait # Uses "default" by default
-   $ dcos_docker run --sync-dir . pytest -k test_tls
+   $ dcos-docker wait # Uses "default" by default
+   $ dcos-docker run --sync-dir . pytest -k test_tls
    ...
-   $ dcos_docker destroy $(dcos_docker list)
+   $ dcos-docker destroy $(dcos-docker list)
 
 Each of these commands and more described in detail in the `full CLI documentation <http://dcos-e2e.readthedocs.io/en/latest/cli.html>`_.
 
