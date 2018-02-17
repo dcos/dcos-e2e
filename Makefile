@@ -8,6 +8,16 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
+.PHONY: yapf
+yapf:
+	yapf \
+	    --diff \
+	    --recursive \
+	    --exclude src/dcos_e2e/_vendor \
+	    --exclude src/dcos_e2e/_version.py \
+	    --exclude versioneer.py \
+	    .
+
 .PHONY: mypy
 mypy:
 	python admin/run_mypy.py
@@ -26,7 +36,6 @@ lint:
 	pylint *.py src/ tests/
 	pyroma .
 	vulture . --min-confidence 100
-	yapf --diff --recursive --exclude src/dcos_e2e/_vendor src/ tests/
 	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
@@ -42,6 +51,12 @@ clean:
 fix-lint:
 	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
 	yapf --in-place --exclude src/dcos_e2e/_vendor --recursive .
+	yapf \
+	    --in-place \
+	    --recursive \
+	    --exclude src/dcos_e2e/_vendor \
+	    --exclude src/dcos_e2e/_version.py \
+	    .
 	isort --recursive --apply
 
 .PHONY: clean-artifacts
