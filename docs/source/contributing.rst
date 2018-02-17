@@ -214,15 +214,11 @@ The release process is as follows.
    Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
    If this is the only change, add an empty entry to the changelog.
 
-#. Bump the version of the software.
-
-   Change ``VERSION`` in ``setup.py``.
-
 #. Commit and push changes.
 
    .. code:: sh
 
-       git commit -am "Bump version"
+       git commit -am "Bump version to $DCOS_E2E_RELEASE"
        git push
 
 #. Create a Pull Request to merge the ``release`` branch into ``master``.
