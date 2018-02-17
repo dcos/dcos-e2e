@@ -2,9 +2,8 @@
 Setup script for DC/OS End to End tests.
 """
 
+import versioneer
 from setuptools import find_packages, setup
-
-VERSION = '2018.01.25.0'
 
 DEPENDENCY_LINKS = []
 
@@ -30,7 +29,8 @@ with open('README.rst') as f:
 
 setup(
     name='DCOS E2E',
-    version=VERSION,
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     author='Adam Dangoor',
     author_email='adangoor@mesosphere.com',
     description='Test helpers for testing DC/OS end to end.',

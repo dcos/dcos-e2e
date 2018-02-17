@@ -10,6 +10,7 @@ def main() -> None:
     args = ['mypy', 'src/', 'tests/']
     ignore_paths = {
         'src/dcos_e2e/_vendor',
+        'src/dcos_e2e/_version.py',
     }
     result = subprocess.run(args=args, stdout=subprocess.PIPE)
     result_lines = result.stdout.decode().strip().split('\n')
