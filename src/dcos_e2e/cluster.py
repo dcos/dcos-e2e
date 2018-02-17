@@ -160,7 +160,7 @@ class Cluster(ContextDecorator):
             auth_user=DcosUser(credentials=CI_CREDENTIALS),
         )
 
-        api_session.wait_for_dcos()
+        api_session.wait_for_dcos()  # type: ignore
 
     def wait_for_dcos_ee(
         self,
@@ -229,8 +229,8 @@ class Cluster(ContextDecorator):
         )
         response.raise_for_status()
 
-        enterprise_session.set_ca_cert()
-        enterprise_session.wait_for_dcos()
+        enterprise_session.set_ca_cert()  # type: ignore
+        enterprise_session.wait_for_dcos()  # type: ignore
 
     def __enter__(self) -> 'Cluster':
         """
