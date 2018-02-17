@@ -40,7 +40,13 @@ clean:
 # Fix some linting errors.
 .PHONY: fix-lint
 fix-lint:
-	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
+	autoflake \
+	    --in-place \
+	    --recursive \
+	    --remove-all-unused-imports \
+	    --remove-unused-variables \
+	    --exclude src/dcos_e2e/_vendor \
+	    .
 	yapf --in-place --exclude src/dcos_e2e/_vendor --recursive .
 	isort --recursive --apply
 
