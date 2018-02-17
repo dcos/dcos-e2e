@@ -333,7 +333,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                invalid_file,
+                str(invalid_file),
             ],
             catch_exceptions=False,
         )
@@ -365,7 +365,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                invalid_file,
+                str(invalid_file),
             ],
             catch_exceptions=False,
         )

@@ -11,7 +11,6 @@ Ideas for improvements
     - TRAVIS_OS_NAME
     - brew install, brew audit, brew test
 * Linuxbrew - test that - good enough?
-* dcos-docker --version
 """
 
 import io
@@ -344,6 +343,7 @@ def _set_logging(
     callback=_set_logging,
 )
 @click.group(name='dcos-docker')
+@click.version_option()
 def dcos_docker(verbose: None) -> None:
     """
     Manage DC/OS clusters on Docker.
