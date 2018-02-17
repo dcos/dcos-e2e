@@ -8,6 +8,10 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
+.PHONY: mypy
+mypy:
+	python admin/run_mypy.py
+
 # Run various linting tools.
 .PHONY: lint
 lint:
@@ -15,7 +19,7 @@ lint:
 	doc8 .
 	flake8 .
 	isort --recursive --check-only
-	mypy src/ tests/
+	$(MAKE) mypy
 	pip-extra-reqs src/
 	pip-missing-reqs src/
 	pydocstyle
