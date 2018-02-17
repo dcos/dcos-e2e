@@ -162,3 +162,4 @@ class Dcosdocker < Formula
       system "#{bin}/dcos-docker", "--help"
   end
 end
+

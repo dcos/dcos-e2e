@@ -83,6 +83,10 @@ docs:
 open-docs:
 	open docs/build/html/index.html
 
+.PHONY: update-homebrew
+update-homebrew:
+	python admin/homebrew_recipe.py > dcosdocker.rb
+
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.
 .PHONY: update-dcos-docker

@@ -10,6 +10,8 @@ Ideas for improvements
 * A mac builder which installs the Homebrew thing
     - TRAVIS_OS_NAME
     - brew install, brew audit, brew test
+    - python admin/homebrew_recipe.py > new_recipe.rb
+    - diff the two recipes
 * Linuxbrew - test that - good enough?
 """
 

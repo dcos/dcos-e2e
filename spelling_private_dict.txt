@@ -18,6 +18,7 @@ dangoor
 dc
 dcos
 dict
+diff
 dir
 enum
 env
