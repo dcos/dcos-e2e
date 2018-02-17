@@ -61,6 +61,7 @@ fix-lint:
 	    --recursive \
 	    --exclude src/dcos_e2e/_vendor \
 	    --exclude src/dcos_e2e/_version.py \
+	    --exclude versioneer.py \
 	    .
 	isort --recursive --apply
 
