@@ -34,6 +34,21 @@ class TestDcosDocker:
     Tests for the top level `dcos-docker` command.
     """
 
+    def test_version(self) -> None:
+        """
+        The CLI version is shown with ``dcos-docker --version``.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['--version'],
+            catch_exceptions=False,
+        )
+
+        assert result.exit_code == 0
+        expected = 'dcos-docker, version'
+        assert expected in result.output
+
     @pytest.mark.parametrize('arguments', [
         [],
         ['--help'],
@@ -55,6 +70,7 @@ class TestDcosDocker:
               Manage DC/OS clusters on Docker.
 
             Options:
+              --version      Show the version and exit.
               -v, --verbose
               --help         Show this message and exit.
 
