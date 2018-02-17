@@ -258,3 +258,12 @@ Update the SHA in ``src/vendorize.toml``.
     python-vendorize
     git add dcos_e2e/_vendor
     git commit -m "Update vendored packages"
+
+Updating the Homebrew Recipe
+----------------------------
+
+To update the Homebrew recipe, run the following command:
+
+.. code:: sh
+
+   make update-homebrew
