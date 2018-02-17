@@ -123,6 +123,9 @@ Before viewing the UI, you may first need to `configure your browser to trust yo
 CLI Reference
 -------------
 
+.. click:: cli:dcos_docker
+  :prog: dcos-docker
+
 .. _dcos-docker-create:
 
 .. click:: cli:create
