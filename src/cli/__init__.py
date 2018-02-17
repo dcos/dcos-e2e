@@ -11,7 +11,6 @@ Ideas for improvements
     - TRAVIS_OS_NAME
     - brew install, brew audit, brew test
 * Linuxbrew - test that - good enough?
-* dcos-docker --version
 """
 
 import io
