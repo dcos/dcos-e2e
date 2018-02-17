@@ -8,6 +8,20 @@ EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
+.PHONY: yapf
+yapf:
+	yapf \
+	    --diff \
+	    --recursive \
+	    --exclude src/dcos_e2e/_vendor \
+	    --exclude src/dcos_e2e/_version.py \
+	    --exclude versioneer.py \
+	    .
+
+.PHONY: mypy
+mypy:
+	python admin/run_mypy.py
+
 # Run various linting tools.
 .PHONY: lint
 lint:
@@ -15,14 +29,13 @@ lint:
 	doc8 .
 	flake8 .
 	isort --recursive --check-only
-	mypy src/cli src/dcos_e2e/backends src/dcos_e2e/*.py tests/
+	$(MAKE) mypy
 	pip-extra-reqs src/
 	pip-missing-reqs src/
 	pydocstyle
 	pylint *.py src/ tests/
 	pyroma .
 	vulture . --min-confidence 100
-	yapf --diff --recursive --exclude src/dcos_e2e/_vendor src/ tests/
 	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
@@ -36,8 +49,20 @@ clean:
 # Fix some linting errors.
 .PHONY: fix-lint
 fix-lint:
-	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
-	yapf --in-place --exclude src/dcos_e2e/_vendor --recursive .
+	autoflake \
+	    --in-place \
+	    --recursive \
+	    --remove-all-unused-imports \
+	    --remove-unused-variables \
+	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py \
+	    .
+	yapf \
+	    --in-place \
+	    --recursive \
+	    --exclude src/dcos_e2e/_vendor \
+	    --exclude src/dcos_e2e/_version.py \
+	    --exclude versioneer.py \
+	    .
 	isort --recursive --apply
 
 .PHONY: clean-artifacts

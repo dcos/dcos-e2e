@@ -159,7 +159,7 @@ class Dcosdocker < Formula
   test do
       ENV["LC_ALL"] = "en_US.utf-8"
       ENV["LANG"] = "en_US.utf-8"
-      system "#{bin}/dcos_docker", "--help"
+      system "#{bin}/dcos-docker", "--help"
   end
 end
 

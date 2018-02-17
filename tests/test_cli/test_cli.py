@@ -31,7 +31,7 @@ from cli import dcos_docker
 
 class TestDcosDocker:
     """
-    Tests for the top level `dcos_docker` command.
+    Tests for the top level `dcos-docker` command.
     """
 
     @pytest.mark.parametrize('arguments', [
@@ -40,7 +40,7 @@ class TestDcosDocker:
     ])
     def test_help(self, arguments: List[str]) -> None:
         """
-        Help test is shown with `dcos_docker` and `dcos_docker --help`.
+        Help test is shown with `dcos-docker` and `dcos-docker --help`.
         """
         runner = CliRunner()
         result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
@@ -50,7 +50,7 @@ class TestDcosDocker:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker [OPTIONS] COMMAND [ARGS]...
+            Usage: dcos-docker [OPTIONS] COMMAND [ARGS]...
 
               Manage DC/OS clusters on Docker.
 
@@ -81,7 +81,7 @@ class TestCreate:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker create --help`.
+        Help text is shown with `dcos-docker create --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -95,7 +95,7 @@ class TestCreate:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker create [OPTIONS] ARTIFACT
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
               Create a DC/OS cluster.
 
@@ -199,7 +199,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos_docker create [OPTIONS] ARTIFACT
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" is not in the format /absolute/local/path:/remote/path.
             """# noqa: E501,E261
@@ -228,7 +228,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos_docker create [OPTIONS] ARTIFACT
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" does not exist.
             """# noqa: E501,E261
@@ -264,7 +264,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos_docker create [OPTIONS] ARTIFACT
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "some/remote is not an absolute path.
             """# noqa: E501,E261
@@ -311,7 +311,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos_docker create [OPTIONS] ARTIFACT
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
             """# noqa: E501,E261
@@ -333,7 +333,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                invalid_file,
+                str(invalid_file),
             ],
             catch_exceptions=False,
         )
@@ -343,7 +343,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-           Usage: dcos_docker create [OPTIONS] ARTIFACT
+           Usage: dcos-docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "@" is not valid YAML
             """# noqa: E501,E261
@@ -365,7 +365,7 @@ class TestCreate:
                 'create',
                 str(oss_artifact),
                 '--extra-config',
-                invalid_file,
+                str(invalid_file),
             ],
             catch_exceptions=False,
         )
@@ -375,7 +375,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
            """\
-           Usage: dcos_docker create [OPTIONS] ARTIFACT
+           Usage: dcos-docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
             """# noqa: E501,E261
@@ -410,7 +410,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
            """\
-            Usage: dcos_docker create [OPTIONS] ARTIFACT
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "-c" / "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
             """# noqa: E501,E261
@@ -528,7 +528,7 @@ class TestDestroy:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker destroy --help`.
+        Help text is shown with `dcos-docker destroy --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -542,11 +542,11 @@ class TestDestroy:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker destroy [OPTIONS] [CLUSTER_IDS]...
+            Usage: dcos-docker destroy [OPTIONS] [CLUSTER_IDS]...
 
               Destroy clusters.
 
-              To destroy all clusters, run ``dcos_docker destroy $(dcos_docker list)``.
+              To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
 
             Options:
               --help  Show this message and exit.
@@ -598,7 +598,7 @@ class TestList:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker list --help`.
+        Help text is shown with `dcos-docker list --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -609,7 +609,7 @@ class TestList:
         assert result.exit_code == 0
         expected_help = dedent(
             """\
-            Usage: dcos_docker list [OPTIONS]
+            Usage: dcos-docker list [OPTIONS]
 
               List all clusters.
 
@@ -627,7 +627,7 @@ class TestInspect:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker inspect --help`.
+        Help text is shown with `dcos-docker inspect --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -641,14 +641,14 @@ class TestInspect:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker inspect [OPTIONS]
+            Usage: dcos-docker inspect [OPTIONS]
 
               Show cluster details.
 
               To quickly get environment variables to use with Docker tooling, use the
               ``--env`` flag.
 
-              Run ``eval $(dcos_docker inspect <CLUSTER_ID> --env)``, then run ``docker
+              Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run ``docker
               exec -it $MASTER_0`` to enter the first master, for example.
 
             Options:
@@ -683,7 +683,7 @@ class TestWait:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker inspect --help`.
+        Help text is shown with `dcos-docker inspect --help`.
         """
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['wait', '--help'])
@@ -693,7 +693,7 @@ class TestWait:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker wait [OPTIONS]
+            Usage: dcos-docker wait [OPTIONS]
 
               Wait for DC/OS to start.
 
@@ -731,7 +731,7 @@ class TestSync:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker sync --help`.
+        Help text is shown with `dcos-docker sync --help`.
         """
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['sync', '--help'])
@@ -741,7 +741,7 @@ class TestSync:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker sync [OPTIONS] [DCOS_CHECKOUT_DIR]
+            Usage: dcos-docker sync [OPTIONS] [DCOS_CHECKOUT_DIR]
 
               Sync files from a DC/OS checkout to master nodes.
 
@@ -771,7 +771,7 @@ class TestDoctor:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker doctor --help`.
+        Help text is shown with `dcos-docker doctor --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -785,7 +785,7 @@ class TestDoctor:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker doctor [OPTIONS]
+            Usage: dcos-docker doctor [OPTIONS]
 
               Diagnose common issues which stop DC/OS E2E from working correctly.
 
@@ -812,7 +812,7 @@ class TestWeb:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker web --help`.
+        Help text is shown with `dcos-docker web --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -826,12 +826,12 @@ class TestWeb:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker web [OPTIONS]
+            Usage: dcos-docker web [OPTIONS]
 
               Open the browser at the web UI.
 
               Note that the web UI may not be available at first. Consider using
-              ``dcos_docker wait`` before running this command.
+              ``dcos-docker wait`` before running this command.
 
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.
@@ -849,7 +849,7 @@ class TestRun:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos_docker run --help`.
+        Help text is shown with `dcos-docker run --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -863,16 +863,16 @@ class TestRun:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos_docker run [OPTIONS] NODE_ARGS...
+            Usage: dcos-docker run [OPTIONS] NODE_ARGS...
 
               Run an arbitrary command on a node.
 
               This command sets up the environment so that ``pytest`` can be run.
 
-              For example, run ``dcos_docker run --cluster-id 1231599 pytest -k
+              For example, run ``dcos-docker run --cluster-id 1231599 pytest -k
               test_tls.py``.
 
-              Or, with sync: ``dcos_docker run --sync-dir . --cluster-id 1231599 pytest -k
+              Or, with sync: ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k
               test_tls.py``.
 
             Options:

@@ -9,7 +9,10 @@
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS,_vendor
+ignore=CVS,
+       _vendor,
+      versioneer.py,
+      _version.py,
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -82,6 +85,7 @@ disable=line-too-long,
         invalid-sequence-index,
         # Let isort deal with sorting
         ungrouped-imports,
+        wrong-import-order,
         # Let pydocstyle deal with docstrings
         missing-docstring,
         # We don't need everything to be documented because of mypy

@@ -5,13 +5,12 @@ Ideas for improvements
 ----------------------
 
 * Windows support - Vagrant?
-* dcos_docker run -—no-set-env
+* dcos-docker run -—no-set-env
 * Script
 * A mac builder which installs the Homebrew thing
     - TRAVIS_OS_NAME
     - brew install, brew audit, brew test
 * Linuxbrew - test that - good enough?
-* dcos_docker --version
 """
 
 import io
@@ -343,7 +342,8 @@ def _set_logging(
     count=True,
     callback=_set_logging,
 )
-@click.group()
+@click.group(name='dcos-docker')
+@click.version_option()
 def dcos_docker(verbose: None) -> None:
     """
     Manage DC/OS clusters on Docker.
@@ -665,7 +665,7 @@ def destroy(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
 
-    To destroy all clusters, run ``dcos_docker destroy $(dcos_docker list)``.
+    To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
     """
     for cluster_id in cluster_ids:
         if cluster_id not in _existing_cluster_ids():
@@ -855,7 +855,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     To quickly get environment variables to use with Docker tooling, use the
     ``--env`` flag.
 
-    Run ``eval $(dcos_docker inspect <CLUSTER_ID> --env)``, then run
+    Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
@@ -943,10 +943,10 @@ def run(
     This command sets up the environment so that ``pytest`` can be run.
 
     For example, run
-    ``dcos_docker run --cluster-id 1231599 pytest -k test_tls.py``.
+    ``dcos-docker run --cluster-id 1231599 pytest -k test_tls.py``.
 
     Or, with sync:
-    ``dcos_docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
+    ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
     """  # noqa: E501
     if sync_dir is not None:
         ctx.invoke(
@@ -1048,7 +1048,7 @@ def web(cluster_id: str) -> None:
     Open the browser at the web UI.
 
     Note that the web UI may not be available at first.
-    Consider using ``dcos_docker wait`` before running this command.
+    Consider using ``dcos-docker wait`` before running this command.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     master = next(iter(cluster_containers.masters))
@@ -1189,7 +1189,7 @@ def doctor() -> None:
         'If you encounter problems with disk space usage, set the '
         '``TMPDIR`` environment variable to a suitable temporary '
         'directory or use the ``--workspace-dir`` option on the '
-        '``dcos_docker create`` command.'
+        '``dcos-docker create`` command.'
     ).format(
         tmp_prefix=Path('/') / gettempprefix(),
         free_space=free_space_gb,
