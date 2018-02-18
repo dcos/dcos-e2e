@@ -764,45 +764,11 @@ def run(
         )
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-
-    def ip_addresses(nodes: Iterable[Container]) -> str:
-        return ','.join(n.attrs['NetworkSettings']['IPAddress'] for n in nodes)
-
-    env_file = '/opt/mesosphere/environment.export'
-    test_dir = '/opt/mesosphere/active/dcos-integration-test/'
-    args = ['source', env_file, '&&', 'cd', test_dir, '&&'] + list(node_args)
-
-    environment = {
-        'MASTER_HOSTS': ip_addresses(cluster_containers.masters),
-        'SLAVE_HOSTS': ip_addresses(cluster_containers.agents),
-        'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster_containers.public_agents),
-        'DCOS_LOGIN_UNAME': dcos_login_uname,
-        'DCOS_LOGIN_PW': dcos_login_pw,
-        # Without this we have display errors.
-        # See https://github.com/moby/moby/issues/25450.
-        'COLUMNS': shutil.get_terminal_size().columns,
-        'LINES': shutil.get_terminal_size().lines,
-        'TERM': os.environ['TERM'],
-    }
-
-    master = next(iter(cluster_containers.cluster.masters))
-    master.run(
-        args=args,
-        env=environment,
-        # shell=True,
-        user=cluster_containers.cluster.default_ssh_user,
+    cluster_containers.cluster.run_integration_tests(
+        pytest_command=list(node_args),
     )
 
-    # env_vars = []
-    # for key, value in environment.items():
-    #     env_vars += ['-e', '{key}={value}'.format(key=key, value=value)]
-    #
-    # master = next(iter(cluster_containers.masters))
-    # docker_exec = ['docker', 'exec', '-it']
-    # cmd = ['/bin/bash', '-c', '"{args}"'.format(args=' '.join(args))]
-    # system_cmd = docker_exec + env_vars + [master.id] + cmd
-    # joined = ' '.join(system_cmd)
-    # os.system(joined)
+    #cat /etc/hostname - this gives the container name
 
 
 def _tar_with_filter(

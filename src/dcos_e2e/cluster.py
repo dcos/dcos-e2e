@@ -389,7 +389,7 @@ class Cluster(ContextDecorator):
             user=self.default_ssh_user,
             log_output_live=log_output_live,
             env=environment_variables,
-            shell=True,
+            shell=False,
         )
 
     def destroy(self) -> None:
