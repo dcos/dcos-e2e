@@ -4,7 +4,7 @@ Abstract base classes.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from ..node import Node
 
@@ -20,7 +20,7 @@ class ClusterManager(abc.ABC):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Dict[Path, Path],
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
         cluster_backend: 'ClusterBackend',
     ) -> None:
         """
@@ -30,7 +30,7 @@ class ClusterManager(abc.ABC):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: A mapping of host paths to paths on
+            files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to

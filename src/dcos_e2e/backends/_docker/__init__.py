@@ -12,7 +12,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 import docker
 import yaml
@@ -247,7 +247,7 @@ class DockerCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Dict[Path, Path],
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
         cluster_backend: Docker,
     ) -> None:
         """
@@ -257,11 +257,11 @@ class DockerCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: A mapping of host paths to paths on
+            files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS. Currently on DC/OS
-                Docker the only supported paths on the installer are in the
-                `/genconf` directory.
+                the installer node before installing DC/OS.
+                Currently on DC/OS Docker the only supported paths on the
+                installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
         # To avoid conflicts, we use random container names.
@@ -342,7 +342,7 @@ class DockerCluster(ClusterManager):
             private_key_path=ssh_dir / 'id_rsa',
         )
 
-        for host_path, installer_path in files_to_copy_to_installer.items():
+        for host_path, installer_path in files_to_copy_to_installer:
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))

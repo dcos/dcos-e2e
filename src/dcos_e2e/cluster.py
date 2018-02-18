@@ -5,7 +5,7 @@ DC/OS Cluster management tools. Independent of back ends.
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from retry import retry
 
@@ -31,7 +31,7 @@ class Cluster(ContextDecorator):
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -41,7 +41,7 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: A mapping of host paths to paths on
+            files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
@@ -51,7 +51,7 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
+            files_to_copy_to_installer=files_to_copy_to_installer,
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
@@ -87,7 +87,7 @@ class Cluster(ContextDecorator):
             masters=len(masters),
             agents=len(agents),
             public_agents=len(public_agents),
-            files_to_copy_to_installer=None,
+            files_to_copy_to_installer=(),
             cluster_backend=backend,
         )
 

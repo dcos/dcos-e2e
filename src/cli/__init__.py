@@ -398,7 +398,7 @@ def create(
         if security_mode is not None:
             extra_config['security'] = security_mode
 
-    files_to_copy_to_installer = {}
+    files_to_copy_to_installer = []
     if genconf_dir is not None:
         container_genconf_path = Path('/genconf')
         for genconf_file in genconf_dir.glob('**/*'):
@@ -406,7 +406,7 @@ def create(
                 continue
             genconf_relative = genconf_file.relative_to(genconf_dir)
             relative_path = container_genconf_path / genconf_relative
-            files_to_copy_to_installer[genconf_file] = relative_path
+            files_to_copy_to_installer.append((genconf_file, relative_path))
 
     cluster_backend = Docker(
         custom_master_mounts=custom_master_mounts,
