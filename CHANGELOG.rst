@@ -16,6 +16,8 @@ Next
 -  Documentation is now on Read The Docs.
 -  Add a Command Line Interface.
 -  Vendor ``dcos_test_utils`` so ``--process-dependency-links`` is not needed.
+-  Backwards incompatible change:
+   ``Cluter``\'s ``files_to_copy_to_installer`` argument is now a ``List`` of ``Tuple``\s rather than a ``Dict``.
 
 2018.01.25.0
 ------------
