@@ -714,19 +714,26 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     '--dcos-login-uname',
     type=str,
     default='admin',
-    help='The username to set the ``DCOS_LOGIN_UNAME`` as.'
+    help=(
+        'The username to set the ``DCOS_LOGIN_UNAME`` environment variable to.'
+    ),
 )
 @click.option(
     '--dcos-login-pw',
     type=str,
     default='admin',
-    help='The password to set the ``DCOS_LOGIN_PW`` as.'
+    help=(
+        'The password to set the ``DCOS_LOGIN_PW`` environment variable to.'
+    ),
 )
 @click.argument('node_args', type=str, nargs=-1, required=True)
 @click.option(
     '--sync-dir',
     type=click.Path(exists=True),
-    help='Syncs to DC/OS checkout specified before running the command.',
+    help=(
+        'The path to a DC/OS checkout. '
+        'Part of this checkout will be synced before the command is run.'
+    ),
     callback=validate_path_is_directory,
 )
 @click.pass_context
@@ -756,14 +763,9 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    args = [
-        'source',
-        '/opt/mesosphere/environment.export',
-        '&&',
-        'cd',
-        '/opt/mesosphere/active/dcos-integration-test/',
-        '&&',
-    ] + list(node_args)
+    env_file = '/opt/mesosphere/environment.export'
+    test_dir = '/opt/mesosphere/active/dcos-integration-test/'
+    args = ['source', env_file, '&&', 'cd', test_dir, '&&'] + list(node_args)
 
     def ip_addresses(nodes: Iterable[Node]) -> str:
         return ','.join(map(lambda node: str(node.public_ip_address), nodes))
@@ -786,23 +788,14 @@ def run(
         'TERM': os.environ['TERM'],
     }
 
-    docker_env_vars = []
+    env_vars = []
     for key, value in environment.items():
-        docker_env_vars.append('-e')
-        docker_env_vars.append('{key}={value}'.format(key=key, value=value))
+        env_vars += ['-e', '{key}={value}'.format(key=key, value=value)]
 
     master = next(iter(cluster_containers.masters))
-    system_cmd = [
-        'docker',
-        'exec',
-        '-it',
-    ] + docker_env_vars + [
-        master.id,
-        '/bin/bash',
-        '-c',
-        '"{args}"'.format(args=' '.join(args)),
-    ]
-
+    docker_exec = ['docker', 'exec', '-it']
+    cmd = ['/bin/bash', '-c', '"{args}"'.format(args=' '.join(args))]
+    system_cmd = docker_exec + env_vars + [master.id] + cmd
     joined = ' '.join(system_cmd)
     os.system(joined)
 
