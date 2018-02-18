@@ -763,14 +763,9 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    args = [
-        'source',
-        '/opt/mesosphere/environment.export',
-        '&&',
-        'cd',
-        '/opt/mesosphere/active/dcos-integration-test/',
-        '&&',
-    ] + list(node_args)
+    env_file = '/opt/mesosphere/environment.export'
+    test_dir = '/opt/mesosphere/active/dcos-integration-test/'
+    args = ['source', env_file, '&&', 'cd', test_dir, '&&'] + list(node_args)
 
     def ip_addresses(nodes: Iterable[Node]) -> str:
         return ','.join(map(lambda node: str(node.public_ip_address), nodes))
