@@ -154,7 +154,10 @@ class Node:
                 code.
         """
         ssh_args = self._compose_ssh_command(
-            args=args, user=user, env=env, shell=shell
+            args=args,
+            user=user,
+            env=env,
+            shell=shell,
         )
         import os
         os.system(' '.join(ssh_args))
