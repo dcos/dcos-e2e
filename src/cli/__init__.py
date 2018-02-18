@@ -726,7 +726,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @click.option(
     '--sync-dir',
     type=click.Path(exists=True),
-    help='Syncs to DC/OS checkout specified before running the command.',
+    help=(
+        'The path to a DC/OS checkout. '
+        'Part of this checkout will be synced before the command is run.'
+    ),
     callback=validate_path_is_directory,
 )
 @click.pass_context
