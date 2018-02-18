@@ -79,6 +79,8 @@ untar
 url
 username
 utils
+validator
+validators
 vendored
 versioning
 vm
