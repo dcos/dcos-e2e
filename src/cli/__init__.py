@@ -788,15 +788,14 @@ def run(
         'TERM': os.environ['TERM'],
     }
 
-    docker_env_vars = []
+    env_vars = []
     for key, value in environment.items():
-        docker_env_vars.append('-e')
-        docker_env_vars.append('{key}={value}'.format(key=key, value=value))
+        env_vars += ['-e', '{key}={value}'.format(key=key, value=value)]
 
     master = next(iter(cluster_containers.masters))
     docker_exec = ['docker', 'exec', '-it']
     cmd = ['/bin/bash', '-c', '"{args}"'.format(args=' '.join(args))]
-    system_cmd = docker_exec + docker_env_vars + [master.id] + cmd
+    system_cmd = docker_exec + env_vars + [master.id] + cmd
     joined = ' '.join(system_cmd)
     os.system(joined)
 
