@@ -846,8 +846,8 @@ class TestWeb:
 
               Open the browser at the web UI.
 
-              Note that the web UI may not be available at first. Consider using
-              ``dcos-docker wait`` before running this command.
+              Note that the web UI may not be available at first. Consider using ``dcos-
+              docker wait`` before running this command.
 
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.

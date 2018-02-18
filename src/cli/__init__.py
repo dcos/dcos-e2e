@@ -1,25 +1,11 @@
 """
 A CLI for controlling DC/OS clusters on Docker.
-
-Ideas for improvements
-----------------------
-
-* Windows support - Vagrant?
-* dcos-docker run -—no-set-env
-* Script
-* A mac builder which installs the Homebrew thing
-    - TRAVIS_OS_NAME
-    - brew install, brew audit, brew test
-    - python admin/homebrew_recipe.py > new_recipe.rb
-    - diff the two recipes
-* Linuxbrew - test that - good enough?
 """
 
 import io
 import json
 import logging
 import os
-import re
 import shutil
 import subprocess
 import tarfile
@@ -45,7 +31,6 @@ import click
 import click_spinner
 import docker
 import urllib3
-import yaml
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -54,33 +39,24 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.distributions import Distribution
-from dcos_e2e.docker_storage_drivers import DockerStorageDriver
-from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
-_LINUX_DISTRIBUTIONS = {
-    'centos-7': Distribution.CENTOS_7,
-    'ubuntu-16.04': Distribution.UBUNTU_16_04,
-    'coreos': Distribution.COREOS,
-    'fedora-23': Distribution.FEDORA_23,
-    'debian-8': Distribution.DEBIAN_8,
-}
-
-_DOCKER_VERSIONS = {
-    '1.13.1': DockerVersion.v1_13_1,
-    '1.11.2': DockerVersion.v1_11_2,
-}
-
-_DOCKER_STORAGE_DRIVERS = {
-    'aufs': DockerStorageDriver.AUFS,
-    'overlay': DockerStorageDriver.OVERLAY,
-    'overlay2': DockerStorageDriver.OVERLAY_2,
-}
-
-_CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
-_WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
-_VARIANT_LABEL_KEY = 'dcos_e2e.variant'
+from ._common import (
+    CLUSTER_ID_LABEL_KEY,
+    DOCKER_STORAGE_DRIVERS,
+    DOCKER_VERSIONS,
+    LINUX_DISTRIBUTIONS,
+    VARIANT_LABEL_KEY,
+    WORKSPACE_DIR_LABEL_KEY,
+    existing_cluster_ids,
+)
+from ._validators import (
+    validate_cluster_exists,
+    validate_cluster_id,
+    validate_dcos_configuration,
+    validate_path_is_directory,
+    validate_path_pair,
+)
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -129,168 +105,6 @@ class _InspectView:
         Return dictionary with information to be shown to users.
         """
         return {'docker_container_name': self._container.name}
-
-
-def _existing_cluster_ids() -> Set[str]:
-    """
-    Return the IDs of existing clusters.
-    """
-    client = docker.from_env(version='auto')
-    filters = {'label': _CLUSTER_ID_LABEL_KEY}
-    containers = client.containers.list(filters=filters)
-    return set(
-        [container.labels[_CLUSTER_ID_LABEL_KEY] for container in containers]
-    )
-
-
-def _validate_dcos_configuration(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Union[int, bool, str],
-) -> Dict[str, Any]:
-    """
-    Validate that a given value is a file containing a YAML map.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value is None:
-        return {}
-
-    content = Path(str(value)).read_text()
-
-    try:
-        return dict(yaml.load(content) or {})
-    except ValueError:
-        message = '"{content}" is not a valid DC/OS configuration'.format(
-            content=content,
-        )
-    except yaml.YAMLError:
-        message = '"{content}" is not valid YAML'.format(content=content)
-
-    raise click.BadParameter(message=message)
-
-
-def _validate_cluster_id(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> str:
-    """
-    Validate that a given value is a YAML map.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value in _existing_cluster_ids():
-        message = 'A cluster with the id "{value}" already exists'.format(
-            value=value,
-        )
-        raise click.BadParameter(message=message)
-
-    # This matches the Docker ID regular expression.
-    # This regular expression can be seen by running:
-    # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
-    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
-        message = (
-            'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-            'are allowed and the cluster ID cannot be empty.'
-        ).format(value=value)
-        raise click.BadParameter(message)
-
-    return str(value)
-
-
-def _validate_cluster_exists(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> str:
-    """
-    Validate that a cluster exists with the given name.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value is None:
-        if 'default' in _existing_cluster_ids():
-            return 'default'
-        message = '--cluster-id was not given and no cluster "default" exists'
-        raise click.BadParameter(message)
-
-    cluster_id = str(value)
-    if cluster_id not in _existing_cluster_ids():
-        message = 'Cluster "{value}" does not exist'.format(value=value)
-        raise click.BadParameter(message)
-
-    return cluster_id
-
-
-def _validate_path_is_directory(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> Optional[Path]:
-    """
-    Validate that a path is a directory.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value is None:
-        return None
-
-    path = Path(str(value))
-    if not path.is_dir():
-        message = '"{path}" is not a directory.'.format(path=str(path))
-        raise click.BadParameter(message=message)
-
-    return path
-
-
-def _validate_path_pair(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> List[Tuple[Path, Path]]:
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    result = []  # type: List[Tuple[Path, Path]]
-
-    if value is None:
-        return result
-
-    for path_pair in value:
-        try:
-            [local_path, remote_path] = list(map(Path, path_pair.split(':')))
-        except ValueError:
-            message = (
-                '"{path_pair}" is not in the format '
-                '/absolute/local/path:/remote/path.'
-            ).format(path_pair=path_pair)
-            raise click.BadParameter(message=message)
-
-        if not local_path.exists():
-            message = '"{local_path}" does not exist.'.format(
-                local_path=local_path,
-            )
-            raise click.BadParameter(message=message)
-
-        if not remote_path.is_absolute():
-            message = '"{remote_path} is not an absolute path.'.format(
-                remote_path=remote_path,
-            )
-            raise click.BadParameter(message=message)
-
-        result.append((local_path, remote_path))
-
-    return result
 
 
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
@@ -359,21 +173,21 @@ def dcos_docker(verbose: None) -> None:
 @click.argument('artifact', type=click.Path(exists=True))
 @click.option(
     '--docker-version',
-    type=click.Choice(sorted(_DOCKER_VERSIONS.keys())),
+    type=click.Choice(sorted(DOCKER_VERSIONS.keys())),
     default='1.13.1',
     show_default=True,
     help='The Docker version to install on the nodes.',
 )
 @click.option(
     '--linux-distribution',
-    type=click.Choice(sorted(_LINUX_DISTRIBUTIONS.keys())),
+    type=click.Choice(sorted(LINUX_DISTRIBUTIONS.keys())),
     default='centos-7',
     show_default=True,
     help='The Linux distribution to use on the nodes.',
 )
 @click.option(
     '--docker-storage-driver',
-    type=click.Choice(sorted(_DOCKER_STORAGE_DRIVERS.keys())),
+    type=click.Choice(sorted(DOCKER_STORAGE_DRIVERS.keys())),
     default=None,
     show_default=False,
     help=(
@@ -405,7 +219,7 @@ def dcos_docker(verbose: None) -> None:
 @click.option(
     '--extra-config',
     type=click.Path(exists=True),
-    callback=_validate_dcos_configuration,
+    callback=validate_dcos_configuration,
     help=(
         'The path to a file including DC/OS configuration YAML. '
         'The contents of this file will be added to add to a default '
@@ -425,7 +239,7 @@ def dcos_docker(verbose: None) -> None:
     '--cluster-id',
     type=str,
     default=uuid.uuid4().hex,
-    callback=_validate_cluster_id,
+    callback=validate_cluster_id,
     help=(
         'A unique identifier for the cluster. '
         'Defaults to a random value. '
@@ -445,7 +259,7 @@ def dcos_docker(verbose: None) -> None:
 @click.option(
     '--genconf-dir',
     type=click.Path(exists=True),
-    callback=_validate_path_is_directory,
+    callback=validate_path_is_directory,
     help=(
         'Path to a directory that contains additional files for '
         'DC/OS installer. All files from this directory will be copied to the '
@@ -455,7 +269,7 @@ def dcos_docker(verbose: None) -> None:
 @click.option(
     '--copy-to-master',
     type=str,
-    callback=_validate_path_pair,
+    callback=validate_path_pair,
     multiple=True,
     help=(
         'Files to copy to master nodes before installing DC/OS. '
@@ -467,7 +281,7 @@ def dcos_docker(verbose: None) -> None:
 @click.option(
     '--workspace-dir',
     type=click.Path(exists=True),
-    callback=_validate_path_is_directory,
+    callback=validate_path_is_directory,
     help=(
         'Creating a cluster can use approximately 2 GB of temporary storage. '
         'Set this option to use a custom "workspace" for this temporary '
@@ -582,13 +396,13 @@ def create(
         custom_master_mounts=custom_master_mounts,
         custom_agent_mounts=custom_agent_mounts,
         custom_public_agent_mounts=custom_public_agent_mounts,
-        linux_distribution=_LINUX_DISTRIBUTIONS[linux_distribution],
-        docker_version=_DOCKER_VERSIONS[docker_version],
-        storage_driver=_DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
+        linux_distribution=LINUX_DISTRIBUTIONS[linux_distribution],
+        docker_version=DOCKER_VERSIONS[docker_version],
+        storage_driver=DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
         docker_container_labels={
-            _CLUSTER_ID_LABEL_KEY: cluster_id,
-            _WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
-            _VARIANT_LABEL_KEY: 'ee' if enterprise else '',
+            CLUSTER_ID_LABEL_KEY: cluster_id,
+            WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
+            VARIANT_LABEL_KEY: 'ee' if enterprise else '',
         },
         workspace_dir=workspace_dir,
     )
@@ -653,7 +467,7 @@ def list_clusters() -> None:
     """
     List all clusters.
     """
-    for cluster_id in _existing_cluster_ids():
+    for cluster_id in existing_cluster_ids():
         click.echo(cluster_id)
 
 
@@ -670,7 +484,7 @@ def destroy(cluster_ids: List[str]) -> None:
     To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
     """
     for cluster_id in cluster_ids:
-        if cluster_id not in _existing_cluster_ids():
+        if cluster_id not in existing_cluster_ids():
             warning = 'Cluster "{cluster_id}" does not exist'.format(
                 cluster_id=cluster_id,
             )
@@ -703,7 +517,7 @@ class _ClusterContainers:
         Args:
             cluster_id: The ID of the cluster.
         """
-        self._cluster_id_label = _CLUSTER_ID_LABEL_KEY + '=' + cluster_id
+        self._cluster_id_label = CLUSTER_ID_LABEL_KEY + '=' + cluster_id
 
     def _containers_by_node_type(
         self,
@@ -757,7 +571,7 @@ class _ClusterContainers:
         Return whether the cluster is a DC/OS Enterprise cluster.
         """
         master_container = next(iter(self.masters))
-        return bool(master_container.labels[_VARIANT_LABEL_KEY] == 'ee')
+        return bool(master_container.labels[VARIANT_LABEL_KEY] == 'ee')
 
     @property
     def cluster(self) -> Cluster:
@@ -774,7 +588,7 @@ class _ClusterContainers:
     @property
     def workspace_dir(self) -> Path:
         container = next(iter(self.masters))
-        workspace_dir = container.labels[_WORKSPACE_DIR_LABEL_KEY]
+        workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
         return Path(workspace_dir)
 
 
@@ -783,7 +597,7 @@ class _ClusterContainers:
     '-c',
     '--cluster-id',
     type=str,
-    callback=_validate_cluster_exists,
+    callback=validate_cluster_exists,
     default=None,
     help='If not given, "default" is used.',
 )
@@ -841,7 +655,7 @@ def wait(
     '-c',
     '--cluster-id',
     type=str,
-    callback=_validate_cluster_exists,
+    callback=validate_cluster_exists,
     default=None,
     help='If not given, "default" is used.',
 )
@@ -907,7 +721,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     '-c',
     '--cluster-id',
     type=str,
-    callback=_validate_cluster_exists,
+    callback=validate_cluster_exists,
     default=None,
     help='If not given, "default" is used.',
 )
@@ -928,7 +742,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     '--sync-dir',
     type=click.Path(exists=True),
     help='Syncs to DC/OS checkout specified before running the command.',
-    callback=_validate_path_is_directory,
+    callback=validate_path_is_directory,
 )
 @click.pass_context
 def run(
@@ -1041,7 +855,7 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     '-c',
     '--cluster-id',
     type=str,
-    callback=_validate_cluster_exists,
+    callback=validate_cluster_exists,
     default=None,
     help='If not given, "default" is used.',
 )
@@ -1063,7 +877,7 @@ def web(cluster_id: str) -> None:
     '-c',
     '--cluster-id',
     type=str,
-    callback=_validate_cluster_exists,
+    callback=validate_cluster_exists,
     default=None,
     help='If not given, "default" is used.',
 )
@@ -1206,16 +1020,14 @@ def doctor() -> None:
     storage_driver_url = (
         'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
     )
-    if host_driver not in _DOCKER_STORAGE_DRIVERS:
+    if host_driver not in DOCKER_STORAGE_DRIVERS:
         message = (
             "The host's Docker storage driver is \"{host_driver}\". "
             'We recommend that you use one of: {supported_drivers}. '
             'See {help_url}.'
         ).format(
             host_driver=host_driver,
-            supported_drivers=', '.join(
-                sorted(_DOCKER_STORAGE_DRIVERS.keys())
-            ),
+            supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
             help_url=storage_driver_url,
         )
         _warn(message)

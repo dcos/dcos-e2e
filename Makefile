@@ -105,6 +105,7 @@ fix-lint:
 	    --recursive \
 	    --remove-all-unused-imports \
 	    --remove-unused-variables \
+	    --expand-star-imports \
 	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py \
 	    .
 	yapf \
