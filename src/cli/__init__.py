@@ -1112,7 +1112,3 @@ def doctor() -> None:
         message += mac_message
 
     _info(message=message)
-
-
-if __name__ == '__main__':
-    dcos_docker()
