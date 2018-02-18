@@ -764,9 +764,7 @@ def run(
         )
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    cluster_containers.cluster.run_integration_tests(
-        pytest_command=list(node_args),
-    )
+    cluster_containers.cluster.run_integration_tests(pytest_command=node_args)
 
     #cat /etc/hostname - this gives the container name
 
