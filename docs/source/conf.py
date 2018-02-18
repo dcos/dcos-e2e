@@ -60,6 +60,8 @@ nitpicky = True
 warning_is_error = True
 nitpick_ignore = [
     ('py:exc', 'RetryError'),
+    # See https://bugs.python.org/issue31024 for why Sphinx cannot find this.
+    ('py:class', 'typing.Tuple'),
 ]
 
 html_show_copyright = False
