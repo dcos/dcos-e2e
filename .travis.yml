@@ -7,7 +7,6 @@ addons:
     packages:
     - docker-ce
     - enchant
-    - make
 language: python
 python:
 - '3.5'
@@ -44,7 +43,7 @@ install:
 cache: pip
 before_script:
 - make docs
-- make lint --jobs --output-sync=target
+- make lint
 - travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
 script:
 - pytest -vvv -s "$TEST_PATTERN" --cov=src/dcos_e2e --cov=tests
