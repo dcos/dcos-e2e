@@ -763,14 +763,14 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    env_file = '/opt/mesosphere/environment.export'
-    test_dir = '/opt/mesosphere/active/dcos-integration-test/'
-    args = ['source', env_file, '&&', 'cd', test_dir, '&&'] + list(node_args)
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
     def ip_addresses(nodes: Iterable[Container]) -> str:
         return ','.join(n.attrs['NetworkSettings']['IPAddress'] for n in nodes)
 
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    env_file = '/opt/mesosphere/environment.export'
+    test_dir = '/opt/mesosphere/active/dcos-integration-test/'
+    args = ['source', env_file, '&&', 'cd', test_dir, '&&'] + list(node_args)
 
     environment = {
         'MASTER_HOSTS': ip_addresses(cluster_containers.masters),
