@@ -774,6 +774,7 @@ def run(
     cluster = cluster_containers.cluster
 
     terminal_size = shutil.get_terminal_size()
+    import pdb; pdb.set_trace()
 
     environment = {
         'MASTER_HOSTS': ip_addresses(cluster.masters),
