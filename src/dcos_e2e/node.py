@@ -87,6 +87,8 @@ class Node:
 
         ssh_args = [
             'ssh',
+            # Allocate a psudo-tty.
+            # This allows colors and keyboard control.
             '-t',
             # Suppress warnings.
             # In particular, we don't care about remote host identification
