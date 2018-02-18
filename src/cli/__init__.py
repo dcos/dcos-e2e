@@ -59,6 +59,22 @@ from ._validators import (
 )
 
 
+def _existing_cluster_id_option(command: Callable[..., None],
+                                ) -> Callable[..., None]:
+    """
+    An option decorator for one Cluster ID.
+    """
+    function = click.option(
+        '-c',
+        '--cluster-id',
+        type=str,
+        callback=validate_cluster_exists,
+        default=None,
+        help='If not given, "default" is used.',
+    )(command)  # type: Callable[..., None]
+    return function
+
+
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
     Write an RSA key pair for connecting to nodes via SSH.
@@ -593,14 +609,7 @@ class _ClusterContainers:
 
 
 @dcos_docker.command('wait')
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    callback=validate_cluster_exists,
-    default=None,
-    help='If not given, "default" is used.',
-)
+@_existing_cluster_id_option
 @click.option(
     '--superuser-username',
     type=str,
@@ -651,14 +660,7 @@ def wait(
 
 
 @dcos_docker.command('inspect')
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    callback=validate_cluster_exists,
-    default=None,
-    help='If not given, "default" is used.',
-)
+@_existing_cluster_id_option
 @click.option(
     '--env',
     is_flag=True,
@@ -717,14 +719,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 
 
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    callback=validate_cluster_exists,
-    default=None,
-    help='If not given, "default" is used.',
-)
+@_existing_cluster_id_option
 @click.option(
     '--dcos-login-uname',
     type=str,
@@ -851,14 +846,7 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
 
 
 @dcos_docker.command('web')
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    callback=validate_cluster_exists,
-    default=None,
-    help='If not given, "default" is used.',
-)
+@_existing_cluster_id_option
 def web(cluster_id: str) -> None:
     """
     Open the browser at the web UI.
@@ -873,14 +861,7 @@ def web(cluster_id: str) -> None:
 
 
 @dcos_docker.command('sync')
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    callback=validate_cluster_exists,
-    default=None,
-    help='If not given, "default" is used.',
-)
+@_existing_cluster_id_option
 @click.argument(
     'dcos_checkout_dir',
     type=click.Path(exists=True),
