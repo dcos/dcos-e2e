@@ -47,7 +47,7 @@ These can be run in parallel with:
 
 .. code:: sh
 
-   make lint --jobs
+   make lint --jobs --output-sync=target
 
 To fix some lint errors, run the following:
 
