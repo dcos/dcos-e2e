@@ -767,24 +767,21 @@ def run(
     test_dir = '/opt/mesosphere/active/dcos-integration-test/'
     args = ['source', env_file, '&&', 'cd', test_dir, '&&'] + list(node_args)
 
-    def ip_addresses(nodes: Iterable[Node]) -> str:
-        return ','.join(map(lambda node: str(node.public_ip_address), nodes))
+    def ip_addresses(nodes: Iterable[Container]) -> str:
+        return ','.join(n.attrs['NetworkSettings']['IPAddress'] for n in nodes)
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    cluster = cluster_containers.cluster
-
-    terminal_size = shutil.get_terminal_size()
 
     environment = {
-        'MASTER_HOSTS': ip_addresses(cluster.masters),
-        'SLAVE_HOSTS': ip_addresses(cluster.agents),
-        'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster.public_agents),
+        'MASTER_HOSTS': ip_addresses(cluster_containers.masters),
+        'SLAVE_HOSTS': ip_addresses(cluster_containers.agents),
+        'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster_containers.public_agents),
         'DCOS_LOGIN_UNAME': dcos_login_uname,
         'DCOS_LOGIN_PW': dcos_login_pw,
         # Without this we have display errors.
         # See https://github.com/moby/moby/issues/25450.
-        'COLUMNS': terminal_size.columns,
-        'LINES': terminal_size.lines,
+        'COLUMNS': shutil.get_terminal_size().columns,
+        'LINES': shutil.get_terminal_size().lines,
         'TERM': os.environ['TERM'],
     }
 
