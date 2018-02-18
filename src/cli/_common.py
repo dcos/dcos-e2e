@@ -1,3 +1,7 @@
+"""
+Common code for CLI modules.
+"""
+
 from typing import Set
 
 import docker
