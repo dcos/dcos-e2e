@@ -43,6 +43,12 @@ Run lint tools:
 
     make lint
 
+These can be run in parallel with:
+
+.. code:: sh
+
+   make lint --jobs --output-sync=target
+
 To fix some lint errors, run the following:
 
 .. code:: sh
