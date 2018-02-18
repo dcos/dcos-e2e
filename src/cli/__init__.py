@@ -613,6 +613,7 @@ class _ClusterContainers:
 @click.option(
     '--superuser-username',
     type=str,
+    default='admin',
     help=(
         'The superuser username is needed only on DC/OS Enterprise clusters. '
         'By default, on a DC/OS Enterprise cluster, `admin` is used.'
@@ -621,6 +622,7 @@ class _ClusterContainers:
 @click.option(
     '--superuser-password',
     type=str,
+    default='admin',
     help=(
         'The superuser password is needed only on DC/OS Enterprise clusters. '
         'By default, on a DC/OS Enterprise cluster, `admin` is used.'
@@ -638,24 +640,14 @@ def wait(
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
 
     if not cluster_containers.is_enterprise:
-        if superuser_username or superuser_password:
-            message = (
-                '`--superuser-username` and `--superuser-password` must not '
-                'be set for an open source DC/OS cluster.'
-            )
-            raise click.BadOptionUsage(message=message)
-
         with click_spinner.spinner():
             cluster_containers.cluster.wait_for_dcos_oss()
-
-    superuser_username = superuser_username or 'admin'
-    superuser_password = superuser_password or 'admin'
 
     if cluster_containers.is_enterprise:
         with click_spinner.spinner():
             cluster_containers.cluster.wait_for_dcos_ee(
-                superuser_username=superuser_username or 'admin',
-                superuser_password=superuser_password or 'admin',
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
             )
 
 
