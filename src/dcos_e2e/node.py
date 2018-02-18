@@ -2,11 +2,11 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import subprocess
 import stat
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
-from subprocess import PIPE, CompletedProcess, Popen
 from typing import Any, Dict, List, Optional
 
 import paramiko
@@ -127,7 +127,7 @@ class Node:
         log_output_live: bool = False,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
-    ) -> CompletedProcess:
+    ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
 
@@ -169,7 +169,7 @@ class Node:
         user: str,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
-    ) -> Popen:
+    ) -> subprocess.Popen:
         """
         Open a pipe to a command run on a node as the given user.
 
@@ -195,7 +195,11 @@ class Node:
             env=env,
             shell=shell,
         )
-        return Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+        return Popen(
+            args=ssh_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
     def send_file(
         self,
