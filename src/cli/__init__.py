@@ -714,13 +714,17 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     '--dcos-login-uname',
     type=str,
     default='admin',
-    help='The username to set the ``DCOS_LOGIN_UNAME`` as.'
+    help=(
+        'The username to set the ``DCOS_LOGIN_UNAME`` environment variable to.'
+    ),
 )
 @click.option(
     '--dcos-login-pw',
     type=str,
     default='admin',
-    help='The password to set the ``DCOS_LOGIN_PW`` as.'
+    help=(
+        'The password to set the ``DCOS_LOGIN_PW`` environment variable to.'
+    ),
 )
 @click.argument('node_args', type=str, nargs=-1, required=True)
 @click.option(
