@@ -87,6 +87,7 @@ class Node:
 
         ssh_args = [
             'ssh',
+            '-t',
             # Suppress warnings.
             # In particular, we don't care about remote host identification
             # changes.
@@ -111,7 +112,7 @@ class Node:
             'PreferredAuthentications=publickey',
             str(self.public_ip_address),
         ] + [
-            '{key}={value}'.format(key=k, value=quote(v))
+            '{key}={value}'.format(key=k, value=quote(str(v)))
             for k, v in env.items()
         ] + [quote(arg) for arg in args]
 
@@ -153,7 +154,9 @@ class Node:
         ssh_args = self._compose_ssh_command(
             args=args, user=user, env=env, shell=shell
         )
-        return run_subprocess(args=ssh_args, log_output_live=log_output_live)
+        import os
+        os.system(' '.join(ssh_args))
+        # return os.system(args=ssh_args, log_output_live=log_output_live)
 
     def popen(
         self,
