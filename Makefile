@@ -22,22 +22,58 @@ yapf:
 mypy:
 	python admin/run_mypy.py
 
+.PHONY: check-manifest
+check-makifest:
+	check-manifest .
+
+.PHONY: doc8
+doc8:
+	doc8 .
+
+.PHONY: flake8
+flake8:
+	flake8 .
+
+.PHONY: isort
+isort:
+	isort --recursive --check-only
+
+.PHONY: pip-extra-reqs
+pip-extra-reqs:
+	pip-extra-reqs src/
+
+.PHONY: pip-missing-reqs
+pip-missing-reqs:
+	pip-missing-reqs src/
+
+.PHONY: pydocstyle
+pydocstyle:
+	pydocstyle
+
+.PHONY: pylint
+pylint:
+	pylint *.py src/ tests/
+
+.PHONY: pyroma
+pyroma:
+	pyroma .
+
+.PHONY: vulture
+vulture:
+	vulture . --min-confidence 100
+
+.PHONY: linkcheck
+linkcheck:
+	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
+
+.PHONY: spelling
+spelling:
+	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
+
+
 # Run various linting tools.
 .PHONY: lint
-lint:
-	check-manifest .
-	doc8 .
-	flake8 .
-	isort --recursive --check-only
-	$(MAKE) mypy
-	pip-extra-reqs src/
-	pip-missing-reqs src/
-	pydocstyle
-	pylint *.py src/ tests/
-	pyroma .
-	vulture . --min-confidence 100
-	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
-	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
+lint: mypy yapf check-manifest doc8 flake8 isort pip-extra-reqs pip-missing-reqs pydocstyle pylint pyroma vulture linkcheck spelling
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
