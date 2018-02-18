@@ -3,7 +3,7 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from dcos_e2e.node import Node
 
