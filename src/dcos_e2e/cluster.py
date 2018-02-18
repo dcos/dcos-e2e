@@ -31,7 +31,9 @@ class Cluster(ContextDecorator):
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        files_to_copy_to_installer: Optional[Dict[Path, Path]] = None,
+        # TODO - does this work? Fix CLI? Iterable instead of list?
+        # Fix tests, changelog
+        files_to_copy_to_installer: List[Tuple[Path, Path]] = None,
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -41,7 +43,7 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: A mapping of host paths to paths on
+            files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
