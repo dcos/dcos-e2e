@@ -46,6 +46,6 @@ before_script:
 - make lint --jobs
 - travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
 script:
-- pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests
+- pytest -vvv -s "$TEST_PATTERN" --cov=src/dcos_e2e --cov=tests
 after_success:
 - codecov
