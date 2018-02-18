@@ -31,9 +31,7 @@ class Cluster(ContextDecorator):
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        # TODO - does this work? Fix CLI? Iterable instead of list?
-        # Fix tests, changelog
-        files_to_copy_to_installer: List[Tuple[Path, Path]] = None,
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -47,13 +45,15 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
+        # TODO - does this work? Fix CLI?
+        # Fix tests
         self._default_ssh_user = cluster_backend.default_ssh_user
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=dict(files_to_copy_to_installer or {}),
+            files_to_copy_to_installer=list(files_to_copy_to_installer),
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 

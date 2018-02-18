@@ -57,7 +57,7 @@ class ExistingClusterManager(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Dict[Path, Path],
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]] = (),
         cluster_backend: ExistingCluster,
     ) -> None:
         """
@@ -71,8 +71,8 @@ class ExistingClusterManager(ClusterManager):
             public_agents: The number of public agent nodes to create.
                 This must match the number of public agents in
                 `cluster_backend`.
-            files_to_copy_to_installer: An ignored mapping of host paths to
-                paths on the installer node.
+            files_to_copy_to_installer: Ignored pairs of host paths to paths
+                on the installer node.
             cluster_backend: Details of the specific existing cluster backend
                 to use.
         """

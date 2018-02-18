@@ -257,11 +257,11 @@ class DockerCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: A mapping of host paths to paths on
+            files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS. Currently on DC/OS
-                Docker the only supported paths on the installer are in the
-                `/genconf` directory.
+                the installer node before installing DC/OS.
+                Currently on DC/OS Docker the only supported paths on the
+                installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
         # To avoid conflicts, we use random container names.
