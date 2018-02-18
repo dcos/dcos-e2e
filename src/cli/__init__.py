@@ -630,25 +630,23 @@ class _ClusterContainers:
 )
 def wait(
     cluster_id: str,
-    superuser_username: Optional[str],
-    superuser_password: Optional[str],
+    superuser_username: str,
+    superuser_password: str,
 ) -> None:
     """
     Wait for DC/OS to start.
     """
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-
-    if not cluster_containers.is_enterprise:
-        with click_spinner.spinner():
-            cluster_containers.cluster.wait_for_dcos_oss()
-
-    if cluster_containers.is_enterprise:
-        with click_spinner.spinner():
+    with click_spinner.spinner():
+        if cluster_containers.is_enterprise:
             cluster_containers.cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            return
+
+        cluster_containers.cluster.wait_for_dcos_oss()
 
 
 @dcos_docker.command('inspect')
