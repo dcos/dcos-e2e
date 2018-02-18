@@ -31,6 +31,7 @@ import click
 import click_spinner
 import docker
 import urllib3
+import wrapt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -591,16 +592,21 @@ class _ClusterContainers:
         workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
         return Path(workspace_dir)
 
+def cluster_id_option(command: Callable[..., None]) -> str:
+    """
+    XXX
+    """
+    return click.option(
+        '-c',
+        '--cluster-id',
+        type=str,
+        callback=validate_cluster_exists,
+        default=None,
+        help='If not given, "default" is used.',
+    )(command)
 
 @dcos_docker.command('wait')
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    callback=validate_cluster_exists,
-    default=None,
-    help='If not given, "default" is used.',
-)
+@cluster_id_option
 @click.option(
     '--superuser-username',
     type=str,
