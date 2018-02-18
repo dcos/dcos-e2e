@@ -31,7 +31,6 @@ import click
 import click_spinner
 import docker
 import urllib3
-import wrapt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -60,9 +59,8 @@ from ._validators import (
 )
 
 
-def _existing_cluster_id_option(
-    command: Callable[..., None],
-) -> Callable[..., None]:
+def _existing_cluster_id_option(command: Callable[..., None],
+                                ) -> Callable[..., None]:
     """
     An option decorator for one Cluster ID.
     """
@@ -608,6 +606,7 @@ class _ClusterContainers:
         container = next(iter(self.masters))
         workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
         return Path(workspace_dir)
+
 
 @dcos_docker.command('wait')
 @_existing_cluster_id_option
