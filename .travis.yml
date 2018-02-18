@@ -42,9 +42,8 @@ install:
 - travis_retry pip install --upgrade --editable .[dev]
 cache: pip
 before_script:
-- make clean
 - make docs
-- make lint
+- make lint --jobs
 - travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
 script:
 - pytest -vvv -s "$TEST_PATTERN" --cov=src --cov=tests

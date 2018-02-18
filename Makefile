@@ -72,6 +72,7 @@ spelling:
 
 
 # Run various linting tools.
+# We put each one in a different target so that we can run these in parallel with --jobs
 .PHONY: lint
 lint: mypy yapf check-manifest doc8 flake8 isort pip-extra-reqs pip-missing-reqs pydocstyle pylint pyroma vulture linkcheck spelling
 
