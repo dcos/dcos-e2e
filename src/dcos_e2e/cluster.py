@@ -87,7 +87,7 @@ class Cluster(ContextDecorator):
             masters=len(masters),
             agents=len(agents),
             public_agents=len(public_agents),
-            files_to_copy_to_installer=None,
+            files_to_copy_to_installer=(),
             cluster_backend=backend,
         )
 
