@@ -107,10 +107,10 @@ class TestCopyFiles:
             'license_key_contents': license_key_contents,
         }
 
-        files_to_copy_to_installer = {
-            cert_path: installer_cert_path,
-            ca_key_path: installer_key_path,
-        }
+        files_to_copy_to_installer = (
+            (cert_path, installer_cert_path),
+            (ca_key_path, installer_key_path),
+        )
 
         with Cluster(
             cluster_backend=cluster_backend,

@@ -45,15 +45,13 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        # TODO - does this work? Fix CLI?
-        # Fix tests
         self._default_ssh_user = cluster_backend.default_ssh_user
 
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=list(files_to_copy_to_installer),
+            files_to_copy_to_installer=files_to_copy_to_installer,
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 

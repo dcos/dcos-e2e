@@ -12,7 +12,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 import docker
 import yaml
@@ -247,7 +247,7 @@ class DockerCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Dict[Path, Path],
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
         cluster_backend: Docker,
     ) -> None:
         """
@@ -342,7 +342,7 @@ class DockerCluster(ClusterManager):
             private_key_path=ssh_dir / 'id_rsa',
         )
 
-        for host_path, installer_path in files_to_copy_to_installer.items():
+        for host_path, installer_path in files_to_copy_to_installer:
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path
             copyfile(src=str(host_path), dst=str(destination_path))

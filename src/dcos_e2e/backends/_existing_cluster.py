@@ -57,7 +57,7 @@ class ExistingClusterManager(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Iterable[Tuple[Path, Path]] = (),
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
         cluster_backend: ExistingCluster,
     ) -> None:
         """
