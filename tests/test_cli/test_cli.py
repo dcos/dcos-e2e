@@ -893,10 +893,14 @@ class TestRun:
 
             Options:
               -c, --cluster-id TEXT    If not given, "default" is used.
-              --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME`` as.
-              --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` as.
-              --sync-dir PATH          Syncs to DC/OS checkout specified before running the
-                                       command.
+              --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
+                                       environment variable to.
+              --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` environment
+                                       variable to.
+              --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
+                                       will be synced before the command is run.
+              --no-test-env            With this flag set, no environment variables are set
+                                       and the command is run in the home directory.
               --help                   Show this message and exit.
             """# noqa: E501,E261
         )

@@ -736,7 +736,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 @click.option(
     '--no-test-env',
     is_flag=True,
-    help='XXX'
+    help=(
+        'With this flag set, no environment variables are set and the command '
+        'is run in the home directory. '
+    ),
 )
 @click.pass_context
 def run(
