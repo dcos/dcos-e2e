@@ -5,7 +5,6 @@ A CLI for controlling DC/OS clusters on Docker.
 import io
 import json
 import logging
-import os
 import shutil
 import subprocess
 import tarfile
@@ -763,41 +762,16 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    env_file = '/opt/mesosphere/environment.export'
-    test_dir = '/opt/mesosphere/active/dcos-integration-test/'
-    args = ['source', env_file, '&&', 'cd', test_dir, '&&'] + list(node_args)
-
-    def ip_addresses(nodes: Iterable[Node]) -> str:
-        return ','.join(map(lambda node: str(node.public_ip_address), nodes))
-
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    cluster = cluster_containers.cluster
-
-    terminal_size = shutil.get_terminal_size()
-
-    environment = {
-        'MASTER_HOSTS': ip_addresses(cluster.masters),
-        'SLAVE_HOSTS': ip_addresses(cluster.agents),
-        'PUBLIC_SLAVE_HOSTS': ip_addresses(cluster.public_agents),
+    env = {
         'DCOS_LOGIN_UNAME': dcos_login_uname,
         'DCOS_LOGIN_PW': dcos_login_pw,
-        # Without this we have display errors.
-        # See https://github.com/moby/moby/issues/25450.
-        'COLUMNS': terminal_size.columns,
-        'LINES': terminal_size.lines,
-        'TERM': os.environ['TERM'],
     }
-
-    env_vars = []
-    for key, value in environment.items():
-        env_vars += ['-e', '{key}={value}'.format(key=key, value=value)]
-
-    master = next(iter(cluster_containers.masters))
-    docker_exec = ['docker', 'exec', '-it']
-    cmd = ['/bin/bash', '-c', '"{args}"'.format(args=' '.join(args))]
-    system_cmd = docker_exec + env_vars + [master.id] + cmd
-    joined = ' '.join(system_cmd)
-    os.system(joined)
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers.cluster.run_integration_tests(
+        pytest_command=list(node_args),
+        pipe_output=False,
+        env=env,
+    )
 
 
 def _tar_with_filter(

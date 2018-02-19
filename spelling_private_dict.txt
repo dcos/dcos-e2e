@@ -11,6 +11,7 @@ centos
 changelog
 ci
 cli
+completedprocess
 config
 customizable
 cwd

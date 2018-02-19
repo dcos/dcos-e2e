@@ -336,6 +336,7 @@ class Cluster(ContextDecorator):
         pytest_command: List[str],
         env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
+        pipe_output: bool = True,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -348,6 +349,12 @@ class Cluster(ContextDecorator):
             log_output_live: If ``True``, log output of the ``pytest_command``
                 live. If ``True``, ``stderr`` is merged into ``stdout`` in the
                 return value.
+            pipe_output: If ``True``, pipes are opened to stdout and stderr.
+                This means that the values of stdout and stderr will be in
+                the returned ``subprocess.CompletedProcess`` and optionally
+                sent to a logger, given ``log_output_live``.
+                If ``False``, no output is sent to a logger and the values are
+                not returned.
 
         Returns:
             The result of the ``pytest`` command.
@@ -355,7 +362,6 @@ class Cluster(ContextDecorator):
         Raises:
             subprocess.CalledProcessError: If the ``pytest`` command fails.
         """
-
         args = [
             'source',
             '/opt/mesosphere/environment.export',
@@ -389,7 +395,7 @@ class Cluster(ContextDecorator):
             user=self.default_ssh_user,
             log_output_live=log_output_live,
             env=environment_variables,
-            shell=True,
+            pipe_output=pipe_output,
         )
 
     def destroy(self) -> None:

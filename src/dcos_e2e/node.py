@@ -3,10 +3,10 @@ Tools for managing DC/OS cluster nodes.
 """
 
 import stat
+import subprocess
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
-from subprocess import PIPE, CompletedProcess, Popen
 from typing import Any, Dict, List, Optional
 
 import paramiko
@@ -87,6 +87,9 @@ class Node:
 
         ssh_args = [
             'ssh',
+            # Allocate a pseudo-tty.
+            # This allows colors and keyboard control.
+            '-t',
             # Suppress warnings.
             # In particular, we don't care about remote host identification
             # changes.
@@ -124,24 +127,31 @@ class Node:
         log_output_live: bool = False,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
-    ) -> CompletedProcess:
+        pipe_output: bool = True,
+    ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
 
         Args:
             args: The command to run on the node.
             user: The username to SSH as.
-            log_output_live: If `True`, log output live. If `True`, stderr is
-                merged into stdout in the return value.
+            log_output_live: If ``True``, log output live. If ``True``, stderr
+                is merged into stdout in the return value.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            shell: If False (the default), each argument is passed as a
+            shell: If ``False`` (the default), each argument is passed as a
                 literal value to the command.  If True, the command line is
                 interpreted as a shell command, with a special meaning applied
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            pipe_output: If ``True``, pipes are opened to stdout and stderr.
+                This means that the values of stdout and stderr will be in
+                the returned ``subprocess.CompletedProcess`` and optionally
+                sent to a logger, given ``log_output_live``.
+                If ``False``, no output is sent to a logger and the values are
+                not returned.
 
         Returns:
             The representation of the finished process.
@@ -156,7 +166,13 @@ class Node:
             env=env,
             shell=shell,
         )
-        return run_subprocess(args=ssh_args, log_output_live=log_output_live)
+
+        ' '.join(ssh_args)
+        return run_subprocess(
+            args=ssh_args,
+            log_output_live=log_output_live,
+            pipe_output=pipe_output,
+        )
 
     def popen(
         self,
@@ -164,7 +180,7 @@ class Node:
         user: str,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
-    ) -> Popen:
+    ) -> subprocess.Popen:
         """
         Open a pipe to a command run on a node as the given user.
 
@@ -190,7 +206,11 @@ class Node:
             env=env,
             shell=shell,
         )
-        return Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+        return subprocess.Popen(
+            args=ssh_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
     def send_file(
         self,
