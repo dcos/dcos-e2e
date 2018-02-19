@@ -345,7 +345,10 @@ class DockerCluster(ClusterManager):
         for host_path, installer_path in files_to_copy_to_installer:
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path
-            copyfile(src=str(host_path), dst=str(destination_path))
+            if host_path.is_dir():
+                copytree(src=str(host_path), dst=str(destination_path))
+            else:
+                copyfile(src=str(host_path), dst=str(destination_path))
 
         _write_docker_service_file(
             service_file_path=service_dir / 'docker.service',
