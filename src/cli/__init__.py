@@ -764,13 +764,16 @@ def run(
         'DCOS_LOGIN_UNAME': dcos_login_uname,
         'DCOS_LOGIN_PW': dcos_login_pw,
     }
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    cluster_containers.cluster.run_integration_tests(
-        pytest_command=list(node_args),
-        pipe_output=False,
-        env=env,
-    )
 
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    try:
+        cluster_containers.cluster.run_integration_tests(
+            pytest_command=list(node_args),
+            pipe_output=False,
+            env=env,
+        )
+    except subprocess.CalledProcessError:
+        pass
 
 def _tar_with_filter(
     path: Path,
