@@ -127,6 +127,7 @@ class Node:
         log_output_live: bool = False,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
+        pipe_output: bool = True,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -145,6 +146,12 @@ class Node:
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            pipe_output: If ``True``, pipes are opened to stdout and stderr.
+                This means that the values of stdout and stderr will be in
+                the returned ``subprocess.CompletedProcess`` and optionally
+                sent to a logger, given ``log_output_live``.
+                If ``False``, no output is sent to a logger and the values are
+                not returned.
 
         Returns:
             The representation of the finished process.
@@ -159,9 +166,13 @@ class Node:
             env=env,
             shell=shell,
         )
-        import os
-        os.system(' '.join(ssh_args))
-        # return os.system(args=ssh_args, log_output_live=log_output_live)
+
+        joined = ' '.join(ssh_args)
+        return run_subprocess(
+            args=ssh_args,
+            log_output_live=log_output_live,
+            pipe_output=pipe_output,
+        )
 
     def popen(
         self,

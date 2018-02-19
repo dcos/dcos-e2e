@@ -16,6 +16,7 @@ def run_subprocess(
     log_output_live: bool,
     cwd: Optional[Union[bytes, str]] = None,
     env: Optional[Dict[str, str]] = None,
+        pipe_output: bool = True,
 ) -> CompletedProcess:
     """
     Run a command in a subprocess.
@@ -26,6 +27,12 @@ def run_subprocess(
             merged into stdout in the return value.
         cwd: See :py:func:`subprocess.run`.
         env: See :py:func:`subprocess.run`.
+        pipe_output: If ``True``, pipes are opened to stdout and stderr.
+            This means that the values of stdout and stderr will be in
+            the returned ``subprocess.CompletedProcess`` and optionally
+            sent to a logger, given ``log_output_live``.
+            If ``False``, no output is sent to a logger and the values are
+            not returned.
 
     Returns:
         See :py:func:`subprocess.run`.
@@ -34,11 +41,12 @@ def run_subprocess(
         subprocess.CalledProcessError: See :py:func:`subprocess.run`.
         Exception: An exception was raised in getting the output from the call.
     """
+    process_stdout = PIPE if pipe_output else None
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
     # See http://stackoverflow.com/a/18423003.
     if log_output_live:
-        process_stderr = STDOUT
+        process_stderr = process_stdout
     else:
         process_stderr = PIPE
 
