@@ -400,9 +400,7 @@ def create(
     files_to_copy_to_installer = []
     if genconf_dir is not None:
         container_genconf_path = Path('/genconf')
-        for genconf_file in genconf_dir.glob('**/*'):
-            if genconf_file.is_dir():
-                continue
+        for genconf_file in genconf_dir.glob('*'):
             genconf_relative = genconf_file.relative_to(genconf_dir)
             relative_path = container_genconf_path / genconf_relative
             files_to_copy_to_installer.append((genconf_file, relative_path))
@@ -429,6 +427,8 @@ def create(
         public_agents=public_agents,
         files_to_copy_to_installer=files_to_copy_to_installer,
     )
+
+    import pdb; pdb.set_trace()
 
     nodes = {
         *cluster.masters,
