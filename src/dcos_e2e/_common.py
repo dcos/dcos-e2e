@@ -16,7 +16,7 @@ def run_subprocess(
     log_output_live: bool,
     cwd: Optional[Union[bytes, str]] = None,
     env: Optional[Dict[str, str]] = None,
-        pipe_output: bool = True,
+    pipe_output: bool = True,
 ) -> CompletedProcess:
     """
     Run a command in a subprocess.
@@ -53,7 +53,7 @@ def run_subprocess(
     with Popen(
         args=args,
         cwd=cwd,
-        stdout=PIPE,
+        stdout=process_stdout,
         stderr=process_stderr,
         env=env,
     ) as process:
