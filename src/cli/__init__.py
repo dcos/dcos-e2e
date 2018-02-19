@@ -428,8 +428,6 @@ def create(
         files_to_copy_to_installer=files_to_copy_to_installer,
     )
 
-    import pdb; pdb.set_trace()
-
     nodes = {
         *cluster.masters,
         *cluster.agents,
