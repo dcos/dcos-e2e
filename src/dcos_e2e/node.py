@@ -234,15 +234,14 @@ class Node:
             username=user,
             key_filename=str(self._ssh_key_path),
         )
+        self.run(
+            args=[
+                'mkdir',
+                '--parents',
+                str(remote_path.parent),
+            ],
+            user=user,
+        )
 
-        with SCPClient(ssh_client.get_transport()) as scp:
-            self.run(
-                args=[
-                    'mkdir',
-                    '--parents',
-                    str(remote_path.parent),
-                ],
-                user=user,
-            )
-
-            scp.put(files=str(local_path), remote_path=str(remote_path))
+        with client.open_sftp() as sftp:
+            sftp.put(str(local_path), str(remote_path))
