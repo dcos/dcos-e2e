@@ -396,6 +396,7 @@ class Cluster(ContextDecorator):
             log_output_live=log_output_live,
             env=environment_variables,
             pipe_output=pipe_output,
+            shell=True,
         )
 
     def destroy(self) -> None:
