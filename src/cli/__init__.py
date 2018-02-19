@@ -733,6 +733,11 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     ),
     callback=validate_path_is_directory,
 )
+@click.option(
+    '--no-test-env',
+    is_flag=True,
+    help='XXX'
+)
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -741,6 +746,7 @@ def run(
     sync_dir: Optional[Path],
     dcos_login_uname: str,
     dcos_login_pw: str,
+    no_test_env: bool,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -766,8 +772,26 @@ def run(
     }
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster = cluster_containers.cluster
+
+    if no_test_env:
+        try:
+            test_host = next(iter(cluster.masters))
+
+            test_host.run(
+                args=list(node_args),
+                user=cluster.default_ssh_user,
+                log_output_live=False,
+                pipe_output=False,
+                shell=True,
+            )
+        except subprocess.CalledProcessError:
+            pass
+
+        return
+
     try:
-        cluster_containers.cluster.run_integration_tests(
+        cluster.run_integration_tests(
             pytest_command=list(node_args),
             pipe_output=False,
             env=env,
