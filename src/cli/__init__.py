@@ -733,6 +733,16 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     ),
     callback=validate_path_is_directory,
 )
+@click.option(
+    '--no-test-context',
+    is_flag=True,
+    help=(
+        'Use this flag to run the given command without setting up the test '
+        'context. '
+        'This is particularly useful before '
+        '/opt/mesosphere/environment.export exists on the node.'
+    ),
+)
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -741,6 +751,7 @@ def run(
     sync_dir: Optional[Path],
     dcos_login_uname: str,
     dcos_login_pw: str,
+    no_test_context: bool,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -764,13 +775,29 @@ def run(
         'DCOS_LOGIN_UNAME': dcos_login_uname,
         'DCOS_LOGIN_PW': dcos_login_pw,
     }
+
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+
+    if no_test_context:
+        # Tests are run on a random master node.
+        test_host = next(iter(self.masters))
+
+        test_host.run(
+            args=args,
+            user=self.default_ssh_user,
+            log_output_live=log_output_live,
+            env=env,
+            pipe_output=False,
+            shell=True,
+        )
+
+        return
+
     cluster_containers.cluster.run_integration_tests(
         pytest_command=list(node_args),
         pipe_output=False,
         env=env,
     )
-
 
 def _tar_with_filter(
     path: Path,
