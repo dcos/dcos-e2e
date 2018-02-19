@@ -160,9 +160,6 @@ class Node:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
         """
-        # shell = True
-        # log_output_live = False
-        #
         ssh_args = self._compose_ssh_command(
             args=args,
             user=user,
@@ -171,7 +168,6 @@ class Node:
         )
 
         joined = ' '.join(ssh_args)
-        # subprocess.run(args=ssh_args)
         return run_subprocess(
             args=ssh_args,
             log_output_live=log_output_live,
