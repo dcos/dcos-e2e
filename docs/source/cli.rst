@@ -160,8 +160,7 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
 
 #. Verify that everything has worked.
 
-
-
+   See `Verify installation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom/#verify-installation>`_ for steps to verify that the DC/OS Enterprise cluster was installed properly with the custom CA certificate.
 
 CLI Reference
 -------------
