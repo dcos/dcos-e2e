@@ -133,7 +133,7 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
 
 #. Put the above-mentioned files, into a directory, e.g. :file:`/path/to/genconf/`.
 
-#. Create an file containing the "extra" configuration.
+#. Create a file containing the "extra" configuration.
 
    :ref:`dcos-docker-create` takes an ``--extra-config`` option.
    This adds the contents of the specified YAML file to a minimal DC/OS configuration.
@@ -146,7 +146,21 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
       ca_certificate_key_path: genconf/dcos-ca-certificate-key.key
       ca_certificate_chain_path: genconf/dcos-ca-certificate-chain.crt
 
-#.
+#. Create a cluster.
+
+   .. code:: console
+
+      dcos-docker create \
+          /path/to/dcos_generate_config.ee.sh \
+          --genconf-dir /path/to/genconf/ \
+          --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
+          --license-key /path/to/license.txt \
+          --extra-config config.yml \
+          --cluster-id default
+
+#. Verify that everything has worked.
+
+
 
 
 CLI Reference
