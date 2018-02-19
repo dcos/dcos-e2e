@@ -222,6 +222,24 @@ class TestNode:
         )
         assert bool(len(debug_messages & matching_messages))
 
+    def test_log_output_live_and_pipe(self, dcos_cluster: Cluster) -> None:
+        """
+        A ``ValueError`` is raised if ``pipe_output`` and ``log_output_live``
+        are both given as ``True``.
+        """
+        (master, ) = dcos_cluster.masters
+        default = dcos_cluster.default_ssh_user
+
+        with pytest.raises(ValueError) as excinfo:
+            master.run(
+                args=['echo', '1'],
+                user=default,
+                log_output_live=True,
+                pipe_output=True,
+            )
+
+        assert str(excinfo) == 'foo'
+
     # An arbitrary time limit to avoid infinite wait times.
     @pytest.mark.timeout(60)
     def test_popen(

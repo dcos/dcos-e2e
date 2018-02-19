@@ -2,8 +2,8 @@
 Tools for managing DC/OS cluster nodes.
 """
 
-import subprocess
 import stat
+import subprocess
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
@@ -87,7 +87,7 @@ class Node:
 
         ssh_args = [
             'ssh',
-            # Allocate a psudo-tty.
+            # Allocate a pseudo-tty.
             # This allows colors and keyboard control.
             '-t',
             # Suppress warnings.
@@ -167,7 +167,7 @@ class Node:
             shell=shell,
         )
 
-        joined = ' '.join(ssh_args)
+        ' '.join(ssh_args)
         return run_subprocess(
             args=ssh_args,
             log_output_live=log_output_live,
@@ -206,7 +206,7 @@ class Node:
             env=env,
             shell=shell,
         )
-        return Popen(
+        return subprocess.Popen(
             args=ssh_args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

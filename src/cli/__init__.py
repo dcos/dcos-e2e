@@ -5,7 +5,6 @@ A CLI for controlling DC/OS clusters on Docker.
 import io
 import json
 import logging
-import os
 import shutil
 import subprocess
 import tarfile
@@ -763,10 +762,15 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
+    env = {
+        'DCOS_LOGIN_UNAME': dcos_login_uname,
+        'DCOS_LOGIN_PW': dcos_login_pw,
+    }
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster_containers.cluster.run_integration_tests(
-        pytest_command=node_args,
+        pytest_command=list(node_args),
         pipe_output=False,
+        env=env,
     )
 
 

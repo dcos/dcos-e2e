@@ -4,7 +4,7 @@ Common utilities for end to end tests.
 
 import logging
 import subprocess
-from subprocess import PIPE, STDOUT, CompletedProcess, Popen
+from subprocess import PIPE, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
@@ -40,7 +40,13 @@ def run_subprocess(
     Raises:
         subprocess.CalledProcessError: See :py:func:`subprocess.run`.
         Exception: An exception was raised in getting the output from the call.
+        ValueError: ``log_output_live`` and ``pipe_output`` are both ``True``.
     """
+    if log_output_live and pipe_output:
+        raise ValueError(
+            '`log_output_live` and `pipe_output` cannot both be `True`.'
+        )
+
     process_stdout = PIPE if pipe_output else None
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.

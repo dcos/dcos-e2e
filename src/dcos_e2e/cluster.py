@@ -362,7 +362,6 @@ class Cluster(ContextDecorator):
         Raises:
             subprocess.CalledProcessError: If the ``pytest`` command fails.
         """
-        # TODO: Exception if pipe_output = False, log_output_live = True
         args = [
             'source',
             '/opt/mesosphere/environment.export',
