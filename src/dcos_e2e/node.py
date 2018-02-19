@@ -134,12 +134,12 @@ class Node:
         Args:
             args: The command to run on the node.
             user: The username to SSH as.
-            log_output_live: If `True`, log output live. If `True`, stderr is
-                merged into stdout in the return value.
+            log_output_live: If ``True``, log output live. If ``True``, stderr
+                is merged into stdout in the return value.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            shell: If False (the default), each argument is passed as a
+            shell: If ``False`` (the default), each argument is passed as a
                 literal value to the command.  If True, the command line is
                 interpreted as a shell command, with a special meaning applied
                 to some characters (e.g. $, &&, >). This means the caller must
