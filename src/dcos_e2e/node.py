@@ -10,7 +10,6 @@ from shlex import quote
 from typing import Any, Dict, List, Optional
 
 import paramiko
-from scp import SCPClient
 
 from ._common import run_subprocess
 
@@ -235,14 +234,15 @@ class Node:
             key_filename=str(self._ssh_key_path),
         )
 
-        with SCPClient(ssh_client.get_transport()) as scp:
-            self.run(
-                args=[
-                    'mkdir',
-                    '--parents',
-                    str(remote_path.parent),
-                ],
-                user=user,
-            )
-
-            scp.put(files=str(local_path), remote_path=str(remote_path))
+        with ssh_client.open_sftp() as sftp:
+            try:
+                sftp.put(
+                    localpath=str(local_path),
+                    remotepath=str(remote_path),
+                )
+            except FileNotFoundError:
+                sftp.mkdir(path=str(remote_path.parent))
+                sftp.put(
+                    localpath=str(local_path),
+                    remotepath=str(remote_path),
+                )
