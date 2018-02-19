@@ -120,6 +120,48 @@ If you instead want to view the web UI URL of your cluster, use the :ref:`dcos-d
 
 Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
 
+Using a Custom CA Certificate
+-----------------------------
+
+On DC/OS Enterprise clusters, it is possible to use a custom CA certificate.
+See `the Custom CA certifiacte documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
+It is possible to use :ref:`dcos-docker-create` to create a cluster with a custom CA certificate.
+
+#. Create or obtain the necessary files:
+
+   :file:`dcos-ca-certificate.crt`, :file:`dcos-ca-certificate-key.key`, and :file:`dcos-ca-certificate-chain.crt`.
+
+#. Put the above-mentioned files, into a directory, e.g. :file:`/path/to/genconf/`.
+
+#. Create a file containing the "extra" configuration.
+
+   :ref:`dcos-docker-create` takes an ``--extra-config`` option.
+   This adds the contents of the specified YAML file to a minimal DC/OS configuration.
+
+   Create a file with the following contents:
+
+   .. code:: yaml
+
+      ca_certificate_path: genconf/dcos-ca-certificate.crt
+      ca_certificate_key_path: genconf/dcos-ca-certificate-key.key
+      ca_certificate_chain_path: genconf/dcos-ca-certificate-chain.crt
+
+#. Create a cluster.
+
+   .. code:: console
+
+      dcos-docker create \
+          /path/to/dcos_generate_config.ee.sh \
+          --genconf-dir /path/to/genconf/ \
+          --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
+          --license-key /path/to/license.txt \
+          --extra-config config.yml \
+          --cluster-id default
+
+#. Verify that everything has worked.
+
+   See `Verify installation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom/#verify-installation>`_ for steps to verify that the DC/OS Enterprise cluster was installed properly with the custom CA certificate.
+
 CLI Reference
 -------------
 
