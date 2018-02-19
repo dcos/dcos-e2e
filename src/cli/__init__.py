@@ -733,16 +733,6 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     ),
     callback=validate_path_is_directory,
 )
-@click.option(
-    '--no-test-context',
-    is_flag=True,
-    help=(
-        'Use this flag to run the given command without setting up the test '
-        'context. '
-        'This is particularly useful before '
-        '/opt/mesosphere/environment.export exists on the node.'
-    ),
-)
 @click.pass_context
 def run(
     ctx: click.core.Context,
