@@ -12,6 +12,8 @@ python:
 - '3.5'
 env:
   matrix:
+  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
+  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
   - TEST_PATTERN=tests/test_cli
   - TEST_PATTERN=tests/test_dcos_e2e/backends/test_docker.py::TestDistributions::test_coreos_enterprise
   - TEST_PATTERN=tests/test_dcos_e2e/backends/test_docker.py::TestDistributions::test_coreos_oss
@@ -28,8 +30,6 @@ env:
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests::test_run_pytest
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters::test_two_clusters
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
   - TEST_PATTERN=tests/test_dcos_e2e/test_node.py::TestNode
