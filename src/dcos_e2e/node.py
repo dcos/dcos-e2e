@@ -237,7 +237,8 @@ class Node:
         )
 
         self.run(
-            args=['mkdir', '--parents', str(remote_path.parent)],
+            args=['mkdir', '--parents',
+                  str(remote_path.parent)],
             user=user,
         )
 
