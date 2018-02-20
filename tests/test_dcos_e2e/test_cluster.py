@@ -22,7 +22,7 @@ class TestIntegrationTests:
     Tests for running integration tests on a node.
     """
 
-    def test_run_pytest(
+    def test_run_pytest_foo(
         self,
         cluster_backend: ClusterBackend,
         oss_artifact: Path,
