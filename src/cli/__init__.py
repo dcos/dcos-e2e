@@ -785,7 +785,7 @@ def run(
                 args=list(node_args),
                 user=cluster.default_ssh_user,
                 log_output_live=False,
-                pipe_output=False,
+                tty=True,
                 shell=True,
             )
         except subprocess.CalledProcessError:
@@ -796,7 +796,7 @@ def run(
     try:
         cluster.run_integration_tests(
             pytest_command=list(node_args),
-            pipe_output=False,
+            tty=True,
             env=env,
         )
     except subprocess.CalledProcessError:

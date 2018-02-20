@@ -4,7 +4,7 @@ Common utilities for end to end tests.
 
 import logging
 import subprocess
-from subprocess import PIPE, CompletedProcess, Popen
+from subprocess import PIPE, STDOUT, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
@@ -53,7 +53,7 @@ def run_subprocess(
     # combine them.
     # See http://stackoverflow.com/a/18423003.
     if log_output_live:
-        process_stderr = process_stdout
+        process_stderr = STDOUT
     else:
         process_stderr = PIPE
 

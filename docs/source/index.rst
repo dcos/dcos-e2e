@@ -28,6 +28,7 @@ Reference
    enterprise
    custom-backend
    cli
+   versioning-and-api-stability
    contributing
 
 .. toctree::
