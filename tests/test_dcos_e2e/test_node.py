@@ -222,10 +222,10 @@ class TestNode:
         )
         assert bool(len(debug_messages & matching_messages))
 
-    def test_log_output_live_and_pipe(self, dcos_cluster: Cluster) -> None:
+    def test_log_output_live_and_tty(self, dcos_cluster: Cluster) -> None:
         """
-        A ``ValueError`` is raised if ``pipe_output`` is ``False`` and
-        ``log_output_live`` is ``True``.
+        A ``ValueError`` is raised if ``tty`` is ``True`` and
+    ``log_output_live`` is ``True``.
         """
         (master, ) = dcos_cluster.masters
         default = dcos_cluster.default_ssh_user
@@ -235,7 +235,7 @@ class TestNode:
                 args=['echo', '1'],
                 user=default,
                 log_output_live=True,
-                pipe_output=False,
+                tty=True,
             )
 
         expected_message = (

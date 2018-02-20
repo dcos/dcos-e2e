@@ -59,6 +59,7 @@ class Node:
         user: str,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
+        tty: bool = False,
     ) -> List[str]:
         """
         Return a command to run `args` on this node over SSH.
@@ -75,6 +76,8 @@ class Node:
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            tty: If ``True``, allocate a pseudo-tty. This means that the users
+                terminal is attached to the streams of the process.
 
         Returns:
             The full SSH command to be run.
@@ -84,11 +87,11 @@ class Node:
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
 
-        ssh_args = [
-            'ssh',
-            # Allocate a pseudo-tty.
-            # This allows colors and keyboard control.
-            '-t',
+        ssh_args = ['ssh']
+        if tty:
+            ssh_args.append('-t')
+
+        ssh_args += [
             # Suppress warnings.
             # In particular, we don't care about remote host identification
             # changes.
@@ -126,7 +129,7 @@ class Node:
         log_output_live: bool = False,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
-        pipe_output: bool = True,
+        tty: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -145,12 +148,10 @@ class Node:
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
-            pipe_output: If ``True``, pipes are opened to stdout and stderr.
-                This means that the values of stdout and stderr will be in
-                the returned ``subprocess.CompletedProcess`` and optionally
-                sent to a logger, given ``log_output_live``.
-                If ``False``, no output is sent to a logger and the values are
-                not returned.
+            tty: If ``True``, allocate a pseudo-tty. This means that the users
+                terminal is attached to the streams of the process.
+                This means that the values of stdout and stderr will not be in
+                the returned ``subprocess.CompletedProcess``.
 
         Returns:
             The representation of the finished process.
@@ -164,12 +165,13 @@ class Node:
             user=user,
             env=env,
             shell=shell,
+            tty=tty,
         )
 
         return run_subprocess(
             args=ssh_args,
             log_output_live=log_output_live,
-            pipe_output=pipe_output,
+            pipe_output=not tty,
         )
 
     def popen(
@@ -203,6 +205,7 @@ class Node:
             user=user,
             env=env,
             shell=shell,
+            tty=False,
         )
         return subprocess.Popen(
             args=ssh_args,

@@ -18,6 +18,7 @@ Next
 -  Vendor ``dcos_test_utils`` so ``--process-dependency-links`` is not needed.
 -  Backwards incompatible change:
    ``Cluter``\'s ``files_to_copy_to_installer`` argument is now a ``List`` of ``Tuple``\s rather than a ``Dict``.
+- Add a ``tty`` option to ``Node.run`` and ``Cluster.run_integration_tests``.
 
 2018.01.25.0
 ------------
