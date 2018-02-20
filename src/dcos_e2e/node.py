@@ -166,7 +166,6 @@ class Node:
             shell=shell,
         )
 
-        ' '.join(ssh_args)
         return run_subprocess(
             args=ssh_args,
             log_output_live=log_output_live,

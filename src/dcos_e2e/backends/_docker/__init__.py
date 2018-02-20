@@ -736,6 +736,8 @@ class DockerCluster(ClusterManager):
             ['systemctl', 'start', 'sshd.service'],
         ]:
             container.exec_run(cmd=cmd)
+            exit_code, output = container.exec_run(cmd=cmd)
+            assert exit_code == 0, output
 
     def destroy(self) -> None:
         """
