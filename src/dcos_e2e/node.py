@@ -239,7 +239,7 @@ class Node:
                     localpath=str(local_path),
                     remotepath=str(remote_path),
                 )
-            except FileNotFoundError:
+            except IOError:
                 sftp.mkdir(path=str(remote_path.parent))
                 sftp.put(
                     localpath=str(local_path),
