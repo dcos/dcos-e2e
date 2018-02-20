@@ -1,5 +1,5 @@
-Versioning and API Stability
-============================
+Versioning, Support and API Stability
+=====================================
 
 DC/OS E2E aims to work with DC/OS OSS and DC/OS Enterprise ``master`` branches.
 These are moving targets.
