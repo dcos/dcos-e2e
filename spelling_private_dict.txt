@@ -72,6 +72,7 @@ tempfile
 tmp
 tmpfs
 travis
+tty
 tuple
 typeshed
 ubuntu
