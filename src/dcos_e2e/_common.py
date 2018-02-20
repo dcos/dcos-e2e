@@ -53,7 +53,7 @@ def run_subprocess(
     # combine them.
     # See http://stackoverflow.com/a/18423003.
     if log_output_live:
-        process_stderr = process_stdout
+        process_stderr = STDOUT
     else:
         process_stderr = PIPE
 
