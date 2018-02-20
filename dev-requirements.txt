@@ -20,7 +20,7 @@ requests-mock==1.4.0
 sphinx-autodoc-typehints==1.2.5
 sphinx-click==1.0.4
 sphinx==1.7.0
-sphinxcontrib-spelling==4.0.1
+sphinxcontrib-spelling==4.1.0
 vulture==0.26
 yapf==0.20.2
 # We should also use https://github.com/pyga/ebb-lint when it is released for
