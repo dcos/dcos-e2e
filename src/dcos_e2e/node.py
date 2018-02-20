@@ -165,11 +165,6 @@ class Node:
             env=env,
             shell=shell,
         )
-        #
-        # if '--no-block-dcos-setup' in args:
-        #
-        #     import pdb; pdb.set_trace()
-        #     pass
 
         return run_subprocess(
             args=ssh_args,

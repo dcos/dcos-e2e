@@ -307,9 +307,6 @@ class DockerCluster(ClusterManager):
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
-        sbin_dir_src = include_dir_src / 'sbin'
-        sbin_dir = include_dir / 'sbin'
-        sbin_dir.mkdir(parents=True)
         service_dir_src = include_dir_src / 'systemd'
         service_dir = include_dir / 'systemd'
         service_dir.mkdir(parents=True)
@@ -365,7 +362,6 @@ class DockerCluster(ClusterManager):
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_tag = docker_image_tag + ':base'
-        base_docker_tag = base_tag + '-docker'
         docker_versions = {
             DockerVersion.v1_13_1: '1.13.1',
             DockerVersion.v1_11_2: '1.11.2',
@@ -682,7 +678,7 @@ class DockerCluster(ClusterManager):
             labels: Docker labels to add to the cluster node containers. Akin
                 to the dictionary option in
                 http://docker-py.readthedocs.io/en/stable/containers.html.
-            public_key_path: XXX
+            public_key_path: The path to an SSH public key to put on the node.
         """
         registry_host = 'registry.local'
         if self.masters:
@@ -725,7 +721,7 @@ class DockerCluster(ClusterManager):
             ['/bin/bash', '-c', disable_systemd_support_cmd],
             ['systemctl', 'start', 'sshd.service'],
             ['mkdir', '/root/.ssh'],
-            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key))
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ]:
             exit_code, output = container.exec_run(cmd=cmd)
             assert exit_code == 0, output
