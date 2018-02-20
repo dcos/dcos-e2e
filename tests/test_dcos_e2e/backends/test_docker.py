@@ -147,9 +147,10 @@ class TestDistributions:
             ('debian', '"8"'): Distribution.DEBIAN_8,
         }
 
-        return distributions[(
-            version_data['ID'].strip(), version_data['VERSION_ID'].strip()
-        ), ]
+        distro_id = version_data['ID'].strip()
+        distro_version_id = version_data['VERSION_ID'].strip()
+
+        return distributions[(distro_id, distro_version_id)]
 
     def test_default(self) -> None:
         """
