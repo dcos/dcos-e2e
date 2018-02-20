@@ -346,6 +346,7 @@ class DockerCluster(ClusterManager):
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path
             if host_path.is_dir():
+                destination_path = destination_path / host_path.stem
                 copytree(src=str(host_path), dst=str(destination_path))
             else:
                 copyfile(src=str(host_path), dst=str(destination_path))
