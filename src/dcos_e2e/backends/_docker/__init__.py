@@ -398,19 +398,11 @@ class DockerCluster(ClusterManager):
             path=str(self._path),
             rm=True,
             forcerm=True,
-            tag=base_docker_tag,
+            tag=docker_image_tag,
             dockerfile=str(
                 Path('build') / 'base-docker' / docker_version / 'Dockerfile'
             ),
         )
-
-        client.images.build(
-            path=str(self._path),
-            rm=True,
-            forcerm=True,
-            tag=docker_image_tag,
-        )
-
         common_mounts = {
             str(certs_dir.resolve()): {
                 'bind': '/etc/docker/certs.d',
