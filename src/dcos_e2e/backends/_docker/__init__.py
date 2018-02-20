@@ -728,15 +728,12 @@ class DockerCluster(ClusterManager):
 
         public_key = public_key_path.read_text()
         echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
-        # echo_key = ['echo', 'foo', '>>', '/root/.ssh/authorized_keys']
-        echo_key = ['/bin/bash', '-c', '"{cmd}"'.format(cmd=' '.join(echo_key))]
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
             ['/bin/bash', '-c', disable_systemd_support_cmd],
             ['systemctl', 'start', 'sshd.service'],
-            ['mkdir', '-p', '/root/.ssh'],
-            ['touch', '/root/.ssh/authorized_keys'],
-            ' '.join(echo_key),
+            ['mkdir', '/root/.ssh'],
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key))
         ]:
             exit_code, output = container.exec_run(cmd=cmd)
             assert exit_code == 0, output
