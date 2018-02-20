@@ -336,7 +336,7 @@ class Cluster(ContextDecorator):
         pytest_command: List[str],
         env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
-        pipe_output: bool = True,
+        tty: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -349,12 +349,10 @@ class Cluster(ContextDecorator):
             log_output_live: If ``True``, log output of the ``pytest_command``
                 live. If ``True``, ``stderr`` is merged into ``stdout`` in the
                 return value.
-            pipe_output: If ``True``, pipes are opened to stdout and stderr.
-                This means that the values of stdout and stderr will be in
-                the returned ``subprocess.CompletedProcess`` and optionally
-                sent to a logger, given ``log_output_live``.
-                If ``False``, no output is sent to a logger and the values are
-                not returned.
+            tty: If ``True``, allocate a pseudo-tty. This means that the users
+                terminal is attached to the streams of the process.
+                This means that the values of stdout and stderr will not be in
+                the returned ``subprocess.CompletedProcess``.
 
         Returns:
             The result of the ``pytest`` command.
@@ -395,7 +393,7 @@ class Cluster(ContextDecorator):
             user=self.default_ssh_user,
             log_output_live=log_output_live,
             env=environment_variables,
-            pipe_output=pipe_output,
+            tty=tty,
             shell=True,
         )
 
