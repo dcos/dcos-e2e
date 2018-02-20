@@ -4,7 +4,7 @@ Common utilities for end to end tests.
 
 import logging
 import subprocess
-from subprocess import PIPE, CompletedProcess, Popen, STDOUT
+from subprocess import PIPE, STDOUT, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
 
 logging.basicConfig(level=logging.DEBUG)
