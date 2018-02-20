@@ -720,6 +720,7 @@ class DockerCluster(ClusterManager):
             ['mkdir', '-p', '/var/lib/dcos'],
             ['/bin/bash', '-c', disable_systemd_support_cmd],
             ['systemctl', 'start', 'sshd.service'],
+            ['mkdir', '--parents', '/root/.ssh'],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ]:
             container.exec_run(cmd=cmd)
