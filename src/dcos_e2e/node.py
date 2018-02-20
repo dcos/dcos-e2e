@@ -236,15 +236,14 @@ class Node:
             key_filename=str(self._ssh_key_path),
         )
 
+        self.run(
+            args=['mkdir', '--parents',
+                  str(remote_path.parent)],
+            user=user,
+        )
+
         with ssh_client.open_sftp() as sftp:
-            try:
-                sftp.put(
-                    localpath=str(local_path),
-                    remotepath=str(remote_path),
-                )
-            except IOError:
-                sftp.mkdir(path=str(remote_path.parent))
-                sftp.put(
-                    localpath=str(local_path),
-                    remotepath=str(remote_path),
-                )
+            sftp.put(
+                localpath=str(local_path),
+                remotepath=str(remote_path),
+            )
