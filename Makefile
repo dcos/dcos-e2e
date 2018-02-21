@@ -30,7 +30,7 @@ mypy:
 	python admin/run_mypy.py
 
 .PHONY: check-manifest
-check-makifest:
+check-manifest:
 	check-manifest .
 
 .PHONY: doc8
