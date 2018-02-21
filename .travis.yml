@@ -34,10 +34,7 @@ env:
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
   - TEST_PATTERN=tests/test_dcos_e2e/test_node.py::TestNode
-  global:
-    secure: CurioLUfLTTBDFdw/+bj9GGHJsjypp/PmU7WRPbGwqeCzM4+LxIkfNmoLMnRVjzhnK3V7W8ZG2WU4BPS51SRljfVl5yJMgsUBf74dY6iHCzcEPQ9diDVuI0idEBR4QI7H9myAbUnc7+wfvzRoRiGDsHkcoDAXQR04B88CmbzSwD/AKu4FW83QJbpcsGyUICcQOgXULqnEB4IIZjrxSEqgX/YN+tinxAi0lr4R5KUNwyiOgBx2XZPRPhikYmuh/eFADGZR2wD0+BxQQK1Bg4vrgbNyP24MFisN8nb1p2spgnIpboNVyhzZwxKUNmDZaQpOHlazv6PkZBZI1lJ0pb1Z+YdyR7Pe2r/S0BiqNyrbBMStlHtmqbyE/P/iFJQ9MZ+R3xn96qRfQuBf+LaGMeEhUUPVD8NMqOY2rgYoJ3btsEZsS0x+2LHsHCaQp4ht36s30NrOcRx7tbq508b2s/AUEIESyolHD29mGlCWXcZyj8A+V+9Aj5YyCGwC76zm/OkAvIJfqpW7UCCzcc5yTXhLF1LsfI4vNzsY1lv3X2B6lYfnGrLJnnOWlJlGfPl/Ns06FFgX0X1myxTa85z9aZIFPvcF0fKImxTi6Bezw0YvNO00Pr/vTVZpkUKjaspNiGSRDcFM01QVl69QN6Zc3nsAwY4owbhdK7ZrBLS0TkwaUQ=
 before_install:
-- docker --version
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
 install:
