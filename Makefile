@@ -1,9 +1,16 @@
 SHELL := /bin/bash -euxo pipefail
 
 OSS_MASTER_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+OSS_1_10_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+OSS_1_11_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 
 OSS_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.sh
+OSS_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.sh
+OSS_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.sh
+
 EE_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
+EE_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.ee.sh
+EE_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.ee.sh
 
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
