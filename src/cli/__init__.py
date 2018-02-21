@@ -1035,7 +1035,7 @@ def doctor() -> None:
 
     try:
         private_mount_container = client.containers.run(
-        image=tiny_image,
+            image=tiny_image,
             tty=True,
             detach=True,
             volumes={
