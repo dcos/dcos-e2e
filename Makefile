@@ -1,9 +1,9 @@
 SHELL := /bin/bash -euxo pipefail
 
-ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+OSS_MASTER_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 
-ARTIFACT_PATH := /tmp/dcos_generate_config.sh
-EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
+OSS_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.sh
+EE_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
 
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
@@ -119,13 +119,13 @@ fix-lint:
 
 .PHONY: clean-artifacts
 clean-artifacts:
-	rm -rf $(ARTIFACT_PATH)
-	rm -rf $(EE_ARTIFACT_PATH)
+	rm -rf $(OSS_MASTER_ARTIFACT_PATH)
+	rm -rf $(EE_MASTER_ARTIFACT_PATH)
 
 .PHONY: download-artifacts
 download-artifacts:
-	curl -o $(ARTIFACT_PATH) $(ARTIFACT_URL)
-	if [ -n "$(EE_ARTIFACT_URL)" ]; then curl -o $(EE_ARTIFACT_PATH) $(EE_ARTIFACT_URL); fi
+	curl -o $(OSS_MASTER_ARTIFACT_PATH) $(OSS_MASTER_ARTIFACT_URL)
+	if [ -n "$(EE_MASTER_ARTIFACT_URL)" ]; then curl -o $(EE_MASTER_ARTIFACT_PATH) $(EE_MASTER_ARTIFACT_URL); fi
 
 .PHONY: docs
 docs:
