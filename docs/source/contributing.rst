@@ -127,7 +127,7 @@ To update this link use the following command, after setting the ``LICENSE_KEY_C
 
 This command will affect all builds and not just the current branch.
 
-We do not use `encrypted secret files <https://docs.travis-ci.com/user/encrypting-files/#Caveat>`__ in case the contents are shown in the logs.
+We do not use `encrypted secret files <https://docs.travis-ci.com/user/encrypting-files/>`__ in case the contents are shown in the logs.
 
 We do not add an encrypted environment variable to ``.travis.yml`` because the license is too large.
 
