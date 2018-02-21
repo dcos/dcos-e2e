@@ -34,6 +34,8 @@ env:
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
   - TEST_PATTERN=tests/test_dcos_e2e/test_node.py::TestNode
+  - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test110
+  - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111
 before_install:
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
@@ -43,7 +45,7 @@ cache: pip
 before_script:
 - make docs
 - make lint
-- travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
+- travis_retry make EE_MASTER_ARTIFACT_URL=$EE_MASTER_ARTIFACT_URL EE_1_10_ARTIFACT_URL=$EE_1_10_ARTIFACT_URL EE_1_11_ARTIFACT_URL=$EE_1_11_ARTIFACT_URL download-artifacts
 script:
 - pytest -vvv -s "$TEST_PATTERN" --cov=src/dcos_e2e --cov=tests
 after_success:
