@@ -1002,8 +1002,10 @@ def doctor() -> None:
     if shutil.which('ssh') is None:
         _error(message='`ssh` must be available on your path.')
 
+    tiny_image = 'tianon/true'
+
     ping_container = client.containers.run(
-        image='alpine',
+        image=tiny_image,
         tty=True,
         detach=True,
     )
@@ -1033,7 +1035,7 @@ def doctor() -> None:
 
     try:
         private_mount_container = client.containers.run(
-            image='alpine',
+            image=tiny_image,
             tty=True,
             detach=True,
             volumes={
