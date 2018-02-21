@@ -19,7 +19,7 @@ def cluster_backend() -> ClusterBackend:
 @pytest.fixture(scope='session')
 def oss_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS OSS.
+    Return the path to a build artifact for DC/OS OSS master.
     """
     return Path('/tmp/dcos_generate_config.sh')
 
@@ -27,7 +27,7 @@ def oss_artifact() -> Path:
 @pytest.fixture(scope='session')
 def enterprise_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS Enterprise.
+    Return the path to a build artifact for DC/OS Enterprise master.
     """
     return Path('/tmp/dcos_generate_config.ee.sh')
 
