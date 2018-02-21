@@ -140,11 +140,17 @@ Updating the DC/OS Enterprise build artifact links
 
 Private links to DC/OS Enterprise artifacts are used by Travis CI.
 
-To update this link use the following command, after setting the ``EE_ARTIFACT_URL`` environment variable.
+To update these links use the following commands, after setting the following environment variables:
+
+* ``EE_MASTER_ARTIFACT_URL``
+* ``EE_1_10_ARTIFACT_URL``
+* ``EE_1_11_ARTIFACT_URL``
 
 .. code:: sh
 
-    travis env set --repo mesosphere/dcos-e2e EE_ARTIFACT_URL $EE_ARTIFACT_URL
+    travis env set --repo mesosphere/dcos-e2e EE_MASTER_ARTIFACT_URL $EE_MASTER_ARTIFACT_URL
+    travis env set --repo mesosphere/dcos-e2e EE_1_10_ARTIFACT_URL $EE_1_10_ARTIFACT_URL
+    travis env set --repo mesosphere/dcos-e2e EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
 
 Parallel builders
 ~~~~~~~~~~~~~~~~~

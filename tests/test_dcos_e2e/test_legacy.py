@@ -5,7 +5,10 @@ We do not test the whole matrix of support, such as each version with each
 Docker version or base operating system, for cost reasons.
 """
 
+import uuid
 from pathlib import Path
+
+from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
