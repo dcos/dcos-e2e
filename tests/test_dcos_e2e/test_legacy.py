@@ -14,7 +14,7 @@ from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
 
-class Test_1_10:
+class Test110:
     """
     Tests for running DC/OS 1.10.
     """
@@ -71,7 +71,7 @@ class Test_1_10:
             )
 
 
-class Test_1_11:
+class Test111:
     """
     Tests for running DC/OS 1.11.
     """
