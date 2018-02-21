@@ -2,6 +2,7 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import json
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -209,9 +210,17 @@ class Cluster(ContextDecorator):
         }
 
         any_master = next(iter(self.masters))
+        config_result = any_master.run(
+            args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
+            user=self.default_ssh_user,
+        )
+        config = json.loads(config_result.stdout.decode())
+        ssl_enabled = config['ssl_enabled']
 
+        scheme = 'https://' if ssl_enabled else 'http://'
+        dcos_url = scheme + str(any_master.public_ip_address)
         enterprise_session = EnterpriseApiSession(
-            dcos_url='https://{ip}'.format(ip=any_master.public_ip_address),
+            dcos_url=dcos_url,
             masters=[str(n.public_ip_address) for n in self.masters],
             slaves=[str(n.public_ip_address) for n in self.agents],
             public_slaves=[
@@ -220,16 +229,17 @@ class Cluster(ContextDecorator):
             auth_user=DcosUser(credentials=credentials),
         )
 
-        response = enterprise_session.get(
-            # We wait for 10 minutes which is arbitrary but should
-            # be more than enough after all systemd units are healthy.
-            '/ca/dcos-ca.crt',
-            retry_timeout=60 * 10,
-            verify=False,
-        )
-        response.raise_for_status()
+        if ssl_enabled:
+            response = enterprise_session.get(
+                # We wait for 10 minutes which is arbitrary but should
+                # be more than enough after all systemd units are healthy.
+                '/ca/dcos-ca.crt',
+                retry_timeout=60 * 10,
+                verify=False,
+            )
+            response.raise_for_status()
+            enterprise_session.set_ca_cert()  # type: ignore
 
-        enterprise_session.set_ca_cert()  # type: ignore
         enterprise_session.wait_for_dcos()  # type: ignore
 
     def __enter__(self) -> 'Cluster':
