@@ -132,6 +132,8 @@ clean-artifacts:
 .PHONY: download-artifacts
 download-artifacts:
 	curl -o $(OSS_MASTER_ARTIFACT_PATH) $(OSS_MASTER_ARTIFACT_URL)
+	curl -o $(OSS_1_10_ARTIFACT_PATH) $(OSS_1_10_ARTIFACT_URL)
+	curl -o $(OSS_1_11_ARTIFACT_PATH) $(OSS_1_11_ARTIFACT_URL)
 	if [ -n "$(EE_MASTER_ARTIFACT_URL)" ]; then curl -o $(EE_MASTER_ARTIFACT_PATH) $(EE_MASTER_ARTIFACT_URL); fi
 
 .PHONY: docs
