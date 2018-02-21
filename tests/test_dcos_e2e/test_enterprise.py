@@ -239,7 +239,11 @@ class TestSecurityDisabled:
             'security': 'disabled',
         }
 
-        with Cluster(cluster_backend=cluster_backend) as cluster:
+        with Cluster(
+            cluster_backend=cluster_backend,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
                 extra_config=config,

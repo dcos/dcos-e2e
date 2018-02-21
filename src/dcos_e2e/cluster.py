@@ -2,6 +2,7 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import json
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -220,16 +221,25 @@ class Cluster(ContextDecorator):
             auth_user=DcosUser(credentials=credentials),
         )
 
-        response = enterprise_session.get(
-            # We wait for 10 minutes which is arbitrary but should
-            # be more than enough after all systemd units are healthy.
-            '/ca/dcos-ca.crt',
-            retry_timeout=60 * 10,
-            verify=False,
+        config_result = any_master.run(
+            args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
+            user=self.default_ssh_user,
         )
-        response.raise_for_status()
 
-        enterprise_session.set_ca_cert()  # type: ignore
+        config = json.loads(config_result.stdout.decode())
+        security_mode = config['security']
+
+        if security_mode != 'disabled':
+            response = enterprise_session.get(
+                # We wait for 10 minutes which is arbitrary but should
+                # be more than enough after all systemd units are healthy.
+                '/ca/dcos-ca.crt',
+                retry_timeout=60 * 10,
+                verify=False,
+            )
+            response.raise_for_status()
+            enterprise_session.set_ca_cert()  # type: ignore
+
         enterprise_session.wait_for_dcos()  # type: ignore
 
     def __enter__(self) -> 'Cluster':
