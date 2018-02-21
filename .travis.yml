@@ -45,7 +45,7 @@ cache: pip
 before_script:
 - make docs
 - make lint
-- travis_retry make EE_ARTIFACT_URL=$EE_ARTIFACT_URL download-artifacts
+- travis_retry make EE_MASTER_ARTIFACT_URL=$EE_MASTER_ARTIFACT_URL EE_1_10_ARTIFACT_URL=$EE_1_10_ARTIFACT_URL EE_1_11_ARTIFACT_URL=$EE_1_11_ARTIFACT_URL download-artifacts
 script:
 - pytest -vvv -s "$TEST_PATTERN" --cov=src/dcos_e2e --cov=tests
 after_success:
