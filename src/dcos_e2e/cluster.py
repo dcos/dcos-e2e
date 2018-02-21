@@ -2,6 +2,7 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
+import json
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -209,9 +210,17 @@ class Cluster(ContextDecorator):
         }
 
         any_master = next(iter(self.masters))
+        config_result = any_master.run(
+            args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
+            user=self.default_ssh_user,
+        )
+        config = json.loads(config_result.stdout.decode())
+        ssl_enabled = config['ssl_enabled']
 
+        scheme = 'https://' if ssl_enabled else 'http://'
+        dcos_url = scheme + str(any_master.public_ip_address)
         enterprise_session = EnterpriseApiSession(
-            dcos_url='https://{ip}'.format(ip=any_master.public_ip_address),
+            dcos_url=dcos_url,
             masters=[str(n.public_ip_address) for n in self.masters],
             slaves=[str(n.public_ip_address) for n in self.agents],
             public_slaves=[
@@ -220,16 +229,17 @@ class Cluster(ContextDecorator):
             auth_user=DcosUser(credentials=credentials),
         )
 
-        response = enterprise_session.get(
-            # We wait for 10 minutes which is arbitrary but should
-            # be more than enough after all systemd units are healthy.
-            '/ca/dcos-ca.crt',
-            retry_timeout=60 * 10,
-            verify=False,
-        )
-        response.raise_for_status()
+        if ssl_enabled:
+            response = enterprise_session.get(
+                # We wait for 10 minutes which is arbitrary but should
+                # be more than enough after all systemd units are healthy.
+                '/ca/dcos-ca.crt',
+                retry_timeout=60 * 10,
+                verify=False,
+            )
+            response.raise_for_status()
+            enterprise_session.set_ca_cert()  # type: ignore
 
-        enterprise_session.set_ca_cert()  # type: ignore
         enterprise_session.wait_for_dcos()  # type: ignore
 
     def __enter__(self) -> 'Cluster':
@@ -336,7 +346,7 @@ class Cluster(ContextDecorator):
         pytest_command: List[str],
         env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
-        pipe_output: bool = True,
+        tty: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -349,12 +359,10 @@ class Cluster(ContextDecorator):
             log_output_live: If ``True``, log output of the ``pytest_command``
                 live. If ``True``, ``stderr`` is merged into ``stdout`` in the
                 return value.
-            pipe_output: If ``True``, pipes are opened to stdout and stderr.
-                This means that the values of stdout and stderr will be in
-                the returned ``subprocess.CompletedProcess`` and optionally
-                sent to a logger, given ``log_output_live``.
-                If ``False``, no output is sent to a logger and the values are
-                not returned.
+            tty: If ``True``, allocate a pseudo-tty. This means that the users
+                terminal is attached to the streams of the process.
+                This means that the values of stdout and stderr will not be in
+                the returned ``subprocess.CompletedProcess``.
 
         Returns:
             The result of the ``pytest`` command.
@@ -395,7 +403,7 @@ class Cluster(ContextDecorator):
             user=self.default_ssh_user,
             log_output_live=log_output_live,
             env=environment_variables,
-            pipe_output=pipe_output,
+            tty=tty,
             shell=True,
         )
 

@@ -144,7 +144,7 @@ To update this link use the following command, after setting the ``EE_ARTIFACT_U
 
 .. code:: sh
 
-    travis encrypt --repo mesosphere/dcos-e2e EE_ARTIFACT_URL="$EE_ARTIFACT_URL" --add
+    travis env set --repo mesosphere/dcos-e2e EE_ARTIFACT_URL $EE_ARTIFACT_URL
 
 Parallel builders
 ~~~~~~~~~~~~~~~~~

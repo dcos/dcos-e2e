@@ -160,8 +160,8 @@ class TestCopyFiles:
         key_filename = 'dcos-ca-certificate-key.key'
 
         genconf = Path('/genconf')
-        installer_cert_path = genconf / cert_filename
-        installer_key_path = genconf / key_filename
+        installer_cert_path = genconf / 'certificates' / cert_filename
+        installer_key_path = genconf / 'certificates' / key_filename
 
         cert_dir_on_host = Path('tests/test_dcos_e2e/certificates').resolve()
         cert_path = cert_dir_on_host / cert_filename
@@ -215,6 +215,46 @@ class TestCopyFiles:
             response.raise_for_status()
 
 
+class TestSecurityDisabled:
+    """
+    Tests for clusters in security disabled mode.
+    """
+
+    def test_wait_for_dcos_ee(
+        self,
+        cluster_backend: ClusterBackend,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        A cluster can start up in security disabled mode.
+        """
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+        config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
+            'security': 'disabled',
+        }
+
+        with Cluster(
+            cluster_backend=cluster_backend,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            cluster.install_dcos_from_path(
+                build_artifact=enterprise_artifact,
+                extra_config=config,
+                log_output_live=True,
+            )
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
+
+
 class TestWaitForDCOS:
     """
     Tests for `Cluster.wait_for_dcos_ee`.
@@ -230,7 +270,6 @@ class TestWaitForDCOS:
         After `Cluster.wait_for_dcos_ee`, the DC/OS Enterprise cluster can
         communicate with the CLI.
         """
-
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         config = {

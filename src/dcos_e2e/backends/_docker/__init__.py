@@ -307,9 +307,6 @@ class DockerCluster(ClusterManager):
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
-        sbin_dir_src = include_dir_src / 'sbin'
-        sbin_dir = include_dir / 'sbin'
-        sbin_dir.mkdir(parents=True)
         service_dir_src = include_dir_src / 'systemd'
         service_dir = include_dir / 'systemd'
         service_dir.mkdir(parents=True)
@@ -322,23 +319,14 @@ class DockerCluster(ClusterManager):
         )
         ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
 
-        dcos_postflight = sbin_dir / 'dcos-postflight'
-
-        copyfile(
-            src=str(sbin_dir_src / 'dcos-postflight'),
-            dst=str(dcos_postflight),
-        )
-        dcos_postflight.chmod(
-            mode=dcos_postflight.stat().st_mode | stat.S_IEXEC,
-        )
-
         copyfile(
             src=str(service_dir_src / 'systemd-journald-init.service'),
             dst=str(service_dir / 'systemd-journald-init.service'),
         )
 
+        public_key_path = ssh_dir / 'id_rsa.pub'
         _write_key_pair(
-            public_key_path=ssh_dir / 'id_rsa.pub',
+            public_key_path=public_key_path,
             private_key_path=ssh_dir / 'id_rsa',
         )
 
@@ -346,6 +334,7 @@ class DockerCluster(ClusterManager):
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path
             if host_path.is_dir():
+                destination_path = destination_path / host_path.stem
                 copytree(src=str(host_path), dst=str(destination_path))
             else:
                 copyfile(src=str(host_path), dst=str(destination_path))
@@ -374,7 +363,6 @@ class DockerCluster(ClusterManager):
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_tag = docker_image_tag + ':base'
-        base_docker_tag = base_tag + '-docker'
         docker_versions = {
             DockerVersion.v1_13_1: '1.13.1',
             DockerVersion.v1_11_2: '1.11.2',
@@ -407,19 +395,11 @@ class DockerCluster(ClusterManager):
             path=str(self._path),
             rm=True,
             forcerm=True,
-            tag=base_docker_tag,
+            tag=docker_image_tag,
             dockerfile=str(
                 Path('build') / 'base-docker' / docker_version / 'Dockerfile'
             ),
         )
-
-        client.images.build(
-            path=str(self._path),
-            rm=True,
-            forcerm=True,
-            tag=docker_image_tag,
-        )
-
         common_mounts = {
             str(certs_dir.resolve()): {
                 'bind': '/etc/docker/certs.d',
@@ -469,6 +449,7 @@ class DockerCluster(ClusterManager):
                         'node_type': 'master',
                     },
                 },
+                public_key_path=public_key_path,
             )
 
         for agent_number in range(1, agents + 1):
@@ -505,6 +486,7 @@ class DockerCluster(ClusterManager):
                         'node_type': 'agent',
                     },
                 },
+                public_key_path=public_key_path,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -541,6 +523,7 @@ class DockerCluster(ClusterManager):
                         'node_type': 'public_agent',
                     },
                 },
+                public_key_path=public_key_path,
             )
 
         # Logically a SSH user should be part of a `Node`.
@@ -672,6 +655,7 @@ class DockerCluster(ClusterManager):
         dcos_num_agents: int,
         docker_image: str,
         labels: Dict[str, str],
+        public_key_path: Path,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -695,6 +679,7 @@ class DockerCluster(ClusterManager):
             labels: Docker labels to add to the cluster node containers. Akin
                 to the dictionary option in
                 http://docker-py.readthedocs.io/en/stable/containers.html.
+            public_key_path: The path to an SSH public key to put on the node.
         """
         registry_host = 'registry.local'
         if self.masters:
@@ -730,10 +715,14 @@ class DockerCluster(ClusterManager):
             '/var/lib/dcos/mesos-slave-common'
         )
 
+        public_key = public_key_path.read_text()
+        echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
             ['/bin/bash', '-c', disable_systemd_support_cmd],
             ['systemctl', 'start', 'sshd.service'],
+            ['mkdir', '--parents', '/root/.ssh'],
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ]:
             container.exec_run(cmd=cmd)
             exit_code, output = container.exec_run(cmd=cmd)
