@@ -1,8 +1,8 @@
 SHELL := /bin/bash -euxo pipefail
 
 OSS_MASTER_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-OSS_1_10_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-OSS_1_11_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+OSS_1_10_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.10/dcos_generate_config.sh
+OSS_1_11_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.11/dcos_generate_config.sh
 
 OSS_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.sh
 OSS_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.sh
