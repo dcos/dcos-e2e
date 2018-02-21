@@ -42,6 +42,7 @@ class Test_1_10:
         self,
         cluster_backend: ClusterBackend,
         enterprise_1_10_artifact: Path,
+        license_key_contents: str,
     ) -> None:
         """
         A DC/OS Enterprise 1.10 cluster can be started.
@@ -98,6 +99,7 @@ class Test_1_11:
         self,
         cluster_backend: ClusterBackend,
         enterprise_1_11_artifact: Path,
+        license_key_contents: str,
     ) -> None:
         """
         A DC/OS Enterprise 1.11 cluster can be started.
