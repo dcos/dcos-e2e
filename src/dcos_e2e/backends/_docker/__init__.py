@@ -44,9 +44,12 @@ def _base_dockerfile_file_obj(linux_distribution: Distribution) -> io.BytesIO:
     distro_path_segment = dcos_docker_distros[linux_distribution]
     current_file = inspect.stack()[0][1]
     current_parent = Path(os.path.abspath(current_file)).parent
-    file_location = (
+    dockerfile = (
         current_parent / 'build' / 'base' / distro_path_segment / 'Dockerfile'
     )
+
+    return io.BytesIO(dockerfile.read_bytes())
+
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
@@ -392,7 +395,7 @@ class DockerCluster(ClusterManager):
         docker_version = docker_versions[cluster_backend.docker_version]
 
         client = docker.from_env(version='auto')
-        _base_dockerfile_file_obj = base_dockerfile(
+        base_dockerfile_file_obj = _base_dockerfile_file_obj(
             linux_distribution=linux_distribution,
         )
         client.images.build(
