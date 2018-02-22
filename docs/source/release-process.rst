@@ -17,6 +17,13 @@ Prerequisites
 Preparing For a Release
 -----------------------
 
+# Set environment variables to GitHub credentials:
+
+    .. code:: sh
+
+       export GH_USER=my_username
+       export GH_PASSWORD=my_password
+
 # Create a release environment:
 
     .. code:: sh
