@@ -84,6 +84,9 @@ def update_changelog(version: str) -> None:
     pass
 
 
+def create_github_release(version: str) -> None:
+    pass
+
 def main() -> None:
     github_username = os.environ['GITHUB_USER']
     github_password = os.environ['GITHUB_PASSWORD']
@@ -98,6 +101,7 @@ def main() -> None:
     homebrew_formula_contents = get_homebrew_formula(version=version_str)
     homebrew_file = Path('dcosdocker.rb')
     homebrew_file.write_text(homebrew_formula_contents)
+    # Merge into master
     update_changelog(version=version_str)
 
 
