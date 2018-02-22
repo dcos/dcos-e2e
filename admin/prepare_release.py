@@ -56,6 +56,7 @@ def get_homebrew_formula(version: str) -> str:
 
     return pattern.format(resource_stanzas=resource_stanzas, version=version)
 
+
 def get_version() -> str:
     """
     Returns the next version of DC/OS E2E.

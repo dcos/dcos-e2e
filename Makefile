@@ -22,6 +22,7 @@ yapf:
 	    --recursive \
 	    --exclude src/dcos_e2e/_vendor \
 	    --exclude src/dcos_e2e/_version.py \
+	    --exclude release/ \
 	    --exclude versioneer.py \
 	    .
 
@@ -113,7 +114,7 @@ fix-lint:
 	    --remove-all-unused-imports \
 	    --remove-unused-variables \
 	    --expand-star-imports \
-	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py \
+	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py,release \
 	    .
 	yapf \
 	    --in-place \
