@@ -4,7 +4,7 @@ Switch to a release branch for the next version of DC/OS E2E.
 
 import datetime
 
-from dulwich.porcelain import tag_list
+from dulwich.porcelain import branch_create, tag_list
 from dulwich.repo import Repo
 
 
@@ -28,17 +28,10 @@ def get_version() -> str:
     return '{date}.{micro}'.format(date=date_str, micro=micro)
 
 
-def checkout_new_branch(name: str) - None:
-    """
-    Checks out a new branch given a branch name.
-    """
-    pass
-
-
 def main():
     version_str = get_version()
     branch_name = 'release-' + version_str
-    checkout_new_branch(name=branch_name)
+    branch_create(repo='.', name=branch_name)
 
 
 if __name__ == '__main__':
