@@ -527,6 +527,12 @@ class DockerCluster(ClusterManager):
                 labels=cluster_backend.docker_container_labels,
             )
 
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            node.run(
+                args=['rm', '-f', '/run/nologin', '||', 'true'],
+                shell=True,
+            )
+
     def install_dcos_from_url(
         self,
         build_artifact: str,

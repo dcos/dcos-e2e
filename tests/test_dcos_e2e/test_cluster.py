@@ -289,7 +289,6 @@ class TestClusterFromNodes:
             masters=cluster.masters,
             agents=cluster.agents,
             public_agents=cluster.public_agents,
-            default_ssh_user=cluster_backend.default_ssh_user,
         ) as duplicate_cluster:
             (duplicate_master, ) = duplicate_cluster.masters
             (duplicate_agent, ) = duplicate_cluster.agents
@@ -298,7 +297,7 @@ class TestClusterFromNodes:
             duplicate_master.run(args=['touch', 'example_master_file'])
             duplicate_agent.run(args=['touch', 'example_agent_file'])
             duplicate_public_agent.run(
-                args=['touch', 'example_public_agent_file']
+                args=['touch', 'example_public_agent_file'],
             )
 
             master.run(args=['test', '-f', 'example_master_file'])
@@ -330,7 +329,6 @@ class TestClusterFromNodes:
                 masters=cluster.masters,
                 agents=cluster.agents,
                 public_agents=cluster.public_agents,
-                default_ssh_user=cluster_backend.default_ssh_user,
             )
 
             with pytest.raises(NotImplementedError):

@@ -94,6 +94,33 @@ class TestNode:
         assert echo_result.stdout.strip() == b'root'
         assert echo_result.stderr == b''
 
+    def test_run_custom_user(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        Commands can be run as a custom user.
+        """
+        (master, ) = dcos_cluster.masters
+
+        testuser = str(uuid.uuid4().hex)
+        master.run(args=['useradd', testuser])
+        master.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        echo_result = master.run(
+            args=['echo', '$USER'],
+            user=testuser,
+            shell=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == testuser
+        assert echo_result.stderr == b''
+
+        master.run(args=['userdel', '-r', testuser])
+
     def test_run_pass_env(
         self,
         dcos_cluster: Cluster,
@@ -217,7 +244,7 @@ class TestNode:
         dcos_cluster: Cluster,
     ) -> None:
         """
-        It is possible to run commands as the given user asynchronously.
+        It is possible to run commands as the default user asynchronously.
         """
         (master, ) = dcos_cluster.masters
 
@@ -246,15 +273,62 @@ class TestNode:
         assert return_code_1 == 0
         assert return_code_2 == 0
 
+    # An arbitrary time limit to avoid infinite wait times.
+    @pytest.mark.timeout(60)
+    def test_popen_custom_user(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        It is possible to run commands as a custom user asynchronously.
+        """
+        (master, ) = dcos_cluster.masters
+
+        testuser = str(uuid.uuid4().hex)
+        master.run(args=['useradd', testuser])
+        master.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        popen_1 = master.popen(
+            args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
+            user=testuser,
+            shell=True,
+        )
+
+        popen_2 = master.popen(
+            args=[
+                '(mkfifo /tmp/pipe | true)',
+                '&&',
+                '(echo $USER > /tmp/pipe)',
+            ],
+            user=testuser,
+            shell=True,
+        )
+
+        stdout, _ = popen_1.communicate()
+        return_code_1 = popen_1.poll()
+
+        # Needed to cleanly terminate second subprocess
+        popen_2.communicate()
+        return_code_2 = popen_2.poll()
+
+        assert stdout.strip().decode() == testuser
+        assert return_code_1 == 0
+        assert return_code_2 == 0
+
+        master.run(args=['userdel', '-r', testuser])
+
     def test_send_file(
         self,
         dcos_cluster: Cluster,
         tmpdir: local,
     ) -> None:
         """
-        It is possible to send a file to a cluster node.
+        It is possible to send a file to a cluster node as the default user.
         """
-        content = str(uuid.uuid4())
+        content = str(uuid.uuid4().hex)
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
         master_destination_path = Path('/etc/new_dir/on_master_node.txt')
@@ -266,6 +340,38 @@ class TestNode:
         args = ['cat', str(master_destination_path)]
         result = master.run(args=args)
         assert result.stdout.decode() == content
+
+    def test_send_file_custom_user(
+        self,
+        dcos_cluster: Cluster,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node as a custom user.
+        """
+        (master, ) = dcos_cluster.masters
+
+        testuser = str(uuid.uuid4().hex)
+        master.run(args=['useradd', testuser])
+        master.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        content = str(uuid.uuid4().hex)
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        master_destination_path = Path('/etc/new_dir/on_master_node.txt')
+        (master, ) = dcos_cluster.masters
+        master.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = master.run(args=args, user=testuser)
+        assert result.stdout.decode() == content
+
+        master.run(args=['userdel', '-r', testuser])
 
     def test_string_representation(
         self,

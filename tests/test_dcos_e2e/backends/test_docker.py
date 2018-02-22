@@ -332,7 +332,7 @@ class TestDockerStorageDriver:
         """
         Given a `Node`, return the `DockerStorageDriver` on that node.
         """
-        result = node.run(args=['docker', 'info', '--format', '{{.Driver}}'], )
+        result = node.run(args=['docker', 'info', '--format', '{{.Driver}}'])
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 

@@ -59,7 +59,6 @@ class Cluster(ContextDecorator):
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
-        default_ssh_user: str,
     ) -> 'Cluster':
         """
         Create a cluster from existing nodes.
@@ -68,7 +67,6 @@ class Cluster(ContextDecorator):
             masters: The master nodes in an existing cluster.
             agents: The agent nodes in an existing cluster.
             public_agents: The public agent nodes in an existing cluster.
-            default_ssh_user: The default username to use for SSH connections.
 
         Returns:
             A cluster object with the nodes of an existing cluster.
@@ -77,7 +75,6 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            default_ssh_user=default_ssh_user,
         )
 
         return cls(
