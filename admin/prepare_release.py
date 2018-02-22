@@ -89,8 +89,9 @@ def main() -> None:
         b'HEAD',
         b'refs/heads/' + branch_name.encode('utf-8'),
     )
-    homebrew_formula_contents = ''
-    print(homebrew_formula_contents)
+    homebrew_formula_contents = get_homebrew_formula(version=version_str)
+    homebrew_file = Path('dcosdocker.rb')
+    homebrew_file.write_text(homebrew_formula_contents)
 
 
 if __name__ == '__main__':
