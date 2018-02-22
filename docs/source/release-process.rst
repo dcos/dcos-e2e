@@ -27,6 +27,7 @@ Preparing For a Release
        virtualenv -p python3 release
        source release/bin/activate
        pip install --editable .[dev]
+       python admin/choose_version.py
 
 #. Choose a new version:
 
