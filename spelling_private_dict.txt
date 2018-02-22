@@ -19,6 +19,7 @@ dict
 dir
 enum
 env
+eval
 fallback
 func
 genconf
@@ -40,6 +41,7 @@ pluggable
 postflight
 pragma
 py
+pyperclip
 pytest
 reachability
 rsa
@@ -54,6 +56,7 @@ submodules
 subprocess
 symlink
 systemd
+tarfile
 tempfile
 tmp
 tmpfs
@@ -70,5 +73,7 @@ sso
 oauth
 versioning
 whitespace
+wildcard
 workspace
+yapf
 zookeeper
