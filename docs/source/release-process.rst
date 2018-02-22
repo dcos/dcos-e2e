@@ -6,6 +6,7 @@ Outcomes
 
 * A new ``git`` tag available to install.
 * An updated `Homebrew`_ recipe.
+* Python 3.5+.
 
 Prerequisites
 -------------
@@ -21,6 +22,13 @@ Performing a Release
    .. code:: sh
 
       git clone git@github.com:mesosphere/dcos-e2e.git
+
+# Create a virtual environment:
+
+    .. code:: sh
+
+       cd dcos-e2e
+       pip install --editable .[dev]
 
 #. Choose a new version:
 
@@ -38,10 +46,15 @@ Performing a Release
        git fetch origin
        git checkout -b release-$DCOS_E2E_RELEASE origin/master
 
-#. Add changes in the new release to ``CHANGELOG.rst``.
+#. Update Homebrew
 
-   Do not add a change note which says that this updates the tool to work with the latest version of DC/OS OSS or DC/OS Enterprise, as this is implied.
-   If this is the only change, add an empty entry to the changelog.
+   .. code:: sh
+
+      make update-homebrew
+
+#. Change ``CHANGELOG.rst`` title.
+
+
 
 #. Commit and push changes.
 

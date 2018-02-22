@@ -35,3 +35,4 @@ Reference
    :hidden:
 
    changelog
+   release-process
