@@ -13,6 +13,8 @@ Prerequisites
 * `Homebrew`_ or `Linuxbrew`_.
 * ``python3`` on your ``PATH`` set to Python 3.5+.
 * Push access to this repository.
+* Trust that ``master`` is ready and high enough quality for release.
+  This includes the ``Next`` section in ``CHANGELOG.rst`` being up to date.
 
 Preparing For a Release
 -----------------------
@@ -47,13 +49,11 @@ Add a section heading below "Next" with the title of the release in progress.
        git commit -am "Bump version to $DCOS_E2E_RELEASE"
        git push
 
-#. Create a Pull Request to merge the ``release`` branch into ``master``.
-
 
 Release
 -------
 
-#. Merge the ``release`` Pull Request once CI has passed.
+#. Merge the ``release`` Pull Request.
 
 #. Tag a release:
 
