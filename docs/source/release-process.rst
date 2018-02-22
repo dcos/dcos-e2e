@@ -29,27 +29,6 @@ Preparing For a Release
        pip install --editable .[dev]
        python admin/choose_version.py
 
-#. Choose a new version:
-
-   .. code:: sh
-
-       export DCOS_E2E_RELEASE=2017.06.15.0
-
-#. Create a release branch:
-
-   .. code:: sh
-
-       git fetch origin
-       git checkout -b release-$DCOS_E2E_RELEASE origin/master
-
-#. Update Homebrew
-
-   .. code:: sh
-
-      make update-homebrew
-
-Change the ``url`` in ``dcosdocker.rb`` to link to the release in progress.
-
 #. Change ``CHANGELOG.rst`` title.
 
 Add a section heading below "Next" with the title of the release in progress.
