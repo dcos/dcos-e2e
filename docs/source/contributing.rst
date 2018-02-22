@@ -279,3 +279,17 @@ To update the Homebrew recipe, run the following command:
 .. code:: sh
 
    make update-homebrew
+
+Then test the Homebrew recipe:
+
+Install `Homebrew`_ or `Linuxbrew`_.
+
+.. code:: sh
+
+   brew install dcosdocker.rb
+   brew audit dcosdocker
+   brew test dcosdocker
+
+
+.. _Homebrew: https://brew.sh/
+.. _Linuxbrew: http://linuxbrew.sh/
