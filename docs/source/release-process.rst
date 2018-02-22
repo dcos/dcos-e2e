@@ -6,13 +6,13 @@ Outcomes
 
 * A new ``git`` tag available to install.
 * An updated `Homebrew`_ recipe.
-* Python 3.5+.
 
 Prerequisites
 -------------
 
 * `Homebrew`_ or `Linuxbrew`_.
-* ``git``.
+* ``python3`` on your ``PATH`` set to Python 3.5+.
+* Push access to this repository.
 
 Preparing For a Release
 -----------------------
