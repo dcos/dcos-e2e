@@ -1,5 +1,5 @@
 """
-Print "export DCOS_E2E_RELEASE={version}" for the next version of DC/OS E2E.
+Switch to a release branch for the next version of DC/OS E2E.
 """
 
 import datetime
@@ -28,5 +28,11 @@ def get_version():
     return '{date}.{micro}'.format(date=date_str, micro=micro)
 
 
+def main():
+    version_str = get_version()
+    branch_name = 'release-' + version_str
+    checkout_new_branch(branch_name=branch_name)
+
+
 if __name__ == '__main__':
-    print(get_version())
+    main()
