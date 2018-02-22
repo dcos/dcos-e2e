@@ -26,6 +26,7 @@ def get_formula(version: str) -> str:
           include Language::Python::Virtualenv
 
           url "https://github.com/mesosphere/dcos-e2e.git#{version}"
+          head "https://github.com/mesosphere/dcos-e2e.git"
           homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
           depends_on "python3"
 
