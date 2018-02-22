@@ -1,6 +1,16 @@
 Release Process
 ===============
 
+Outcomes
+--------
+
+
+Prerequisites
+-------------
+
+* `Homebrew`_ or `Linuxbrew`_.
+* ``git``.
+
 This repository aims to work with DC/OS OSS and DC/OS Enterprise ``master`` branches.
 These are moving targets.
 For this reason, `CalVer <http://calver.org/>`__ is used as a date at which the repository is last known to have worked with DC/OS OSS and DC/OS Enterprise is the main versioning use.
@@ -45,3 +55,6 @@ The release process is as follows.
    Set the "Tag version" to the new version.
    Choose "master" as the target.
    Add the changes from the changelog to the release description.
+
+.. _Homebrew: https://brew.sh/
+.. _Linuxbrew: http://linuxbrew.sh/
