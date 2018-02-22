@@ -26,7 +26,6 @@ def get_formula() -> str:
           include Language::Python::Virtualenv
 
           url "https://github.com/mesosphere/dcos-e2e.git"
-          head "https://github.com/mesosphere/dcos-e2e.git"
           homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
           depends_on "python3"
 
@@ -49,4 +48,4 @@ def get_formula() -> str:
 
 
 if __name__ == '__main__':
-    print(get_formula())
+    print(get_formula(version=master))
