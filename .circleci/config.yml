@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  build:
+    macos:
+      xcode: "9.2.0"
+
+      - run:
+          name: Install CLI
+          command: brew install https://github.com/mesosphere/dcos-e2e/blob/master/dcosdocker.rb
+
+      - run:
+          name: Audit formula
+          command: brew audit dcosdocker
+
+      - run:
+          name: Test formula
+          command: brew test dcosdocker
