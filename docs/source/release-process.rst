@@ -13,8 +13,8 @@ Prerequisites
 * `Homebrew`_ or `Linuxbrew`_.
 * ``git``.
 
-
-The release process is as follows.
+Performing a Release
+--------------------
 
 #. Choose a new version.
 
