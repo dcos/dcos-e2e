@@ -45,7 +45,7 @@ def get_formula(version: str) -> str:
         """
     )
 
-    return pattern.format(resource_stanzas=resource_stanzas)
+    return pattern.format(resource_stanzas=resource_stanzas, version=version)
 
 
 if __name__ == '__main__':
