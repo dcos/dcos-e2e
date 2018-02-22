@@ -81,6 +81,8 @@ def update_changelog(version: str) -> None:
 
 
 def main() -> None:
+    github_username = os.environ['GITHUB_USER']
+    github_password = os.environ['GITHUB_PASSWORD']
     version_str = get_version()
     branch_name = 'release-' + version_str
     branch_create(repo='.', name=branch_name.encode('utf-8'))

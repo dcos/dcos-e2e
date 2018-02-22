@@ -21,8 +21,8 @@ Preparing For a Release
 
     .. code:: sh
 
-       export GH_USER=my_username
-       export GH_PASSWORD=my_password
+       export GITHUB_USER=my_username
+       export GITHUB_PASSWORD=my_password
 
 # Create a release environment:
 
