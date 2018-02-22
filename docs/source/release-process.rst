@@ -14,8 +14,8 @@ Prerequisites
 * `Homebrew`_ or `Linuxbrew`_.
 * ``git``.
 
-Performing a Release
---------------------
+Preparing For a Release
+-----------------------
 
 #. Clone DC/OS E2E:
 
@@ -54,7 +54,7 @@ Performing a Release
 
 #. Change ``CHANGELOG.rst`` title.
 
-
+# TODO
 
 #. Commit and push changes.
 
@@ -64,6 +64,10 @@ Performing a Release
        git push
 
 #. Create a Pull Request to merge the ``release`` branch into ``master``.
+
+
+Release
+-------
 
 #. Merge the ``release`` Pull Request once CI has passed.
 
