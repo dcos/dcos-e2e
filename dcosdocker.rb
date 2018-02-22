@@ -1,8 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/mesosphere/dcos-e2e.git"
-  head "https://github.com/mesosphere/dcos-e2e.git"
+  url "https://github.com/mesosphere/dcos-e2e.git#2018.01.25.0"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
 
