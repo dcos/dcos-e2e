@@ -4,6 +4,7 @@ Helpers for creating and interacting with clusters on Docker.
 
 import configparser
 import inspect
+import io
 import os
 import socket
 import stat
@@ -27,6 +28,25 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
+
+def _base_dockerfile_file_obj(linux_distribution: Distribution) -> io.BytesIO:
+    """
+    Return the Dockerfile to use for the base OS image.
+    """
+    dcos_docker_distros = {
+        Distribution.CENTOS_7: 'centos-7',
+        Distribution.UBUNTU_16_04: 'ubuntu-xenial',
+        Distribution.FEDORA_23: 'fedora-23',
+        Distribution.COREOS: 'coreos',
+        Distribution.DEBIAN_8: 'debian-jessie',
+    }
+
+    distro_path_segment = dcos_docker_distros[linux_distribution]
+    current_file = inspect.stack()[0][1]
+    current_parent = Path(os.path.abspath(current_file)).parent
+    file_location = (
+        current_parent / 'build' / 'base' / distro_path_segment / 'Dockerfile'
+    )
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
@@ -368,27 +388,19 @@ class DockerCluster(ClusterManager):
             DockerVersion.v1_11_2: '1.11.2',
         }
 
-        dcos_docker_distros = {
-            Distribution.CENTOS_7: 'centos-7',
-            Distribution.UBUNTU_16_04: 'ubuntu-xenial',
-            Distribution.FEDORA_23: 'fedora-23',
-            Distribution.COREOS: 'coreos',
-            Distribution.DEBIAN_8: 'debian-jessie',
-        }
-
         linux_distribution = cluster_backend.linux_distribution
-        distro_path_segment = dcos_docker_distros[linux_distribution]
         docker_version = docker_versions[cluster_backend.docker_version]
 
         client = docker.from_env(version='auto')
+        _base_dockerfile_file_obj = base_dockerfile(
+            linux_distribution=linux_distribution,
+        )
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
             tag=base_tag,
-            dockerfile=str(
-                Path('build') / 'base' / distro_path_segment / 'Dockerfile'
-            ),
+            fileobj=base_dockerfile_file_obj,
         )
 
         client.images.build(
