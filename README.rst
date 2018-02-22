@@ -6,6 +6,8 @@
 
 |Documentation Status|
 
+|Circle CI|
+
 DC/OS E2E
 =========
 
@@ -99,3 +101,5 @@ Each of these commands and more described in detail in the `full CLI documentati
 .. |Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
+.. |Circle CI| image:: https://circleci.com/gh/adamtheturtle/dcos-e2e.svg?style=svg
+    :target: https://circleci.com/gh/adamtheturtle/dcos-e2e
