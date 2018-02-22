@@ -16,7 +16,13 @@ Prerequisites
 Performing a Release
 --------------------
 
-#. Choose a new version.
+#. Clone DC/OS E2E:
+
+   .. code:: sh
+
+      git clone git@github.com:mesosphere/dcos-e2e.git
+
+#. Choose a new version:
 
    This should be today’s date in the format ``YYYY.MM.DD.MICRO``.
    ``MICRO`` should refer to the number of releases created on this date, starting from ``0``.
