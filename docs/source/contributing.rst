@@ -271,15 +271,8 @@ Update the SHA in ``src/vendorize.toml``.
     git add dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
-
-Homebrew
---------
-
-There is a Homebrew option for installing the CLI on macOS.
-Currently only ``master`` is supported.
-
 Updating the Homebrew Recipe
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 To update the Homebrew recipe, run the following command:
 
