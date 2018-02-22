@@ -17,17 +17,15 @@ Prerequisites
 Preparing For a Release
 -----------------------
 
-#. Clone DC/OS E2E:
-
-   .. code:: sh
-
-      git clone git@github.com:mesosphere/dcos-e2e.git
-
-# Create a virtual environment:
+# Create a release environment:
 
     .. code:: sh
 
+       cd $(mktemp -d)
        cd dcos-e2e
+       git clone git@github.com:mesosphere/dcos-e2e.git
+       virtualenv -p python3 release
+       source release/bin/activate
        pip install --editable .[dev]
 
 #. Choose a new version:
