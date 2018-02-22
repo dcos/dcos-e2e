@@ -328,7 +328,7 @@ class TestNode:
         """
         It is possible to send a file to a cluster node as the default user.
         """
-        content = str(uuid.uuid4().hex)
+        content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
         master_destination_path = Path('/etc/new_dir/on_master_node.txt')
@@ -358,7 +358,7 @@ class TestNode:
             shell=True,
         )
 
-        content = str(uuid.uuid4().hex)
+        content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
         master_destination_path = Path('/etc/new_dir/on_master_node.txt')
