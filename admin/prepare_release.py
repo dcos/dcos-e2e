@@ -3,6 +3,7 @@ Switch to a release branch for the next version of DC/OS E2E.
 """
 
 import datetime
+import os
 import subprocess
 from pathlib import Path
 from textwrap import dedent
@@ -77,6 +78,9 @@ def get_version() -> str:
 
 
 def update_changelog(version: str) -> None:
+    """
+    XXX
+    """
     pass
 
 
