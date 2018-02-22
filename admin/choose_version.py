@@ -32,6 +32,8 @@ def main():
     version_str = get_version()
     branch_name = 'release-' + version_str
     branch_create(repo='.', name=branch_name.encode('utf-8'))
+    repo = Repo('.')
+    repo.refs.set_symbolic_ref(b'HEAD', b'refs/heads/' + branch_name.encode('utf-8'))
 
 
 if __name__ == '__main__':
