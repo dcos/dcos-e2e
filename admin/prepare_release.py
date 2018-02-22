@@ -76,7 +76,7 @@ def get_version() -> str:
     return '{date}.{micro}'.format(date=date_str, micro=micro)
 
 
-def update_changelog() -> None:
+def update_changelog(version: str) -> None:
     pass
 
 
@@ -92,6 +92,7 @@ def main() -> None:
     homebrew_formula_contents = get_homebrew_formula(version=version_str)
     homebrew_file = Path('dcosdocker.rb')
     homebrew_file.write_text(homebrew_formula_contents)
+    update_changelog(version=version_str)
 
 
 if __name__ == '__main__':
