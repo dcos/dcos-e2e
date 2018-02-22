@@ -84,8 +84,16 @@ def update_changelog(version: str) -> None:
     pass
 
 
-def create_github_release(version: str) -> None:
+def create_github_release(
+    github_username: str,
+    github_password: str,
+    version: str,
+) -> None:
+    """
+    XXX
+    """
     pass
+
 
 def main() -> None:
     github_username = os.environ['GITHUB_USER']
