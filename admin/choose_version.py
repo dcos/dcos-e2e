@@ -8,7 +8,7 @@ from dulwich.porcelain import tag_list
 from dulwich.repo import Repo
 
 
-def get_version():
+def get_version() -> str:
     """
     Returns the next version of DC/OS E2E.
     This is today’s date in the format ``YYYY.MM.DD.MICRO``.
@@ -28,10 +28,17 @@ def get_version():
     return '{date}.{micro}'.format(date=date_str, micro=micro)
 
 
+def checkout_new_branch(name: str) - None:
+    """
+    Checks out a new branch given a branch name.
+    """
+    pass
+
+
 def main():
     version_str = get_version()
     branch_name = 'release-' + version_str
-    checkout_new_branch(branch_name=branch_name)
+    checkout_new_branch(name=branch_name)
 
 
 if __name__ == '__main__':
