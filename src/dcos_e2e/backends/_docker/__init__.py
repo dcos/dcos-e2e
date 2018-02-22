@@ -4,7 +4,6 @@ Helpers for creating and interacting with clusters on Docker.
 
 import configparser
 import inspect
-import io
 import os
 import socket
 import stat
@@ -29,7 +28,7 @@ from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
 
-def _base_dockerfile_file_obj(linux_distribution: Distribution) -> io.BytesIO:
+def _base_dockerfile(linux_distribution: Distribution) -> Path:
     """
     Return the Dockerfile to use for the base OS image.
     """
@@ -44,11 +43,12 @@ def _base_dockerfile_file_obj(linux_distribution: Distribution) -> io.BytesIO:
     distro_path_segment = dcos_docker_distros[linux_distribution]
     current_file = inspect.stack()[0][1]
     current_parent = Path(os.path.abspath(current_file)).parent
+    dcos_docker = current_parent / 'dcos_docker'
     dockerfile = (
-        current_parent / 'build' / 'base' / distro_path_segment / 'Dockerfile'
+        dcos_docker / 'build' / 'base' / distro_path_segment / 'Dockerfile'
     )
 
-    return io.BytesIO(dockerfile.read_bytes())
+    return dockerfile
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -395,7 +395,7 @@ class DockerCluster(ClusterManager):
         docker_version = docker_versions[cluster_backend.docker_version]
 
         client = docker.from_env(version='auto')
-        base_dockerfile_file_obj = _base_dockerfile_file_obj(
+        base_dockerfile = _base_dockerfile(
             linux_distribution=linux_distribution,
         )
         client.images.build(
@@ -403,7 +403,7 @@ class DockerCluster(ClusterManager):
             rm=True,
             forcerm=True,
             tag=base_tag,
-            fileobj=base_dockerfile_file_obj,
+            dockerfile=str(base_dockerfile),
         )
 
         client.images.build(
