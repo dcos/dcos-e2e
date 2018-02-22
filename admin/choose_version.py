@@ -31,7 +31,7 @@ def get_version() -> str:
 def main():
     version_str = get_version()
     branch_name = 'release-' + version_str
-    branch_create(repo='.', name=branch_name)
+    branch_create(repo='.', name=branch_name.encode('utf-8'))
 
 
 if __name__ == '__main__':
