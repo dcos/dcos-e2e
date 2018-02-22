@@ -3,13 +3,12 @@ Switch to a release branch for the next version of DC/OS E2E.
 """
 
 import datetime
-
-from dulwich.porcelain import branch_create, tag_list
-from dulwich.repo import Repo
-
 import subprocess
 from pathlib import Path
 from textwrap import dedent
+
+from dulwich.porcelain import branch_create, tag_list
+from dulwich.repo import Repo
 
 
 def get_homebrew_formula(version: str) -> str:
@@ -61,8 +60,8 @@ def get_version() -> str:
     """
     Returns the next version of DC/OS E2E.
     This is today’s date in the format ``YYYY.MM.DD.MICRO``.
-    ``MICRO`` refers to the number of releases created on this date, starting
-    from ``0``.
+    ``MICRO`` refers to the number of releases created on this date,
+    starting from ``0``.
     """
     utc_now = datetime.datetime.utcnow()
     date_format = '%Y.%m.%d'
@@ -76,17 +75,22 @@ def get_version() -> str:
     micro = int(len(today_tag_labels))
     return '{date}.{micro}'.format(date=date_str, micro=micro)
 
+
 def update_changelog() -> None:
     pass
 
 
-def main():
+def main() -> None:
     version_str = get_version()
     branch_name = 'release-' + version_str
     branch_create(repo='.', name=branch_name.encode('utf-8'))
     repo = Repo('.')
-    repo.refs.set_symbolic_ref(b'HEAD', b'refs/heads/' + branch_name.encode('utf-8'))
-    homebrew_formula_contents = 
+    repo.refs.set_symbolic_ref(
+        b'HEAD',
+        b'refs/heads/' + branch_name.encode('utf-8'),
+    )
+    homebrew_formula_contents = ''
+    print(homebrew_formula_contents)
 
 
 if __name__ == '__main__':
