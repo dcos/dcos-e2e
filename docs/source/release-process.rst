@@ -52,9 +52,11 @@ Preparing For a Release
 
       make update-homebrew
 
+Change the ``url`` in ``dcosdocker.rb`` to link to the release in progress.
+
 #. Change ``CHANGELOG.rst`` title.
 
-# TODO
+Add a section heading below "Next" with the title of the release in progress.
 
 #. Commit and push changes.
 

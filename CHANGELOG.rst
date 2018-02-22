@@ -3,8 +3,8 @@ Changelog
 
 .. contents::
 
-|NEXT-RELEASE|
---------------
+Next
+----
 
 -  Add ``linux_distribution`` parameter to the ``Docker`` backend.
 -  Add support for CoreOS in the ``Docker`` backend.
