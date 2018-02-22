@@ -366,6 +366,7 @@ class TestNode:
         master.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
+            user=testuser,
         )
         args = ['cat', str(master_destination_path)]
         result = master.run(args=args, user=testuser)
