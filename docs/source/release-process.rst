@@ -32,9 +32,6 @@ Preparing For a Release
 
 #. Choose a new version:
 
-   This should be today’s date in the format ``YYYY.MM.DD.MICRO``.
-   ``MICRO`` should refer to the number of releases created on this date, starting from ``0``.
-
    .. code:: sh
 
        export DCOS_E2E_RELEASE=2017.06.15.0
