@@ -11,8 +11,9 @@ from textwrap import dedent
 
 import docutils
 import docutils.parsers.rst
-from dulwich.porcelain import add, branch_create, commit, push, tag_list
+from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
+from github import Github
 
 
 def get_homebrew_formula(version: str) -> str:
@@ -92,6 +93,7 @@ def update_changelog(version: str) -> None:
     )
     changelog.write_text(new_changelog_contents)
 
+
 def get_changelog_contents() -> str:
     """
     XXX
@@ -138,16 +140,24 @@ def create_github_release(
     """
     XXX
     """
-    from github import Github
     gh = Github(github_token)
-    for repo in gh.get_user().get_repos():
-        print(repo.name)
+    org = gh.get_organization('mesosphere')
+    repository = org.get_repo('dcos-e2e')
+    repository.create_git_tag_and_release(
+        tag=version,
+        tag_message='Release ' + version,
+        release_name='Release ' + version,
+        release_message=changelog_contents,
+        type='commit',
+        object=repository.get_commits()[0].sha,
+    )
 
 
-def commit_and_push() -> None:
+def commit_and_push(version: str) -> None:
     repo = Repo('.')
     add()
-    commit(message=b'Update for release')
+    message = b'Update for release ' + version.encode('utf-8')
+    commit(message=message)
     branch_name = 'master'
     push(
         repo=repo,
@@ -170,8 +180,7 @@ def main() -> None:
     version_str = get_version()
     changelog_contents = get_changelog_contents()
     update_changelog(version=version_str)
-    version_str = get_version()
-    # commit_and_push()
+    # commit_and_push(version=version_str)
     # update_homebrew(version_str=version_str)
     create_github_release(
         changelog_contents=changelog_contents,
