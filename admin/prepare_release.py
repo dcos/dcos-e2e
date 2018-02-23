@@ -11,7 +11,7 @@ from textwrap import dedent
 
 import docutils
 import docutils.parsers.rst
-from dulwich.porcelain import branch_create, tag_list
+from dulwich.porcelain import add, branch_create, commit, push, tag_list
 from dulwich.repo import Repo
 
 
@@ -154,6 +154,16 @@ def create_github_release(
     """
 
 
+def commit_and_push(version: str) -> None:
+    repo = Repo('.')
+    add()
+    commit(message=b'Update for release')
+    push(repo=repo)
+    import pdb; pdb.set_trace()
+
+    pass
+
+
 def update_homebrew(version_str: str) -> None:
     """
     Update the Homebrew file.
@@ -168,10 +178,13 @@ def main() -> None:
     github_password = os.environ['GITHUB_PASSWORD']
     changelog_contents = get_changelog_contents()
     version_str = get_version()
+    commit_and_push(version=version_str)
+    return
     # branch_name = 'release-' + version_str
     # checkout_new_branch(branch_name=branch_name)
     # update_homebrew(version_str=version_str)
-    # update_changelog(version=version_str)
+    update_changelog(version=version_str)
+    commit_and_push()
     # Commit
     # Push
     # Create PR
