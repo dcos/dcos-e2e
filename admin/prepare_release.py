@@ -159,6 +159,7 @@ def commit_and_push(version: str, branch_name: str) -> None:
     add()
     commit(message=b'Update for release')
     ref_name = 'refs/heads/{branch_name}'.format(branch_name=branch_name)
+    import pdb; pdb.set_trace()
     push(
         repo=repo,
         remote_location='git@github.com:mesosphere/dcos-e2e.git',
