@@ -119,12 +119,14 @@ def get_changelog_contents() -> str:
 
     parser = docutils.parsers.rst.Parser()
     parser.parse(source, document)
-    [next_section] = [
-        item for item in document.traverse() if 'ids' in item and
-        item['ids'] == ['next']
-    ]
+    try:
+        [next_section] = [
+            item for item in document.traverse() if 'ids' in item and
+            item['ids'] == ['next']
+        ]
+    except ValueError:
+        raise ValueError('Expecting section titled "Next" in CHANGELOG.rst')
 
-    list_items = []
     bullet_list_index = next_section.first_child_matching_class(
         childclass=docutils.nodes.bullet_list,
     )
@@ -135,10 +137,10 @@ def get_changelog_contents() -> str:
 
     bullet_list = next_section[bullet_list_index]
     list_items = [bullet.astext() for bullet in bullet_list]
-    # for item in bullet_list:
-    # import pdb; pdb.set_trace()
-    return bullet_list.astext()
-    return ''
+    result = ''
+    for item in list_items:
+        result += '* ' + item + '\n\n'
+    return result.strip()
 
 def create_github_release(
     changelog_contents: str,
