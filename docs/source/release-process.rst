@@ -18,11 +18,11 @@ Prerequisites
 Preparing For a Release
 -----------------------
 
-# Get a GitHub access token:
+#. Get a GitHub access token:
 
 Follow the `GitHub instructions <https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/>`__ for getting an access token.
 
-# Set environment variables to GitHub credentials, e.g.:
+#. Set environment variables to GitHub credentials, e.g.:
 
     .. code:: sh
 
