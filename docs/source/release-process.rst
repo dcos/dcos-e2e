@@ -29,7 +29,7 @@ Follow the `GitHub instructions <https://help.github.com/articles/creating-a-per
 
        export GITHUB_TOKEN=75c72ad718d9c346c13d30ce762f121647b502414
 
-# Perform a release:
+#. Perform a release:
 
     .. code:: sh
 
