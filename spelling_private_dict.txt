@@ -21,7 +21,6 @@ dcos
 dict
 diff
 dir
-dockerfile
 enum
 env
 eval
