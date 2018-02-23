@@ -12,6 +12,7 @@ Prerequisites
 -------------
 
 * ``python3`` on your ``PATH`` set to Python 3.5+.
+* ``virtualenv``.
 * Push access to this repository.
 * Trust that ``master`` is ready and high enough quality for release.
   This includes the ``Next`` section in ``CHANGELOG.rst`` being up to date.
@@ -33,6 +34,6 @@ Follow the `GitHub instructions <https://help.github.com/articles/creating-a-per
 
     .. code:: sh
 
-       curl https://github.com/mesosphere/dcos-e2e/blob/master/admin/release.sh | bash
+       curl https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/admin/release.sh | bash
 
 .. _Homebrew: https://brew.sh/
