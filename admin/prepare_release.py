@@ -4,8 +4,8 @@ Switch to a release branch for the next version of DC/OS E2E.
 
 import datetime
 import os
-import uuid
 import subprocess
+import uuid
 from pathlib import Path
 from textwrap import dedent
 
@@ -113,7 +113,7 @@ def get_changelog_contents() -> str:
     source = changelog.read_text()
     document_name = uuid.uuid4().hex
     settings = docutils.frontend.OptionParser(
-        components=(docutils.parsers.rst.Parser,)
+        components=(docutils.parsers.rst.Parser, )
     ).get_default_values()
     document = docutils.utils.new_document(document_name, settings)
 
@@ -121,8 +121,8 @@ def get_changelog_contents() -> str:
     parser.parse(source, document)
     try:
         [next_section] = [
-            item for item in document.traverse() if 'ids' in item and
-            item['ids'] == ['next']
+            item for item in document.traverse()
+            if 'ids' in item and item['ids'] == ['next']
         ]
     except ValueError:
         raise ValueError('Expecting section titled "Next" in CHANGELOG.rst')
