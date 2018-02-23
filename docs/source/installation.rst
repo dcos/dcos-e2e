@@ -14,7 +14,8 @@ Then install the latest stable version:
 
     brew install https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
-Or the latest ``master``.
+Or the latest ``master``:
+
 Homebrew installs the dependencies for the latest released version and so installing ``master`` may not work.
 
 .. code:: sh
