@@ -6,6 +6,7 @@ Outcomes
 
 * A new ``git`` tag available to install.
 * An updated `Homebrew`_ recipe.
+* The new version title in the changelog.
 
 Prerequisites
 -------------
@@ -15,8 +16,8 @@ Prerequisites
 * Trust that ``master`` is ready and high enough quality for release.
   This includes the ``Next`` section in ``CHANGELOG.rst`` being up to date.
 
-Preparing For a Release
------------------------
+Perform a Release
+-----------------
 
 #. Get a GitHub access token:
 
