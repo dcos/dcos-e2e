@@ -142,6 +142,7 @@ def get_changelog_contents() -> str:
         result += '* ' + item + '\n\n'
     return result.strip()
 
+
 def create_github_release(
     changelog_contents: str,
     github_username: str,
@@ -151,16 +152,9 @@ def create_github_release(
     """
     XXX
     """
-        # if 'Next' in item.__repr__() and not item.children:
-        #     print(item.__repr__())
-        #     import pdb; pdb.set_trace()
-        #     pass
-        # if item.text == '
-        # # import pdb; pdb.set_trace()
-        # pass
 
 
-def update_homebrew() -> None:
+def update_homebrew(version_str: str) -> None:
     """
     Update the Homebrew file.
     """
@@ -176,7 +170,7 @@ def main() -> None:
     version_str = get_version()
     # branch_name = 'release-' + version_str
     # checkout_new_branch(branch_name=branch_name)
-    # update_homebrew()
+    # update_homebrew(version_str=version_str)
     # update_changelog(version=version_str)
     # Commit
     # Push
