@@ -1,5 +1,5 @@
 """
-Switch to a release branch for the next version of DC/OS E2E.
+Release the next version of DC/OS E2E.
 """
 
 import datetime
@@ -112,6 +112,9 @@ def create_github_release(
 
 
 def commit_and_push(version: str) -> None:
+    """
+    Commit and push all changes.
+    """
     repo = Repo('.')
     add()
     message = b'Update for release ' + version.encode('utf-8')
