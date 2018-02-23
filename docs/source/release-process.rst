@@ -19,12 +19,15 @@ Prerequisites
 Preparing For a Release
 -----------------------
 
-# Set environment variables to GitHub credentials:
+# Get a GitHub access token:
+
+Follow the `GitHub instructions <https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/>`__ for getting an access token.
+
+# Set environment variables to GitHub credentials, e.g.:
 
     .. code:: sh
 
-       export GITHUB_USERNAME=my_username
-       export GITHUB_PASSWORD=my_password
+       export GITHUB_TOKEN=75c72ad718d9c346c13d30ce762f121647b502414
 
 # Create a release environment:
 

@@ -132,13 +132,16 @@ def get_changelog_contents() -> str:
 
 def create_github_release(
     changelog_contents: str,
-    github_username: str,
-    github_password: str,
+    github_token: str,
     version: str,
 ) -> None:
     """
     XXX
     """
+    from github import Github
+    gh = Github(github_token)
+    for repo in gh.get_user().get_repos():
+        print(repo.name)
 
 
 def commit_and_push() -> None:
@@ -163,18 +166,16 @@ def update_homebrew(version_str: str) -> None:
 
 
 def main() -> None:
-    github_username = os.environ['GITHUB_USERNAME']
-    github_password = os.environ['GITHUB_PASSWORD']
+    github_token = os.environ['GITHUB_TOKEN']
     version_str = get_version()
     changelog_contents = get_changelog_contents()
     update_changelog(version=version_str)
     version_str = get_version()
-    commit_and_push()
+    # commit_and_push()
     # update_homebrew(version_str=version_str)
     create_github_release(
         changelog_contents=changelog_contents,
-        github_username=github_username,
-        github_password=github_password,
+        github_token=github_token,
         version=version_str,
     )
     return
