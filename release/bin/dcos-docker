@@ -1,0 +1,12 @@
+#!/private/var/folders/3l/ffdytd9n2cnbgch4rwt6k7jm0000gn/T/tmp.DSZjtJOH/dcos-e2e/release/bin/python3.6
+# EASY-INSTALL-ENTRY-SCRIPT: 'DCOS-E2E','console_scripts','dcos-docker'
+__requires__ = 'DCOS-E2E'
+import re
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(
+        load_entry_point('DCOS-E2E', 'console_scripts', 'dcos-docker')()
+    )
