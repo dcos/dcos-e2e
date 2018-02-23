@@ -17,6 +17,7 @@ extensions = [
     'sphinx_autodoc_typehints',
     'sphinx.ext.intersphinx',
     'sphinxcontrib.spelling',
+    'sphinx_click.ext',
 ]
 
 templates_path = ['_templates']
@@ -59,6 +60,8 @@ nitpicky = True
 warning_is_error = True
 nitpick_ignore = [
     ('py:exc', 'RetryError'),
+    # See https://bugs.python.org/issue31024 for why Sphinx cannot find this.
+    ('py:class', 'typing.Tuple'),
 ]
 
 html_show_copyright = False
@@ -67,6 +70,7 @@ html_show_sourcelink = False
 
 html_theme_options = {
     'show_powered_by': 'false',
+    'fixed_sidebar': 'true',
 }
 
 html_sidebars = {

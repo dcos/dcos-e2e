@@ -1,30 +1,101 @@
 SHELL := /bin/bash -euxo pipefail
 
-ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+OSS_MASTER_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+OSS_1_10_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.10/dcos_generate_config.sh
+OSS_1_11_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.11/dcos_generate_config.sh
 
-ARTIFACT_PATH := /tmp/dcos_generate_config.sh
-EE_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
+OSS_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.sh
+OSS_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.sh
+OSS_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.sh
+
+EE_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
+EE_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.ee.sh
+EE_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.ee.sh
 
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
-# Run various linting tools.
-.PHONY: lint
-lint:
+.PHONY: yapf
+yapf:
+	yapf \
+	    --diff \
+	    --recursive \
+	    --exclude src/dcos_e2e/_vendor \
+	    --exclude src/dcos_e2e/_version.py \
+	    --exclude versioneer.py \
+	    .
+
+.PHONY: mypy
+mypy:
+	python admin/run_mypy.py
+
+.PHONY: check-manifest
+check-manifest:
 	check-manifest .
+
+.PHONY: doc8
+doc8:
 	doc8 .
+
+.PHONY: flake8
+flake8:
 	flake8 .
+
+.PHONY: isort
+isort:
 	isort --recursive --check-only
-	mypy src/ tests/
+
+.PHONY: pip-extra-reqs
+pip-extra-reqs:
 	pip-extra-reqs src/
+
+.PHONY: pip-missing-reqs
+pip-missing-reqs:
 	pip-missing-reqs src/
+
+.PHONY: pydocstyle
+pydocstyle:
 	pydocstyle
+
+.PHONY: pylint
+pylint:
 	pylint *.py src/ tests/
+
+.PHONY: pyroma
+pyroma:
 	pyroma .
+
+.PHONY: vulture
+vulture:
 	vulture . --min-confidence 100
-	yapf --diff --recursive src/ tests/
+
+.PHONY: linkcheck
+linkcheck:
 	$(MAKE) -C docs linkcheck SPHINXOPTS=$(SPHINXOPTS)
+
+.PHONY: spelling
+spelling:
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
+
+
+# Run various linting tools.
+# We put each one in a different target so that we can run these in parallel with --jobs
+.PHONY: lint
+lint: \
+    check-manifest \
+    doc8 \
+    flake8 \
+    isort \
+    linkcheck \
+    mypy \
+    pip-extra-reqs \
+    pip-missing-reqs \
+    pydocstyle \
+    pylint \
+    pyroma \
+    spelling \
+    vulture \
+    yapf
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
@@ -36,19 +107,36 @@ clean:
 # Fix some linting errors.
 .PHONY: fix-lint
 fix-lint:
-	autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables .
-	yapf --in-place --recursive .
+	autoflake \
+	    --in-place \
+	    --recursive \
+	    --remove-all-unused-imports \
+	    --remove-unused-variables \
+	    --expand-star-imports \
+	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py \
+	    .
+	yapf \
+	    --in-place \
+	    --recursive \
+	    --exclude src/dcos_e2e/_vendor \
+	    --exclude src/dcos_e2e/_version.py \
+	    --exclude versioneer.py \
+	    .
 	isort --recursive --apply
 
 .PHONY: clean-artifacts
 clean-artifacts:
-	rm -rf $(ARTIFACT_PATH)
-	rm -rf $(EE_ARTIFACT_PATH)
+	rm -rf $(OSS_MASTER_ARTIFACT_PATH)
+	rm -rf $(EE_MASTER_ARTIFACT_PATH)
 
 .PHONY: download-artifacts
 download-artifacts:
-	curl -o $(ARTIFACT_PATH) $(ARTIFACT_URL)
-	if [ -n "$(EE_ARTIFACT_URL)" ]; then curl -o $(EE_ARTIFACT_PATH) $(EE_ARTIFACT_URL); fi
+	curl -o $(OSS_MASTER_ARTIFACT_PATH) $(OSS_MASTER_ARTIFACT_URL)
+	curl -o $(OSS_1_10_ARTIFACT_PATH) $(OSS_1_10_ARTIFACT_URL)
+	curl -o $(OSS_1_11_ARTIFACT_PATH) $(OSS_1_11_ARTIFACT_URL)
+	if [ -n "$(EE_MASTER_ARTIFACT_URL)" ]; then curl -o $(EE_MASTER_ARTIFACT_PATH) $(EE_MASTER_ARTIFACT_URL); fi
+	if [ -n "$(EE_1_10_ARTIFACT_URL)" ]; then curl -o $(EE_1_10_ARTIFACT_PATH) $(EE_1_10_ARTIFACT_URL); fi
+	if [ -n "$(EE_1_11_ARTIFACT_URL)" ]; then curl -o $(EE_1_11_ARTIFACT_PATH) $(EE_1_11_ARTIFACT_URL); fi
 
 .PHONY: docs
 docs:
@@ -57,6 +145,10 @@ docs:
 .PHONY: open-docs
 open-docs:
 	open docs/build/html/index.html
+
+.PHONY: update-homebrew
+update-homebrew:
+	python admin/homebrew_recipe.py > dcosdocker.rb
 
 # DC/OS Docker is vendored in this repository using git subtree.
 # To update DC/OS Docker, use the following command.

@@ -3,14 +3,13 @@ Tools for managing DC/OS cluster nodes.
 """
 
 import stat
+import subprocess
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
-from subprocess import PIPE, CompletedProcess, Popen
 from typing import Any, Dict, List, Optional
 
 import paramiko
-from scp import SCPClient
 
 from ._common import run_subprocess
 
@@ -63,6 +62,7 @@ class Node:
         user: str,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
+        tty: bool = False,
     ) -> List[str]:
         """
         Return a command to run `args` on this node over SSH.
@@ -79,6 +79,8 @@ class Node:
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            tty: If ``True``, allocate a pseudo-tty. This means that the users
+                terminal is attached to the streams of the process.
 
         Returns:
             The full SSH command to be run.
@@ -88,8 +90,11 @@ class Node:
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
 
-        ssh_args = [
-            'ssh',
+        ssh_args = ['ssh']
+        if tty:
+            ssh_args.append('-t')
+
+        ssh_args += [
             # Suppress warnings.
             # In particular, we don't care about remote host identification
             # changes.
@@ -114,7 +119,7 @@ class Node:
             'PreferredAuthentications=publickey',
             str(self.public_ip_address),
         ] + [
-            '{key}={value}'.format(key=k, value=quote(v))
+            '{key}={value}'.format(key=k, value=quote(str(v)))
             for k, v in env.items()
         ] + [quote(arg) for arg in args]
 
@@ -127,25 +132,30 @@ class Node:
         log_output_live: bool = False,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
-    ) -> CompletedProcess:
+        tty: bool = False,
+    ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
 
         Args:
             args: The command to run on the node.
-            user: The username to SSH as. If `None` then the `default_ssh_user`
-                is used instead.
-            log_output_live: If `True`, log output live. If `True`, stderr is
-                merged into stdout in the return value.
+            user: The username to SSH as. If ``None`` then the
+                ``default_ssh_user`` is used instead.
+            log_output_live: If ``True``, log output live. If ``True``, stderr
+                is merged into stdout in the return value.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            shell: If False (the default), each argument is passed as a
+            shell: If ``False`` (the default), each argument is passed as a
                 literal value to the command.  If True, the command line is
                 interpreted as a shell command, with a special meaning applied
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            tty: If ``True``, allocate a pseudo-tty. This means that the users
+                terminal is attached to the streams of the process.
+                This means that the values of stdout and stderr will not be in
+                the returned ``subprocess.CompletedProcess``.
 
         Returns:
             The representation of the finished process.
@@ -158,9 +168,18 @@ class Node:
             user = self.default_ssh_user
 
         ssh_args = self._compose_ssh_command(
-            args=args, user=user, env=env, shell=shell
+            args=args,
+            user=user,
+            env=env,
+            shell=shell,
+            tty=tty,
         )
-        return run_subprocess(args=ssh_args, log_output_live=log_output_live)
+
+        return run_subprocess(
+            args=ssh_args,
+            log_output_live=log_output_live,
+            pipe_output=not tty,
+        )
 
     def popen(
         self,
@@ -168,7 +187,7 @@ class Node:
         user: Optional[str] = None,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
-    ) -> Popen:
+    ) -> subprocess.Popen:
         """
         Open a pipe to a command run on a node as the given user.
 
@@ -197,8 +216,13 @@ class Node:
             user=user,
             env=env,
             shell=shell,
+            tty=False,
         )
-        return Popen(args=ssh_args, stdout=PIPE, stderr=PIPE)
+        return subprocess.Popen(
+            args=ssh_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
     def send_file(
         self,
@@ -227,14 +251,14 @@ class Node:
             key_filename=str(self._ssh_key_path),
         )
 
-        with SCPClient(ssh_client.get_transport()) as scp:
-            self.run(
-                args=[
-                    'mkdir',
-                    '--parents',
-                    str(remote_path.parent),
-                ],
-                user=user,
-            )
+        self.run(
+            args=['mkdir', '--parents',
+                  str(remote_path.parent)],
+            user=user,
+        )
 
-            scp.put(files=str(local_path), remote_path=str(remote_path))
+        with ssh_client.open_sftp() as sftp:
+            sftp.put(
+                localpath=str(local_path),
+                remotepath=str(remote_path),
+            )

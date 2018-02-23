@@ -1,1 +1,4 @@
 recursive-include src/dcos_e2e/backends/_docker/dcos_docker *
+recursive-include src/dcos_e2e/_vendor *
+include versioneer.py
+include src/dcos_e2e/_version.py

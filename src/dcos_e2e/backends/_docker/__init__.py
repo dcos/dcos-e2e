@@ -12,7 +12,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
 
 import docker
 import yaml
@@ -26,6 +26,29 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
+
+
+def _base_dockerfile(linux_distribution: Distribution) -> Path:
+    """
+    Return the Dockerfile to use for the base OS image.
+    """
+    dcos_docker_distros = {
+        Distribution.CENTOS_7: 'centos-7',
+        Distribution.UBUNTU_16_04: 'ubuntu-xenial',
+        Distribution.FEDORA_23: 'fedora-23',
+        Distribution.COREOS: 'coreos',
+        Distribution.DEBIAN_8: 'debian-jessie',
+    }
+
+    distro_path_segment = dcos_docker_distros[linux_distribution]
+    current_file = inspect.stack()[0][1]
+    current_parent = Path(os.path.abspath(current_file)).parent
+    dcos_docker = current_parent / 'dcos_docker'
+    dockerfile = (
+        dcos_docker / 'build' / 'base' / distro_path_segment / 'Dockerfile'
+    )
+
+    return dockerfile
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -247,7 +270,7 @@ class DockerCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Dict[Path, Path],
+        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
         cluster_backend: Docker,
     ) -> None:
         """
@@ -257,11 +280,11 @@ class DockerCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: A mapping of host paths to paths on
+            files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS. Currently on DC/OS
-                Docker the only supported paths on the installer are in the
-                `/genconf` directory.
+                the installer node before installing DC/OS.
+                Currently on DC/OS Docker the only supported paths on the
+                installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
         self._default_ssh_user = cluster_backend.default_ssh_user
@@ -309,9 +332,6 @@ class DockerCluster(ClusterManager):
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
-        sbin_dir_src = include_dir_src / 'sbin'
-        sbin_dir = include_dir / 'sbin'
-        sbin_dir.mkdir(parents=True)
         service_dir_src = include_dir_src / 'systemd'
         service_dir = include_dir / 'systemd'
         service_dir.mkdir(parents=True)
@@ -324,30 +344,25 @@ class DockerCluster(ClusterManager):
         )
         ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
 
-        dcos_postflight = sbin_dir / 'dcos-postflight'
-
-        copyfile(
-            src=str(sbin_dir_src / 'dcos-postflight'),
-            dst=str(dcos_postflight),
-        )
-        dcos_postflight.chmod(
-            mode=dcos_postflight.stat().st_mode | stat.S_IEXEC,
-        )
-
         copyfile(
             src=str(service_dir_src / 'systemd-journald-init.service'),
             dst=str(service_dir / 'systemd-journald-init.service'),
         )
 
+        public_key_path = ssh_dir / 'id_rsa.pub'
         _write_key_pair(
-            public_key_path=ssh_dir / 'id_rsa.pub',
+            public_key_path=public_key_path,
             private_key_path=ssh_dir / 'id_rsa',
         )
 
-        for host_path, installer_path in files_to_copy_to_installer.items():
+        for host_path, installer_path in files_to_copy_to_installer:
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path
-            copyfile(src=str(host_path), dst=str(destination_path))
+            if host_path.is_dir():
+                destination_path = destination_path / host_path.stem
+                copytree(src=str(host_path), dst=str(destination_path))
+            else:
+                copyfile(src=str(host_path), dst=str(destination_path))
 
         _write_docker_service_file(
             service_file_path=service_dir / 'docker.service',
@@ -373,43 +388,24 @@ class DockerCluster(ClusterManager):
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_tag = docker_image_tag + ':base'
-        base_docker_tag = base_tag + '-docker'
         docker_versions = {
             DockerVersion.v1_13_1: '1.13.1',
             DockerVersion.v1_11_2: '1.11.2',
         }
 
-        dcos_docker_distros = {
-            Distribution.CENTOS_7: 'centos-7',
-            Distribution.UBUNTU_16_04: 'ubuntu-xenial',
-            Distribution.FEDORA_23: 'fedora-23',
-            Distribution.COREOS: 'coreos',
-            Distribution.DEBIAN_8: 'debian-jessie',
-        }
-
         linux_distribution = cluster_backend.linux_distribution
-        distro_path_segment = dcos_docker_distros[linux_distribution]
         docker_version = docker_versions[cluster_backend.docker_version]
 
         client = docker.from_env(version='auto')
+        base_dockerfile = _base_dockerfile(
+            linux_distribution=linux_distribution,
+        )
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
             tag=base_tag,
-            dockerfile=str(
-                Path('build') / 'base' / distro_path_segment / 'Dockerfile'
-            ),
-        )
-
-        client.images.build(
-            path=str(self._path),
-            rm=True,
-            forcerm=True,
-            tag=base_docker_tag,
-            dockerfile=str(
-                Path('build') / 'base-docker' / docker_version / 'Dockerfile'
-            ),
+            dockerfile=str(base_dockerfile),
         )
 
         client.images.build(
@@ -417,8 +413,10 @@ class DockerCluster(ClusterManager):
             rm=True,
             forcerm=True,
             tag=docker_image_tag,
+            dockerfile=str(
+                Path('build') / 'base-docker' / docker_version / 'Dockerfile'
+            ),
         )
-
         common_mounts = {
             str(certs_dir.resolve()): {
                 'bind': '/etc/docker/certs.d',
@@ -468,6 +466,7 @@ class DockerCluster(ClusterManager):
                         'node_type': 'master',
                     },
                 },
+                public_key_path=public_key_path,
             )
 
         for agent_number in range(1, agents + 1):
@@ -504,6 +503,7 @@ class DockerCluster(ClusterManager):
                         'node_type': 'agent',
                     },
                 },
+                public_key_path=public_key_path,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -540,6 +540,7 @@ class DockerCluster(ClusterManager):
                         'node_type': 'public_agent',
                     },
                 },
+                public_key_path=public_key_path,
             )
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
@@ -669,6 +670,7 @@ class DockerCluster(ClusterManager):
         dcos_num_agents: int,
         docker_image: str,
         labels: Dict[str, str],
+        public_key_path: Path,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -692,6 +694,7 @@ class DockerCluster(ClusterManager):
             labels: Docker labels to add to the cluster node containers. Akin
                 to the dictionary option in
                 http://docker-py.readthedocs.io/en/stable/containers.html.
+            public_key_path: The path to an SSH public key to put on the node.
         """
         registry_host = 'registry.local'
         if self.masters:
@@ -727,12 +730,18 @@ class DockerCluster(ClusterManager):
             '/var/lib/dcos/mesos-slave-common'
         )
 
+        public_key = public_key_path.read_text()
+        echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
             ['/bin/bash', '-c', disable_systemd_support_cmd],
             ['systemctl', 'start', 'sshd.service'],
+            ['mkdir', '--parents', '/root/.ssh'],
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ]:
             container.exec_run(cmd=cmd)
+            exit_code, output = container.exec_run(cmd=cmd)
+            assert exit_code == 0, output
 
     def destroy(self) -> None:
         """

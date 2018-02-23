@@ -12,20 +12,38 @@ DC/OS E2E
 DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environments.
 
 .. contents::
+   :local:
 
 Installation
 ------------
 
-Requires Python 3.5.2+.
+CLI macOS With Homebrew
+~~~~~~~~~~~~~~~~~~~~~~~
+
+To install the CLI on macOS, install `Homebrew`_.
 
 .. code:: sh
 
-    pip install --process-dependency-links git+https://github.com/mesosphere/dcos-e2e.git@master
+    brew install https://github.com/mesosphere/dcos-e2e/blob/master/dcosdocker.rb
 
-Usage
------
+.. _Homebrew: https://brew.sh
 
-Below is a small example with a Docker backend.
+Library and CLI with Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Requires Python 3.5.2+.
+
+Optionally replace ``master`` with a particular version of DC/OS E2E.
+See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
+
+.. code:: sh
+
+    pip install git+https://github.com/mesosphere/dcos-e2e.git@master
+
+Python Library
+--------------
+
+Below is a small example of using DC/OS E2E as a Python library with a Docker backend.
 See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=latest>`_ for more details on these and other features.
 
 .. code:: python
@@ -50,6 +68,27 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
         print(result.stdout)
         cluster.wait_for_dcos_oss()
         cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
+
+CLI
+---
+
+There is also a CLI tool.
+This is useful for quickly creating, managing and destroying clusters.
+
+An typical CLI workflow may look like this:
+
+.. code-block:: console
+
+   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
+   default
+   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 5
+   921214100
+   $ dcos-docker wait # Uses "default" by default
+   $ dcos-docker run --sync-dir . pytest -k test_tls
+   ...
+   $ dcos-docker destroy $(dcos-docker list)
+
+Each of these commands and more described in detail in the `full CLI documentation <http://dcos-e2e.readthedocs.io/en/latest/cli.html>`_.
 
 .. |Build Status| image:: https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/mesosphere/dcos-e2e

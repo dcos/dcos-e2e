@@ -16,6 +16,11 @@ Next
 -  Add ``docker_container_labels`` parameter to the ``Docker`` backend.
 -  Logs are now less cluttered with escape characters.
 -  Documentation is now on Read The Docs.
+-  Add a Command Line Interface.
+-  Vendor ``dcos_test_utils`` so ``--process-dependency-links`` is not needed.
+-  Backwards incompatible change:
+   ``Cluter``\'s ``files_to_copy_to_installer`` argument is now a ``List`` of ``Tuple``\s rather than a ``Dict``.
+- Add a ``tty`` option to ``Node.run`` and ``Cluster.run_integration_tests``.
 
 2018.01.25.0
 ------------

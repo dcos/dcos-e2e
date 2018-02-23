@@ -99,9 +99,13 @@ vagrant/
 .mypy_cache/
 *.DS_Store
 node_modules/
+.pytest_cache/
 
 # NPM
 package-lock.json
 
 # DC/OS License
 license-key.txt
+
+# Visual Studio Code workspace
+.vscode
