@@ -6,79 +6,32 @@ Outcomes
 
 * A new ``git`` tag available to install.
 * An updated `Homebrew`_ recipe.
-* Python 3.5+.
 
 Prerequisites
 -------------
 
-* `Homebrew`_ or `Linuxbrew`_.
-* ``git``.
+* ``python3`` on your ``PATH`` set to Python 3.5+.
+* Push access to this repository.
+* Trust that ``master`` is ready and high enough quality for release.
+  This includes the ``Next`` section in ``CHANGELOG.rst`` being up to date.
 
 Preparing For a Release
 -----------------------
 
-#. Clone DC/OS E2E:
+# Get a GitHub access token:
 
-   .. code:: sh
+Follow the `GitHub instructions <https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/>`__ for getting an access token.
 
-      git clone git@github.com:mesosphere/dcos-e2e.git
-
-# Create a virtual environment:
+# Set environment variables to GitHub credentials, e.g.:
 
     .. code:: sh
 
-       cd dcos-e2e
-       pip install --editable .[dev]
+       export GITHUB_TOKEN=75c72ad718d9c346c13d30ce762f121647b502414
 
-#. Choose a new version:
+# Perform a release:
 
-   This should be today’s date in the format ``YYYY.MM.DD.MICRO``.
-   ``MICRO`` should refer to the number of releases created on this date, starting from ``0``.
+    .. code:: sh
 
-   .. code:: sh
-
-       export DCOS_E2E_RELEASE=2017.06.15.0
-
-#. Create a release branch:
-
-   .. code:: sh
-
-       git fetch origin
-       git checkout -b release-$DCOS_E2E_RELEASE origin/master
-
-#. Update Homebrew
-
-   .. code:: sh
-
-      make update-homebrew
-
-Change the ``url`` in ``dcosdocker.rb`` to link to the release in progress.
-
-#. Change ``CHANGELOG.rst`` title.
-
-Add a section heading below "Next" with the title of the release in progress.
-
-#. Commit and push changes.
-
-   .. code:: sh
-
-       git commit -am "Bump version to $DCOS_E2E_RELEASE"
-       git push
-
-#. Create a Pull Request to merge the ``release`` branch into ``master``.
-
-
-Release
--------
-
-#. Merge the ``release`` Pull Request once CI has passed.
-
-#. Tag a release:
-
-   Visit https://github.com/mesosphere/dcos-e2e/releases/new.
-   Set the "Tag version" to the new version.
-   Choose "master" as the target.
-   Add the changes from the changelog to the release description.
+       curl https://github.com/mesosphere/dcos-e2e/blob/master/admin/release.sh | bash
 
 .. _Homebrew: https://brew.sh/
-.. _Linuxbrew: http://linuxbrew.sh/

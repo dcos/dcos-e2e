@@ -6,6 +6,12 @@ Changelog
 Next
 ----
 
+2018.02.23.0
+------------
+
+2018.02.23.0
+------------
+
 -  Add ``linux_distribution`` parameter to the ``Docker`` backend.
 -  Add support for CoreOS in the ``Docker`` backend.
 -  Add ``docker_version`` parameter to the ``Docker`` backend.
