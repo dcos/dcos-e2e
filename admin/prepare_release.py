@@ -5,12 +5,9 @@ Switch to a release branch for the next version of DC/OS E2E.
 import datetime
 import os
 import subprocess
-import uuid
 from pathlib import Path
 from textwrap import dedent
 
-import docutils
-import docutils.parsers.rst
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
 from github import Github
@@ -94,51 +91,12 @@ def update_changelog(version: str) -> None:
     changelog.write_text(new_changelog_contents)
 
 
-def get_changelog_contents() -> str:
-    """
-    XXX
-    """
-    changelog = Path('CHANGELOG.rst')
-    source = changelog.read_text()
-    document_name = uuid.uuid4().hex
-    settings = docutils.frontend.OptionParser(
-        components=(docutils.parsers.rst.Parser, )
-    ).get_default_values()
-    document = docutils.utils.new_document(document_name, settings)
-
-    parser = docutils.parsers.rst.Parser()
-    parser.parse(source, document)
-    try:
-        [next_section] = [
-            item for item in document.traverse()
-            if 'ids' in item and item['ids'] == ['next']
-        ]
-    except ValueError:
-        raise ValueError('Expecting section titled "Next" in CHANGELOG.rst')
-
-    bullet_list_index = next_section.first_child_matching_class(
-        childclass=docutils.nodes.bullet_list,
-    )
-
-    if bullet_list_index is None:
-        # There are no items in the "Next" section.
-        return ''
-
-    bullet_list = next_section[bullet_list_index]
-    list_items = [bullet.astext() for bullet in bullet_list]
-    result = ''
-    for item in list_items:
-        result += '* ' + item + '\n\n'
-    return result.strip()
-
-
 def create_github_release(
-    changelog_contents: str,
     github_token: str,
     version: str,
 ) -> None:
     """
-    XXX
+    Create a tag and release on GitHub.
     """
     gh = Github(github_token)
     org = gh.get_organization('mesosphere')
@@ -147,7 +105,7 @@ def create_github_release(
         tag=version,
         tag_message='Release ' + version,
         release_name='Release ' + version,
-        release_message=changelog_contents,
+        release_message='Release ' + version,
         type='commit',
         object=repository.get_commits()[0].sha,
     )
@@ -178,12 +136,10 @@ def update_homebrew(version_str: str) -> None:
 def main() -> None:
     github_token = os.environ['GITHUB_TOKEN']
     version_str = get_version()
-    changelog_contents = get_changelog_contents()
-    update_changelog(version=version_str)
+    # update_changelog(version=version_str)
     # commit_and_push(version=version_str)
     # update_homebrew(version_str=version_str)
     create_github_release(
-        changelog_contents=changelog_contents,
         github_token=github_token,
         version=version_str,
     )
