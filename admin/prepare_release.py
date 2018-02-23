@@ -157,8 +157,12 @@ def create_github_release(
 def commit_and_push(version: str) -> None:
     repo = Repo('.')
     add()
-    commit(message=b'Update for release')
-    push(repo=repo)
+    commit_ref = commit(message=b'Update for release')
+    push(
+        repo=repo,
+        remote_location='git@github.com:mesosphere/dcos-e2e.git',
+        refspecs=[commit_ref],
+    )
     import pdb; pdb.set_trace()
 
     pass
