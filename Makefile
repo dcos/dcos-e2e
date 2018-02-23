@@ -59,7 +59,7 @@ pydocstyle:
 
 .PHONY: pylint
 pylint:
-	pylint *.py src/ tests/
+	pylint *.py src/ tests/ admin/
 
 .PHONY: pyroma
 pyroma:

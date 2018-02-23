@@ -1,5 +1,5 @@
 """
-Run `mypy`, ignoring relevant errors.
+Run ``mypy``, ignoring relevant errors.
 """
 
 import subprocess
@@ -7,7 +7,7 @@ import sys
 
 
 def main() -> None:
-    args = ['mypy', 'src/', 'tests/']
+    args = ['mypy', 'src/', 'tests/', 'admin/']
     ignore_paths = {
         'src/dcos_e2e/_vendor',
         'src/dcos_e2e/_version.py',
