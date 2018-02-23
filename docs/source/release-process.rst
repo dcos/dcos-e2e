@@ -32,6 +32,6 @@ Follow the `GitHub instructions <https://help.github.com/articles/creating-a-per
 
     .. code:: sh
 
-       curl https://github.com/mesosphere/dcos-e2e/blob/master/release.sh | bash
+       curl https://github.com/mesosphere/dcos-e2e/blob/master/admin/release.sh | bash
 
 .. _Homebrew: https://brew.sh/
