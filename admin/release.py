@@ -136,14 +136,13 @@ def update_homebrew(version_str: str) -> None:
 def main() -> None:
     github_token = os.environ['GITHUB_TOKEN']
     version_str = get_version()
-    # update_changelog(version=version_str)
-    # commit_and_push(version=version_str)
-    # update_homebrew(version_str=version_str)
+    update_changelog(version=version_str)
+    update_homebrew(version_str=version_str)
+    commit_and_push(version=version_str)
     create_github_release(
         github_token=github_token,
         version=version_str,
     )
-    return
 
 
 if __name__ == '__main__':
