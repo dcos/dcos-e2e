@@ -105,7 +105,7 @@ def checkout_new_branch(branch_name: str) -> None:
     )
 
 
-def get_changelog_text() -> str:
+def get_changelog_contents() -> str:
     """
     XXX
     """
@@ -119,18 +119,25 @@ def get_changelog_text() -> str:
 
     parser = docutils.parsers.rst.Parser()
     parser.parse(source, document)
-    children = document.traverse()
-    for item in children:
-        try:
-            [item_id] = item['ids']
-        except (ValueError, TypeError):
-            continue
-        if item_id == 'next':
-            bullet_list_index = item.first_child_matching_class(
-                childclass=docutils.nodes.bullet_list,
-            )
-            bullet_list = item[bullet_list_index]
-            return bullet_list.astext()
+    [next_section] = [
+        item for item in document.traverse() if 'ids' in item and
+        item['ids'] == ['next']
+    ]
+
+    list_items = []
+    bullet_list_index = next_section.first_child_matching_class(
+        childclass=docutils.nodes.bullet_list,
+    )
+
+    if bullet_list_index is None:
+        # There are no items in the "Next" section.
+        return ''
+
+    bullet_list = next_section[bullet_list_index]
+    list_items = [bullet.astext() for bullet in bullet_list]
+    # for item in bullet_list:
+    # import pdb; pdb.set_trace()
+    return bullet_list.astext()
     return ''
 
 def create_github_release(
@@ -163,6 +170,7 @@ def update_homebrew() -> None:
 def main() -> None:
     github_username = os.environ['GITHUB_USERNAME']
     github_password = os.environ['GITHUB_PASSWORD']
+    changelog_contents = get_changelog_contents()
     version_str = get_version()
     # branch_name = 'release-' + version_str
     # checkout_new_branch(branch_name=branch_name)
@@ -172,7 +180,9 @@ def main() -> None:
     # Push
     # Create PR
     # Merge into master
+    print(changelog_contents)
     create_github_release(
+        changelog_contents=changelog_contents,
         github_username=github_username,
         github_password=github_password,
         version=version_str,
