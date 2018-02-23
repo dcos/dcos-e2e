@@ -6,4 +6,4 @@ cd dcos-e2e
 virtualenv -p python3 release
 source release/bin/activate
 pip install --editable .[dev]
-python admin/prepare_release.py
+python admin/release.py
