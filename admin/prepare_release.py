@@ -159,7 +159,7 @@ def commit_and_push(version: str, branch_name: str) -> None:
     add()
     commit_ref = commit(message=b'Update for release')
     ref_name = 'refs/heads/{branch_name}'.format(branch_name=branch_name)
-    repo.refs[ref_name] = commit_ref
+    repo.refs[ref_name] = commit_ref.encode('utf-8')
     # import pdb; pdb.set_trace()
     push(
         repo=repo,
