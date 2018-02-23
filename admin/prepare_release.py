@@ -92,19 +92,6 @@ def update_changelog(version: str) -> None:
     )
     changelog.write_text(new_changelog_contents)
 
-
-def checkout_new_branch(branch_name: str) -> None:
-    """"
-    Create and checkout a branch.
-    """
-    branch_create(repo='.', name=branch_name.encode('utf-8'))
-    repo = Repo('.')
-    repo.refs.set_symbolic_ref(
-        b'HEAD',
-        b'refs/heads/' + branch_name.encode('utf-8'),
-    )
-
-
 def get_changelog_contents() -> str:
     """
     XXX
@@ -154,12 +141,11 @@ def create_github_release(
     """
 
 
-def commit_and_push(version: str, branch_name: str) -> None:
+def commit_and_push() -> None:
     repo = Repo('.')
     add()
-    commit_ref = commit(message=b'Update for release')
-    ref_name = 'refs/heads/{branch_name}'.format(branch_name=branch_name)
-    repo.refs[ref_name.encode('utf-8')] = commit_ref
+    commit(message=b'Update for release')
+    branch_name = 'master'
     push(
         repo=repo,
         remote_location='git@github.com:mesosphere/dcos-e2e.git',
@@ -179,26 +165,19 @@ def update_homebrew(version_str: str) -> None:
 def main() -> None:
     github_username = os.environ['GITHUB_USERNAME']
     github_password = os.environ['GITHUB_PASSWORD']
-    changelog_contents = get_changelog_contents()
     version_str = get_version()
-    branch_name = 'release-' + version_str
-    commit_and_push(version=version_str, branch_name=branch_name)
-    return
-    # checkout_new_branch(branch_name=branch_name)
-    # update_homebrew(version_str=version_str)
+    changelog_contents = get_changelog_contents()
     update_changelog(version=version_str)
+    version_str = get_version()
     commit_and_push()
-    # Commit
-    # Push
-    # Create PR
-    # Merge into master
-    print(changelog_contents)
+    # update_homebrew(version_str=version_str)
     create_github_release(
         changelog_contents=changelog_contents,
         github_username=github_username,
         github_password=github_password,
         version=version_str,
     )
+    return
 
 
 if __name__ == '__main__':
