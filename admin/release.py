@@ -116,7 +116,8 @@ def commit_and_push(version: str) -> None:
     Commit and push all changes.
     """
     repo = Repo('.')
-    add()
+    paths = ['dcosdocker.rb', 'CHANGELOG.rst']
+    add(paths=paths)
     message = b'Update for release ' + version.encode('utf-8')
     commit(message=message)
     branch_name = 'master'
@@ -146,7 +147,6 @@ def main() -> None:
         github_token=github_token,
         version=version_str,
     )
-    import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':
