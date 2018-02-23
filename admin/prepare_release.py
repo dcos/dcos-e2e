@@ -160,16 +160,11 @@ def commit_and_push(version: str, branch_name: str) -> None:
     commit_ref = commit(message=b'Update for release')
     ref_name = 'refs/heads/{branch_name}'.format(branch_name=branch_name)
     repo.refs[ref_name.encode('utf-8')] = commit_ref
-    # import pdb; pdb.set_trace()
     push(
         repo=repo,
         remote_location='git@github.com:mesosphere/dcos-e2e.git',
-        # refspecs=ref_name.encode('utf-8'),
         refspecs=branch_name.encode('utf-8'),
     )
-    import pdb; pdb.set_trace()
-
-    pass
 
 
 def update_homebrew(version_str: str) -> None:
