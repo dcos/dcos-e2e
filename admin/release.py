@@ -146,6 +146,7 @@ def main() -> None:
         github_token=github_token,
         version=version_str,
     )
+    import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':
