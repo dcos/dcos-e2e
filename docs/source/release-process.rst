@@ -23,7 +23,7 @@ Preparing For a Release
 
     .. code:: sh
 
-       export GITHUB_USER=my_username
+       export GITHUB_USERNAME=my_username
        export GITHUB_PASSWORD=my_password
 
 # Create a release environment:
