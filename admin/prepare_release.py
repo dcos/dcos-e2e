@@ -154,14 +154,15 @@ def create_github_release(
     """
 
 
-def commit_and_push(version: str) -> None:
+def commit_and_push(version: str, branch_name: str) -> None:
     repo = Repo('.')
     add()
-    commit_ref = commit(message=b'Update for release')
+    commit(message=b'Update for release')
+    ref_name = 'refs/head/{branch_name}'.format(branch_name=branch_name)
     push(
         repo=repo,
         remote_location='git@github.com:mesosphere/dcos-e2e.git',
-        refspecs=[commit_ref],
+        refspecs=ref_name,
     )
     import pdb; pdb.set_trace()
 
@@ -182,9 +183,9 @@ def main() -> None:
     github_password = os.environ['GITHUB_PASSWORD']
     changelog_contents = get_changelog_contents()
     version_str = get_version()
-    commit_and_push(version=version_str)
+    branch_name = 'release-' + version_str
+    commit_and_push(version=version_str, branch_name=branch_name)
     return
-    # branch_name = 'release-' + version_str
     # checkout_new_branch(branch_name=branch_name)
     # update_homebrew(version_str=version_str)
     update_changelog(version=version_str)
