@@ -8,6 +8,7 @@ import subprocess
 from pathlib import Path
 from textwrap import dedent
 
+import docutils
 from dulwich.porcelain import branch_create, tag_list
 from dulwich.repo import Repo
 
@@ -81,7 +82,13 @@ def update_changelog(version: str) -> None:
     """
     XXX
     """
-    pass
+    changelog = Path('CHANGELOG.rst')
+    changelog_contents = changelog.read_text()
+    new_changelog_contents = changelog_contents.replace(
+        'Next\n----',
+        'Next\n----\n\n{version}\n------------'.format(version=version),
+    )
+    changelog.write_text(new_changelog_contents)
 
 
 def create_github_release(
@@ -109,8 +116,16 @@ def main() -> None:
     homebrew_formula_contents = get_homebrew_formula(version=version_str)
     homebrew_file = Path('dcosdocker.rb')
     homebrew_file.write_text(homebrew_formula_contents)
-    # Merge into master
     update_changelog(version=version_str)
+    # Commit
+    # Push
+    # Create PR
+    # Merge into master
+    create_github_release(
+        github_username=github_username,
+        github_password=github_password,
+        version=version_str,
+    )
 
 
 if __name__ == '__main__':

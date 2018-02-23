@@ -38,9 +38,6 @@ Preparing For a Release
        pip install --editable .[dev]
        python admin/prepare_release.py
 
-#. Change ``CHANGELOG.rst`` title.
-
-Add a section heading below "Next" with the title of the release in progress.
 
 #. Commit and push changes.
 
