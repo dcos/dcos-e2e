@@ -243,22 +243,22 @@ class Node:
         if user is None:
             user = self.default_ssh_user
 
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(
-            str(self.public_ip_address),
-            username=user,
-            key_filename=str(self._ssh_key_path),
-        )
-
-        self.run(
-            args=['mkdir', '--parents',
-                  str(remote_path.parent)],
-            user=user,
-        )
-
-        with ssh_client.open_sftp() as sftp:
-            sftp.put(
-                localpath=str(local_path),
-                remotepath=str(remote_path),
+        with paramiko.SSHClient() as ssh_client:
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(
+                str(self.public_ip_address),
+                username=user,
+                key_filename=str(self._ssh_key_path),
             )
+
+            self.run(
+                args=['mkdir', '--parents',
+                      str(remote_path.parent)],
+                user=user,
+            )
+
+            with ssh_client.open_sftp() as sftp:
+                sftp.put(
+                    localpath=str(local_path),
+                    remotepath=str(remote_path),
+                )

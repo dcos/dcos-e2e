@@ -380,7 +380,9 @@ class TestNode:
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
-        master_destination_path = Path('/etc/new_dir/on_master_node.txt')
+        master_destination_path = Path(
+            '/home/{}/on_master_node.txt'.format(testuser)
+        )
         (master, ) = dcos_cluster.masters
         master.send_file(
             local_path=Path(str(local_file)),
@@ -391,6 +393,7 @@ class TestNode:
         result = master.run(args=args, user=testuser)
         assert result.stdout.decode() == content
 
+        # Implicitly asserts SSH connection closed by ``send_file``.
         master.run(args=['userdel', '-r', testuser])
 
     def test_string_representation(
