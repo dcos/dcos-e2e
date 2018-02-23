@@ -164,6 +164,7 @@ def commit_and_push(version: str, branch_name: str) -> None:
         repo=repo,
         remote_location='git@github.com:mesosphere/dcos-e2e.git',
         # refspecs=ref_name.encode('utf-8'),
+        refspecs=branch_name.encode('utf-8'),
     )
     import pdb; pdb.set_trace()
 
