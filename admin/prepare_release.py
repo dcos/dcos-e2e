@@ -98,8 +98,8 @@ def create_github_release(
     """
     Create a tag and release on GitHub.
     """
-    gh = Github(github_token)
-    org = gh.get_organization('mesosphere')
+    github_client = Github(github_token)
+    org = github_client.get_organization('mesosphere')
     repository = org.get_repo('dcos-e2e')
     repository.create_git_tag_and_release(
         tag=version,
