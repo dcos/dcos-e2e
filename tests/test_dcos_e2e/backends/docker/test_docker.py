@@ -1,5 +1,8 @@
 """
 Tests for the Docker backend.
+
+This module contains tests for Docker backend features which are not coverered
+by sibling modules.
 """
 
 import uuid
