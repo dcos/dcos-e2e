@@ -2,6 +2,20 @@
 XXX
 """
 
+import uuid
+from pathlib import Path
+
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+import pytest
+from passlib.hash import sha512_crypt
+
+from dcos_e2e.backends import Docker
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
+from dcos_e2e.node import Node
+
+
 class TestDistributions:
     """
     Tests for setting the Linux distribution.
@@ -139,5 +153,3 @@ class TestDistributions:
             )
 
         assert node_distribution == Distribution.COREOS
-
-
