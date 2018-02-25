@@ -1,5 +1,5 @@
 """
-XXX
+Tests for the ``linux_distribution`` option on the Docker backend.
 """
 
 import uuid
@@ -49,15 +49,18 @@ def _get_node_distribution(
     return distributions[(distro_id, distro_version_id)]
 
 
-class TestDistributions:
+class TestDefaults:
     """
-    Tests for setting the Linux distribution.
+    Tests for not using a custom Linux distribution.
     """
 
     def test_default(self) -> None:
         """
-        The default Linux distribution for a `Node`s is the default Linux
-        distribution of the backend.
+        The default Linux distribution is CentOS 7.
+
+        This test does not wait for DC/OS and we do not test DC/OS Enterprise
+        because these are covered by other tests which use the default
+        settings.
         """
         with Cluster(
             cluster_backend=Docker(),
@@ -87,6 +90,12 @@ class TestDistributions:
         """
         with pytest.raises(NotImplementedError):
             Docker(linux_distribution=unsupported_linux_distribution)
+
+
+class TestCoreOS:
+    """
+    Tests for the CoreOS distribution option.
+    """
 
     def test_coreos_oss(
         self,
