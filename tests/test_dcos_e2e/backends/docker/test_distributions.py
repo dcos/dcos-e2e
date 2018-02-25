@@ -16,43 +16,43 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
 
 
+def _get_node_distribution(
+    node: Node,
+    default_ssh_user: str,
+) -> Distribution:
+    """
+    Given a `Node`, return the `Distribution` on that node.
+    """
+    cat_cmd = node.run(
+        args=['cat /etc/*-release'],
+        user=default_ssh_user,
+        shell=True,
+    )
+
+    version_info = cat_cmd.stdout
+    version_info_lines = [
+        line for line in version_info.decode().split('\n') if '=' in line
+    ]
+    version_data = dict(item.split('=') for item in version_info_lines)
+
+    distributions = {
+        ('"centos"', '"7"'): Distribution.CENTOS_7,
+        ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
+        ('coreos', '1298.7.0'): Distribution.COREOS,
+        ('fedora', '23'): Distribution.FEDORA_23,
+        ('debian', '"8"'): Distribution.DEBIAN_8,
+    }
+
+    distro_id = version_data['ID'].strip()
+    distro_version_id = version_data['VERSION_ID'].strip()
+
+    return distributions[(distro_id, distro_version_id)]
+
+
 class TestDistributions:
     """
     Tests for setting the Linux distribution.
     """
-
-    def _get_node_distribution(
-        self,
-        node: Node,
-        default_ssh_user: str,
-    ) -> Distribution:
-        """
-        Given a `Node`, return the `Distribution` on that node.
-        """
-        cat_cmd = node.run(
-            args=['cat /etc/*-release'],
-            user=default_ssh_user,
-            shell=True,
-        )
-
-        version_info = cat_cmd.stdout
-        version_info_lines = [
-            line for line in version_info.decode().split('\n') if '=' in line
-        ]
-        version_data = dict(item.split('=') for item in version_info_lines)
-
-        distributions = {
-            ('"centos"', '"7"'): Distribution.CENTOS_7,
-            ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
-            ('coreos', '1298.7.0'): Distribution.COREOS,
-            ('fedora', '23'): Distribution.FEDORA_23,
-            ('debian', '"8"'): Distribution.DEBIAN_8,
-        }
-
-        distro_id = version_data['ID'].strip()
-        distro_version_id = version_data['VERSION_ID'].strip()
-
-        return distributions[(distro_id, distro_version_id)]
 
     def test_default(self) -> None:
         """
@@ -66,7 +66,7 @@ class TestDistributions:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(
+            node_distribution = _get_node_distribution(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
@@ -107,7 +107,7 @@ class TestDistributions:
             )
             cluster.wait_for_dcos_oss()
             (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(
+            node_distribution = _get_node_distribution(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
@@ -147,7 +147,7 @@ class TestDistributions:
                 superuser_password=superuser_password,
             )
             (master, ) = cluster.masters
-            node_distribution = self._get_node_distribution(
+            node_distribution = _get_node_distribution(
                 node=master,
                 default_ssh_user=cluster.default_ssh_user,
             )
