@@ -97,10 +97,10 @@ An typical CLI workflow may look like this:
 
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 5
-   921214100
-   $ dcos-docker wait # Uses "default" by default
-   $ dcos-docker run --sync-dir . pytest -k test_tls
+   # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
+   # is automatically used.
+   $ dcos-docker wait
+   $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    $ dcos-docker destroy $(dcos-docker list)
 
