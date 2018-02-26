@@ -3,16 +3,16 @@ Command Line Interface
 
 The CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
-An typical CLI workflow may look like this:
+A typical CLI workflow for open source DC/OS may look like this:
 
 .. code-block:: console
 
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 5
-   921214100
+   # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
+   # is automatically used.
    $ dcos-docker wait
-   $ dcos-docker run --sync-dir . pytest -k test_tls
+   $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    $ dcos-docker destroy $(dcos-docker list)
 
@@ -43,8 +43,17 @@ DC/OS Enterprise
 
 There are multiple DC/OS Enterprise-only features available in :ref:`dcos-docker-create`.
 
-The only extra requirement is to give a valid license key.
+The only extra requirement is to give a valid license key, for DC/OS 1.11+.
 See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on how to provide a license key.
+
+For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
+
+.. code-block:: console
+
+   $ dcos-docker create /path/to/dcos_generate_config.ee.sh \
+        --license-key /path/to/license.txt \
+        --security-mode strict \
+        --cluster-id default
 
 "default" Cluster ID
 --------------------
