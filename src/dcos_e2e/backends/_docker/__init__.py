@@ -41,13 +41,7 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     }
 
     distro_path_segment = dcos_docker_distros[linux_distribution]
-    current_file = inspect.stack()[0][1]
-    current_parent = Path(os.path.abspath(current_file)).parent
-    dcos_docker = current_parent / 'dcos_docker'
-    dockerfile = (
-        dcos_docker / 'build' / 'base' / distro_path_segment / 'Dockerfile'
-    )
-
+    dockerfile = Path('build') / 'base' / distro_path_segment / 'Dockerfile'
     return dockerfile
 
 
