@@ -33,7 +33,7 @@ class Node:
                 running on this node.
             default_ssh_user: The default username to use for SSH connections.
             ssh_key_path: The path to an SSH key which can be used to SSH to
-                the node as the `default_ssh_user` user.
+                the node as the ``default_ssh_user`` user.
 
         Attributes:
             ip_address: The IP address used by the DC/OS component
@@ -194,7 +194,7 @@ class Node:
         Args:
             args: The command to run on the node.
             user: The user to open a pipe for a command for over SSH.
-                If `None` the `default_ssh_user` is used instead.
+                If `None` the ``default_ssh_user`` is used instead.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
@@ -237,7 +237,7 @@ class Node:
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
             user: The name of the remote user to send the file via
-                secure copy. If `None` the `default_ssh_user` is
+                secure copy. If `None` the ``default_ssh_user`` is
                 used instead.
         """
         if user is None:

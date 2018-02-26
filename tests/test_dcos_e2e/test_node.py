@@ -282,7 +282,7 @@ class TestNode:
         try:
             # An arbitrary timeout to avoid infinite wait times.
             stdout, _ = proc_1.communicate(timeout=15)
-        except TimeoutExpired:
+        except TimeoutExpired:  # pragma: no cover
             proc_1.kill()
             stdout, _ = proc_1.communicate()
 
@@ -292,9 +292,10 @@ class TestNode:
         try:
             # An arbitrary timeout to avoid infinite wait times.
             proc_2.communicate(timeout=15)
-        except TimeoutExpired:
+        except TimeoutExpired:  # pragma: no cover
             proc_2.kill()
             proc_2.communicate()
+            raise
 
         return_code_2 = proc_2.poll()
 
@@ -339,7 +340,7 @@ class TestNode:
         try:
             # An arbitrary timeout to avoid infinite wait times.
             stdout, _ = proc_1.communicate(timeout=15)
-        except TimeoutExpired:
+        except TimeoutExpired:  # pragma: no cover
             proc_1.kill()
             stdout, _ = proc_1.communicate()
 
@@ -349,9 +350,10 @@ class TestNode:
         try:
             # An arbitrary timeout to avoid infinite wait times.
             proc_2.communicate(timeout=15)
-        except TimeoutExpired:
+        except TimeoutExpired:  # pragma: no cover
             proc_2.kill()
             proc_2.communicate()
+            raise
 
         return_code_2 = proc_2.poll()
 
