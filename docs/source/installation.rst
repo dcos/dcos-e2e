@@ -1,7 +1,7 @@
 Installation
 ------------
 
-DC/OS E2E consists of a Python library and a CLI.
+DC/OS E2E consists of a :doc:`library` and a :doc:`cli`.
 
 CLI macOS With Homebrew
 ~~~~~~~~~~~~~~~~~~~~~~~

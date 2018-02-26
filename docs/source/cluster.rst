@@ -1,5 +1,5 @@
-Cluster
-=======
+The ``Cluster`` class
+=====================
 
 Using DC/OS E2E usually involves creating one or more ``Cluster``\s.
 A cluster is created using a "backend", which might be Docker or a cloud provider for example.

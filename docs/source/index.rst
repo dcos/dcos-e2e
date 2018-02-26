@@ -21,12 +21,7 @@ Reference
    :maxdepth: 3
 
    installation
-   getting-started
-   cluster
-   docker-backend
-   node
-   enterprise
-   custom-backend
+   library
    cli
    versioning-and-api-stability
    contributing
