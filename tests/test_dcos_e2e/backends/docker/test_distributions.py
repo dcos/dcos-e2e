@@ -16,9 +16,7 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
 
 
-def _get_node_distribution(
-    node: Node,
-) -> Distribution:
+def _get_node_distribution(node: Node) -> Distribution:
     """
     Given a `Node`, return the `Distribution` on that node.
     """
