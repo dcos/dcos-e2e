@@ -18,14 +18,12 @@ from dcos_e2e.node import Node
 
 def _get_node_distribution(
     node: Node,
-    default_ssh_user: str,
 ) -> Distribution:
     """
     Given a `Node`, return the `Distribution` on that node.
     """
     cat_cmd = node.run(
         args=['cat /etc/*-release'],
-        user=default_ssh_user,
         shell=True,
     )
 
