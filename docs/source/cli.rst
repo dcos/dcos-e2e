@@ -38,8 +38,6 @@ To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait 
 
 To use this cluster, it is useful to find details using the :ref:`the dcos-docker inspect <dcos-docker-inspect>` command.
 
-.. _dcos-enterprise:
-
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~
 
