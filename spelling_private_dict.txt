@@ -21,7 +21,6 @@ dcos
 dict
 diff
 dir
-dockerfile
 enum
 env
 eval
@@ -40,6 +39,7 @@ macos
 mesos
 mkstemp
 multi
+mypy
 noqa
 oauth
 os

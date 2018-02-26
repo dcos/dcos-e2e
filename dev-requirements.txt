@@ -2,15 +2,17 @@ autoflake==1.1
 check-manifest==0.36
 dcoscli==0.5.7
 doc8==0.8.0
-flake8-quotes==0.13.1
+dulwich==0.18.6
+flake8-quotes==0.14.0
 flake8==3.5.0
-homebrew-pypi-poet==0.9.0
+homebrew-pypi-poet==0.10.0
 isort==4.3.4
 mypy==0.560
 pip_check_reqs==2.0.1
 py==1.5.2
 pydocstyle==2.1.1
 pyenchant==2.0.0
+pygithub==1.36
 pylint==1.8.2
 pyroma==2.3
 pytest-cov==2.5.1  # Measure code coverage
@@ -19,7 +21,7 @@ pytest==3.4.1
 requests-mock==1.4.0
 sphinx-autodoc-typehints==1.2.5
 sphinx-click==1.0.4
-sphinx==1.7.0
+sphinx==1.7.1
 sphinxcontrib-spelling==4.1.0
 vulture==0.26
 yapf==0.20.2
