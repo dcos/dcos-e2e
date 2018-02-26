@@ -1,5 +1,5 @@
-Getting Started
----------------
+Getting Started with the Library
+--------------------------------
 
 To create a DC/OS :py:class:`~dcos_e2e.cluster.Cluster`, you need a backend.
 Backends are customizable, but for now let's use a standard :doc:`Docker backend <docker-backend>`.
