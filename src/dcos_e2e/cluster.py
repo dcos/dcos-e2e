@@ -46,8 +46,6 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        self._default_ssh_user = cluster_backend.default_ssh_user
-
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
@@ -62,7 +60,6 @@ class Cluster(ContextDecorator):
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
-        default_ssh_user: str,
     ) -> 'Cluster':
         """
         Create a cluster from existing nodes.
@@ -71,8 +68,6 @@ class Cluster(ContextDecorator):
             masters: The master nodes in an existing cluster.
             agents: The agent nodes in an existing cluster.
             public_agents: The public agent nodes in an existing cluster.
-            default_ssh_user: The SSH user name which can be connected to with
-                the SSH keys associated with all nodes.
 
         Returns:
             A cluster object with the nodes of an existing cluster.
@@ -81,7 +76,6 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            default_ssh_user=default_ssh_user,
         )
 
         return cls(
@@ -105,7 +99,6 @@ class Cluster(ContextDecorator):
             node.run(
                 args=['/opt/mesosphere/bin/dcos-diagnostics', '--diag'],
                 # Keep in mind this must be run as privileged user.
-                user=self.default_ssh_user,
                 log_output_live=True,
                 env={
                     'LC_ALL': 'en_US.UTF-8',
@@ -212,7 +205,6 @@ class Cluster(ContextDecorator):
         any_master = next(iter(self.masters))
         config_result = any_master.run(
             args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
-            user=self.default_ssh_user,
         )
         config = json.loads(config_result.stdout.decode())
         ssl_enabled = config['ssl_enabled']
@@ -269,13 +261,6 @@ class Cluster(ContextDecorator):
         Return all DC/OS public agent :class:`.node.Node` s.
         """
         return self._cluster.public_agents
-
-    @property
-    def default_ssh_user(self) -> str:
-        """
-        Return the default SSH user for accessing a node.
-        """
-        return self._default_ssh_user
 
     def install_dcos_from_url(
         self,
@@ -400,7 +385,6 @@ class Cluster(ContextDecorator):
 
         return test_host.run(
             args=args,
-            user=self.default_ssh_user,
             log_output_live=log_output_live,
             env=environment_variables,
             tty=tty,

@@ -114,10 +114,3 @@ class ClusterBackend(abc.ABC):
         Return the :class:`ClusterManager` class to use to create and manage a
         cluster.
         """
-
-    @property
-    @abc.abstractmethod
-    def default_ssh_user(self) -> str:
-        """
-        Return the default SSH user as a string.
-        """

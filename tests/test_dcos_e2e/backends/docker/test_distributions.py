@@ -16,16 +16,12 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
 
 
-def _get_node_distribution(
-    node: Node,
-    default_ssh_user: str,
-) -> Distribution:
+def _get_node_distribution(node: Node) -> Distribution:
     """
     Given a `Node`, return the `Distribution` on that node.
     """
     cat_cmd = node.run(
         args=['cat /etc/*-release'],
-        user=default_ssh_user,
         shell=True,
     )
 
@@ -69,10 +65,7 @@ class TestDefaults:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
+            node_distribution = _get_node_distribution(node=master)
 
         assert node_distribution == Distribution.CENTOS_7
 
@@ -116,10 +109,7 @@ class TestCoreOS:
             )
             cluster.wait_for_dcos_oss()
             (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
+            node_distribution = _get_node_distribution(node=master)
 
         assert node_distribution == Distribution.COREOS
 
@@ -156,9 +146,6 @@ class TestCoreOS:
                 superuser_password=superuser_password,
             )
             (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
+            node_distribution = _get_node_distribution(node=master)
 
         assert node_distribution == Distribution.COREOS

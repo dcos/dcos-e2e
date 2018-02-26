@@ -41,10 +41,7 @@ With a :py:class:`~dcos_e2e.cluster.Cluster` you can then run commands on arbitr
 .. code:: python
 
     for master in cluster.masters:
-        result = master.run(
-            args=['test', '-f', path],
-            user=cluster.default_ssh_user,
-        )
+        result = master.run(args=['test', '-f', path])
         print(result.stdout)
 
 There is much more that you can do with :py:class:`~dcos_e2e.cluster.Cluster`\s and :py:class:`~dcos_e2e.node.Node`\s, and there are other ways to create a cluster.

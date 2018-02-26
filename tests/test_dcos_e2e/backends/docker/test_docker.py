@@ -89,7 +89,7 @@ class TestDockerBackend:
                     content = str(uuid.uuid4())
                     local_file.write(content)
                     args = ['cat', str(path)]
-                    result = node.run(args=args, user=cluster.default_ssh_user)
+                    result = node.run(args=args)
                     assert result.stdout.decode() == content
 
     def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
@@ -123,14 +123,12 @@ class TestDockerVersion:
     def _get_docker_version(
         self,
         node: Node,
-        default_ssh_user: str,
     ) -> DockerVersion:
         """
         Given a `Node`, return the `DockerVersion` on that node.
         """
         result = node.run(
             args=['docker', 'version', '--format', '{{.Server.Version}}'],
-            user=default_ssh_user,
         )
         docker_versions = {
             '1.13.1': DockerVersion.v1_13_1,
@@ -150,10 +148,7 @@ class TestDockerVersion:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            docker_version = self._get_docker_version(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
+            docker_version = self._get_docker_version(node=master)
 
         assert docker_version == DockerVersion.v1_13_1
 
@@ -174,10 +169,7 @@ class TestDockerVersion:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            node_docker_version = self._get_docker_version(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
+            node_docker_version = self._get_docker_version(node=master)
 
         assert docker_version == node_docker_version
 
@@ -212,15 +204,11 @@ class TestDockerStorageDriver:
     def _get_storage_driver(
         self,
         node: Node,
-        default_ssh_user: str,
     ) -> DockerStorageDriver:
         """
         Given a `Node`, return the `DockerStorageDriver` on that node.
         """
-        result = node.run(
-            args=['docker', 'info', '--format', '{{.Driver}}'],
-            user=default_ssh_user,
-        )
+        result = node.run(args=['docker', 'info', '--format', '{{.Driver}}'])
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
 
@@ -260,10 +248,7 @@ class TestDockerStorageDriver:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            node_driver = self._get_storage_driver(
-                node=master,
-                default_ssh_user=cluster.default_ssh_user,
-            )
+            node_driver = self._get_storage_driver(node=master)
 
         assert node_driver == DockerStorageDriver.AUFS
 

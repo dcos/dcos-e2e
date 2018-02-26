@@ -77,10 +77,7 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
             extra_config={'check_time': True},
         )
         (master, ) = cluster.masters
-        result = master.run(
-            args=['test', '-f', path],
-            user=cluster.default_ssh_user,
-        )
+        result = master.run(args=['test', '-f', path])
         print(result.stdout)
         cluster.wait_for_dcos_oss()
         cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
