@@ -109,3 +109,6 @@ license-key.txt
 
 # Visual Studio Code workspace
 .vscode
+
+# Virtualenv for release
+release/

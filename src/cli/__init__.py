@@ -437,7 +437,6 @@ def create(
     for node in nodes:
         node.run(
             args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
-            user=cluster.default_ssh_user,
             shell=True,
         )
         node.run(
@@ -447,7 +446,6 @@ def create(
                 '>>',
                 '/root/.ssh/authorized_keys',
             ],
-            user=cluster.default_ssh_user,
             shell=True,
         )
 
@@ -457,7 +455,6 @@ def create(
             node.send_file(
                 local_path=local_path,
                 remote_path=remote_path,
-                user=cluster.default_ssh_user,
             )
 
     try:
@@ -554,6 +551,7 @@ class _ClusterContainers:
         return Node(
             public_ip_address=address,
             private_ip_address=address,
+            default_ssh_user='root',
             ssh_key_path=ssh_key_path,
         )
 
@@ -595,7 +593,6 @@ class _ClusterContainers:
             masters=set(map(self._to_node, self.masters)),
             agents=set(map(self._to_node, self.agents)),
             public_agents=set(map(self._to_node, self.public_agents)),
-            default_ssh_user='root',
         )
 
     @property
@@ -783,7 +780,6 @@ def run(
 
             test_host.run(
                 args=list(node_args),
-                user=cluster.default_ssh_user,
                 log_output_live=False,
                 tty=True,
                 shell=True,
@@ -886,10 +882,7 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
     node_lib_dir = node_active_dir / 'bootstrap' / 'lib'
     # Different versions of DC/OS have different versions of Python.
     master = next(iter(cluster.masters))
-    ls_result = master.run(
-        args=['ls', str(node_lib_dir)],
-        user=cluster.default_ssh_user,
-    )
+    ls_result = master.run(args=['ls', str(node_lib_dir)])
     python_version = ls_result.stdout.decode().strip()
     node_python_dir = node_lib_dir / python_version
     node_bootstrap_dir = (
@@ -904,7 +897,6 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
     for master in cluster.masters:
         master.run(
             args=['rm', '-rf', str(node_test_py_pattern)],
-            user=cluster.default_ssh_user,
             # We use a wildcard character, `*`, so we need shell expansion.
             shell=True,
         )

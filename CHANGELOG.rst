@@ -6,6 +6,33 @@ Changelog
 Next
 ----
 
+-  Backwards incompatible change: Move ``default_ssh_user`` parameter from ``Cluster`` to ``Node``.
+   The ``default_ssh_user`` is now used for ``Node.run``, ``Node.popen`` and ``Node.send_file`` if ``user`` is not supplied.
+
+2018.02.23.4
+------------
+
+2018.02.23.3
+------------
+
+2018.02.23.2
+------------
+
+2018.02.23.1
+------------
+
+2018.02.23.1
+------------
+
+2018.02.23.1
+------------
+
+2018.02.23.0
+------------
+
+2018.02.23.0
+------------
+
 -  Add ``linux_distribution`` parameter to the ``Docker`` backend.
 -  Add support for CoreOS in the ``Docker`` backend.
 -  Add ``docker_version`` parameter to the ``Docker`` backend.

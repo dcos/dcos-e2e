@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/mesosphere/dcos-e2e.git"
+  url "https://github.com/mesosphere/dcos-e2e/archive/2018.02.23.4.tar.gz"
   head "https://github.com/mesosphere/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -57,8 +57,8 @@ class Dcosdocker < Formula
   end
 
   resource "docker" do
-    url "https://files.pythonhosted.org/packages/75/63/5d1b2b8df79a6041fedf3979960b4a2d4eb5a24f746cd4323ad3243d9423/docker-3.0.1.tar.gz"
-    sha256 "994e0ab827ff9b09ee4ee47ccbaec824eada0a7946fb082482895567aa2c79ae"
+    url "https://files.pythonhosted.org/packages/03/f5/ebb1b5db272b7165cf09ccccdbe91edc60db530c1280a0282084eb2893c0/docker-3.1.0.tar.gz"
+    sha256 "53ee5532d59f63287d0da5f0fd8b34af5704382152114cc1e1f3eb79167bd567"
   end
 
   resource "docker-pycreds" do
@@ -107,8 +107,8 @@ class Dcosdocker < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/a8/84/25b93a15997be680fc8ce1a7b9315b03650ced546908e5008c0912b1c2e1/pytest-3.4.0.tar.gz"
-    sha256 "6074ea3b9c999bd6d0df5fa9d12dd95ccd23550df2a582f5f5b848331d2e82ca"
+    url "https://files.pythonhosted.org/packages/84/11/a6fe751118861b4d6587e07633f2e055733fc3678f7e5d7ae30303d90b7e/pytest-3.4.1.tar.gz"
+    sha256 "9ddcb879c8cc859d2540204b5399011f842e5e8823674bf429f70ada281b3cc6"
   end
 
   resource "PyYAML" do
@@ -131,11 +131,6 @@ class Dcosdocker < Formula
     sha256 "08c039560a6da2fe4f2c426d0766e284d3b736e355f8dd24b37367b0bb41973b"
   end
 
-  resource "scp" do
-    url "https://files.pythonhosted.org/packages/1d/a9/618f1e40e30c69ffab668493953e74e6c266f383af6e34e1b8f089e41139/scp-0.10.2.tar.gz"
-    sha256 "18f59e48df67fac0b069591609a0f4d50d781a101ddb8ec705f0c2e3501a8386"
-  end
-
   resource "six" do
     url "https://files.pythonhosted.org/packages/16/d8/bc6316cf98419719bd59c91742194c111b6f2e85abac88e496adefaf7afe/six-1.11.0.tar.gz"
     sha256 "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
@@ -147,8 +142,8 @@ class Dcosdocker < Formula
   end
 
   resource "websocket-client" do
-    url "https://files.pythonhosted.org/packages/83/91/162f2c76729633d1dc36b09746895c7766bc183bba94cb4d2ec398676060/websocket_client-0.46.0.tar.gz"
-    sha256 "933f6bbf08b381f2adbca9e93d7e7958ba212b42c73acb310b18f0fbe74f3738"
+    url "https://files.pythonhosted.org/packages/c9/bb/8d3dd9063cfe0cd5d03fe6a1f74ddd948f384e9c1eff0eb978f3976a7d27/websocket_client-0.47.0.tar.gz"
+    sha256 "a453dc4dfa6e0db3d8fd7738a308a88effe6240c59f3226eb93e8f020c216149"
   end
 
 
@@ -162,4 +157,3 @@ class Dcosdocker < Formula
       system "#{bin}/dcos_docker", "--help"
   end
 end
-

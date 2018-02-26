@@ -20,7 +20,6 @@ class ExistingCluster(ClusterBackend):
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
-        default_ssh_user: str,
     ) -> None:
         """
         Create a record of an existing cluster backend for use by a cluster
@@ -29,7 +28,6 @@ class ExistingCluster(ClusterBackend):
         self.masters = masters
         self.agents = agents
         self.public_agents = public_agents
-        self._default_ssh_user = default_ssh_user
 
     @property
     def cluster_cls(self) -> Type['ExistingClusterManager']:
@@ -38,13 +36,6 @@ class ExistingCluster(ClusterBackend):
         create and manage a cluster.
         """
         return ExistingClusterManager
-
-    @property
-    def default_ssh_user(self) -> str:
-        """
-        Return the default SSH user for this backend.
-        """
-        return self._default_ssh_user
 
 
 class ExistingClusterManager(ClusterManager):

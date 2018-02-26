@@ -9,6 +9,8 @@ Configuration for Sphinx.
 import os
 import sys
 
+import dcos_e2e
+
 sys.path.insert(0, os.path.abspath('.'))
 
 extensions = [
@@ -31,8 +33,8 @@ author = 'Adam Dangoor'
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
-version = '2018.01.25.0'
-release = '2018.01.25.0'
+version = dcos_e2e.__version__
+release = version.split('+')[0]
 
 language = None
 
@@ -70,7 +72,6 @@ html_show_sourcelink = False
 
 html_theme_options = {
     'show_powered_by': 'false',
-    'fixed_sidebar': 'true',
 }
 
 html_sidebars = {

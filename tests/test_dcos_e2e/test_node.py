@@ -5,7 +5,7 @@ Tests for managing DC/OS cluster nodes.
 import logging
 import uuid
 from pathlib import Path
-from subprocess import CalledProcessError
+from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
 
 import pytest
@@ -55,10 +55,9 @@ class TestNode:
         When shell=False, preserve arguments as literal values.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         echo_result = master.run(
-            args=['echo', 'Hello, ', '&&', 'echo', 'World!'], user=default
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!']
         )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
@@ -72,11 +71,9 @@ class TestNode:
         When shell=True, interpret spaces and special characters.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         echo_result = master.run(
             args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
-            user=default,
             shell=True,
         )
         assert echo_result.returncode == 0
@@ -91,14 +88,38 @@ class TestNode:
         Remote environment variables are available.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
-        echo_result = master.run(
-            args=['echo', '$USER'], user=default, shell=True
-        )
+        echo_result = master.run(args=['echo', '$USER'], shell=True)
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'root'
         assert echo_result.stderr == b''
+
+    def test_run_custom_user(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        Commands can be run as a custom user.
+        """
+        (master, ) = dcos_cluster.masters
+
+        testuser = str(uuid.uuid4().hex)
+        master.run(args=['useradd', testuser])
+        master.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        echo_result = master.run(
+            args=['echo', '$USER'],
+            user=testuser,
+            shell=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == testuser
+        assert echo_result.stderr == b''
+
+        master.run(args=['userdel', '-r', testuser])
 
     def test_run_pass_env(
         self,
@@ -108,11 +129,9 @@ class TestNode:
         Environment variables can be passed to the remote execution
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         echo_result = master.run(
             args=['echo', '$MYVAR'],
-            user=default,
             env={'MYVAR': 'hello, world'},
             shell=True,
         )
@@ -129,10 +148,9 @@ class TestNode:
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(args=['unset_command'], user=default)
+            master.run(args=['unset_command'])
 
         exception = excinfo.value
         assert exception.returncode == 127
@@ -162,10 +180,9 @@ class TestNode:
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(args=['unset_command'], user=default, shell=True)
+            master.run(args=['unset_command'], shell=True)
 
         exception = excinfo.value
         assert exception.returncode == 127
@@ -194,14 +211,12 @@ class TestNode:
         With `log_output_live`, stdout and stderr are merged and logged.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         # With `log_output_live`, output is logged and stderr is merged
         # into stdout.
         with pytest.raises(CalledProcessError) as excinfo:
             master.run(
                 args=['unset_command'],
-                user=default,
                 log_output_live=True,
             )
 
@@ -228,12 +243,10 @@ class TestNode:
     ``log_output_live`` is ``True``.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
         with pytest.raises(ValueError) as excinfo:
             master.run(
                 args=['echo', '1'],
-                user=default,
                 log_output_live=True,
                 tty=True,
             )
@@ -243,44 +256,113 @@ class TestNode:
         )
         assert str(excinfo.value) == expected_message
 
-    # An arbitrary time limit to avoid infinite wait times.
-    @pytest.mark.timeout(60)
     def test_popen(
         self,
         dcos_cluster: Cluster,
     ) -> None:
         """
-        It is possible to run commands as the given user asynchronously.
+        It is possible to run commands as the default user asynchronously.
         """
         (master, ) = dcos_cluster.masters
-        default = dcos_cluster.default_ssh_user
 
-        popen_1 = master.popen(
+        proc_1 = master.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
-            user=default,
             shell=True,
         )
 
-        popen_2 = master.popen(
+        proc_2 = master.popen(
             args=[
                 '(mkfifo /tmp/pipe | true)',
                 '&&',
                 '(echo $USER > /tmp/pipe)',
             ],
-            user=default,
             shell=True,
         )
 
-        stdout, _ = popen_1.communicate()
-        return_code_1 = popen_1.poll()
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            stdout, _ = proc_1.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_1.kill()
+            stdout, _ = proc_1.communicate()
+
+        return_code_1 = proc_1.poll()
 
         # Needed to cleanly terminate second subprocess
-        popen_2.communicate()
-        return_code_2 = popen_2.poll()
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            proc_2.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_2.kill()
+            proc_2.communicate()
+            raise
 
-        assert stdout.strip().decode() == default
+        return_code_2 = proc_2.poll()
+
+        assert stdout.strip().decode() == master.default_ssh_user
         assert return_code_1 == 0
         assert return_code_2 == 0
+
+        master.run(['rm', '-f', '/tmp/pipe'])
+
+    def test_popen_custom_user(
+        self,
+        dcos_cluster: Cluster,
+    ) -> None:
+        """
+        It is possible to run commands as a custom user asynchronously.
+        """
+        (master, ) = dcos_cluster.masters
+
+        testuser = str(uuid.uuid4().hex)
+        master.run(args=['useradd', testuser])
+        master.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        proc_1 = master.popen(
+            args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
+            user=testuser,
+            shell=True,
+        )
+
+        proc_2 = master.popen(
+            args=[
+                '(mkfifo /tmp/pipe | true)',
+                '&&',
+                '(echo $USER > /tmp/pipe)',
+            ],
+            user=testuser,
+            shell=True,
+        )
+
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            stdout, _ = proc_1.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_1.kill()
+            stdout, _ = proc_1.communicate()
+
+        return_code_1 = proc_1.poll()
+
+        # Needed to cleanly terminate second subprocess
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            proc_2.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_2.kill()
+            proc_2.communicate()
+            raise
+
+        return_code_2 = proc_2.poll()
+
+        assert stdout.strip().decode() == testuser
+        assert return_code_1 == 0
+        assert return_code_2 == 0
+
+        master.run(['rm', '-f', '/tmp/pipe'], user=testuser)
+        master.run(args=['userdel', '-r', testuser])
 
     def test_send_file(
         self,
@@ -288,7 +370,7 @@ class TestNode:
         tmpdir: local,
     ) -> None:
         """
-        It is possible to send a file to a cluster node.
+        It is possible to send a file to a cluster node as the default user.
         """
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
@@ -298,11 +380,46 @@ class TestNode:
         master.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
-            user=dcos_cluster.default_ssh_user,
         )
         args = ['cat', str(master_destination_path)]
-        result = master.run(args=args, user=dcos_cluster.default_ssh_user)
+        result = master.run(args=args)
         assert result.stdout.decode() == content
+
+    def test_send_file_custom_user(
+        self,
+        dcos_cluster: Cluster,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node as a custom user.
+        """
+        (master, ) = dcos_cluster.masters
+
+        testuser = str(uuid.uuid4().hex)
+        master.run(args=['useradd', testuser])
+        master.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        master_destination_path = Path(
+            '/home/{}/on_master_node.txt'.format(testuser)
+        )
+        (master, ) = dcos_cluster.masters
+        master.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+            user=testuser,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = master.run(args=args, user=testuser)
+        assert result.stdout.decode() == content
+
+        # Implicitly asserts SSH connection closed by ``send_file``.
+        master.run(args=['userdel', '-r', testuser])
 
     def test_string_representation(
         self,

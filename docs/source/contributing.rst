@@ -238,16 +238,8 @@ Update the SHA in ``src/vendorize.toml``.
     git add dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
-Updating the Homebrew Recipe
+Testing the Homebrew Recipe
 ----------------------------
-
-To update the Homebrew recipe, run the following command:
-
-.. code:: sh
-
-   make update-homebrew
-
-Then test the Homebrew recipe:
 
 Install `Homebrew`_ or `Linuxbrew`_.
 

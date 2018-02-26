@@ -22,9 +22,25 @@ CLI macOS With Homebrew
 
 To install the CLI on macOS, install `Homebrew`_.
 
+Then install the latest stable version:
+
 .. code:: sh
 
-    brew install https://github.com/mesosphere/dcos-e2e/blob/master/dcosdocker.rb
+    brew install https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
+
+Or the latest ``master``:
+
+Homebrew installs the dependencies for the latest released version and so installing ``master`` may not work.
+
+.. code:: sh
+
+    brew install --HEAD https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
+
+To upgrade to a newer version, run the following command:
+
+.. code:: sh
+
+    brew upgrade https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
 .. _Homebrew: https://brew.sh
 
@@ -61,10 +77,7 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
             extra_config={'check_time': True},
         )
         (master, ) = cluster.masters
-        result = master.run(
-            args=['test', '-f', path],
-            user=cluster.default_ssh_user,
-        )
+        result = master.run(args=['test', '-f', path])
         print(result.stdout)
         cluster.wait_for_dcos_oss()
         cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
@@ -81,10 +94,10 @@ An typical CLI workflow may look like this:
 
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 5
-   921214100
-   $ dcos-docker wait # Uses "default" by default
-   $ dcos-docker run --sync-dir . pytest -k test_tls
+   # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
+   # is automatically used.
+   $ dcos-docker wait
+   $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    $ dcos-docker destroy $(dcos-docker list)
 

@@ -287,6 +287,8 @@ class DockerCluster(ClusterManager):
                 installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
+        self._default_ssh_user = cluster_backend.default_ssh_user
+
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
@@ -541,13 +543,11 @@ class DockerCluster(ClusterManager):
                 public_key_path=public_key_path,
             )
 
-        # Logically a SSH user should be part of a `Node`.
-        # However with the DC/OS config there is a notion of a SSH user for
-        # an entire DC/OS cluster, which in our case maps to a single SSH user
-        # for every cluster created with the corresponding backend. Maybe
-        # we're better off making this a `default_ssh_user` of a
-        # `ClusterManager` instead.
-        self._default_ssh_user = cluster_backend.default_ssh_user
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            node.run(
+                args=['rm', '-f', '/run/nologin', '||', 'true'],
+                shell=True,
+            )
 
     def install_dcos_from_url(
         self,
@@ -658,7 +658,7 @@ class DockerCluster(ClusterManager):
             ]
 
             for node in nodes:
-                node.run(args=dcos_install_args, user=ssh_user)
+                node.run(args=dcos_install_args)
 
     def _start_dcos_container(
         self,
@@ -781,6 +781,7 @@ class DockerCluster(ClusterManager):
                 Node(
                     public_ip_address=container_ip_address,
                     private_ip_address=container_ip_address,
+                    default_ssh_user=self._default_ssh_user,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
                 )
             )
