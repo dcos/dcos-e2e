@@ -3,7 +3,7 @@ Command Line Interface
 
 The CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
-An typical CLI workflow for open source DC/OS may look like this:
+A typical CLI workflow for open source DC/OS may look like this:
 
 .. code-block:: console
 
