@@ -5,7 +5,7 @@ Tests for managing DC/OS cluster nodes.
 import logging
 import uuid
 from pathlib import Path
-from subprocess import CalledProcessError
+from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
 
 import pytest
@@ -256,8 +256,6 @@ class TestNode:
         )
         assert str(excinfo.value) == expected_message
 
-    # An arbitrary time limit to avoid infinite wait times.
-    @pytest.mark.timeout(120)
     def test_popen(
         self,
         dcos_cluster: Cluster,
@@ -267,12 +265,12 @@ class TestNode:
         """
         (master, ) = dcos_cluster.masters
 
-        popen_1 = master.popen(
+        proc_1 = master.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
             shell=True,
         )
 
-        popen_2 = master.popen(
+        proc_2 = master.popen(
             args=[
                 '(mkfifo /tmp/pipe | true)',
                 '&&',
@@ -281,19 +279,31 @@ class TestNode:
             shell=True,
         )
 
-        stdout, _ = popen_1.communicate()
-        return_code_1 = popen_1.poll()
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            stdout, _ = proc_1.communicate(timeout=15)
+        except TimeoutExpired:
+            proc_1.kill()
+            stdout, _ = proc_1.communicate()
+
+        return_code_1 = proc_1.poll()
 
         # Needed to cleanly terminate second subprocess
-        popen_2.communicate()
-        return_code_2 = popen_2.poll()
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            proc_2.communicate(timeout=15)
+        except TimeoutExpired:
+            proc_2.kill()
+            proc_2.communicate()
+
+        return_code_2 = proc_2.poll()
 
         assert stdout.strip().decode() == master.default_ssh_user
         assert return_code_1 == 0
         assert return_code_2 == 0
 
-    # An arbitrary time limit to avoid infinite wait times.
-    @pytest.mark.timeout(300)
+        master.run(['rm', '-f', '/tmp/pipe'])
+
     def test_popen_custom_user(
         self,
         dcos_cluster: Cluster,
@@ -310,13 +320,13 @@ class TestNode:
             shell=True,
         )
 
-        popen_1 = master.popen(
+        proc_1 = master.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
             user=testuser,
             shell=True,
         )
 
-        popen_2 = master.popen(
+        proc_2 = master.popen(
             args=[
                 '(mkfifo /tmp/pipe | true)',
                 '&&',
@@ -326,17 +336,30 @@ class TestNode:
             shell=True,
         )
 
-        stdout, _ = popen_1.communicate()
-        return_code_1 = popen_1.poll()
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            stdout, _ = proc_1.communicate(timeout=15)
+        except TimeoutExpired:
+            proc_1.kill()
+            stdout, _ = proc_1.communicate()
+
+        return_code_1 = proc_1.poll()
 
         # Needed to cleanly terminate second subprocess
-        popen_2.communicate()
-        return_code_2 = popen_2.poll()
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            proc_2.communicate(timeout=15)
+        except TimeoutExpired:
+            proc_2.kill()
+            proc_2.communicate()
+
+        return_code_2 = proc_2.poll()
 
         assert stdout.strip().decode() == testuser
         assert return_code_1 == 0
         assert return_code_2 == 0
 
+        master.run(['rm', '-f', '/tmp/pipe'], user=testuser)
         master.run(args=['userdel', '-r', testuser])
 
     def test_send_file(
