@@ -293,7 +293,7 @@ class TestNode:
         assert return_code_2 == 0
 
     # An arbitrary time limit to avoid infinite wait times.
-    @pytest.mark.timeout(120)
+    @pytest.mark.timeout(300)
     def test_popen_custom_user(
         self,
         dcos_cluster: Cluster,
