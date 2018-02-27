@@ -28,6 +28,23 @@ from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
 
+def _base_dockerfile(linux_distribution: Distribution) -> Path:
+    """
+    Return the Dockerfile to use for the base OS image.
+    """
+    dcos_docker_distros = {
+        Distribution.CENTOS_7: 'centos-7',
+        Distribution.UBUNTU_16_04: 'ubuntu-xenial',
+        Distribution.FEDORA_23: 'fedora-23',
+        Distribution.COREOS: 'coreos',
+        Distribution.DEBIAN_8: 'debian-jessie',
+    }
+
+    distro_path_segment = dcos_docker_distros[linux_distribution]
+    dockerfile = Path('build') / 'base' / distro_path_segment / 'Dockerfile'
+    return dockerfile
+
+
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
     Write an RSA key pair for connecting to nodes via SSH.
@@ -370,27 +387,19 @@ class DockerCluster(ClusterManager):
             DockerVersion.v1_11_2: '1.11.2',
         }
 
-        dcos_docker_distros = {
-            Distribution.CENTOS_7: 'centos-7',
-            Distribution.UBUNTU_16_04: 'ubuntu-xenial',
-            Distribution.FEDORA_23: 'fedora-23',
-            Distribution.COREOS: 'coreos',
-            Distribution.DEBIAN_8: 'debian-jessie',
-        }
-
         linux_distribution = cluster_backend.linux_distribution
-        distro_path_segment = dcos_docker_distros[linux_distribution]
         docker_version = docker_versions[cluster_backend.docker_version]
 
         client = docker.from_env(version='auto')
+        base_dockerfile = _base_dockerfile(
+            linux_distribution=linux_distribution,
+        )
         client.images.build(
             path=str(self._path),
             rm=True,
             forcerm=True,
             tag=base_tag,
-            dockerfile=str(
-                Path('build') / 'base' / distro_path_segment / 'Dockerfile'
-            ),
+            dockerfile=str(base_dockerfile),
         )
 
         client.images.build(
