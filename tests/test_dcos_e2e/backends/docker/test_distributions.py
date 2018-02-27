@@ -5,9 +5,6 @@ Tests for the ``linux_distribution`` option on the Docker backend.
 import uuid
 from pathlib import Path
 
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-import pytest
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
