@@ -15,6 +15,9 @@ env:
   - TEST_PATTERN=tests/test_cli
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestDefaults
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestFedora23
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestDebian8
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize

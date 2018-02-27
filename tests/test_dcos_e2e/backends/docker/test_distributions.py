@@ -69,6 +69,18 @@ class TestDefaults:
 
         assert node_distribution == Distribution.CENTOS_7
 
+        with Cluster(
+            # The distribution is also CentOS 7 if it is explicitly set.
+            cluster_backend=Docker(linux_distribution=Distribution.CENTOS_7),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node_distribution = _get_node_distribution(node=master)
+
+        assert node_distribution == Distribution.CENTOS_7
+
     @pytest.mark.parametrize(
         'unsupported_linux_distribution',
         set(Distribution) - {Distribution.CENTOS_7, Distribution.COREOS}
@@ -160,7 +172,7 @@ class TestCoreOS:
     Tests for the CoreOS distribution option.
     """
 
-    def test_coreos_oss(
+    def test_oss(
         self,
         oss_artifact: Path,
     ) -> None:
@@ -172,7 +184,7 @@ class TestCoreOS:
             oss_artifact=oss_artifact,
         )
 
-    def test_coreos_enterprise(
+    def test_enterprise(
         self,
         enterprise_artifact: Path,
         license_key_contents: str,
@@ -182,6 +194,102 @@ class TestCoreOS:
         """
         _enterprise_distribution_test(
             distribution=Distribution.COREOS,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
+
+
+class TestUbuntu1604:
+    """
+    Tests for the Ubuntu 16.04 distribution option.
+    """
+
+    def test_oss(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        DC/OS OSS can start up on Ubuntu 16.04.
+        """
+        _oss_distribution_test(
+            distribution=Distribution.UBUNTU_16_04,
+            oss_artifact=oss_artifact,
+        )
+
+    def test_enterprise(
+        self,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on Ubuntu 16.04.
+        """
+        _enterprise_distribution_test(
+            distribution=Distribution.UBUNTU_16_04,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
+
+
+class TestFedora23:
+    """
+    Tests for the Fedora 23 distribution option.
+    """
+
+    def test_oss(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        DC/OS OSS can start up on Fedora 23.
+        """
+        _oss_distribution_test(
+            distribution=Distribution.FEDORA_23,
+            oss_artifact=oss_artifact,
+        )
+
+    def test_enterprise(
+        self,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on Fedora 23.
+        """
+        _enterprise_distribution_test(
+            distribution=Distribution.FEDORA_23,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
+
+
+class TestDebian8:
+    """
+    Tests for the Debian 8 distribution option.
+    """
+
+    def test_oss(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        DC/OS OSS can start up on Debian 8.
+        """
+        _oss_distribution_test(
+            distribution=Distribution.DEBIAN_8,
+            oss_artifact=oss_artifact,
+        )
+
+    def test_enterprise(
+        self,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on Debian 8.
+        """
+        _enterprise_distribution_test(
+            distribution=Distribution.DEBIAN_8,
             enterprise_artifact=enterprise_artifact,
             license_key_contents=license_key_contents,
         )
