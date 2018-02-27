@@ -45,58 +45,6 @@ def _get_node_distribution(node: Node) -> Distribution:
     return distributions[(distro_id, distro_version_id)]
 
 
-class TestDefaults:
-    """
-    Tests for not using a custom Linux distribution.
-    """
-
-    def test_default(self) -> None:
-        """
-        The default Linux distribution is CentOS 7.
-
-        This test does not wait for DC/OS and we do not test DC/OS Enterprise
-        because these are covered by other tests which use the default
-        settings.
-        """
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(node=master)
-
-        assert node_distribution == Distribution.CENTOS_7
-
-        with Cluster(
-            # The distribution is also CentOS 7 if it is explicitly set.
-            cluster_backend=Docker(linux_distribution=Distribution.CENTOS_7),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(node=master)
-
-        assert node_distribution == Distribution.CENTOS_7
-
-    @pytest.mark.parametrize(
-        'unsupported_linux_distribution',
-        set(Distribution) - {Distribution.CENTOS_7, Distribution.COREOS}
-    )
-    def test_custom_choice(
-        self,
-        unsupported_linux_distribution: Distribution,
-    ) -> None:
-        """
-        Starting a cluster with a non-default Linux distribution raises a
-        `NotImplementedError`.
-        """
-        with pytest.raises(NotImplementedError):
-            Docker(linux_distribution=unsupported_linux_distribution)
-
-
 def _oss_distribution_test(
     distribution: Distribution,
     oss_artifact: Path,
@@ -165,6 +113,43 @@ def _enterprise_distribution_test(
         node_distribution = _get_node_distribution(node=master)
 
     assert node_distribution == distribution
+
+
+class TestCentos7:
+    """
+    Tests for using CentOS 7.
+    """
+
+    def test_default(self) -> None:
+        """
+        The default Linux distribution is CentOS 7.
+
+        This test does not wait for DC/OS and we do not test DC/OS Enterprise
+        because these are covered by other tests which use the default
+        settings.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node_distribution = _get_node_distribution(node=master)
+
+        assert node_distribution == Distribution.CENTOS_7
+
+        with Cluster(
+            # The distribution is also CentOS 7 if it is explicitly set.
+            cluster_backend=Docker(linux_distribution=Distribution.CENTOS_7),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node_distribution = _get_node_distribution(node=master)
+
+        assert node_distribution == Distribution.CENTOS_7
 
 
 class TestCoreOS:
