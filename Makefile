@@ -154,5 +154,5 @@ update-dcos-docker:
 	git subtree pull \
 	    --prefix src/dcos_e2e/backends/_docker/dcos_docker \
 	    --squash \
-	    git@github.com:collinvandyck/dcos-docker.git \
-	    cvandyck/distros
+	    git@github.com:dcos/dcos-docker.git \
+	    master
