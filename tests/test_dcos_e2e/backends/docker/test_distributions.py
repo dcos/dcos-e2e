@@ -85,6 +85,76 @@ class TestDefaults:
             Docker(linux_distribution=unsupported_linux_distribution)
 
 
+def _oss_distribution_test(
+    distribution: Distribution,
+    oss_artifact: Path,
+) -> None:
+    """
+    Assert that given a ``linux_distribution``, an open source DC/OS
+    ``Cluster`` with the Linux distribution is started.
+
+    We use this rather than pytest parametrization so that we can separate
+    the tests in ``.travis.yml``.
+    """
+    with Cluster(
+        cluster_backend=Docker(linux_distribution=distribution),
+        masters=1,
+        agents=0,
+        public_agents=0,
+    ) as cluster:
+        cluster.install_dcos_from_path(
+            build_artifact=oss_artifact,
+            log_output_live=True,
+        )
+        cluster.wait_for_dcos_oss()
+        (master, ) = cluster.masters
+        node_distribution = _get_node_distribution(node=master)
+
+    assert node_distribution == distribution
+
+
+def _enterprise_distribution_test(
+    distribution: Distribution,
+    enterprise_artifact: Path,
+    license_key_contents: str,
+) -> None:
+    """
+    Assert that given a ``linux_distribution``, a DC/OS Enterprise ``Cluster``
+    with the Linux distribution is started.
+
+    We use this rather than pytest parametrization so that we can separate
+    the tests in ``.travis.yml``.
+    """
+    superuser_username = str(uuid.uuid4())
+    superuser_password = str(uuid.uuid4())
+    config = {
+        'superuser_username': superuser_username,
+        'superuser_password_hash': sha512_crypt.hash(superuser_password),
+        'fault_domain_enabled': False,
+        'license_key_contents': license_key_contents,
+    }
+
+    with Cluster(
+        cluster_backend=Docker(linux_distribution=distribution),
+        masters=1,
+        agents=0,
+        public_agents=0,
+    ) as cluster:
+        cluster.install_dcos_from_path(
+            build_artifact=enterprise_artifact,
+            extra_config=config,
+            log_output_live=True,
+        )
+        cluster.wait_for_dcos_ee(
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+        )
+        (master, ) = cluster.masters
+        node_distribution = _get_node_distribution(node=master)
+
+    assert node_distribution == distribution
+
+
 class TestCoreOS:
     """
     Tests for the CoreOS distribution option.
@@ -97,21 +167,10 @@ class TestCoreOS:
         """
         DC/OS OSS can start up on CoreOS.
         """
-        with Cluster(
-            cluster_backend=Docker(linux_distribution=Distribution.COREOS),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            cluster.install_dcos_from_path(
-                build_artifact=oss_artifact,
-                log_output_live=True,
-            )
-            cluster.wait_for_dcos_oss()
-            (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(node=master)
-
-        assert node_distribution == Distribution.COREOS
+        _oss_distribution_test(
+            distribution=Distribution.COREOS,
+            oss_artifact=oss_artifact,
+        )
 
     def test_coreos_enterprise(
         self,
@@ -121,31 +180,8 @@ class TestCoreOS:
         """
         DC/OS Enterprise can start up on CoreOS.
         """
-        superuser_username = str(uuid.uuid4())
-        superuser_password = str(uuid.uuid4())
-        config = {
-            'superuser_username': superuser_username,
-            'superuser_password_hash': sha512_crypt.hash(superuser_password),
-            'fault_domain_enabled': False,
-            'license_key_contents': license_key_contents,
-        }
-
-        with Cluster(
-            cluster_backend=Docker(linux_distribution=Distribution.COREOS),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
-                extra_config=config,
-                log_output_live=True,
-            )
-            cluster.wait_for_dcos_ee(
-                superuser_username=superuser_username,
-                superuser_password=superuser_password,
-            )
-            (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(node=master)
-
-        assert node_distribution == Distribution.COREOS
+        _enterprise_distribution_test(
+            distribution=Distribution.COREOS,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
