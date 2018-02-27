@@ -13,7 +13,7 @@ python:
 env:
   matrix:
   - TEST_PATTERN=tests/test_cli
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestDefaults
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestFedora23
