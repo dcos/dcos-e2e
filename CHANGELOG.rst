@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.02.27.0
+------------
+
 -  Backwards incompatible change: Move ``default_ssh_user`` parameter from ``Cluster`` to ``Node``.
    The ``default_ssh_user`` is now used for ``Node.run``, ``Node.popen`` and ``Node.send_file`` if ``user`` is not supplied.
 
