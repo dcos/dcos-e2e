@@ -4,6 +4,7 @@ Release the next version of DC/OS E2E.
 
 import datetime
 import os
+import re
 import subprocess
 from pathlib import Path
 from textwrap import dedent
@@ -137,11 +138,27 @@ def update_homebrew(version_str: str) -> None:
     homebrew_file.write_text(homebrew_formula_contents)
 
 
+def update_vagrantfile(version: str) -> None:
+    """
+    Update the Vagrantfile.
+    """
+    vagrantfile = Path('vagrant/Vagrantfile')
+    vagrantfile_contents = vagrantfile.read_text()
+    updated = re.sub(
+        r"DEFAULT_DCOS_E2E_REF\s*=\s*'[^']+'",
+        "DEFAULT_DCOS_E2E_REF = '{}'".format(version),
+        vagrantfile_contents,
+        count=1
+    )
+    vagrantfile.write_text(updated)
+
+
 def main() -> None:
     github_token = os.environ['GITHUB_TOKEN']
     version_str = get_version()
     update_changelog(version=version_str)
     update_homebrew(version_str=version_str)
+    update_vagrantfile(version=version_str)
     commit_and_push(version=version_str)
     create_github_release(
         github_token=github_token,
