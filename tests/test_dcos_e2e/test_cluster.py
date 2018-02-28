@@ -12,7 +12,6 @@ from typing import List
 
 import pytest
 from _pytest.logging import LogCaptureFixture
-
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 

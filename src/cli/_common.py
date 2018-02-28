@@ -5,7 +5,6 @@ Common code for CLI modules.
 from typing import Set
 
 import docker
-
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion

@@ -8,12 +8,11 @@ from pathlib import Path
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 import pytest
-from passlib.hash import sha512_crypt
-
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
+from passlib.hash import sha512_crypt
 
 
 def _get_node_distribution(node: Node) -> Distribution:

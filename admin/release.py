@@ -4,8 +4,8 @@ Release the next version of DC/OS E2E.
 
 import datetime
 import os
-import subprocess
 import re
+import subprocess
 from pathlib import Path
 from textwrap import dedent
 
