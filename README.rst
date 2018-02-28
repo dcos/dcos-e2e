@@ -44,6 +44,7 @@ To upgrade to a newer version, run the following command:
 
 .. _Homebrew: https://brew.sh
 
+
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

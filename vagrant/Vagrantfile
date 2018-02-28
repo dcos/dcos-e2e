@@ -1,6 +1,10 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# The next line is managed by `admin/release.py` - check there before modifying
+DEFAULT_DCOS_E2E_REF = '2018.02.27.0'
+
+dcos_e2e_git_ref = ENV.fetch('DCOS_E2E_REF', DEFAULT_DCOS_E2E_REF)
 
 # Provisioning script to install Docker and dcos-e2e
 $provision_script = <<SCRIPT
@@ -22,7 +26,7 @@ usermod -a -G docker ubuntu
 
 # Install dcos-e2e
 apt-get install -y python3-pip
-pip3 install git+https://github.com/mesosphere/dcos-e2e.git@master
+pip3 install git+https://github.com/mesosphere/dcos-e2e.git@#{dcos_e2e_git_ref}
 
 # Accept IP forwarding to Docker containers.  On the VM host, set this VM guest's IP (192.168.18.2)
 # as the gateway for routing 172.17.0.0/16.  This allows the VM host to connect to Docker containers,

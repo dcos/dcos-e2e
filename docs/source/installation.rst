@@ -41,10 +41,9 @@ Windows
 
 The only supported way to run DC/OS E2E on Windows is using Vagrant and VirtualBox.
 
-- Ensure Virtualization and VT-X support is enabled in your PC's BIOS.
-- Disable Hyper-V virtualisation.
-- Install VirtualBox and VirtualBox Extension Pack.
-- Install Vagrant.
+- Ensure Virtualization and VT-X support is enabled in your PC's BIOS. Disable Hyper-V virtualisation. See https://www.howtogeek.com/213795/how-to-enable-intel-vt-x-in-your-computers-bios-or-uefi-firmware/
+- Install `VirtualBox`_ and VirtualBox Extension Pack.
+- Install `Vagrant`_.
 - Install the Vagrant plugin for persistent disks:
 
 .. code:: ps1
@@ -64,6 +63,12 @@ The only supported way to run DC/OS E2E on Windows is using Vagrant and VirtualB
 
     ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/vagrant/Vagrantfile')) | Set-Content -LiteralPath Vagrantfile
 
+- By default, the ``Vagrantfile`` installs DC/OS E2E from the most recent release at the time it is downloaded.  To use a different release, or any Git reference, set the environment variable ``DCOS_E2E_REF``:
+
+.. code:: ps1
+
+    $env:DCOS_E2E_REF = "master"
+
 - Start the virtual machine and login:
 
 .. code:: ps1
@@ -79,7 +84,7 @@ To connect to the cluster nodes from the Windows host (e.g. to use the DC/OS web
 
     route add 172.17.0.0 MASK 255.255.0.0 192.168.18.2
 
-To shutdown, logout of the virtual machine shell, and destroy the virtual machine and disk
+To shutdown, logout of the virtual machine shell, and destroy the virtual machine and disk:
 
 .. code:: ps1
 
@@ -93,3 +98,5 @@ The route will be removed on reboot. You can manually remove the route in PowerS
 
 
 .. _Homebrew: https://brew.sh
+.. _VirtualBox: https://www.virtualbox.org/wiki/Downloads
+.. _Vagrant: https://www.vagrantup.com/downloads.html
