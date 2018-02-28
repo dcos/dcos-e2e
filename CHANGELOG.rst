@@ -6,32 +6,13 @@ Changelog
 Next
 ----
 
+-  Support Ubuntu, Fedora and Debian on the ``Docker`` backend.
+
 2018.02.27.0
 ------------
 
 -  Backwards incompatible change: Move ``default_ssh_user`` parameter from ``Cluster`` to ``Node``.
    The ``default_ssh_user`` is now used for ``Node.run``, ``Node.popen`` and ``Node.send_file`` if ``user`` is not supplied.
-
-2018.02.23.4
-------------
-
-2018.02.23.3
-------------
-
-2018.02.23.2
-------------
-
-2018.02.23.1
-------------
-
-2018.02.23.1
-------------
-
-2018.02.23.1
-------------
-
-2018.02.23.0
-------------
 
 2018.02.23.0
 ------------
