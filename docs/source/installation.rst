@@ -76,7 +76,7 @@ The only supported way to run DC/OS E2E on Windows is using Vagrant and VirtualB
     vagrant up
     vagrant ssh
 
-You can now run ``dcos-docker`` commands.
+You can now run :doc:`cli` commands or use the :doc:`library`.
 
 To connect to the cluster nodes from the Windows host (e.g. to use the DC/OS web interface), in PowerShell Run as Administrator, and add the Virtual Machine as a gateway:
 
