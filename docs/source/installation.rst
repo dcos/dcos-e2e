@@ -41,7 +41,7 @@ Windows
 
 The only supported way to run DC/OS E2E on Windows is using Vagrant and VirtualBox.
 
-- Ensure Virtualization and VT-X support is enabled in your PC's BIOS. Disable Hyper-V virtualisation. See https://www.howtogeek.com/213795/how-to-enable-intel-vt-x-in-your-computers-bios-or-uefi-firmware/
+- Ensure Virtualization and VT-X support is enabled in your PC's BIOS. Disable Hyper-V virtualization. See https://www.howtogeek.com/213795/how-to-enable-intel-vt-x-in-your-computers-bios-or-uefi-firmware/
 - Install `VirtualBox`_ and VirtualBox Extension Pack.
 - Install `Vagrant`_.
 - Install the Vagrant plugin for persistent disks:

@@ -8,9 +8,10 @@ Docker version or base operating system, for cost reasons.
 import uuid
 from pathlib import Path
 
+from passlib.hash import sha512_crypt
+
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from passlib.hash import sha512_crypt
 
 
 class Test110:

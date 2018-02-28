@@ -47,7 +47,7 @@ To upgrade to a newer version, run the following command:
 Windows Installation with Vagrant
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On Windows, it is possible to run DC/OS E2E in Vagrant. See `Windows Installation <http://dcos-e2e.readthedocs.io/en/latest/installation.html#Windows>`_
+On Windows, it is possible to run DC/OS E2E in Vagrant. See `Windows Installation <http://dcos-e2e.readthedocs.io/en/latest/installation.html#Windows>`_.
 
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

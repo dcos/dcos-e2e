@@ -48,7 +48,10 @@ oss
 parallelizable
 parallelization
 pluggable
+plugin
+plugins
 postflight
+powershell
 pragma
 py
 pyperclip
@@ -83,10 +86,12 @@ untar
 url
 username
 utils
+vagrantfile
 validator
 validators
 vendored
 versioning
+virtualization
 vm
 whitespace
 wildcard

@@ -10,11 +10,12 @@ from typing import Iterator
 
 import pytest
 from _pytest.logging import LogCaptureFixture
-from dcos_e2e.backends import ClusterBackend
-from dcos_e2e.cluster import Cluster
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
+
+from dcos_e2e.backends import ClusterBackend
+from dcos_e2e.cluster import Cluster
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name

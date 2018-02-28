@@ -33,11 +33,12 @@ import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from docker.models.containers import Container
+from passlib.hash import sha512_crypt
+
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
-from docker.models.containers import Container
-from passlib.hash import sha512_crypt
 
 from ._common import (
     CLUSTER_ID_LABEL_KEY,

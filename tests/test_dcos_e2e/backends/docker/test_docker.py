@@ -13,13 +13,14 @@ from typing import Dict
 # are disabled.
 import docker
 import pytest
+from py.path import local  # pylint: disable=no-name-in-module, import-error
+from requests_mock import Mocker, NoMockAddress
+
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
-from py.path import local  # pylint: disable=no-name-in-module, import-error
-from requests_mock import Mocker, NoMockAddress
 
 
 class TestDockerBackend:
