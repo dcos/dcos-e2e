@@ -12,28 +12,8 @@ python:
 - '3.5'
 env:
   matrix:
-  - TEST_PATTERN=tests/test_cli
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestFedora23
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestDebian8
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
-  - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
-  - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
-  - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_default_config
-  - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_extend_config
-  - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging
-  - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests::test_run_pytest
-  - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters::test_two_clusters
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
-  - TEST_PATTERN=tests/test_dcos_e2e/test_node.py::TestNode
-  - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test110
-  - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111
 before_install:
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
@@ -41,9 +21,7 @@ install:
 - travis_retry pip install --upgrade --editable .[dev]
 cache: pip
 before_script:
-- make docs
-- make lint
-- travis_retry make EE_MASTER_ARTIFACT_URL=$EE_MASTER_ARTIFACT_URL EE_1_10_ARTIFACT_URL=$EE_1_10_ARTIFACT_URL EE_1_11_ARTIFACT_URL=$EE_1_11_ARTIFACT_URL download-artifacts
+- travis_retry make EE_MASTER_ARTIFACT_URL=$EE_MASTER_ARTIFACT_URL download-artifacts
 script:
 - pytest -vvv -s "$TEST_PATTERN" --cov=src/dcos_e2e --cov=tests
 after_success:
