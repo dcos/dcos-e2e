@@ -12,6 +12,7 @@ RUN apt-get update \
 		ca-certificates \
 		curl \
 		debianutils \
+                debus \
 		gawk \
 		git \
 		iproute \
