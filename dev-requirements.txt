@@ -7,7 +7,7 @@ flake8-quotes==0.14.0
 flake8==3.5.0
 homebrew-pypi-poet==0.10.0
 isort==4.3.4
-mypy==0.560
+mypy==0.570
 pip_check_reqs==2.0.1
 py==1.5.2
 pydocstyle==2.1.1
