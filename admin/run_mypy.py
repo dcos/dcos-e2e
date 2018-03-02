@@ -7,10 +7,11 @@ import sys
 
 
 def main() -> None:
-    args = ['mypy', 'src/', 'tests/', 'admin/']
+    args = ['mypy', '.']
     ignore_paths = {
         'src/dcos_e2e/_vendor',
         'src/dcos_e2e/_version.py',
+        'versioneer.py',
     }
     result = subprocess.run(args=args, stdout=subprocess.PIPE)
     result_lines = result.stdout.decode().strip().split('\n')
