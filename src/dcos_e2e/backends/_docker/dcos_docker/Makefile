@@ -83,7 +83,7 @@ info: ips ## Provides information about the master and agent's ips.
 open-browser: ips ## Opens your browser to the master ip.
 	$(OPEN_CMD) "http://$(firstword $(MASTER_IPS))"
 
-build-base: generate $(SERVICE_DIR)/systemd-journald-init.service ## Build the base docker image.
+build-base: $(SERVICE_DIR)/systemd-journald-init.service ## Build the base docker image.
 	@echo "+ Building the base $(DISTRO) image"
 	@$(foreach distro,$(wildcard build/base/$(DISTRO)*/Dockerfile),$(call build_base_image,$(word 3,$(subst /, ,$(distro)))))
 	@docker tag $(DOCKER_IMAGE):base-$(DISTRO) $(DOCKER_IMAGE):base
@@ -97,14 +97,11 @@ build: build-base-docker $(GENCONF_DIR)/ip-detect $(SBIN_DIR)/dcos-postflight $(
 	@echo "+ Building the dcos-docker image"
 	@docker build --rm --force-rm -t $(DOCKER_IMAGE) .
 
-build-all: generate ## Build the base and base-docker images for all permutations of distros and docker versions.
+build-all: ## Build the base and base-docker images for all permutations of distros and docker versions.
 	@echo "+ Building the base images"
 	@$(foreach distro,$(wildcard build/base/*/Dockerfile),$(call build_base_image,$(word 3,$(subst /, ,$(distro)))))
 	@echo "+ Building the base-docker images"
 	@$(foreach version,$(wildcard build/base-docker/*/Dockerfile),$(call build_base_docker_image,$(word 3,$(subst /, ,$(version)))))
-
-generate: $(CURDIR)/build/base ## generate the Dockerfiles for all the base distros.
-	@$(CURDIR)/build/base/generate.sh
 
 $(SSH_DIR): $(INCLUDE_DIR)
 	@mkdir -p $@
@@ -122,9 +119,9 @@ postflight: ## Polls DC/OS until it is healthy (5m timeout)
 	$(foreach NUM,$(shell [[ $(MASTERS) == 0 ]] || seq 1 1 $(MASTERS)),$(call postflight_container,$(MASTER_CTR),$(NUM)))
 	@echo "+ DC/OS Healthy (Master Nodes)"
 	@echo "+ Checking agent nodes"
-	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(MASTERS)),$(call postflight_container,$(AGENT_CTR),$(NUM)))
+	$(foreach NUM,$(shell [[ $(AGENTS) == 0 ]] || seq 1 1 $(AGENTS)),$(call postflight_container,$(AGENT_CTR),$(NUM)))
 	@echo "+ Checking public agent nodes"
-	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(MASTERS)),$(call postflight_container,$(PUBLIC_AGENT_CTR),$(NUM)))
+	$(foreach NUM,$(shell [[ $(PUBLIC_AGENTS) == 0 ]] || seq 1 1 $(PUBLIC_AGENTS)),$(call postflight_container,$(PUBLIC_AGENT_CTR),$(NUM)))
 	@echo "+ DC/OS Healthy (All Nodes)"
 
 master: $(BOOTSTRAP_GENCONF_PATH) ## Starts the containers for DC/OS masters.
