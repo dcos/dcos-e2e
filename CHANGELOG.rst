@@ -7,6 +7,7 @@ Next
 ----
 
 - Fix public agents on DC/OS 1.10.
+- Remove options to use Fedora and Debian in the ``Docker`` backend nodes.
 
 2018.02.28.0
 ------------
