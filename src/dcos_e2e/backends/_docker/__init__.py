@@ -365,7 +365,7 @@ class DockerCluster(ClusterManager):
 
         self._master_prefix = self._cluster_id + '-master-'
         self._agent_prefix = self._cluster_id + '-agent-'
-        self._public_agent_prefix = self._cluster_id + '-public_agent-'
+        self._public_agent_prefix = self._cluster_id + '-public-agent-'
 
         bootstrap_genconf_path = self._genconf_dir / 'serve'
         # We wrap this in `Path` to work around

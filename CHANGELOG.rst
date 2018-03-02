@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Fix public agents on DC/OS 1.10.
+
 2018.02.28.0
 ------------
 
