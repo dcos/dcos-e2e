@@ -27,11 +27,7 @@ class Test110:
         """
         An open source DC/OS 1.10 cluster can be started.
         """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_10_artifact,
                 log_output_live=True,
@@ -55,11 +51,8 @@ class Test110:
             'fault_domain_enabled': False,
             'license_key_contents': license_key_contents,
         }
-        with Cluster(
-            cluster_backend=cluster_backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
+
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_1_10_artifact,
                 extra_config=config,
@@ -84,11 +77,7 @@ class Test111:
         """
         An open source DC/OS 1.11 cluster can be started.
         """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_11_artifact,
                 log_output_live=True,
@@ -112,11 +101,8 @@ class Test111:
             'fault_domain_enabled': False,
             'license_key_contents': license_key_contents,
         }
-        with Cluster(
-            cluster_backend=cluster_backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
+
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_1_11_artifact,
                 extra_config=config,
