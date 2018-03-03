@@ -16,7 +16,6 @@ Next
 - Add ``Vagrantfile`` to run DC/OS E2E in a virtual machine.
 - Add instructions for running DC/OS E2E on Windows.
 - Allow relative paths for the build artifact.
->>>>>>> origin/master
 
 2018.02.27.0
 ------------
