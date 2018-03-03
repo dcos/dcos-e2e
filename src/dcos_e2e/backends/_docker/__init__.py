@@ -334,9 +334,12 @@ class DockerCluster(ClusterManager):
 
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_dst = Path(self._genconf_dir / 'ip-detect')
-        copyfile(src=str(ip_detect_src), dst=str(ip_detect_dst))
+        files_to_copy_to_installer.append(
+            (
+                current_parent / 'resources' / 'ip-detect',
+                Path('/genconf/ip-detect')
+            )
+        )
 
         copyfile(
             src=str(service_dir_src / 'systemd-journald-init.service'),
