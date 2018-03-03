@@ -43,6 +43,20 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     return dockerfile
 
 
+def _docker_dockerfile(docker_version: DockerVersion) -> Path:
+    """
+    Return the Dockerfile to use to install a particular version of Docker.
+    """
+    docker_versions = {
+        DockerVersion.v1_13_1: '1.13.1',
+        DockerVersion.v1_11_2: '1.11.2',
+    }
+
+    version_segment = docker_versions[docker_version]
+    dockerfile = Path('build') / 'base-docker' / version_segment / 'Dockerfile'
+    return dockerfile
+
+
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
     Write an RSA key pair for connecting to nodes via SSH.
@@ -372,17 +386,13 @@ class DockerCluster(ClusterManager):
 
         docker_image_tag = 'mesosphere/dcos-docker'
         base_tag = docker_image_tag + ':base'
-        docker_versions = {
-            DockerVersion.v1_13_1: '1.13.1',
-            DockerVersion.v1_11_2: '1.11.2',
-        }
-
-        linux_distribution = cluster_backend.linux_distribution
-        docker_version = docker_versions[cluster_backend.docker_version]
 
         client = docker.from_env(version='auto')
         base_dockerfile = _base_dockerfile(
-            linux_distribution=linux_distribution,
+            linux_distribution=cluster_backend.linux_distribution,
+        )
+        docker_dockerfile = _docker_dockerfile(
+            docker_version=cluster_backend.docker_version,
         )
         client.images.build(
             path=str(self._path),
@@ -397,10 +407,9 @@ class DockerCluster(ClusterManager):
             rm=True,
             forcerm=True,
             tag=docker_image_tag,
-            dockerfile=str(
-                Path('build') / 'base-docker' / docker_version / 'Dockerfile'
-            ),
+            dockerfile=str(docker_dockerfile),
         )
+
         common_mounts = {
             str(certs_dir.resolve()): {
                 'bind': '/etc/docker/certs.d',
