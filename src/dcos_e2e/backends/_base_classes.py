@@ -4,7 +4,7 @@ Abstract base classes.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, Iterable, Set, Tuple, Type
+from typing import Any, Dict, List, Set, Tuple, Type
 
 from ..node import Node
 
@@ -20,7 +20,7 @@ class ClusterManager(abc.ABC):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
+        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: 'ClusterBackend',
     ) -> None:
         """
