@@ -18,6 +18,7 @@ cwd
 dangoor
 dc
 dcos
+debian
 dict
 diff
 dir

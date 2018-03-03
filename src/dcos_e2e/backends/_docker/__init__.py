@@ -35,9 +35,7 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     dcos_docker_distros = {
         Distribution.CENTOS_7: 'centos-7',
         Distribution.UBUNTU_16_04: 'ubuntu-xenial',
-        Distribution.FEDORA_23: 'fedora-23',
         Distribution.COREOS: 'coreos',
-        Distribution.DEBIAN_8: 'debian-jessie',
     }
 
     distro_path_segment = dcos_docker_distros[linux_distribution]

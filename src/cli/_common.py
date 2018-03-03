@@ -14,8 +14,6 @@ LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
     'ubuntu-16.04': Distribution.UBUNTU_16_04,
     'coreos': Distribution.COREOS,
-    'fedora-23': Distribution.FEDORA_23,
-    'debian-8': Distribution.DEBIAN_8,
 }
 
 DOCKER_VERSIONS = {
