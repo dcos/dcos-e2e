@@ -48,6 +48,7 @@ os
 oss
 parallelizable
 parallelization
+parameterization
 pluggable
 plugin
 plugins
