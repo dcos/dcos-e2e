@@ -1,0 +1,85 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# The next line is managed by `admin/release.py` - check there before modifying
+DEFAULT_DCOS_E2E_REF = '2018.02.27.0'
+
+dcos_e2e_git_ref = ENV.fetch('DCOS_E2E_REF', DEFAULT_DCOS_E2E_REF)
+
+# Provisioning script to install Docker and dcos-e2e
+$provision_script = <<SCRIPT
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail -x
+
+# Docker CE installation instructions
+apt-get update
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+apt-key fingerprint 0EBFCD88 | grep -c Docker
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+apt-get update
+apt-get install -y docker-ce=17.12.0~ce-0~ubuntu
+
+# Allow user to run Docker commands
+usermod -a -G docker ubuntu
+
+# Install dcos-e2e
+apt-get install -y python3-pip
+pip3 install git+https://github.com/mesosphere/dcos-e2e.git@#{dcos_e2e_git_ref}
+
+# Accept IP forwarding to Docker containers.  On the VM host, set this VM guest's IP (192.168.18.2)
+# as the gateway for routing 172.17.0.0/16.  This allows the VM host to connect to Docker containers,
+# to use the DC/OS web interface, for example.
+iptables -I DOCKER-USER ! -i docker0 -o docker0 -j ACCEPT
+SCRIPT
+
+# Provisioning script to start user in /vagrant directory
+$user_script = <<SCRIPT
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail -x
+
+grep -q 'cd /vagrant' ~/.bash_profile || echo -e '\n[ -d /vagrant ] && cd /vagrant' >> ~/.bash_profile
+SCRIPT
+
+unless Vagrant.has_plugin?("vagrant-persistent-storage")
+  raise 'Please run "vagrant plugin install vagrant-persistent-storage" first'
+end
+
+Vagrant.configure("2") do |config|
+
+  if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.scope = :box
+  end
+  if Vagrant.has_plugin?('vagrant-vbguest')
+    config.vbguest.auto_update = true
+  end
+
+  config.vm.box = "ubuntu/xenial64"
+
+  config.vm.network "private_network", ip: "192.168.18.2"
+
+  config.vm.provider :virtualbox do |vbox|
+    vbox.name = "dcos-e2e"
+    vbox.cpus = 2
+    vbox.memory = 10240
+  end
+
+  unless ARGV[0] == "destroy"
+    # Add a large disk for Docker volumes.
+    # The persistent-storage plugin keeps disks on vagrant destroy.
+    # Hide this stanza on `destroy` to ensure disk is destroyed.
+    config.persistent_storage.enabled = true
+    config.persistent_storage.location = "vagrant-disk.vdi"
+    config.persistent_storage.size = 50 * 1024  # 50 GiB
+    config.persistent_storage.mountname = 'docker'
+    config.persistent_storage.filesystem = 'ext4'
+    config.persistent_storage.mountpoint = '/var/lib/docker'
+    config.persistent_storage.diskdevice = '/dev/sdc'
+  end
+
+  config.vm.provision "shell", inline: $provision_script
+
+  config.vm.provision "shell", inline: $user_script, privileged: false
+end

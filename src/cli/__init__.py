@@ -371,9 +371,10 @@ def create(
         private_key_path=private_key_path,
     )
 
+    artifact_path = Path(artifact).resolve()
     try:
         enterprise = _is_enterprise(
-            build_artifact=Path(artifact),
+            build_artifact=artifact_path,
             workspace_dir=workspace_dir,
         )
     except subprocess.CalledProcessError:
@@ -460,7 +461,7 @@ def create(
     try:
         with click_spinner.spinner():
             cluster.install_dcos_from_path(
-                build_artifact=Path(artifact),
+                build_artifact=artifact_path,
                 extra_config=extra_config,
             )
     except CalledProcessError as exc:

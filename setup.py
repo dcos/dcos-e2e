@@ -29,8 +29,8 @@ with open('README.rst') as f:
 
 setup(
     name='DCOS E2E',
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
+    version=versioneer.get_version(),  # type: ignore
+    cmdclass=versioneer.get_cmdclass(),  # type: ignore
     author='Adam Dangoor',
     author_email='adangoor@mesosphere.com',
     description='Test helpers for testing DC/OS end to end.',

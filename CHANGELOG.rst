@@ -6,7 +6,17 @@ Changelog
 Next
 ----
 
--  Support Ubuntu, Fedora and Debian on the ``Docker`` backend.
+- Fix public agents on DC/OS 1.10.
+- Remove options to use Fedora and Debian in the ``Docker`` backend nodes.
+- Fix the Ubuntu distribution on the ``Docker`` backend.
+
+2018.02.28.0
+------------
+
+- Add ``Vagrantfile`` to run DC/OS E2E in a virtual machine.
+- Add instructions for running DC/OS E2E on Windows.
+- Allow relative paths for the build artifact.
+>>>>>>> origin/master
 
 2018.02.27.0
 ------------
