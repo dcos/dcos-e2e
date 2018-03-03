@@ -48,7 +48,7 @@ def _oss_distribution_test(
     Assert that given a ``linux_distribution``, an open source DC/OS
     ``Cluster`` with the Linux distribution is started.
 
-    We use this rather than pytest parametrization so that we can separate
+    We use this rather than pytest parameterization so that we can separate
     the tests in ``.travis.yml``.
     """
     with Cluster(
@@ -77,7 +77,7 @@ def _enterprise_distribution_test(
     Assert that given a ``linux_distribution``, a DC/OS Enterprise ``Cluster``
     with the Linux distribution is started.
 
-    We use this rather than pytest parametrization so that we can separate
+    We use this rather than pytest parameterization so that we can separate
     the tests in ``.travis.yml``.
     """
     superuser_username = str(uuid.uuid4())
