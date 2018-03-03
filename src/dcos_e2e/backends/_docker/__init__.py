@@ -12,7 +12,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, ignore_patterns, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
 import docker
 import yaml
@@ -268,7 +268,7 @@ class DockerCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
+        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: Docker,
     ) -> None:
         """
