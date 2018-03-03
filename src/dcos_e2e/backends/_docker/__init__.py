@@ -212,10 +212,6 @@ class Docker(ClusterBackend):
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
 
-        Raises:
-            NotImplementedError: The ``linux_distribution`` is not supported by
-                this backend.
-
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
         """
@@ -227,10 +223,6 @@ class Docker(ClusterBackend):
         self.custom_master_mounts = custom_master_mounts or {}
         self.custom_agent_mounts = custom_agent_mounts or {}
         self.custom_public_agent_mounts = custom_public_agent_mounts or {}
-        supported_distributions = {Distribution.CENTOS_7, Distribution.COREOS}
-        if linux_distribution not in supported_distributions:
-            raise NotImplementedError
-
         self.linux_distribution = linux_distribution
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver

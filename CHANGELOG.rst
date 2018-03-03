@@ -8,6 +8,7 @@ Next
 
 - Fix public agents on DC/OS 1.10.
 - Remove options to use Fedora and Debian in the ``Docker`` backend nodes.
+- Fix the Ubuntu distribution on the ``Docker`` backend.
 
 2018.02.28.0
 ------------
@@ -21,27 +22,6 @@ Next
 
 -  Backwards incompatible change: Move ``default_ssh_user`` parameter from ``Cluster`` to ``Node``.
    The ``default_ssh_user`` is now used for ``Node.run``, ``Node.popen`` and ``Node.send_file`` if ``user`` is not supplied.
-
-2018.02.23.4
-------------
-
-2018.02.23.3
-------------
-
-2018.02.23.2
-------------
-
-2018.02.23.1
-------------
-
-2018.02.23.1
-------------
-
-2018.02.23.1
-------------
-
-2018.02.23.0
-------------
 
 2018.02.23.0
 ------------

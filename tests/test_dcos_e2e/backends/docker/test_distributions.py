@@ -5,9 +5,6 @@ Tests for the ``linux_distribution`` option on the Docker backend.
 import uuid
 from pathlib import Path
 
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-import pytest
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
@@ -43,46 +40,6 @@ def _get_node_distribution(node: Node) -> Distribution:
     return distributions[(distro_id, distro_version_id)]
 
 
-class TestDefaults:
-    """
-    Tests for not using a custom Linux distribution.
-    """
-
-    def test_default(self) -> None:
-        """
-        The default Linux distribution is CentOS 7.
-
-        This test does not wait for DC/OS and we do not test DC/OS Enterprise
-        because these are covered by other tests which use the default
-        settings.
-        """
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            node_distribution = _get_node_distribution(node=master)
-
-        assert node_distribution == Distribution.CENTOS_7
-
-    @pytest.mark.parametrize(
-        'unsupported_linux_distribution',
-        set(Distribution) - {Distribution.CENTOS_7, Distribution.COREOS}
-    )
-    def test_custom_choice(
-        self,
-        unsupported_linux_distribution: Distribution,
-    ) -> None:
-        """
-        Starting a cluster with a non-default Linux distribution raises a
-        `NotImplementedError`.
-        """
-        with pytest.raises(NotImplementedError):
-            Docker(linux_distribution=unsupported_linux_distribution)
-
-
 def _oss_distribution_test(
     distribution: Distribution,
     oss_artifact: Path,
@@ -91,7 +48,7 @@ def _oss_distribution_test(
     Assert that given a ``linux_distribution``, an open source DC/OS
     ``Cluster`` with the Linux distribution is started.
 
-    We use this rather than pytest parametrization so that we can separate
+    We use this rather than pytest parameterization so that we can separate
     the tests in ``.travis.yml``.
     """
     with Cluster(
@@ -120,7 +77,7 @@ def _enterprise_distribution_test(
     Assert that given a ``linux_distribution``, a DC/OS Enterprise ``Cluster``
     with the Linux distribution is started.
 
-    We use this rather than pytest parametrization so that we can separate
+    We use this rather than pytest parameterization so that we can separate
     the tests in ``.travis.yml``.
     """
     superuser_username = str(uuid.uuid4())
@@ -153,12 +110,49 @@ def _enterprise_distribution_test(
     assert node_distribution == distribution
 
 
+class TestCentos7:
+    """
+    Tests for using CentOS 7.
+    """
+
+    def test_default(self) -> None:
+        """
+        The default Linux distribution is CentOS 7.
+
+        This test does not wait for DC/OS and we do not test DC/OS Enterprise
+        because these are covered by other tests which use the default
+        settings.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node_distribution = _get_node_distribution(node=master)
+
+        assert node_distribution == Distribution.CENTOS_7
+
+        with Cluster(
+            # The distribution is also CentOS 7 if it is explicitly set.
+            cluster_backend=Docker(linux_distribution=Distribution.CENTOS_7),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node_distribution = _get_node_distribution(node=master)
+
+        assert node_distribution == Distribution.CENTOS_7
+
+
 class TestCoreOS:
     """
     Tests for the CoreOS distribution option.
     """
 
-    def test_coreos_oss(
+    def test_oss(
         self,
         oss_artifact: Path,
     ) -> None:
@@ -170,7 +164,7 @@ class TestCoreOS:
             oss_artifact=oss_artifact,
         )
 
-    def test_coreos_enterprise(
+    def test_enterprise(
         self,
         enterprise_artifact: Path,
         license_key_contents: str,
@@ -180,6 +174,38 @@ class TestCoreOS:
         """
         _enterprise_distribution_test(
             distribution=Distribution.COREOS,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
+
+
+class TestUbuntu1604:
+    """
+    Tests for the Ubuntu 16.04 distribution option.
+    """
+
+    def test_oss(
+        self,
+        oss_artifact: Path,
+    ) -> None:
+        """
+        DC/OS OSS can start up on Ubuntu 16.04.
+        """
+        _oss_distribution_test(
+            distribution=Distribution.UBUNTU_16_04,
+            oss_artifact=oss_artifact,
+        )
+
+    def test_enterprise(
+        self,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on Ubuntu 16.04.
+        """
+        _enterprise_distribution_test(
+            distribution=Distribution.UBUNTU_16_04,
             enterprise_artifact=enterprise_artifact,
             license_key_contents=license_key_contents,
         )
