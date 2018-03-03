@@ -6,7 +6,6 @@ import configparser
 import inspect
 import os
 import socket
-import stat
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -323,7 +322,6 @@ class DockerCluster(ClusterManager):
         # https://github.com/PyCQA/pylint/issues/224.
         Path(self._genconf_dir).mkdir(exist_ok=True)
         self._genconf_dir = Path(self._genconf_dir).resolve()
-        self._genconf_dir_src = self._path / 'genconf.src'
         include_dir = self._path / 'include'
         include_dir_src = self._path / 'include.src'
         certs_dir = include_dir / 'certs'
@@ -334,13 +332,11 @@ class DockerCluster(ClusterManager):
         service_dir = include_dir / 'systemd'
         service_dir.mkdir(parents=True)
 
-        ip_detect = Path(self._genconf_dir / 'ip-detect')
-
-        copyfile(
-            src=str(self._genconf_dir_src / 'ip-detect'),
-            dst=str(ip_detect),
-        )
-        ip_detect.chmod(mode=ip_detect.stat().st_mode | stat.S_IEXEC)
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        ip_detect_src = current_parent / 'resources' / 'ip-detect'
+        ip_detect_dst = Path(self._genconf_dir / 'ip-detect')
+        copyfile(src=str(ip_detect_src), dst=str(ip_detect_dst))
 
         copyfile(
             src=str(service_dir_src / 'systemd-journald-init.service'),
