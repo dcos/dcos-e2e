@@ -50,7 +50,7 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=files_to_copy_to_installer,
+            files_to_copy_to_installer=list(files_to_copy_to_installer),
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 

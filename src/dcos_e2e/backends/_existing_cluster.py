@@ -3,7 +3,7 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Iterable, Set, Tuple, Type
+from typing import Any, Dict, List, Set, Tuple, Type
 
 from dcos_e2e.node import Node
 
@@ -48,7 +48,7 @@ class ExistingClusterManager(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Iterable[Tuple[Path, Path]],
+        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: ExistingCluster,
     ) -> None:
         """
