@@ -359,11 +359,6 @@ class DockerCluster(ClusterManager):
             else:
                 copyfile(src=str(host_path), dst=str(destination_path))
 
-        # _write_docker_service_file(
-        #     service_file_path=service_dir / 'docker.service',
-        #     storage_driver=cluster_backend.docker_storage_driver,
-        # )
-
         self._master_prefix = self._cluster_id + '-master-'
         self._agent_prefix = self._cluster_id + '-agent-'
         self._public_agent_prefix = self._cluster_id + '-public-agent-'
