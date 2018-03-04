@@ -52,8 +52,9 @@ def _docker_dockerfile(docker_version: DockerVersion) -> Path:
     version of Docker.
     """
     docker_versions = {
-        DockerVersion.v1_13_1: '1.13.1',
         DockerVersion.v1_11_2: '1.11.2',
+        DockerVersion.v1_13_1: '1.13.1',
+        DockerVersion.v17_12_1_ce: '17.12.1-ce',
     }
 
     version_segment = docker_versions[docker_version]
