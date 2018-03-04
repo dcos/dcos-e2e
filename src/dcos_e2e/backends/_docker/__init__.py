@@ -451,6 +451,7 @@ class DockerCluster(ClusterManager):
                     },
                 },
                 public_key_path=public_key_path,
+                docker_storage_driver=cluster_backend.docker_storage_driver,
             )
 
         for agent_number in range(1, agents + 1):
@@ -488,6 +489,7 @@ class DockerCluster(ClusterManager):
                     },
                 },
                 public_key_path=public_key_path,
+                docker_storage_driver=cluster_backend.docker_storage_driver,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -525,6 +527,7 @@ class DockerCluster(ClusterManager):
                     },
                 },
                 public_key_path=public_key_path,
+                docker_storage_driver=cluster_backend.docker_storage_driver,
             )
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
@@ -655,6 +658,7 @@ class DockerCluster(ClusterManager):
         docker_image: str,
         labels: Dict[str, str],
         public_key_path: Path,
+        docker_storage_driver: DockerStorageDriver,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -679,6 +683,8 @@ class DockerCluster(ClusterManager):
                 to the dictionary option in
                 http://docker-py.readthedocs.io/en/stable/containers.html.
             public_key_path: The path to an SSH public key to put on the node.
+            docker_storage_driver: The storage driver to use for Docker on the
+                node.
         """
         registry_host = 'registry.local'
         if self.masters:
@@ -730,9 +736,8 @@ class DockerCluster(ClusterManager):
         ]
 
         docker_service_name = 'docker.service'
-        storage_driver = DockerStorageDriver.OVERLAY_2
         docker_service_text = _docker_service_file(
-            storage_driver=storage_driver,
+            storage_driver=docker_storage_driver,
         )
         docker_service_dst = '/lib/systemd/system/' + docker_service_name
         echo_docker = [
