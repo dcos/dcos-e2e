@@ -143,7 +143,7 @@ class TestCreate:
               --docker-version [1.11.2|1.13.1]
                                               The Docker version to install on the nodes.
                                               [default: 1.13.1]
-              --linux-distribution [centos-7|coreos|debian-8|fedora-23|ubuntu-16.04]
+              --linux-distribution [centos-7|coreos|ubuntu-16.04]
                                               The Linux distribution to use on the nodes.
                                               [default: centos-7]
               --docker-storage-driver [aufs|overlay|overlay2]
