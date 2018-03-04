@@ -36,6 +36,7 @@ ip
 linting
 linuxbrew
 login
+logout
 macOS
 macos
 mesos
