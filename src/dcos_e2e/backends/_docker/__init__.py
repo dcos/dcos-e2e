@@ -4,6 +4,7 @@ Helpers for creating and interacting with clusters on Docker.
 
 import configparser
 import inspect
+import io
 import os
 import shlex
 import socket
@@ -130,11 +131,10 @@ def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
     # Ignore erroneous error https://github.com/python/typeshed/issues/1857.
     config.optionxform = str  # type: ignore
     config.read_dict(docker_service_contents)
-    import io
-    thingy = io.StringIO()
-    config.write(thingy)
-    thingy.seek(0)
-    return thingy.read()
+    config_string = io.StringIO()
+    config.write(config_string)
+    config_string.seek(0)
+    return config_string.read()
 
 
 def _get_open_port() -> int:
