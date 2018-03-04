@@ -211,16 +211,6 @@ Release Process
 
 See :doc:`release-process`.
 
-Updating DC/OS Docker
----------------------
-
-`DC/OS Docker <https://github.com/dcos/dcos-docker>`__ is vendored in this repository using ``git subtree``.
-To update DC/OS Docker, use the following command:
-
-.. code:: sh
-
-    make update-dcos-docker
-
 Updating DC/OS Test Utils
 -------------------------
 
