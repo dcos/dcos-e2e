@@ -145,7 +145,7 @@ def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
 
     docker_service_contents = {
         'Unit': {
-            'Description': 'Docker Appkication Container Engine',
+            'Description': 'Docker Application Container Engine',
             'Documentation': 'https://docs.docker.com',
             'After': 'dbus.service',
         },
