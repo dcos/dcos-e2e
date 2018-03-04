@@ -11,7 +11,7 @@ import socket
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from shutil import copyfile, copytree, ignore_patterns, rmtree
+from shutil import copyfile, copytree, rmtree
 from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
@@ -212,8 +212,6 @@ class Docker(ClusterBackend):
                 containers. Akin to the dictionary option in `Containers.run`_.
 
         Attributes:
-            dcos_docker_path: The path to a clone of DC/OS Docker.
-                This clone will be used to create the cluster.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
             custom_master_mounts: Custom mounts add to master node containers.
@@ -232,9 +230,6 @@ class Docker(ClusterBackend):
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
         """
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        self.dcos_docker_path = current_parent / 'dcos_docker'
         self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.custom_master_mounts = custom_master_mounts or {}
@@ -303,15 +298,6 @@ class DockerCluster(ClusterManager):
         # reduces the chance of side-effects affecting sequential tests.
         workspace_dir = cluster_backend.workspace_dir
         self._path = Path(workspace_dir) / uuid.uuid4().hex / self._cluster_id
-
-        copytree(
-            src=str(cluster_backend.dcos_docker_path),
-            dst=str(self._path),
-            # If there is already a config, we do not copy it as it will be
-            # overwritten and therefore copying it is wasteful.
-            ignore=ignore_patterns('dcos_generate_config.sh'),
-        )
-
         self._path = self._path.resolve()
 
         # Files in the `genconf` directory are mounted to the installer at
@@ -324,7 +310,7 @@ class DockerCluster(ClusterManager):
         self._genconf_dir = self._path / 'genconf'
         # We wrap these in `Path` to work around
         # https://github.com/PyCQA/pylint/issues/224.
-        Path(self._genconf_dir).mkdir(exist_ok=True)
+        Path(self._genconf_dir).mkdir(exist_ok=True, parents=True)
         self._genconf_dir = Path(self._genconf_dir).resolve()
         include_dir = self._path / 'include'
         certs_dir = include_dir / 'certs'
