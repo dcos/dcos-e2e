@@ -40,8 +40,10 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     }
 
     distro_path_segment = dcos_docker_distros[linux_distribution]
-    dockerfile = Path('build') / 'base' / distro_path_segment / 'Dockerfile'
-    return dockerfile
+    current_file = inspect.stack()[0][1]
+    current_parent = Path(os.path.abspath(current_file)).parent
+    dockerfiles = current_parent / 'resources' / 'dockerfiles' / 'base'
+    return dockerfiles / distro_path_segment
 
 
 def _docker_dockerfile(docker_version: DockerVersion) -> Path:
@@ -54,8 +56,10 @@ def _docker_dockerfile(docker_version: DockerVersion) -> Path:
     }
 
     version_segment = docker_versions[docker_version]
-    dockerfile = Path('build') / 'base-docker' / version_segment / 'Dockerfile'
-    return dockerfile
+    current_file = inspect.stack()[0][1]
+    current_parent = Path(os.path.abspath(current_file)).parent
+    dockerfiles = current_parent / 'resources' / 'dockerfiles' / 'base-docker'
+    return dockerfiles / version_segment
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -377,19 +381,17 @@ class DockerCluster(ClusterManager):
             docker_version=cluster_backend.docker_version,
         )
         client.images.build(
-            path=str(self._path),
+            path=str(base_dockerfile),
             rm=True,
             forcerm=True,
             tag=base_tag,
-            dockerfile=str(base_dockerfile),
         )
 
         client.images.build(
-            path=str(self._path),
+            path=str(docker_dockerfile),
             rm=True,
             forcerm=True,
             tag=docker_image_tag,
-            dockerfile=str(docker_dockerfile),
         )
 
         common_mounts = {
