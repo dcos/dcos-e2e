@@ -722,7 +722,7 @@ class DockerCluster(ClusterManager):
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
 
-        systemd_init_name = 'systemd-jorunald-init.service'
+        systemd_init_name = 'systemd-journald-init.service'
         systemd_init_src = current_parent / 'resources' / systemd_init_name
         systemd_init_text = systemd_init_src.read_text()
         systemd_init_dst = '/lib/systemd/system/' + systemd_init_name
