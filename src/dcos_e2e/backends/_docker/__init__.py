@@ -139,7 +139,6 @@ def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
         '/usr/bin/docker daemon '
         '-D '
         '-s {storage_driver_name} '
-        '--disable-legacy-registry=true '
         '--exec-opt=native.cgroupdriver=cgroupfs'
     ).format(storage_driver_name=storage_driver_name)
 
