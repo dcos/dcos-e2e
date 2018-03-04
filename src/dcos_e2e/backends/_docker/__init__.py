@@ -323,25 +323,16 @@ class DockerCluster(ClusterManager):
         Path(self._genconf_dir).mkdir(exist_ok=True)
         self._genconf_dir = Path(self._genconf_dir).resolve()
         include_dir = self._path / 'include'
-        include_dir_src = self._path / 'include.src'
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
-        service_dir_src = include_dir_src / 'systemd'
-        service_dir = include_dir / 'systemd'
-        service_dir.mkdir(parents=True)
 
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         ip_detect_src = current_parent / 'resources' / 'ip-detect'
         ip_detect_dst = Path('/genconf/ip-detect')
         files_to_copy_to_installer.append((ip_detect_src, ip_detect_dst))
-
-        copyfile(
-            src=str(service_dir_src / 'systemd-journald-init.service'),
-            dst=str(service_dir / 'systemd-journald-init.service'),
-        )
 
         public_key_path = ssh_dir / 'id_rsa.pub'
         _write_key_pair(
