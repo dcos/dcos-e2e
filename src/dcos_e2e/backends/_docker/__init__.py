@@ -719,11 +719,22 @@ class DockerCluster(ClusterManager):
             '/var/lib/dcos/mesos-slave-common'
         )
 
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+
+        systemd_init_name = 'systemd-jorunald-init.service'
+        systemd_init_src = current_parent / 'resources' / systemd_init_name
+        systemd_init_text = systemd_init_src.read_text()
+        systemd_init_dst = '/lib/systemd/system/' + systemd_init_name
+
         public_key = public_key_path.read_text()
         echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
+        echo_init_src = ['echo', systemd_init_text, '>>', systemd_init_dst]
+
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
             ['/bin/bash', '-c', disable_systemd_support_cmd],
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_init_src)),
             ['systemctl', 'start', 'sshd.service'],
             ['mkdir', '--parents', '/root/.ssh'],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
