@@ -136,7 +136,7 @@ def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
     }[storage_driver]
 
     docker_cmd = (
-        '/usr/bin/docker daemon '
+        '/usr/bin/dockerd '
         '-D '
         '-s {storage_driver_name} '
         '--exec-opt=native.cgroupdriver=cgroupfs'
