@@ -4,7 +4,9 @@ Helpers for creating and interacting with clusters on Docker.
 
 import configparser
 import inspect
+import io
 import os
+import shlex
 import socket
 import uuid
 from ipaddress import IPv4Address
@@ -85,15 +87,11 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
 
-def _write_docker_service_file(
-    service_file_path: Path,
-    storage_driver: DockerStorageDriver,
-) -> None:
+def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
     """
-    Write a systemd unit for a Docker service.
+    Return the contents of a systemd unit file for a Docker service.
 
     Args:
-        service_file_path: The path to a file to write to.
         storage_driver: The Docker storage driver to use.
     """
     storage_driver_name = {
@@ -132,8 +130,10 @@ def _write_docker_service_file(
     # Ignore erroneous error https://github.com/python/typeshed/issues/1857.
     config.optionxform = str  # type: ignore
     config.read_dict(docker_service_contents)
-    with service_file_path.open(mode='w') as service_file:
-        config.write(service_file)
+    config_string = io.StringIO()
+    config.write(config_string)
+    config_string.seek(0)
+    return config_string.read()
 
 
 def _get_open_port() -> int:
@@ -323,25 +323,16 @@ class DockerCluster(ClusterManager):
         Path(self._genconf_dir).mkdir(exist_ok=True)
         self._genconf_dir = Path(self._genconf_dir).resolve()
         include_dir = self._path / 'include'
-        include_dir_src = self._path / 'include.src'
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
-        service_dir_src = include_dir_src / 'systemd'
-        service_dir = include_dir / 'systemd'
-        service_dir.mkdir(parents=True)
 
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         ip_detect_src = current_parent / 'resources' / 'ip-detect'
         ip_detect_dst = Path('/genconf/ip-detect')
         files_to_copy_to_installer.append((ip_detect_src, ip_detect_dst))
-
-        copyfile(
-            src=str(service_dir_src / 'systemd-journald-init.service'),
-            dst=str(service_dir / 'systemd-journald-init.service'),
-        )
 
         public_key_path = ssh_dir / 'id_rsa.pub'
         _write_key_pair(
@@ -357,11 +348,6 @@ class DockerCluster(ClusterManager):
                 copytree(src=str(host_path), dst=str(destination_path))
             else:
                 copyfile(src=str(host_path), dst=str(destination_path))
-
-        _write_docker_service_file(
-            service_file_path=service_dir / 'docker.service',
-            storage_driver=cluster_backend.docker_storage_driver,
-        )
 
         self._master_prefix = self._cluster_id + '-master-'
         self._agent_prefix = self._cluster_id + '-agent-'
@@ -456,6 +442,7 @@ class DockerCluster(ClusterManager):
                     },
                 },
                 public_key_path=public_key_path,
+                docker_storage_driver=cluster_backend.docker_storage_driver,
             )
 
         for agent_number in range(1, agents + 1):
@@ -493,6 +480,7 @@ class DockerCluster(ClusterManager):
                     },
                 },
                 public_key_path=public_key_path,
+                docker_storage_driver=cluster_backend.docker_storage_driver,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -530,6 +518,7 @@ class DockerCluster(ClusterManager):
                     },
                 },
                 public_key_path=public_key_path,
+                docker_storage_driver=cluster_backend.docker_storage_driver,
             )
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
@@ -660,6 +649,7 @@ class DockerCluster(ClusterManager):
         docker_image: str,
         labels: Dict[str, str],
         public_key_path: Path,
+        docker_storage_driver: DockerStorageDriver,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -684,6 +674,8 @@ class DockerCluster(ClusterManager):
                 to the dictionary option in
                 http://docker-py.readthedocs.io/en/stable/containers.html.
             public_key_path: The path to an SSH public key to put on the node.
+            docker_storage_driver: The storage driver to use for Docker on the
+                node.
         """
         registry_host = 'registry.local'
         if self.masters:
@@ -719,10 +711,45 @@ class DockerCluster(ClusterManager):
             '/var/lib/dcos/mesos-slave-common'
         )
 
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+
+        systemd_init_name = 'systemd-journald-init.service'
+        systemd_init_src = current_parent / 'resources' / systemd_init_name
+        systemd_init_text = systemd_init_src.read_text()
+        systemd_init_dst = '/lib/systemd/system/' + systemd_init_name
+        echo_init_src = [
+            'echo',
+            '-e',
+            shlex.quote(systemd_init_text),
+            '>',
+            systemd_init_dst,
+        ]
+
+        docker_service_name = 'docker.service'
+        docker_service_text = _docker_service_file(
+            storage_driver=docker_storage_driver,
+        )
+        docker_service_dst = '/lib/systemd/system/' + docker_service_name
+        echo_docker = [
+            'echo',
+            '-e',
+            shlex.quote(docker_service_text),
+            '>',
+            docker_service_dst,
+        ]
+
         public_key = public_key_path.read_text()
         echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
+
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
+            ['mkdir', '-p', '/lib/systemd/system'],
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_init_src)),
+            ['systemctl', 'enable', systemd_init_name],
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
+            ['systemctl', 'enable', docker_service_name],
+            ['systemctl', 'start', docker_service_name],
             ['/bin/bash', '-c', disable_systemd_support_cmd],
             ['systemctl', 'start', 'sshd.service'],
             ['mkdir', '--parents', '/root/.ssh'],
@@ -730,7 +757,7 @@ class DockerCluster(ClusterManager):
         ]:
             container.exec_run(cmd=cmd)
             exit_code, output = container.exec_run(cmd=cmd)
-            assert exit_code == 0, output
+            assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
 
     def destroy(self) -> None:
         """

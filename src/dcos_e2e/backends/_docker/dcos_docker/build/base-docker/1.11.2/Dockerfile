@@ -14,6 +14,3 @@ RUN curl -sSL --fail "https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER
 	&& rm -f /etc/securetty \
 	&& ln -vf /bin/true /usr/sbin/modprobe \
 	&& ln -vf /bin/true /sbin/modprobe
-
-COPY include/systemd/docker.service /lib/systemd/system/
-RUN systemctl enable docker.service || true
