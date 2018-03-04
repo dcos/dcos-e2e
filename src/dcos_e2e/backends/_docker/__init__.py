@@ -5,6 +5,7 @@ Helpers for creating and interacting with clusters on Docker.
 import configparser
 import inspect
 import os
+import shlex
 import socket
 import uuid
 from ipaddress import IPv4Address
@@ -647,8 +648,6 @@ class DockerCluster(ClusterManager):
             ]
 
             for node in nodes:
-                import pdb
-                pdb.set_trace()
                 node.run(args=dcos_install_args)
 
     def _start_dcos_container(
@@ -728,8 +727,13 @@ class DockerCluster(ClusterManager):
         systemd_init_src = current_parent / 'resources' / systemd_init_name
         systemd_init_text = systemd_init_src.read_text()
         systemd_init_dst = '/lib/systemd/system/' + systemd_init_name
-        import shlex
-        echo_init_src = ['echo', '-e', shlex.quote(systemd_init_text), '>', systemd_init_dst]
+        echo_init_src = [
+            'echo',
+            '-e',
+            shlex.quote(systemd_init_text),
+            '>',
+            systemd_init_dst,
+        ]
 
         docker_service_name = 'docker.service'
         storage_driver = DockerStorageDriver.OVERLAY_2
@@ -737,7 +741,13 @@ class DockerCluster(ClusterManager):
             storage_driver=storage_driver,
         )
         docker_service_dst = '/lib/systemd/system/' + docker_service_name
-        echo_docker = ['echo', '-e', shlex.quote(docker_service_text), '>', docker_service_dst]
+        echo_docker = [
+            'echo',
+            '-e',
+            shlex.quote(docker_service_text),
+            '>',
+            docker_service_dst,
+        ]
 
         public_key = public_key_path.read_text()
         echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
@@ -758,7 +768,6 @@ class DockerCluster(ClusterManager):
             container.exec_run(cmd=cmd)
             exit_code, output = container.exec_run(cmd=cmd)
             assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
-        # import pdb; pdb.set_trace()
 
     def destroy(self) -> None:
         """
