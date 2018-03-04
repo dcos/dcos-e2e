@@ -321,6 +321,7 @@ class DockerCluster(ClusterManager):
         # reduces the chance of side-effects affecting sequential tests.
         workspace_dir = cluster_backend.workspace_dir
         self._path = Path(workspace_dir) / uuid.uuid4().hex / self._cluster_id
+        self._path.mkdir(exist_ok=True, parents=True)
         self._path = self._path.resolve()
 
         # Files in the `genconf` directory are mounted to the installer at
