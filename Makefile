@@ -28,7 +28,7 @@ yapf:
 
 .PHONY: mypy
 mypy:
-	python admin/run_mypy.py
+	mypy *.py src/ tests/ admin/
 
 .PHONY: check-manifest
 check-manifest:
