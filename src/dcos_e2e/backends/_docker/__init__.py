@@ -85,10 +85,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
 
-def _write_docker_service_file(
-    service_file_path: Path,
-    storage_driver: DockerStorageDriver,
-) -> None:
+def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
     """
     Write a systemd unit for a Docker service.
 
@@ -132,8 +129,11 @@ def _write_docker_service_file(
     # Ignore erroneous error https://github.com/python/typeshed/issues/1857.
     config.optionxform = str  # type: ignore
     config.read_dict(docker_service_contents)
-    with service_file_path.open(mode='w') as service_file:
-        config.write(service_file)
+    import io
+    thingy = io.StringIO()
+    config.write(thingy)
+    thingy.seek(0)
+    return thingy.read()
 
 
 def _get_open_port() -> int:
@@ -358,10 +358,10 @@ class DockerCluster(ClusterManager):
             else:
                 copyfile(src=str(host_path), dst=str(destination_path))
 
-        _write_docker_service_file(
-            service_file_path=service_dir / 'docker.service',
-            storage_driver=cluster_backend.docker_storage_driver,
-        )
+        # _write_docker_service_file(
+        #     service_file_path=service_dir / 'docker.service',
+        #     storage_driver=cluster_backend.docker_storage_driver,
+        # )
 
         self._master_prefix = self._cluster_id + '-master-'
         self._agent_prefix = self._cluster_id + '-agent-'
@@ -647,6 +647,8 @@ class DockerCluster(ClusterManager):
             ]
 
             for node in nodes:
+                import pdb
+                pdb.set_trace()
                 node.run(args=dcos_install_args)
 
     def _start_dcos_container(
@@ -726,22 +728,34 @@ class DockerCluster(ClusterManager):
         systemd_init_src = current_parent / 'resources' / systemd_init_name
         systemd_init_text = systemd_init_src.read_text()
         systemd_init_dst = '/lib/systemd/system/' + systemd_init_name
+        echo_init_src = ['echo', systemd_init_text, '>>', systemd_init_dst]
+
+        docker_service_name = 'docker.service'
+        storage_driver = DockerStorageDriver.OVERLAY_2
+        docker_service_text = _docker_service_file(
+            storage_driver=storage_driver,
+        )
+        docker_service_dst = '/lib/systemd/system/' + docker_service_name
+        echo_docker = ['echo', docker_service_text, '>>', docker_service_dst]
 
         public_key = public_key_path.read_text()
         echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
-        echo_init_src = ['echo', systemd_init_text, '>>', systemd_init_dst]
 
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
+            ['mkdir', '-p', '/lib/systemd/system'],
             ['/bin/bash', '-c', disable_systemd_support_cmd],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_init_src)),
+            ['systemctl', 'enable', systemd_init_name],
+            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
+            ['systemctl', 'enable', docker_service_name],
             ['systemctl', 'start', 'sshd.service'],
             ['mkdir', '--parents', '/root/.ssh'],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ]:
             container.exec_run(cmd=cmd)
             exit_code, output = container.exec_run(cmd=cmd)
-            assert exit_code == 0, output
+            assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
 
     def destroy(self) -> None:
         """
