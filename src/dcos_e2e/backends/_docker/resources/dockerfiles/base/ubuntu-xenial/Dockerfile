@@ -51,6 +51,4 @@ RUN ln -s /usr/sbin/useradd /usr/bin/useradd
 RUN ln -s /usr/sbin/groupadd /usr/bin/groupadd
 RUN ln -s /bin/systemd-tmpfiles /usr/bin/systemd-tmpfiles
 
-# systemd needs a different stop signal
-STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]

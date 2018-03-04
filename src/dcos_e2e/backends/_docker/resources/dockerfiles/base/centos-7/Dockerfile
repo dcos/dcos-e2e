@@ -41,6 +41,4 @@ done \
 && rm -f /lib/systemd/system/graphical.target.wants/* \
 && ln -vf /lib/systemd/system/multi-user.target /lib/systemd/system/default.target
 
-# systemd needs a different stop signal
-STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]

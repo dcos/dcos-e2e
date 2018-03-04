@@ -699,6 +699,7 @@ class DockerCluster(ClusterManager):
             volumes=volumes,
             tmpfs=tmpfs,
             labels=labels,
+            stop_signal='SIGRTMIN+3',
         )
 
         disable_systemd_support_cmd = (
