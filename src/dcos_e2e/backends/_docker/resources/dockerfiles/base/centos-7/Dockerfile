@@ -13,7 +13,6 @@ RUN yum install -y \
 		iputils \
 		libcgroup \
 		libselinux-utils \
-		nano \
 		net-tools \
 		openssh-client \
 		openssh-server \
@@ -22,7 +21,6 @@ RUN yum install -y \
 		tar \
 		tree \
 		unzip \
-		vim \
 		which \
 		xz \
 && ( \

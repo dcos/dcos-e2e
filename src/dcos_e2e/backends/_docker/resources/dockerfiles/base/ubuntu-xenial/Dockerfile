@@ -17,7 +17,6 @@ RUN apt-get update \
 		iputils-ping \
 		libcgroup-dev \
 		libpopt0 \
-		nano \
 		net-tools \
 		openssh-client \
 		openssh-server \
@@ -26,7 +25,6 @@ RUN apt-get update \
 		tar \
 		tree \
 		unzip \
-		vim-nox \
 		xz-utils \
 	&& rm -rf /var/lib/apt/lists/* \
 && ( \
