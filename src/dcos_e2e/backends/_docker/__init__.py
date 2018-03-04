@@ -397,6 +397,11 @@ class DockerCluster(ClusterManager):
             },
         }
 
+        anonymous_mounts = [
+            {'bind': '/var/lib/docker', 'mode': 'rw'},
+            {'bind': '/opt', 'mode': 'rw'},
+        ]
+
         agent_mounts = {
             '/sys/fs/cgroup': {
                 'bind': '/sys/fs/cgroup',
@@ -406,16 +411,7 @@ class DockerCluster(ClusterManager):
         }
 
         for master_number in range(1, masters + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-            }
+            unique_mounts = {uuid.uuid(): item for item in anonymous_mounts}
 
             self._start_dcos_container(
                 container_base_name=self._master_prefix,
@@ -440,15 +436,9 @@ class DockerCluster(ClusterManager):
             )
 
         for agent_number in range(1, agents + 1):
+            unique_mounts = {uuid.uuid(): item for item in anonymous_mounts}
             unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
+                **unique_mounts,
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/mesos/slave',
                     'mode': 'rw',
@@ -478,15 +468,9 @@ class DockerCluster(ClusterManager):
             )
 
         for public_agent_number in range(1, public_agents + 1):
+            unique_mounts = {uuid.uuid(): item for item in anonymous_mounts}
             unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
+                **unique_mounts,
                 str(uuid.uuid4()): {
                     'bind': '/var/lib/mesos/slave',
                     'mode': 'rw',
