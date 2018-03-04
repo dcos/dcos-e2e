@@ -128,7 +128,6 @@ class TestDockerVersion:
         Given a `Node`, return the `DockerVersion` on that node.
         """
         args = ['docker', 'version', '--format', '{{.Server.Version}}']
-        import pdb; pdb.set_trace()
         result = node.run(args)
         docker_versions = {
             '1.11.2': DockerVersion.v1_11_2,
@@ -158,9 +157,6 @@ class TestDockerVersion:
         """
         It is possible to set a custom version of Docker.
         """
-        if docker_version != DockerVersion.v17_12_1_ce:
-            return
-
         # We specify the storage driver because `overlay2` is not compatible
         # with old versions of Docker.
         with Cluster(
