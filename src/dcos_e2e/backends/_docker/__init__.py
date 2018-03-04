@@ -131,6 +131,7 @@ def _docker_service_file(
 
     Args:
         storage_driver: The Docker storage driver to use.
+        docker_version: The version of Docker to start.
     """
     storage_driver_name = {
         DockerStorageDriver.AUFS: 'aufs',
