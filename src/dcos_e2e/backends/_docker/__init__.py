@@ -248,13 +248,6 @@ class Docker(ClusterBackend):
         """
         return DockerCluster
 
-    @property
-    def default_ssh_user(self) -> str:
-        """
-        Return `root` as the default SSH user for the Docker backend.
-        """
-        return 'root'
-
 
 class DockerCluster(ClusterManager):
     """
@@ -283,7 +276,7 @@ class DockerCluster(ClusterManager):
                 installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
-        self._default_ssh_user = cluster_backend.default_ssh_user
+        self._default_ssh_user = 'root'
 
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
