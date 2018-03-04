@@ -728,7 +728,8 @@ class DockerCluster(ClusterManager):
         systemd_init_src = current_parent / 'resources' / systemd_init_name
         systemd_init_text = systemd_init_src.read_text()
         systemd_init_dst = '/lib/systemd/system/' + systemd_init_name
-        echo_init_src = ['echo', systemd_init_text, '>>', systemd_init_dst]
+        import shlex
+        echo_init_src = ['echo', '-e', shlex.quote(systemd_init_text), '>', systemd_init_dst]
 
         docker_service_name = 'docker.service'
         storage_driver = DockerStorageDriver.OVERLAY_2
@@ -736,7 +737,7 @@ class DockerCluster(ClusterManager):
             storage_driver=storage_driver,
         )
         docker_service_dst = '/lib/systemd/system/' + docker_service_name
-        echo_docker = ['echo', docker_service_text, '>>', docker_service_dst]
+        echo_docker = ['echo', '-e', shlex.quote(docker_service_text), '>', docker_service_dst]
 
         public_key = public_key_path.read_text()
         echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
@@ -744,11 +745,12 @@ class DockerCluster(ClusterManager):
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
             ['mkdir', '-p', '/lib/systemd/system'],
-            ['/bin/bash', '-c', disable_systemd_support_cmd],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_init_src)),
             ['systemctl', 'enable', systemd_init_name],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
             ['systemctl', 'enable', docker_service_name],
+            ['systemctl', 'start', docker_service_name],
+            ['/bin/bash', '-c', disable_systemd_support_cmd],
             ['systemctl', 'start', 'sshd.service'],
             ['mkdir', '--parents', '/root/.ssh'],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
@@ -756,6 +758,7 @@ class DockerCluster(ClusterManager):
             container.exec_run(cmd=cmd)
             exit_code, output = container.exec_run(cmd=cmd)
             assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
+        # import pdb; pdb.set_trace()
 
     def destroy(self) -> None:
         """
