@@ -127,12 +127,12 @@ class TestDockerVersion:
         """
         Given a `Node`, return the `DockerVersion` on that node.
         """
-        result = node.run(
-            args=['docker', 'version', '--format', '{{.Server.Version}}'],
-        )
+        args = ['docker', 'version', '--format', '{{.Server.Version}}']
+        result = node.run(args)
         docker_versions = {
-            '1.13.1': DockerVersion.v1_13_1,
             '1.11.2': DockerVersion.v1_11_2,
+            '1.13.1': DockerVersion.v1_13_1,
+            '17.12.1-ce': DockerVersion.v17_12_1_ce,
         }
 
         return docker_versions[result.stdout.decode().strip()]
