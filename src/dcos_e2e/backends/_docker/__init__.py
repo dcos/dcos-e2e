@@ -398,8 +398,14 @@ class DockerCluster(ClusterManager):
         }
 
         anonymous_mounts = [
-            {'bind': '/var/lib/docker', 'mode': 'rw'},
-            {'bind': '/opt', 'mode': 'rw'},
+            {
+                'bind': '/var/lib/docker',
+                'mode': 'rw',
+            },
+            {
+                'bind': '/opt',
+                'mode': 'rw',
+            },
         ]
 
         agent_mounts = {
@@ -411,7 +417,7 @@ class DockerCluster(ClusterManager):
         }
 
         for master_number in range(1, masters + 1):
-            unique_mounts = {uuid.uuid4(): item for item in anonymous_mounts}
+            unique_mounts = {str(uuid.uuid4()): m for m in anonymous_mounts}
 
             self._start_dcos_container(
                 container_base_name=self._master_prefix,
@@ -436,7 +442,7 @@ class DockerCluster(ClusterManager):
             )
 
         for agent_number in range(1, agents + 1):
-            unique_mounts = {uuid.uuid4(): item for item in anonymous_mounts}
+            unique_mounts = {str(uuid.uuid4()): m for m in anonymous_mounts}
             unique_mounts = {
                 **unique_mounts,
                 str(uuid.uuid4()): {
@@ -468,7 +474,7 @@ class DockerCluster(ClusterManager):
             )
 
         for public_agent_number in range(1, public_agents + 1):
-            unique_mounts = {uuid.uuid4(): item for item in anonymous_mounts}
+            unique_mounts = {str(uuid.uuid4()): m for m in anonymous_mounts}
             unique_mounts = {
                 **unique_mounts,
                 str(uuid.uuid4()): {
