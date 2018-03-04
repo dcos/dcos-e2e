@@ -700,6 +700,7 @@ class DockerCluster(ClusterManager):
             tmpfs=tmpfs,
             labels=labels,
             stop_signal='SIGRTMIN+3',
+            command=['/sbin/init'],
         )
 
         disable_systemd_support_cmd = (

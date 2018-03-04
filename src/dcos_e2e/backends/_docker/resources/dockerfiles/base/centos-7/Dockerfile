@@ -40,5 +40,3 @@ done \
 && rm -f /lib/systemd/system/basic.target.wants/* \
 && rm -f /lib/systemd/system/graphical.target.wants/* \
 && ln -vf /lib/systemd/system/multi-user.target /lib/systemd/system/default.target
-
-CMD ["/sbin/init"]
