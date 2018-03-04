@@ -398,8 +398,14 @@ class DockerCluster(ClusterManager):
         }
 
         anonymous_mounts = [
-            {'bind': '/var/lib/docker', 'mode': 'rw'},
-            {'bind': '/opt', 'mode': 'rw'},
+            {
+                'bind': '/var/lib/docker',
+                'mode': 'rw',
+            },
+            {
+                'bind': '/opt',
+                'mode': 'rw',
+            },
         ]
 
         agent_mounts = {
