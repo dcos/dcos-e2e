@@ -89,10 +89,9 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
 def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
     """
-    Write a systemd unit for a Docker service.
+    Return the contents of a systemd unit file for a Docker service.
 
     Args:
-        service_file_path: The path to a file to write to.
         storage_driver: The Docker storage driver to use.
     """
     storage_driver_name = {
