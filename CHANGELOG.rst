@@ -9,6 +9,7 @@ Next
 - Fix public agents on DC/OS 1.10.
 - Remove options to use Fedora and Debian in the ``Docker`` backend nodes.
 - Fix the Ubuntu distribution on the ``Docker`` backend.
+- Add support for Docker 17.12.1-ce on nodes in the ``Docker`` backend.
 
 2018.02.28.0
 ------------
