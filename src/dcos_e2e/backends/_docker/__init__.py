@@ -52,8 +52,9 @@ def _docker_dockerfile(docker_version: DockerVersion) -> Path:
     version of Docker.
     """
     docker_versions = {
-        DockerVersion.v1_13_1: '1.13.1',
         DockerVersion.v1_11_2: '1.11.2',
+        DockerVersion.v1_13_1: '1.13.1',
+        DockerVersion.v17_12_1_ce: '17.12.1-ce',
     }
 
     version_segment = docker_versions[docker_version]
@@ -121,12 +122,16 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
 
-def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
+def _docker_service_file(
+    storage_driver: DockerStorageDriver,
+    docker_version: DockerVersion,
+) -> str:
     """
     Return the contents of a systemd unit file for a Docker service.
 
     Args:
         storage_driver: The Docker storage driver to use.
+        docker_version: The version of Docker to start.
     """
     storage_driver_name = {
         DockerStorageDriver.AUFS: 'aufs',
@@ -134,17 +139,25 @@ def _docker_service_file(storage_driver: DockerStorageDriver) -> str:
         DockerStorageDriver.OVERLAY_2: 'overlay2',
     }[storage_driver]
 
+    daemon = {
+        DockerVersion.v1_11_2: '/usr/bin/docker daemon',
+        DockerVersion.v1_13_1: '/usr/bin/docker daemon',
+        DockerVersion.v17_12_1_ce: '/usr/bin/dockerd',
+    }[docker_version]
+
     docker_cmd = (
-        '/usr/bin/docker daemon '
+        '{daemon} '
         '-D '
         '-s {storage_driver_name} '
-        '--disable-legacy-registry=true '
         '--exec-opt=native.cgroupdriver=cgroupfs'
-    ).format(storage_driver_name=storage_driver_name)
+    ).format(
+        storage_driver_name=storage_driver_name,
+        daemon=daemon,
+    )
 
     docker_service_contents = {
         'Unit': {
-            'Description': 'Docker Appkication Container Engine',
+            'Description': 'Docker Application Container Engine',
             'Documentation': 'https://docs.docker.com',
             'After': 'dbus.service',
         },
@@ -438,6 +451,7 @@ class DockerCluster(ClusterManager):
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
+                docker_version=cluster_backend.docker_version,
             )
 
         for agent_number in range(1, agents + 1):
@@ -476,6 +490,7 @@ class DockerCluster(ClusterManager):
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
+                docker_version=cluster_backend.docker_version,
             )
 
         for public_agent_number in range(1, public_agents + 1):
@@ -514,6 +529,7 @@ class DockerCluster(ClusterManager):
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
+                docker_version=cluster_backend.docker_version,
             )
 
         for node in {*self.masters, *self.agents, *self.public_agents}:
@@ -645,6 +661,7 @@ class DockerCluster(ClusterManager):
         labels: Dict[str, str],
         public_key_path: Path,
         docker_storage_driver: DockerStorageDriver,
+        docker_version: DockerVersion,
     ) -> None:
         """
         Start a master, agent or public agent container.
@@ -669,6 +686,7 @@ class DockerCluster(ClusterManager):
                 to the dictionary option in
                 http://docker-py.readthedocs.io/en/stable/containers.html.
             public_key_path: The path to an SSH public key to put on the node.
+            docker_version: The Docker version to use on the node.
             docker_storage_driver: The storage driver to use for Docker on the
                 node.
         """
@@ -726,6 +744,7 @@ class DockerCluster(ClusterManager):
         docker_service_name = 'docker.service'
         docker_service_text = _docker_service_file(
             storage_driver=docker_storage_driver,
+            docker_version=docker_version,
         )
         docker_service_dst = '/lib/systemd/system/' + docker_service_name
         echo_docker = [
