@@ -150,7 +150,10 @@ def _docker_service_file(
         '-D '
         '-s {storage_driver_name} '
         '--exec-opt=native.cgroupdriver=cgroupfs'
-    ).format(storage_driver_name=storage_driver_name, daemon=daemon)
+    ).format(
+        storage_driver_name=storage_driver_name,
+        daemon=daemon,
+    )
 
     docker_service_contents = {
         'Unit': {
