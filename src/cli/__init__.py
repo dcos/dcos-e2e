@@ -472,7 +472,7 @@ def create(
                 build_artifact=artifact_path,
                 extra_config=extra_config,
             )
-    except CalledProcessError as exc:
+    except CalledProcessError:
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)
         cluster.destroy()
