@@ -432,10 +432,10 @@ def create(
             public_agents=public_agents,
             files_to_copy_to_installer=files_to_copy_to_installer,
         )
-    except CalledProcessError:
+    except CalledProcessError as exc:
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
-        return
+        sys.exit(exc.returncode)
 
     nodes = {
         *cluster.masters,
@@ -472,11 +472,11 @@ def create(
                 build_artifact=artifact_path,
                 extra_config=extra_config,
             )
-    except CalledProcessError:
+    except CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)
         cluster.destroy()
-        return
+        sys.exit(exc.returncode)
 
     click.echo(cluster_id)
 
