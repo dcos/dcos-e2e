@@ -1074,3 +1074,11 @@ def doctor() -> None:
         message += mac_message
 
     _info(message=message)
+
+    message = (
+        'If you continue to experience problems, more information is '
+        'available at '
+        'http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html#troubleshooting'  # noqa: E501
+    )
+
+    _info(message=message)
