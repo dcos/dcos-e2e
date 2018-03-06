@@ -1,7 +1,7 @@
 click==6.7
 click-spinner==0.1.7
 cryptography==2.1.4
-docker==3.1.0
+docker==3.1.1
 paramiko==2.4.0
 passlib==1.7.1
 PyYAML==3.12
