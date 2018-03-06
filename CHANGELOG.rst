@@ -12,6 +12,7 @@ Next
 - Add support for Docker ``17.12.1-ce`` on nodes in the ``Docker`` backend.
 - Exceptions in ``create`` in the CLI point towards the ``doctor`` command.
 - Removed a race condition in the ``doctor`` command.
+- ``dcos-docker run`` now exits with the return code of the command run.
 
 2018.02.28.0
 ------------

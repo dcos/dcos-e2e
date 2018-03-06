@@ -7,6 +7,7 @@ import json
 import logging
 import shutil
 import subprocess
+import sys
 import tarfile
 import uuid
 from ipaddress import IPv4Address
@@ -785,8 +786,8 @@ def run(
                 tty=True,
                 shell=True,
             )
-        except subprocess.CalledProcessError:
-            pass
+        except subprocess.CalledProcessError as exc:
+            sys.exit(exc.returncode)
 
         return
 
@@ -796,8 +797,8 @@ def run(
             tty=True,
             env=env,
         )
-    except subprocess.CalledProcessError:
-        pass
+    except subprocess.CalledProcessError as exc:
+        sys.exit(exc.returncode)
 
 
 def _tar_with_filter(
