@@ -10,6 +10,8 @@ Next
 - Remove options to use Fedora and Debian in the ``Docker`` backend nodes.
 - Fix the Ubuntu distribution on the ``Docker`` backend.
 - Add support for Docker ``17.12.1-ce`` on nodes in the ``Docker`` backend.
+- Exceptions in ``create`` in the CLI point towards the ``doctor`` command.
+- Removed a race condition in the ``doctor`` command.
 
 2018.02.28.0
 ------------

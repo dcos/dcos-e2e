@@ -995,7 +995,8 @@ def doctor() -> None:
     if shutil.which('ssh') is None:
         _error(message='`ssh` must be available on your path.')
 
-    tiny_image = 'tianon/true'
+    # Image for a container which sleeps for a long time.
+    tiny_image = 'luca3m/sleep'
 
     ping_container = client.containers.run(
         image=tiny_image,
@@ -1072,5 +1073,13 @@ def doctor() -> None:
     )
     if docker_for_mac:
         message += mac_message
+
+    _info(message=message)
+
+    message = (
+        'If you continue to experience problems, more information is '
+        'available at '
+        'http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html#troubleshooting'  # noqa: E501
+    )
 
     _info(message=message)
