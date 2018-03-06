@@ -135,6 +135,7 @@ def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     result = subprocess.check_output(
         args=get_version_args,
         cwd=str(workspace_dir),
+        stderr=subprocess.PIPE,
     )
 
     # In some cases, the name of the generated file is included in the output.
