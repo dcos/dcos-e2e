@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.03.07.0
+------------
+
 - Fix public agents on DC/OS 1.10.
 - Remove options to use Fedora and Debian in the ``Docker`` backend nodes.
 - Fix the Ubuntu distribution on the ``Docker`` backend.
