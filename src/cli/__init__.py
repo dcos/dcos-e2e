@@ -499,8 +499,8 @@ def list_clusters() -> None:
 )
 @click.pass_context
 def destroy_list(
-    cluster_ids: List[str],
     ctx: click.core.Context,
+    cluster_ids: List[str],
 ) -> None:
     """
     Destroy clusters.

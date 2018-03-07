@@ -593,13 +593,14 @@ class TestDestroyList:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos-docker destroy [OPTIONS]
+            Usage: dcos-docker destroy-list [OPTIONS] [CLUSTER_IDS]...
 
-              Destroy a cluster.
+              Destroy clusters.
+
+              To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
-              --help                 Show this message and exit.
+              --help  Show this message and exit.
             """# noqa: E501,E261
         )
         # yapf: enable
