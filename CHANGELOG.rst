@@ -13,6 +13,7 @@ Next
 - Exceptions in ``create`` in the CLI point towards the ``doctor`` command.
 - Removed a race condition in the ``doctor`` command.
 - ``dcos-docker run`` now exits with the return code of the command run.
+- ``dcos-docker destroy-list`` is a new command and ``dcos-docker destroy`` now adheres to the common semantics of the CLI.
 
 2018.02.28.0
 ------------
