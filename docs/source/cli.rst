@@ -14,7 +14,7 @@ A typical CLI workflow for open source DC/OS may look like this:
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
-   $ dcos-docker destroy $(dcos-docker list)
+   $ dcos-docker destroy
 
 Each of these and more are described in detail below.
 
@@ -98,6 +98,37 @@ A shortcut is instead to run a command like the following:
 
 This is run on a random master node.
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+
+Destroying Clusters
+-------------------
+
+There are two commands which can be used to destroy clusters.
+These are :ref:`dcos-docker-destroy` and :ref:`dcos-docker-destroy-list`.
+
+Either destroy a cluster with :ref:`dcos-docker-destroy`:
+
+.. code-block:: console
+
+   $ dcos-docker destroy
+   default
+   $ dcos-docker destroy pr_4033_strict
+   pr_4033_strict
+
+or use :ref:`dcos-docker-destroy-list` to destroy multiple clusters:
+
+.. code-block:: console
+
+   $ dcos-docker destroy-list pr_4033_strict pr_4019_permissive
+   pr_4033_strict
+   pr_4019_permissive
+
+To destroy all clusters, run the following command:
+
+.. code-block:: console
+
+   $ dcos-docker destroy-list $(dcos-docker list)
+   pr_4033_strict
+   pr_4019_permissive
 
 Viewing Debug Information
 -------------------------
@@ -203,8 +234,15 @@ CLI Reference
 .. click:: cli:sync_code
   :prog: dcos-docker sync
 
+.. _dcos-docker-destroy:
+
 .. click:: cli:destroy
   :prog: dcos-docker destroy
+
+.. _dcos-docker-destroy-list:
+
+.. click:: cli:destroy_list
+  :prog: dcos-docker destroy-list
 
 .. _dcos-docker-doctor:
 

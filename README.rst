@@ -106,7 +106,7 @@ An typical CLI workflow may look like this:
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
-   $ dcos-docker destroy $(dcos-docker list)
+   $ dcos-docker destroy
 
 Each of these commands and more described in detail in the `full CLI documentation <http://dcos-e2e.readthedocs.io/en/latest/cli.html>`_.
 
