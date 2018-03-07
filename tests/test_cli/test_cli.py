@@ -571,6 +571,21 @@ class TestDestroy:
         # yapf: enable
         assert result.output == expected_help
 
+    def test_cluster_does_not_exist(self) -> None:
+        """
+        An error is shown if the given cluster does not exist.
+        """
+        unique = uuid.uuid4().hex
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy', '--cluster-id', unique],
+        )
+        assert result.exit_code == 2
+        expected_error = 'Cluster "{unique}" does not exist'
+        expected_error = expected_error.format(unique=unique)
+        assert expected_error in result.output
+
 
 class TestDestroyList:
     """
