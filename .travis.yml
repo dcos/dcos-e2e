@@ -41,6 +41,7 @@ install:
 - travis_retry pip install --upgrade --editable .[dev]
 cache: pip
 before_script:
+- make pull-images
 - make docs
 - make lint
 - travis_retry make EE_MASTER_ARTIFACT_URL=$EE_MASTER_ARTIFACT_URL EE_1_10_ARTIFACT_URL=$EE_1_10_ARTIFACT_URL EE_1_11_ARTIFACT_URL=$EE_1_11_ARTIFACT_URL download-artifacts
