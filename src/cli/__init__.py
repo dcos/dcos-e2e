@@ -491,13 +491,13 @@ def list_clusters() -> None:
         click.echo(cluster_id)
 
 
-@dcos_docker.command('destroy')
+@dcos_docker.command('destroy-list')
 @click.argument(
     'cluster_ids',
     nargs=-1,
     type=str,
 )
-def destroy(cluster_ids: List[str]) -> None:
+def destroy_list(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
 
@@ -525,6 +525,28 @@ def destroy(cluster_ids: List[str]) -> None:
         client = docker.from_env(version='auto')
         client.volumes.prune()
         click.echo(cluster_id)
+
+
+@dcos_docker.command('destroy')
+@_existing_cluster_id_option
+def destroy(cluster_id: str) -> None:
+    """
+    Destroy a cluster.
+    """
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    containers = {
+        *cluster_containers.masters,
+        *cluster_containers.agents,
+        *cluster_containers.public_agents,
+    }
+    rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
+    for container in containers:
+        container.stop()
+        container.remove(v=True)
+
+    client = docker.from_env(version='auto')
+    client.volumes.prune()
+    click.echo(cluster_id)
 
 
 class _ClusterContainers:
