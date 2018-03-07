@@ -14,7 +14,7 @@ A typical CLI workflow for open source DC/OS may look like this:
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
-   $ dcos-docker destroy $(dcos-docker list)
+   $ dcos-docker destroy
 
 Each of these and more are described in detail below.
 
@@ -98,6 +98,11 @@ A shortcut is instead to run a command like the following:
 
 This is run on a random master node.
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+
+Destroying Clusters
+-------------------
+
+XXX
 
 Viewing Debug Information
 -------------------------
