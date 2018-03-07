@@ -571,6 +571,40 @@ class TestDestroy:
         # yapf: enable
         assert result.output == expected_help
 
+
+class TestDestroyList:
+    """
+    Tests for the `destroy-list` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker destroy --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-list', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker destroy [OPTIONS]
+
+              Destroy a cluster.
+
+            Options:
+              -c, --cluster-id TEXT  If not given, "default" is used.
+              --help                 Show this message and exit.
+            """# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
     def test_cluster_does_not_exist(self) -> None:
         """
         An error is shown if the given cluster does not exist.
@@ -579,7 +613,7 @@ class TestDestroy:
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
-            ['destroy', unique],
+            ['destroy-list', unique],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -596,7 +630,7 @@ class TestDestroy:
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
-            ['destroy', unique, unique_2],
+            ['destroy-list', unique, unique_2],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
