@@ -135,6 +135,7 @@ def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     result = subprocess.check_output(
         args=get_version_args,
         cwd=str(workspace_dir),
+        stderr=subprocess.PIPE,
     )
 
     # In some cases, the name of the generated file is included in the output.
@@ -363,6 +364,7 @@ def create(
     base_workspace_dir = workspace_dir or Path(gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
+    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
@@ -380,6 +382,7 @@ def create(
         )
     except subprocess.CalledProcessError:
         rmtree(path=str(workspace_dir), ignore_errors=True)
+        click.echo(doctor_message)
         raise
 
     if enterprise:
@@ -422,13 +425,18 @@ def create(
         workspace_dir=workspace_dir,
     )
 
-    cluster = Cluster(
-        cluster_backend=cluster_backend,
-        masters=masters,
-        agents=agents,
-        public_agents=public_agents,
-        files_to_copy_to_installer=files_to_copy_to_installer,
-    )
+    try:
+        cluster = Cluster(
+            cluster_backend=cluster_backend,
+            masters=masters,
+            agents=agents,
+            public_agents=public_agents,
+            files_to_copy_to_installer=files_to_copy_to_installer,
+        )
+    except CalledProcessError as exc:
+        click.echo('Error creating cluster.', err=True)
+        click.echo(doctor_message)
+        sys.exit(exc.returncode)
 
     nodes = {
         *cluster.masters,
@@ -466,10 +474,10 @@ def create(
                 extra_config=extra_config,
             )
     except CalledProcessError as exc:
-        click.echo('Error creating cluster:', err=True)
-        click.echo(str(exc), err=True)
+        click.echo('Error installing DC/OS.', err=True)
+        click.echo(doctor_message)
         cluster.destroy()
-        return
+        sys.exit(exc.returncode)
 
     click.echo(cluster_id)
 
