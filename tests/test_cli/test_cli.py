@@ -75,15 +75,16 @@ class TestDcosDocker:
               --help         Show this message and exit.
 
             Commands:
-              create   Create a DC/OS cluster.
-              destroy  Destroy clusters.
-              doctor   Diagnose common issues which stop DC/OS E2E...
-              inspect  Show cluster details.
-              list     List all clusters.
-              run      Run an arbitrary command on a node.
-              sync     Sync files from a DC/OS checkout to master...
-              wait     Wait for DC/OS to start.
-              web      Open the browser at the web UI.
+              create        Create a DC/OS cluster.
+              destroy       Destroy a cluster.
+              destroy-list  Destroy clusters.
+              doctor        Diagnose common issues which stop DC/OS E2E...
+              inspect       Show cluster details.
+              list          List all clusters.
+              run           Run an arbitrary command on a node.
+              sync          Sync files from a DC/OS checkout to master...
+              wait          Wait for DC/OS to start.
+              web           Open the browser at the web UI.
             """# noqa: E501,E261
         )
         # yapf: enable
@@ -558,7 +559,56 @@ class TestDestroy:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos-docker destroy [OPTIONS] [CLUSTER_IDS]...
+            Usage: dcos-docker destroy [OPTIONS]
+
+              Destroy a cluster.
+
+            Options:
+              -c, --cluster-id TEXT  If not given, "default" is used.
+              --help                 Show this message and exit.
+            """# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+    def test_cluster_does_not_exist(self) -> None:
+        """
+        An error is shown if the given cluster does not exist.
+        """
+        unique = uuid.uuid4().hex
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy', '--cluster-id', unique],
+        )
+        assert result.exit_code == 2
+        expected_error = 'Cluster "{unique}" does not exist'
+        expected_error = expected_error.format(unique=unique)
+        assert expected_error in result.output
+
+
+class TestDestroyList:
+    """
+    Tests for the `destroy-list` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker destroy --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-list', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker destroy-list [OPTIONS] [CLUSTER_IDS]...
 
               Destroy clusters.
 
@@ -579,7 +629,7 @@ class TestDestroy:
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
-            ['destroy', unique],
+            ['destroy-list', unique],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -596,7 +646,7 @@ class TestDestroy:
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
-            ['destroy', unique, unique_2],
+            ['destroy-list', unique, unique_2],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
