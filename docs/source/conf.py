@@ -85,6 +85,8 @@ html_sidebars = {
 # Don't check anchors because many websites use #! for AJAX magic
 # http://sphinx-doc.org/config.html#confval-linkcheck_anchors
 linkcheck_anchors = False
+# Retry link checking to avoid transient network errors.
+linkcheck_retries = 5
 
 spelling_word_list_filename = '../../spelling_private_dict.txt'
 
