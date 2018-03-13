@@ -726,21 +726,6 @@ class DockerCluster(ClusterManager):
             '/var/lib/dcos/mesos-slave-common'
         )
 
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-
-        systemd_init_name = 'systemd-journald-init.service'
-        systemd_init_src = current_parent / 'resources' / systemd_init_name
-        systemd_init_text = systemd_init_src.read_text()
-        systemd_init_dst = '/lib/systemd/system/' + systemd_init_name
-        echo_init_src = [
-            'echo',
-            '-e',
-            shlex.quote(systemd_init_text),
-            '>',
-            systemd_init_dst,
-        ]
-
         docker_service_name = 'docker.service'
         docker_service_text = _docker_service_file(
             storage_driver=docker_storage_driver,
@@ -761,8 +746,6 @@ class DockerCluster(ClusterManager):
         for cmd in [
             ['mkdir', '-p', '/var/lib/dcos'],
             ['mkdir', '-p', '/lib/systemd/system'],
-            '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_init_src)),
-            ['systemctl', 'enable', systemd_init_name],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
             ['systemctl', 'enable', docker_service_name],
             ['systemctl', 'start', docker_service_name],
