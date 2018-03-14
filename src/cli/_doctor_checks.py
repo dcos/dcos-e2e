@@ -2,12 +2,15 @@
 Checks for showing up common sources of errors with the Docker backend.
 """
 
+import shutil
 import subprocess
 from pathlib import Path
-from tempfile import gettempdir
+from tempfile import gettempdir, gettempprefix
 
 import click
 import docker
+
+from ._common import DOCKER_STORAGE_DRIVERS
 
 
 def _info(message: str) -> None:
@@ -67,7 +70,6 @@ def check_storage_driver() -> None:
     """
     client = docker.from_env(version='auto')
     host_driver = client.info()['Driver']
-    docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
     storage_driver_url = (
         'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
     )
@@ -98,6 +100,8 @@ def check_networking() -> None:
     """
     # Image for a container which sleeps for a long time.
     tiny_image = 'luca3m/sleep'
+    client = docker.from_env(version='auto')
+    docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
 
     ping_container = client.containers.run(
         image=tiny_image,
@@ -134,6 +138,7 @@ def check_mount_tmp() -> None:
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
     tiny_image = 'luca3m/sleep'
+    client = docker.from_env(version='auto')
 
     tmp_path = Path('/tmp').resolve()
 
@@ -170,7 +175,9 @@ def check_memory() -> None:
     """
     Show information about the memory available to Docker.
     """
+    client = docker.from_env(version='auto')
     docker_memory = client.info()['MemTotal']
+    docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
     message = (
         'Docker has approximately {memory:.1f} GB of memory available. '
         'The amount of memory required depends on the workload. '
