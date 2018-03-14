@@ -49,7 +49,15 @@ from ._common import (
     WORKSPACE_DIR_LABEL_KEY,
     existing_cluster_ids,
 )
-from ._doctor_checks import check_free_space, check_storage_driver
+from ._doctor_checks import (
+    check_free_space,
+    check_memory,
+    check_mount_tmp,
+    check_networking,
+    check_ssh,
+    check_storage_driver,
+    link_to_troubleshooting,
+)
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,

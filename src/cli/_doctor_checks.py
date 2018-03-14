@@ -2,6 +2,13 @@
 Checks for showing up common sources of errors with the Docker backend.
 """
 
+import subprocess
+from pathlib import Path
+from tempfile import gettempdir
+
+import click
+import docker
+
 
 def _info(message: str) -> None:
     """
@@ -30,7 +37,7 @@ def _error(message: str) -> None:
     click.echo(message)
 
 
-def check_free_space():
+def check_free_space() -> None:
     """
     Warn if there is not enough free space in the default temporary directory.
     """
@@ -54,7 +61,7 @@ def check_free_space():
         _warn(message=low_space_message)
 
 
-def check_storage_driver():
+def check_storage_driver() -> None:
     """
     Warn if the Docker storage driver is not a recommended driver.
     """
@@ -77,7 +84,7 @@ def check_storage_driver():
         _warn(message)
 
 
-def check_ssh():
+def check_ssh() -> None:
     """
     Error if `ssh` is not available on the path.
     """
@@ -85,7 +92,7 @@ def check_ssh():
         _error(message='`ssh` must be available on your path.')
 
 
-def check_networking():
+def check_networking() -> None:
     """
     Error if the Docker network is not set up correctly.
     """
@@ -120,7 +127,7 @@ def check_networking():
     ping_container.remove(v=True)
 
 
-def check_mount_tmp():
+def check_mount_tmp() -> None:
     """
     Error if it is not possible to mount the temporary directory.
     """
@@ -159,7 +166,7 @@ def check_mount_tmp():
         private_mount_container.remove(v=True)
 
 
-def check_memory():
+def check_memory() -> None:
     """
     Show information about the memory available to Docker.
     """
@@ -185,7 +192,7 @@ def check_memory():
     _info(message=message)
 
 
-def link_to_troubleshooting():
+def link_to_troubleshooting() -> None:
     """
     Link to documentation for further troubleshooting.
     """
