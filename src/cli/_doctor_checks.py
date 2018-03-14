@@ -73,7 +73,17 @@ def check_storage_driver() -> None:
     storage_driver_url = (
         'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
     )
-    if host_driver not in DOCKER_STORAGE_DRIVERS:
+
+    aufs_supported = False
+    supported_host_driver = bool(host_driver in DOCKER_STORAGE_DRIVERS)
+    can_work = bool(aufs_supported or supported_host_driver)
+
+    if not can_work:
+        message = 'XXX'
+        _error(message=message)
+        return
+
+    if not supported_host_driver:
         message = (
             "The host's Docker storage driver is \"{host_driver}\". "
             'We recommend that you use one of: {supported_drivers}. '
@@ -83,7 +93,7 @@ def check_storage_driver() -> None:
             supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
             help_url=storage_driver_url,
         )
-        _warn(message)
+        _warn(message=message)
 
 
 def check_ssh() -> None:
