@@ -151,3 +151,40 @@ def check_mount_tmp():
     else:
         private_mount_container.stop()
         private_mount_container.remove(v=True)
+
+def check_memory():
+    """
+    Show information about the memory available to Docker.
+    """
+    docker_memory = client.info()['MemTotal']
+    message = (
+        'Docker has approximately {memory:.1f} GB of memory available. '
+        'The amount of memory required depends on the workload. '
+        'For example, creating large clusters or multiple clusters requires '
+        'a lot of memory.\n'
+        'A four node cluster seems to work well on a machine with 9 GB '
+        'of memory available to Docker.'
+    ).format(
+        memory=docker_memory / 1024 / 1024 / 1024,
+    )
+    mac_message = (
+        '\n'
+        'To dedicate more memory to Docker for Mac, go to '
+        'Docker > Preferences > Advanced.'
+    )
+    if docker_for_mac:
+        message += mac_message
+
+    _info(message=message)
+
+def link_to_troubleshooting():
+    """
+    XXX
+    """
+    message = (
+        'If you continue to experience problems, more information is '
+        'available at '
+        'http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html#troubleshooting'  # noqa: E501
+    )
+
+    _info(message=message)
