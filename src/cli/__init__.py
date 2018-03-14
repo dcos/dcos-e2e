@@ -5,7 +5,6 @@ A CLI for controlling DC/OS clusters on Docker.
 import io
 import json
 import logging
-import shutil
 import subprocess
 import sys
 import tarfile
@@ -14,7 +13,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
-from tempfile import gettempdir, gettempprefix
+from tempfile import gettempdir
 from typing import (  # noqa: F401
     Any,
     Callable,
@@ -50,10 +49,7 @@ from ._common import (
     WORKSPACE_DIR_LABEL_KEY,
     existing_cluster_ids,
 )
-from ._doctor_checks import (
-    check_free_space,
-    check_storage_driver,
-)
+from ._doctor_checks import check_free_space, check_storage_driver
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
@@ -950,6 +946,7 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
             data=bootstrap_tarstream,
         )
 
+
 @dcos_docker.command('doctor')
 def doctor() -> None:
     """
@@ -962,4 +959,3 @@ def doctor() -> None:
     check_mount_tmp()
     check_memory()
     link_to_troubleshooting()
-

@@ -2,6 +2,7 @@
 Checks for showing up common sources of errors with the Docker backend.
 """
 
+
 def _info(message: str) -> None:
     """
     Show a warning message.
@@ -28,6 +29,7 @@ def _error(message: str) -> None:
     click.echo(click.style('Error: ', fg='red'), nl=False)
     click.echo(message)
 
+
 def check_free_space():
     """
     Warn if there is not enough free space in the default temporary directory.
@@ -51,6 +53,7 @@ def check_free_space():
     if free_space_gb < 5:
         _warn(message=low_space_message)
 
+
 def check_storage_driver():
     """
     Warn if the Docker storage driver is not a recommended driver.
@@ -73,12 +76,14 @@ def check_storage_driver():
         )
         _warn(message)
 
+
 def check_ssh():
     """
     Error if `ssh` is not available on the path.
     """
     if shutil.which('ssh') is None:
         _error(message='`ssh` must be available on your path.')
+
 
 def check_networking():
     """
@@ -113,6 +118,7 @@ def check_networking():
 
     ping_container.stop()
     ping_container.remove(v=True)
+
 
 def check_mount_tmp():
     """
@@ -152,6 +158,7 @@ def check_mount_tmp():
         private_mount_container.stop()
         private_mount_container.remove(v=True)
 
+
 def check_memory():
     """
     Show information about the memory available to Docker.
@@ -177,9 +184,10 @@ def check_memory():
 
     _info(message=message)
 
+
 def link_to_troubleshooting():
     """
-    XXX
+    Link to documentation for further troubleshooting.
     """
     message = (
         'If you continue to experience problems, more information is '
