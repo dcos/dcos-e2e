@@ -1,0 +1,212 @@
+"""
+Checks for showing up common sources of errors with the Docker backend.
+"""
+
+import shutil
+import subprocess
+from pathlib import Path
+from tempfile import gettempdir, gettempprefix
+
+import click
+import docker
+
+from ._common import DOCKER_STORAGE_DRIVERS
+
+
+def _info(message: str) -> None:
+    """
+    Show a warning message.
+    """
+    click.echo()
+    click.echo(click.style('Note: ', fg='blue'), nl=False)
+    click.echo(message)
+
+
+def _warn(message: str) -> None:
+    """
+    Show a warning message.
+    """
+    click.echo()
+    click.echo(click.style('Warning: ', fg='yellow'), nl=False)
+    click.echo(message)
+
+
+def _error(message: str) -> None:
+    """
+    Show an error message.
+    """
+    click.echo()
+    click.echo(click.style('Error: ', fg='red'), nl=False)
+    click.echo(message)
+
+
+def check_free_space() -> None:
+    """
+    Warn if there is not enough free space in the default temporary directory.
+    """
+    free_space = shutil.disk_usage(gettempdir()).free
+    free_space_gb = free_space / 1024 / 1024 / 1024
+
+    low_space_message = (
+        'The default temporary directory ("{tmp_prefix}") has '
+        '{free_space:.1f} GB of free space available. '
+        'Creating a cluster typically takes approximately 2 GB of temporary '
+        'storage. '
+        'If you encounter problems with disk space usage, set the ``TMPDIR`` '
+        'environment variable to a suitable temporary directory or use the '
+        '``--workspace-dir`` option on the ``dcos-docker create`` command.'
+    ).format(
+        tmp_prefix=Path('/') / gettempprefix(),
+        free_space=free_space_gb,
+    )
+
+    if free_space_gb < 5:
+        _warn(message=low_space_message)
+
+
+def check_storage_driver() -> None:
+    """
+    Warn if the Docker storage driver is not a recommended driver.
+    """
+    client = docker.from_env(version='auto')
+    host_driver = client.info()['Driver']
+    storage_driver_url = (
+        'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
+    )
+    if host_driver not in DOCKER_STORAGE_DRIVERS:
+        message = (
+            "The host's Docker storage driver is \"{host_driver}\". "
+            'We recommend that you use one of: {supported_drivers}. '
+            'See {help_url}.'
+        ).format(
+            host_driver=host_driver,
+            supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
+            help_url=storage_driver_url,
+        )
+        _warn(message)
+
+
+def check_ssh() -> None:
+    """
+    Error if `ssh` is not available on the path.
+    """
+    if shutil.which('ssh') is None:
+        _error(message='`ssh` must be available on your path.')
+
+
+def check_networking() -> None:
+    """
+    Error if the Docker network is not set up correctly.
+    """
+    # Image for a container which sleeps for a long time.
+    tiny_image = 'luca3m/sleep'
+    client = docker.from_env(version='auto')
+    docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
+
+    ping_container = client.containers.run(
+        image=tiny_image,
+        tty=True,
+        detach=True,
+    )
+
+    ping_container.reload()
+    ip_address = ping_container.attrs['NetworkSettings']['IPAddress']
+
+    try:
+        subprocess.check_call(
+            args=['ping', ip_address, '-c', '1', '-t', '1'],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        message = 'Cannot connect to a Docker container by its IP address.'
+        if docker_for_mac:
+            message += (
+                ' We recommend using '
+                'https://github.com/wojas/docker-mac-network. '
+            )
+        _error(message=message)
+
+    ping_container.stop()
+    ping_container.remove(v=True)
+
+
+def check_mount_tmp() -> None:
+    """
+    Error if it is not possible to mount the temporary directory.
+    """
+    # Any image will do, we use this for another test so using it here saves
+    # pulling another image.
+    tiny_image = 'luca3m/sleep'
+    client = docker.from_env(version='auto')
+
+    tmp_path = Path('/tmp').resolve()
+
+    try:
+        private_mount_container = client.containers.run(
+            image=tiny_image,
+            tty=True,
+            detach=True,
+            volumes={
+                str(tmp_path): {
+                    'bind': '/test',
+                },
+            },
+        )
+    except docker.errors.APIError as exc:
+        message = (
+            'There was an error mounting the temporary directory path '
+            '"{tmp_path}" in container: \n\n'
+            '{exception_detail}'
+        ).format(
+            tmp_path=tmp_path,
+            exception_detail=exc.explanation.decode(
+                'ascii',
+                'backslashreplace',
+            ),
+        )
+        _error(message=message)
+    else:
+        private_mount_container.stop()
+        private_mount_container.remove(v=True)
+
+
+def check_memory() -> None:
+    """
+    Show information about the memory available to Docker.
+    """
+    client = docker.from_env(version='auto')
+    docker_memory = client.info()['MemTotal']
+    docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
+    message = (
+        'Docker has approximately {memory:.1f} GB of memory available. '
+        'The amount of memory required depends on the workload. '
+        'For example, creating large clusters or multiple clusters requires '
+        'a lot of memory.\n'
+        'A four node cluster seems to work well on a machine with 9 GB '
+        'of memory available to Docker.'
+    ).format(
+        memory=docker_memory / 1024 / 1024 / 1024,
+    )
+    mac_message = (
+        '\n'
+        'To dedicate more memory to Docker for Mac, go to '
+        'Docker > Preferences > Advanced.'
+    )
+    if docker_for_mac:
+        message += mac_message
+
+    _info(message=message)
+
+
+def link_to_troubleshooting() -> None:
+    """
+    Link to documentation for further troubleshooting.
+    """
+    message = (
+        'If you continue to experience problems, more information is '
+        'available at '
+        'http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html#troubleshooting'  # noqa: E501
+    )
+
+    _info(message=message)
