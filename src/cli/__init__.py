@@ -50,6 +50,10 @@ from ._common import (
     WORKSPACE_DIR_LABEL_KEY,
     existing_cluster_ids,
 )
+from ._doctor_checks import (
+    check_free_space,
+    check_storage_driver,
+)
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
@@ -946,139 +950,18 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
             data=bootstrap_tarstream,
         )
 
-
-def _info(message: str) -> None:
-    """
-    Show a warning message.
-    """
-    click.echo()
-    click.echo(click.style('Note: ', fg='blue'), nl=False)
-    click.echo(message)
-
-
-def _warn(message: str) -> None:
-    """
-    Show a warning message.
-    """
-    click.echo()
-    click.echo(click.style('Warning: ', fg='yellow'), nl=False)
-    click.echo(message)
-
-
-def _error(message: str) -> None:
-    """
-    Show an error message.
-    """
-    click.echo()
-    click.echo(click.style('Error: ', fg='red'), nl=False)
-    click.echo(message)
-
-
 @dcos_docker.command('doctor')
 def doctor() -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
-    free_space = shutil.disk_usage(gettempdir()).free
-    free_space_gb = free_space / 1024 / 1024 / 1024
+    check_free_space()
+    check_storage_driver()
+    check_ssh()
+    check_networking()
+    check_mount_tmp()
 
-    low_space_message = (
-        'The default temporary directory ("{tmp_prefix}") has '
-        '{free_space:.1f} GB of free space available. '
-        'Creating a cluster typically takes approximately 2 GB of '
-        'temporary storage. '
-        'If you encounter problems with disk space usage, set the '
-        '``TMPDIR`` environment variable to a suitable temporary '
-        'directory or use the ``--workspace-dir`` option on the '
-        '``dcos-docker create`` command.'
-    ).format(
-        tmp_prefix=Path('/') / gettempprefix(),
-        free_space=free_space_gb,
-    )
 
-    if free_space_gb < 5:
-        _warn(message=low_space_message)
-
-    client = docker.from_env(version='auto')
-    host_driver = client.info()['Driver']
-    docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
-    storage_driver_url = (
-        'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
-    )
-    if host_driver not in DOCKER_STORAGE_DRIVERS:
-        message = (
-            "The host's Docker storage driver is \"{host_driver}\". "
-            'We recommend that you use one of: {supported_drivers}. '
-            'See {help_url}.'
-        ).format(
-            host_driver=host_driver,
-            supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
-            help_url=storage_driver_url,
-        )
-        _warn(message)
-
-    if shutil.which('ssh') is None:
-        _error(message='`ssh` must be available on your path.')
-
-    # Image for a container which sleeps for a long time.
-    tiny_image = 'luca3m/sleep'
-
-    ping_container = client.containers.run(
-        image=tiny_image,
-        tty=True,
-        detach=True,
-    )
-
-    ping_container.reload()
-    ip_address = ping_container.attrs['NetworkSettings']['IPAddress']
-
-    try:
-        subprocess.check_call(
-            args=['ping', ip_address, '-c', '1', '-t', '1'],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-    except subprocess.CalledProcessError:
-        message = 'Cannot connect to a Docker container by its IP address.'
-        if docker_for_mac:
-            message += (
-                ' We recommend using '
-                'https://github.com/wojas/docker-mac-network. '
-            )
-        _error(message=message)
-
-    ping_container.stop()
-    ping_container.remove(v=True)
-
-    tmp_path = Path('/tmp').resolve()
-
-    try:
-        private_mount_container = client.containers.run(
-            image=tiny_image,
-            tty=True,
-            detach=True,
-            volumes={
-                str(tmp_path): {
-                    'bind': '/test',
-                },
-            },
-        )
-    except docker.errors.APIError as exc:
-        message = (
-            'There was an error mounting a the temporary directory path '
-            '"{tmp_path}" in container: \n\n'
-            '{exception_detail}'
-        ).format(
-            tmp_path=tmp_path,
-            exception_detail=exc.explanation.decode(
-                'ascii',
-                'backslashreplace',
-            ),
-        )
-        _error(message=message)
-    else:
-        private_mount_container.stop()
-        private_mount_container.remove(v=True)
 
     docker_memory = client.info()['MemTotal']
     message = (

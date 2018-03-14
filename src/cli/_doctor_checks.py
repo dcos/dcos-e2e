@@ -113,3 +113,41 @@ def check_networking():
 
     ping_container.stop()
     ping_container.remove(v=True)
+
+def check_mount_tmp():
+    """
+    Error if it is not possible to mount the temporary directory.
+    """
+    # Any image will do, we use this for another test so using it here saves
+    # pulling another image.
+    tiny_image = 'luca3m/sleep'
+
+    tmp_path = Path('/tmp').resolve()
+
+    try:
+        private_mount_container = client.containers.run(
+            image=tiny_image,
+            tty=True,
+            detach=True,
+            volumes={
+                str(tmp_path): {
+                    'bind': '/test',
+                },
+            },
+        )
+    except docker.errors.APIError as exc:
+        message = (
+            'There was an error mounting the temporary directory path '
+            '"{tmp_path}" in container: \n\n'
+            '{exception_detail}'
+        ).format(
+            tmp_path=tmp_path,
+            exception_detail=exc.explanation.decode(
+                'ascii',
+                'backslashreplace',
+            ),
+        )
+        _error(message=message)
+    else:
+        private_mount_container.stop()
+        private_mount_container.remove(v=True)
