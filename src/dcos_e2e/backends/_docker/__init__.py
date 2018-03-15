@@ -212,6 +212,8 @@ def _get_fallback_storage_driver() -> DockerStorageDriver:
     except KeyError:
         # This chooses the aufs driver if the host's driver is not
         # supported because this is widely supported.
+        #
+        # This is encoded in a `dcos-docker doctor` check.
         return DockerStorageDriver.AUFS
 
 

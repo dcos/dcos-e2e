@@ -73,7 +73,43 @@ def check_storage_driver() -> None:
     storage_driver_url = (
         'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
     )
-    if host_driver not in DOCKER_STORAGE_DRIVERS:
+    # Any image will do, we use this for another test so using it here saves
+    # pulling another image.
+    tiny_image = 'luca3m/sleep'
+    container = client.containers.run(
+        image=tiny_image,
+        tty=True,
+        detach=True,
+        privileged=True,
+        volumes={'/proc': {
+            'bind': '/host/proc',
+            'mode': 'rw'
+        }},
+    )
+
+    cmd = ['cat', '/host/proc/filesystems']
+    _, output = container.exec_run(cmd=cmd)
+    container.stop()
+    container.remove(v=True)
+    aufs_supported = bool(b'aufs' in output.split())
+    supported_host_driver = bool(host_driver in DOCKER_STORAGE_DRIVERS)
+    can_work = bool(aufs_supported or supported_host_driver)
+
+    if not can_work:
+        message = (
+            "The host's Docker storage driver is \"{host_driver}\". "
+            'aufs is not available. '
+            'Change your storage driver to one of: {supported_drivers}. '
+            'See {help_url}.'
+        ).format(
+            host_driver=host_driver,
+            supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
+            help_url=storage_driver_url,
+        )
+        _error(message=message)
+        return
+
+    if not supported_host_driver:
         message = (
             "The host's Docker storage driver is \"{host_driver}\". "
             'We recommend that you use one of: {supported_drivers}. '
@@ -83,7 +119,7 @@ def check_storage_driver() -> None:
             supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
             help_url=storage_driver_url,
         )
-        _warn(message)
+        _warn(message=message)
 
 
 def check_ssh() -> None:
