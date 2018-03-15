@@ -196,7 +196,7 @@ def _get_open_port() -> int:
 
 def _get_fallback_storage_driver() -> DockerStorageDriver:
     """
-    Return
+    Return the Docker storage driver to use if one is not given.
     """
     storage_drivers = {
         'aufs': DockerStorageDriver.AUFS,
