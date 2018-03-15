@@ -93,7 +93,16 @@ def check_storage_driver() -> None:
     can_work = bool(aufs_supported or supported_host_driver)
 
     if not can_work:
-        message = 'XXX'
+        message = (
+            "The host's Docker storage driver is \"{host_driver}\". "
+            'aufs is not available. '
+            'Change your storage driver to one of: {supported_drivers}. '
+            'See {help_url}.'
+        ).format(
+            host_driver=host_driver,
+            supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
+            help_url=storage_driver_url,
+        )
         _error(message=message)
         return
 

@@ -960,10 +960,10 @@ def doctor() -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
-    # check_free_space()
+    check_free_space()
     check_storage_driver()
-    # check_ssh()
-    # check_networking()
-    # check_mount_tmp()
-    # check_memory()
-    # link_to_troubleshooting()
+    check_ssh()
+    check_networking()
+    check_mount_tmp()
+    check_memory()
+    link_to_troubleshooting()
