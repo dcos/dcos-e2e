@@ -73,8 +73,22 @@ def check_storage_driver() -> None:
     storage_driver_url = (
         'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
     )
+    # Any image will do, we use this for another test so using it here saves
+    # pulling another image.
+    tiny_image = 'luca3m/sleep'
+    container = client.containers.run(
+        image=tiny_image,
+        tty=True,
+        detach=True,
+        privileged=True,
+        volumes={'/proc': {'bind': '/host/proc', 'mode': 'rw'}},
+    )
 
-    aufs_supported = False
+    cmd = ['cat', '/host/proc/filesystems']
+    _, output = container.exec_run(cmd=cmd)
+    container.stop()
+    container.remove(v=True)
+    aufs_supported = bool(b'aufs' in output.split())
     supported_host_driver = bool(host_driver in DOCKER_STORAGE_DRIVERS)
     can_work = bool(aufs_supported or supported_host_driver)
 
