@@ -81,7 +81,10 @@ def check_storage_driver() -> None:
         tty=True,
         detach=True,
         privileged=True,
-        volumes={'/proc': {'bind': '/host/proc', 'mode': 'rw'}},
+        volumes={'/proc': {
+            'bind': '/host/proc',
+            'mode': 'rw'
+        }},
     )
 
     cmd = ['cat', '/host/proc/filesystems']
