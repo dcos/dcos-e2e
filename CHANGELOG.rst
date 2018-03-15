@@ -6,8 +6,7 @@ Changelog
 Next
 ----
 
-2018.03.14.0
-------------
+- Add a ``dcos-docker doctor`` check that a supported storage driver is available.
 
 2018.03.07.0
 ------------
