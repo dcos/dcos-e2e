@@ -60,9 +60,9 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict[str, Any]] = None,
-        shell: bool = False,
-        tty: bool = False,
+        env: Optional[Dict[str, Any]],
+        shell: bool,
+        tty: bool,
     ) -> List[str]:
         """
         Return a command to run `args` on this node over SSH.
@@ -73,12 +73,12 @@ class Node:
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            shell: If False (the default), each argument is passed as a
-                literal value to the command.  If True, the command line is
-                interpreted as a shell command, with a special meaning applied
-                to some characters (e.g. $, &&, >). This means the caller must
-                quote arguments if they may contain these special characters,
-                including whitespace.
+            shell: If False, each argument is passed as a literal value to the
+                command. If True, the command line is interpreted as a shell
+                command, with a special meaning applied to some characters
+                (e.g. $, &&, >). This means the caller must quote arguments if
+                they may contain these special characters, including
+                whitespace.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
 
