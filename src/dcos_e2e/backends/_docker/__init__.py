@@ -761,7 +761,7 @@ class DockerCluster(ClusterManager):
             # spotted here, consider adding a retry loop to wait for SSH to be
             # available.
             for node in nodes:
-                node.run(args=dcos_install_args)
+                node.run(args=dcos_install_args, quiet=False)
 
     def destroy(self) -> None:
         """
