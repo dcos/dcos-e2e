@@ -534,12 +534,6 @@ class DockerCluster(ClusterManager):
                 docker_version=cluster_backend.docker_version,
             )
 
-        for node in {*self.masters, *self.agents, *self.public_agents}:
-            node.run(
-                args=['rm', '-f', '/run/nologin', '||', 'true'],
-                shell=True,
-            )
-
     def install_dcos_from_url(
         self,
         build_artifact: str,
@@ -755,6 +749,7 @@ class DockerCluster(ClusterManager):
             ['systemctl', 'start', 'sshd.service'],
             ['mkdir', '--parents', '/root/.ssh'],
             '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
+            ['rm', '-f', '/run/nologin', '||', 'true'],
         ]:
             container.exec_run(cmd=cmd)
             exit_code, output = container.exec_run(cmd=cmd)
