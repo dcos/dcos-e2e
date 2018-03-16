@@ -642,6 +642,10 @@ class DockerCluster(ClusterManager):
                 role,
             ]
 
+            # There is a potential race here, if the SSH daemon on a node has
+            # not started up yet. However, this is unlikely. If a 255 is
+            # spotted here, consider adding a retry loop to wait for SSH to be
+            # available.
             for node in nodes:
                 node.run(args=dcos_install_args)
 
