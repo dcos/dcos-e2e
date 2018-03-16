@@ -6,8 +6,10 @@ import configparser
 import inspect
 import io
 import os
+import logging
 import shlex
 import socket
+import subprocess
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -28,6 +30,8 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
+logging.basicConfig(level=logging.DEBUG)
+LOGGER = logging.getLogger(__name__)
 
 def _base_dockerfile(linux_distribution: Distribution) -> Path:
     """
@@ -762,7 +766,11 @@ class DockerCluster(ClusterManager):
             # spotted here, consider adding a retry loop to wait for SSH to be
             # available.
             for node in nodes:
-                node.run(args=dcos_install_args, quiet=False)
+                try:
+                    node.run(args=dcos_install_args, quiet=False)
+                except CalledProcessError as exc:  # pragma: nocover
+                    LOGGER.error(exc.stdout)
+                    LOGGER.error(exc.stderr)
 
     def destroy(self) -> None:
         """
