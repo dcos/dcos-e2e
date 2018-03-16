@@ -769,9 +769,9 @@ class DockerCluster(ClusterManager):
             for node in nodes:
                 try:
                     node.run(args=dcos_install_args, quiet=False)
-                except subprocess.CalledProcessError as exc:  # pragma: nocover
-                    LOGGER.error(exc.stdout)
-                    LOGGER.error(exc.stderr)
+                except subprocess.CalledProcessError as ex:  # pragma: no cover
+                    LOGGER.error(ex.stdout)
+                    LOGGER.error(ex.stderr)
 
     def destroy(self) -> None:
         """
