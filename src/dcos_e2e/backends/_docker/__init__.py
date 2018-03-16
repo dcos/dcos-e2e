@@ -5,8 +5,8 @@ Helpers for creating and interacting with clusters on Docker.
 import configparser
 import inspect
 import io
-import os
 import logging
+import os
 import shlex
 import socket
 import subprocess
@@ -32,6 +32,7 @@ from dcos_e2e.node import Node
 
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
+
 
 def _base_dockerfile(linux_distribution: Distribution) -> Path:
     """
@@ -768,7 +769,7 @@ class DockerCluster(ClusterManager):
             for node in nodes:
                 try:
                     node.run(args=dcos_install_args, quiet=False)
-                except CalledProcessError as exc:  # pragma: nocover
+                except subprocess.CalledProcessError as exc:  # pragma: nocover
                     LOGGER.error(exc.stdout)
                     LOGGER.error(exc.stderr)
 
