@@ -60,9 +60,10 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict[str, Any]] = None,
-        shell: bool = False,
-        tty: bool = False,
+        env: Optional[Dict[str, Any]],
+        shell: bool,
+        tty: bool,
+        quiet: bool,
     ) -> List[str]:
         """
         Return a command to run `args` on this node over SSH.
@@ -73,14 +74,15 @@ class Node:
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            shell: If False (the default), each argument is passed as a
-                literal value to the command.  If True, the command line is
-                interpreted as a shell command, with a special meaning applied
-                to some characters (e.g. $, &&, >). This means the caller must
-                quote arguments if they may contain these special characters,
-                including whitespace.
+            shell: If False, each argument is passed as a literal value to the
+                command. If True, the command line is interpreted as a shell
+                command, with a special meaning applied to some characters
+                (e.g. $, &&, >). This means the caller must quote arguments if
+                they may contain these special characters, including
+                whitespace.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
+            quiet: Whether the SSH command is to be run in quiet mode.
 
         Returns:
             The full SSH command to be run.
@@ -94,11 +96,13 @@ class Node:
         if tty:
             ssh_args.append('-t')
 
-        ssh_args += [
+        if quiet:
             # Suppress warnings.
-            # In particular, we don't care about remote host identification
-            # changes.
-            '-q',
+            # In particular, we often do not care about remote host
+            # identification changes.
+            ssh_args.append('-q')
+
+        ssh_args += [
             # This makes sure that only keys passed with the -i option are
             # used. Needed when there are already keys present in the SSH
             # key chain, which cause `Error: Too many Authentication
@@ -133,6 +137,7 @@ class Node:
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
         tty: bool = False,
+        quiet: bool = True,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -156,6 +161,7 @@ class Node:
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+            quiet: If ``False``, show SSH warnings.
 
         Returns:
             The representation of the finished process.
@@ -173,6 +179,7 @@ class Node:
             env=env,
             shell=shell,
             tty=tty,
+            quiet=quiet,
         )
 
         return run_subprocess(
@@ -217,6 +224,7 @@ class Node:
             env=env,
             shell=shell,
             tty=False,
+            quiet=True,
         )
         return subprocess.Popen(
             args=ssh_args,
