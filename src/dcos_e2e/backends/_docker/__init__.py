@@ -2,12 +2,9 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
-import configparser
 import inspect
-import io
 import logging
 import os
-import shlex
 import socket
 import subprocess
 import uuid
@@ -15,7 +12,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
 import docker
 import yaml
@@ -30,72 +27,11 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
+from ._containers import start_dcos_container
+from ._docker_build import build_docker_image
+
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
-
-
-def _base_dockerfile(linux_distribution: Distribution) -> Path:
-    """
-    Return the directory including a Dockerfile to use for the base OS image.
-    """
-    dcos_docker_distros = {
-        Distribution.CENTOS_7: 'centos-7',
-        Distribution.UBUNTU_16_04: 'ubuntu-xenial',
-        Distribution.COREOS: 'coreos',
-    }
-
-    distro_path_segment = dcos_docker_distros[linux_distribution]
-    current_file = inspect.stack()[0][1]
-    current_parent = Path(os.path.abspath(current_file)).parent
-    dockerfiles = current_parent / 'resources' / 'dockerfiles' / 'base'
-    return dockerfiles / distro_path_segment
-
-
-def _docker_dockerfile(docker_version: DockerVersion) -> Path:
-    """
-    Return the directory including a Dockerfile to use to install a particular
-    version of Docker.
-    """
-    docker_versions = {
-        DockerVersion.v1_11_2: '1.11.2',
-        DockerVersion.v1_13_1: '1.13.1',
-        DockerVersion.v17_12_1_ce: '17.12.1-ce',
-    }
-
-    version_segment = docker_versions[docker_version]
-    current_file = inspect.stack()[0][1]
-    current_parent = Path(os.path.abspath(current_file)).parent
-    dockerfiles = current_parent / 'resources' / 'dockerfiles' / 'base-docker'
-    return dockerfiles / version_segment
-
-
-def _build_docker_image(
-    tag: str,
-    linux_distribution: Distribution,
-    docker_version: DockerVersion,
-) -> None:
-    """
-    Build a Docker image to use for node containers.
-    """
-    base_tag = tag + ':base'
-
-    client = docker.from_env(version='auto')
-    base_dockerfile = _base_dockerfile(linux_distribution=linux_distribution)
-    docker_dockerfile = _docker_dockerfile(docker_version=docker_version)
-
-    client.images.build(
-        path=str(base_dockerfile),
-        rm=True,
-        forcerm=True,
-        tag=base_tag,
-    )
-
-    client.images.build(
-        path=str(docker_dockerfile),
-        rm=True,
-        forcerm=True,
-        tag=tag,
-    )
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -125,179 +61,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
-
-
-def _docker_service_file(
-    storage_driver: DockerStorageDriver,
-    docker_version: DockerVersion,
-) -> str:
-    """
-    Return the contents of a systemd unit file for a Docker service.
-
-    Args:
-        storage_driver: The Docker storage driver to use.
-        docker_version: The version of Docker to start.
-    """
-    storage_driver_name = {
-        DockerStorageDriver.AUFS: 'aufs',
-        DockerStorageDriver.OVERLAY: 'overlay',
-        DockerStorageDriver.OVERLAY_2: 'overlay2',
-    }[storage_driver]
-
-    daemon = {
-        DockerVersion.v1_11_2: '/usr/bin/docker daemon',
-        DockerVersion.v1_13_1: '/usr/bin/docker daemon',
-        DockerVersion.v17_12_1_ce: '/usr/bin/dockerd',
-    }[docker_version]
-
-    docker_cmd = (
-        '{daemon} '
-        '-D '
-        '-s {storage_driver_name} '
-        '--exec-opt=native.cgroupdriver=cgroupfs'
-    ).format(
-        storage_driver_name=storage_driver_name,
-        daemon=daemon,
-    )
-
-    docker_service_contents = {
-        'Unit': {
-            'Description': 'Docker Application Container Engine',
-            'Documentation': 'https://docs.docker.com',
-            'After': 'dbus.service',
-        },
-        'Service': {
-            'ExecStart': docker_cmd,
-            'LimitNOFILE': '1048576',
-            'LimitNPROC': '1048576',
-            'LimitCORE': 'infinity',
-            'Delegate': 'yes',
-            'TimeoutStartSec': '0',
-        },
-        'Install': {
-            'WantedBy': 'default.target',
-        },
-    }
-    config = configparser.ConfigParser()
-    # Ignore erroneous error https://github.com/python/typeshed/issues/1857.
-    config.optionxform = str  # type: ignore
-    config.read_dict(docker_service_contents)
-    config_string = io.StringIO()
-    config.write(config_string)
-    config_string.seek(0)
-    return config_string.read()
-
-
-def _start_dcos_container(
-    existing_masters: Set[Node],
-    container_base_name: str,
-    container_number: int,
-    volumes: Union[Dict[str, Dict[str, str]], List[str]],
-    tmpfs: Dict[str, str],
-    dcos_num_masters: int,
-    dcos_num_agents: int,
-    docker_image: str,
-    labels: Dict[str, str],
-    public_key_path: Path,
-    docker_storage_driver: DockerStorageDriver,
-    docker_version: DockerVersion,
-) -> None:
-    """
-    Start a master, agent or public agent container.
-    In this container, start Docker and `sshd`.
-
-    Run Mesos without `systemd` support. This is not supported by DC/OS.
-    See https://jira.mesosphere.com/browse/DCOS_OSS-1131.
-
-    Args:
-        existing_masters: The existing masters in the cluster.
-        container_base_name: The start of the container name.
-        container_number: The end of the container name.
-        volumes: See `volumes` on
-            http://docker-py.readthedocs.io/en/latest/containers.html.
-        tmpfs: See `tmpfs` on
-            http://docker-py.readthedocs.io/en/latest/containers.html.
-        dcos_num_masters: The number of master nodes expected to be in the
-            cluster once it has been created.
-        dcos_num_agents: The number of agent nodes (agent and public
-            agents) expected to be in the cluster once it has been created.
-        docker_image: The name of the Docker image to use.
-        labels: Docker labels to add to the cluster node containers. Akin to
-            the dictionary option in
-            http://docker-py.readthedocs.io/en/stable/containers.html.
-        public_key_path: The path to an SSH public key to put on the node.
-        docker_version: The Docker version to use on the node.
-        docker_storage_driver: The storage driver to use for Docker on the
-            node.
-    """
-    registry_host = 'registry.local'
-    if existing_masters:
-        first_master = next(iter(existing_masters))
-        extra_host_ip_address = str(first_master.public_ip_address)
-    else:
-        extra_host_ip_address = '127.0.0.1'
-    hostname = container_base_name + str(container_number)
-    environment = {
-        'container': hostname,
-        'DCOS_NUM_MASTERS': dcos_num_masters,
-        'DCOS_NUM_AGENTS': dcos_num_agents,
-    }
-    extra_hosts = {registry_host: extra_host_ip_address}
-
-    client = docker.from_env(version='auto')
-    container = client.containers.run(
-        name=hostname,
-        privileged=True,
-        detach=True,
-        tty=True,
-        environment=environment,
-        hostname=hostname,
-        extra_hosts=extra_hosts,
-        image=docker_image,
-        volumes=volumes,
-        tmpfs=tmpfs,
-        labels=labels,
-        stop_signal='SIGRTMIN+3',
-        command=['/sbin/init'],
-    )
-
-    disable_systemd_support_cmd = (
-        "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
-        '/var/lib/dcos/mesos-slave-common'
-    )
-
-    docker_service_name = 'docker.service'
-    docker_service_text = _docker_service_file(
-        storage_driver=docker_storage_driver,
-        docker_version=docker_version,
-    )
-    docker_service_dst = '/lib/systemd/system/' + docker_service_name
-    echo_docker = [
-        'echo',
-        '-e',
-        shlex.quote(docker_service_text),
-        '>',
-        docker_service_dst,
-    ]
-
-    public_key = public_key_path.read_text()
-    echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
-
-    for cmd in [
-        ['mkdir', '-p', '/var/lib/dcos'],
-        ['mkdir', '-p', '/lib/systemd/system'],
-        '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
-        ['systemctl', 'enable', docker_service_name],
-        ['systemctl', 'start', docker_service_name],
-        ['/bin/bash', '-c', disable_systemd_support_cmd],
-        ['systemctl', 'start', 'sshd.service'],
-        ['mkdir', '--parents', '/root/.ssh'],
-        '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
-        ['rm', '-f', '/run/nologin', '||', 'true'],
-    ]:
-        container.exec_run(cmd=cmd)
-        exit_code, output = container.exec_run(cmd=cmd)
-        assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
 
 
 def _get_open_port() -> int:
@@ -513,7 +276,7 @@ class DockerCluster(ClusterManager):
         }
 
         docker_image_tag = 'mesosphere/dcos-docker'
-        _build_docker_image(
+        build_docker_image(
             tag=docker_image_tag,
             linux_distribution=cluster_backend.linux_distribution,
             docker_version=cluster_backend.docker_version,
@@ -550,7 +313,7 @@ class DockerCluster(ClusterManager):
                 },
             }
 
-            _start_dcos_container(
+            start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._master_prefix,
                 container_number=master_number,
@@ -590,7 +353,7 @@ class DockerCluster(ClusterManager):
                 },
             }
 
-            _start_dcos_container(
+            start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._agent_prefix,
                 container_number=agent_number,
@@ -630,7 +393,7 @@ class DockerCluster(ClusterManager):
                 },
             }
 
-            _start_dcos_container(
+            start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
