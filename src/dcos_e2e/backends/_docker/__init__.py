@@ -7,7 +7,6 @@ import inspect
 import io
 import logging
 import os
-import shlex
 import socket
 import subprocess
 import uuid
@@ -15,7 +14,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
 import docker
 import yaml
@@ -125,118 +124,6 @@ def _docker_service_file(
     config.write(config_string)
     config_string.seek(0)
     return config_string.read()
-
-
-def start_dcos_container(
-    existing_masters: Set[Node],
-    container_base_name: str,
-    container_number: int,
-    volumes: Union[Dict[str, Dict[str, str]], List[str]],
-    tmpfs: Dict[str, str],
-    dcos_num_masters: int,
-    dcos_num_agents: int,
-    docker_image: str,
-    labels: Dict[str, str],
-    public_key_path: Path,
-    docker_storage_driver: DockerStorageDriver,
-    docker_version: DockerVersion,
-) -> None:
-    """
-    Start a master, agent or public agent container.
-    In this container, start Docker and `sshd`.
-
-    Run Mesos without `systemd` support. This is not supported by DC/OS.
-    See https://jira.mesosphere.com/browse/DCOS_OSS-1131.
-
-    Args:
-        existing_masters: The existing masters in the cluster.
-        container_base_name: The start of the container name.
-        container_number: The end of the container name.
-        volumes: See `volumes` on
-            http://docker-py.readthedocs.io/en/latest/containers.html.
-        tmpfs: See `tmpfs` on
-            http://docker-py.readthedocs.io/en/latest/containers.html.
-        dcos_num_masters: The number of master nodes expected to be in the
-            cluster once it has been created.
-        dcos_num_agents: The number of agent nodes (agent and public
-            agents) expected to be in the cluster once it has been created.
-        docker_image: The name of the Docker image to use.
-        labels: Docker labels to add to the cluster node containers. Akin to
-            the dictionary option in
-            http://docker-py.readthedocs.io/en/stable/containers.html.
-        public_key_path: The path to an SSH public key to put on the node.
-        docker_version: The Docker version to use on the node.
-        docker_storage_driver: The storage driver to use for Docker on the
-            node.
-    """
-    registry_host = 'registry.local'
-    if existing_masters:
-        first_master = next(iter(existing_masters))
-        extra_host_ip_address = str(first_master.public_ip_address)
-    else:
-        extra_host_ip_address = '127.0.0.1'
-    hostname = container_base_name + str(container_number)
-    environment = {
-        'container': hostname,
-        'DCOS_NUM_MASTERS': dcos_num_masters,
-        'DCOS_NUM_AGENTS': dcos_num_agents,
-    }
-    extra_hosts = {registry_host: extra_host_ip_address}
-
-    client = docker.from_env(version='auto')
-    container = client.containers.run(
-        name=hostname,
-        privileged=True,
-        detach=True,
-        tty=True,
-        environment=environment,
-        hostname=hostname,
-        extra_hosts=extra_hosts,
-        image=docker_image,
-        volumes=volumes,
-        tmpfs=tmpfs,
-        labels=labels,
-        stop_signal='SIGRTMIN+3',
-        command=['/sbin/init'],
-    )
-
-    disable_systemd_support_cmd = (
-        "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
-        '/var/lib/dcos/mesos-slave-common'
-    )
-
-    docker_service_name = 'docker.service'
-    docker_service_text = _docker_service_file(
-        storage_driver=docker_storage_driver,
-        docker_version=docker_version,
-    )
-    docker_service_dst = '/lib/systemd/system/' + docker_service_name
-    echo_docker = [
-        'echo',
-        '-e',
-        shlex.quote(docker_service_text),
-        '>',
-        docker_service_dst,
-    ]
-
-    public_key = public_key_path.read_text()
-    echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
-
-    for cmd in [
-        ['mkdir', '-p', '/var/lib/dcos'],
-        ['mkdir', '-p', '/lib/systemd/system'],
-        '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
-        ['systemctl', 'enable', docker_service_name],
-        ['systemctl', 'start', docker_service_name],
-        ['/bin/bash', '-c', disable_systemd_support_cmd],
-        ['systemctl', 'start', 'sshd.service'],
-        ['mkdir', '--parents', '/root/.ssh'],
-        '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
-        ['rm', '-f', '/run/nologin', '||', 'true'],
-    ]:
-        container.exec_run(cmd=cmd)
-        exit_code, output = container.exec_run(cmd=cmd)
-        assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
 
 
 def _get_open_port() -> int:

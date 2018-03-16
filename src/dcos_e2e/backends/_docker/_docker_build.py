@@ -2,6 +2,15 @@
 Helpers for building Docker images.
 """
 
+import inspect
+import os
+from pathlib import Path
+
+import docker
+
+from dcos_e2e.distributions import Distribution
+from dcos_e2e.docker_versions import DockerVersion
+
 
 def _base_dockerfile(linux_distribution: Distribution) -> Path:
     """
