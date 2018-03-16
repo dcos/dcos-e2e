@@ -205,6 +205,7 @@ def _start_dcos_container(
     See https://jira.mesosphere.com/browse/DCOS_OSS-1131.
 
     Args:
+        existing_masters: The existing masters in the cluster.
         container_base_name: The start of the container name.
         container_number: The end of the container name.
         volumes: See `volumes` on
