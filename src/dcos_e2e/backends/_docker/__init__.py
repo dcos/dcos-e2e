@@ -2,9 +2,7 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
-import configparser
 import inspect
-import io
 import logging
 import os
 import socket
@@ -63,67 +61,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
-
-
-def _docker_service_file(
-    storage_driver: DockerStorageDriver,
-    docker_version: DockerVersion,
-) -> str:
-    """
-    Return the contents of a systemd unit file for a Docker service.
-
-    Args:
-        storage_driver: The Docker storage driver to use.
-        docker_version: The version of Docker to start.
-    """
-    storage_driver_name = {
-        DockerStorageDriver.AUFS: 'aufs',
-        DockerStorageDriver.OVERLAY: 'overlay',
-        DockerStorageDriver.OVERLAY_2: 'overlay2',
-    }[storage_driver]
-
-    daemon = {
-        DockerVersion.v1_11_2: '/usr/bin/docker daemon',
-        DockerVersion.v1_13_1: '/usr/bin/docker daemon',
-        DockerVersion.v17_12_1_ce: '/usr/bin/dockerd',
-    }[docker_version]
-
-    docker_cmd = (
-        '{daemon} '
-        '-D '
-        '-s {storage_driver_name} '
-        '--exec-opt=native.cgroupdriver=cgroupfs'
-    ).format(
-        storage_driver_name=storage_driver_name,
-        daemon=daemon,
-    )
-
-    docker_service_contents = {
-        'Unit': {
-            'Description': 'Docker Application Container Engine',
-            'Documentation': 'https://docs.docker.com',
-            'After': 'dbus.service',
-        },
-        'Service': {
-            'ExecStart': docker_cmd,
-            'LimitNOFILE': '1048576',
-            'LimitNPROC': '1048576',
-            'LimitCORE': 'infinity',
-            'Delegate': 'yes',
-            'TimeoutStartSec': '0',
-        },
-        'Install': {
-            'WantedBy': 'default.target',
-        },
-    }
-    config = configparser.ConfigParser()
-    # Ignore erroneous error https://github.com/python/typeshed/issues/1857.
-    config.optionxform = str  # type: ignore
-    config.read_dict(docker_service_contents)
-    config_string = io.StringIO()
-    config.write(config_string)
-    config_string.seek(0)
-    return config_string.read()
 
 
 def _get_open_port() -> int:
