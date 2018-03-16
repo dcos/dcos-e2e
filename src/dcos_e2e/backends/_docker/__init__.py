@@ -30,6 +30,7 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
 
+from ._containers import start_dcos_container
 from ._docker_build import build_docker_image
 
 logging.basicConfig(level=logging.DEBUG)
@@ -126,7 +127,7 @@ def _docker_service_file(
     return config_string.read()
 
 
-def _start_dcos_container(
+def start_dcos_container(
     existing_masters: Set[Node],
     container_base_name: str,
     container_number: int,
@@ -488,7 +489,7 @@ class DockerCluster(ClusterManager):
                 },
             }
 
-            _start_dcos_container(
+            start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._master_prefix,
                 container_number=master_number,
@@ -528,7 +529,7 @@ class DockerCluster(ClusterManager):
                 },
             }
 
-            _start_dcos_container(
+            start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._agent_prefix,
                 container_number=agent_number,
@@ -568,7 +569,7 @@ class DockerCluster(ClusterManager):
                 },
             }
 
-            _start_dcos_container(
+            start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
