@@ -901,7 +901,7 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
     """
     local_packages = Path(dcos_checkout_dir) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
-    if not local_test_dir.exists():
+    if not Path(local_test_dir).exists():
         message = (
             'DCOS_CHECKOUT_DIR must be set to the checkout of a DC/OS '
             'repository.\n'
