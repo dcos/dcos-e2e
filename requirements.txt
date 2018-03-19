@@ -1,6 +1,6 @@
 click==6.7
 click-spinner==0.1.7
-cryptography==2.1.4
+cryptography==2.2
 docker==3.1.1
 paramiko==2.4.1
 passlib==1.7.1
