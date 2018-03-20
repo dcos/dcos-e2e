@@ -11,6 +11,8 @@ DC/OS E2E
 
 DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environments.
 
+See the full documentation on `Read the Docs <http://dcos-e2e.readthedocs.io/>`_.
+
 .. contents::
    :local:
 
@@ -104,7 +106,7 @@ An typical CLI workflow may look like this:
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
-   $ dcos-docker destroy $(dcos-docker list)
+   $ dcos-docker destroy
 
 Each of these commands and more described in detail in the `full CLI documentation <http://dcos-e2e.readthedocs.io/en/latest/cli.html>`_.
 

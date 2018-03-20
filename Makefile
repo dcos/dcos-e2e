@@ -146,3 +146,15 @@ docs:
 .PHONY: open-docs
 open-docs:
 	open docs/build/html/index.html
+
+# We pull Docker images before the tests start to catch any flakiness early.
+# See https://jira.mesosphere.com/browse/DCOS_OSS-2120 for details of
+# flakiness.
+.PHONY: pull-images
+pull-images:
+	# These are the base images for operating systems used.
+	docker pull ubuntu:xenial
+	docker pull centos:7
+	docker pull quay.io/shift/coreos:stable-1298.7.0
+	# This is used by the ``dcos-docker doctor`` command.
+	docker pull luca3m/sleep

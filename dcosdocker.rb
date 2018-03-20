@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/mesosphere/dcos-e2e/archive/2018.02.28.0.tar.gz"
+  url "https://github.com/mesosphere/dcos-e2e/archive/2018.03.14.0.tar.gz"
   head "https://github.com/mesosphere/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -57,8 +57,8 @@ class Dcosdocker < Formula
   end
 
   resource "docker" do
-    url "https://files.pythonhosted.org/packages/03/f5/ebb1b5db272b7165cf09ccccdbe91edc60db530c1280a0282084eb2893c0/docker-3.1.0.tar.gz"
-    sha256 "53ee5532d59f63287d0da5f0fd8b34af5704382152114cc1e1f3eb79167bd567"
+    url "https://files.pythonhosted.org/packages/0d/17/ad98e025e5528337c4dc5835a5874898eb226da17e4ffed732c894cb1938/docker-3.1.1.tar.gz"
+    sha256 "462165ca6367f802280684ab44e581cd2efba8995d78d07ea994e42194927c3b"
   end
 
   resource "docker-pycreds" do
@@ -72,8 +72,8 @@ class Dcosdocker < Formula
   end
 
   resource "paramiko" do
-    url "https://files.pythonhosted.org/packages/c8/de/791773d6a4b23327c7475ae3d7ada0d07fa147bf77fb6f561a4a7d8afd11/paramiko-2.4.0.tar.gz"
-    sha256 "486f637f0a33a4792e0e567be37426c287efaa8c4c4a45e3216f9ce7fd70b1fc"
+    url "https://files.pythonhosted.org/packages/29/65/83181630befb17cd1370a6abb9a87957947a43c2332216e5975353f61d64/paramiko-2.4.1.tar.gz"
+    sha256 "33e36775a6c71790ba7692a73f948b329cf9295a72b0102144b031114bd2a4f3"
   end
 
   resource "passlib" do
@@ -107,8 +107,8 @@ class Dcosdocker < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/84/11/a6fe751118861b4d6587e07633f2e055733fc3678f7e5d7ae30303d90b7e/pytest-3.4.1.tar.gz"
-    sha256 "9ddcb879c8cc859d2540204b5399011f842e5e8823674bf429f70ada281b3cc6"
+    url "https://files.pythonhosted.org/packages/dd/05/4579d3028ba1740467690c3427d3991eff91f95cbaa6bb0280f40708721a/pytest-3.4.2.tar.gz"
+    sha256 "117bad36c1a787e1a8a659df35de53ba05f9f3398fb9e4ac17e80ad5903eb8c5"
   end
 
   resource "PyYAML" do

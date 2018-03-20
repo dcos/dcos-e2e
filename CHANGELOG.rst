@@ -7,6 +7,11 @@ Next
 ----
 
 - Add ``dump_output`` function to dump command output on ``Node`` objects.
+- Add a ``dcos-docker doctor`` check that a supported storage driver is available.
+
+2018.03.07.0
+------------
+
 - Fix public agents on DC/OS 1.10.
 - Remove options to use Fedora and Debian in the ``Docker`` backend nodes.
 - Fix the Ubuntu distribution on the ``Docker`` backend.
@@ -14,6 +19,7 @@ Next
 - Exceptions in ``create`` in the CLI point towards the ``doctor`` command.
 - Removed a race condition in the ``doctor`` command.
 - ``dcos-docker run`` now exits with the return code of the command run.
+- ``dcos-docker destroy-list`` is a new command and ``dcos-docker destroy`` now adheres to the common semantics of the CLI.
 
 2018.02.28.0
 ------------
