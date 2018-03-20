@@ -275,7 +275,7 @@ class Node:
         """
         Dump the output of a particular SSH command composed of ``args``
         to a file in ``path`` with a filename like so:
-        {private_ip}_{public_ip}_{args}_{datetime}.log
+        ``{private_ip}_{public_ip}_{args}_{datetime}.log``
         """
         if user is None:
             user = self.default_ssh_user
@@ -284,7 +284,7 @@ class Node:
             args=args,
             user=user,
             env=env,
-            shell=True,
+            shell=shell,
         )
 
         filename = '{private_ip}_{public_ip}_{command}_{datetime}.log'.format(

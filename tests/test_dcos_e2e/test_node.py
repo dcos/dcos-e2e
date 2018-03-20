@@ -6,7 +6,7 @@ import logging
 import os
 import uuid
 from pathlib import Path
-from subprocess import CalledProcessError, run, TimeoutExpired
+from subprocess import CalledProcessError, TimeoutExpired, run
 from typing import Iterator
 
 import pytest
@@ -434,22 +434,22 @@ class TestNode:
 
         master.dump_output(args=['echo', 'test'], path=tmpdir)
 
-        dumpfile = None
+        dump_filename = None
 
         for filename in os.listdir(tmpdir):
             if filename.endswith('.log'):
-                dumpfile = filename
+                dump_filename = filename
                 break
 
-        assert dumpfile
+        assert dump_filename
 
-        dump_filepath = Path(tmpdir / dumpfile)
+        dump_filepath = Path(tmpdir / dump_filename)
         print(dump_filepath)
 
-        with open(dump_filepath) as df:
-            dumped_file_content = df.read()
+        with open(dump_filepath) as dumpfile:
+            dumped_content = dumpfile.read()
 
-        assert dumped_file_content == 'test\n'
+        assert dumped_content == 'test\n'
 
         run(args=['rm', dump_filepath])
 
@@ -477,22 +477,22 @@ class TestNode:
             shell=True,
         )
 
-        dumpfile = None
+        dump_filename = None
 
         for filename in os.listdir(tmpdir):
             if filename.endswith('.log'):
-                dumpfile = filename
+                dump_filename = filename
                 break
 
-        assert dumpfile
+        assert dump_filename
 
-        dump_filepath = Path(tmpdir / dumpfile)
+        dump_filepath = Path(tmpdir / dump_filename)
         print(dump_filepath)
 
-        with open(dump_filepath) as df:
-            dumped_file_content = df.read()
+        with open(dump_filepath) as dumpfile:
+            dumped_content = dumpfile.read()
 
-        assert dumped_file_content == testuser + '\n'
+        assert dumped_content == testuser + '\n'
 
         master.run(args=['userdel', '-r', testuser])
 
