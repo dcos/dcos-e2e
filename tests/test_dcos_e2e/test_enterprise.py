@@ -91,7 +91,7 @@ class TestCopyFiles:
         ca_key_path = cert_dir_on_host / key_filename
 
         master_key_path = Path(
-            '/var/lib/dcos/pki/tls/CA/private/custom_ca.key'
+            '/var/lib/dcos/pki/tls/CA/private/custom_ca.key',
         )
 
         superuser_username = str(uuid.uuid4())
@@ -167,7 +167,7 @@ class TestCopyFiles:
         ca_key_path = cert_dir_on_host / key_filename
 
         master_key_path = Path(
-            '/var/lib/dcos/pki/tls/CA/private/custom_ca.key'
+            '/var/lib/dcos/pki/tls/CA/private/custom_ca.key',
         )
 
         superuser_username = str(uuid.uuid4())

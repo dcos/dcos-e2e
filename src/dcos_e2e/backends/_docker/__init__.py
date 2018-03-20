@@ -499,7 +499,7 @@ class DockerCluster(ClusterManager):
         ]
 
         installer_ctr = '{cluster_id}-installer'.format(
-            cluster_id=self._cluster_id
+            cluster_id=self._cluster_id,
         )
         installer_port = _get_open_port()
 
@@ -568,7 +568,7 @@ class DockerCluster(ClusterManager):
         nodes = set([])
         for container in containers:
             container_ip_address = IPv4Address(
-                container.attrs['NetworkSettings']['IPAddress']
+                container.attrs['NetworkSettings']['IPAddress'],
             )
             nodes.add(
                 Node(
@@ -576,7 +576,7 @@ class DockerCluster(ClusterManager):
                     private_ip_address=container_ip_address,
                     default_ssh_user=self._default_ssh_user,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
-                )
+                ),
             )
         return nodes
 

@@ -225,21 +225,21 @@ def dcos_docker(verbose: None) -> None:
     type=click.INT,
     default=1,
     show_default=True,
-    help='The number of master nodes.'
+    help='The number of master nodes.',
 )
 @click.option(
     '--agents',
     type=click.INT,
     default=1,
     show_default=True,
-    help='The number of agent nodes.'
+    help='The number of agent nodes.',
 )
 @click.option(
     '--public-agents',
     type=click.INT,
     default=1,
     show_default=True,
-    help='The number of public agent nodes.'
+    help='The number of public agent nodes.',
 )
 @click.option(
     '--extra-config',
@@ -732,7 +732,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'Nodes': nodes,
     }  # type: Dict[Any, Any]
     click.echo(
-        json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True)
+        json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
     )
 
 

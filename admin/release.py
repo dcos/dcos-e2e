@@ -53,7 +53,7 @@ def get_homebrew_formula(version: str) -> str:
               system "#{{bin}}/dcos_docker", "--help"
           end
         end
-        """
+        """,
     )
 
     return pattern.format(resource_stanzas=resource_stanzas, version=version)
@@ -148,7 +148,7 @@ def update_vagrantfile(version: str) -> None:
         r"DEFAULT_DCOS_E2E_REF\s*=\s*'[^']+'",
         "DEFAULT_DCOS_E2E_REF = '{}'".format(version),
         vagrantfile_contents,
-        count=1
+        count=1,
     )
     vagrantfile.write_text(updated)
 
