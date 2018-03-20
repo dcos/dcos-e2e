@@ -57,7 +57,7 @@ class TestNode:
         (master, ) = dcos_cluster.masters
 
         echo_result = master.run(
-            args=['echo', 'Hello, ', '&&', 'echo', 'World!']
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
         )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
@@ -160,14 +160,15 @@ class TestNode:
         error_message = 'unset_command'
         debug_messages = set(
             filter(
-                lambda record: record.levelno == logging.DEBUG, caplog.records
-            )
+                lambda record: record.levelno == logging.DEBUG,
+                caplog.records,
+            ),
         )
         matching_messages = set(
             filter(
                 lambda record: error_message in record.getMessage(),
-                caplog.records
-            )
+                caplog.records,
+            ),
         )
         assert not bool(len(debug_messages & matching_messages))
 
@@ -191,14 +192,15 @@ class TestNode:
         error_message = 'unset_command'
         debug_messages = set(
             filter(
-                lambda record: record.levelno == logging.DEBUG, caplog.records
-            )
+                lambda record: record.levelno == logging.DEBUG,
+                caplog.records,
+            ),
         )
         matching_messages = set(
             filter(
                 lambda record: error_message in record.getMessage(),
-                caplog.records
-            )
+                caplog.records,
+            ),
         )
         assert not bool(len(debug_messages & matching_messages))
 
@@ -226,14 +228,15 @@ class TestNode:
         error_message = 'unset_command'
         debug_messages = set(
             filter(
-                lambda record: record.levelno == logging.DEBUG, caplog.records
-            )
+                lambda record: record.levelno == logging.DEBUG,
+                caplog.records,
+            ),
         )
         matching_messages = set(
             filter(
                 lambda record: error_message in record.getMessage(),
-                caplog.records
-            )
+                caplog.records,
+            ),
         )
         assert bool(len(debug_messages & matching_messages))
 
@@ -405,9 +408,10 @@ class TestNode:
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
-        master_destination_path = Path(
-            '/home/{}/on_master_node.txt'.format(testuser)
+        master_destination = '/home/{user}/on_master_node.txt'.format(
+            user=testuser,
         )
+        master_destination_path = Path(master_destination)
         (master, ) = dcos_cluster.masters
         master.send_file(
             local_path=Path(str(local_file)),
