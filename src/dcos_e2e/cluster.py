@@ -368,7 +368,7 @@ class Cluster(ContextDecorator):
 
         def ip_addresses(nodes: Iterable[Node]) -> str:
             return ','.join(
-                map(lambda node: str(node.public_ip_address), nodes)
+                map(lambda node: str(node.public_ip_address), nodes),
             )
 
         environment_variables = {

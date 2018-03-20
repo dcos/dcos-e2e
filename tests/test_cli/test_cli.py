@@ -85,7 +85,7 @@ class TestDcosDocker:
               sync          Sync files from a DC/OS checkout to master...
               wait          Wait for DC/OS to start.
               web           Open the browser at the web UI.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -186,7 +186,7 @@ class TestCreate:
                                               temporary directory location if this option is
                                               not set.
               --help                          Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -219,7 +219,7 @@ class TestCreate:
             Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" is not in the format /absolute/local/path:/remote/path.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_message
@@ -248,7 +248,7 @@ class TestCreate:
             Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" does not exist.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_message
@@ -284,7 +284,7 @@ class TestCreate:
             Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "some/remote is not an absolute path.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_message
@@ -331,7 +331,7 @@ class TestCreate:
             Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         ).format(path=invalid_path)
         # yapf: enable
         assert result.output == expected_message
@@ -363,7 +363,7 @@ class TestCreate:
            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "@" is not valid YAML
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_message
@@ -395,7 +395,7 @@ class TestCreate:
            Usage: dcos-docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_message
@@ -430,7 +430,7 @@ class TestCreate:
             Usage: dcos-docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "-c" / "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         ).format(cluster_id=invalid_id)
         # yapf: enable
         assert result.output == expected_message
@@ -566,7 +566,7 @@ class TestDestroy:
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.
               --help                 Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -616,7 +616,7 @@ class TestDestroyList:
 
             Options:
               --help  Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -681,7 +681,7 @@ class TestList:
 
             Options:
               --help  Show this message and exit.
-            """
+            """,
         )
         assert result.output == expected_help
 
@@ -721,7 +721,7 @@ class TestInspect:
               -c, --cluster-id TEXT  If not given, "default" is used.
               --env                  Show details in an environment variable format to eval.
               --help                 Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -772,7 +772,7 @@ class TestWait:
                                          Enterprise clusters. By default, on a DC/OS
                                          Enterprise cluster, `admin` is used.
               --help                     Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -824,7 +824,7 @@ class TestSync:
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.
               --help                 Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -857,7 +857,7 @@ class TestDoctor:
 
             Options:
               --help  Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -902,7 +902,7 @@ class TestWeb:
             Options:
               -c, --cluster-id TEXT  If not given, "default" is used.
               --help                 Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
@@ -952,7 +952,7 @@ class TestRun:
               --no-test-env            With this flag set, no environment variables are set
                                        and the command is run in the home directory.
               --help                   Show this message and exit.
-            """# noqa: E501,E261
+            """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help

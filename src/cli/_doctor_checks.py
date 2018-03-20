@@ -83,7 +83,7 @@ def check_storage_driver() -> None:
         privileged=True,
         volumes={'/proc': {
             'bind': '/host/proc',
-            'mode': 'rw'
+            'mode': 'rw',
         }},
     )
 

@@ -45,7 +45,7 @@ def run_subprocess(
     """
     if log_output_live and not pipe_output:
         raise ValueError(
-            '`log_output_live` cannot be `True` if `pipe_output` is `False`.'
+            '`log_output_live` cannot be `True` if `pipe_output` is `False`.',
         )
 
     process_stdout = PIPE if pipe_output else None
@@ -70,7 +70,7 @@ def run_subprocess(
                 stderr = b''
                 for line in process.stdout:
                     LOGGER.debug(
-                        line.rstrip().decode('ascii', 'backslashreplace')
+                        line.rstrip().decode('ascii', 'backslashreplace'),
                     )
                     stdout += line
                 # stderr/stdout are not readable anymore which usually means
