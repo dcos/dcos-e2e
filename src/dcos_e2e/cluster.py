@@ -211,7 +211,7 @@ class Cluster(ContextDecorator):
 
         scheme = 'https://' if ssl_enabled else 'http://'
         dcos_url = scheme + str(any_master.public_ip_address)
-        enterprise_session = EnterpriseApiSession(
+        enterprise_session = EnterpriseApiSession(  # type: ignore
             dcos_url=dcos_url,
             masters=[str(n.public_ip_address) for n in self.masters],
             slaves=[str(n.public_ip_address) for n in self.agents],
@@ -230,9 +230,9 @@ class Cluster(ContextDecorator):
                 verify=False,
             )
             response.raise_for_status()
-            enterprise_session.set_ca_cert()  # type: ignore
+            enterprise_session.set_ca_cert()
 
-        enterprise_session.wait_for_dcos()  # type: ignore
+        enterprise_session.wait_for_dcos()
 
     def __enter__(self) -> 'Cluster':
         """
