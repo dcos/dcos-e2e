@@ -32,6 +32,18 @@ log = logging.getLogger(__name__)
 CI_CREDENTIALS = {'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik9UQkVOakZFTWtWQ09VRTRPRVpGTlRNMFJrWXlRa015Tnprd1JrSkVRemRCTWpBM1FqYzVOZyJ9.eyJlbWFpbCI6ImFsYmVydEBiZWtzdGlsLm5ldCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczovL2Rjb3MuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTA5OTY0NDk5MDExMTA4OTA1MDUwIiwiYXVkIjoiM3lGNVRPU3pkbEk0NVExeHNweHplb0dCZTlmTnhtOW0iLCJleHAiOjIwOTA4ODQ5NzQsImlhdCI6MTQ2MDE2NDk3NH0.OxcoJJp06L1z2_41_p65FriEGkPzwFB_0pA9ULCvwvzJ8pJXw9hLbmsx-23aY2f-ydwJ7LSibL9i5NbQSR2riJWTcW4N7tLLCCMeFXKEK4hErN2hyxz71Fl765EjQSO5KD1A-HsOPr3ZZPoGTBjE0-EFtmXkSlHb1T2zd0Z8T5Z2-q96WkFoT6PiEdbrDA-e47LKtRmqsddnPZnp0xmMQdTr2MjpVgvqG7TlRvxDcYc-62rkwQXDNSWsW61FcKfQ-TRIZSf2GS9F9esDF4b5tRtrXcBNaorYa9ql0XAWH5W_ct4ylRNl3vwkYKWa4cmPvOqT5Wlj9Tf0af4lNO40PQ'}     # noqa
 
 
+def check_json(response):
+    response.raise_for_status()
+    try:
+        json_response = response.json()
+        logging.debug('Response: {}'.format(json_response))
+    except ValueError:
+        logging.exception('Could not deserialize response contents:{}'.format(response.content.decode()))
+        raise
+    assert len(json_response) > 0, 'Empty JSON returned from dcos-diagnostics request'
+    return json_response
+
+
 def path_join(p1: str, p2: str):
     """Helper to ensure there is only one '/' between two strings"""
     return '{}/{}'.format(p1.rstrip('/'), p2.lstrip('/'))
@@ -198,6 +210,35 @@ class RetryCommonHttpErrorsMixin:
             return super(RetryCommonHttpErrorsMixin, self).api_request(*args, **kwargs)
 
         return retry_errors()
+
+
+class ARNodeApiClientMixin:
+    def api_request(self, method, path_extension, *, scheme=None, host=None, query=None,
+                    fragment=None, port=None, node=None, **kwargs):
+        """ Communicating with a DC/OS cluster is done by default through Admin Router.
+        Use this Mixin with an ApiClientSession that requires distinguishing between nodes.
+        Admin Router has both a master and agent process and so this wrapper accepts a
+        node argument. node must be a host in self.master or self.all_slaves. If given,
+        the request will be made to the Admin Router endpoint for that node type
+        """
+        if node is not None:
+            assert port is None, 'node is intended to retrieve port; cannot set both simultaneously'
+            assert host is None, 'node is intended to retrieve host; cannot set both simultaneously'
+            if node in self.masters:
+                # Due to guarantees about state in DcosApiSession, nothing else to do.
+                # Master Admin Router uses default HTTP (80) and HTTPS (443) ports.
+                pass
+            elif node in self.all_slaves:
+                scheme = scheme if scheme is not None else self.default_url.scheme
+                if scheme == 'http':
+                    port = 61001
+                if scheme == 'https':
+                    port = 61002
+            else:
+                raise Exception('Node {} is not recognized within the DC/OS cluster'.format(node))
+            host = node
+        return super().api_request(method, path_extension, scheme=scheme, host=host,
+                                   query=query, fragment=fragment, port=port, **kwargs)
 
 
 def session_tempfile(data):

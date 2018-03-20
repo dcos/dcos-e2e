@@ -14,13 +14,12 @@ from typing import List, Optional
 import requests
 import retrying
 
-from .. import dcos_test_utils
-from ..dcos_test_utils import marathon as ___vendorize__0
-dcos_test_utils.marathon = ___vendorize__0
-from .. import dcos_test_utils
-from ..dcos_test_utils import package as ___vendorize__0
-dcos_test_utils.package = ___vendorize__0
-from ..dcos_test_utils.helpers import ApiClientSession, RetryCommonHttpErrorsMixin, Url, assert_response_ok
+from ..dcos_test_utils import (
+    diagnostics,
+    marathon,
+    package,
+    helpers
+)
 
 log = logging.getLogger(__name__)
 
@@ -46,8 +45,8 @@ class DcosAuth(requests.auth.AuthBase):
         return request
 
 
-class Exhibitor(RetryCommonHttpErrorsMixin, ApiClientSession):
-    def __init__(self, default_url: Url, session: Optional[requests.Session]=None,
+class Exhibitor(helpers.RetryCommonHttpErrorsMixin, helpers.ApiClientSession):
+    def __init__(self, default_url: helpers.Url, session: Optional[requests.Session]=None,
                  exhibitor_admin_password: Optional[str]=None):
         super().__init__(default_url)
         if session is not None:
@@ -57,35 +56,7 @@ class Exhibitor(RetryCommonHttpErrorsMixin, ApiClientSession):
             self.session.auth = requests.auth.HTTPBasicAuth('admin', exhibitor_admin_password)
 
 
-class ARNodeApiClientMixin:
-    def api_request(self, method, path_extension, *, scheme=None, host=None, query=None,
-                    fragment=None, port=None, node=None, **kwargs):
-        """ Communicating with a DC/OS cluster is done by default through Admin Router.
-        Use this Mixin with an ApiClientSession that requires distinguishing between nodes.
-        Admin Router has both a master and agent process and so this wrapper accepts a
-        node argument. node must be a host in self.master or self.all_slaves. If given,
-        the request will be made to the Admin Router endpoint for that node type
-        """
-        if node is not None:
-            assert port is None, 'node is intended to retrieve port; cannot set both simultaneously'
-            assert host is None, 'node is intended to retrieve host; cannot set both simultaneously'
-            if node in self.masters:
-                # Nothing else to do, master Admin Router uses default HTTP (80) and HTTPS (443) ports
-                pass
-            elif node in self.all_slaves:
-                scheme = scheme if scheme is not None else self.default_url.scheme
-                if scheme == 'http':
-                    port = 61001
-                if scheme == 'https':
-                    port = 61002
-            else:
-                raise Exception('Node {} is not recognized within the DC/OS cluster'.format(node))
-            host = node
-        return super().api_request(method, path_extension, scheme=scheme, host=host,
-                                   query=query, fragment=fragment, port=port, **kwargs)
-
-
-class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSession):
+class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrorsMixin, helpers.ApiClientSession):
     def __init__(
             self,
             dcos_url: str,
@@ -108,21 +79,33 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             auth_user: use this user's auth for all requests
                 Note: user must be authenticated explicitly or call self.wait_for_dcos()
         """
-        super().__init__(Url.from_string(dcos_url))
+        super().__init__(helpers.Url.from_string(dcos_url))
         self.master_list = masters
         self.slave_list = slaves
         self.public_slave_list = public_slaves
         self.auth_user = auth_user
         self.exhibitor_admin_password = exhibitor_admin_password
 
+    @classmethod
+    def create(cls):
+        api = cls(**cls.get_args_from_env())
+        api._authenticate_default_user()
+        return api
+
     @staticmethod
     def get_args_from_env():
         """ Provides the required arguments for a unauthenticated cluster
         """
+        dcos_acs_token = os.getenv('DCOS_ACS_TOKEN')
+        if dcos_acs_token is None:
+            auth_user = DcosUser(helpers.CI_CREDENTIALS)
+        else:
+            auth_user = DcosUser({'token': dcos_acs_token})
         masters = os.getenv('MASTER_HOSTS')
         slaves = os.getenv('SLAVE_HOSTS')
         public_slaves = os.getenv('PUBLIC_SLAVE_HOSTS')
         return {
+            'auth_user': auth_user,
             'dcos_url': os.getenv('DCOS_DNS_ADDRESS', 'http://leader.mesos'),
             'masters': masters.split(',') if masters else None,
             'slaves': slaves.split(',') if slaves else None,
@@ -365,6 +348,21 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         assert r.status_code == 200, "Expecting status code 200 for Metronome but got {} with body {}"\
             .format(r.status_code, r.content)
 
+    @retrying.retry(wait_fixed=2000,
+                    retry_on_result=lambda r: r is False,
+                    retry_on_exception=lambda _: False)
+    def _wait_for_all_healthy_services(self):
+        r = self.health.get('units')
+        r.raise_for_status()
+
+        all_healthy = True
+        for unit in r.json()['units']:
+            if unit['health'] != 0:
+                log.info("{} service health: {}".format(unit['id'], unit['health']))
+                all_healthy = False
+
+        return all_healthy
+
     def wait_for_dcos(self):
         self._wait_for_adminrouter_up()
         self._authenticate_default_user()
@@ -388,6 +386,7 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         self._wait_for_srouter_slaves_endpoints()
         self._wait_for_dcos_history_data()
         self._wait_for_metronome()
+        self._wait_for_all_healthy_services()
 
     def copy(self):
         """ Create a new client session without cookies, with the authentication intact.
@@ -415,7 +414,7 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
         else:
             # Exhibitor is protected with HTTP basic auth, which conflicts with adminrouter's auth. We must bypass
             # the adminrouter and access Exhibitor directly.
-            default_url = Url.from_string('http://{}:8181'.format(self.masters[0]))
+            default_url = helpers.Url.from_string('http://{}:8181'.format(self.masters[0]))
 
         return Exhibitor(
             default_url=default_url,
@@ -424,7 +423,7 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
 
     @property
     def marathon(self):
-        return dcos_test_utils.marathon.Marathon(
+        return marathon.Marathon(
             default_url=self.default_url.copy(path='marathon'),
             session=self.copy().session)
 
@@ -436,15 +435,18 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
 
     @property
     def cosmos(self):
-        return dcos_test_utils.package.Cosmos(
+        return package.Cosmos(
             default_url=self.default_url.copy(path="package"),
             session=self.copy().session)
 
     @property
     def health(self):
-        new = self.copy()
-        new.default_url = self.default_url.copy(query='cache=0', path='system/health/v1')
-        return new
+        health_url = self.default_url.copy(query='cache=0', path='system/health/v1')
+        return diagnostics.Diagnostics(
+            health_url,
+            self.masters,
+            self.all_slaves,
+            session=self.copy().session)
 
     @property
     def logs(self):
@@ -479,14 +481,14 @@ class DcosApiSession(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClient
             return True
         log.info('Creating metronome job: ' + repr(job_definition))
         r = self.metronome.post('jobs', json=job_definition)
-        assert_response_ok(r)
+        helpers.assert_response_ok(r)
         log.info('Starting metronome job')
         r = self.metronome.post('jobs/{}/runs'.format(job_id))
-        assert_response_ok(r)
+        helpers.assert_response_ok(r)
         wait_for_completion()
         log.info('Deleting metronome one-off')
         r = self.metronome.delete('jobs/' + job_id)
-        assert_response_ok(r)
+        helpers.assert_response_ok(r)
 
     def mesos_sandbox_directory(self, slave_id, framework_id, task_id):
         r = self.get('/agent/{}/state'.format(slave_id))
