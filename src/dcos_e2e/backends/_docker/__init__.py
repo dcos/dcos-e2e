@@ -458,6 +458,9 @@ class DockerCluster(ClusterManager):
                 variables that are applied on top of the default DC/OS
                 configuration of the Docker backend.
             log_output_live: If `True`, log output of the installation live.
+
+        Raises:
+            CalledProcessError: There was an error installing DC/OS on a node.
         """
         ssh_user = self._default_ssh_user
 
@@ -531,10 +534,11 @@ class DockerCluster(ClusterManager):
             # available.
             for node in nodes:
                 try:
-                    node.run(args=dcos_install_args, quiet=False)
+                    node.run(args=dcos_install_args)
                 except subprocess.CalledProcessError as ex:  # pragma: no cover
                     LOGGER.error(ex.stdout)
                     LOGGER.error(ex.stderr)
+                    raise
 
     def destroy(self) -> None:
         """
