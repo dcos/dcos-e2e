@@ -13,7 +13,7 @@ pip_check_reqs==2.0.1
 py==1.5.2
 pydocstyle==2.1.1
 pyenchant==2.0.0
-pygithub==1.37
+pygithub==1.38
 pylint==1.8.3
 pyroma==2.3
 pytest-cov==2.5.1  # Measure code coverage
