@@ -458,6 +458,9 @@ class DockerCluster(ClusterManager):
                 variables that are applied on top of the default DC/OS
                 configuration of the Docker backend.
             log_output_live: If `True`, log output of the installation live.
+
+        Raises:
+            CalledProcessError: There was an error installing DC/OS on a node.
         """
         ssh_user = self._default_ssh_user
 
