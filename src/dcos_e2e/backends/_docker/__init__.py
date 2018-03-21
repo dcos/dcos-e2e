@@ -531,10 +531,11 @@ class DockerCluster(ClusterManager):
             # available.
             for node in nodes:
                 try:
-                    node.run(args=dcos_install_args, quiet=False)
+                    node.run(args=dcos_install_args)
                 except subprocess.CalledProcessError as ex:  # pragma: no cover
                     LOGGER.error(ex.stdout)
                     LOGGER.error(ex.stderr)
+                    raise
 
     def destroy(self) -> None:
         """

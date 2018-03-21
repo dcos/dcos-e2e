@@ -63,7 +63,6 @@ class Node:
         env: Optional[Dict[str, Any]],
         shell: bool,
         tty: bool,
-        quiet: bool,
     ) -> List[str]:
         """
         Return a command to run `args` on this node over SSH.
@@ -82,7 +81,6 @@ class Node:
                 whitespace.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
-            quiet: Whether the SSH command is to be run in quiet mode.
 
         Returns:
             The full SSH command to be run.
@@ -95,12 +93,6 @@ class Node:
         ssh_args = ['ssh']
         if tty:
             ssh_args.append('-t')
-
-        if quiet:
-            # Suppress warnings.
-            # In particular, we often do not care about remote host
-            # identification changes.
-            ssh_args.append('-q')
 
         ssh_args += [
             # This makes sure that only keys passed with the -i option are
@@ -121,6 +113,9 @@ class Node:
             # Bypass password checking.
             '-o',
             'PreferredAuthentications=publickey',
+            # Ignore warnings about remote host identification changes.
+            '-o',
+            'UserKnownHostsFile=/dev/null',
             str(self.public_ip_address),
         ] + [
             '{key}={value}'.format(key=k, value=quote(str(v)))
@@ -137,7 +132,6 @@ class Node:
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
         tty: bool = False,
-        quiet: bool = True,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -161,7 +155,6 @@ class Node:
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
-            quiet: If ``False``, show SSH warnings.
 
         Returns:
             The representation of the finished process.
@@ -179,7 +172,6 @@ class Node:
             env=env,
             shell=shell,
             tty=tty,
-            quiet=quiet,
         )
 
         return run_subprocess(
@@ -224,7 +216,6 @@ class Node:
             env=env,
             shell=shell,
             tty=False,
-            quiet=True,
         )
         return subprocess.Popen(
             args=ssh_args,
