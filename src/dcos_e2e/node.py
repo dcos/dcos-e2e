@@ -113,9 +113,13 @@ class Node:
             # Bypass password checking.
             '-o',
             'PreferredAuthentications=publickey',
-            # Ignore warnings about remote host identification changes.
+            # Do not add this node to the standard known hosts file.
             '-o',
             'UserKnownHostsFile=/dev/null',
+            # Ignore warnings about remote host identification changes and new
+            # hosts being added to the known hosts file in particular.
+            '-o',
+            'LogLevel=ERROR',
             str(self.public_ip_address),
         ] + [
             '{key}={value}'.format(key=k, value=quote(str(v)))
