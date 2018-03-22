@@ -3,9 +3,10 @@ Tests for managing DC/OS cluster nodes.
 """
 
 import logging
+import os
 import uuid
 from pathlib import Path
-from subprocess import CalledProcessError, TimeoutExpired
+from subprocess import CalledProcessError, TimeoutExpired, run
 from typing import Iterator
 
 import pytest
@@ -424,6 +425,82 @@ class TestNode:
 
         # Implicitly asserts SSH connection closed by ``send_file``.
         master.run(args=['userdel', '-r', testuser])
+
+    def test_dump_output(
+        self,
+        dcos_cluster: Cluster,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to dump command output to file.
+        """
+        (master, ) = dcos_cluster.masters
+
+        master.dump_output(args=['echo', 'test'], path=tmpdir)
+
+        dump_filename = None
+
+        for filename in os.listdir(tmpdir):
+            if filename.endswith('.log'):
+                dump_filename = filename
+                break
+
+        assert dump_filename
+
+        dump_filepath = Path(tmpdir / dump_filename)
+        print(dump_filepath)
+
+        with open(dump_filepath) as dumpfile:
+            dumped_content = dumpfile.read()
+
+        assert dumped_content == 'test\n'
+
+        run(args=['rm', dump_filepath])
+
+    def test_dump_output_custom_user(
+        self,
+        dcos_cluster: Cluster,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to dump command output to file as a custom user.
+        """
+        (master, ) = dcos_cluster.masters
+
+        testuser = str(uuid.uuid4().hex)
+        master.run(args=['useradd', testuser])
+        master.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        master.dump_output(
+            args=['echo', '$USER'],
+            path=tmpdir,
+            user=testuser,
+            shell=True,
+        )
+
+        dump_filename = None
+
+        for filename in os.listdir(tmpdir):
+            if filename.endswith('.log'):
+                dump_filename = filename
+                break
+
+        assert dump_filename
+
+        dump_filepath = Path(tmpdir / dump_filename)
+        print(dump_filepath)
+
+        with open(dump_filepath) as dumpfile:
+            dumped_content = dumpfile.read()
+
+        assert dumped_content == testuser + '\n'
+
+        master.run(args=['userdel', '-r', testuser])
+
+        run(args=['rm', dump_filepath])
 
     def test_string_representation(
         self,

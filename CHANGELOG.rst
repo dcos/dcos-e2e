@@ -6,6 +6,7 @@ Changelog
 Next
 ----
 
+- Add ``dump_output`` function to dump command output on ``Node`` objects.
 - Add a ``dcos-docker doctor`` check that a supported storage driver is available.
 
 2018.03.07.0

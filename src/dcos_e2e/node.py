@@ -4,6 +4,7 @@ Tools for managing DC/OS cluster nodes.
 
 import stat
 import subprocess
+from datetime import datetime
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
@@ -265,3 +266,38 @@ class Node:
                     localpath=str(local_path),
                     remotepath=str(remote_path),
                 )
+
+    def dump_output(
+        self,
+        args: List[str],
+        path: Path,
+        user: Optional[str] = None,
+        env: Optional[Dict[str, Any]] = None,
+        shell: bool = False,
+    ) -> None:
+        """
+        Dump the output of a particular SSH command composed of ``args``
+        to a file in ``path`` with a filename like so:
+        ``{private_ip}_{public_ip}_{args}_{datetime}.log``
+        """
+        if user is None:
+            user = self.default_ssh_user
+
+        result = self.run(
+            args=args,
+            user=user,
+            env=env,
+            shell=shell,
+        )
+
+        filename = '{private_ip}_{public_ip}_{command}_{datetime}.log'.format(
+            private_ip=str(self.private_ip_address),
+            public_ip=str(self.public_ip_address),
+            command='_'.join(args),
+            datetime=datetime.now().isoformat().split('.')[0],
+        )
+
+        filepath = Path(path / filename)
+
+        with open(filepath, 'wb') as dumpfile:
+            dumpfile.write(result.stdout)
