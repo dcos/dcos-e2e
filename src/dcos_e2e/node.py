@@ -116,6 +116,8 @@ class Node:
             # Ignore warnings about remote host identification changes.
             '-o',
             'UserKnownHostsFile=/dev/null',
+            '-o',
+            'LogLevel=ERROR',
             str(self.public_ip_address),
         ] + [
             '{key}={value}'.format(key=k, value=quote(str(v)))
