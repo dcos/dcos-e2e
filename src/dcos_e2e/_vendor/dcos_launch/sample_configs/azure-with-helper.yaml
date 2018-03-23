@@ -1,0 +1,15 @@
+---
+launch_config_version: 1
+deployment_name: Azure-Resource-Manager-Trial-Deploy
+template_url: https://downloads.dcos.io/dcos/testing/master/azure/acs-deploy-1.json
+provider: azure
+azure_location: East US
+ssh_user: dcos
+template_parameters:
+    agentVMSize: Standard_D2
+    masterEndpointDNSNamePrefix: testing-foo-bar
+    agentEndpointDNSNamePrefix: testing-baz-qux
+    agentCount: 4
+    oauthEnabled: false
+    nameSuffix: 12435
+key_helper: true
