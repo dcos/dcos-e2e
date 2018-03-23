@@ -16,8 +16,8 @@ class TestAWSBackend:
     """
     Tests for functionality specific to the Docker backend.
     """
-
     def test_distribution_not_supported(self, license_key_contents: str) -> None:
+        pass
 
     def test_run_integration_test(self, license_key_contents: str) -> None:
 

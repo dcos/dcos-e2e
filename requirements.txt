@@ -1,12 +1,6 @@
-# We want to install an exact version of dcos-launch.
-# We parse this file in `setup.py`.
-# The method used here is the only way that I, Adam, know how to get the exact version installed here and with `setup.py`.
-# See https://underyx.me/2015/11/23/adding-an-unreleased-commit-as-a-dependency as an example of a guide which recommends this method.
---find-links git+https://github.com/dcos/dcos-launch.git@f930a18c4d5a8069a2fce7279b21754807479e78#egg=dcos-launch-0.1.0
 click==6.7
 click-spinner==0.1.7
 cryptography==2.2.1
-dcos-launch==0.1.0
 docker==3.1.4
 paramiko==2.4.1
 passlib==1.7.1

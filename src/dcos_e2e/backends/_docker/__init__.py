@@ -63,7 +63,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
 
-
 def _get_open_port() -> int:
     """
     Return a free port.
