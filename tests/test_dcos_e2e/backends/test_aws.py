@@ -17,7 +17,9 @@ class TestAWSBackend:
     Tests for functionality specific to the Docker backend.
     """
 
-    def test_cluster(self, license_key_contents: str) -> None:
+    def test_distribution_not_supported(self, license_key_contents: str) -> None:
+
+    def test_run_integration_test(self, license_key_contents: str) -> None:
 
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
@@ -26,6 +28,7 @@ class TestAWSBackend:
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'fault_domain_enabled': False,
             'license_key_contents': license_key_contents,
+            'security': 'strict',
         }
 
         aws_backend = AWS(
@@ -68,15 +71,19 @@ class TestAWSBackend:
             )
 
             # TODO: Defintely to do before shipping
-            #0. Update dcos-e2e
             #1. Test running on Travis
-            #   - Add keys to Travis
             #   - 100% test coverage
+            #   - Add keys to Travis
             #   - Test install from Path
             #2. CHANGELOG entry
             #3. Initial documentation - doesn't work on Windows
-            #4. Vendor dcos-launch
 
             # TODO: Nice to have
             #Get Bilal to use it
             #Get it to work with Windows
+
+            # TODO: Vendoring
+            #Latest dcos-launch
+            #pkg_resource('dcos_launch') -> ('dcos_e2e._vendor.dcos_launch')
+            #config.py, util.py, platform/aws.py
+            #Idea is for it do use inspect rather than pkg_resource

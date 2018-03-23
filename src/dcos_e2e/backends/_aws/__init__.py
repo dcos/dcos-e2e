@@ -9,10 +9,10 @@ from tempfile import gettempdir
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Type
 
-from dcos_launch import config, get_launcher
-from dcos_launch.aws import DcosCloudformationLauncher
-from dcos_launch.onprem import AbstractOnpremLauncher
-from dcos_launch.util import AbstractLauncher  # noqa: F401
+from dcos_e2e._vendor.dcos_launch import config, get_launcher
+from dcos_e2e._vendor.dcos_launch.aws import DcosCloudformationLauncher
+from dcos_e2e._vendor.dcos_launch.onprem import AbstractOnpremLauncher
+from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
 from retry import retry
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -28,7 +28,6 @@ class AWS(ClusterBackend):
     def __init__(
         self,
         aws_region: str = 'us-west-2',
-        instance_type: str = 'm4.large',
         admin_location: str = '0.0.0.0/0',
         linux_distribution: Distribution = Distribution.CENTOS_7,
         workspace_dir: Optional[Path] = None,
@@ -52,7 +51,7 @@ class AWS(ClusterBackend):
             'platform': 'aws',
             'provider': 'onprem',
             'aws_region': aws_region,
-            'instance_type': instance_type,
+            'instance_type': 'm4.large',
             'admin_location': admin_location,
         }
 
@@ -84,7 +83,7 @@ class AWSCluster(ClusterManager):
         self._path = Path(self._path) / unique
         Path(self._path).mkdir(exist_ok=True)
 
-        self._default_ssh_user = cluster_backend.default_ssh_user
+        self._default_ssh_user = cluster_backend._default_ssh_user
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
         self.cluster_info = {}  # type: Dict[str, Any]

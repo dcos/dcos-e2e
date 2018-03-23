@@ -229,6 +229,25 @@ Update the SHA in ``src/vendorize.toml``.
     git add dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
+Updating DC/OS Launch
+-------------------------
+
+`DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ is vendored in this repository using `python-vendorize <https://github.com/mwilliamson/python-vendorize>`__.
+To update DC/OS Test Utils:
+
+Update the SHA in ``src/vendorize.toml``.
+
+.. code:: sh
+
+    pip install git+https://github.com/mwilliamson/python-vendorize.git
+    git rm -r src/dcos_e2e/_vendor/
+    rm -rf src/dcos_e2e/_vendor/*
+    cd src/
+    python-vendorize
+    git add dcos_e2e/_vendor
+    git commit -m "Update vendored packages"
+
+
 Testing the Homebrew Recipe
 ----------------------------
 
