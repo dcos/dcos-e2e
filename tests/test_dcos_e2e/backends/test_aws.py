@@ -37,7 +37,14 @@ class TestAWSBackend:
             masters=1,
         ) as cluster:
 
-            import pdb; pdb.set_trace()
+            (master, ) = cluster.masters
+
+            result = master.run(
+                args=['echo', '$USER'],
+                shell=True,
+            )
+
+            result.stdout.decode() == 'centos\n'
 
             cluster.install_dcos_from_url(
                 build_artifact=os.environ['INSTALLER_URL'],
@@ -50,11 +57,17 @@ class TestAWSBackend:
                 superuser_password=superuser_password,
             )
 
-            import pdb; pdb.set_trace()
+            # No error is raised with a successful command.
+            cluster.run_integration_tests(
+                pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
+                env={
+                    'DCOS_LOGIN_UNAME': superuser_username,
+                    'DCOS_LOGIN_PW': superuser_password,
+                },
+                log_output_live=True,
+            )
 
             # TODO: Defintely to do before shipping
-            #0. Wait for SSH connections
-            #0. Extensive comments
             #0. Update dcos-e2e
             #1. Test running on Travis
             #   - Add keys to Travis

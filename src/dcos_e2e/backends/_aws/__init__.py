@@ -4,6 +4,7 @@ A DC/OS Launch backend for DC/OS E2E.
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
+from subprocess import CalledProcessError
 from tempfile import gettempdir
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Type
@@ -12,6 +13,7 @@ from dcos_launch import config, get_launcher
 from dcos_launch.aws import DcosCloudformationLauncher
 from dcos_launch.onprem import AbstractOnpremLauncher
 from dcos_launch.util import AbstractLauncher  # noqa: F401
+from retry import retry
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
@@ -110,39 +112,63 @@ class AWSCluster(ClusterManager):
 
         launch_config = {**cluster_config, **cluster_backend.config}
 
-        # Fake url to pass config validation
-        launch_config['installer_url'] = 'https://google.com'
-
-        # Preliminary DC/OS config to pass config validation
-        dcos_config = {
+        # First we create a preliminary dcos-config inside the
+        # dcos-launch config to pass the config validation step.
+        launch_config['dcos_config'] = {
             'cluster_name': unique,
             'resolvers': ['10.10.0.2', '8.8.8.8'],
             'master_discovery': 'static',
             'exhibitor_storage_backend': 'static',
         }
 
-        launch_config['dcos_config'] = dcos_config
+        # Supply a valid URL to the preliminary config.
+        # This is replaced later before the DC/OS installation.
+        launch_config['installer_url'] = 'https://google.com'
 
+        # Validate the preliminary dcos-launch config.
         validated_launch_config = config.get_validated_config(
             launch_config, str(self._path)
         )
 
-        # Returns a DcosCloudformationLauncher
+        # Get a DcosCloudformationLauncher object
         self.launcher = get_launcher(validated_launch_config)
 
-        # Creates the AWS stack
+        # Create the AWS stack from the DcosCloudformationLauncher.
+        # Update ``cluster_info`` with the AWS SSH key information.
         self.cluster_info = self.launcher.create()
 
-        # Waits for stack setup completion
-        DcosCloudformationLauncher.wait(self.launcher)
-
-        # Store the generated AWS SSH key
+        # Store the generated AWS SSH key to the file system.
         self._ssh_key_path = self._path / 'id_rsa'
         private_key = self.cluster_info['ssh_private_key']
         self._ssh_key_path.write_bytes(private_key.encode())
 
-        # Update the cluster_info with post-install DC/OS information
+        # Wait for the AWS stack setup completion.
+        DcosCloudformationLauncher.wait(self.launcher)
+
+        # Update the cluster_info with AWS stack information.
+        # This makes node IP addresses available to ``cluster_info``.
+        # cluster.masters/agents/public_agents rely on this information.
         self.cluster_info = self.launcher.describe()
+
+        # Wait for SSH connectivity
+        @retry(
+            exceptions=(CalledProcessError),
+            tries=500,
+            delay=10,
+        )
+        def wait_for_ssh_connectivity():
+            """Poll all nodes until they are reachable over SSH."""
+            for node in {
+                    *self.masters,
+                    *self.agents,
+                    *self.public_agents,
+            }:
+                node.run(args=['pwd'])
+
+        # Despite cluster.masters/agents/public_agents objects being
+        # accessible already we still need to wait until their SSH daemon
+        # is up and running.
+        wait_for_ssh_connectivity()
 
     def install_dcos_from_url(
         self,
@@ -151,22 +177,20 @@ class AWSCluster(ClusterManager):
         log_output_live: bool,
     ) -> None:
 
-        # Returns an AbstractOnpremLauncher
-        # self.launcher = get_launcher(self.cluster_info)
-
-        # Overwrite the installer_url
+        # In order to install DC/OS with the preliminary dcos-launch
+        # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
 
-        # Get the fake validated config
+        # The DC/OS config parameters from ``extra_config`` are applied
+        # on top of the preliminary DC/OS config.
         dcos_config = self.launcher.config['dcos_config']
-
-        # Write back the real config plus exta parameters
         self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
 
-        # Start the actual DC/OS installation process
+        # The ``wait`` method starts the actual DC/OS installation process.
         AbstractOnpremLauncher.wait(self.launcher)
 
-        # Update the cluster_info with post-install DC/OS information
+        # Update the cluster_info with post-install DC/OS information.
+        # This enters the new DC/OS config information into ``cluster_info``.
         self.cluster_info = self.launcher.describe()
 
     def install_dcos_from_path(
