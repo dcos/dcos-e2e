@@ -19,6 +19,19 @@ from .backends import ClusterBackend, _ExistingCluster
 from .node import Node
 
 
+@retry(
+    exceptions=(subprocess.CalledProcessError),
+    tries=60,
+    delay=1,
+)
+def _wait_for_ssh(node: Node) -> None:
+    """
+    Retry for up to one minute (arbitrary) until SSH is available on the given
+    node.
+    """
+    node.run(args=['echo'])
+
+
 class Cluster(ContextDecorator):
     """
     A record of a DC/OS cluster.
@@ -53,6 +66,13 @@ class Cluster(ContextDecorator):
             files_to_copy_to_installer=list(files_to_copy_to_installer),
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
+
+        for node in {
+            *self.masters,
+            *self.agents,
+            *self.public_agents,
+        }:
+            _wait_for_ssh(node=node)
 
     @classmethod
     def from_nodes(
