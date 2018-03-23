@@ -13,7 +13,6 @@ from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.aws import DcosCloudformationLauncher
 from dcos_e2e._vendor.dcos_launch.onprem import AbstractOnpremLauncher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
-from retry import retry
 
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
@@ -142,26 +141,6 @@ class AWSCluster(ClusterManager):
         # This makes node IP addresses available to ``cluster_info``.
         # cluster.masters/agents/public_agents rely on this information.
         self.cluster_info = self.launcher.describe()
-
-        # Wait for SSH connectivity
-        @retry(
-            exceptions=(CalledProcessError),
-            tries=500,
-            delay=10,
-        )
-        def wait_for_ssh_connectivity():
-            """Poll all nodes until they are reachable over SSH."""
-            for node in {
-                    *self.masters,
-                    *self.agents,
-                    *self.public_agents,
-            }:
-                node.run(args=['pwd'])
-
-        # Despite cluster.masters/agents/public_agents objects being
-        # accessible already we still need to wait until their SSH daemon
-        # is up and running.
-        wait_for_ssh_connectivity()
 
     def install_dcos_from_url(
         self,
