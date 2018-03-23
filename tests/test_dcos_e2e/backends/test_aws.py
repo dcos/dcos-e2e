@@ -36,12 +36,18 @@ class TestAWSBackend:
             cluster_backend=aws_backend,
             masters=1,
         ) as cluster:
+
+            import pdb; pdb.set_trace()
+
             cluster.install_dcos_from_url(
                 build_artifact=os.environ['INSTALLER_URL'],
                 extra_config=config,
                 log_output_live=True,
             )
+
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+
+            import pdb; pdb.set_trace()
