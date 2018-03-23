@@ -71,13 +71,12 @@ class TestAWSBackend:
             )
 
             # TODO: Defintely to do before shipping
-            # 1. Test running on Travis
+            # #. Test running on Travis
             #   - 100% test coverage
             #   - Add keys to Travis
             #   - Test install from Path
-            # 2. CHANGELOG entry
-            # 3. Initial documentation - document that this does not work on
-            # Windows, or how to get it to work with WSL
+            # #. Initial documentation - document that this does not work on
+            #    Windows, or how to get it to work with WSL
 
             # TODO: Nice to have
             # Get Bilal to use it
