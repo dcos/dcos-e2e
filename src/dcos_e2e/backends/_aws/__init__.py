@@ -37,16 +37,14 @@ class AWS(ClusterBackend):
         Create a configuration for a Docker cluster backend.
 
         """
-        supported_distributions = {Distribution.CENTOS_7, Distribution.COREOS}
-        if linux_distribution not in supported_distributions:
-            raise NotImplementedError
-
-        aws_ssh_user = {
+        supported_distributions = {
             Distribution.CENTOS_7: 'centos',
             Distribution.COREOS: 'core',
         }
+        if linux_distribution not in supported_distributions.keys():
+            raise NotImplementedError
 
-        self._default_ssh_user = aws_ssh_user[linux_distribution]
+        self._default_ssh_user = supported_distributions[linux_distribution]
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
 
@@ -61,10 +59,6 @@ class AWS(ClusterBackend):
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
         return AWSCluster
-
-    @property
-    def default_ssh_user(self) -> str:
-        return self._default_ssh_user
 
 
 class AWSCluster(ClusterManager):
