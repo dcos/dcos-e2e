@@ -19,6 +19,7 @@ import yaml
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from retry import retry
 
 from dcos_e2e._common import run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -95,6 +96,19 @@ def _get_fallback_storage_driver() -> DockerStorageDriver:
         #
         # This is encoded in a `dcos-docker doctor` check.
         return DockerStorageDriver.AUFS
+
+
+@retry(
+    exceptions=(subprocess.CalledProcessError),
+    tries=60,
+    delay=1,
+)
+def _wait_for_ssh(node: Node) -> None:
+    """
+    Retry for up to one minute (arbitrary) until SSH is available on the given
+    node.
+    """
+    node.run(args=['echo'])
 
 
 class Docker(ClusterBackend):
@@ -416,6 +430,13 @@ class DockerCluster(ClusterManager):
                 docker_storage_driver=cluster_backend.docker_storage_driver,
                 docker_version=cluster_backend.docker_version,
             )
+
+        for node in {
+            *self.masters,
+            *self.agents,
+            *self.public_agents,
+        }:
+            _wait_for_ssh(node=node)
 
     def install_dcos_from_url(
         self,
