@@ -71,19 +71,21 @@ class TestAWSBackend:
             )
 
             # TODO: Defintely to do before shipping
-            #1. Test running on Travis
+            # 1. Test running on Travis
             #   - 100% test coverage
             #   - Add keys to Travis
             #   - Test install from Path
-            #2. CHANGELOG entry
-            #3. Initial documentation - doesn't work on Windows
+            # 2. CHANGELOG entry
+            # 3. Initial documentation - document that this does not work on
+            # Windows, or how to get it to work with WSL
 
             # TODO: Nice to have
-            #Get Bilal to use it
-            #Get it to work with Windows
+            # Get Bilal to use it
+            # Get it to work with Windows
 
             # TODO: Vendoring
-            #Latest dcos-launch
-            #pkg_resource('dcos_launch') -> ('dcos_e2e._vendor.dcos_launch')
-            #config.py, util.py, platform/aws.py
+            # Change DC/OS Launch as there is an error on import after
+            # vendoring:
+            # pkg_resource('dcos_launch') -> ('dcos_e2e._vendor.dcos_launch')
+            # config.py, util.py, platform/aws.py
             #Idea is for it do use inspect rather than pkg_resource
