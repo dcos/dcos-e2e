@@ -211,11 +211,12 @@ Release Process
 
 See :doc:`release-process`.
 
-Updating DC/OS Test Utils
--------------------------
+Updating DC/OS Test Utils and DC/OS Launch
+------------------------------------------
 
-`DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ is vendored in this repository using `python-vendorize <https://github.com/mwilliamson/python-vendorize>`__.
-To update DC/OS Test Utils:
+`DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
+This is done using `python-vendorize <https://github.com/mwilliamson/python-vendorize>`__.
+To update DC/OS Test Utils or DC/OS Launch:
 
 Update the SHA in ``src/vendorize.toml``.
 
