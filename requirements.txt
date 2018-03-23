@@ -3,7 +3,8 @@
 # The method used here is the only way that I, Adam, know how to get the exact version installed here and with `setup.py`.
 # See https://underyx.me/2015/11/23/adding-an-unreleased-commit-as-a-dependency as an example of a guide which recommends this method.
 --find-links git+https://github.com/dcos/dcos-test-utils.git@47825add34311ce12bebe6b6ff0993b6bee8295c#egg=dcos-test-utils-0.1
---find-links git+https://github.com/timaa2k/dcos-launch.git@open-cf-template-ports#egg=dcos-launch-0.1.0
+#--find-links git+https://github.com/timaa2k/dcos-launch.git@open-cf-template-ports#egg=dcos-launch-0.1.0
+--find-links git+https://github.com/dcos/dcos-launch.git@fad6d70caf282f7260d2d7af88f044ccfd64f8c7#egg=dcos-launch-0.1.0
 cryptography==2.1.4
 dcos-launch==0.1.0
 dcos-test-utils==0.1
