@@ -2,6 +2,7 @@ adam
 admin
 args
 aufs
+aws
 backend
 backends
 bootstrap
