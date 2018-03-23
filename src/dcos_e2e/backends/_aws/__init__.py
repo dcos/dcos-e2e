@@ -183,8 +183,8 @@ class AWSCluster(ClusterManager):
         raise NotImplementedError(message)
 
     def destroy(self) -> None:
-        if self.dcos_launcher:
-            self.dcos_launcher.delete()
+        if self.launcher:
+            self.launcher.delete()
 
     @property
     def masters(self) -> Set[Node]:
