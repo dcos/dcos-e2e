@@ -51,3 +51,19 @@ class TestAWSBackend:
             )
 
             import pdb; pdb.set_trace()
+
+            # TODO: Defintely to do before shipping
+            #0. Wait for SSH connections
+            #0. Extensive comments
+            #0. Update dcos-e2e
+            #1. Test running on Travis
+            #   - Add keys to Travis
+            #   - 100% test coverage
+            #   - Test install from Path
+            #2. CHANGELOG entry
+            #3. Initial documentation - doesn't work on Windows
+            #4. Vendor dcos-launch
+
+            # TODO: Nice to have
+            #Get Bilal to use it
+            #Get it to work with Windows
