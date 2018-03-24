@@ -20,6 +20,7 @@ class TestIsEnterprise:
         oss_artifact: Path,
         oss_1_11_artifact: Path,
         oss_1_10_artifact: Path,
+        oss_1_9_artifact: Path,
         tmpdir_factory: TempdirFactory,
     ) -> None:
         """
@@ -29,6 +30,7 @@ class TestIsEnterprise:
             oss_artifact,
             oss_1_11_artifact,
             oss_1_10_artifact,
+            oss_1_9_artifact,
         ]
 
         for artifact in artifacts:
@@ -44,6 +46,7 @@ class TestIsEnterprise:
         enterprise_artifact: Path,
         enterprise_1_11_artifact: Path,
         enterprise_1_10_artifact: Path,
+        enterprise_1_9_artifact: Path,
         tmpdir_factory: TempdirFactory,
     ) -> None:
         """
@@ -53,6 +56,7 @@ class TestIsEnterprise:
             enterprise_artifact,
             enterprise_1_11_artifact,
             enterprise_1_10_artifact,
+            enterprise_1_9_artifact,
         ]
 
         for artifact in artifacts:
