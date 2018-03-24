@@ -2,6 +2,11 @@
 Tests for utilities for the CLI.
 """
 
+import uuid
+from pathlib import Path
+
+from _pytest.tmpdir import TempdirFactory
+
 from cli._utils import is_enterprise
 
 
@@ -15,7 +20,7 @@ class TestIsEnterprise:
         oss_artifact: Path,
         oss_1_11_artifact: Path,
         oss_1_10_artifact: Path,
-        tmpdir: local,
+        tmpdir_factory: TempdirFactory,
     ) -> None:
         """
         ``False`` is returned when given a DC/OS OSS artifact.
@@ -27,6 +32,8 @@ class TestIsEnterprise:
         ]
 
         for artifact in artifacts:
+            random = uuid.uuid4().hex
+            workspace_dir = Path(str(tmpdir_factory.mktemp(random)))
             assert not is_enterprise(
                 build_artifact=artifact,
                 workspace_dir=workspace_dir,
@@ -41,5 +48,16 @@ class TestIsEnterprise:
         """
         ``True`` is returned when given a DC/OS Enterprise artifact.
         """
-        artifacts = []
-        pass
+        artifacts = [
+            enterprise_artifact,
+            enterprise_1_11_artifact,
+            enterprise_1_10_artifact,
+        ]
+
+        for artifact in artifacts:
+            random = uuid.uuid4().hex
+            workspace_dir = Path(str(tmpdir_factory.mktemp(random)))
+            assert is_enterprise(
+                build_artifact=artifact,
+                workspace_dir=workspace_dir,
+            )
