@@ -9,8 +9,8 @@ import pkg_resources
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-import dcos_test_utils
 import yaml
+from dcos_e2e._vendor import dcos_test_utils
 
 log = logging.getLogger(__name__)
 

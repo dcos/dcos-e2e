@@ -6,7 +6,7 @@ import os
 
 from ..dcos_launch import onprem, util
 from ..dcos_launch.platforms import gcp
-from dcos_test_utils.helpers import Host
+from dcos_e2e._vendor.dcos_test_utils.helpers import Host
 from googleapiclient.errors import HttpError
 
 log = logging.getLogger(__name__)
