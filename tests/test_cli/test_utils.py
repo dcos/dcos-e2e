@@ -44,6 +44,7 @@ class TestIsEnterprise:
         enterprise_artifact: Path,
         enterprise_1_11_artifact: Path,
         enterprise_1_10_artifact: Path,
+        tmpdir_factory: TempdirFactory,
     ) -> None:
         """
         ``True`` is returned when given a DC/OS Enterprise artifact.
