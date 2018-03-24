@@ -16,7 +16,11 @@ class TestAWSBackend:
     """
     Tests for functionality specific to the Docker backend.
     """
-    def test_distribution_not_supported(self, license_key_contents: str) -> None:
+
+    def test_distribution_not_supported(
+        self,
+        license_key_contents: str,
+    ) -> None:
         pass
 
     def test_run_integration_test(self, license_key_contents: str) -> None:
@@ -31,9 +35,7 @@ class TestAWSBackend:
             'security': 'strict',
         }
 
-        aws_backend = AWS(
-                workspace_dir=Path('/tmp')
-        )
+        aws_backend = AWS(workspace_dir=Path('/tmp'))
 
         with Cluster(
             cluster_backend=aws_backend,

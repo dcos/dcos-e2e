@@ -4,7 +4,6 @@ A DC/OS Launch backend for DC/OS E2E.
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from subprocess import CalledProcessError
 from tempfile import gettempdir
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Type
@@ -13,7 +12,6 @@ from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.aws import DcosCloudformationLauncher
 from dcos_e2e._vendor.dcos_launch.onprem import AbstractOnpremLauncher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
-
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node
