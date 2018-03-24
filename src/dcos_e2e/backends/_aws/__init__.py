@@ -117,7 +117,8 @@ class AWSCluster(ClusterManager):
 
         # Validate the preliminary dcos-launch config.
         validated_launch_config = config.get_validated_config(
-            launch_config, str(self._path)
+            launch_config,
+            str(self._path),
         )
 
         # Get a DcosCloudformationLauncher object

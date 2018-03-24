@@ -89,4 +89,4 @@ class TestAWSBackend:
             # vendoring:
             # pkg_resource('dcos_launch') -> ('dcos_e2e._vendor.dcos_launch')
             # config.py, util.py, platform/aws.py
-            #Idea is for it do use inspect rather than pkg_resource
+            # Idea is for it do use inspect rather than pkg_resource
