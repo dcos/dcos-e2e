@@ -177,35 +177,3 @@ class TestCoreOS:
             enterprise_artifact=enterprise_artifact,
             license_key_contents=license_key_contents,
         )
-
-
-class TestUbuntu1604:
-    """
-    Tests for the Ubuntu 16.04 distribution option.
-    """
-
-    def test_oss(
-        self,
-        oss_artifact: Path,
-    ) -> None:
-        """
-        DC/OS OSS can start up on Ubuntu 16.04.
-        """
-        _oss_distribution_test(
-            distribution=Distribution.UBUNTU_16_04,
-            oss_artifact=oss_artifact,
-        )
-
-    def test_enterprise(
-        self,
-        enterprise_artifact: Path,
-        license_key_contents: str,
-    ) -> None:
-        """
-        DC/OS Enterprise can start up on Ubuntu 16.04.
-        """
-        _enterprise_distribution_test(
-            distribution=Distribution.UBUNTU_16_04,
-            enterprise_artifact=enterprise_artifact,
-            license_key_contents=license_key_contents,
-        )
