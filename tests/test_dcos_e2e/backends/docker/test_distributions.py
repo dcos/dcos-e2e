@@ -30,7 +30,6 @@ def _get_node_distribution(node: Node) -> Distribution:
 
     distributions = {
         ('"centos"', '"7"'): Distribution.CENTOS_7,
-        ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
         ('coreos', '1298.7.0'): Distribution.COREOS,
     }
 
