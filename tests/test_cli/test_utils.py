@@ -2,6 +2,7 @@
 Tests for utilities for the CLI.
 """
 
+import shutil
 import uuid
 from pathlib import Path
 
@@ -40,6 +41,9 @@ class TestIsEnterprise:
                 build_artifact=artifact,
                 workspace_dir=workspace_dir,
             )
+            # We delete the workspace during the test so as not to use too much
+            # space for the test.
+            shutil.rmtree(path=str(workspace_dir))
 
     def test_enterprise(
         self,
@@ -66,3 +70,6 @@ class TestIsEnterprise:
                 build_artifact=artifact,
                 workspace_dir=workspace_dir,
             )
+            # We delete the workspace during the test so as not to use too much
+            # space for the test.
+            shutil.rmtree(path=str(workspace_dir))
