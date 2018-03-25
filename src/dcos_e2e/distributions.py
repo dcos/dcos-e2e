@@ -13,4 +13,4 @@ class Distribution(Enum):
     """
 
     CENTOS_7 = 1
-    COREOS = 3
+    COREOS = 2
