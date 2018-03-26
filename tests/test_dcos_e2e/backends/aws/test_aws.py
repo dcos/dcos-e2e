@@ -40,8 +40,8 @@ class TestAWSBackend:
 
     def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
         """
-        The AWS backend requires a build artifact URL in order
-        to launch a DC/OS cluster.
+        The AWS backend requires a build artifact URL in order to launch a
+        DC/OS cluster.
         """
         with Cluster(
             cluster_backend=AWS(),
@@ -61,7 +61,9 @@ class TestAWSBackend:
         assert str(excinfo.value) == expected_error
 
     def test_run_integration_test(self, license_key_contents: str) -> None:
-
+        """
+        It is possible to run DC/OS integration tests on AWS.
+        """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         config = {
