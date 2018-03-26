@@ -12,7 +12,6 @@ from dcos_e2e.docker_versions import DockerVersion
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
-    'ubuntu-16.04': Distribution.UBUNTU_16_04,
     'coreos': Distribution.COREOS,
 }
 
