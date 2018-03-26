@@ -37,7 +37,8 @@ class AWS(ClusterBackend):
         Args:
             aws_region: The AWS location to create nodes in. See
                 `Regions and Availability Zones`_.
-            admin_location: Closed thing.
+            admin_location: The IP address range from which the AWS nodes can
+                be accessed.
             linux_distribution: The Linux distribution to boot DC/OS on.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
@@ -45,6 +46,9 @@ class AWS(ClusterBackend):
                 :py:func:`tempfile.mkstemp`.
 
         Attributes:
+            linux_distribution: The Linux distribution to boot DC/OS on.
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
             aws_region: Open thing.
 
         .. _Regions and Availability Zones:
