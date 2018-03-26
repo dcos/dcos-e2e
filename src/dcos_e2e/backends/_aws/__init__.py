@@ -55,7 +55,7 @@ class AWS(ClusterBackend):
 
 
 class AWSCluster(ClusterManager):
-    # pylint: disable=too-many-arguments,super-init-not-called
+    # pylint: disable=super-init-not-called
     """
     A record of an AWS cluster.
     """

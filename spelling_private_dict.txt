@@ -108,4 +108,3 @@ yapf
 yml
 zookeeper
 AbstractLauncher
-AWS
