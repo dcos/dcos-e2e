@@ -49,7 +49,7 @@ Troubleshooting
 
 In case of an error during the DC/OS installation the journal from each node will be dumped and downloaded to the folder that the tests were executed in. The logs are prefixed with the installation phase that failed, ``preflight``, ``deploy`` or ``postflight``.
 
-When using temporary credentials it is required to pay attention that the credentials are still valid or renewed when deleting a cluster. If the credentials are not valid anymore the AWS backend fails to delete the private keypair generated at cluster creation.
+When using temporary credentials it is required to pay attention that the credentials are still valid or renewed when deleting a cluster. If the credentials are not valid anymore the AWS backend fails to delete the private key pair generated at cluster creation.
 It is therefore recommended to a periodically renew temporary AWS credentials when executing tests using the AWS backend.
 
 Reference
