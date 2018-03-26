@@ -43,7 +43,7 @@ class AWS(ClusterBackend):
             ).format(linux_distribution.name)
             raise NotImplementedError(message)
 
-        self._default_ssh_user = supported_distributions[linux_distribution]
+        self.default_ssh_user = supported_distributions[linux_distribution]
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
 
@@ -83,7 +83,7 @@ class AWSCluster(ClusterManager):
         self._path = Path(self._path) / unique
         Path(self._path).mkdir(exist_ok=True)
 
-        self._default_ssh_user = cluster_backend._default_ssh_user
+        self._default_ssh_user = cluster_backend.default_ssh_user
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
         self.cluster_info = {}  # type: Dict[str, Any]
@@ -125,7 +125,7 @@ class AWSCluster(ClusterManager):
         )
 
         # Get a DcosCloudformationLauncher object
-        self.launcher = get_launcher(validated_launch_config)
+        self.launcher = get_launcher(validated_launch_config)  # type: ignore
 
         # Create the AWS stack from the DcosCloudformationLauncher.
         # Update ``cluster_info`` with the AWS SSH key information.
@@ -134,10 +134,10 @@ class AWSCluster(ClusterManager):
         # Store the generated AWS SSH key to the file system.
         self._ssh_key_path = self._path / 'id_rsa'
         private_key = self.cluster_info['ssh_private_key']
-        self._ssh_key_path.write_bytes(private_key.encode())
+        Path(self._ssh_key_path).write_bytes(private_key.encode())
 
         # Wait for the AWS stack setup completion.
-        DcosCloudformationLauncher.wait(self.launcher)
+        DcosCloudformationLauncher.wait(self.launcher)  # type: ignore
 
         # Update the cluster_info with AWS stack information.
         # This makes node IP addresses available to ``cluster_info``.
@@ -161,7 +161,7 @@ class AWSCluster(ClusterManager):
         self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
 
         # The ``wait`` method starts the actual DC/OS installation process.
-        AbstractOnpremLauncher.wait(self.launcher)
+        AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
 
         # Update the cluster_info with post-install DC/OS information.
         # This enters the new DC/OS config information into ``cluster_info``.
