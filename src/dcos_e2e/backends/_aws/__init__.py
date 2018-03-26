@@ -67,6 +67,10 @@ class AWS(ClusterBackend):
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
+        """
+        Return the `ClusterManager` class to use to create and manage a
+        cluster.
+        """
         return AWSCluster
 
 
