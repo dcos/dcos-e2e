@@ -71,7 +71,7 @@ pyroma:
 
 .PHONY: vulture
 vulture:
-	vulture . --min-confidence 100 --exclude src/dcos_e2e/_vendor/
+	vulture --min-confidence 100 --exclude _vendor .
 
 .PHONY: linkcheck
 linkcheck:
