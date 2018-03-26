@@ -590,7 +590,7 @@ class DockerCluster(ClusterManager):
     @property
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`.node.Node` s.
         """
         return self._nodes(container_base_name=self._agent_prefix)
 

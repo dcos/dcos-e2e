@@ -203,6 +203,9 @@ class AWSCluster(ClusterManager):
 
     @property
     def masters(self) -> Set[Node]:
+        """
+        Return all DC/OS master :class:`.node.Node` s.
+        """
         nodes = set([])
         cluster_masters = list(self.cluster_info['masters'])
         for master in cluster_masters:
@@ -218,6 +221,9 @@ class AWSCluster(ClusterManager):
 
     @property
     def agents(self) -> Set[Node]:
+        """
+        Return all DC/OS agent :class:`.node.Node` s.
+        """
         nodes = set([])
         cluster_agents = list(self.cluster_info['private_agents'])
         for priv_agent in cluster_agents:
@@ -233,6 +239,9 @@ class AWSCluster(ClusterManager):
 
     @property
     def public_agents(self) -> Set[Node]:
+        """
+        Return all DC/OS public agent :class:`.node.Node` s.
+        """
         nodes = set([])
         cluster_public_agents = list(self.cluster_info['public_agents'])
         for pub_agent in cluster_public_agents:
