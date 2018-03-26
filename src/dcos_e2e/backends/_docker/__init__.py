@@ -433,10 +433,10 @@ class DockerCluster(ClusterManager):
             extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration of the Docker backend.
-            log_output_live: If `True`, log output of the installation live.
+            log_output_live: If ``True``, log output of the installation live.
 
         Raises:
-            NotImplementedError: `NotImplementedError` because the Docker
+            NotImplementedError: ``NotImplementedError`` because the Docker
                 backend does not support the DC/OS advanced installation
                 method.
         """
