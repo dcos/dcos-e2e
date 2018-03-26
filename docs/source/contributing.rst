@@ -158,7 +158,7 @@ To update these links use the following commands, after setting the following en
     travis env set --repo mesosphere/dcos-e2e EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
 
 Updating the Amazon Web Services credentials
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Private credentials for Amazon Web Services used by Travis CI.
 
