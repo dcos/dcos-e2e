@@ -17,7 +17,7 @@ The ``private_ip_address`` refers to the internal network of the AWS stack which
 The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
 
 Restricting access to a cluster
----------------------------------
+-------------------------------
 
 The AWS backend takes a parameter ``admin_location``.
 This parameter restricts the access to the AWS stack from the outside to a particular IP address range.
@@ -34,7 +34,7 @@ The AWS backend generates a key
 
 
 Cluster lifetime
-------------------
+----------------
 
 The cluster lifetime is fixed at a maximum of two hours.
 That is because of a limitation of ``dcos-launch`` which is used under the hood.
