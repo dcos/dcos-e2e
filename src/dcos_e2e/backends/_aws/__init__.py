@@ -35,10 +35,10 @@ class AWS(ClusterBackend):
         Create a configuration for an AWS cluster backend.
 
         Args:
-            aws_region: The AWS location to create nodes in. See
-                `Regions and Availability Zones`_.
             admin_location: The IP address range from which the AWS nodes can
                 be accessed.
+            aws_region: The AWS location to create nodes in. See
+                `Regions and Availability Zones`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
@@ -46,24 +46,21 @@ class AWS(ClusterBackend):
                 :py:func:`tempfile.mkstemp`.
 
         Attributes:
+            admin_location: The IP address range from which the AWS nodes can
+                be accessed.
+            aws_region: The AWS location to create nodes in. See
+                `Regions and Availability Zones`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
-            aws_region: Open thing.
 
         .. _Regions and Availability Zones:
             https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
         """
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
-
-        self.config = {
-            'platform': 'aws',
-            'provider': 'onprem',
-            'aws_region': aws_region,
-            'instance_type': 'm4.large',
-            'admin_location': admin_location,
-        }
+        self.aws_region = aws_region
+        self.admin_location = admin_location
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
@@ -119,17 +116,20 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'coreos',
         }
 
-        cluster_config = {
-            'launch_config_version': 1,
+        launch_config = {
+            'admin_location': cluster_backend.admin_location,
+            'aws_region': cluster_backend.aws_region,
             'deployment_name': unique,
+            'instance_type': 'm4.large',
+            'key_helper': True,
+            'launch_config_version': 1,
             'num_masters': masters,
             'num_private_agents': agents,
             'num_public_agents': public_agents,
             'os_name': aws_distros[cluster_backend.linux_distribution],
-            'key_helper': True,
+            'platform': 'aws',
+            'provider': 'onprem',
         }
-
-        launch_config = {**cluster_config, **cluster_backend.config}
 
         # First we create a preliminary dcos-config inside the
         # dcos-launch config to pass the config validation step.
