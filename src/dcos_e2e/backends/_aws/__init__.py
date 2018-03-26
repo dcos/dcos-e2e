@@ -1,6 +1,7 @@
 """
-A DC/OS Launch backend for DC/OS E2E.
+Helpers for creating and interacting with clusters on AWS.
 """
+
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -30,8 +31,23 @@ class AWS(ClusterBackend):
         workspace_dir: Optional[Path] = None,
     ) -> None:
         """
-        Create a configuration for a Docker cluster backend.
+        Create a configuration for an AWS cluster backend.
 
+        Args:
+            aws_region: The AWS location to create nodes in. See
+                `Regions and Availability Zones`_.
+            admin_location: Closed thing.
+            linux_distribution: The Linux distribution to boot DC/OS on.
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
+                This is equivalent to `dir` in
+                :py:func:`tempfile.mkstemp`.
+
+        Attributes:
+            aws_region: Open thing.
+
+        .. _Regions and Availability Zones:
+            https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
         """
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
