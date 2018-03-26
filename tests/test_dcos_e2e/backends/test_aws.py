@@ -49,7 +49,7 @@ class TestAWSBackend:
                 shell=True,
             )
 
-            result.stdout.decode() == 'centos\n'
+            assert result.stdout.decode() == 'centos\n'
 
             cluster.install_dcos_from_url(
                 build_artifact=os.environ['INSTALLER_URL'],
@@ -72,13 +72,14 @@ class TestAWSBackend:
                 log_output_live=True,
             )
 
-            # TODO: Defintely to do before shipping
+            # TODO: Definitely to do before shipping
             # #. Test running on Travis
             #   - 100% test coverage
             #   - Add keys to Travis
             #   - Test install from Path
             # #. Initial documentation - document that this does not work on
-            #    Windows, or how to get it to work with WSL
+            #    Windows, or how to get it to work with Windows Subsystem for
+            #    Linux.
 
             # TODO: Nice to have
             # Get Bilal to use it
@@ -86,7 +87,5 @@ class TestAWSBackend:
 
             # TODO: Vendoring
             # Change DC/OS Launch as there is an error on import after
-            # vendoring:
-            # pkg_resource('dcos_launch') -> ('dcos_e2e._vendor.dcos_launch')
-            # config.py, util.py, platform/aws.py
+            # vendoring.
             # Idea is for it do use inspect rather than pkg_resource

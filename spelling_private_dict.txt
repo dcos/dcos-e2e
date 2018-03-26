@@ -5,6 +5,7 @@ aufs
 aws
 backend
 backends
+bilal
 bootstrap
 breakpoint
 calledprocesserror
@@ -94,6 +95,7 @@ vagrantfile
 validator
 validators
 vendored
+vendoring
 versioning
 virtualization
 vm
