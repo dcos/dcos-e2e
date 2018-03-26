@@ -5,6 +5,7 @@ Helpers for creating and interacting with clusters on AWS.
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
+from shutil import rmtree
 from tempfile import gettempdir
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Type
@@ -198,8 +199,13 @@ class AWSCluster(ClusterManager):
         raise NotImplementedError(message)
 
     def destroy(self) -> None:
+        """
+        Destroy all nodes in the cluster.
+        """
         if self.launcher:
             self.launcher.delete()
+
+        rmtree(path=str(self._path), ignore_errors=True)
 
     @property
     def masters(self) -> Set[Node]:
