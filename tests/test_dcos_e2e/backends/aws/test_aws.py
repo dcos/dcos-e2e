@@ -6,22 +6,54 @@ import os
 import uuid
 from pathlib import Path
 
+import pytest
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
 
 
 class TestAWSBackend:
     """
-    Tests for functionality specific to the Docker backend.
+    Tests for functionality specific to the AWS backend.
     """
 
     def test_distribution_not_supported(
         self,
-        license_key_contents: str,
+        oss_artifact_url: str,
     ) -> None:
-        pass
+        with pytest.raises(NotImplementedError) as excinfo:
+            AWS(linux_distribution=Distribution.UBUNTU_16_04)
+
+        expected_error = (
+            'Linux distribution UBUNTU_16_04 is not supported '
+            'by the AWS backend.'
+        )
+
+        assert str(excinfo.value) == expected_error
+
+    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
+        """
+        The AWS backend requires a build artifact URL in order
+        to launch a DC/OS cluster.
+        """
+        with Cluster(
+            cluster_backend=AWS(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            with pytest.raises(NotImplementedError) as excinfo:
+                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+
+        expected_error = (
+            'The AWS backend does not support the installation of build '
+            'artifacts passed via path. This is because a more efficient'
+            'installation method exists in ``install_dcos_from_url``.'
+        )
+
+        assert str(excinfo.value) == expected_error
 
     def test_run_integration_test(self, license_key_contents: str) -> None:
 
@@ -72,11 +104,12 @@ class TestAWSBackend:
                 log_output_live=True,
             )
 
+
+
             # TODO: Defintely to do before shipping
             # #. Test running on Travis
             #   - 100% test coverage
             #   - Add keys to Travis
-            #   - Test install from Path
             # #. Initial documentation - document that this does not work on
             #    Windows, or how to get it to work with WSL
 

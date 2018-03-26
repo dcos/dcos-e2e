@@ -38,7 +38,10 @@ class AWS(ClusterBackend):
             Distribution.COREOS: 'core',
         }
         if linux_distribution not in supported_distributions.keys():
-            raise NotImplementedError
+            message = (
+                'Linux distribution {} is not supported by the AWS backend.'
+            ).format(linux_distribution.name)
+            raise NotImplementedError(message)
 
         self._default_ssh_user = supported_distributions[linux_distribution]
         self.workspace_dir = workspace_dir or Path(gettempdir())
@@ -171,9 +174,9 @@ class AWSCluster(ClusterManager):
         log_output_live: bool,
     ) -> None:
         message = (
-            'The DC/OS Launch backend does not support the installation of '
-            'build artifacts passed via a path. This is because a more '
-            'efficient installation method exists in `install_dcos_from_url`.'
+            'The AWS backend does not support the installation of build '
+            'artifacts passed via path. This is because a more efficient'
+            'installation method exists in ``install_dcos_from_url``.'
         )
         raise NotImplementedError(message)
 

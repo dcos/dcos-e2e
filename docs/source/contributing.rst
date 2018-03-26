@@ -155,6 +155,21 @@ To update these links use the following commands, after setting the following en
     travis env set --repo mesosphere/dcos-e2e EE_1_10_ARTIFACT_URL $EE_1_10_ARTIFACT_URL
     travis env set --repo mesosphere/dcos-e2e EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
 
+Updating the Amazon Web Services credentials
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Private credentials for Amazon Web Services used by Travis CI.
+
+To update the credentials use the following commands, after setting the following environment variables:
+
+* ``AWS_ACCESS_KEY_ID``
+* ``AWS_SECRET_ACCESS_KEY``
+
+.. code:: sh
+
+    travis env set --repo mesosphere/dcos-e2e AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+    travis env set --repo mesosphere/dcos-e2e AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
+
 Parallel builders
 ~~~~~~~~~~~~~~~~~
 
@@ -195,7 +210,7 @@ This repository aims to maintain high standards in terms of coding quality and q
 Untied to a particular backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Currently only DC/OS Docker is supported.
+Currently dcos-e2e supports an AWS and Docker backend.
 However, it is intended that multiple backends can be supported.
 See "New Backends" for details.
 

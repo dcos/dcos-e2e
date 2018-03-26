@@ -11,6 +11,7 @@ It includes a library which is focused on helping you to write tests which requi
    installation
    getting-started
    cluster
+   aws-backend
    docker-backend
    node
    enterprise
