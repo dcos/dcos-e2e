@@ -1,6 +1,7 @@
 """
 Helpers for running tests with `pytest`.
 """
+import os
 from pathlib import Path
 
 import pytest
@@ -86,6 +87,14 @@ def oss_artifact_url() -> str:
     Return the url to a build artifact for DC/OS OSS.
     """
     return 'https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh'
+
+
+@pytest.fixture(scope='session')
+def ee_artifact_url() -> str:
+    """
+    Return the url to a build artifact for DC/OS OSS.
+    """
+    return os.environ['EE_MASTER_ARTIFACT_URL']
 
 
 @pytest.fixture(scope='session')

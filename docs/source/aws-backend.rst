@@ -14,6 +14,18 @@ This is because the installation method employs a bootstrap node that directly d
 
 ``Node``\ s of ``Cluster``\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``. The ``private_ip_address`` refers to the internal network of the AWS stack which is also used by DC/OS internally. The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
 
+AWS Regions
+-----------
+
+When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster should be launched. It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
+
+* ``us-west-1`` US East (North California)
+* ``us-west-2`` US East (Oregon)
+* ``us-east-1`` US East (North Virginia)
+* ``us-east-2`` US East (Ohio)
+* ``eu-cental-1`` EU (Frankfurt)
+* ``eu-west-1`` EU (Ireland)
+
 Restricting access to a cluster
 ---------------------------------
 

@@ -162,7 +162,10 @@ class AWSCluster(ClusterManager):
         self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
 
         # The ``wait`` method starts the actual DC/OS installation process.
-        AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
+        try:
+            AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
+        except (KeyboardInterrupt, Exception):
+            self.destroy()
 
         # Update the cluster_info with post-install DC/OS information.
         # This enters the new DC/OS config information into ``cluster_info``.

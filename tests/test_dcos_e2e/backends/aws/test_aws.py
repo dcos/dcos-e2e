@@ -2,7 +2,6 @@
 Tests for the Docker backend.
 """
 
-import os
 import uuid
 from pathlib import Path
 
@@ -61,7 +60,13 @@ class TestAWSBackend:
 
         assert str(excinfo.value) == expected_error
 
-    def test_run_integration_test(self, license_key_contents: str) -> None:
+    @pytest.mark.parametrize('linux_distribution', list(Distribution))
+    def test_run_enterprise_integration_test(
+        self,
+        ee_artifact_url: str,
+        license_key_contents: str,
+        linux_distribution: Distribution,
+    ) -> None:
 
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
@@ -73,24 +78,22 @@ class TestAWSBackend:
             'security': 'strict',
         }
 
-        aws_backend = AWS(workspace_dir=Path('/tmp'))
-
         with Cluster(
-            cluster_backend=aws_backend,
+            cluster_backend=AWS(linux_distribution=linux_distribution),
             masters=1,
         ) as cluster:
 
             (master, ) = cluster.masters
 
             result = master.run(
-                args=['echo', '$USER'],
+                args=['echo', 'test'],
                 shell=True,
             )
 
-            assert result.stdout.decode() == 'centos\n'
+            assert result.stdout.decode() == 'test\n'
 
             cluster.install_dcos_from_url(
-                build_artifact=os.environ['INSTALLER_URL'],
+                build_artifact=ee_artifact_url,
                 extra_config=config,
                 log_output_live=True,
             )
@@ -112,6 +115,7 @@ class TestAWSBackend:
 
             # #. Test running on Travis
             #   - Add keys to Travis
+            #   - Add EE_ARTIFACT_URL to travis
 
             # Nice to have:
             # Get Bilal to use it
