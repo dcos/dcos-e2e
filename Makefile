@@ -1,14 +1,17 @@
 SHELL := /bin/bash -euxo pipefail
 
 OSS_MASTER_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+OSS_1_9_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.9/dcos_generate_config.sh
 OSS_1_10_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.10/dcos_generate_config.sh
 OSS_1_11_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.11/dcos_generate_config.sh
 
 OSS_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.sh
+OSS_1_9_ARTIFACT_PATH := /tmp/dcos_generate_config_1_9.sh
 OSS_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.sh
 OSS_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.sh
 
 EE_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
+EE_1_9_ARTIFACT_PATH := /tmp/dcos_generate_config_1_9.ee.sh
 EE_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.ee.sh
 EE_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.ee.sh
 
@@ -18,13 +21,13 @@ SPHINXOPTS := -W
 .PHONY: yapf
 yapf:
 	yapf \
-	    --diff \
-	    --recursive \
-	    --exclude src/dcos_e2e/_vendor \
-	    --exclude src/dcos_e2e/_version.py \
-	    --exclude release/ \
-	    --exclude versioneer.py \
-	    .
+			--diff \
+			--recursive \
+			--exclude src/dcos_e2e/_vendor \
+			--exclude src/dcos_e2e/_version.py \
+			--exclude release/ \
+			--exclude versioneer.py \
+			.
 
 .PHONY: mypy
 mypy:
@@ -68,7 +71,7 @@ pyroma:
 
 .PHONY: vulture
 vulture:
-	vulture --min-confidence 100 --exclude _vendor .
+	vulture . --min-confidence 100 --exclude src/dcos_e2e/_vendor/
 
 .PHONY: linkcheck
 linkcheck:
@@ -83,20 +86,20 @@ spelling:
 # We put each one in a different target so that we can run these in parallel with --jobs
 .PHONY: lint
 lint: \
-    check-manifest \
-    doc8 \
-    flake8 \
-    isort \
-    linkcheck \
-    mypy \
-    pip-extra-reqs \
-    pip-missing-reqs \
-    pydocstyle \
-    pylint \
-    pyroma \
-    spelling \
-    vulture \
-    yapf
+		check-manifest \
+		doc8 \
+		flake8 \
+		isort \
+		linkcheck \
+		mypy \
+		pip-extra-reqs \
+		pip-missing-reqs \
+		pydocstyle \
+		pylint \
+		pyroma \
+		spelling \
+		vulture \
+		yapf
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
@@ -109,20 +112,20 @@ clean:
 .PHONY: fix-lint
 fix-lint:
 	autoflake \
-	    --in-place \
-	    --recursive \
-	    --remove-all-unused-imports \
-	    --remove-unused-variables \
-	    --expand-star-imports \
-	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py,release \
-	    .
+			--in-place \
+			--recursive \
+			--remove-all-unused-imports \
+			--remove-unused-variables \
+			--expand-star-imports \
+			--exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py,release \
+			.
 	yapf \
-	    --in-place \
-	    --recursive \
-	    --exclude src/dcos_e2e/_vendor \
-	    --exclude src/dcos_e2e/_version.py \
-	    --exclude versioneer.py \
-	    .
+			--in-place \
+			--recursive \
+			--exclude src/dcos_e2e/_vendor \
+			--exclude src/dcos_e2e/_version.py \
+			--exclude versioneer.py \
+			.
 	isort --recursive --apply
 
 .PHONY: clean-artifacts
@@ -133,9 +136,11 @@ clean-artifacts:
 .PHONY: download-artifacts
 download-artifacts:
 	curl -o $(OSS_MASTER_ARTIFACT_PATH) $(OSS_MASTER_ARTIFACT_URL)
+	curl -o $(OSS_1_9_ARTIFACT_PATH) $(OSS_1_9_ARTIFACT_URL)
 	curl -o $(OSS_1_10_ARTIFACT_PATH) $(OSS_1_10_ARTIFACT_URL)
 	curl -o $(OSS_1_11_ARTIFACT_PATH) $(OSS_1_11_ARTIFACT_URL)
 	if [ -n "$(EE_MASTER_ARTIFACT_URL)" ]; then curl -o $(EE_MASTER_ARTIFACT_PATH) $(EE_MASTER_ARTIFACT_URL); fi
+	if [ -n "$(EE_1_9_ARTIFACT_URL)" ]; then curl -o $(EE_1_9_ARTIFACT_PATH) $(EE_1_9_ARTIFACT_URL); fi
 	if [ -n "$(EE_1_10_ARTIFACT_URL)" ]; then curl -o $(EE_1_10_ARTIFACT_PATH) $(EE_1_10_ARTIFACT_URL); fi
 	if [ -n "$(EE_1_11_ARTIFACT_URL)" ]; then curl -o $(EE_1_11_ARTIFACT_PATH) $(EE_1_11_ARTIFACT_URL); fi
 
