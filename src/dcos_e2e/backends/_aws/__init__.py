@@ -50,11 +50,6 @@ class AWS(ClusterBackend):
         .. _Regions and Availability Zones:
             https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
         """
-        ssh_user = {
-            Distribution.CENTOS_7: 'centos',
-            Distribution.COREOS: 'core',
-        }
-        self.default_ssh_user = ssh_user[linux_distribution]
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
 
@@ -101,7 +96,12 @@ class AWSCluster(ClusterManager):
         self._path = Path(self._path) / unique
         Path(self._path).mkdir(exist_ok=True)
 
-        self._default_ssh_user = cluster_backend.default_ssh_user
+        ssh_user = {
+            Distribution.CENTOS_7: 'centos',
+            Distribution.COREOS: 'core',
+        }
+        self._default_ssh_user = ssh_user[cluster_backend.linux_distribution]
+
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
         self.cluster_info = {}  # type: Dict[str, Any]
