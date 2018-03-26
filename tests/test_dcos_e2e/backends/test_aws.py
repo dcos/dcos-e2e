@@ -72,7 +72,7 @@ class TestAWSBackend:
                 log_output_live=True,
             )
 
-            # TODO: Definitely to do before shipping
+            # Definitely to do before shipping:
             # #. Test running on Travis
             #   - 100% test coverage
             #   - Add keys to Travis
@@ -81,11 +81,11 @@ class TestAWSBackend:
             #    Windows, or how to get it to work with Windows Subsystem for
             #    Linux.
 
-            # TODO: Nice to have
+            # Nice to have:
             # Get Bilal to use it
             # Get it to work with Windows
 
-            # TODO: Vendoring
+            # Vendoring:
             # Change DC/OS Launch as there is an error on import after
             # vendoring.
             # Idea is for it do use inspect rather than pkg_resource
