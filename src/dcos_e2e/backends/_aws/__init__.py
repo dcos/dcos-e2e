@@ -40,7 +40,7 @@ class AWS(ClusterBackend):
         if linux_distribution not in supported_distributions.keys():
             raise NotImplementedError
 
-        self._default_ssh_user = supported_distributions[linux_distribution]
+        self.default_ssh_user = supported_distributions[linux_distribution]
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
 
@@ -80,7 +80,7 @@ class AWSCluster(ClusterManager):
         self._path = Path(self._path) / unique
         Path(self._path).mkdir(exist_ok=True)
 
-        self._default_ssh_user = cluster_backend._default_ssh_user
+        self._default_ssh_user = cluster_backend.default_ssh_user
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
         self.cluster_info = {}  # type: Dict[str, Any]
