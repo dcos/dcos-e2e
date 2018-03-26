@@ -29,6 +29,7 @@ Accessing a cluster
 
 SSH is used to access cluster nodes.
 The ``dcos-e2e`` testing environment provides tools to run commands on clusters.
+
 However, for debugging purposes, it may be desirable to access a cluster node manually.
 The AWS backend generates a key
 
