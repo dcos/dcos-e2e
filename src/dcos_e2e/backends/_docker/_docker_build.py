@@ -18,7 +18,6 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     """
     dcos_docker_distros = {
         Distribution.CENTOS_7: 'centos-7',
-        Distribution.UBUNTU_16_04: 'ubuntu-xenial',
         Distribution.COREOS: 'coreos',
     }
 

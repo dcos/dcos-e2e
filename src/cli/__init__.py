@@ -58,6 +58,7 @@ from ._doctor_checks import (
     check_storage_driver,
     link_to_troubleshooting,
 )
+from ._utils import is_enterprise
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
@@ -129,30 +130,6 @@ class _InspectView:
         Return dictionary with information to be shown to users.
         """
         return {'docker_container_name': self._container.name}
-
-
-def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
-    """
-    Return whether the build artifact is an Enterprise artifact.
-    """
-    get_version_args = [
-        'bash',
-        str(build_artifact),
-        '--version',
-    ]
-    result = subprocess.check_output(
-        args=get_version_args,
-        cwd=str(workspace_dir),
-        stderr=subprocess.PIPE,
-    )
-
-    # In some cases, the name of the generated file is included in the output.
-    result = result.decode()
-    if '.tar\n' in result:
-        result = result.split('.tar\n')[1]
-    version_info = json.loads(result)
-    variant = version_info['variant']
-    return bool(variant == 'ee')
 
 
 def _set_logging(
@@ -384,7 +361,7 @@ def create(
 
     artifact_path = Path(artifact).resolve()
     try:
-        enterprise = _is_enterprise(
+        enterprise = is_enterprise(
             build_artifact=artifact_path,
             workspace_dir=workspace_dir,
         )
