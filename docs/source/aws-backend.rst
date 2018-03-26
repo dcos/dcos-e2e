@@ -12,12 +12,17 @@ DC/OS Installation
 
 This is because the installation method employs a bootstrap node that directly downloads the ``build_artifact`` from the specified URL.
 
-``Node``\ s of ``Cluster``\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``. The ``private_ip_address`` refers to the internal network of the AWS stack which is also used by DC/OS internally. The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
+``Node``\ s of ``Cluster``\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``.
+The ``private_ip_address`` refers to the internal network of the AWS stack which is also used by DC/OS internally.
+The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
 
 Restricting access to a cluster
 ---------------------------------
 
-The AWS backend takes a parameter ``admin_location``. This parameter restricts the access to the AWS stack from the outside to a particular IP address range. The default value ``'0.0.0.0/0'`` will allow accessing the cluster from anywhere. It is recommended to restrict the IP address range to the public IP of the machine executing tests with the AWS backend.
+The AWS backend takes a parameter ``admin_location``.
+This parameter restricts the access to the AWS stack from the outside to a particular IP address range.
+The default value ``'0.0.0.0/0'`` will allow accessing the cluster from anywhere.
+It is recommended to restrict the IP address range to the public IP of the machine executing tests with the AWS backend.
 
 Accessing a cluster
 -------------------

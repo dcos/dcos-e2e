@@ -8,14 +8,15 @@ An Amazon Web Services account with sufficient funds must be available.
 
 The AWS credentials for the account must be present either in the environment as environment variables or in the default file system location under ``~/.aws/credentials``.
 
-The Mesosphere internal AWS tool ``maws`` automatically stores account specific temporary AWS credentials in the default file system location. After logging in with ``maws`` clusters can be launched using the AWS backend.
+The Mesosphere internal AWS tool ``maws`` automatically stores account specific temporary AWS credentials in the default file system location.
+After logging in with ``maws`` clusters can be launched using the AWS backend.
 
-
-For CI deployments long lived credentials are preferred. It is recommended to use the environment variables method for AWS credentials in that case.
+For CI deployments long lived credentials are preferred.
+It is recommended to use the environment variables method for AWS credentials in that case.
 
 The environment variables are set as follows:
 
-.. code::
+.. code:: sh
 
    export AWS_ACCESS_KEY_ID=<aws_access_key_id>
    export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
