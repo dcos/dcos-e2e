@@ -134,7 +134,7 @@ class AWSCluster(ClusterManager):
 
         # Supply a valid URL to the preliminary config.
         # This is replaced later before the DC/OS installation.
-        launch_config['installer_url'] = 'https://google.com'
+        launch_config['installer_url'] = 'https://example.com'
 
         # Validate the preliminary dcos-launch config.
         validated_launch_config = config.get_validated_config(
