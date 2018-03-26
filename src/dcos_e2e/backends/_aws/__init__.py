@@ -146,12 +146,14 @@ class AWSCluster(ClusterManager):
 
         # Validate the preliminary dcos-launch config.
         validated_launch_config = config.get_validated_config(
-            launch_config,
-            str(self._path),
+            user_config=launch_config,
+            config_dir=str(self._path),
         )
 
         # Get a DcosCloudformationLauncher object
-        self.launcher = get_launcher(validated_launch_config)  # type: ignore
+        self.launcher = get_launcher(  # type: ignore
+            config=validated_launch_config,
+        )
 
         # Create the AWS stack from the DcosCloudformationLauncher.
         # Update ``cluster_info`` with the AWS SSH key information.
