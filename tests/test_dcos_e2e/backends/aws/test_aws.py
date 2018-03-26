@@ -19,15 +19,21 @@ class TestAWSBackend:
     Tests for functionality specific to the AWS backend.
     """
 
-    def test_distribution_not_supported(
+    def test_copy_to_installer_not_supported(
         self,
         oss_artifact_url: str,
     ) -> None:
+        """
+        The AWS backend does not support copying files to the installer.
+        """
         with pytest.raises(NotImplementedError) as excinfo:
-            AWS(linux_distribution=Distribution.UBUNTU_16_04)
+            Cluster(
+                cluster_backend=AWS(),
+                files_to_copy_to_installer={Path('/'): Path('/')}
+            )
 
         expected_error = (
-            'Linux distribution UBUNTU_16_04 is not supported '
+            'Copying files to the installer is currently not supported '
             'by the AWS backend.'
         )
 

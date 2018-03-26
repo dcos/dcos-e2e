@@ -33,17 +33,11 @@ class AWS(ClusterBackend):
         Create a configuration for a Docker cluster backend.
 
         """
-        supported_distributions = {
+        ssh_user = {
             Distribution.CENTOS_7: 'centos',
             Distribution.COREOS: 'core',
         }
-        if linux_distribution not in supported_distributions.keys():
-            message = (
-                'Linux distribution {} is not supported by the AWS backend.'
-            ).format(linux_distribution.name)
-            raise NotImplementedError(message)
-
-        self.default_ssh_user = supported_distributions[linux_distribution]
+        self.default_ssh_user = ssh_user[linux_distribution]
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
 
@@ -74,6 +68,13 @@ class AWSCluster(ClusterManager):
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: AWS,
     ) -> None:
+
+        if files_to_copy_to_installer:
+            message = (
+                'Copying files to the installer is currently not supported '
+                'by the AWS backend.'
+            )
+            raise NotImplementedError(message)
 
         unique = 'dcos-e2e-{}'.format(str(uuid.uuid4()))
 
