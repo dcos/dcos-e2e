@@ -32,6 +32,8 @@ env:
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
   - TEST_PATTERN=tests/test_dcos_e2e/test_node.py::TestNode
+  - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_oss
+  - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test110::test_oss
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111::test_oss
