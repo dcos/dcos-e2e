@@ -229,6 +229,7 @@ Update the SHA in ``src/vendorize.toml``.
     rm -rf src/dcos_e2e/_vendor/*
     cd src/
     python-vendorize
+    python admin/update_launch.py
     git add dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
