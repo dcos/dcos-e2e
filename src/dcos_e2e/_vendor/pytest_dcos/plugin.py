@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from ..dcos_test_utils import dcos_api, enterprise, logger
+from dcos_test_utils import dcos_api, enterprise, logger
 
 logger.setup(os.getenv('LOG_LEVEL', 'DEBUG'))
 
