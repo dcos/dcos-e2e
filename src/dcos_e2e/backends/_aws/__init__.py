@@ -179,15 +179,21 @@ class AWSCluster(ClusterManager):
         log_output_live: bool,
     ) -> None:
         """
+        Install DC/OS from a URL.
+
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration of the AWS backend.
-            log_output_live: If `True`, log output of the installation live.
-        """
+            log_output_live: If ``True``, log output of the installation live.
 
+        Raises:
+            NotImplementedError: ``NotImplementedError`` because the Docker
+                backend does not support the DC/OS advanced installation
+                method.
+        """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
@@ -210,6 +216,22 @@ class AWSCluster(ClusterManager):
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
+        """
+        Install DC/OS from a given build artifact. This is not supported and
+        simply raises a his is not supported and simply raises a
+        ``NotImplementedError``.
+
+        Args:
+            build_artifact: The ``Path`` to a build artifact to install DC/OS
+                from.
+            extra_config: May contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration of the AWS backend.
+            log_output_live: If ``True``, log output of the installation live.
+
+        Raises:
+            CalledProcessError: There was an error installing DC/OS on a node.
+        """
         message = (
             'The AWS backend does not support the installation of build '
             'artifacts passed via path. This is because a more efficient'
