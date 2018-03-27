@@ -12,7 +12,7 @@ DC/OS Installation
 
 This is because the installation method employs a bootstrap node that directly downloads the ``build_artifact`` from the specified URL.
 
-:py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``.
+:py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the :py:class:`~dcos_e2e.backends.AWS` backend distinguish between ``public_ip_address`` and ``private_ip_address``.
 The ``private_ip_address`` refers to the internal network of the AWS stack which is also used by DC/OS internally.
 The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
 
@@ -40,7 +40,7 @@ SSH can be used to access cluster nodes for the purpose of debugging if ``worksp
 The AWS backend generates a key in the ``workspace_dir`` directory under ``ssh/id_rsa``.
 Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
 The SSH user depends on the ``linux_distribution`` given to the AWS backend.
-For ``CENTOS_7`` that is ``centos``, for ``COREOS`` it is ``core``.
+For :py:obj:`~dcos_e2e.distributions.Distribution.CENTOS_7` that is ``centos``, for :py:obj:`~dcos_e2e.distributions.Distribution.COREOS` it is ``core``.
 
 It is important to keep in mind that ``workspace_dir`` is a temporary directory and therefore will be cleaned up after the test.
 If ``workspace_dir`` is unset the AWS backend will create a new temporary directory in an operating system specific location.
