@@ -111,8 +111,7 @@ class TestAWSBackend:
                 log_output_live=True,
             )
 
-            # #. Test running on Travis
-            #   - Add keys to Travis
+            # Test running on Travis
 
             # Nice to have:
             # Get Bilal to use it
@@ -122,3 +121,6 @@ class TestAWSBackend:
             # Change DC/OS Launch as there is an error on import after
             # vendoring.
             # Idea is for it do use inspect rather than pkg_resource
+            #
+            # Make a script which uses python-vendorize internals to remap the
+            # dcos-test-utils imports.

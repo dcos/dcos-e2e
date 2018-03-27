@@ -203,11 +203,6 @@ class AWSCluster(ClusterManager):
                 variables that are applied on top of the default DC/OS
                 configuration of the AWS backend.
             log_output_live: If ``True``, log output of the installation live.
-
-        Raises:
-            NotImplementedError: ``NotImplementedError`` because the Docker
-                backend does not support the DC/OS advanced installation
-                method.
         """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
@@ -245,7 +240,9 @@ class AWSCluster(ClusterManager):
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
-            CalledProcessError: There was an error installing DC/OS on a node.
+            NotImplementedError: ``NotImplementedError`` because the AWS
+                backend does not support the DC/OS advanced installation
+                method.
         """
         message = (
             'The AWS backend does not support the installation of build '
