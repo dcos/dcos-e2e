@@ -18,10 +18,7 @@ class TestAWSBackend:
     Tests for functionality specific to the AWS backend.
     """
 
-    def test_copy_to_installer_not_supported(
-        self,
-        oss_artifact_url: str,
-    ) -> None:
+    def test_copy_to_installer_not_supported(self) -> None:
         """
         The AWS backend does not support copying files to the installer.
         """
@@ -113,6 +110,7 @@ class TestAWSBackend:
 
             # Test running on Travis
             # Document how to run tests locally.
+            # Why not self.launcher.wait?
 
             # Nice to have:
             # Get Bilal to use it
