@@ -1,5 +1,5 @@
 AWS Backend
-==============
+===========
 
 The AWS backend is used to spin up clusters using EC2 instances on Amazon Web Services, where each instance is a DC/OS node.
 
@@ -39,7 +39,7 @@ It is recommended to restrict the address range to a subnet including the public
 For example ``<external-ip>/24``.
 
 Accessing cluster nodes
--------------------------
+-----------------------
 
 SSH can be used to access cluster nodes for the purpose of debugging.
 The AWS backend generates a key in the ``workspace_dir`` directory under ``ssh/id_rsa``.
