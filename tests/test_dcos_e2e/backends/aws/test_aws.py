@@ -4,12 +4,13 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
+from typing import Set
 
 import pytest
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import AWS
-from dcos_e2e.cluster import Cluster
+from dcos_e2e.cluster import Cluster, Node
 from dcos_e2e.distributions import Distribution
 
 
@@ -102,12 +103,23 @@ class TestAWSBackend:
                 superuser_password=superuser_password,
             )
 
+            def private_hosts(nodes: Set[Node]) -> str:
+                return ','.join([str(node.private_ip_address)
+                                 for node in nodes])
+
+            master_ip = next(iter(cluster.masters)).private_ip_address
+
             # No error is raised with a successful command.
             cluster.run_integration_tests(
                 pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
                 env={
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
+                    'DCOS_SSL_ENABLED': 'true',
+                    'MASTER_HOSTS': private_hosts(cluster.masters),
+                    'SLAVE_HOSTS': private_hosts(cluster.agents),
+                    'PUBLIC_SLAVE_HOSTS': private_hosts(cluster.public_agents),
+                    'DCOS_DNS_ADDRESS': 'https://' + str(master_ip),
                 },
                 log_output_live=True,
             )

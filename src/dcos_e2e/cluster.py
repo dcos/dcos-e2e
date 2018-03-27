@@ -22,14 +22,14 @@ from .node import Node
 @retry(
     exceptions=(subprocess.CalledProcessError),
     tries=60,
-    delay=1,
+    delay=5,
 )
 def _wait_for_ssh(node: Node) -> None:
     """
     Retry for up to one minute (arbitrary) until SSH is available on the given
     node.
     """
-    node.run(args=['echo'])
+    node.run(args=['pwd'], log_output_live=True)
 
 
 class Cluster(ContextDecorator):
