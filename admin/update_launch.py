@@ -7,7 +7,7 @@ python -c 'import dcos_e2e._vendor.dcos_launch'
 import vendorize
 
 
-def main():
+def test_main():
     package_path = 'src/dcos_e2e/_vendor/dcos_launch'
     top_level_names = ['dcos_test_utils']
     vendorize._rewrite_imports_in_package(package_path, top_level_names, depth=1)
