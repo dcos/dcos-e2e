@@ -19,7 +19,8 @@ The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside
 AWS Regions
 -----------
 
-When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched. It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
+When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched.
+It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
 
 * ``us-west-1`` US East (North California)
 * ``us-west-2`` US East (Oregon)
@@ -31,14 +32,21 @@ When launching a cluster with Amazon Web Services there are a number of differen
 Restricting access to the cluster
 ---------------------------------
 
-The AWS backend takes a parameter ``admin_location``. This parameter restricts the access to the AWS stack from the outside to a particular IP address range. The default value ``'0.0.0.0/0'`` will allow accessing the cluster from anywhere. It is recommended to restrict the address range to a subnet including the public IP of the machine executing tests with the AWS backend. For example ``<external-ip>/24``.
+The AWS backend takes a parameter ``admin_location``. This parameter restricts the access to the AWS stack from the outside to a particular IP address range.
+The default value ``'0.0.0.0/0'`` will allow accessing the cluster from anywhere.
+It is recommended to restrict the address range to a subnet including the public IP of the machine executing tests with the AWS backend.
+For example ``<external-ip>/24``.
 
 Accessing cluster nodes
 -------------------------
 
-SSH can be used to access cluster nodes for the purpose of debugging. The AWS backend generates a key in the ``workspace_dir`` directory under ``ssh/id_rsa``. Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command. The SSH user depends on the ``linux_distribution`` given to the AWS backend. For ``CENTOS_7`` that is ``centos``, for ``COREOS`` it is ``core``.
+SSH can be used to access cluster nodes for the purpose of debugging.
+The AWS backend generates a key in the ``workspace_dir`` directory under ``ssh/id_rsa``. Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
+The SSH user depends on the ``linux_distribution`` given to the AWS backend.
+For ``CENTOS_7`` that is ``centos``, for ``COREOS`` it is ``core``.
 
-It is important to keep in mind that ``workspace_dir`` is a temporary directory and therefore will be cleaned up after the test. If ``workspace_dir`` is unset the AWS backend will create a new temporary directory in a operating system specific location.
+It is important to keep in mind that ``workspace_dir`` is a temporary directory and therefore will be cleaned up after the test.
+If ``workspace_dir`` is unset the AWS backend will create a new temporary directory in a operating system specific location.
 
 Cluster lifetime
 ----------------

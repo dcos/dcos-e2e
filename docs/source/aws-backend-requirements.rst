@@ -22,8 +22,7 @@ The environment variables are set as follows:
    export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>
 
 
-The EC2 instances launched by the AWS backend will bring about costs in the order of
-24 ct per instance, assuming the fixed cluster lifetime of two hours and ``m4.large`` EC2 instances.
+The EC2 instances launched by the AWS backend will bring about costs in the order of 24 ct per instance, assuming the fixed cluster lifetime of two hours and ``m4.large`` EC2 instances.
 
 ``ssh``
 ~~~~~~~
