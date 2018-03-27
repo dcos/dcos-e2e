@@ -14,9 +14,9 @@ from dcos_e2e.cluster import Cluster, Node
 from dcos_e2e.distributions import Distribution
 
 
-class TestAWSBackend:
+class TestUnsupported:
     """
-    Tests for functionality specific to the AWS backend.
+    Tests for unsupported functionality specific to the AWS backend.
     """
 
     def test_copy_to_installer_not_supported(self) -> None:
@@ -57,6 +57,12 @@ class TestAWSBackend:
         )
 
         assert str(excinfo.value) == expected_error
+
+
+class TestRunIntegrationTest:
+    """
+    Tests for functionality specific to the AWS backend.
+    """
 
     @pytest.mark.parametrize('linux_distribution', list(Distribution))
     def test_run_enterprise_integration_test(
