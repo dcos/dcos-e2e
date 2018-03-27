@@ -1,3 +1,4 @@
+AbstractLauncher
 adam
 admin
 args
@@ -107,5 +108,3 @@ xfail
 yapf
 yml
 zookeeper
-AbstractLauncher
-AWS

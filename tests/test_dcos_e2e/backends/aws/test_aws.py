@@ -10,7 +10,6 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.distributions import Distribution
 
 
 class TestAWSBackend:
@@ -18,30 +17,27 @@ class TestAWSBackend:
     Tests for functionality specific to the AWS backend.
     """
 
-    def test_copy_to_installer_not_supported(
-        self,
-        oss_artifact_url: str,
-    ) -> None:
+    def test_copy_to_installer_not_supported(self) -> None:
         """
         The AWS backend does not support copying files to the installer.
         """
         with pytest.raises(NotImplementedError) as excinfo:
             Cluster(
                 cluster_backend=AWS(),
-                files_to_copy_to_installer={Path('/'): Path('/')}
+                files_to_copy_to_installer={Path('/'): Path('/')},
             )
 
         expected_error = (
-            'Copying files to the installer is currently not supported '
-            'by the AWS backend.'
+            'Copying files to the installer is currently not supported by the '
+            'AWS backend.'
         )
 
         assert str(excinfo.value) == expected_error
 
     def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
         """
-        The AWS backend requires a build artifact URL in order
-        to launch a DC/OS cluster.
+        The AWS backend requires a build artifact URL in order to launch a
+        DC/OS cluster.
         """
         with Cluster(
             cluster_backend=AWS(),
@@ -60,6 +56,7 @@ class TestAWSBackend:
 
         assert str(excinfo.value) == expected_error
 
+<<<<<<< HEAD
     @pytest.mark.parametrize('linux_distribution', list(Distribution))
     def test_run_enterprise_integration_test(
         self,
@@ -68,6 +65,12 @@ class TestAWSBackend:
         linux_distribution: Distribution,
     ) -> None:
 
+=======
+    def test_run_integration_test(self, license_key_contents: str) -> None:
+        """
+        It is possible to run DC/OS integration tests on AWS.
+        """
+>>>>>>> 3646391877435e6e80ab92a4572db8addcf3ae6c
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         config = {
@@ -113,9 +116,8 @@ class TestAWSBackend:
                 log_output_live=True,
             )
 
-            # #. Test running on Travis
-            #   - Add keys to Travis
-            #   - Add EE_ARTIFACT_URL to travis
+            # Test running on Travis
+            # Document how to run tests locally.
 
             # Nice to have:
             # Get Bilal to use it
@@ -125,3 +127,6 @@ class TestAWSBackend:
             # Change DC/OS Launch as there is an error on import after
             # vendoring.
             # Idea is for it do use inspect rather than pkg_resource
+            #
+            # Make a script which uses ``python-vendorize``internals to remap
+            # the dcos-test-utils imports.

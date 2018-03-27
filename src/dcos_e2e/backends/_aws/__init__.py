@@ -1,9 +1,11 @@
 """
-A DC/OS Launch backend for DC/OS E2E.
+Helpers for creating and interacting with clusters on AWS.
 """
+
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
+from shutil import rmtree
 from tempfile import gettempdir
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Type
@@ -30,32 +32,47 @@ class AWS(ClusterBackend):
         workspace_dir: Optional[Path] = None,
     ) -> None:
         """
-        Create a configuration for a Docker cluster backend.
+        Create a configuration for an AWS cluster backend.
 
+        Args:
+            admin_location: The IP address range from which the AWS nodes can
+                be accessed.
+            aws_region: The AWS location to create nodes in. See
+                `Regions and Availability Zones`_.
+            linux_distribution: The Linux distribution to boot DC/OS on.
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
+                This is equivalent to `dir` in
+                :py:func:`tempfile.mkstemp`.
+
+        Attributes:
+            admin_location: The IP address range from which the AWS nodes can
+                be accessed.
+            aws_region: The AWS location to create nodes in. See
+                `Regions and Availability Zones`_.
+            linux_distribution: The Linux distribution to boot DC/OS on.
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
+
+        .. _Regions and Availability Zones:
+            https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
         """
-        ssh_user = {
-            Distribution.CENTOS_7: 'centos',
-            Distribution.COREOS: 'core',
-        }
-        self.default_ssh_user = ssh_user[linux_distribution]
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
-
-        self.config = {
-            'platform': 'aws',
-            'provider': 'onprem',
-            'aws_region': aws_region,
-            'instance_type': 'm4.large',
-            'admin_location': admin_location,
-        }
+        self.aws_region = aws_region
+        self.admin_location = admin_location
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
+        """
+        Return the `ClusterManager` class to use to create and manage a
+        cluster.
+        """
         return AWSCluster
 
 
 class AWSCluster(ClusterManager):
-    # pylint: disable=too-many-arguments,super-init-not-called
+    # pylint: disable=super-init-not-called
     """
     A record of an AWS cluster.
     """
@@ -68,11 +85,26 @@ class AWSCluster(ClusterManager):
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: AWS,
     ) -> None:
+        """
+        Create an AWS cluster.
 
+        Args:
+            masters: The number of master nodes to create.
+            agents: The number of agent nodes to create.
+            public_agents: The number of public agent nodes to create.
+            files_to_copy_to_installer: Pairs of host paths to paths on the
+                installer node. This must be empty for as it is not currently
+                supported.
+            cluster_backend: Details of the specific AWS backend to use.
+
+        Raises:
+            NotImplementedError: ``files_to_copy_to_installer`` includes files
+                to copy to the installer.
+        """
         if files_to_copy_to_installer:
             message = (
-                'Copying files to the installer is currently not supported '
-                'by the AWS backend.'
+                'Copying files to the installer is currently not supported by '
+                'the AWS backend.'
             )
             raise NotImplementedError(message)
 
@@ -84,7 +116,12 @@ class AWSCluster(ClusterManager):
         self._path = Path(self._path) / unique
         Path(self._path).mkdir(exist_ok=True)
 
-        self._default_ssh_user = cluster_backend.default_ssh_user
+        ssh_user = {
+            Distribution.CENTOS_7: 'centos',
+            Distribution.COREOS: 'core',
+        }
+        self._default_ssh_user = ssh_user[cluster_backend.linux_distribution]
+
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
         self.cluster_info = {}  # type: Dict[str, Any]
@@ -94,17 +131,23 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'coreos',
         }
 
-        cluster_config = {
-            'launch_config_version': 1,
+        launch_config = {
+            'admin_location': cluster_backend.admin_location,
+            'aws_region': cluster_backend.aws_region,
             'deployment_name': unique,
+            # Supply a valid URL to the preliminary config.
+            # This is replaced later before the DC/OS installation.
+            'installer_url': 'https://example.com',
+            'instance_type': 'm4.large',
+            'key_helper': True,
+            'launch_config_version': 1,
             'num_masters': masters,
             'num_private_agents': agents,
             'num_public_agents': public_agents,
             'os_name': aws_distros[cluster_backend.linux_distribution],
-            'key_helper': True,
+            'platform': 'aws',
+            'provider': 'onprem',
         }
-
-        launch_config = {**cluster_config, **cluster_backend.config}
 
         # First we create a preliminary dcos-config inside the
         # dcos-launch config to pass the config validation step.
@@ -115,18 +158,16 @@ class AWSCluster(ClusterManager):
             'exhibitor_storage_backend': 'static',
         }
 
-        # Supply a valid URL to the preliminary config.
-        # This is replaced later before the DC/OS installation.
-        launch_config['installer_url'] = 'https://google.com'
-
         # Validate the preliminary dcos-launch config.
         validated_launch_config = config.get_validated_config(
-            launch_config,
-            str(self._path),
+            user_config=launch_config,
+            config_dir=str(self._path),
         )
 
         # Get a DcosCloudformationLauncher object
-        self.launcher = get_launcher(validated_launch_config)  # type: ignore
+        self.launcher = get_launcher(  # type: ignore
+            config=validated_launch_config,
+        )
 
         # Create the AWS stack from the DcosCloudformationLauncher.
         # Update ``cluster_info`` with the AWS SSH key information.
@@ -151,7 +192,17 @@ class AWSCluster(ClusterManager):
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
+        """
+        Install DC/OS from a URL.
 
+        Args:
+            build_artifact: The URL string to a build artifact to install DC/OS
+                from.
+            extra_config: This may contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration of the AWS backend.
+            log_output_live: If ``True``, log output of the installation live.
+        """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
@@ -181,6 +232,24 @@ class AWSCluster(ClusterManager):
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
+        """
+        Install DC/OS from a given build artifact. This is not supported and
+        simply raises a his is not supported and simply raises a
+        ``NotImplementedError``.
+
+        Args:
+            build_artifact: The ``Path`` to a build artifact to install DC/OS
+                from.
+            extra_config: May contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration of the AWS backend.
+            log_output_live: If ``True``, log output of the installation live.
+
+        Raises:
+            NotImplementedError: ``NotImplementedError`` because the AWS
+                backend does not support the DC/OS advanced installation
+                method.
+        """
         message = (
             'The AWS backend does not support the installation of build '
             'artifacts passed via path. This is because a more efficient'
@@ -189,11 +258,19 @@ class AWSCluster(ClusterManager):
         raise NotImplementedError(message)
 
     def destroy(self) -> None:
+        """
+        Destroy all nodes in the cluster.
+        """
         if self.launcher:
             self.launcher.delete()
 
+        rmtree(path=str(self._path), ignore_errors=True)
+
     @property
     def masters(self) -> Set[Node]:
+        """
+        Return all DC/OS master :class:`.node.Node` s.
+        """
         nodes = set([])
         cluster_masters = list(self.cluster_info['masters'])
         for master in cluster_masters:
@@ -209,6 +286,9 @@ class AWSCluster(ClusterManager):
 
     @property
     def agents(self) -> Set[Node]:
+        """
+        Return all DC/OS agent :class:`.node.Node` s.
+        """
         nodes = set([])
         cluster_agents = list(self.cluster_info['private_agents'])
         for priv_agent in cluster_agents:
@@ -224,6 +304,9 @@ class AWSCluster(ClusterManager):
 
     @property
     def public_agents(self) -> Set[Node]:
+        """
+        Return all DC/OS public agent :class:`.node.Node` s.
+        """
         nodes = set([])
         cluster_public_agents = list(self.cluster_info['public_agents'])
         for pub_agent in cluster_public_agents:

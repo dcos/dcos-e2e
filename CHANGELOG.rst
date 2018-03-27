@@ -6,6 +6,11 @@ Changelog
 Next
 ----
 
+- Add an AWS backend to the library.
+
+2018.03.26.0
+------------
+
 - Add a ``dcos-docker doctor`` check that a supported storage driver is available.
 - Fix error with using Docker version `v17.12.1-ce` inside Docker nodes.
 - Fix race condition between installing DC/OS and SSH starting.

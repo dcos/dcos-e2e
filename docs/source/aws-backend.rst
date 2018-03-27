@@ -12,7 +12,9 @@ DC/OS Installation
 
 This is because the installation method employs a bootstrap node that directly downloads the ``build_artifact`` from the specified URL.
 
-``Node``\ s of ``Cluster``\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``. The ``private_ip_address`` refers to the internal network of the AWS stack which is also used by DC/OS internally. The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
+``Node``\ s of ``Cluster``\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``.
+The ``private_ip_address`` refers to the internal network of the AWS stack which is also used by DC/OS internally.
+The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
 
 AWS Regions
 -----------
@@ -39,16 +41,21 @@ SSH can be used to access cluster nodes for the purpose of debugging. The AWS ba
 It is important to keep in mind that ``workspace_dir`` is a temporary directory and therefore will be cleaned up after the test. If ``workspace_dir`` is unset the AWS backend will create a new temporary directory in a operating system specific location.
 
 Cluster lifetime
-------------------
+----------------
 
-The cluster lifetime is fixed at a maximum of two hours, that's because of a limitation of ``dcos-launch`` which is used under the hood. That will most likely change in the future.
+The cluster lifetime is fixed at a maximum of two hours.
+That is because of a limitation of ``dcos-launch`` which is used under the hood.
+That will most likely change in the future.
 
-If the cluster was launched with ``maws`` (Mesosphere temporary AWS credentials) the cluster can be controlled via CCM at ``ccm.mesosphere.com``. This allows for extending the cluster lifetime and also for cleaning up the cluster if anything goes wrong.
+If the cluster was launched with ``maws`` (Mesosphere temporary AWS credentials) the cluster can be controlled via CCM at ``ccm.mesosphere.com``.
+This allows for extending the cluster lifetime and also for cleaning up the cluster if anything goes wrong.
 
 EC2 instance types
 ------------------
 
-The AWS backend does not offer a choice for EC2 instances. Currently it launches ``x4.large`` instances for DC/OS nodes. Please direct requests for supporting more instance types towards Adam Dangoor.
+The AWS backend does not offer a choice for EC2 instances.
+Currently it launches ``m4.large`` instances for DC/OS nodes.
+Please direct requests for supporting more instance types towards Adam Dangoor.
 
 Unsupported features
 --------------------
@@ -58,9 +65,11 @@ The AWS backend does currently not support the ``Cluster`` feature of copying fi
 Troubleshooting
 ---------------
 
-In case of an error during the DC/OS installation the journal from each node will be dumped and downloaded to the folder that the tests were executed in. The logs are prefixed with the installation phase that failed, ``preflight``, ``deploy`` or ``postflight``.
+In case of an error during the DC/OS installation the journal from each node will be dumped and downloaded to the folder that the tests were executed in.
+The logs are prefixed with the installation phase that failed, ``preflight``, ``deploy`` or ``postflight``.
 
-When using temporary credentials it is required to pay attention that the credentials are still valid or renewed when deleting a cluster. If the credentials are not valid anymore the AWS backend fails to delete the private keypair generated at cluster creation.
+When using temporary credentials it is required to pay attention that the credentials are still valid or renewed when deleting a cluster.
+If the credentials are not valid anymore the AWS backend fails to delete the private key pair generated at cluster creation.
 It is therefore recommended to a periodically renew temporary AWS credentials when executing tests using the AWS backend.
 
 Reference
