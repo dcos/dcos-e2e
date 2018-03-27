@@ -10,7 +10,11 @@ import pkg_resources
 import yaml
 from ..dcos_launch import util
 from ..dcos_launch.platforms import onprem as platforms_onprem
+<<<<<<< HEAD
 from dcos_e2e._vendor.dcos_test_utils import onprem
+=======
+from ..dcos_test_utils import onprem
+>>>>>>> origin/master
 
 log = logging.getLogger(__name__)
 
