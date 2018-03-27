@@ -22,12 +22,7 @@ AWS Regions
 When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched.
 It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
 
-* ``us-west-1`` US East (North California)
-* ``us-west-2`` US East (Oregon)
-* ``us-east-1`` US East (North Virginia)
-* ``us-east-2`` US East (Ohio)
-* ``eu-cental-1`` EU (Frankfurt)
-* ``eu-west-1`` EU (Ireland)
+See the `Regions and Availability Zones`_ for available regions.
 
 Restricting access to the cluster
 ---------------------------------
