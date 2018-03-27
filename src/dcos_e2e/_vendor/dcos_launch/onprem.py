@@ -10,7 +10,7 @@ import pkg_resources
 import yaml
 from ..dcos_launch import util
 from ..dcos_launch.platforms import onprem as platforms_onprem
-from dcos_test_utils import onprem
+from ..dcos_test_utils import onprem
 
 log = logging.getLogger(__name__)
 

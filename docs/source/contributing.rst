@@ -217,19 +217,16 @@ Updating DC/OS Test Utils and DC/OS Launch
 ------------------------------------------
 
 `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
-This is done using `python-vendorize <https://github.com/mwilliamson/python-vendorize>`__.
 To update DC/OS Test Utils or DC/OS Launch:
 
 Update the SHA in ``src/vendorize.toml``.
 
 .. code:: sh
 
-    pip install git+https://github.com/mwilliamson/python-vendorize.git
-    git rm -r src/dcos_e2e/_vendor/
-    rm -rf src/dcos_e2e/_vendor/*
-    cd src/
-    python-vendorize
-    git add dcos_e2e/_vendor
+    git rm -rf src/dcos_e2e/_vendor/
+    rm -rf src/dcos_e2e/_vendor
+    python admin/update_launch.py
+    git add src/dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
 Testing the Homebrew Recipe
