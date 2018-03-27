@@ -112,6 +112,7 @@ class TestAWSBackend:
             )
 
             # Test running on Travis
+            # Document how to run tests locally.
 
             # Nice to have:
             # Get Bilal to use it
@@ -122,5 +123,5 @@ class TestAWSBackend:
             # vendoring.
             # Idea is for it do use inspect rather than pkg_resource
             #
-            # Make a script which uses python-vendorize internals to remap the
-            # dcos-test-utils imports.
+            # Make a script which uses ``python-vendorize``internals to remap
+            # the dcos-test-utils imports.
