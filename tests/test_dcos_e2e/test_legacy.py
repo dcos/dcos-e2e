@@ -47,7 +47,6 @@ class Test19:
         config = {
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
-            'fault_domain_enabled': False,
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
