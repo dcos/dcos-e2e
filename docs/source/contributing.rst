@@ -234,7 +234,7 @@ Updating DC/OS Test Utils and DC/OS Launch
 `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
 To update DC/OS Test Utils or DC/OS Launch:
 
-Update the SHA in ``src/vendorize.toml``.
+Update the SHAs in ``admin/update_launch.py``.
 
 .. code:: sh
 
