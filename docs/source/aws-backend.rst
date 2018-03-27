@@ -41,7 +41,7 @@ For example ``<external-ip>/24``.
 Accessing cluster nodes
 -----------------------
 
-SSH can be used to access cluster nodes for the purpose of debugging.
+SSH can be used to access cluster nodes for the purpose of debugging if ``workspace_dir`` is set.
 The AWS backend generates a key in the ``workspace_dir`` directory under ``ssh/id_rsa``.
 Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
 The SSH user depends on the ``linux_distribution`` given to the AWS backend.
