@@ -27,8 +27,9 @@ def test_main():
     for requirement in [launch_url, test_utils_url]:
         subprocess.check_call(
             ['pip', 'install', '--no-dependencies', '--target', target_directory, requirement])
-        top_level_names = ['dcos_launch', 'dcos_test_utils']
-        vendorize._rewrite_imports(target_directory, top_level_names)
+
+    top_level_names = ['dcos_launch', 'dcos_test_utils']
+    vendorize._rewrite_imports(target_directory, top_level_names)
 
     # module_path = 'src/dcos_e2e/_vendor/dcos_launch/util.py'
     # top_level_names = ['dcos_test_utils']
