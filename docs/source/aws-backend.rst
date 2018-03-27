@@ -12,7 +12,7 @@ DC/OS Installation
 
 This is because the installation method employs a bootstrap node that directly downloads the ``build_artifact`` from the specified URL.
 
-``Node``\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``.
+:py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the AWS backend distinguish between ``public_ip_address`` and ``private_ip_address``.
 The ``private_ip_address`` refers to the internal network of the AWS stack which is also used by DC/OS internally.
 The ``public_ip_address`` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
 
