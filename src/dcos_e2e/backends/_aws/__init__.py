@@ -92,9 +92,9 @@ class AWSCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. This must be empty for as it is not
-                currently supported.
+            files_to_copy_to_installer: Pairs of host paths to paths on the
+                installer node. This must be empty for as it is not currently
+                supported.
             cluster_backend: Details of the specific AWS backend to use.
 
         Raises:
