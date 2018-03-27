@@ -29,8 +29,8 @@ class TestAWSBackend:
             )
 
         expected_error = (
-            'Copying files to the installer is currently not supported '
-            'by the AWS backend.'
+            'Copying files to the installer is currently not supported by the '
+            'AWS backend.'
         )
 
         assert str(excinfo.value) == expected_error
