@@ -43,8 +43,8 @@ See :doc:`how to use DC/OS Enterprise <enterprise>` with DC/OS E2E.
 Destroying a ``Cluster``
 ------------------------
 
-``Cluster``\s have a ``destroy()`` method.
-This can be called manually, or ``Cluster``\s can be used as context managers.
+:py:class:`~dcos_e2e.cluster.Cluster`\ s have a ``destroy()`` method.
+This can be called manually, or :py:class:`~dcos_e2e.cluster.Cluster`\ s can be used as context managers.
 In this case the cluster will be destroyed when exiting the context manager.
 
 .. code:: python
