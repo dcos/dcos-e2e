@@ -49,7 +49,7 @@ Cluster lifetime
 ----------------
 
 The cluster lifetime is fixed at a maximum of two hours.
-That is because of a limitation of ``dcos-launch`` which is used under the hood.
+That is because of a limitation of `dcos-launch` which is used under the hood.
 That will most likely change in the future.
 
 If the cluster was launched with ``maws`` (Mesosphere temporary AWS credentials) the cluster can be controlled via `CCM`_.
@@ -84,3 +84,4 @@ Reference
 
 .. _CCM: ccm.mesosphere.com
 .. _AWS Regions and Availability Zones: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
+.. _dcos-launch: https://github.com/dcos/dcos-launch
