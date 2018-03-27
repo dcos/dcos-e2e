@@ -32,7 +32,8 @@ It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
 Restricting access to the cluster
 ---------------------------------
 
-The AWS backend takes a parameter ``admin_location``. This parameter restricts the access to the AWS stack from the outside to a particular IP address range.
+The AWS backend takes a parameter ``admin_location``.
+This parameter restricts the access to the AWS stack from the outside to a particular IP address range.
 The default value ``'0.0.0.0/0'`` will allow accessing the cluster from anywhere.
 It is recommended to restrict the address range to a subnet including the public IP of the machine executing tests with the AWS backend.
 For example ``<external-ip>/24``.
@@ -41,7 +42,8 @@ Accessing cluster nodes
 -------------------------
 
 SSH can be used to access cluster nodes for the purpose of debugging.
-The AWS backend generates a key in the ``workspace_dir`` directory under ``ssh/id_rsa``. Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
+The AWS backend generates a key in the ``workspace_dir`` directory under ``ssh/id_rsa``.
+Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
 The SSH user depends on the ``linux_distribution`` given to the AWS backend.
 For ``CENTOS_7`` that is ``centos``, for ``COREOS`` it is ``core``.
 
