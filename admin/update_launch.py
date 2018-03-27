@@ -1,3 +1,9 @@
+"""
+Try to get the following to work:
+
+python -c 'import dcos_e2e._vendor.dcos_launch'
+"""
+
 import vendorize
 
 
