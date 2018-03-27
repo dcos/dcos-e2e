@@ -110,8 +110,9 @@ class TestRunIntegrationTest:
             )
 
             def private_hosts(nodes: Set[Node]) -> str:
-                return ','.join([str(node.private_ip_address)
-                                 for node in nodes])
+                return ','.join(
+                    [str(node.private_ip_address) for node in nodes],
+                )
 
             master_ip = next(iter(cluster.masters)).private_ip_address
 

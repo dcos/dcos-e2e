@@ -219,7 +219,7 @@ class AWSCluster(ClusterManager):
         # https://jira.mesosphere.com/browse/DCOS-21660
         try:
             AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
-        except (KeyboardInterrupt, Exception):
+        except (KeyboardInterrupt, Exception):  # pylint: disable=broad-except
             self.destroy()
 
         # Update the cluster_info with post-install DC/OS information.
