@@ -83,6 +83,4 @@ It is therefore recommended to a periodically renew temporary AWS credentials wh
 Reference
 ---------
 
-.. autoclass:: dcos_e2e.backends._aws.AWS
-
-.. autoclass:: dcos_e2e.backends._aws.AWSCluster
+.. autoclass:: dcos_e2e.backends.AWS
