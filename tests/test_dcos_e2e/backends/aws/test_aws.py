@@ -142,6 +142,3 @@ class TestRunIntegrationTest:
             # Change DC/OS Launch as there is an error on import after
             # vendoring.
             # Idea is for it do use inspect rather than pkg_resource
-            #
-            # Make a script which uses ``python-vendorize``internals to remap
-            # the dcos-test-utils imports.
