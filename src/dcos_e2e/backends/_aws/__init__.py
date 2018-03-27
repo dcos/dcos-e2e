@@ -135,6 +135,9 @@ class AWSCluster(ClusterManager):
             'admin_location': cluster_backend.admin_location,
             'aws_region': cluster_backend.aws_region,
             'deployment_name': unique,
+            # Supply a valid URL to the preliminary config.
+            # This is replaced later before the DC/OS installation.
+            'installer_url': 'https://example.com',
             'instance_type': 'm4.large',
             'key_helper': True,
             'launch_config_version': 1,
@@ -154,10 +157,6 @@ class AWSCluster(ClusterManager):
             'master_discovery': 'static',
             'exhibitor_storage_backend': 'static',
         }
-
-        # Supply a valid URL to the preliminary config.
-        # This is replaced later before the DC/OS installation.
-        launch_config['installer_url'] = 'https://example.com'
 
         # Validate the preliminary dcos-launch config.
         validated_launch_config = config.get_validated_config(
