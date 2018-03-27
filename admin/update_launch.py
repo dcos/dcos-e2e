@@ -2,10 +2,13 @@ import vendorize
 
 
 def main():
-    target_directory = 'src/dcos_e2e/_vendor/dcos_launch'
+    package_path = 'src/dcos_e2e/_vendor/dcos_launch'
     top_level_names = ['dcos_test_utils']
-    vendorize._rewrite_imports(target_directory, top_level_names)
+    # import pdb; pdb.set_trace()
     # top_level = vendorize._read_top_level_names(target_directory)
+    # top_level_names = ['dcos_launch', 'dcos_test_utils']
+    import pdb; pdb.set_trace()
+    vendorize._rewrite_imports_in_package(package_path, top_level_names, depth=1)
     # vendorize.vendorize_requirement(
     # )
     # target_directory = 1
