@@ -4,7 +4,7 @@ azure-common==1.1.8
 azure-mgmt-network==2.0.0rc1
 azure-mgmt-resource==1.2.2
 azure-monitor==0.3.1
-boto3==1.6.16
+boto3==1.6.17
 botocore==1.9.17
 click-spinner==0.1.7
 click==6.7
@@ -12,7 +12,7 @@ cryptography==2.2.1
 docker==3.1.4
 docopt==0.6.2
 google-api-python-client==1.6.5
-oauth2client==3.0.0
+oauth2client==4.1.2
 paramiko==2.4.1
 passlib==1.7.1
 pytest==3.5.0
