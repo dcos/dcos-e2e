@@ -53,9 +53,7 @@ To work around this, run ``docker run --rm --privileged alpine hwclock -s``.
 Reference
 ---------
 
-.. autoclass:: dcos_e2e.backends._docker.Docker
-
-.. autoclass:: dcos_e2e.backends._docker.DockerCluster
+.. autoclass:: dcos_e2e.backends.Docker
 
 .. autoclass:: dcos_e2e.distributions.Distribution
    :members:
