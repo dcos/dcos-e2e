@@ -162,6 +162,10 @@ class AWSCluster(ClusterManager):
         self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
 
         # The ``wait`` method starts the actual DC/OS installation process.
+        # We do not use ``self.launcher.wait()`` here because at the time of
+        # writing it does both, waiting for the AWS stack and installing
+        # DC/OS. This is desired to be changed by the dcos-launch team.
+        # https://jira.mesosphere.com/browse/DCOS-21660
         try:
             AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
         except (KeyboardInterrupt, Exception):
