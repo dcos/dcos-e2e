@@ -48,7 +48,7 @@ The SSH user depends on the ``linux_distribution`` given to the AWS backend.
 For ``CENTOS_7`` that is ``centos``, for ``COREOS`` it is ``core``.
 
 It is important to keep in mind that ``workspace_dir`` is a temporary directory and therefore will be cleaned up after the test.
-If ``workspace_dir`` is unset the AWS backend will create a new temporary directory in a operating system specific location.
+If ``workspace_dir`` is unset the AWS backend will create a new temporary directory in an operating system specific location.
 
 Cluster lifetime
 ----------------
