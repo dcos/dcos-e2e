@@ -10,6 +10,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
 
 
 class TestAWSBackend:
@@ -56,7 +57,6 @@ class TestAWSBackend:
 
         assert str(excinfo.value) == expected_error
 
-<<<<<<< HEAD
     @pytest.mark.parametrize('linux_distribution', list(Distribution))
     def test_run_enterprise_integration_test(
         self,
