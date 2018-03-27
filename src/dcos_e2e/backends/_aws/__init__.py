@@ -85,11 +85,26 @@ class AWSCluster(ClusterManager):
         files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: AWS,
     ) -> None:
+        """
+        Create an AWS cluster.
 
+        Args:
+            masters: The number of master nodes to create.
+            agents: The number of agent nodes to create.
+            public_agents: The number of public agent nodes to create.
+            files_to_copy_to_installer: Pairs of host paths to paths on
+                the installer node. This must be empty for as it is not
+                currently supported.
+            cluster_backend: Details of the specific AWS backend to use.
+
+        Raises:
+            NotImplementedError: ``files_to_copy_to_installer`` includes files
+                to copy to the installer.
+        """
         if files_to_copy_to_installer:
             message = (
-                'Copying files to the installer is currently not supported '
-                'by the AWS backend.'
+                'Copying files to the installer is currently not supported by '
+                'the AWS backend.'
             )
             raise NotImplementedError(message)
 
