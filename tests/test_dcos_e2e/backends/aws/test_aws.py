@@ -64,13 +64,9 @@ class TestAWSBackend:
         license_key_contents: str,
         linux_distribution: Distribution,
     ) -> None:
-
-=======
-    def test_run_integration_test(self, license_key_contents: str) -> None:
         """
         It is possible to run DC/OS integration tests on AWS.
         """
->>>>>>> 3646391877435e6e80ab92a4572db8addcf3ae6c
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         config = {
