@@ -22,7 +22,7 @@ AWS Regions
 When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched.
 It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
 
-See the `Regions and Availability Zones`_ for available regions.
+See the `AWS Regions and Availability Zones`_ for available regions.
 
 Restricting access to the cluster
 ---------------------------------
@@ -83,3 +83,4 @@ Reference
 .. autoclass:: dcos_e2e.backends.AWS
 
 .. _CCM: ccm.mesosphere.com
+.. _AWS Regions and Availability Zones: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
