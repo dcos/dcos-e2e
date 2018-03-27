@@ -424,16 +424,19 @@ class DockerCluster(ClusterManager):
         log_output_live: bool,
     ) -> None:
         """
+        Install DC/OS from a URL. This is not supported and simply raises a
+        ``NotImplementedError``.
+
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration of the Docker backend.
-            log_output_live: If `True`, log output of the installation live.
+            log_output_live: If ``True``, log output of the installation live.
 
         Raises:
-            NotImplementedError: `NotImplementedError` because the Docker
+            NotImplementedError: ``NotImplementedError`` because the Docker
                 backend does not support the DC/OS advanced installation
                 method.
         """
@@ -451,13 +454,15 @@ class DockerCluster(ClusterManager):
         log_output_live: bool,
     ) -> None:
         """
+        Install DC/OS from a given build artifact.
+
         Args:
-            build_artifact: The `Path` to a build artifact to install DC/OS
+            build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
             extra_config: May contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration of the Docker backend.
-            log_output_live: If `True`, log output of the installation live.
+            log_output_live: If ``True``, log output of the installation live.
 
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.
@@ -590,7 +595,7 @@ class DockerCluster(ClusterManager):
     @property
     def agents(self) -> Set[Node]:
         """
-        Return all DC/OS agent ``Node``s.
+        Return all DC/OS agent :class:`.node.Node` s.
         """
         return self._nodes(container_base_name=self._agent_prefix)
 
