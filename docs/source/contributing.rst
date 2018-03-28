@@ -58,8 +58,9 @@ To fix some lint errors, run the following:
 Tests for this package
 ----------------------
 
+Some tests require the Docker backend and some tests require the AWS backend.
 See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
-These requirements also apply to the tests.
+See the :doc:`AWS backend documentation <aws-backend>` for details of what is needed for the AWS backend.
 
 Download dependencies which are used by the tests:
 

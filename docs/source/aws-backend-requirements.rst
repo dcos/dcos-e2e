@@ -32,8 +32,8 @@ The ``ssh`` command must be available.
 Operating System
 ~~~~~~~~~~~~~~~~
 
-This tool has been tested on macOS and on Linux.
+The AWS backend has been tested on macOS and on Linux.
 
-It is not expected that this tool will work out of the box with Windows.
+It is not expected that it will work out of the box with Windows.
 
 If your operating system is not supported, it may be possible to use Vagrant, or another Linux virtual machine.
