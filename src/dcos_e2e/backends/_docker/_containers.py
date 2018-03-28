@@ -178,10 +178,11 @@ def start_dcos_container(
         ['systemctl', 'enable', docker_service_name],
         ['systemctl', 'start', docker_service_name],
         ['/bin/bash', '-c', disable_systemd_support_cmd],
-        ['systemctl', 'start', 'sshd.service'],
         ['mkdir', '--parents', '/root/.ssh'],
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ['rm', '-f', '/run/nologin', '||', 'true'],
+        ['systemctl', 'enable', 'sshd'],
+        ['systemctl', 'start', 'sshd'],
     ]:
         container.exec_run(cmd=cmd)
         exit_code, output = container.exec_run(cmd=cmd)
