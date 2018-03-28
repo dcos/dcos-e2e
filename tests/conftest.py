@@ -92,7 +92,7 @@ def oss_artifact_url() -> str:
 @pytest.fixture(scope='session')
 def ee_artifact_url() -> str:
     """
-    Return the url to a build artifact for DC/OS OSS.
+    Return the url to a build artifact for Enterprise DC/OS.
     """
     return os.environ['EE_MASTER_ARTIFACT_URL']
 

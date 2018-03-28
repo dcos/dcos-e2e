@@ -172,6 +172,8 @@ To update the credentials use the following commands, after setting the followin
     travis env set --repo mesosphere/dcos-e2e AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
     travis env set --repo mesosphere/dcos-e2e AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
 
+Currently credentials are taken from the OneLogin Secure Notes note ``dcos-e2e integration testing AWS credentials``.
+
 Parallel builders
 ~~~~~~~~~~~~~~~~~
 
