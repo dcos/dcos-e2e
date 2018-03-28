@@ -57,9 +57,12 @@ Reference
 
 .. autoclass:: dcos_e2e.distributions.Distribution
    :members:
+   :undoc-members:
 
 .. autoclass:: dcos_e2e.docker_versions.DockerVersion
    :members:
+   :undoc-members:
 
 .. autoclass:: dcos_e2e.docker_storage_drivers.DockerStorageDriver
    :members:
+   :undoc-members:
