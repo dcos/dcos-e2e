@@ -239,6 +239,15 @@ Update the SHAs in ``admin/update_launch.py``.
     git add src/dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
+Redirect DC/OS Launch package resources
+---------------------------------------
+
+In order discover its package resources after an update of the vendored DC/OS Launch, all references to ``dcos_launch`` must be replaced with ``dcos_e2e._vendor.dcos_launch`` in the following files.
+
+* :file:`dcos_e2e/_vendor/dcos_launch/config.py`
+* :file:`dcos_e2e/_vendor/dcos_launch/onprem.py`
+* :file:`dcos_e2e/_vendor/dcos_launch/platform/aws.py`
+
 Testing the Homebrew Recipe
 ----------------------------
 

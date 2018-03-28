@@ -262,6 +262,10 @@ class AWSCluster(ClusterManager):
         Destroy all nodes in the cluster.
         """
         if self.launcher:
+            # Deletion only works if valid AWS credentials are present. This
+            # a problem if temporary credentials become invalid before
+            # destroying a cluster because the generated AWS KeyPair persists.
+            # https://jira.mesosphere.com/browse/DCOS-21893
             self.launcher.delete()
 
         rmtree(path=str(self._path), ignore_errors=True)
