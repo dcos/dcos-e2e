@@ -102,6 +102,8 @@ class AWSCluster(ClusterManager):
                 to copy to the installer.
         """
         if files_to_copy_to_installer:
+            # Copying files to the installer is not yet supported.
+            # https://jira.mesosphere.com/browse/DCOS-21894
             message = (
                 'Copying files to the installer is currently not supported by '
                 'the AWS backend.'

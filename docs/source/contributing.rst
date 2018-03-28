@@ -249,6 +249,8 @@ In order discover its package resources after an update of the vendored DC/OS La
 * :file:`dcos_e2e/_vendor/dcos_launch/onprem.py`
 * :file:`dcos_e2e/_vendor/dcos_launch/platform/aws.py`
 
+The progress on automating this procedure is tracked in the JIRA issue `DCOS-21895 <https://jira.mesosphere.com/browse/DCOS-21895>`_.
+
 Testing the Homebrew Recipe
 ----------------------------
 
