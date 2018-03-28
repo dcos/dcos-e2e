@@ -8,8 +8,8 @@ The Docker backend is user to spin up clusters on Docker containers, where each 
 DC/OS Installation
 ------------------
 
-``Cluster``\ s created by the Docker backend only support installing DC/OS via ``install_dcos_from_path``.
-``Node``\ s of ``Cluster``\ s created by the Docker backend do not distinguish between ``public_ip_address`` and ``private_ip_address``.
+:py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend only support installing DC/OS via ``install_dcos_from_path``.
+:py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend do not distinguish between ``public_ip_address`` and ``private_ip_address``.
 
 Troubleshooting
 ---------------
