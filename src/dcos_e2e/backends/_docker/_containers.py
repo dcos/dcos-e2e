@@ -181,6 +181,7 @@ def start_dcos_container(
         ['mkdir', '--parents', '/root/.ssh'],
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ['rm', '-f', '/run/nologin', '||', 'true'],
+        ['systemctl', 'enable', 'sshd'],
         ['systemctl', 'start', 'sshd'],
     ]:
         container.exec_run(cmd=cmd)
