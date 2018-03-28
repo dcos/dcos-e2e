@@ -60,7 +60,6 @@ EC2 instance types
 
 The AWS backend does not offer a choice for EC2 instances.
 Currently it launches ``m4.large`` instances for DC/OS nodes.
-Please direct requests for different instance type support towards Tim Weidner.
 
 Unsupported features
 --------------------
