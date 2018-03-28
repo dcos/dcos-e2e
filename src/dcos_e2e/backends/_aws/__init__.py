@@ -112,7 +112,7 @@ class AWSCluster(ClusterManager):
 
         unique = 'dcos-e2e-{}'.format(str(uuid.uuid4()))
 
-        self._path = Path(cluster_backend.workspace_dir) / uuid.uuid4().hex
+        self._path = Path(cluster_backend.workspace_dir) / unique
         Path(self._path).mkdir(exist_ok=True)
         self._path = Path(self._path).resolve()
         self._path = Path(self._path) / unique
@@ -166,7 +166,8 @@ class AWSCluster(ClusterManager):
             config_dir=str(self._path),
         )
 
-        # Get a DcosCloudformationLauncher object
+        # Also DcosCloudformationLauncher
+        # Get a OnpremLauncher object
         self.launcher = get_launcher(  # type: ignore
             config=validated_launch_config,
         )
@@ -175,18 +176,26 @@ class AWSCluster(ClusterManager):
         # Update ``cluster_info`` with the AWS SSH key information.
         self.cluster_info = self.launcher.create()
 
-        # Store the generated AWS SSH key to the file system.
-        self._ssh_key_path = self._path / 'id_rsa'
-        private_key = self.cluster_info['ssh_private_key']
-        Path(self._ssh_key_path).write_bytes(private_key.encode())
+        # Stack ID, SSH Key in the config
 
         # Wait for the AWS stack setup completion.
         DcosCloudformationLauncher.wait(self.launcher)  # type: ignore
 
+        # No config change
+
         # Update the cluster_info with AWS stack information.
         # This makes node IP addresses available to ``cluster_info``.
         # cluster.masters/agents/public_agents rely on this information.
+
+        # OnpremLauncher, DcosCloudformationLauncher
+        self.launcher = get_launcher(self.cluster_info)  # type: ignore
+
         self.cluster_info = self.launcher.describe()
+
+        # Store the generated AWS SSH key to the file system.
+        self._ssh_key_path = self._path / 'id_rsa'
+        private_key = self.cluster_info['ssh_private_key']
+        Path(self._ssh_key_path).write_bytes(private_key.encode())
 
     def install_dcos_from_url(
         self,
@@ -204,6 +213,12 @@ class AWSCluster(ClusterManager):
                 variables that are applied on top of the default DC/OS
                 configuration of the AWS backend.
             log_output_live: If ``True``, log output of the installation live.
+
+        Raises:
+            KeyboardInterrupt: If a keyboard interrupt is triggered during the
+                installation of DC/OS.
+            Exception: If the DC/OS installation fails for any other reason.
+
         """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
@@ -221,8 +236,9 @@ class AWSCluster(ClusterManager):
         # https://jira.mesosphere.com/browse/DCOS-21660
         try:
             AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
-        except (KeyboardInterrupt, Exception):  # pylint: disable=broad-except
+        except (KeyboardInterrupt, Exception):
             self.destroy()
+            raise
 
         # Update the cluster_info with post-install DC/OS information.
         # This enters the new DC/OS config information into ``cluster_info``.
