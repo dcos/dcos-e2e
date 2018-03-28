@@ -3,6 +3,7 @@ Installation
 
 DC/OS E2E consists of a :doc:`library` and a :doc:`cli`.
 
+The CLI works only with the Docker backend, while the library supports multiple backends.
 The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
 
 Windows is not currently supported, but we provide instructions on using DC/OS E2E on Windows with Vagrant.
@@ -58,8 +59,8 @@ The only supported way to run DC/OS E2E on Windows is using Vagrant and VirtualB
 
 .. code:: ps1
 
-        vagrant plugin install vagrant-cachier
-        vagrant plugin install vagrant-vbguest
+    vagrant plugin install vagrant-cachier
+    vagrant plugin install vagrant-vbguest
 
 - Start Powershell and download the E2E ``Vagrantfile`` to a directory containing a DC/OS installer file:
 
