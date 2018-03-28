@@ -109,11 +109,6 @@ class TestRunIntegrationTest:
                 superuser_password=superuser_password,
             )
 
-            def private_hosts(nodes: Set[Node]) -> str:
-                return ','.join(
-                    [str(node.private_ip_address) for node in nodes],
-                )
-
             master_ip = next(iter(cluster.masters)).private_ip_address
 
             # No error is raised with a successful command.
@@ -123,9 +118,6 @@ class TestRunIntegrationTest:
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                     'DCOS_SSL_ENABLED': 'true',
-                    'MASTER_HOSTS': private_hosts(cluster.masters),
-                    'SLAVE_HOSTS': private_hosts(cluster.agents),
-                    'PUBLIC_SLAVE_HOSTS': private_hosts(cluster.public_agents),
                     'DCOS_DNS_ADDRESS': 'https://' + str(master_ip),
                 },
                 log_output_live=True,
