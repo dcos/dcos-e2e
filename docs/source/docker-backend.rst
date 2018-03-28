@@ -8,8 +8,8 @@ The Docker backend is user to spin up clusters on Docker containers, where each 
 DC/OS Installation
 ------------------
 
-``Cluster``\ s created by the Docker backend only support installing DC/OS via ``install_dcos_from_path``.
-``Node``\ s of ``Cluster``\ s created by the Docker backend do not distinguish between ``public_ip_address`` and ``private_ip_address``.
+:py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend only support installing DC/OS via ``install_dcos_from_path``.
+:py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend do not distinguish between :py:attr:`~dcos_e2e.node.Node.public_ip_address` and .:py:attr:`~dcos_e2e.node.Node.private_ip_address`.
 
 Troubleshooting
 ---------------
@@ -31,9 +31,9 @@ If this repository is available, run ``make clean``.
 macOS File Sharing
 ~~~~~~~~~~~~~~~~~~
 
-On macOS ``/tmp`` is a symlink to ``/private/tmp``.
-``/tmp`` is used by the harness.
-Docker for Mac must be configured to allow ``/private`` to be bind mounted into Docker containers.
+On macOS :file:`/tmp` is a symlink to :file:`/private/tmp`.
+:file:`/tmp` is used by the harness.
+Docker for Mac must be configured to allow :file:`/private` to be bind mounted into Docker containers.
 This is the default.
 See Docker > Preferences > File Sharing.
 
