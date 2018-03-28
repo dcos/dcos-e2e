@@ -209,13 +209,6 @@ Robustness
 Narrowing down bugs from end to end tests is hard enough without dealing with the framework’s bugs.
 This repository aims to maintain high standards in terms of coding quality and quality enforcement by CI is part of that.
 
-Untied to a particular backend
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Currently dcos-e2e supports an AWS and Docker backend.
-However, it is intended that multiple backends can be supported.
-See "New Backends" for details.
-
 Version Policy
 --------------
 
