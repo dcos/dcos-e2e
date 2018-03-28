@@ -13,6 +13,10 @@ python:
 env:
   matrix:
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
 before_install:
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
