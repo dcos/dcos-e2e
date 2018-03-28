@@ -121,15 +121,3 @@ class TestRunIntegrationTest:
                 },
                 log_output_live=True,
             )
-
-            # Test running on Travis
-            # Document how to run tests locally.
-
-            # Nice to have:
-            # Get Bilal to use it
-            # Get it to work with Windows
-
-            # Vendoring:
-            # Change DC/OS Launch as there is an error on import after
-            # vendoring.
-            # Idea is for it do use inspect rather than pkg_resource
