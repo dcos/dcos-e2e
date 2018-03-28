@@ -36,8 +36,6 @@ The only supported way to use the Docker backend on Windows is using Vagrant and
 
 - Start Powershell and download the DC/OS E2E ``Vagrantfile`` to a directory containing a DC/OS installer file:
 
-.. _VirtualBox: https://www.virtualbox.org/wiki/Downloads
-.. _Vagrant: https://www.vagrantup.com/downloads.html
 .. code:: ps1
 
     ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/vagrant/Vagrantfile')) | Set-Content -LiteralPath Vagrantfile
@@ -62,20 +60,20 @@ To connect to the cluster nodes from the Windows host (e.g. to use the DC/OS web
 
 .. code:: ps1
 
-    route add 172.17.0.0 MASK 255.255.0.0 192.168.18.2
+   route add 172.17.0.0 MASK 255.255.0.0 192.168.18.2
 
 To shutdown, logout of the virtual machine shell, and destroy the virtual machine and disk:
 
 .. code:: ps1
 
-    vagrant destroy
+   vagrant destroy
 
 The route will be removed on reboot.
 You can manually remove the route in PowerShell Run as Administrator using:
 
 .. code:: ps1
 
-    route delete 172.17.0.0
+   route delete 172.17.0.0
 
 Troubleshooting
 ---------------
