@@ -31,9 +31,9 @@ If this repository is available, run ``make clean``.
 macOS File Sharing
 ~~~~~~~~~~~~~~~~~~
 
-On macOS ``/tmp`` is a symlink to ``/private/tmp``.
-``/tmp`` is used by the harness.
-Docker for Mac must be configured to allow ``/private`` to be bind mounted into Docker containers.
+On macOS :file:`/tmp` is a symlink to :file:`/private/tmp`.
+:file:`/tmp` is used by the harness.
+Docker for Mac must be configured to allow :file:`/private` to be bind mounted into Docker containers.
 This is the default.
 See Docker > Preferences > File Sharing.
 
