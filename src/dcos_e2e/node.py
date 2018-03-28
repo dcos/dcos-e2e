@@ -36,8 +36,10 @@ class Node:
                 the node as the ``default_ssh_user`` user.
 
         Attributes:
-            ip_address: The IP address used by the DC/OS component
+            public_ip_address: The public IP address of the node.
+            private_ip_address: The IP address used by the DC/OS component
                 running on this node.
+            default_ssh_user: The default username to use for SSH connections.
         """
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address

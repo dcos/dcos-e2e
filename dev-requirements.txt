@@ -18,12 +18,12 @@ pylint==1.8.3
 pyroma==2.3
 pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1
-pytest==3.5.0
 requests-mock==1.4.0
 sphinx-autodoc-typehints==1.3.0
 sphinx-click==1.1.0
 sphinx==1.7.2
 sphinxcontrib-spelling==4.1.0
+vendorize==0.1.0
 vulture==0.26
 yapf==0.21.0
 # We should also use https://github.com/pyga/ebb-lint when it is released for

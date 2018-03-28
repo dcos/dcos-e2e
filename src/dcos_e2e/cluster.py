@@ -117,13 +117,20 @@ class Cluster(ContextDecorator):
         """
         for node in self.masters:
             node.run(
-                args=['/opt/mesosphere/bin/dcos-diagnostics', '--diag'],
+                args=[
+                    '/opt/mesosphere/bin/dcos-diagnostics',
+                    '--diag',
+                    '||',
+                    '/opt/mesosphere/bin/3dt',
+                    '--diag',
+                ],
                 # Keep in mind this must be run as privileged user.
                 log_output_live=True,
                 env={
                     'LC_ALL': 'en_US.UTF-8',
                     'LANG': 'en_US.UTF-8',
                 },
+                shell=True,
             )
 
     def wait_for_dcos_oss(self) -> None:
@@ -388,7 +395,7 @@ class Cluster(ContextDecorator):
 
         def ip_addresses(nodes: Iterable[Node]) -> str:
             return ','.join(
-                map(lambda node: str(node.public_ip_address), nodes),
+                map(lambda node: str(node.private_ip_address), nodes),
             )
 
         environment_variables = {

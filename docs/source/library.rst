@@ -11,7 +11,9 @@ It includes a library which is focused on helping you to write tests which requi
    installation
    getting-started
    cluster
-   docker-backend
+   backends
    node
    enterprise
-   custom-backend
+   distributions
+   docker-versions
+   docker-storage-driver

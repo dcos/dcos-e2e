@@ -42,7 +42,7 @@ dcos_launch.config = ___vendorize__0
 from .. import dcos_launch
 from ..dcos_launch import util as ___vendorize__0
 dcos_launch.util = ___vendorize__0
-from dcos_test_utils import logger
+from ..dcos_test_utils import logger
 from docopt import docopt
 
 json_prettyprint_args = {

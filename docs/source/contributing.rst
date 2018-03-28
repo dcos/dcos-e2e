@@ -194,13 +194,6 @@ Robustness
 Narrowing down bugs from end to end tests is hard enough without dealing with the framework’s bugs.
 This repository aims to maintain high standards in terms of coding quality and quality enforcement by CI is part of that.
 
-Untied to a particular backend
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Currently only DC/OS Docker is supported.
-However, it is intended that multiple backends can be supported.
-See "New Backends" for details.
-
 Version Policy
 --------------
 
@@ -217,19 +210,16 @@ Updating DC/OS Test Utils and DC/OS Launch
 ------------------------------------------
 
 `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
-This is done using `python-vendorize <https://github.com/mwilliamson/python-vendorize>`__.
 To update DC/OS Test Utils or DC/OS Launch:
 
-Update the SHA in ``src/vendorize.toml``.
+Update the SHAs in ``admin/update_launch.py``.
 
 .. code:: sh
 
-    pip install git+https://github.com/mwilliamson/python-vendorize.git
-    git rm -r src/dcos_e2e/_vendor/
-    rm -rf src/dcos_e2e/_vendor/*
-    cd src/
-    python-vendorize
-    git add dcos_e2e/_vendor
+    git rm -rf src/dcos_e2e/_vendor/
+    rm -rf src/dcos_e2e/_vendor
+    python admin/update_launch.py
+    git add src/dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
 Testing the Homebrew Recipe
