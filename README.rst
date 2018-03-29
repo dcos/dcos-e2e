@@ -19,6 +19,18 @@ See the full documentation on `Read the Docs <http://dcos-e2e.readthedocs.io/>`_
 Installation
 ------------
 
+DC/OS E2E consists of a `library`_ and a `CLI`_.
+
+The CLI works only with the `Docker backend`_, while the library supports multiple `backends`_.
+The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
+
+Windows is not currently supported, but we provide instructions on using DC/OS E2E on Windows with Vagrant on particular `backends`_\ ' documentation.
+
+.. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html
+.. _CLI: http://dcos-e2e.readthedocs.io/en/latest/cli.html
+.. _Docker backend: http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html
+.. _backends: http://dcos-e2e.readthedocs.io/en/latest/backends.html
+
 CLI macOS With Homebrew
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -30,6 +42,12 @@ Then install the latest stable version:
 
     brew install https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
+To upgrade to a newer version, run the following command:
+
+.. code:: sh
+
+    brew upgrade https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
+
 Or the latest ``master``:
 
 Homebrew installs the dependencies for the latest released version and so installing ``master`` may not work.
@@ -37,19 +55,6 @@ Homebrew installs the dependencies for the latest released version and so instal
 .. code:: sh
 
     brew install --HEAD https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
-
-To upgrade to a newer version, run the following command:
-
-.. code:: sh
-
-    brew upgrade https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
-
-.. _Homebrew: https://brew.sh
-
-Windows Installation with Vagrant
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-On Windows, it is possible to run DC/OS E2E in Vagrant. See `Windows Installation <http://dcos-e2e.readthedocs.io/en/latest/installation.html#Windows>`_.
 
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,3 +124,4 @@ Each of these commands and more described in detail in the `full CLI documentati
 .. |Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
+.. _Homebrew: https://brew.sh
