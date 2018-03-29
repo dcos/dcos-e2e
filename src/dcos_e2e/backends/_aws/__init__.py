@@ -176,26 +176,21 @@ class AWSCluster(ClusterManager):
         # Update ``cluster_info`` with the AWS SSH key information.
         self.cluster_info = self.launcher.create()
 
-        # Stack ID, SSH Key in the config
-
-        # Wait for the AWS stack setup completion.
-        DcosCloudformationLauncher.wait(self.launcher)  # type: ignore
-
-        # No config change
-
-        # Update the cluster_info with AWS stack information.
-        # This makes node IP addresses available to ``cluster_info``.
-        # cluster.masters/agents/public_agents rely on this information.
-
-        # OnpremLauncher, DcosCloudformationLauncher
-        self.launcher = get_launcher(self.cluster_info)  # type: ignore
-
-        self.cluster_info = self.launcher.describe()
-
         # Store the generated AWS SSH key to the file system.
         self._ssh_key_path = self._path / 'id_rsa'
         private_key = self.cluster_info['ssh_private_key']
         Path(self._ssh_key_path).write_bytes(private_key.encode())
+
+        # Wait for the AWS stack setup completion.
+        DcosCloudformationLauncher.wait(self.launcher)  # type: ignore
+
+        # Update the cluster_info with AWS stack information:
+        # ``describe`` fetches the latest information for the stack.
+        # This makes node IP addresses available to ``cluster_info``.
+        # This also inserts bootstrap node information into ``cluster_info``.
+        self.cluster_info = AbstractOnpremLauncher.describe(  # type: ignore
+            self.launcher,
+        )
 
     def install_dcos_from_url(
         self,
@@ -239,10 +234,6 @@ class AWSCluster(ClusterManager):
         except (KeyboardInterrupt, Exception):
             self.destroy()
             raise
-
-        # Update the cluster_info with post-install DC/OS information.
-        # This enters the new DC/OS config information into ``cluster_info``.
-        self.cluster_info = self.launcher.describe()
 
     def install_dcos_from_path(
         self,
