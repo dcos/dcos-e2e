@@ -1,5 +1,5 @@
-The ``Cluster`` class
-=====================
+The :py:class:`~dcos_e2e.cluster.Cluster` class
+===============================================
 
 Using DC/OS E2E usually involves creating one or more ``Cluster``\s.
 A cluster is created using a "backend", which might be Docker or a cloud provider for example.
@@ -16,8 +16,8 @@ Choosing a Backend
 
 See :doc:`backends` for a backend to use for :paramref:`~dcos_e2e.cluster.Cluster.cluster_backend`.
 
-Creating a Cluster from Existing Nodes
---------------------------------------
+Creating a :py:class:`~dcos_e2e.cluster.Cluster` from Existing :py:class:`~dcos_e2e.node.Node`\ s
+-------------------------------------------------------------------------------------------------
 
 It is possible to create a :py:class:`~dcos_e2e.cluster.Cluster` from existing nodes.
 :py:class:`~dcos_e2e.cluster.Cluster`\ s created with this method cannot be destroyed by DC/OS E2E.
