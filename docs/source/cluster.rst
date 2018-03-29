@@ -1,5 +1,5 @@
-The ``Cluster`` class
-=====================
+The :py:class:`~dcos_e2e.cluster.Cluster` class
+===============================================
 
 Using DC/OS E2E usually involves creating one or more ``Cluster``\s.
 A cluster is created using a "backend", which might be Docker or a cloud provider for example.
@@ -14,15 +14,14 @@ A ``Cluster`` object is then used to interact with the DC/OS cluster.
 Choosing a Backend
 ------------------
 
-At the time of writing the only backend which ships with DC/OS E2E is :doc:`the Docker backend <docker-backend>`.
-It is also possible to :doc:`create your own backend <custom-backend>`.
+See :doc:`backends` for a backend to use for :paramref:`~dcos_e2e.cluster.Cluster.cluster_backend`.
 
-Creating a Cluster from Existing Nodes
---------------------------------------
+Creating a :py:class:`~dcos_e2e.cluster.Cluster` from Existing :py:class:`~dcos_e2e.node.Node`\ s
+-------------------------------------------------------------------------------------------------
 
-It is possible to create a ``Cluster`` from existing nodes.
-Clusters created with this method cannot be destroyed by DC/OS E2E.
-It is assumed that DC/OS is already up and running on the given nodes and installing DC/OS is not supported.
+It is possible to create a :py:class:`~dcos_e2e.cluster.Cluster` from existing nodes.
+:py:class:`~dcos_e2e.cluster.Cluster`\ s created with this method cannot be destroyed by DC/OS E2E.
+It is assumed that DC/OS is already up and running on the given :py:class:`~dcos_e2e.node.Node`\ s and installing DC/OS is not supported.
 
 .. automethod:: dcos_e2e.cluster.Cluster.from_nodes
 
@@ -33,7 +32,7 @@ Some backends support installing DC/OS from a path to a build artifact.
 Some backends support installing DC/OS from a URL pointing to a build artifact.
 
 Each backend comes with a default DC/OS configuration which is enough to start an open source DC/OS cluster.
-The ``extra_config`` parameter allows you to add to or override these configuration settings.
+The :paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_path.extra_config` parameter allows you to add to or override these configuration settings.
 See :doc:`how to use DC/OS Enterprise <enterprise>` with DC/OS E2E.
 
 .. automethod:: dcos_e2e.cluster.Cluster.install_dcos_from_path
@@ -43,7 +42,7 @@ See :doc:`how to use DC/OS Enterprise <enterprise>` with DC/OS E2E.
 Destroying a ``Cluster``
 ------------------------
 
-:py:class:`~dcos_e2e.cluster.Cluster`\ s have a ``destroy()`` method.
+:py:class:`~dcos_e2e.cluster.Cluster`\ s have a :py:meth:`~dcos_e2e.cluster.Cluster.destroy` method.
 This can be called manually, or :py:class:`~dcos_e2e.cluster.Cluster`\ s can be used as context managers.
 In this case the cluster will be destroyed when exiting the context manager.
 
@@ -51,6 +50,8 @@ In this case the cluster will be destroyed when exiting the context manager.
 
     with Cluster(backend=Docker(), masters=3, agents=2):
         pass
+
+.. automethod:: dcos_e2e.cluster.Cluster.destroy
 
 Waiting for DC/OS
 -----------------

@@ -20,6 +20,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinxcontrib.spelling',
     'sphinx_click.ext',
+    'sphinx_paramlinks',
 ]
 
 templates_path = ['_templates']
