@@ -14,8 +14,7 @@ A ``Cluster`` object is then used to interact with the DC/OS cluster.
 Choosing a Backend
 ------------------
 
-At the time of writing the only backend which ships with DC/OS E2E is :doc:`the Docker backend <docker-backend>`.
-It is also possible to :doc:`create your own backend <custom-backend>`.
+See :doc:`backends`.
 
 Creating a Cluster from Existing Nodes
 --------------------------------------
