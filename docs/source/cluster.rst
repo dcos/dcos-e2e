@@ -32,7 +32,7 @@ Some backends support installing DC/OS from a path to a build artifact.
 Some backends support installing DC/OS from a URL pointing to a build artifact.
 
 Each backend comes with a default DC/OS configuration which is enough to start an open source DC/OS cluster.
-The ``extra_config`` parameter allows you to add to or override these configuration settings.
+The :paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_path.extra_config` parameter allows you to add to or override these configuration settings.
 See :doc:`how to use DC/OS Enterprise <enterprise>` with DC/OS E2E.
 
 .. automethod:: dcos_e2e.cluster.Cluster.install_dcos_from_path
