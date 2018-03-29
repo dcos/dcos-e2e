@@ -42,7 +42,7 @@ See :doc:`how to use DC/OS Enterprise <enterprise>` with DC/OS E2E.
 Destroying a ``Cluster``
 ------------------------
 
-:py:class:`~dcos_e2e.cluster.Cluster`\ s have a ``destroy()`` method.
+:py:class:`~dcos_e2e.cluster.Cluster`\ s have a :py:meth:`~dcos_e2e.cluster.Cluster.destroy` method.
 This can be called manually, or :py:class:`~dcos_e2e.cluster.Cluster`\ s can be used as context managers.
 In this case the cluster will be destroyed when exiting the context manager.
 
@@ -50,6 +50,8 @@ In this case the cluster will be destroyed when exiting the context manager.
 
     with Cluster(backend=Docker(), masters=3, agents=2):
         pass
+
+.. automethod:: dcos_e2e.cluster.Cluster.destroy
 
 Waiting for DC/OS
 -----------------
