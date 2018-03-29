@@ -19,12 +19,12 @@ See the full documentation on `Read the Docs <http://dcos-e2e.readthedocs.io/>`_
 Installation
 ------------
 
-DC/OS E2E consists of a :doc:`library` and a :doc:`cli`.
+DC/OS E2E consists of a `library`_ and a `CLI`_.
 
-The CLI works only with the :doc:`docker-backend`, while the library supports multiple :doc:`backends`.
+The CLI works only with the `Docker backend`_, while the library supports multiple `backends`_.
 The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
 
-Windows is not currently supported, but we provide instructions on using DC/OS E2E on Windows with Vagrant on particular :doc:`backends`\ ' documentation.
+Windows is not currently supported, but we provide instructions on using DC/OS E2E on Windows with Vagrant on particular `backends`_\ ' documentation.
 
 CLI macOS With Homebrew
 ~~~~~~~~~~~~~~~~~~~~~~~
