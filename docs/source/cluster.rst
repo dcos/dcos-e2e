@@ -19,9 +19,9 @@ See :doc:`backends`.
 Creating a Cluster from Existing Nodes
 --------------------------------------
 
-It is possible to create a ``Cluster`` from existing nodes.
-Clusters created with this method cannot be destroyed by DC/OS E2E.
-It is assumed that DC/OS is already up and running on the given nodes and installing DC/OS is not supported.
+It is possible to create a :py:class:`~dcos_e2e.cluster.Cluster` from existing nodes.
+:py:class:`~dcos_e2e.cluster.Cluster`\ s created with this method cannot be destroyed by DC/OS E2E.
+It is assumed that DC/OS is already up and running on the given :py:class:`~dcos_e2e.node.Node`\ s and installing DC/OS is not supported.
 
 .. automethod:: dcos_e2e.cluster.Cluster.from_nodes
 
