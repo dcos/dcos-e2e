@@ -14,7 +14,7 @@ A ``Cluster`` object is then used to interact with the DC/OS cluster.
 Choosing a Backend
 ------------------
 
-See :doc:`backends` for a backend to use for :paramref:`dcos_e2e.cluster.Cluster.cluster_backend`.
+See :doc:`backends` for a backend to use for :paramref:`~dcos_e2e.cluster.Cluster.cluster_backend`.
 
 Creating a Cluster from Existing Nodes
 --------------------------------------
