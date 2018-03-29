@@ -4,13 +4,12 @@ Tests for the Docker backend.
 
 import uuid
 from pathlib import Path
-from typing import Set
 
 import pytest
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import AWS
-from dcos_e2e.cluster import Cluster, Node
+from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 
 

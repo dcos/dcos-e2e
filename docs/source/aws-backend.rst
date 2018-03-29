@@ -60,12 +60,12 @@ EC2 instance types
 
 The AWS backend does not offer a choice for EC2 instances.
 Currently it launches ``m4.large`` instances for DC/OS nodes.
-Please direct requests for different instance type support towards Tim Weidner.
 
 Unsupported features
 --------------------
 
 The AWS backend does currently not support the :py:class:`~dcos_e2e.cluster.Cluster` feature of copying files to the DC/OS installer.
+The progress on this feature is tracked in the corresponding JIRA issue `DCOS-21894 <https://jira.mesosphere.com/browse/DCOS-21894>`_.
 
 Troubleshooting
 ---------------
