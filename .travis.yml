@@ -13,9 +13,6 @@ python:
 env:
   matrix:
   - TEST_PATTERN=tests/test_cli
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
-  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
@@ -36,6 +33,9 @@ env:
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111::test_oss
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111::test_enterprise
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise
 before_install:
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
