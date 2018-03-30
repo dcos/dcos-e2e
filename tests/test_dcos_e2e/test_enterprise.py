@@ -11,6 +11,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 
 class TestEnterpriseIntegrationTests:
@@ -254,20 +255,18 @@ class TestSecurityDisabled:
 
 
 def _can_connect_with_cli(
-    cluster: Cluster,
+    master: Node,
     username: str,
     password: str,
 ) -> bool:
     """
-    Return whether the CLI can connect with a ``cluster``.
+    Return whether the CLI can connect with a ``master``.
 
     This is, at the time of writing, a good metric of whether the cluster
     is "ready". The best metric would be to take each of the integration
     tests and to see if they pass after 0 seconds, but this is a currently
     suitable compromise.
     """
-    (master, ) = next(iter(cluster.masters))
-
     setup_args = [
         'dcos',
         'cluster',
@@ -300,7 +299,7 @@ class TestWaitForDCOS:
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
         license_key_contents: str,
-    ):
+    ) -> None:
         """
         Test ``wait_for_dcos_ee`` with a given security mode.
         """
@@ -325,8 +324,9 @@ class TestWaitForDCOS:
                 superuser_password=superuser_password,
             )
 
+            (master, ) = cluster.masters
             assert _can_connect_with_cli(
-                cluster=cluster,
+                master=master,
                 username=superuser_username,
                 password=superuser_password,
             )
