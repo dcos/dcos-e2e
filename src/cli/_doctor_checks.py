@@ -40,7 +40,7 @@ def _error(message: str) -> None:
     click.echo(message)
 
 
-def check_free_space() -> None:
+def check_tmp_free_space() -> None:
     """
     Warn if there is not enough free space in the default temporary directory.
     """

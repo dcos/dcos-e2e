@@ -50,12 +50,12 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._doctor_checks import (
-    check_free_space,
     check_memory,
     check_mount_tmp,
     check_networking,
     check_ssh,
     check_storage_driver,
+    check_tmp_free_space,
     link_to_troubleshooting,
 )
 from ._utils import is_enterprise
@@ -937,7 +937,7 @@ def doctor() -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
-    check_free_space()
+    check_tmp_free_space()
     check_storage_driver()
     check_ssh()
     check_networking()
