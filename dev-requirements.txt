@@ -4,7 +4,7 @@ dcoscli==0.6.0
 doc8==0.8.0
 dulwich==0.19.0
 flake8-commas==2.0.0
-flake8-quotes==0.14.0
+flake8-quotes==0.14.1
 flake8==3.5.0
 homebrew-pypi-poet==0.10.0
 isort==4.3.4
