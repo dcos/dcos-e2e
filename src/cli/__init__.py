@@ -56,6 +56,7 @@ from ._doctor_checks import (
     check_ssh,
     check_storage_driver,
     check_tmp_free_space,
+    check_var_free_space,
     link_to_troubleshooting,
 )
 from ._utils import is_enterprise
@@ -938,6 +939,7 @@ def doctor() -> None:
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     check_tmp_free_space()
+    check_var_free_space()
     check_storage_driver()
     check_ssh()
     check_networking()

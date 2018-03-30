@@ -64,6 +64,13 @@ def check_tmp_free_space() -> None:
         _warn(message=low_space_message)
 
 
+def check_var_free_space() -> None:
+    """
+    XXX
+    """
+    pass
+
+
 def check_storage_driver() -> None:
     """
     Warn if the Docker storage driver is not a recommended driver.
