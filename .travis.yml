@@ -1,4 +1,3 @@
-group: deprecated-2017Q4
 sudo: required
 services:
 - docker
@@ -25,7 +24,9 @@ env:
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest
   - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled
-  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
+  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_disabled
+  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_permissive
+  - TEST_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_strict
   - TEST_PATTERN=tests/test_dcos_e2e/test_node.py::TestNode
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_oss
   - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise

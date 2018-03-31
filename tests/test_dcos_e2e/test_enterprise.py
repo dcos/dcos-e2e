@@ -11,6 +11,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 
 class TestEnterpriseIntegrationTests:
@@ -253,20 +254,54 @@ class TestSecurityDisabled:
             )
 
 
+def _can_connect_with_cli(
+    master: Node,
+    username: str,
+    password: str,
+) -> bool:
+    """
+    Return whether the CLI can connect with a ``master``.
+
+    This is, at the time of writing, a good metric of whether the cluster
+    is "ready". The best metric would be to take each of the integration
+    tests and to see if they pass after 0 seconds, but this is a currently
+    suitable compromise.
+    """
+    setup_args = [
+        'dcos',
+        'cluster',
+        'setup',
+        'https://' + str(master.public_ip_address),
+        '--no-check',
+        '--username',
+        username,
+        '--password',
+        password,
+    ]
+
+    setup = subprocess.run(
+        args=setup_args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    return bool(setup.returncode == 0 and setup.stderr == b'')
+
+
 class TestWaitForDCOS:
     """
     Tests for `Cluster.wait_for_dcos_ee`.
     """
 
-    def test_auth_with_cli(
+    def _test_security_mode(
         self,
+        security_mode: str,
         cluster_backend: ClusterBackend,
         enterprise_artifact: Path,
         license_key_contents: str,
     ) -> None:
         """
-        After `Cluster.wait_for_dcos_ee`, the DC/OS Enterprise cluster can
-        communicate with the CLI.
+        Test ``wait_for_dcos_ee`` with a given security mode.
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
@@ -275,6 +310,7 @@ class TestWaitForDCOS:
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'fault_domain_enabled': False,
             'license_key_contents': license_key_contents,
+            'security': security_mode,
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
@@ -283,29 +319,65 @@ class TestWaitForDCOS:
                 extra_config=config,
                 log_output_live=True,
             )
-            (master, ) = cluster.masters
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
 
-            setup_args = [
-                'dcos',
-                'cluster',
-                'setup',
-                'https://' + str(master.public_ip_address),
-                '--no-check',
-                '--username',
-                superuser_username,
-                '--password',
-                superuser_password,
-            ]
-
-            setup = subprocess.run(
-                args=setup_args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+            (master, ) = cluster.masters
+            assert _can_connect_with_cli(
+                master=master,
+                username=superuser_username,
+                password=superuser_password,
             )
 
-            assert setup.returncode == 0
-            assert setup.stderr == b''
+    def test_disabled(
+        self,
+        cluster_backend: ClusterBackend,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        After `Cluster.wait_for_dcos_ee`, a DC/OS Enterprise cluster in
+        disabled mode is "ready".
+        """
+        self._test_security_mode(
+            security_mode='disabled',
+            cluster_backend=cluster_backend,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
+
+    def test_permissive(
+        self,
+        cluster_backend: ClusterBackend,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        After `Cluster.wait_for_dcos_ee`, a DC/OS Enterprise cluster in
+        permissive mode is "ready".
+        """
+        self._test_security_mode(
+            security_mode='permissive',
+            cluster_backend=cluster_backend,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
+
+    def test_strict(
+        self,
+        cluster_backend: ClusterBackend,
+        enterprise_artifact: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        After `Cluster.wait_for_dcos_ee`, a DC/OS Enterprise cluster in
+        strict mode is "ready".
+        """
+        self._test_security_mode(
+            security_mode='strict',
+            cluster_backend=cluster_backend,
+            enterprise_artifact=enterprise_artifact,
+            license_key_contents=license_key_contents,
+        )
