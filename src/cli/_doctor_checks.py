@@ -320,11 +320,19 @@ def link_to_troubleshooting() -> CheckLevels:
 
 def check_1_9_sed() -> CheckLevels:
     """
-    XXX
+    Warn if the system's version of ``sed`` is incompatible with legacy DC/OS
+    installers.
     """
-    args = ['sed']
-    result = subprocess.check_output(args=args)
-    if result != 'XXX':
+    import tempfile
+    temp = tempfile.NamedTemporaryFile()
+    Path(temp.name).write_text('a\na')
+    sed_args = "sed '0,/a/ s/a/b/' " + temp.name
+    result = subprocess.check_output(
+        args=sed_args,
+        shell=True,
+    )
+
+    if result != b'b\na':
         message = (
             ''
             ''
