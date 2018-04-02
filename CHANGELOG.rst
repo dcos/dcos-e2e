@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+- Add support for DC/OS 1.9 on Linux hosts.
+- ``dcos-docker doctor`` returns a status code of ``1`` if there are any errors.
+
 2018.03.26.0
 ------------
 

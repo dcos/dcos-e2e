@@ -4,6 +4,7 @@ Checks for showing up common sources of errors with the Docker backend.
 
 import shutil
 import subprocess
+from enum import IntEnum
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
@@ -13,9 +14,19 @@ import docker
 from ._common import DOCKER_STORAGE_DRIVERS
 
 
+class CheckLevels(IntEnum):
+    """
+    Levels of issues that a check can raise.
+    """
+
+    NONE = 1
+    WARNING = 2
+    ERROR = 3
+
+
 def _info(message: str) -> None:
     """
-    Show a warning message.
+    Show an info message.
     """
     click.echo()
     click.echo(click.style('Note: ', fg='blue'), nl=False)
@@ -40,7 +51,7 @@ def _error(message: str) -> None:
     click.echo(message)
 
 
-def check_free_space() -> None:
+def check_free_space() -> CheckLevels:
     """
     Warn if there is not enough free space in the default temporary directory.
     """
@@ -62,9 +73,12 @@ def check_free_space() -> None:
 
     if free_space_gb < 5:
         _warn(message=low_space_message)
+        return CheckLevels.WARNING
+
+    return CheckLevels.NONE
 
 
-def check_storage_driver() -> None:
+def check_storage_driver() -> CheckLevels:
     """
     Warn if the Docker storage driver is not a recommended driver.
     """
@@ -107,7 +121,7 @@ def check_storage_driver() -> None:
             help_url=storage_driver_url,
         )
         _error(message=message)
-        return
+        return CheckLevels.ERROR
 
     if not supported_host_driver:
         message = (
@@ -120,20 +134,26 @@ def check_storage_driver() -> None:
             help_url=storage_driver_url,
         )
         _warn(message=message)
+        return CheckLevels.WARNING
+
+    return CheckLevels.NONE
 
 
-def check_ssh() -> None:
+def check_ssh() -> CheckLevels:
     """
     Error if `ssh` is not available on the path.
     """
     if shutil.which('ssh') is None:
         _error(message='`ssh` must be available on your path.')
+        return CheckLevels.ERROR
+    return CheckLevels.NONE
 
 
-def check_networking() -> None:
+def check_networking() -> CheckLevels:
     """
     Error if the Docker network is not set up correctly.
     """
+    highest_level = CheckLevels.NONE
     # Image for a container which sleeps for a long time.
     tiny_image = 'luca3m/sleep'
     client = docker.from_env(version='auto')
@@ -162,15 +182,18 @@ def check_networking() -> None:
                 'https://github.com/wojas/docker-mac-network. '
             )
         _error(message=message)
+        highest_level = CheckLevels.ERROR
 
     ping_container.stop()
     ping_container.remove(v=True)
+    return highest_level
 
 
-def check_mount_tmp() -> None:
+def check_mount_tmp() -> CheckLevels:
     """
     Error if it is not possible to mount the temporary directory.
     """
+    highest_level = CheckLevels.NONE
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
     tiny_image = 'luca3m/sleep'
@@ -202,12 +225,14 @@ def check_mount_tmp() -> None:
             ),
         )
         _error(message=message)
-    else:
-        private_mount_container.stop()
-        private_mount_container.remove(v=True)
+        highest_level = CheckLevels.ERROR
+
+    private_mount_container.stop()
+    private_mount_container.remove(v=True)
+    return highest_level
 
 
-def check_memory() -> None:
+def check_memory() -> CheckLevels:
     """
     Show information about the memory available to Docker.
     """
@@ -233,9 +258,10 @@ def check_memory() -> None:
         message += mac_message
 
     _info(message=message)
+    return CheckLevels.NONE
 
 
-def link_to_troubleshooting() -> None:
+def link_to_troubleshooting() -> CheckLevels:
     """
     Link to documentation for further troubleshooting.
     """
@@ -246,3 +272,4 @@ def link_to_troubleshooting() -> None:
     )
 
     _info(message=message)
+    return CheckLevels.NONE
