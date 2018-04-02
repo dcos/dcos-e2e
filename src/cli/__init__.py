@@ -50,6 +50,7 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._doctor_checks import (
+    CheckLevels,
     check_free_space,
     check_memory,
     check_mount_tmp,
@@ -937,10 +938,16 @@ def doctor() -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
-    check_free_space()
-    check_storage_driver()
-    check_ssh()
-    check_networking()
-    check_mount_tmp()
-    check_memory()
-    link_to_troubleshooting()
+    check_functions = [
+        check_free_space,
+        check_storage_driver,
+        check_ssh,
+        check_networking,
+        check_mount_tmp,
+        check_memory,
+        link_to_troubleshooting,
+    ]
+
+    highest_level = max(function() for function in check_functions)
+    if highest_level == CheckLevels.ERROR:
+        sys.exit(1)
