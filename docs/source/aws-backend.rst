@@ -65,7 +65,7 @@ Unsupported features
 --------------------
 
 The AWS backend does currently not support the :py:class:`~dcos_e2e.cluster.Cluster` feature of copying files to the DC/OS installer.
-The progress on this feature is tracked in the corresponding JIRA issue `DCOS-21894 <https://jira.mesosphere.com/browse/DCOS-21894>`_.
+The progress on this feature is tracked in :issue:`DCOS-21894`.
 
 Troubleshooting
 ---------------
