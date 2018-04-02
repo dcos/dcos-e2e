@@ -50,8 +50,10 @@ Change the local version of ``sed``
 
 It is possible to use unmodified installers if we use ``GNU sed`` as the system's default ``sed``.
 This may have unforeseen side-effects.
-This requires (TODO link)Homebrew to be installed.
+This requires `Homebrew`_ to be installed.
 
 .. code:: sh
 
    brew install gnu-sed --with-default-names
+
+.. _Homebrew: https://brew.sh
