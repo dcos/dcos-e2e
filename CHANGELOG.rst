@@ -7,6 +7,7 @@ Next
 ----
 
 - Add a new ``dcos-docker doctor`` check for suitable ``sed`` for DC/OS 1.9.
+- Support ``cluster.run_integration_tests`` on DC/OS 1.9.
 
 2018.04.02.0
 ------------
