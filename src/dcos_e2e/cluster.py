@@ -398,17 +398,20 @@ class Cluster(ContextDecorator):
                 map(lambda node: str(node.private_ip_address), nodes),
             )
 
+        # Tests are run on a random master node.
+        test_host = next(iter(self.masters))
+
         environment_variables = {
+            # This is needed for 1.9 (and below?)
+            'PUBLIC_MASTER_HOSTS': ip_addresses(self.masters),
             'MASTER_HOSTS': ip_addresses(self.masters),
             'SLAVE_HOSTS': ip_addresses(self.agents),
             'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
+            'DCOS_DNS_ADDRESS': 'http://' + str(test_host.private_ip_address),
             **env,
         }
 
         args += pytest_command
-
-        # Tests are run on a random master node.
-        test_host = next(iter(self.masters))
 
         return test_host.run(
             args=args,
