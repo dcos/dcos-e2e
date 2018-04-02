@@ -23,20 +23,34 @@ All backwards incompatible changes will be documented in the :doc:`changelog`.
 DC/OS 1.9 and below
 -------------------
 
-DC/OS installers are not immediately compatible with the BSD sed that ships with macOS. This will be fixed in a future release of DC/OS: https://github.com/dcos/dcos/pull/1571 . For now, use one of the following options:
+Installers for DC/OS 1.9 and below require a version of ``sed`` that is not compatible with the BSD sed that ships with macOS.
 
-1. Modify the installer with the following script:
+Some (TODO link to backends doc)backends allow us to install DC/OS from a (TODO link to install from path)local path.
+Some backends allow us to install DC/OS from a URL.
 
-    ```
-    sed -e 'H;1h;$!d;x' -e "s/sed '0,/sed '1,/" dcos_generate_config.sh > dcos_generate_config.sh.bak
-    mv dcos_generate_config.sh.bak dcos_generate_config.sh
-    ```
 
-2. Install GNU sed with Homebrew:
+To use these versions of DC/OS with macOS for (TODO link)install from path, we can either modify the installer or modify the local version of ``sed``.
 
-    ```
-    brew install gnu-sed --with-default-names
-    ```
+Modify the installer
+^^^^^^^^^^^^^^^^^^^^
 
-    Warning: This method will make GNU sed the default sed, which may have unforeseen side-effects.
+The following command replaces an installer named :file:`dcos_generate_config.sh` with a slightly different installer that works with the default ``sed`` on macOS.
 
+.. code:: sh
+
+   sed \
+       -e 'H;1h;$!d;x' \
+       -e "s/sed '0,/sed '1,/" \
+       dcos_generate_config.sh > dcos_generate_config.sh.bak
+   mv dcos_generate_config.sh.bak dcos_generate_config.sh
+
+Change the local version of ``sed``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is possible to use unmodified installers if we use ``GNU sed`` as the system's default ``sed``.
+This may have unforeseen side-effects.
+This requires (TODO link)Homebrew to be installed.
+
+.. code:: sh
+
+   brew install gnu-sed --with-default-names
