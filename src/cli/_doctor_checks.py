@@ -313,6 +313,7 @@ def link_to_troubleshooting() -> CheckLevels:
         'If you continue to experience problems, more information is '
         'available at '
         'http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html#troubleshooting'  # noqa: E501
+        '.'
     )
 
     _info(message=message)
@@ -335,6 +336,7 @@ def check_1_9_sed() -> CheckLevels:
             'DC/OS 1.9 and below. '
             'See '
             'http://dcos-e2e.readthedocs.io/en/latest/versioning-and-api-stability.html#dc-os-1-9-and-below'  # noqa: E501
+            '.'
         )
         _warn(message=message)
         return CheckLevels.WARNING
