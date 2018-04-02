@@ -4,7 +4,7 @@ Checks for showing up common sources of errors with the Docker backend.
 
 import shutil
 import subprocess
-from enum import Enum
+from enum import IntEnum
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
@@ -14,7 +14,7 @@ import docker
 from ._common import DOCKER_STORAGE_DRIVERS
 
 
-class CheckLevels(Enum):
+class CheckLevels(IntEnum):
     """
     Levels of issues that a check can raise.
     """
