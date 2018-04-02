@@ -331,8 +331,10 @@ def check_1_9_sed() -> CheckLevels:
 
     if result != b'b\na':
         message = (
-            ''
-            ''
+            'The version of ``sed`` is not compatible with installers for '
+            'DC/OS 1.9 and below. '
+            'See '
+            'http://dcos-e2e.readthedocs.io/en/latest/versioning-and-api-stability.html#dc-os-1-9-and-below'  # noqa: E501
         )
         _warn(message=message)
         return CheckLevels.WARNING
