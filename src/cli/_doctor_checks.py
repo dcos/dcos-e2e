@@ -4,6 +4,7 @@ Checks for showing up common sources of errors with the Docker backend.
 
 import shutil
 import subprocess
+from enum import Enum
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
@@ -13,9 +14,19 @@ import docker
 from ._common import DOCKER_STORAGE_DRIVERS
 
 
+class CheckLevels(Enum):
+    """
+    Levels of issues that a check can raise.
+    """
+
+    NONE = 1
+    WARNING = 2
+    ERROR = 3
+
+
 def _info(message: str) -> None:
     """
-    Show a warning message.
+    Show an info message.
     """
     click.echo()
     click.echo(click.style('Note: ', fg='blue'), nl=False)
