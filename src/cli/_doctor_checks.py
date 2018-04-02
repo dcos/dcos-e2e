@@ -326,6 +326,8 @@ def check_1_9_sed() -> CheckLevels:
     result = subprocess.check_output(args=args)
     if result != 'XXX':
         message = (
+            ''
+            ''
         )
         _warn(message=message)
         return CheckLevels.WARNING
