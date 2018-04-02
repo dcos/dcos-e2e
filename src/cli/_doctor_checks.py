@@ -202,9 +202,10 @@ def check_mount_tmp() -> None:
             ),
         )
         _error(message=message)
-    else:
-        private_mount_container.stop()
-        private_mount_container.remove(v=True)
+        return
+
+    private_mount_container.stop()
+    private_mount_container.remove(v=True)
 
 
 def check_memory() -> None:
