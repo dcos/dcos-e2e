@@ -367,9 +367,12 @@ def create(
             build_artifact=artifact_path,
             workspace_dir=workspace_dir,
         )
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as exc:
         rmtree(path=str(workspace_dir), ignore_errors=True)
         click.echo(doctor_message)
+        click.echo()
+        click.echo('Original error:')
+        click.echo(exc.stderr)
         raise
 
     if enterprise:
