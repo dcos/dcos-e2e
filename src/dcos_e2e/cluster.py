@@ -402,6 +402,8 @@ class Cluster(ContextDecorator):
         test_host = next(iter(self.masters))
 
         environment_variables = {
+            # This is needed for 1.9 (and below?)
+            'PUBLIC_MASTER_HOSTS': ip_addresses(self.masters),
             'MASTER_HOSTS': ip_addresses(self.masters),
             'SLAVE_HOSTS': ip_addresses(self.agents),
             'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
