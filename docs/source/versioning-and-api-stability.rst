@@ -30,7 +30,7 @@ Some :doc:`backends` allow us to install DC/OS from a local path (:paramref:`~dc
 
 Some :doc:`backends` allow us to install DC/OS from a URL (:paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_url`).
 
-To use these versions of DC/OS with macOS and (:paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_path`), we can either modify the installer or modify the local version of ``sed``.
+To use these versions of DC/OS with macOS and :paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_path`, we can either modify the installer or modify the local version of ``sed``.
 
 Modify the installer
 ^^^^^^^^^^^^^^^^^^^^
