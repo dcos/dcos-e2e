@@ -78,14 +78,13 @@ def check_tmp_free_space() -> CheckLevels:
     return CheckLevels.NONE
 
 
-def check_var_free_space() -> CheckLevels:
+def check_docker_root_free_space() -> CheckLevels:
     """
-    XXX
+    Warn if there is not enough free space in the Docker root directory.
     """
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
-    # ROOT DIR = client.info['DockerRootDir']
-    tiny_image = 'ubuntu'
+    tiny_image = 'luca3m/sleep'
     client = docker.from_env(version='auto')
     container = client.containers.run(
         image=tiny_image,
@@ -107,7 +106,6 @@ def check_var_free_space() -> CheckLevels:
         'The Docker root directory is at "{docker_root_dir}". '
         'On macOS this location is on a hidden virtual machine. '
         'This directory has {free_space:.1f} GB of free space available. '
-        'Creating a cluster typically takes approximately N GB of space. '
         'If you encounter problems try running ``docker system prune``.'
     ).format(
         docker_root_dir=client.info()['DockerRootDir'],
@@ -116,7 +114,7 @@ def check_var_free_space() -> CheckLevels:
 
     # The choice of 5 GB is arbitrary. Let's see how it goes in practice and
     # potentially adjust later.
-    if available_gigabytes < 15:
+    if available_gigabytes < 5:
         _warn(message=low_space_message)
         return CheckLevels.WARNING
 
