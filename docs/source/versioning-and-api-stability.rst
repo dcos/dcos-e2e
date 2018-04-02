@@ -5,7 +5,7 @@ DC/OS E2E aims to work with DC/OS OSS and DC/OS Enterprise ``master`` branches.
 These are moving targets.
 For this reason, `CalVer <http://calver.org/>`__ is used as a date at which the repository is last known to have worked with DC/OS OSS and DC/OS Enterprise is the main versioning use.
 
-As well as ``master``, DC/OS E2E supports the following versions:
+As well as ``master``, DC/OS E2E supports the following versions of DC/OS:
 
 * DC/OS 1.11
 * DC/OS 1.10
