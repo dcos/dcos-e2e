@@ -9,7 +9,7 @@ As well as ``master``, DC/OS E2E supports the following versions:
 
 * DC/OS 1.11
 * DC/OS 1.10
-* DC/OS 1.9 (not supported on macOS, see :issue:`DCOS_OSS-2176`)
+* DC/OS 1.9 (limited support, see XXX)
 
 Other versions may work but are not tested.
 
@@ -17,3 +17,24 @@ See `GitHub <https://github.com/mesosphere/dcos-e2e/releases>`_ for releases.
 
 There is no guarantee of API stability at this point.
 All backwards incompatible changes will be documented in the :doc:`changelog`.
+
+DC/OS 1.9 and below
+-------------------
+
+DC/OS installers are not immediately compatible with the BSD sed that ships with macOS. This will be fixed in a future release of DC/OS: https://github.com/dcos/dcos/pull/1571 . For now, use one of the following options:
+
+1. Modify the installer with the following script:
+
+    ```
+    sed -e 'H;1h;$!d;x' -e "s/sed '0,/sed '1,/" dcos_generate_config.sh > dcos_generate_config.sh.bak
+    mv dcos_generate_config.sh.bak dcos_generate_config.sh
+    ```
+
+2. Install GNU sed with Homebrew:
+
+    ```
+    brew install gnu-sed --with-default-names
+    ```
+
+    Warning: This method will make GNU sed the default sed, which may have unforeseen side-effects.
+
