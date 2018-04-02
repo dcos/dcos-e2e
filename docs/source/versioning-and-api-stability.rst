@@ -9,7 +9,7 @@ As well as ``master``, DC/OS E2E supports the following versions:
 
 * DC/OS 1.11
 * DC/OS 1.10
-* DC/OS 1.9 (limited support, see XXX)
+* DC/OS 1.9 (limited support, see legacy_installers_)
 
 Other versions may work but are not tested.
 
@@ -17,6 +17,8 @@ See `GitHub <https://github.com/mesosphere/dcos-e2e/releases>`_ for releases.
 
 There is no guarantee of API stability at this point.
 All backwards incompatible changes will be documented in the :doc:`changelog`.
+
+.. _legacy_installers:
 
 DC/OS 1.9 and below
 -------------------

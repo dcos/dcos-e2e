@@ -316,3 +316,11 @@ def link_to_troubleshooting() -> CheckLevels:
 
     _info(message=message)
     return CheckLevels.NONE
+
+
+def check_1_9_sed() -> CheckLevels:
+    """
+    XXX
+    """
+    # TODO: Try some sed with 0/
+    # If it isn't as expected, warn
