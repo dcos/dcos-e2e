@@ -50,11 +50,7 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._doctor_checks import (
-<<<<<<< HEAD
-=======
     CheckLevels,
-    check_free_space,
->>>>>>> origin/master
     check_memory,
     check_mount_tmp,
     check_networking,
@@ -945,13 +941,13 @@ def doctor() -> None:
     """
     check_functions = [
         check_var_free_space,
-        check_free_space,
-        check_storage_driver,
-        check_ssh,
-        check_networking,
-        check_mount_tmp,
-        check_memory,
-        link_to_troubleshooting,
+        # check_free_space,
+        # check_storage_driver,
+        # check_ssh,
+        # check_networking,
+        # check_mount_tmp,
+        # check_memory,
+        # link_to_troubleshooting,
     ]
 
     highest_level = max(function() for function in check_functions)
