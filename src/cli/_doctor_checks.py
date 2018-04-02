@@ -68,7 +68,20 @@ def check_var_free_space() -> None:
     """
     XXX
     """
-    pass
+    # Any image will do, we use this for another test so using it here saves
+    # pulling another image.
+    tiny_image = 'luca3m/sleep'
+    client = docker.from_env(version='auto')
+    container = client.containers.run(
+        image=tiny_image,
+        tty=True,
+        detach=True,
+        privileged=True,
+        volumes={'/var/lib/docker': {
+            'bind': '/var_lib',
+            'mode': 'rw',
+        }},
+    )
 
 
 def check_storage_driver() -> None:
