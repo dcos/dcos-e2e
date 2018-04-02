@@ -145,6 +145,8 @@ def check_ssh() -> CheckLevels:
     """
     if shutil.which('ssh') is None:
         _error(message='`ssh` must be available on your path.')
+        return CheckLevels.ERROR
+    return CheckLevels.NONE
 
 
 def check_networking() -> CheckLevels:
