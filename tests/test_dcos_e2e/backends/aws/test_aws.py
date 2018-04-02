@@ -108,8 +108,6 @@ class TestRunIntegrationTest:
                 superuser_password=superuser_password,
             )
 
-            master_ip = next(iter(cluster.masters)).private_ip_address
-
             # No error is raised with a successful command.
             cluster.run_integration_tests(
                 pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
@@ -117,7 +115,6 @@ class TestRunIntegrationTest:
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                     'DCOS_SSL_ENABLED': 'true',
-                    'DCOS_DNS_ADDRESS': 'https://' + str(master_ip),
                 },
                 log_output_live=True,
             )
