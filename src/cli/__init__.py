@@ -945,13 +945,13 @@ def doctor() -> None:
     """
     check_functions = [
         check_1_9_sed,
-        # check_docker_root_free_space,
-        # check_memory,
-        # check_mount_tmp,
-        # check_networking,
-        # check_ssh,
-        # check_storage_driver,
-        # check_tmp_free_space,
+        check_docker_root_free_space,
+        check_memory,
+        check_mount_tmp,
+        check_networking,
+        check_ssh,
+        check_storage_driver,
+        check_tmp_free_space,
     ]
 
     highest_level = max(function() for function in check_functions)
