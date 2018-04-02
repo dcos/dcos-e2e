@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.04.02.0
+------------
+
 - Add support for DC/OS 1.9 on Linux hosts.
 - ``dcos-docker doctor`` returns a status code of ``1`` if there are any errors.
 - Add a new ``dcos-docker doctor`` check for free space in the Docker root directory.
