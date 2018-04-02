@@ -9,7 +9,7 @@ As well as ``master``, DC/OS E2E supports the following versions:
 
 * DC/OS 1.11
 * DC/OS 1.10
-* DC/OS 1.9 (limited support, see legacy_installers_)
+* DC/OS 1.9 (limited support, see :ref:`legacy_installers`)
 
 Other versions may work but are not tested.
 
