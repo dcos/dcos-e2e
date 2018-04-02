@@ -5,6 +5,7 @@ This module contains tests for Docker backend features which are not covered by
 sibling modules.
 """
 
+import subprocess
 import uuid
 from pathlib import Path
 from typing import Dict
@@ -15,12 +16,26 @@ import docker
 import pytest
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker, NoMockAddress
+from retry import retry
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node
+
+
+@retry(
+    exceptions=(subprocess.CalledProcessError),
+    tries=60,
+    delay=1,
+)
+def _wait_for_docker(node: Node) -> None:
+    """
+    Retry for up to one minute (arbitrary) until Docker is running on the given
+    node.
+    """
+    node.run(args=['docker', 'info'])
 
 
 class TestDockerBackend:
@@ -127,6 +142,7 @@ class TestDockerVersion:
         """
         Given a `Node`, return the `DockerVersion` on that node.
         """
+        _wait_for_docker(node=node)
         args = ['docker', 'version', '--format', '{{.Server.Version}}']
         result = node.run(args)
         docker_versions = {
@@ -208,6 +224,7 @@ class TestDockerStorageDriver:
         """
         Given a `Node`, return the `DockerStorageDriver` on that node.
         """
+        _wait_for_docker(node=node)
         result = node.run(args=['docker', 'info', '--format', '{{.Driver}}'])
 
         return self.DOCKER_STORAGE_DRIVERS[result.stdout.decode().strip()]
