@@ -322,5 +322,12 @@ def check_1_9_sed() -> CheckLevels:
     """
     XXX
     """
-    # TODO: Try some sed with 0/
-    # If it isn't as expected, warn
+    args = ['sed']
+    result = subprocess.check_output(args=args)
+    if result != 'XXX':
+        message = (
+        )
+        _warn(message=message)
+        return CheckLevels.WARNING
+
+    return CheckLevels.NONE
