@@ -4,6 +4,7 @@ Checks for showing up common sources of errors with the Docker backend.
 
 import shutil
 import subprocess
+import tempfile
 from enum import IntEnum
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
@@ -323,14 +324,10 @@ def check_1_9_sed() -> CheckLevels:
     Warn if the system's version of ``sed`` is incompatible with legacy DC/OS
     installers.
     """
-    import tempfile
     temp = tempfile.NamedTemporaryFile()
     Path(temp.name).write_text('a\na')
     sed_args = "sed '0,/a/ s/a/b/' " + temp.name
-    result = subprocess.check_output(
-        args=sed_args,
-        shell=True,
-    )
+    result = subprocess.check_output(args=sed_args, shell=True)
 
     if result != b'b\na':
         message = (
