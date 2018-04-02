@@ -51,7 +51,7 @@ def _error(message: str) -> None:
     click.echo(message)
 
 
-def check_free_space() -> CheckLevels:
+def check_tmp_free_space() -> CheckLevels:
     """
     Warn if there is not enough free space in the default temporary directory.
     """
@@ -72,6 +72,49 @@ def check_free_space() -> CheckLevels:
     )
 
     if free_space_gb < 5:
+        _warn(message=low_space_message)
+        return CheckLevels.WARNING
+
+    return CheckLevels.NONE
+
+
+def check_docker_root_free_space() -> CheckLevels:
+    """
+    Warn if there is not enough free space in the Docker root directory.
+    """
+    # Any image will do, we use this for another test so using it here saves
+    # pulling another image.
+    tiny_image = 'luca3m/sleep'
+    client = docker.from_env(version='auto')
+    container = client.containers.run(
+        image=tiny_image,
+        tty=True,
+        detach=True,
+        privileged=True,
+    )
+
+    cmd = ['df', '/']
+    _, output = container.exec_run(cmd=cmd)
+    container.stop()
+    container.remove(v=True)
+
+    _, information = output.decode().strip().split('\n')
+    _, _, _, avail, _, _ = information.split()
+    available_bytes = int(avail)
+    available_gigabytes = available_bytes / 1024 / 1024
+    low_space_message = (
+        'The Docker root directory is at "{docker_root_dir}". '
+        'On macOS this location is on a hidden virtual machine. '
+        'This directory has {free_space:.1f} GB of free space available. '
+        'If you encounter problems try running ``docker system prune``.'
+    ).format(
+        docker_root_dir=client.info()['DockerRootDir'],
+        free_space=available_gigabytes,
+    )
+
+    # The choice of 5 GB is arbitrary. Let's see how it goes in practice and
+    # potentially adjust later.
+    if available_gigabytes < 5:
         _warn(message=low_space_message)
         return CheckLevels.WARNING
 

@@ -51,12 +51,13 @@ from ._common import (
 )
 from ._doctor_checks import (
     CheckLevels,
-    check_free_space,
+    check_docker_root_free_space,
     check_memory,
     check_mount_tmp,
     check_networking,
     check_ssh,
     check_storage_driver,
+    check_tmp_free_space,
     link_to_troubleshooting,
 )
 from ._utils import is_enterprise
@@ -939,15 +940,17 @@ def doctor() -> None:
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     check_functions = [
-        check_free_space,
-        check_storage_driver,
-        check_ssh,
-        check_networking,
-        check_mount_tmp,
+        check_docker_root_free_space,
         check_memory,
-        link_to_troubleshooting,
+        check_mount_tmp,
+        check_networking,
+        check_ssh,
+        check_storage_driver,
+        check_tmp_free_space,
     ]
 
     highest_level = max(function() for function in check_functions)
+
+    link_to_troubleshooting()
     if highest_level == CheckLevels.ERROR:
         sys.exit(1)
