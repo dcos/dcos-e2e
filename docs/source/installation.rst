@@ -19,6 +19,12 @@ Then install the latest stable version:
 
     brew install https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
+To upgrade to a newer version, run the following command:
+
+.. code:: sh
+
+    brew upgrade https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
+
 Or the latest ``master``:
 
 Homebrew installs the dependencies for the latest released version and so installing ``master`` may not work.
@@ -28,6 +34,7 @@ Homebrew installs the dependencies for the latest released version and so instal
     brew install --HEAD https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
 
+
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -35,6 +42,7 @@ Requires Python 3.5.2+.
 
 Optionally replace ``master`` with a particular version of DC/OS E2E.
 The latest release is |release|.
+See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
 
 .. code:: sh
 
