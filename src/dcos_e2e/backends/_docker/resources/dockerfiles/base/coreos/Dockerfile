@@ -19,3 +19,4 @@ RUN mkdir -p /etc/systemd/system/sshd.d
 RUN touch /etc/systemd/system/sshd.d/restart_policy.conf
 RUN echo '[Service]' >> /etc/systemd/system/sshd.d/restart_policy.conf
 RUN echo 'Restart=Always' >> /etc/systemd/system/sshd.d/restart_policy.conf
+RUN echo 'RestartSec=3s' >> /etc/systemd/system/sshd.d/restart_policy.conf
