@@ -77,7 +77,7 @@ class TestRunIntegrationTest:
     Tests for functionality specific to the AWS backend.
     """
 
-    @pytest.mark.parametrize('linux_distribution', list(Distribution))
+    @pytest.mark.parametrize('linux_distribution', [Distribution.CENTOS_7])
     def test_run_enterprise_integration_test(
         self,
         ee_artifact_url: str,
