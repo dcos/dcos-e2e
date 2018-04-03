@@ -92,7 +92,7 @@ class Node:
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
 
-        ssh_args = ['ssh']
+        ssh_args = ['ssh', '-vvv']
         if tty:
             ssh_args.append('-t')
 
