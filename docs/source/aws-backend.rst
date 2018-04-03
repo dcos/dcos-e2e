@@ -40,7 +40,7 @@ SSH can be used to access cluster nodes for the purpose of debugging if :paramre
 The AWS backend generates a key in the :paramref:`~dcos_e2e.backends.AWS.workspace_dir` directory under ``ssh/id_rsa``.
 Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
 The SSH user depends on the :paramref:`~dcos_e2e.backends.AWS.linux_distribution` given to the :py:class:`~dcos_e2e.backends.AWS` backend.
-For :py:obj:`~dcos_e2e.distributions.Distribution.CENTOS_7` that is ``centos``, for :py:obj:`~dcos_e2e.distributions.Distribution.COREOS` it is ``core``.
+For :py:obj:`~dcos_e2e.distributions.Distribution.CENTOS_7` that is ``centos``.
 
 It is important to keep in mind files in the given :paramref:`~dcos_e2e.backends.AWS.workspace_dir` are temporary and are removed up when the cluster is destroyed.
 If :paramref:`~dcos_e2e.backends.AWS.workspace_dir` is unset the :py:class:`~dcos_e2e.backends.AWS` backend will create a new temporary directory in an operating system specific location.

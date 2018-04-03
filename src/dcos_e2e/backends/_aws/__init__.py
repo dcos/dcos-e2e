@@ -54,9 +54,28 @@ class AWS(ClusterBackend):
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
 
+        Raises:
+            NotImplementedError: In case an unsupported Linux distribution has
+                been passed in at backend creation.
+
         .. _Regions and Availability Zones:
             https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
         """
+        supported_distributions = set(
+            [
+                Distribution.CENTOS_7,
+                # Progress on COREOS support is tracked in JIRA:
+                # https://jira.mesosphere.com/browse/DCOS-21954
+            ],
+        )
+
+        if linux_distribution not in supported_distributions:
+            message = (
+                'The {} Linux distribution is currently not support by '
+                'the AWS backend.'
+            ).format(linux_distribution.name)
+            raise NotImplementedError(message)
+
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
         self.aws_region = aws_region
