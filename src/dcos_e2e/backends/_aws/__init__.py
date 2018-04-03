@@ -208,12 +208,6 @@ class AWSCluster(ClusterManager):
                 variables that are applied on top of the default DC/OS
                 configuration of the AWS backend.
             log_output_live: If ``True``, log output of the installation live.
-
-        Raises:
-            KeyboardInterrupt: If a keyboard interrupt is triggered during the
-                installation of DC/OS.
-            Exception: If the DC/OS installation fails for any other reason.
-
         """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
@@ -229,11 +223,7 @@ class AWSCluster(ClusterManager):
         # writing it does both, waiting for the AWS stack and installing
         # DC/OS. This is desired to be changed by the dcos-launch team.
         # https://jira.mesosphere.com/browse/DCOS-21660
-        try:
-            AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
-        except (KeyboardInterrupt, Exception):
-            self.destroy()
-            raise
+        AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
 
     def install_dcos_from_path(
         self,
