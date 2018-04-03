@@ -77,6 +77,9 @@ When using temporary credentials it is required to pay attention that the creden
 If the credentials are not valid anymore the AWS backend does not delete the public/private key pair generated during cluster creation.
 It is therefore recommended to a periodically renew temporary AWS credentials when executing tests using the AWS backend.
 
+In rare cases it might also happen that a AWS stack deployment fails with the message ``ROLLBACK_IN_PROGRESS``.
+In that case one of the EC2 instances failed to come up. Re-running the test is the only option then.
+
 Reference
 ---------
 

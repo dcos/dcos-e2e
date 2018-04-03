@@ -114,7 +114,7 @@ class TestRunIntegrationTest:
                 env={
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
-                    'DCOS_SSL_ENABLED': 'true',
+                    #'DCOS_SSL_ENABLED': 'true',
                 },
                 log_output_live=True,
             )
