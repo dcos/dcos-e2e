@@ -15,8 +15,8 @@ RUN echo 'WantedBy=default.target' >> /lib/systemd/system/systemd-journald-init.
 RUN systemctl enable systemd-journald-init.service || true
 
 # This works around https://github.com/coreos/bugs/issues/1591.
-RUN mkdir -p /etc/systemd/system/sshd.d
-RUN touch /etc/systemd/system/sshd.d/restart_policy.conf
-RUN echo '[Service]' >> /etc/systemd/system/sshd.d/restart_policy.conf
-RUN echo 'Restart=Always' >> /etc/systemd/system/sshd.d/restart_policy.conf
-RUN echo 'RestartSec=3s' >> /etc/systemd/system/sshd.d/restart_policy.conf
+RUN mkdir -p /etc/systemd/system/sshd.service.d
+RUN touch /etc/systemd/system/sshd.service.d/override.conf
+RUN echo '[Service]' >> /etc/systemd/system/sshd.service.d/override.conf
+RUN echo 'Restart=always' >> /etc/systemd/system/sshd.service.d/override.conf
+# RUN echo 'RestartSec=3s' >> /etc/systemd/system/sshd.service.d/override.conf

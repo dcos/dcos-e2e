@@ -56,6 +56,7 @@ def _oss_distribution_test(
         agents=0,
         public_agents=0,
     ) as cluster:
+        import pdb; pdb.set_trace()
         cluster.install_dcos_from_path(
             build_artifact=oss_artifact,
             log_output_live=True,
@@ -151,7 +152,7 @@ class TestCoreOS:
     Tests for the CoreOS distribution option.
     """
 
-    def test_oss(
+    def test_oss_experiment(
         self,
         oss_artifact: Path,
     ) -> None:
