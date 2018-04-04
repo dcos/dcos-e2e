@@ -13,6 +13,21 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 
 
+class TestDefaults:
+    """
+    Tests for default values of the AWS backend.
+    """
+
+    def test_admin_location(self) -> None:
+        assert AWS().admin_location == '0.0.0.0/0'
+
+    def test_aws_region(self) -> None:
+        assert AWS().aws_region == 'us-west-2'
+
+    def test_linux_distribution(self) -> None:
+        assert AWS().linux_distribution == Distribution.CENTOS_7
+
+
 class TestUnsupported:
     """
     Tests for unsupported functionality specific to the AWS backend.
@@ -86,6 +101,7 @@ class TestRunIntegrationTest:
     ) -> None:
         """
         It is possible to run DC/OS integration tests on AWS.
+        This test module only requires a single master node.
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
@@ -101,15 +117,6 @@ class TestRunIntegrationTest:
             cluster_backend=AWS(linux_distribution=linux_distribution),
             masters=1,
         ) as cluster:
-
-            (master, ) = cluster.masters
-
-            result = master.run(
-                args=['echo', 'test'],
-                shell=True,
-            )
-
-            assert result.stdout.decode() == 'test\n'
 
             cluster.install_dcos_from_url(
                 build_artifact=ee_artifact_url,

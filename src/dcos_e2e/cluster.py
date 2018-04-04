@@ -22,7 +22,7 @@ from .node import Node
 @retry(
     exceptions=(subprocess.CalledProcessError),
     tries=60,
-    delay=5,
+    delay=1,
 )
 def _wait_for_ssh(node: Node) -> None:
     """

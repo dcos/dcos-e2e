@@ -20,7 +20,7 @@ AWS Regions
 -----------
 
 When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched.
-It is recommended to use ``us-east-1`` or ``us-east-2`` to keep the cost low.
+It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
 
 See the `AWS Regions and Availability Zones`_ for available regions.
 
@@ -81,7 +81,7 @@ If the credentials are not valid anymore the AWS backend does not delete the pub
 It is therefore recommended to periodically renew temporary AWS credentials when executing tests using the AWS backend.
 
 In rare cases it might also happen that a AWS stack deployment fails with the message ``ROLLBACK_IN_PROGRESS``.
-In that case one of the EC2 instances failed to come up. Starting a new cluster is the only option then.
+In that case at least one of the EC2 instances failed to come up. Starting a new cluster is the only option then.
 
 Reference
 ---------
@@ -91,4 +91,3 @@ Reference
 .. _CCM: ccm.mesosphere.com
 .. _AWS Regions and Availability Zones: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
 .. _dcos-launch: https://github.com/dcos/dcos-launch
-.. _maws: https://github.com/mesosphere/maws
