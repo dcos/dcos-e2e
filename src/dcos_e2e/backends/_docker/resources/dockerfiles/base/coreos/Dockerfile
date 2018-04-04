@@ -13,3 +13,15 @@ RUN echo '' >> /lib/systemd/system/systemd-journald-init.service
 RUN echo '[Install]' >> /lib/systemd/system/systemd-journald-init.service
 RUN echo 'WantedBy=default.target' >> /lib/systemd/system/systemd-journald-init.service
 RUN systemctl enable systemd-journald-init.service || true
+
+# This works around https://github.com/coreos/bugs/issues/1591.
+RUN mkdir -p /etc/systemd/system/sshd.service.d
+RUN touch /etc/systemd/system/sshd.service.d/override.conf
+RUN echo '[Service]' >> /etc/systemd/system/sshd.service.d/override.conf
+RUN echo 'Restart=always' >> /etc/systemd/system/sshd.service.d/override.conf
+# Without this we get:
+# sshd.service: Start request repeated too quickly.
+# Failed to start OpenSSH server daemon.
+# sshd.service: Unit entered failed state.
+# sshd.service: Failed with result 'start-limit-hit'.
+RUN echo 'RestartSec=3s' >> /etc/systemd/system/sshd.service.d/override.conf
