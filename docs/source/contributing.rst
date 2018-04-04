@@ -161,7 +161,7 @@ To update these links use the following commands, after setting the following en
 Updating the Amazon Web Services credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Private credentials for Amazon Web Services used by Travis CI.
+Private credentials for Amazon Web Services are used by Travis CI.
 
 To update the credentials use the following commands, after setting the following environment variables:
 

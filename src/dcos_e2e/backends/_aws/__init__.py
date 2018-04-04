@@ -112,7 +112,7 @@ class AWSCluster(ClusterManager):
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
             files_to_copy_to_installer: Pairs of host paths to paths on the
-                installer node. This must be empty for as it is not currently
+                installer node. This must be empty as it is not currently
                 supported.
             cluster_backend: Details of the specific AWS backend to use.
 
@@ -180,12 +180,12 @@ class AWSCluster(ClusterManager):
         }
 
         # Validate the preliminary dcos-launch config.
+        # This also fills in blanks in the dcos-launch config.
         validated_launch_config = config.get_validated_config(
             user_config=launch_config,
             config_dir=str(self._path),
         )
 
-        # Also DcosCloudformationLauncher
         # Get a OnpremLauncher object
         self.launcher = get_launcher(  # type: ignore
             config=validated_launch_config,

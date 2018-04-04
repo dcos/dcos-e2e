@@ -89,6 +89,7 @@ html_sidebars = {
 linkcheck_anchors = False
 # Retry link checking to avoid transient network errors.
 linkcheck_retries = 5
+linkcheck_ignore = [r'https://github.com/mesosphere/maws']
 
 spelling_word_list_filename = '../../spelling_private_dict.txt'
 

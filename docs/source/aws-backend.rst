@@ -20,7 +20,7 @@ AWS Regions
 -----------
 
 When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched.
-It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
+It is recommended to use ``us-east-1`` or ``us-east-2`` to keep the cost low.
 
 See the `AWS Regions and Availability Zones`_ for available regions.
 
@@ -37,34 +37,37 @@ Accessing cluster nodes
 -----------------------
 
 SSH can be used to access cluster nodes for the purpose of debugging if :paramref:`~dcos_e2e.backends.AWS.workspace_dir` is set.
-The AWS backend generates a key in the :paramref:`~dcos_e2e.backends.AWS.workspace_dir` directory under ``ssh/id_rsa``.
-Adding this key to the ``ssh-agent`` or changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
+The AWS backend generates a SSH key file ``id_rsa`` in a cluster-specific sub-directory under the :paramref:`~dcos_e2e.backends.AWS.workspace_dir` directory. The sub-directory is named after the unique cluster ID generated during cluster creation. The cluster ID is prefixed with ``dcos-e2e-`` and can be found through the DC/OS UI in the upper left corner or through the CCM UI when using `maws`_ with a Mesosphere AWS account.
+Adding this key to the ``ssh-agent`` or manually providing it via the ``-i`` flag after changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
 The SSH user depends on the :paramref:`~dcos_e2e.backends.AWS.linux_distribution` given to the :py:class:`~dcos_e2e.backends.AWS` backend.
 For :py:obj:`~dcos_e2e.distributions.Distribution.CENTOS_7` that is ``centos``.
 
-It is important to keep in mind files in the given :paramref:`~dcos_e2e.backends.AWS.workspace_dir` are temporary and are removed up when the cluster is destroyed.
+It is important to keep in mind files in the given :paramref:`~dcos_e2e.backends.AWS.workspace_dir` are temporary and are removed when the cluster is destroyed.
 If :paramref:`~dcos_e2e.backends.AWS.workspace_dir` is unset the :py:class:`~dcos_e2e.backends.AWS` backend will create a new temporary directory in an operating system specific location.
 
 Cluster lifetime
 ----------------
 
-The cluster lifetime is fixed at a maximum of two hours.
-That is because of a limitation of `dcos-launch`_ which is used under the hood.
-That will most likely change in the future.
+The cluster lifetime is fixed at two hours.
 
-If the cluster was launched with ``maws`` (Mesosphere temporary AWS credentials) the cluster can be controlled via `CCM`_.
+If the cluster was launched with `maws`_ (Mesosphere temporary AWS credentials) the cluster can be controlled via `CCM`_.
 This allows for extending the cluster lifetime and also for cleaning up the cluster if anything goes wrong.
 
 EC2 instance types
 ------------------
 
-The AWS backend does not offer a choice for EC2 instances.
-Currently it launches ``m4.large`` instances for DC/OS nodes.
+Currently the AWS backend launches ``m4.large`` instances for all DC/OS nodes.
+
+Unsupported DC/OS versions
+--------------------------
+
+The AWS backend does currently not support DC/OS versions below 1.10.
+Adding support for DC/OS 1.9 is tracked in :issue:`DCOS-21960`.
 
 Unsupported features
 --------------------
 
-The AWS backend does currently not support the :py:class:`~dcos_e2e.cluster.Cluster` feature of copying files to the DC/OS installer.
+The AWS backend does currently not support the :py:class:`~dcos_e2e.cluster.Cluster` feature of copying files to the DC/OS installer by supplying :paramref:`~dcos_e2e.cluster.Cluster.files_to_copy_to_installer`.
 The progress on this feature is tracked in :issue:`DCOS-21894`.
 
 Troubleshooting
@@ -75,10 +78,10 @@ The logs are prefixed with the installation phase that failed, ``preflight``, ``
 
 When using temporary credentials it is required to pay attention that the credentials are still valid or renewed when destroying a cluster.
 If the credentials are not valid anymore the AWS backend does not delete the public/private key pair generated during cluster creation.
-It is therefore recommended to a periodically renew temporary AWS credentials when executing tests using the AWS backend.
+It is therefore recommended to periodically renew temporary AWS credentials when executing tests using the AWS backend.
 
 In rare cases it might also happen that a AWS stack deployment fails with the message ``ROLLBACK_IN_PROGRESS``.
-In that case one of the EC2 instances failed to come up. Re-running the test is the only option then.
+In that case one of the EC2 instances failed to come up. Starting a new cluster is the only option then.
 
 Reference
 ---------
@@ -88,3 +91,4 @@ Reference
 .. _CCM: ccm.mesosphere.com
 .. _AWS Regions and Availability Zones: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
 .. _dcos-launch: https://github.com/dcos/dcos-launch
+.. _maws: https://github.com/mesosphere/maws
