@@ -19,12 +19,21 @@ class TestDefaults:
     """
 
     def test_admin_location(self) -> None:
+        """
+        The default ``admin_location`` is correct.
+        """
         assert AWS().admin_location == '0.0.0.0/0'
 
     def test_aws_region(self) -> None:
+        """
+        The default ``aws_region`` is correct.
+        """
         assert AWS().aws_region == 'us-west-2'
 
     def test_linux_distribution(self) -> None:
+        """
+        The default ``linux_distribution`` is correct.
+        """
         assert AWS().linux_distribution == Distribution.CENTOS_7
 
 
