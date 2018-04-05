@@ -6,6 +6,7 @@ import sys
 import pkg_resources
 
 import cerberus
+from .. import dcos_launch
 import yaml
 from ..dcos_launch import util
 from ..dcos_launch.platforms import aws, gcp
@@ -331,7 +332,7 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'coerce': 'expand_local_path',
         'required': False,
         'default_setter':
-            lambda doc: pkg_resources.resource_filename('dcos_launch', 'scripts/install_prereqs.sh') \
+            lambda doc: pkg_resources.resource_filename(dcos_launch.__name__, 'scripts/install_prereqs.sh') \
             if doc['install_prereqs'] else ''
     },
     'install_prereqs': {

@@ -7,6 +7,7 @@ import typing
 
 import pkg_resources
 
+from .. import dcos_launch
 import yaml
 from ..dcos_launch import util
 from ..dcos_launch.platforms import onprem as platforms_onprem
@@ -109,7 +110,7 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
             # use a sensible default
             shutil.copyfile(
                 pkg_resources.resource_filename(
-                    'dcos_launch', script_hyphen + '/{}.sh'.format(self.config['platform'])),
+                    dcos_launch.__name__, script_hyphen + '/{}.sh'.format(self.config['platform'])),
                 default_path_local)
 
         with open(os.path.join(genconf_dir, 'config.yaml'), 'w') as f:

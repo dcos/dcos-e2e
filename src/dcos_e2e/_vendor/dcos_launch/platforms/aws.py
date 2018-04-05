@@ -27,14 +27,16 @@ import retrying
 from botocore.exceptions import ClientError, WaiterError
 from ...dcos_test_utils.helpers import Host, SshInfo
 
+from ... import dcos_launch
+
 log = logging.getLogger(__name__)
 
 
 def template_by_instance_type(instance_type):
     if instance_type.split('.')[0] in ('c4', 't2', 'm4'):
-        template = pkg_resources.resource_string('dcos_launch', 'templates/vpc-ebs-only-cluster-template.json')
+        template = pkg_resources.resource_string(dcos_launch.__name__, 'templates/vpc-ebs-only-cluster-template.json')
     else:
-        template = pkg_resources.resource_string('dcos_launch', 'templates/vpc-cluster-template.json')
+        template = pkg_resources.resource_string(dcos_launch.__name__, 'templates/vpc-cluster-template.json')
     return template.decode('utf-8')
 
 
