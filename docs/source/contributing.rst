@@ -236,7 +236,7 @@ Update the SHAs in ``admin/update_launch.py``.
 
     git rm -rf src/dcos_e2e/_vendor/
     rm -rf src/dcos_e2e/_vendor
-    python admin/update_launch.py
+    python admin/update_vendored_packages.py
     git add src/dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
