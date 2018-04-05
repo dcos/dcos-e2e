@@ -19,7 +19,7 @@ def main() -> None:
     vendored_launch_sha = 'fad6d70caf282f7260d2d7af88f044ccfd64f8c7'
     vendored_test_utils_sha = 'a4cd8815fde6624a645c83eef85abde88b73a38f'
 
-    launch = 'git+https://github.com/dcos/dcos-launch@{sha}'.format(
+    launch = 'git+https://github.com/adamtheturtle/dcos-launch@{sha}'.format(
         sha=vendored_launch_sha,
     )
 
