@@ -16,7 +16,7 @@ def main() -> None:
     We use our own script as we want the vendored ``dcos_launch`` to use the
     vendored ``dcos_test_utils``.
     """
-    vendored_launch_sha = 'fad6d70caf282f7260d2d7af88f044ccfd64f8c7'
+    vendored_launch_sha = 'abf6fe18f1fa30b12324cfbd0db3e5f267efdef3'
     vendored_test_utils_sha = 'a4cd8815fde6624a645c83eef85abde88b73a38f'
 
     launch = 'git+https://github.com/adamtheturtle/dcos-launch@{sha}'.format(
