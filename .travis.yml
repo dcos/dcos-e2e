@@ -13,6 +13,9 @@ python:
 env:
   matrix:
   - TEST_PATTERN=tests/test_cli
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
   - TEST_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize

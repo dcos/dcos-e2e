@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add an AWS backend to the library.
+
 2018.04.02.1
 ------------
 

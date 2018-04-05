@@ -58,8 +58,9 @@ To fix some lint errors, run the following:
 Tests for this package
 ----------------------
 
+Some tests require the Docker backend and some tests require the AWS backend.
 See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
-These requirements also apply to the tests.
+See the :doc:`AWS backend documentation <aws-backend>` for details of what is needed for the AWS backend.
 
 Download dependencies which are used by the tests:
 
@@ -157,6 +158,23 @@ To update these links use the following commands, after setting the following en
     travis env set --repo mesosphere/dcos-e2e EE_1_10_ARTIFACT_URL $EE_1_10_ARTIFACT_URL
     travis env set --repo mesosphere/dcos-e2e EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
 
+Updating the Amazon Web Services credentials
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Private credentials for Amazon Web Services are used by Travis CI.
+
+To update the credentials use the following commands, after setting the following environment variables:
+
+* ``AWS_ACCESS_KEY_ID``
+* ``AWS_SECRET_ACCESS_KEY``
+
+.. code:: sh
+
+    travis env set --repo mesosphere/dcos-e2e AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+    travis env set --repo mesosphere/dcos-e2e AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
+
+Currently credentials are taken from the OneLogin Secure Notes note ``dcos-e2e integration testing AWS credentials``.
+
 Parallel builders
 ~~~~~~~~~~~~~~~~~
 
@@ -221,6 +239,17 @@ Update the SHAs in ``admin/update_launch.py``.
     python admin/update_launch.py
     git add src/dcos_e2e/_vendor
     git commit -m "Update vendored packages"
+
+Redirect DC/OS Launch package resources
+---------------------------------------
+
+In order discover its package resources after an update of the vendored DC/OS Launch, all references to ``dcos_launch`` must be replaced with ``dcos_e2e._vendor.dcos_launch`` in the following files.
+
+* :file:`dcos_e2e/_vendor/dcos_launch/config.py`
+* :file:`dcos_e2e/_vendor/dcos_launch/onprem.py`
+* :file:`dcos_e2e/_vendor/dcos_launch/platform/aws.py`
+
+The progress on automating this procedure is tracked in :issue:`DCOS-21895`.
 
 Testing the Homebrew Recipe
 ----------------------------
