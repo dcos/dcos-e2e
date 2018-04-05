@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 git rm -rf src/dcos_e2e/_vendor/
 rm -rf src/dcos_e2e/_vendor
 python admin/update_vendored_packages.py
