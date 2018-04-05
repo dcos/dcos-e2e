@@ -331,7 +331,7 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'coerce': 'expand_local_path',
         'required': False,
         'default_setter':
-            lambda doc: pkg_resources.resource_filename('dcos_e2e._vendor.dcos_launch', 'scripts/install_prereqs.sh') \
+            lambda doc: pkg_resources.resource_filename('dcos_launch', 'scripts/install_prereqs.sh') \
             if doc['install_prereqs'] else ''
     },
     'install_prereqs': {

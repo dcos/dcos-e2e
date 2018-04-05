@@ -109,7 +109,7 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
             # use a sensible default
             shutil.copyfile(
                 pkg_resources.resource_filename(
-                    'dcos_e2e._vendor.dcos_launch', script_hyphen + '/{}.sh'.format(self.config['platform'])),
+                    'dcos_launch', script_hyphen + '/{}.sh'.format(self.config['platform'])),
                 default_path_local)
 
         with open(os.path.join(genconf_dir, 'config.yaml'), 'w') as f:
