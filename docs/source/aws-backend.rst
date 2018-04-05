@@ -19,7 +19,7 @@ The :py:attr:`~dcos_e2e.node.Node.public_ip_address` allows for reaching AWS EC2
 AWS Regions
 -----------
 
-When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched.
+When launching a cluster with Amazon Web Services there are a number of different regions to choose from where the cluster is launched using :paramref:`~dcos_e2e.backends.AWS.aws_region`.
 It is recommended to use ``us-west-1`` or ``us-west-2`` to keep the cost low.
 
 See the `AWS Regions and Availability Zones`_ for available regions.
