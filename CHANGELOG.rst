@@ -7,6 +7,7 @@ Next
 ----
 
 - Add an AWS backend to the library.
+- Add ability to control which labels are added to particular node types on the ``Docker`` backend.
 
 2018.04.02.1
 ------------
