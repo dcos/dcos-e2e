@@ -310,40 +310,46 @@ class TestLabels:
         ]
         return dict(container.labels)
 
-    def test_default(self) -> None:
-        """
-        The node type is stored in a label.
-        """
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=1,
-            public_agents=1,
-        ) as cluster:
-            (master, ) = cluster.masters
-            (agent, ) = cluster.agents
-            (public_agent, ) = cluster.public_agents
-            assert self._get_labels(master)['node_type'] == 'master'
-            assert self._get_labels(agent)['node_type'] == 'agent'
-            assert (
-                self._get_labels(public_agent)['node_type'] == 'public_agent'
-            )
-
     def test_custom(self) -> None:
         """
         It is possible to set node Docker container labels.
         """
-        key = uuid.uuid4().hex
-        value = uuid.uuid4().hex
-        labels = {key: value}
+        cluster_key = uuid.uuid4().hex
+        cluster_value = uuid.uuid4().hex
+        cluster_labels = {cluster_key: cluster_value}
+
+        cluster_key = uuid.uuid4().hex
+        cluster_value = uuid.uuid4().hex
+        cluster_labels = {cluster_key: cluster_value}
 
         with Cluster(
-            cluster_backend=Docker(docker_container_labels=labels),
+            cluster_backend=Docker(
+                docker_container_labels=cluster_labels,
+                docker_master_labels=master_labels,
+                docker_agent_labels=agent_labels,
+                docker_public_agent_labels=public_agent_labels,
+            ),
             masters=1,
             agents=1,
             public_agents=1,
         ) as cluster:
-            nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
-            for node in nodes:
+            for node in cluster.masters:
                 node_labels = self._get_labels(node=node)
-                assert node_labels[key] == value
+                assert node_labels[cluster_key] == cluster_value
+                assert node_labels[master_key] == master_value
+                assert agent_key not in node_labels
+                assert public_agent_key not in node_labels
+
+            for node in cluster.agents:
+                node_labels = self._get_labels(node=node)
+                assert node_labels[cluster_key] == cluster_value
+                assert node_labels[agent_key] == master_value
+                assert master_key not in node_labels
+                assert public_agent_key not in node_labels
+
+            for node in cluster.agents:
+                node_labels = self._get_labels(node=node)
+                assert node_labels[cluster_key] == cluster_value
+                assert node_labels[public_agent_key] == master_value
+                assert master_key not in node_labels
+                assert agent_key not in node_labels
