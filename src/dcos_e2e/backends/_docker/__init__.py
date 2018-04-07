@@ -178,6 +178,9 @@ class Docker(ClusterBackend):
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver
         self.docker_container_labels = docker_container_labels or {}
+        self.docker_master_labels = docker_master_labels or {}
+        self.docker_agent_labels = docker_agent_labels or {}
+        self.docker_public_agent_labels = docker_public_agent_labels or {}
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
