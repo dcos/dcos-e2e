@@ -112,6 +112,9 @@ class Docker(ClusterBackend):
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
         docker_container_labels: Optional[Dict[str, str]] = None,
+        docker_master_labels: Optional[Dict[str, str]] = None,
+        docker_agent_labels: Optional[Dict[str, str]] = None,
+        docker_container_labels: Optional[Dict[str, str]] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
