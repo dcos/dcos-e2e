@@ -150,7 +150,9 @@ docs:
 
 .PHONY: open-docs
 open-docs:
-	open docs/build/html/index.html
+	xdg-open docs/build/html/index.html >/dev/null 2>&1 || \
+	open docs/build/html/index.html >/dev/null 2>&1 || \
+	echo "Requires 'xdg-open' or 'open' but neither is available."
 
 # We pull Docker images before the tests start to catch any flakiness early.
 # See https://jira.mesosphere.com/browse/DCOS_OSS-2120 for details of
