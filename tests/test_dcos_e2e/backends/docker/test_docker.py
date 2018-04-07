@@ -351,13 +351,13 @@ class TestLabels:
             for node in cluster.agents:
                 node_labels = self._get_labels(node=node)
                 assert node_labels[cluster_key] == cluster_value
-                assert node_labels[agent_key] == master_value
+                assert node_labels[agent_key] == agent_value
                 assert master_key not in node_labels
                 assert public_agent_key not in node_labels
 
             for node in cluster.agents:
                 node_labels = self._get_labels(node=node)
                 assert node_labels[cluster_key] == cluster_value
-                assert node_labels[public_agent_key] == master_value
+                assert node_labels[public_agent_key] == public_agent_value
                 assert master_key not in node_labels
                 assert agent_key not in node_labels
