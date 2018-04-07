@@ -345,9 +345,7 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{
-                        'node_type': 'master',
-                    },
+                    **cluster_backend.docker_master_labels,
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
@@ -385,9 +383,7 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{
-                        'node_type': 'agent',
-                    },
+                    **cluster_backend.docker_agent_labels,
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
@@ -425,9 +421,7 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{
-                        'node_type': 'public_agent',
-                    },
+                    **cluster_backend.docker_public_agent_labels,
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
