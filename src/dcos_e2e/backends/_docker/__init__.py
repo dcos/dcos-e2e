@@ -114,7 +114,7 @@ class Docker(ClusterBackend):
         docker_container_labels: Optional[Dict[str, str]] = None,
         docker_master_labels: Optional[Dict[str, str]] = None,
         docker_agent_labels: Optional[Dict[str, str]] = None,
-        docker_container_labels: Optional[Dict[str, str]] = None,
+        docker_public_agent_labels: Optional[Dict[str, str]] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
