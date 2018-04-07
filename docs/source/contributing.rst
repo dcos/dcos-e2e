@@ -230,13 +230,13 @@ Updating DC/OS Test Utils and DC/OS Launch
 `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
 To update DC/OS Test Utils or DC/OS Launch:
 
-Update the SHAs in ``admin/update_launch.py``.
+Update the SHAs in ``admin/update_vendored_packages.py``.
 
 .. code:: sh
 
     git rm -rf src/dcos_e2e/_vendor/
     rm -rf src/dcos_e2e/_vendor
-    python admin/update_launch.py
+    python admin/update_vendored_packages.py
     git add src/dcos_e2e/_vendor
     git commit -m "Update vendored packages"
 
