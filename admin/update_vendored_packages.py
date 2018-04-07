@@ -16,6 +16,8 @@ def main() -> None:
     We use our own script as we want the vendored ``dcos_launch`` to use the
     vendored ``dcos_test_utils``.
     """
+    # TODO use updated SHA once https://github.com/dcos/dcos-launch/pull/114 has
+    # landed.
     vendored_launch_sha = 'fad6d70caf282f7260d2d7af88f044ccfd64f8c7'
     vendored_test_utils_sha = 'a4cd8815fde6624a645c83eef85abde88b73a38f'
 
