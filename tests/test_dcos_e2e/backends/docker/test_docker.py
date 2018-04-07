@@ -318,9 +318,17 @@ class TestLabels:
         cluster_value = uuid.uuid4().hex
         cluster_labels = {cluster_key: cluster_value}
 
-        cluster_key = uuid.uuid4().hex
-        cluster_value = uuid.uuid4().hex
-        cluster_labels = {cluster_key: cluster_value}
+        master_key = uuid.uuid4().hex
+        master_value = uuid.uuid4().hex
+        master_labels = {master_key: master_value}
+
+        agent_key = uuid.uuid4().hex
+        agent_value = uuid.uuid4().hex
+        agent_labels = {agent_key: agent_value}
+
+        public_agent_key = uuid.uuid4().hex
+        public_agent_value = uuid.uuid4().hex
+        public_agent_labels = {public_agent_key: public_agent_value}
 
         with Cluster(
             cluster_backend=Docker(
