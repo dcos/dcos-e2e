@@ -7,6 +7,7 @@ Next
 ----
 
 - Add an AWS backend to the library.
+- Add support for Ubuntu on the ``Docker`` backend.
 
 2018.04.02.1
 ------------
