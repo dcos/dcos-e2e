@@ -232,13 +232,11 @@ To update DC/OS Test Utils or DC/OS Launch:
 
 Update the SHAs in ``admin/update_vendored_packages.py``.
 
+The following creates a commit with changes to the vendored packages:
+
 .. code:: sh
 
-    git rm -rf src/dcos_e2e/_vendor/
-    rm -rf src/dcos_e2e/_vendor
-    python admin/update_vendored_packages.py
-    git add src/dcos_e2e/_vendor
-    git commit -m "Update vendored packages"
+   admin/update_vendored_packages.sh
 
 Redirect DC/OS Launch package resources
 ---------------------------------------
