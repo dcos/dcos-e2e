@@ -184,7 +184,7 @@ class TestUbuntu1604:
     Tests for the Ubuntu 16.04 distribution option.
     """
 
-    def test_oss_ubuntu(
+    def test_oss(
         self,
         oss_artifact: Path,
     ) -> None:
