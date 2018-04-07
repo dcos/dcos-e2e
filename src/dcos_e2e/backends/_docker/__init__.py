@@ -135,6 +135,14 @@ class Docker(ClusterBackend):
                 ``aufs`` is used.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
+            docker_master_labels: Docker labels to add to the cluster master
+                node containers. Akin to the dictionary option in
+                `Containers.run`_.
+            docker_agent_labels: Docker labels to add to the cluster agent node
+                containers. Akin to the dictionary option in `Containers.run`_.
+            docker_public_agent_labels: Docker labels to add to the cluster
+                public agent node containers. Akin to the dictionary option in
+                `Containers.run`_.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -149,8 +157,14 @@ class Docker(ClusterBackend):
             docker_version: The Docker version to install on the cluster nodes.
             docker_storage_driver: The storage driver to use for Docker on the
                 cluster nodes.
-            docker_container_labels: Docker labels to add to the cluster node
+            docker_master_labels: Docker labels to add to the cluster master
+                node containers. Akin to the dictionary option in
+                `Containers.run`_.
+            docker_agent_labels: Docker labels to add to the cluster agent node
                 containers. Akin to the dictionary option in `Containers.run`_.
+            docker_public_agent_labels: Docker labels to add to the cluster
+                public agent node containers. Akin to the dictionary option in
+                `Containers.run`_.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
