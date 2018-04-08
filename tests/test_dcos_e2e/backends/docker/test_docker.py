@@ -355,7 +355,7 @@ class TestLabels:
                 assert master_key not in node_labels
                 assert public_agent_key not in node_labels
 
-            for node in cluster.agents:
+            for node in cluster.public_agents:
                 node_labels = self._get_labels(node=node)
                 assert node_labels[cluster_key] == cluster_value
                 assert node_labels[public_agent_key] == public_agent_value
