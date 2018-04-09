@@ -152,7 +152,15 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'coreos',
         }
 
+        # Workaround for 1.9 as it will not work with ip_detect_public_filename
+        # https://jira.mesosphere.com/browse/DCOS-21960
+        detect_ip_public = (
+            '#!/bin/bash\n'
+            'curl fsSL http://169.254.169.254/latest/meta-data/public-ipv4',
+        )
+
         launch_config = {
+            'ip_detect_public_contents': detect_ip_public,
             'admin_location': cluster_backend.admin_location,
             'aws_region': cluster_backend.aws_region,
             'deployment_name': unique,
@@ -174,8 +182,9 @@ class AWSCluster(ClusterManager):
         # dcos-launch config to pass the config validation step.
         launch_config['dcos_config'] = {
             'cluster_name': unique,
-            'resolvers': ['10.10.0.2', '8.8.8.8'],
+            'resolvers': ['8.8.4.4', '8.8.8.8'],
             'master_discovery': 'static',
+            'dns_search': 'mesos',
             'exhibitor_storage_backend': 'static',
         }
 
@@ -228,6 +237,7 @@ class AWSCluster(ClusterManager):
                 configuration of the AWS backend.
             log_output_live: If ``True``, log output of the installation live.
         """
+
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
