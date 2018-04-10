@@ -81,6 +81,9 @@ linkcheck:
 spelling:
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
+.PHONY: shellcheck
+shellcheck:
+	shellcheck --exclude SC2164,SC1091 admin/*.sh
 
 # Run various linting tools.
 # We put each one in a different target so that we can run these in parallel with --jobs
@@ -97,6 +100,7 @@ lint: \
     pydocstyle \
     pylint \
     pyroma \
+    shellcheck \
     spelling \
     vulture \
     yapf

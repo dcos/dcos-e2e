@@ -22,7 +22,7 @@ Optionally install the following tools for linting and interacting with Travis C
     gem install travis --no-rdoc --no-ri
 
 Spell checking requires ``enchant``.
-This can be installed on macOS, for example, with `Homebrew <https://brew.sh>`__:
+This can be installed on macOS, for example, with `Homebrew`_:
 
 .. code:: sh
 
@@ -33,6 +33,19 @@ and on Ubuntu with ``apt``:
 .. code:: sh
 
     apt-get install -y enchant
+
+Linting Bash requires `shellcheck`_:
+This can be installed on macOS, for example, with `Homebrew`_:
+
+.. code:: sh
+
+    brew install shellcheck
+
+and on Ubuntu with ``apt``:
+
+.. code:: sh
+
+    apt-get install -y shellcheck
 
 Linting
 -------
@@ -263,3 +276,4 @@ Install `Homebrew`_ or `Linuxbrew`_.
 
 .. _Homebrew: https://brew.sh/
 .. _Linuxbrew: http://linuxbrew.sh/
+.. _shellcheck: https://www.shellcheck.net
