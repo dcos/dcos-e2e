@@ -23,7 +23,14 @@ Each of these and more are described in detail below.
 
 .. include:: docker-backend-requirements.rst
 
-.. include:: installation.rst
+Installation
+------------
+
+The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
+
+.. include:: cli-homebrew.rst
+
+.. include:: install-python.rst
 
 Creating a Cluster
 ------------------
