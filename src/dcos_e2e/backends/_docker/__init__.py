@@ -160,6 +160,8 @@ class Docker(ClusterBackend):
             docker_version: The Docker version to install on the cluster nodes.
             docker_storage_driver: The storage driver to use for Docker on the
                 cluster nodes.
+            docker_container_labels: Docker labels to add to the cluster node
+                containers. Akin to the dictionary option in `Containers.run`_.
             docker_master_labels: Docker labels to add to the cluster master
                 node containers. Akin to the dictionary option in
                 `Containers.run`_.
