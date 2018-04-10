@@ -97,4 +97,5 @@ You can manually remove the route in PowerShell Run as Administrator using:
 DC/OS E2E comes with the :ref:`dcos-docker-doctor` command.
 Run this command to check your system for common causes of problems.
 
-This requires DC/OS E2E to be installed.
+.. _VirtualBox: https://www.virtualbox.org/wiki/Downloads
+.. _Vagrant: https://www.vagrantup.com/downloads.html

@@ -54,6 +54,3 @@ Reference
 ---------
 
 .. autoclass:: dcos_e2e.backends.Docker
-
-.. _VirtualBox: https://www.virtualbox.org/wiki/Downloads
-.. _Vagrant: https://www.vagrantup.com/downloads.html
