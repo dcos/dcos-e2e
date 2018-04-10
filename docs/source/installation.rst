@@ -34,7 +34,6 @@ Homebrew installs the dependencies for the latest released version and so instal
     brew install --HEAD https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
 
-
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
