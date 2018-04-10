@@ -27,6 +27,7 @@ Installation
 ------------
 
 The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
+See "Operating System" requirements for instructions on using the CLI on Windows in a Vagrant VM.
 
 .. include:: cli-homebrew.rst
 
