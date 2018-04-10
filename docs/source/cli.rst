@@ -1,7 +1,7 @@
-Command Line Interface
-======================
+``dcos-docker`` CLI
+===================
 
-The CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
+The ``dcos-docker`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
 A typical CLI workflow for open source DC/OS may look like this:
 
@@ -27,6 +27,11 @@ Each of these and more are described in detail below.
 
 Creating a Cluster
 ------------------
+
+To create a cluster you first need to download `a DC/OS release <https://dcos.io/releases/>`__.
+
+`DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
+Ask your sales representative for release artifacts.
 
 Creating a cluster is possible with the ``dcos-docker create`` command.
 This command allows you to customize the cluster in many ways.
