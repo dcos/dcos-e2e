@@ -71,9 +71,9 @@ class AWS(ClusterBackend):
 
         if linux_distribution not in supported_distributions:
             message = (
-                'The {} Linux distribution is currently not support by '
-                'the AWS backend.'
-            ).format(linux_distribution.name)
+                'The {distribution_name} Linux distribution is currently not '
+                'supported by the AWS backend.'
+            ).format(distribution_name=linux_distribution.name)
             raise NotImplementedError(message)
 
         self.workspace_dir = workspace_dir or Path(gettempdir())
