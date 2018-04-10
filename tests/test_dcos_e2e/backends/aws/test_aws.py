@@ -50,8 +50,22 @@ class TestUnsupported:
             AWS(linux_distribution=Distribution.COREOS)
 
         expected_error = (
-            'The COREOS Linux distribution is currently not support by '
+            'The COREOS Linux distribution is currently not supported by '
             'the AWS backend.'
+        )
+
+        assert str(excinfo.value) == expected_error
+
+    def test_linux_distribution_ubuntu(self) -> None:
+        """
+        The AWS backend does not support the COREOS Linux distribution.
+        """
+        with pytest.raises(NotImplementedError) as excinfo:
+            AWS(linux_distribution=Distribution.UBUNTU_16_04)
+
+        expected_error = (
+            'The UBUNTU_16_04 Linux distribution is currently not supported '
+            'by the AWS backend.'
         )
 
         assert str(excinfo.value) == expected_error
