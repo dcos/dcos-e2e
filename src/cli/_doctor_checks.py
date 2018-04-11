@@ -347,5 +347,13 @@ def check_1_9_sed() -> CheckLevels:
 def check_selinux() -> CheckLevels:
     """
     XXX
+    See XXX
     """
+    if shutil.which('sestatus') is None:
+        return
+
+    message = (
+        'SELinux is in "Enforcing" mode. '
+        'SELinux must be in "Permissive" or "Disabled" mode.'
+    )
     _error(message=message)
