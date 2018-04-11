@@ -346,15 +346,16 @@ def check_1_9_sed() -> CheckLevels:
 
 def check_selinux() -> CheckLevels:
     """
-    XXX
-    See XXX
+    Error if SELinux is enabled.
+    This can cause problems such as mount problems for the installer.
     """
     if shutil.which('getenforce') is None:
         return
 
     result = subprocess.check_output(args=['getenforce'])
-    message = (
-        'SELinux is in "Enforcing" mode. '
-        'SELinux must be in "Permissive" or "Disabled" mode.'
-    )
-    _error(message=message)
+    if result == b'Enforcing':
+        message = (
+            'SELinux is in "Enforcing" mode. '
+            'SELinux must be in "Permissive" or "Disabled" mode.'
+        )
+        _error(message=message)
