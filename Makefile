@@ -81,6 +81,9 @@ linkcheck:
 spelling:
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
+.PHONY: shellcheck
+shellcheck:
+	shellcheck --exclude SC2164,SC1091 admin/*.sh
 
 # Run various linting tools.
 # We put each one in a different target so that we can run these in parallel with --jobs
@@ -97,6 +100,7 @@ lint: \
     pydocstyle \
     pylint \
     pyroma \
+    shellcheck \
     spelling \
     vulture \
     yapf
@@ -150,7 +154,9 @@ docs:
 
 .PHONY: open-docs
 open-docs:
-	open docs/build/html/index.html
+	xdg-open docs/build/html/index.html >/dev/null 2>&1 || \
+	open docs/build/html/index.html >/dev/null 2>&1 || \
+	echo "Requires 'xdg-open' or 'open' but neither is available."
 
 # We pull Docker images before the tests start to catch any flakiness early.
 # See https://jira.mesosphere.com/browse/DCOS_OSS-2120 for details of

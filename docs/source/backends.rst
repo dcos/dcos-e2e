@@ -7,4 +7,5 @@ DC/OS E2E comes with some backends and it is also possible to create custom back
    :maxdepth: 1
 
    docker-backend
+   aws-backend
    custom-backend

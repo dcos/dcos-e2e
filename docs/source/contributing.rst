@@ -22,7 +22,7 @@ Optionally install the following tools for linting and interacting with Travis C
     gem install travis --no-rdoc --no-ri
 
 Spell checking requires ``enchant``.
-This can be installed on macOS, for example, with `Homebrew <https://brew.sh>`__:
+This can be installed on macOS, for example, with `Homebrew`_:
 
 .. code:: sh
 
@@ -33,6 +33,19 @@ and on Ubuntu with ``apt``:
 .. code:: sh
 
     apt-get install -y enchant
+
+Linting Bash requires `shellcheck`_:
+This can be installed on macOS, for example, with `Homebrew`_:
+
+.. code:: sh
+
+    brew install shellcheck
+
+and on Ubuntu with ``apt``:
+
+.. code:: sh
+
+    apt-get install -y shellcheck
 
 Linting
 -------
@@ -58,8 +71,9 @@ To fix some lint errors, run the following:
 Tests for this package
 ----------------------
 
+Some tests require the Docker backend and some tests require the AWS backend.
 See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
-These requirements also apply to the tests.
+See the :doc:`AWS backend documentation <aws-backend>` for details of what is needed for the AWS backend.
 
 Download dependencies which are used by the tests:
 
@@ -157,6 +171,23 @@ To update these links use the following commands, after setting the following en
     travis env set --repo mesosphere/dcos-e2e EE_1_10_ARTIFACT_URL $EE_1_10_ARTIFACT_URL
     travis env set --repo mesosphere/dcos-e2e EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
 
+Updating the Amazon Web Services credentials
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Private credentials for Amazon Web Services are used by Travis CI.
+
+To update the credentials use the following commands, after setting the following environment variables:
+
+* ``AWS_ACCESS_KEY_ID``
+* ``AWS_SECRET_ACCESS_KEY``
+
+.. code:: sh
+
+    travis env set --repo mesosphere/dcos-e2e AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+    travis env set --repo mesosphere/dcos-e2e AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
+
+Currently credentials are taken from the OneLogin Secure Notes note ``dcos-e2e integration testing AWS credentials``.
+
 Parallel builders
 ~~~~~~~~~~~~~~~~~
 
@@ -212,15 +243,13 @@ Updating DC/OS Test Utils and DC/OS Launch
 `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
 To update DC/OS Test Utils or DC/OS Launch:
 
-Update the SHAs in ``admin/update_launch.py``.
+Update the SHAs in ``admin/update_vendored_packages.py``.
+
+The following creates a commit with changes to the vendored packages:
 
 .. code:: sh
 
-    git rm -rf src/dcos_e2e/_vendor/
-    rm -rf src/dcos_e2e/_vendor
-    python admin/update_launch.py
-    git add src/dcos_e2e/_vendor
-    git commit -m "Update vendored packages"
+   admin/update_vendored_packages.sh
 
 Testing the Homebrew Recipe
 ----------------------------
@@ -236,3 +265,4 @@ Install `Homebrew`_ or `Linuxbrew`_.
 
 .. _Homebrew: https://brew.sh/
 .. _Linuxbrew: http://linuxbrew.sh/
+.. _shellcheck: https://www.shellcheck.net

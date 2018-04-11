@@ -112,6 +112,9 @@ class Docker(ClusterBackend):
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
         docker_container_labels: Optional[Dict[str, str]] = None,
+        docker_master_labels: Optional[Dict[str, str]] = None,
+        docker_agent_labels: Optional[Dict[str, str]] = None,
+        docker_public_agent_labels: Optional[Dict[str, str]] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -135,6 +138,14 @@ class Docker(ClusterBackend):
                 ``aufs`` is used.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
+            docker_master_labels: Docker labels to add to the cluster master
+                node containers. Akin to the dictionary option in
+                `Containers.run`_.
+            docker_agent_labels: Docker labels to add to the cluster agent node
+                containers. Akin to the dictionary option in `Containers.run`_.
+            docker_public_agent_labels: Docker labels to add to the cluster
+                public agent node containers. Akin to the dictionary option in
+                `Containers.run`_.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -151,6 +162,14 @@ class Docker(ClusterBackend):
                 cluster nodes.
             docker_container_labels: Docker labels to add to the cluster node
                 containers. Akin to the dictionary option in `Containers.run`_.
+            docker_master_labels: Docker labels to add to the cluster master
+                node containers. Akin to the dictionary option in
+                `Containers.run`_.
+            docker_agent_labels: Docker labels to add to the cluster agent node
+                containers. Akin to the dictionary option in `Containers.run`_.
+            docker_public_agent_labels: Docker labels to add to the cluster
+                public agent node containers. Akin to the dictionary option in
+                `Containers.run`_.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
@@ -164,6 +183,9 @@ class Docker(ClusterBackend):
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver
         self.docker_container_labels = docker_container_labels or {}
+        self.docker_master_labels = docker_master_labels or {}
+        self.docker_agent_labels = docker_agent_labels or {}
+        self.docker_public_agent_labels = docker_public_agent_labels or {}
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -328,9 +350,7 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{
-                        'node_type': 'master',
-                    },
+                    **cluster_backend.docker_master_labels,
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
@@ -368,9 +388,7 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{
-                        'node_type': 'agent',
-                    },
+                    **cluster_backend.docker_agent_labels,
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,
@@ -408,9 +426,7 @@ class DockerCluster(ClusterManager):
                 docker_image=docker_image_tag,
                 labels={
                     **cluster_backend.docker_container_labels,
-                    **{
-                        'node_type': 'public_agent',
-                    },
+                    **cluster_backend.docker_public_agent_labels,
                 },
                 public_key_path=public_key_path,
                 docker_storage_driver=cluster_backend.docker_storage_driver,

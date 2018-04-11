@@ -1,10 +1,10 @@
 autoflake==1.1
 check-manifest==0.36
-dcoscli==0.6.0
+dcoscli==0.6.1
 doc8==0.8.0
-dulwich==0.19.0
+dulwich==0.19.2
 flake8-commas==2.0.0
-flake8-quotes==0.14.1
+flake8-quotes==1.0.0
 flake8==3.5.0
 homebrew-pypi-poet==0.10.0
 isort==4.3.4
@@ -13,8 +13,8 @@ pip_check_reqs==2.0.1
 py==1.5.3
 pydocstyle==2.1.1
 pyenchant==2.0.0
-pygithub==1.38
-pylint==1.8.3
+pygithub==1.39
+pylint==1.8.4
 pyroma==2.3
 pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1

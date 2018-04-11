@@ -413,6 +413,9 @@ def create(
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
             VARIANT_LABEL_KEY: 'ee' if enterprise else '',
         },
+        docker_master_labels={'node_type': 'master'},
+        docker_agent_labels={'node_type': 'agent'},
+        docker_public_agent_labels={'node_type': 'public_agent'},
         workspace_dir=workspace_dir,
     )
 
