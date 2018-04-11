@@ -152,15 +152,7 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'coreos',
         }
 
-        # Workaround for 1.9 as it will not work with ip_detect_public_filename
-        # https://jira.mesosphere.com/browse/DCOS-21960
-        detect_ip_public = (
-            '#!/bin/bash\n'
-            'curl fsSL http://169.254.169.254/latest/meta-data/public-ipv4',
-        )
-
         launch_config = {
-            'ip_detect_public_contents': detect_ip_public,
             'admin_location': cluster_backend.admin_location,
             'aws_region': cluster_backend.aws_region,
             'deployment_name': unique,
@@ -178,6 +170,10 @@ class AWSCluster(ClusterManager):
             'provider': 'onprem',
         }
 
+        # Workaround for 1.9 as it will not work with ip_detect_public_filename
+        # https://jira.mesosphere.com/browse/DCOS-21960
+        detect_ip_public = '#!/bin/bash\ncurl fsSL http://169.254.169.254/latest/meta-data/public-ipv4'
+
         # First we create a preliminary dcos-config inside the
         # dcos-launch config to pass the config validation step.
         launch_config['dcos_config'] = {
@@ -186,6 +182,7 @@ class AWSCluster(ClusterManager):
             'master_discovery': 'static',
             'dns_search': 'mesos',
             'exhibitor_storage_backend': 'static',
+            'ip_detect_public_contents': detect_ip_public.encode(),
         }
 
         # Validate the preliminary dcos-launch config.
