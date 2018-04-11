@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- The AWS backend now supports DC/OS 1.9.
+
 2018.04.11.0
 ------------
 
