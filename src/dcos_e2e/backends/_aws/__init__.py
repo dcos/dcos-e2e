@@ -182,9 +182,8 @@ class AWSCluster(ClusterManager):
         # dcos-launch config to pass the config validation step.
         launch_config['dcos_config'] = {
             'cluster_name': unique,
-            'resolvers': ['8.8.4.4', '8.8.8.8'],
+            'resolvers': ['10.10.0.2', '8.8.8.8'],
             'master_discovery': 'static',
-            'dns_search': 'mesos',
             'exhibitor_storage_backend': 'static',
             'ip_detect_public_contents': detect_ip_public,
         }
