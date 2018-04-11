@@ -9,7 +9,7 @@ Then install the latest stable version:
 
     brew install https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
-To upgrade to a newer version, run the following command:
+To upgrade from an older version, run the following command:
 
 .. code:: sh
 
