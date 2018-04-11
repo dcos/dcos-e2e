@@ -22,7 +22,7 @@ Optionally install the following tools for linting and interacting with Travis C
     gem install travis --no-rdoc --no-ri
 
 Spell checking requires ``enchant``.
-This can be installed on macOS, for example, with `Homebrew <https://brew.sh>`__:
+This can be installed on macOS, for example, with `Homebrew`_:
 
 .. code:: sh
 
@@ -33,6 +33,19 @@ and on Ubuntu with ``apt``:
 .. code:: sh
 
     apt-get install -y enchant
+
+Linting Bash requires `shellcheck`_:
+This can be installed on macOS, for example, with `Homebrew`_:
+
+.. code:: sh
+
+    brew install shellcheck
+
+and on Ubuntu with ``apt``:
+
+.. code:: sh
+
+    apt-get install -y shellcheck
 
 Linting
 -------
@@ -238,17 +251,6 @@ The following creates a commit with changes to the vendored packages:
 
    admin/update_vendored_packages.sh
 
-Redirect DC/OS Launch package resources
----------------------------------------
-
-In order discover its package resources after an update of the vendored DC/OS Launch, all references to ``dcos_launch`` must be replaced with ``dcos_e2e._vendor.dcos_launch`` in the following files.
-
-* :file:`dcos_e2e/_vendor/dcos_launch/config.py`
-* :file:`dcos_e2e/_vendor/dcos_launch/onprem.py`
-* :file:`dcos_e2e/_vendor/dcos_launch/platform/aws.py`
-
-The progress on automating this procedure is tracked in :issue:`DCOS-21895`.
-
 Testing the Homebrew Recipe
 ----------------------------
 
@@ -263,3 +265,4 @@ Install `Homebrew`_ or `Linuxbrew`_.
 
 .. _Homebrew: https://brew.sh/
 .. _Linuxbrew: http://linuxbrew.sh/
+.. _shellcheck: https://www.shellcheck.net

@@ -31,7 +31,6 @@ Options:
             One of: critical, error, warning, info, debug, and trace
             [default: info].
 """
-import json
 import os
 import sys
 
@@ -39,52 +38,31 @@ from .. import dcos_launch
 from .. import dcos_launch
 from ..dcos_launch import config as ___vendorize__0
 dcos_launch.config = ___vendorize__0
-from .. import dcos_launch
-from ..dcos_launch import util as ___vendorize__0
-dcos_launch.util = ___vendorize__0
+from ..dcos_launch import util
 from ..dcos_test_utils import logger
 from docopt import docopt
-
-json_prettyprint_args = {
-    "sort_keys": True,
-    "indent": 2,
-    "separators": (',', ':')
-}
-
-
-def write_json(filename, data):
-    with open(filename, "w+") as f:
-        return json.dump(data, f, **json_prettyprint_args)
-
-
-def json_prettyprint(data):
-    return json.dumps(data, **json_prettyprint_args)
-
-
-def load_json(filename):
-    try:
-        with open(filename) as f:
-            return json.load(f)
-    except ValueError as ex:
-        raise ValueError("Invalid JSON in {0}: {1}".format(filename, ex)) from ex
 
 
 def do_main(args):
     logger.setup(args['--log-level'].upper(), noisy_modules=['googleapiclient', 'oauth2client'])
 
-    config_path = args['--config-path']
     if args['create']:
-        config = dcos_launch.config.get_validated_config_from_path(config_path)
+        config = dcos_launch.config.get_validated_config_from_path(args['--config-path'])
         info_path = args['--info-path']
         if os.path.exists(info_path):
             raise dcos_launch.util.LauncherError(
                 'InputConflict',  '{} already exists! Delete this or specify a '
                 'different cluster info path with the -i option'.format(info_path))
-        write_json(info_path, dcos_launch.get_launcher(config).create())
+        launcher = dcos_launch.get_launcher(config)
+        cluster_info = launcher.create()
+        util.write_json(info_path, cluster_info)
+        create_exception = getattr(launcher, 'create_exception', None)
+        if create_exception:
+            raise create_exception
         return 0
 
     try:
-        info = load_json(args['--info-path'])
+        info = util.load_json(args['--info-path'])
     except FileNotFoundError as ex:
         raise dcos_launch.util.LauncherError('MissingInfoJSON', None) from ex
 
@@ -96,14 +74,14 @@ def do_main(args):
         return 0
 
     if args['describe']:
-        print(json_prettyprint(launcher.describe()))
+        print(util.json_prettyprint(launcher.describe()))
         return 0
 
     if args['pytest']:
         var_list = list()
         if args['--env'] is not None:
             if '=' in args['--env']:
-                # User is attempting to do an assigment with the option
+                # User is attempting to do an assignment with the option
                 raise dcos_launch.util.LauncherError(
                     'OptionError', "The '--env' option can only pass through environment variables "
                     "from the current environment. Set variables according to the shell being used.")

@@ -12,23 +12,27 @@ from googleapiclient.errors import HttpError
 log = logging.getLogger(__name__)
 
 
+def get_credentials(env) -> tuple:
+    path = None
+    if env is None:
+        env = os.environ.copy()
+    if 'GCE_CREDENTIALS' in env:
+        json_credentials = env['GCE_CREDENTIALS']
+    elif 'GOOGLE_APPLICATION_CREDENTIALS' in env:
+        path = env['GOOGLE_APPLICATION_CREDENTIALS']
+        json_credentials = util.read_file(path)
+    else:
+        raise util.LauncherError(
+            'MissingParameter', 'Either GCE_CREDENTIALS or GOOGLE_APPLICATION_CREDENTIALS must be set in env')
+
+    return json_credentials, path
+
+
 class OnPremLauncher(onprem.AbstractOnpremLauncher):
     # Launches a homogeneous cluster of plain GMIs intended for onprem DC/OS
     def __init__(self, config: dict, env=None):
-        if env is None:
-            env = os.environ.copy()
-        if 'GCE_CREDENTIALS' in env:
-            json_credentials = env['GCE_CREDENTIALS']
-        elif 'GCE_CREDENTIALS_PATH' in env:
-            json_credentials = util.read_file(env['GCE_CREDENTIALS_PATH'])
-        elif 'GOOGLE_APPLICATION_CREDENTIALS' in env:
-            json_credentials = util.read_file(env['GOOGLE_APPLICATION_CREDENTIALS'])
-        else:
-            raise util.LauncherError(
-                'MissingParameter', 'Either GCE_CREDENTIALS or GCE_CREDENTIALS_PATH must be set in env')
-        credentials_dict = json.loads(json_credentials)
-
-        self.gcp_wrapper = gcp.GcpWrapper(credentials_dict)
+        creds_string, _ = get_credentials(env)
+        self.gcp_wrapper = gcp.GcpWrapper(json.loads(creds_string))
         self.config = config
 
     @property

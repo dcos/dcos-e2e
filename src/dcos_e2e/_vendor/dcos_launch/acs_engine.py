@@ -211,7 +211,7 @@ class ACSEngineLauncher(dcos_launch.util.AbstractLauncher):
     def delete(self):
         self.resource_group.delete()
 
-    def test(self, args: list, env_dict: dict, test_host=None, test_port=22) -> int:
+    def test(self, args: list, env_dict: dict, test_host=None, test_port=22, details: dict=None) -> int:
         details = self.describe()
         env_dict.update({
             'WINDOWS_HOSTS': ','.join(m['private_ip'] for m in details['windows_private_agents']),

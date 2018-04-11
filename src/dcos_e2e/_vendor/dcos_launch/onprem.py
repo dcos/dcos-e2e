@@ -7,6 +7,7 @@ import typing
 
 import pkg_resources
 
+from .. import dcos_launch
 import yaml
 from ..dcos_launch import util
 from ..dcos_launch.platforms import onprem as platforms_onprem
@@ -76,7 +77,7 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
             default_path_local = os.path.join(genconf_dir, script_hyphen)
             filename_key = script + '_filename'
 
-            if (script == 'fault_domain_detect'):
+            if script == 'fault_domain_detect':
                 if 'fault_domain_helper' in self.config:
                     # fault_domain_helper is enabled; use it
                     with open(default_path_local, 'w') as f:
@@ -109,7 +110,7 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
             # use a sensible default
             shutil.copyfile(
                 pkg_resources.resource_filename(
-                    'dcos_e2e._vendor.dcos_launch', script_hyphen + '/{}.sh'.format(self.config['platform'])),
+                    dcos_launch.__name__, script_hyphen + '/{}.sh'.format(self.config['platform'])),
                 default_path_local)
 
         with open(os.path.join(genconf_dir, 'config.yaml'), 'w') as f:
