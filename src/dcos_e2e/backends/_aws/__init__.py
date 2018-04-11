@@ -170,7 +170,7 @@ class AWSCluster(ClusterManager):
             'provider': 'onprem',
         }
 
-        # Workaround for < 1.9.8 where ``ip_detect_public_filename`` is ignored.
+        # Workaround ``ip_detect_public_filename`` being is ignored.
         # https://jira.mesosphere.com/browse/DCOS-21960
         detect_ip_public = (
             '"#!/bin/bash\\n '
