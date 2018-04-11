@@ -251,17 +251,6 @@ The following creates a commit with changes to the vendored packages:
 
    admin/update_vendored_packages.sh
 
-Redirect DC/OS Launch package resources
----------------------------------------
-
-In order discover its package resources after an update of the vendored DC/OS Launch, all references to ``dcos_launch`` must be replaced with ``dcos_e2e._vendor.dcos_launch`` in the following files.
-
-* :file:`dcos_e2e/_vendor/dcos_launch/config.py`
-* :file:`dcos_e2e/_vendor/dcos_launch/onprem.py`
-* :file:`dcos_e2e/_vendor/dcos_launch/platform/aws.py`
-
-The progress on automating this procedure is tracked in :issue:`DCOS-21895`.
-
 Testing the Homebrew Recipe
 ----------------------------
 
