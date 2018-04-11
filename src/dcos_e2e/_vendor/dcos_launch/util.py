@@ -1,4 +1,5 @@
 import abc
+import json
 import logging
 import os
 import subprocess
@@ -9,6 +10,7 @@ import pkg_resources
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from .. import dcos_launch
 from .. import dcos_test_utils
 import yaml
 
@@ -21,6 +23,30 @@ MOCK_SUBNET_ID = 'subnet-foo-bar'
 MOCK_GATEWAY_ID = 'gateway-foo-bar'
 MOCK_STACK_ID = 'this-is-a-important-test-stack::deadbeefdeadbeef'
 NO_TEST_FLAG = 'NO PRIVATE SSH KEY PROVIDED - CANNOT TEST'
+
+
+json_prettyprint_args = {
+    "sort_keys": True,
+    "indent": 2,
+    "separators": (',', ':')
+}
+
+
+def write_json(filename, data):
+    with open(filename, "w+") as f:
+        return json.dump(data, f, **json_prettyprint_args)
+
+
+def json_prettyprint(data):
+    return json.dumps(data, **json_prettyprint_args)
+
+
+def load_json(filename):
+    try:
+        with open(filename) as f:
+            return json.load(f)
+    except ValueError as ex:
+        raise ValueError("Invalid JSON in {0}: {1}".format(filename, ex)) from ex
 
 
 def set_from_env(key):
@@ -45,7 +71,7 @@ def stub(output):
 
 def get_temp_config_path(tmpdir, name, update: dict = None):
     config = yaml.load(
-        pkg_resources.resource_string('dcos_e2e._vendor.dcos_launch', 'sample_configs/{}'.format(name)).decode('utf-8'))
+        pkg_resources.resource_string(dcos_launch.__name__, 'sample_configs/{}'.format(name)).decode('utf-8'))
     if update is not None:
         config.update(update)
     new_config_path = tmpdir.join('my_config.yaml')
@@ -73,6 +99,9 @@ class AbstractLauncher(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     def wait(self):
+        raise NotImplementedError()
+
+    def describe(self):
         raise NotImplementedError()
 
     def delete(self):
@@ -152,7 +181,7 @@ def convert_host_list(host_list):
     return [{'private_ip': h.private_ip, 'public_ip': h.public_ip} for h in host_list]
 
 
-def generate_rsa_keypair(key_size=2048):
+def generate_rsa_keypair(key_size=2048, priv_key_format=serialization.PrivateFormat.PKCS8):
     """Generate an RSA keypair.
     Create new RSA keypair with an exponent of 65537. Serialize the public
     key OpenSSH format that is used by providers for specifying access keys
@@ -172,7 +201,7 @@ def generate_rsa_keypair(key_size=2048):
 
     privkey_pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.PKCS8,
+        format=priv_key_format,
         encryption_algorithm=serialization.NoEncryption())
 
     public_key = private_key.public_key()

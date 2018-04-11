@@ -106,7 +106,6 @@ properties:
   - IPProtocol: icmp
 """
 
-
 # template for a firewall that controls internal access
 INTERNAL_FIREWALL_TEMPLATE = """
 type: compute.v1.firewall
