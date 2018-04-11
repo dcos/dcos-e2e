@@ -349,10 +349,10 @@ def check_selinux() -> CheckLevels:
     XXX
     See XXX
     """
-    if shutil.which('sestatus') is None:
+    if shutil.which('getenforce') is None:
         return
 
-    result = subprocess.check_output(args=['sestatus'])
+    result = subprocess.check_output(args=['getenforce'])
     message = (
         'SELinux is in "Enforcing" mode. '
         'SELinux must be in "Permissive" or "Disabled" mode.'
