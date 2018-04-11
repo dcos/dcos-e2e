@@ -342,3 +342,10 @@ def check_1_9_sed() -> CheckLevels:
         return CheckLevels.WARNING
 
     return CheckLevels.NONE
+
+
+def check_selinux() -> CheckLevels:
+    """
+    XXX
+    """
+    _error(message=message)
