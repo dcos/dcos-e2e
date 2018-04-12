@@ -170,6 +170,14 @@ class AWSCluster(ClusterManager):
             'provider': 'onprem',
         }
 
+        # Work around ``ip_detect_public_filename`` being ignored.
+        # https://jira.mesosphere.com/browse/DCOS-21960
+        detect_ip_public = (
+            '"#!/bin/bash\\n '
+            'curl -fsSL '
+            'http://169.254.169.254/latest/meta-data/public-ipv4"'
+        )
+
         # First we create a preliminary dcos-config inside the
         # dcos-launch config to pass the config validation step.
         launch_config['dcos_config'] = {
@@ -177,6 +185,7 @@ class AWSCluster(ClusterManager):
             'resolvers': ['10.10.0.2', '8.8.8.8'],
             'master_discovery': 'static',
             'exhibitor_storage_backend': 'static',
+            'ip_detect_public_contents': detect_ip_public,
         }
 
         # Validate the preliminary dcos-launch config.
