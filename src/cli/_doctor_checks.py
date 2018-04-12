@@ -350,7 +350,7 @@ def check_selinux() -> CheckLevels:
     This can cause problems such as mount problems for the installer.
     """
     if shutil.which('getenforce') is None:
-        return
+        return CheckLevels.NONE
 
     result = subprocess.check_output(args=['getenforce'])
     if result == b'Enforcing':
@@ -359,3 +359,6 @@ def check_selinux() -> CheckLevels:
             'SELinux must be in "Permissive" or "Disabled" mode.'
         )
         _error(message=message)
+        return CheckLevels.ERROR
+
+    return CheckLevels.NONE
