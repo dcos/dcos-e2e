@@ -1,4 +1,4 @@
-Cerberus==1.1
+Cerberus==1.2
 PyYAML==3.12
 azure-common==1.1.9
 azure-mgmt-network==2.0.0rc2
