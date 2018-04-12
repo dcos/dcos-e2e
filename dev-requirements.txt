@@ -1,5 +1,5 @@
 autoflake==1.1
-check-manifest==0.36
+check-manifest==0.37
 dcoscli==0.6.1
 doc8==0.8.0
 dulwich==0.19.2
