@@ -134,12 +134,10 @@ fix-lint:
 
 .PHONY: clean-artifacts
 clean-artifacts:
-	rm -rf $(OSS_MASTER_ARTIFACT_PATH)
 	rm -rf $(EE_MASTER_ARTIFACT_PATH)
 
 .PHONY: download-artifacts
 download-artifacts:
-	curl -o $(OSS_MASTER_ARTIFACT_PATH) $(OSS_MASTER_ARTIFACT_URL)
 	if [ -n "$(EE_MASTER_ARTIFACT_URL)" ]; then curl -o $(EE_MASTER_ARTIFACT_PATH) $(EE_MASTER_ARTIFACT_URL); fi
 
 .PHONY: docs
