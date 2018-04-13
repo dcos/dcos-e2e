@@ -143,8 +143,14 @@ class ApiClientSession:
             fragment=fragment,
             port=port))
 
-        log.debug('Request method {}: {}. Arguments: {}'.format(method, request_url, repr(kwargs)))
+        if 'login' in request_url:
+            log.error('Request method {}: {}. Arguments: {}'.format(method, request_url, repr(kwargs)))
+
         r = self.session.request(method, request_url, **kwargs)
+
+        if 'login' in request_url:
+            log.error(r.request.body)
+        
         self.session.cookies.clear()
         return r
 

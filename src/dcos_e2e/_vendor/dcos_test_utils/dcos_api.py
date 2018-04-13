@@ -164,8 +164,11 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         if self.auth_user is None:
             return
         log.info('Attempting authentication')
+
         # explicitly use a session with no user authentication for requesting auth headers
+        log.error('AUTH_USER CREDENTIALS: ' + str(self.auth_user.credentials))
         r = self.post('/acs/api/v1/auth/login', json=self.auth_user.credentials, auth=None)
+
         r.raise_for_status()
         log.info('Received authentication blob: {}'.format(r.json()))
         self.auth_user.auth_token = r.json()['token']
