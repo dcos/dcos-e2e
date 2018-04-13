@@ -60,8 +60,8 @@ class TestExperiment:
 
 
 def helper(cluster_backend, enterprise_artifact, license_key_contents):
-    superuser_username = str(uuid.uuid4())
-    superuser_password = str(uuid.uuid4())
+    superuser_username = 'bootstrapuser'
+    superuser_password = 'deleteme'
     superuser_hashed_password = sha512_crypt.hash(superuser_password)
 
     print('EXPECTED CREDENTIALS')
