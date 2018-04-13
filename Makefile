@@ -140,13 +140,7 @@ clean-artifacts:
 .PHONY: download-artifacts
 download-artifacts:
 	curl -o $(OSS_MASTER_ARTIFACT_PATH) $(OSS_MASTER_ARTIFACT_URL)
-	curl -o $(OSS_1_9_ARTIFACT_PATH) $(OSS_1_9_ARTIFACT_URL)
-	curl -o $(OSS_1_10_ARTIFACT_PATH) $(OSS_1_10_ARTIFACT_URL)
-	curl -o $(OSS_1_11_ARTIFACT_PATH) $(OSS_1_11_ARTIFACT_URL)
 	if [ -n "$(EE_MASTER_ARTIFACT_URL)" ]; then curl -o $(EE_MASTER_ARTIFACT_PATH) $(EE_MASTER_ARTIFACT_URL); fi
-	if [ -n "$(EE_1_9_ARTIFACT_URL)" ]; then curl -o $(EE_1_9_ARTIFACT_PATH) $(EE_1_9_ARTIFACT_URL); fi
-	if [ -n "$(EE_1_10_ARTIFACT_URL)" ]; then curl -o $(EE_1_10_ARTIFACT_PATH) $(EE_1_10_ARTIFACT_URL); fi
-	if [ -n "$(EE_1_11_ARTIFACT_URL)" ]; then curl -o $(EE_1_11_ARTIFACT_PATH) $(EE_1_11_ARTIFACT_URL); fi
 
 .PHONY: docs
 docs:
@@ -164,8 +158,4 @@ open-docs:
 .PHONY: pull-images
 pull-images:
 	# These are the base images for operating systems used.
-	docker pull ubuntu:xenial
 	docker pull centos:7
-	docker pull quay.io/shift/coreos:stable-1298.7.0
-	# This is used by the ``dcos-docker doctor`` command.
-	docker pull luca3m/sleep
