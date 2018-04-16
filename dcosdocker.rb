@@ -108,7 +108,7 @@ class Dcosdocker < Formula
 
   resource "docker" do
     url "https://github.com/adamtheturtle/docker-py/archive/3.2.2-a.zip"
-    sha256 "f1a512a0dbc518459159d4584572ebc6de2cc8006b2e376eff02cfae7d72aff0"
+    sha256 "cf6fdbb5500ac425b42c4c5b3bf242f9fa900f251de82c3993311f939969aafa"
   end
 
   resource "docker-pycreds" do
