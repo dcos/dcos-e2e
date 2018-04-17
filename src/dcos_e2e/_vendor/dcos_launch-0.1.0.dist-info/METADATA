@@ -1,0 +1,33 @@
+Metadata-Version: 2.1
+Name: dcos-launch
+Version: 0.1.0
+Summary: DC/OS cluster provisioning
+Home-page: https://dcos.io
+Author: Mesosphere, Inc.
+Author-email: help@dcos.io
+License: apache2
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Requires-Dist: azure-storage
+Requires-Dist: azure-mgmt-network
+Requires-Dist: azure-mgmt-resource
+Requires-Dist: azure-monitor
+Requires-Dist: boto3
+Requires-Dist: botocore
+Requires-Dist: cerberus
+Requires-Dist: docopt
+Requires-Dist: google-api-python-client
+Requires-Dist: oauth2client (==3.0.0)
+Requires-Dist: pyinstaller (==3.3)
+Requires-Dist: py
+Requires-Dist: pytest
+Requires-Dist: pyyaml
+Requires-Dist: requests
+Requires-Dist: retrying
+
+UNKNOWN
+
+
