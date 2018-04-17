@@ -7,7 +7,7 @@ from typing import List
 
 import requests
 
-from dcos_test_utils.helpers import Host
+from ..dcos_test_utils.helpers import Host
 
 log = logging.getLogger(__name__)
 

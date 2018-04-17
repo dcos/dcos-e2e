@@ -1,4 +1,4 @@
-from dcos_launch import acs_engine, arm, aws, gcp, terraform, util
+from ..dcos_launch import acs_engine, arm, aws, gcp, terraform, util
 
 VERSION = '0.1.0'
 

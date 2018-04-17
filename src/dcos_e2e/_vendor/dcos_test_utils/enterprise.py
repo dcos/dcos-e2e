@@ -1,7 +1,7 @@
 import logging
 import os
 
-from dcos_test_utils import dcos_api, helpers, iam
+from ..dcos_test_utils import dcos_api, helpers, iam
 
 log = logging.getLogger(__name__)
 

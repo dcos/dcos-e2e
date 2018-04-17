@@ -10,8 +10,8 @@ import pkg_resources
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-import dcos_launch
-import dcos_test_utils
+from .. import dcos_launch
+from .. import dcos_test_utils
 import yaml
 
 log = logging.getLogger(__name__)

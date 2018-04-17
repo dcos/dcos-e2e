@@ -3,7 +3,7 @@
 
 import logging
 
-from dcos_test_utils.helpers import (ApiClientSession,
+from ..dcos_test_utils.helpers import (ApiClientSession,
                                      RetryCommonHttpErrorsMixin)
 
 log = logging.getLogger(__name__)

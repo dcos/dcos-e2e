@@ -3,8 +3,14 @@
 import logging
 import os
 
-import dcos_launch.platforms.arm
-import dcos_launch.util
+from .. import dcos_launch
+from ..dcos_launch import platforms as ___vendorize__0
+dcos_launch.platforms = ___vendorize__0
+from ..dcos_launch.platforms import arm as ___vendorize__1
+dcos_launch.platforms.arm = ___vendorize__1
+from .. import dcos_launch
+from ..dcos_launch import util as ___vendorize__0
+dcos_launch.util = ___vendorize__0
 
 log = logging.getLogger(__name__)
 

@@ -1,9 +1,11 @@
 import json
 import logging
 
-import dcos_launch.util
-from dcos_launch import onprem
-from dcos_launch.platforms import aws
+from .. import dcos_launch
+from ..dcos_launch import util as ___vendorize__0
+dcos_launch.util = ___vendorize__0
+from ..dcos_launch import onprem
+from ..dcos_launch.platforms import aws
 
 log = logging.getLogger(__name__)
 
