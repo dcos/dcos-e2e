@@ -202,6 +202,9 @@
             "ToPort": "65535",
             "SourceSecurityGroupId": { "Ref" : "ExternalSecurityGroup"}
           }
+        ],
+        "Tags" : [
+          { "Key" : "KubernetesCluster", "Value" : { "Ref" : "AWS::StackName" } }
         ]
       }
     },
@@ -285,8 +288,13 @@
             "Key" : "Network",
             "Value" : "Public",
             "PropagateAtLaunch" : "true"
-            }
-          ]
+          },
+          {
+            "Key" : "KubernetesCluster",
+            "Value" : { "Ref" : "AWS::StackName" },
+            "PropagateAtLaunch" : "true"
+          }
+        ]
       }
     },
     "BareServerLaunchConfig": {
@@ -385,6 +393,6 @@
           }
         ]
       }
-    },
+    }
   }
 }

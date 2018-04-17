@@ -70,6 +70,7 @@ def do_main(args):
 
     if args['wait']:
         launcher.wait()
+        launcher.install_dcos()
         print('Cluster is ready!')
         return 0
 

@@ -1,3 +1,4 @@
+import json
 import logging
 
 from .. import dcos_launch
@@ -89,7 +90,9 @@ class DcosCloudformationLauncher(dcos_launch.util.AbstractLauncher):
         if len(self.config['temp_resources']) > 0:
             # must wait for stack to be deleted before removing
             # network resources on which it depends
-            self.stack.wait_for_complete(transition_states=['DELETE_IN_PROGRESS'], end_states=['DELETE_COMPLETE'])
+            self.stack.wait_for_complete(
+                transition_states=['CREATE_COMPLETE', 'DELETE_IN_PROGRESS'],
+                end_states=['DELETE_COMPLETE'])
             self.delete_temp_resources(self.config['temp_resources'])
 
     def delete_temp_resources(self, temp_resources):
@@ -149,14 +152,17 @@ class OnPremLauncher(DcosCloudformationLauncher, onprem.AbstractOnpremLauncher):
         }
         if not self.config['key_helper']:
             template_parameters['KeyName'] = self.config['aws_key_name']
+        template_body = dcos_launch.platforms.aws.template_by_instance_type(self.config['instance_type'])
+        if 'iam_role_permissions' in self.config:
+            template_body_json = json.loads(template_body)
+            template_body_json[
+                'Resources']['BareRole']['Properties']['Policies'][0]['PolicyDocument']['Statement'].extend(
+                self.config['iam_role_permissions'])
+            template_body = json.dumps(template_body_json)
         self.config.update({
-            'template_body': aws.template_by_instance_type(self.config['instance_type']),
+            'template_body': template_body,
             'template_parameters': template_parameters})
         return DcosCloudformationLauncher.create(self)
-
-    def wait(self):
-        DcosCloudformationLauncher.wait(self)
-        onprem.AbstractOnpremLauncher.wait(self)
 
     def describe(self):
         return onprem.AbstractOnpremLauncher.describe(self)
