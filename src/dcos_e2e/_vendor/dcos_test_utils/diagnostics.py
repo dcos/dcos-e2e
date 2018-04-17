@@ -11,7 +11,7 @@ import os
 
 import retrying
 
-from ..dcos_test_utils.helpers import (
+from dcos_test_utils.helpers import (
     ARNodeApiClientMixin,
     ApiClientSession,
     RetryCommonHttpErrorsMixin,

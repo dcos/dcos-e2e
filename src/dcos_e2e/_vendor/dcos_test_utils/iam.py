@@ -1,4 +1,4 @@
-from ..dcos_test_utils import helpers
+from dcos_test_utils import helpers
 
 
 class Iam(helpers.ApiClientSession):

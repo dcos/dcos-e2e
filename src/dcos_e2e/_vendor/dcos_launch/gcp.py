@@ -4,9 +4,9 @@ import json
 import logging
 import os
 
-from ..dcos_launch import onprem, util
-from ..dcos_launch.platforms import gcp
-from ..dcos_test_utils.helpers import Host
+from dcos_launch import onprem, util
+from dcos_launch.platforms import gcp
+from dcos_test_utils.helpers import Host
 from googleapiclient.errors import HttpError
 
 log = logging.getLogger(__name__)
@@ -96,7 +96,6 @@ class OnPremLauncher(onprem.AbstractOnpremLauncher):
         once the instance template is deployed, an instance group manager and all its instances are deployed.
         """
         self.deployment.wait_for_completion()
-        super().wait()
 
     def delete(self):
         """ Deletes all the resources associated with the deployment (instance template, network, firewall, instance

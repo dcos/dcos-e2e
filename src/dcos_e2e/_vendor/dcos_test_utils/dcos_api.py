@@ -14,7 +14,7 @@ from typing import List, Optional
 import requests
 import retrying
 
-from ..dcos_test_utils import (
+from dcos_test_utils import (
     diagnostics,
     marathon,
     package,

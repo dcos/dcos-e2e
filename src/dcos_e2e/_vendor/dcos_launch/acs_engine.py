@@ -10,14 +10,8 @@ import uuid
 
 import requests
 
-from .. import dcos_launch
-from ..dcos_launch import platforms as ___vendorize__0
-dcos_launch.platforms = ___vendorize__0
-from ..dcos_launch.platforms import arm as ___vendorize__1
-dcos_launch.platforms.arm = ___vendorize__1
-from .. import dcos_launch
-from ..dcos_launch import util as ___vendorize__0
-dcos_launch.util = ___vendorize__0
+import dcos_launch.platforms.arm
+import dcos_launch.util
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +39,8 @@ def generate_acs_engine_template(
         "apiVersion": "vlabs",
         "properties": {
             "orchestratorProfile": {
-                "orchestratorType": "DCOS"
+                "orchestratorType": "DCOS",
+                "orchestratorVersion": "1.11.0"
             },
             "masterProfile": {
                 "count": num_masters,
@@ -179,10 +174,22 @@ class ACSEngineLauncher(dcos_launch.util.AbstractLauncher):
             self.config['windows_admin_user'],
             self.config['windows_admin_password'],
             self.config['linux_admin_user'])
+        windows_image_source_url = self.config.get('windows_image_source_url')
+        if windows_image_source_url:
+            acs_engine_template["properties"]["windowsProfile"]["WindowsImageSourceUrl"] = windows_image_source_url
         linux_bs_url = self.config.get('dcos_linux_bootstrap_url')
+        linux_repository_url = self.config.get('dcos_linux_repository_url')
+        linux_cluster_package_list_id = self.config.get('dcos_linux_cluster_package_list_id')
+        provider_package_id = self.config.get('provider_package_id')
         arm_template, self.config['template_parameters'] = run_acs_engine(self.config['acs_engine_tarball_url'], acs_engine_template)  # noqa
         if linux_bs_url:
             self.config['template_parameters']['dcosBootstrapURL'] = linux_bs_url
+        if linux_repository_url:
+            self.config['template_parameters']['dcosRepositoryURL'] = linux_repository_url
+        if linux_cluster_package_list_id:
+            self.config['template_parameters']['dcosClusterPackageListID'] = linux_cluster_package_list_id
+        if provider_package_id:
+            self.config['template_parameters']['dcosProviderPackageID'] = provider_package_id
         self.azure_wrapper.deploy_template_to_new_resource_group(
             self.config.get('template_url'),
             self.config['deployment_name'],
@@ -211,7 +218,7 @@ class ACSEngineLauncher(dcos_launch.util.AbstractLauncher):
     def delete(self):
         self.resource_group.delete()
 
-    def test(self, args: list, env_dict: dict, test_host=None, test_port=22, details: dict=None) -> int:
+    def test(self, args: list, env_dict: dict, test_host=None, test_port=2200, details: dict=None) -> int:
         details = self.describe()
         env_dict.update({
             'WINDOWS_HOSTS': ','.join(m['private_ip'] for m in details['windows_private_agents']),

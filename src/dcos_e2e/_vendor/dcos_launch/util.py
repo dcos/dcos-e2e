@@ -10,8 +10,8 @@ import pkg_resources
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from .. import dcos_launch
-from .. import dcos_test_utils
+import dcos_launch
+import dcos_test_utils
 import yaml
 
 log = logging.getLogger(__name__)
@@ -106,6 +106,10 @@ class AbstractLauncher(metaclass=abc.ABCMeta):
 
     def delete(self):
         raise NotImplementedError()
+
+    def install_dcos(self):
+        # Only implemented in onprem. For other deployment methods, dcos installation occurs in the wait() step.
+        pass
 
     def test(self, args: list, env_dict: dict, test_host: str=None, test_port: int=22, details: dict=None) -> int:
         """ Connects to master host with SSH and then run the internal integration test

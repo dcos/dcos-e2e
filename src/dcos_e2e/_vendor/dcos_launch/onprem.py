@@ -7,11 +7,11 @@ import typing
 
 import pkg_resources
 
-from .. import dcos_launch
+import dcos_launch
 import yaml
-from ..dcos_launch import util
-from ..dcos_launch.platforms import onprem as platforms_onprem
-from ..dcos_test_utils import onprem
+from dcos_launch import util
+from dcos_launch.platforms import onprem as platforms_onprem
+from dcos_test_utils import onprem
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +21,9 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     def get_cluster_hosts(self):
+        raise NotImplementedError()
+
+    def wait(self):
         raise NotImplementedError()
 
     def get_onprem_cluster(self):
@@ -177,7 +180,7 @@ echo "{{\\"fault_domain\\":{{\\"region\\":{{\\"name\\": \\"$REGION\\"}},\\"zone\
 """
         return bash_script.format(cases=case_str)
 
-    def wait(self):
+    def install_dcos(self):
         cluster = self.get_onprem_cluster()
         bootstrap_host = cluster.bootstrap_host.public_ip
         bootstrap_ssh_client = self.get_bootstrap_ssh_client()
