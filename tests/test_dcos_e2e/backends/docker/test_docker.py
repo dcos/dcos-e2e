@@ -47,6 +47,8 @@ class TestDockerBackend:
         """
         It is possible to mount local files to master nodes.
         """
+        local_all_file = tmpdir.join('all_file.txt')
+        local_all_file.write('')
         local_master_file = tmpdir.join('master_file.txt')
         local_master_file.write('')
         local_agent_file = tmpdir.join('agent_file.txt')
@@ -93,12 +95,15 @@ class TestDockerBackend:
         ) as cluster:
             for nodes, path, local_file in [
                 (cluster.masters, master_path, local_master_file),
+                (cluster.masters, master_path, local_all_file),
                 (cluster.agents, agent_path, local_agent_file),
+                (cluster.agents, agent_path, local_all_file),
                 (
                     cluster.public_agents,
                     public_agent_path,
                     local_public_agent_file,
                 ),
+                (cluster.public_agents, public_agent_path, local_all_file),
             ]:
                 for node in nodes:
                     content = str(uuid.uuid4())
