@@ -7,8 +7,8 @@ import subprocess
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
 
-logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 
 def run_subprocess(
