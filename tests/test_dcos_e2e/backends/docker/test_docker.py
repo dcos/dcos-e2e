@@ -59,6 +59,20 @@ class TestDockerBackend:
         master_path = Path('/etc/on_master_nodes.txt')
         agent_path = Path('/etc/on_agent_nodes.txt')
         public_agent_path = Path('/etc/on_public_agent_nodes.txt')
+        all_path = Path('/etc/on_all_nodes.txt')
+
+        custom_container_mounts = {
+            str(local_all_file): {
+                'bind': str(all_path),
+                'mode': 'rw',
+            },
+        }
+        custom_master_mounts = {
+            str(local_master_file): {
+                'bind': str(master_path),
+                'mode': 'rw',
+            },
+        }
 
         custom_master_mounts = {
             str(local_master_file): {
@@ -82,6 +96,7 @@ class TestDockerBackend:
         }
 
         backend = Docker(
+            custom_container_mounts=custom_container_mounts,
             custom_master_mounts=custom_master_mounts,
             custom_agent_mounts=custom_agent_mounts,
             custom_public_agent_mounts=custom_public_agent_mounts,
@@ -95,15 +110,15 @@ class TestDockerBackend:
         ) as cluster:
             for nodes, path, local_file in [
                 (cluster.masters, master_path, local_master_file),
-                (cluster.masters, master_path, local_all_file),
+                (cluster.masters, all_path, local_all_file),
                 (cluster.agents, agent_path, local_agent_file),
-                (cluster.agents, agent_path, local_all_file),
+                (cluster.agents, all_path, local_all_file),
                 (
                     cluster.public_agents,
                     public_agent_path,
                     local_public_agent_file,
                 ),
-                (cluster.public_agents, public_agent_path, local_all_file),
+                (cluster.public_agents, all_path, local_all_file),
             ]:
                 for node in nodes:
                     content = str(uuid.uuid4())
