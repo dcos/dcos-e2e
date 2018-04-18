@@ -7,6 +7,7 @@ Next
 ----
 
 - The AWS backend now supports DC/OS 1.9.
+- The Docker backend now supports having custom mounts which apply to all nodes.
 
 2018.04.11.0
 ------------
