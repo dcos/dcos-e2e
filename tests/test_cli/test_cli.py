@@ -189,6 +189,19 @@ class TestCreate:
                                               containers. See https://docs.docker.com/engine
                                               /reference/run/#volume-shared-filesystems for
                                               the syntax to use.
+              --custom-master-volume TEXT     Bind mount a volume on all cluster master node
+                                              containers. See https://docs.docker.com/engine
+                                              /reference/run/#volume-shared-filesystems for
+                                              the syntax to use.
+              --custom-agent-volume TEXT      Bind mount a volume on all cluster agent node
+                                              containers. See https://docs.docker.com/engine
+                                              /reference/run/#volume-shared-filesystems for
+                                              the syntax to use.
+              --custom-public-agent-volume TEXT
+                                              Bind mount a volume on all cluster public
+                                              agent node containers. See https://docs.docker
+                                              .com/engine/reference/run/#volume-shared-
+                                              filesystems for the syntax to use.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
