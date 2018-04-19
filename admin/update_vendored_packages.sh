@@ -3,7 +3,7 @@
 # Update vendored packages.
 
 # ``python-vendorize`` has problems with pip 10.0.0
-OLD_PIP=$(python -c 'import pkg_resources; pkg_resources.get_distribution("pip").parsed_version.public')
+OLD_PIP=$(python -c 'import pkg_resources; print(pkg_resources.get_distribution("pip").parsed_version.public)')
 git rm -rf src/dcos_e2e/_vendor/
 rm -rf src/dcos_e2e/_vendor
 pip install pip==9.0.1
