@@ -306,6 +306,7 @@ def dcos_docker(verbose: None) -> None:
     help=(
         'XXX'
     ),
+    multiple=True,
 )
 def create(
     agents: int,
@@ -322,7 +323,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     genconf_dir: Optional[Path],
     workspace_dir: Optional[Path],
-    volumes: Optional[Dict[str, Dict[str, str]]] = None,
+    custom_volumes: Optional[Dict[str, Dict[str, str]]] = None,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -356,6 +357,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
+    return
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
