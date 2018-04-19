@@ -160,3 +160,13 @@ def validate_path_pair(
         result.append((local_path, remote_path))
 
     return result
+
+
+def validate_volumes(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Dict[str, Dict[str, str]]:
+    for _ in (ctx, param, value):
+        pass
+    return {}

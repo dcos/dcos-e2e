@@ -69,6 +69,7 @@ from ._validators import (
     validate_dcos_configuration,
     validate_path_is_directory,
     validate_path_pair,
+    validate_volumes,
 )
 
 
@@ -299,7 +300,7 @@ def dcos_docker(verbose: None) -> None:
     ),
 )
 @click.option(
-    '--volumes',
+    '--custom-volumes',
     type=str,
     callback=validate_volumes,
     help=(
@@ -321,6 +322,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     genconf_dir: Optional[Path],
     workspace_dir: Optional[Path],
+    volumes: Optional[Dict[str, Dict[str, str]]] = None,
 ) -> None:
     """
     Create a DC/OS cluster.
