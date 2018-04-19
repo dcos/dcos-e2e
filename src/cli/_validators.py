@@ -168,6 +168,9 @@ def validate_volumes(
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
 ) -> Dict[str, Dict[str, str]]:
+    """
+    XXX
+    """
     for _ in (ctx, param):
         pass
     volumes = {}
