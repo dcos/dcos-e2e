@@ -19,25 +19,28 @@ def get_logger(name: str) -> logging.Logger:
     Returns:
         See :py:class:`logging.Logger`.
     """
-
     # This gets the root logger with a ``logging.lastResort``
     # StreamHandler that logs on WARNING level.
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
-    # Add a new StreamHandler that logs on DEBUG level in order
-    # to override the ``logging.lastResort`` handler.
-    handler = logging.StreamHandler()
-    handler.setLevel(logging.DEBUG)
+    # Do this if a logger is called for the first time
+    if not logger.hasHandlers():
+        logger.setLevel(logging.DEBUG)
 
-    # Take control of the logging format
-    formatter = logging.Formatter(
-        fmt='%(asctime)s %(levelname)-8s %(name)s | %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
-    handler.setFormatter(formatter)
+        # Add a new StreamHandler that logs on DEBUG level in order
+        # to override the ``logging.lastResort`` handler.
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
 
-    logger.addHandler(handler)
+        # Take control of the logging format
+        formatter = logging.Formatter(
+            fmt='%(asctime)s %(levelname)-8s %(name)s | %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S',
+        )
+        handler.setFormatter(formatter)
+
+        logger.addHandler(handler)
+
     return logger
 
 
