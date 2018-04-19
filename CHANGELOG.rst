@@ -8,7 +8,7 @@ Next
 
 - The AWS backend now supports DC/OS 1.9.
 - The Docker backend now supports having custom mounts which apply to all nodes.
-- Add ``custom-volume`` parameter to ``dcos-docker create``.
+- Add ``custom-volume`` parameter (and similar for each node type) to ``dcos-docker create``.
 
 2018.04.11.0
 ------------
