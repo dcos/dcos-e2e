@@ -169,7 +169,8 @@ def validate_volumes(
     value: Any,
 ) -> Dict[str, Dict[str, str]]:
     """
-    XXX
+    Turn volume definition strings into dictionaries that ``docker-py`` can
+    use.
     """
     for _ in (ctx, param):
         pass

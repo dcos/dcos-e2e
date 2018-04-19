@@ -360,7 +360,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    return
+    custom_container_mounts = custom_volumes
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
@@ -418,6 +418,7 @@ def create(
             files_to_copy_to_installer.append((genconf_file, relative_path))
 
     cluster_backend = Docker(
+        custom_container_mounts=custom_container_mounts,
         custom_master_mounts=custom_master_mounts,
         custom_agent_mounts=custom_agent_mounts,
         custom_public_agent_mounts=custom_public_agent_mounts,
