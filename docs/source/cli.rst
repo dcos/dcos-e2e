@@ -177,7 +177,7 @@ Using a Custom CA Certificate
 -----------------------------
 
 On DC/OS Enterprise clusters, it is possible to use a custom CA certificate.
-See `the Custom CA certifiacte documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
+See `the Custom CA certificate documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
 It is possible to use :ref:`dcos-docker-create` to create a cluster with a custom CA certificate.
 
 #. Create or obtain the necessary files:
