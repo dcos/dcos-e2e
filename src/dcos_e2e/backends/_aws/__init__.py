@@ -170,7 +170,7 @@ class AWSCluster(ClusterManager):
             'provider': 'onprem',
         }
 
-        # Workaround ``ip_detect_public_filename`` being is ignored.
+        # Work around ``ip_detect_public_filename`` being ignored.
         # https://jira.mesosphere.com/browse/DCOS-21960
         detect_ip_public = (
             '"#!/bin/bash\\n '
@@ -237,7 +237,6 @@ class AWSCluster(ClusterManager):
                 configuration of the AWS backend.
             log_output_live: If ``True``, log output of the installation live.
         """
-
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
