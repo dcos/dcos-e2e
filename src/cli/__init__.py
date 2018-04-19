@@ -298,6 +298,14 @@ def dcos_docker(verbose: None) -> None:
         'not set.'
     ),
 )
+@click.option(
+    '--volumes',
+    type=str,
+    callback=validate_volumes,
+    help=(
+        'XXX'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
