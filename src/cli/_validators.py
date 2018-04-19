@@ -184,7 +184,11 @@ def validate_volumes(
         elif len(parts) == 3:
             host_src, container_dst, mode = parts
         else:
-            message = 'XXX'
+            message = (
+            'See '
+            'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
+            'for the syntax to use.'
+            )
             raise click.BadParameter(message=message)
 
         volumes[host_src] = {'bind': container_dst, 'mode': mode}
