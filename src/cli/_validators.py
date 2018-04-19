@@ -3,6 +3,7 @@ Validators for CLI options.
 """
 
 import re
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -172,8 +173,19 @@ def validate_volumes(
     volumes = {}
     for volume_definition in value:
         parts = volume_definition.split(':')
-        host_path = 1
-        container_path = 2
-        mode = 3
-        volumes[host_path] = {'bind': container_path, 'mode': mode}
+
+        if len(parts) == 1:
+            host_src = str(uuid.uuid4())
+            [container_dst] = parts
+            mode = 'rw'
+        elif len(parts) == 2:
+            host_src, container_dst = parts
+            mode = 'rw'
+        elif len(parts) == 3:
+            host_src, container_dst, mode = parts
+        else:
+            message = 'XXX'
+            raise click.BadParameter(message=message)
+
+        volumes[host_src] = {'bind': container_dst, 'mode': mode}
     return volumes
