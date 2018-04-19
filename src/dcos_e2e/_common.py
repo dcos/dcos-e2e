@@ -21,7 +21,7 @@ def get_logger(name: str) -> logging.Logger:
     """
     # This gets the root logger with a ``logging.lastResort``
     # StreamHandler that logs on WARNING level.
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(name)
 
     # Do this if a logger is called for the first time
     if not logger.hasHandlers():
