@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/mesosphere/dcos-e2e/archive/2018.04.11.0.tar.gz"
+  url "https://github.com/mesosphere/dcos-e2e/archive/2018.04.19.0.tar.gz"
   head "https://github.com/mesosphere/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -67,13 +67,13 @@ class Dcosdocker < Formula
   end
 
   resource "Cerberus" do
-    url "https://files.pythonhosted.org/packages/e0/7e/3949c86f4e60bc2b3d24ebc94af55ffaf9d62ad221f47c194edc9bd7fa94/Cerberus-1.1.tar.gz"
-    sha256 "a5b39090fde3ec3294c9d7030b8eda935b42222160a66a922e0c8aea34cabfdf"
+    url "https://files.pythonhosted.org/packages/90/31/e30784a1f9a4b46875cfed1c9f806c188e2181e7ba3b568e81e7b0bc5718/Cerberus-1.2.tar.gz"
+    sha256 "f5c2e048fb15ecb3c088d192164316093fcfa602a74b3386eefb2983aa7e800a"
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/15/d4/2f888fc463d516ff7bf2379a4e9a552fef7f22a94147655d9b1097108248/certifi-2018.1.18.tar.gz"
-    sha256 "edbc3f203427eef571f79a7692bb160a2b0f7ccaa31953e99bd17e307cf63f7d"
+    url "https://files.pythonhosted.org/packages/4d/9c/46e950a6f4d6b4be571ddcae21e7bc846fcbb88f1de3eff0f6dd0a6be55d/certifi-2018.4.16.tar.gz"
+    sha256 "13e698f54293db9f89122b0581843a782ad0934a4fe0172d2a980ba77fc61bb7"
   end
 
   resource "cffi" do
@@ -102,13 +102,13 @@ class Dcosdocker < Formula
   end
 
   resource "decorator" do
-    url "https://files.pythonhosted.org/packages/70/f1/cb9373195639db13063f55eb06116310ad691e1fd125e6af057734dc44ea/decorator-4.2.1.tar.gz"
-    sha256 "7d46dd9f3ea1cf5f06ee0e4e1277ae618cf48dfb10ada7c8427cd46c42702a0e"
+    url "https://files.pythonhosted.org/packages/6f/24/15a229626c775aae5806312f6bf1e2a73785be3402c0acdec5dbddd8c11e/decorator-4.3.0.tar.gz"
+    sha256 "c39efa13fbdeb4506c476c9b3babf6a718da943dab7811c206005a4a956c080c"
   end
 
   resource "docker" do
-    url "https://github.com/adamtheturtle/docker-py/archive/3.2.1.zip"
-    sha256 "0a3fb952bff47f68c58b5108f8c84a4e8ec62f7a2866907b8f14ef162b709c38"
+    url "https://files.pythonhosted.org/packages/77/0d/13b28b1e532e5c9ab9f5593ec757852877bbf691341b22fa807b767bc92d/docker-3.2.1.tar.gz"
+    sha256 "0d698c3dc4df66c988de5df21a62cdc3450de2fa8523772779e5e23799c41f43"
   end
 
   resource "docker-pycreds" do
@@ -167,13 +167,13 @@ class Dcosdocker < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/e5/51/5c57754bfb2c097f5057c11a712d7b45f9a7f78191085085d3f34c809c4f/msrest-0.4.27.tar.gz"
-    sha256 "cf45f02d73e45e5382f0e03b7552f530b090547cf77c4fb19f7dbe1990b3a739"
+    url "https://files.pythonhosted.org/packages/4f/a8/4626b184183977e470e9d6d3604c01ecd2f3463789f064aa59a2190965c0/msrest-0.4.28.tar.gz"
+    sha256 "65bdde2ea8aa3312eb4ce6142d5da65d455f561a7676eee678c1a6e00416f5a0"
   end
 
   resource "msrestazure" do
-    url "https://files.pythonhosted.org/packages/8c/71/d5f247fdcdbd8fbc6dc7759b047757516758a54a0d1c2d41668bc4e6b905/msrestazure-0.4.25.tar.gz"
-    sha256 "5d715590ebb127c3e085691832d7264076b60706c1ae324eecba9d09789c90fe"
+    url "https://files.pythonhosted.org/packages/e9/e8/7089a28a672104177f4bc116756889fe58b0ed4b092d9247e43f0b0c39e2/msrestazure-0.4.27.tar.gz"
+    sha256 "9340b1cd08be597027c6bd74c91de61b8b815aed91b72eae7212e2315aa869e0"
   end
 
   resource "oauth2client" do
