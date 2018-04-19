@@ -167,7 +167,8 @@ def validate_volumes(
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
 ) -> Dict[str, Dict[str, str]]:
-    for _ in (ctx, param, value):
+    for _ in (ctx, param):
         pass
-    import pdb; pdb.set_trace()
+    for volume_definition in value:
+        parts = volume_definition.split(':')
     return {}

@@ -304,7 +304,10 @@ def dcos_docker(verbose: None) -> None:
     type=str,
     callback=validate_volumes,
     help=(
-        'XXX'
+        'Bind mount a volume on all cluster node containers. '
+        'See '
+        'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
+        'for the syntax to use.'
     ),
     multiple=True,
 )
