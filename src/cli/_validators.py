@@ -189,9 +189,9 @@ def validate_volumes(
             host_src, container_dst, mode = parts
         else:
             message = (
-            'See '
-            'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
-            'for the syntax to use.'
+                'See '
+                'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
+                'for the syntax to use.'
             )
             raise click.BadParameter(message=message)
 
