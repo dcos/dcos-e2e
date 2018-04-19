@@ -69,6 +69,7 @@ from ._validators import (
     validate_dcos_configuration,
     validate_path_is_directory,
     validate_path_pair,
+    validate_volumes,
 )
 
 
@@ -298,6 +299,18 @@ def dcos_docker(verbose: None) -> None:
         'not set.'
     ),
 )
+@click.option(
+    '--custom-volume',
+    type=str,
+    callback=validate_volumes,
+    help=(
+        'Bind mount a volume on all cluster node containers. '
+        'See '
+        'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
+        'for the syntax to use.'
+    ),
+    multiple=True,
+)
 def create(
     agents: int,
     artifact: str,
@@ -313,6 +326,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     genconf_dir: Optional[Path],
     workspace_dir: Optional[Path],
+    custom_volume: Optional[Dict[str, Dict[str, str]]] = None,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -346,6 +360,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
+    custom_container_mounts = custom_volume
     custom_master_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
     custom_public_agent_mounts = {}  # type: Dict[str, Dict[str, str]]
@@ -403,6 +418,7 @@ def create(
             files_to_copy_to_installer.append((genconf_file, relative_path))
 
     cluster_backend = Docker(
+        custom_container_mounts=custom_container_mounts,
         custom_master_mounts=custom_master_mounts,
         custom_agent_mounts=custom_agent_mounts,
         custom_public_agent_mounts=custom_public_agent_mounts,

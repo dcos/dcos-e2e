@@ -185,6 +185,10 @@ class TestCreate:
                                               .html#tempfile.gettempdir for details on the
                                               temporary directory location if this option is
                                               not set.
+              --custom-volume TEXT            Bind mount a volume on all cluster node
+                                              containers. See https://docs.docker.com/engine
+                                              /reference/run/#volume-shared-filesystems for
+                                              the syntax to use.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
