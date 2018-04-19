@@ -6,6 +6,7 @@ Changelog
 Next
 ----
 
+- Logs from dependencies are no longer emitted.
 - The AWS backend now supports DC/OS 1.9.
 
 2018.04.11.0
