@@ -169,6 +169,11 @@ def validate_volumes(
 ) -> Dict[str, Dict[str, str]]:
     for _ in (ctx, param):
         pass
+    volumes = {}
     for volume_definition in value:
         parts = volume_definition.split(':')
-    return {}
+        host_path = 1
+        container_path = 2
+        mode = 3
+        volumes[host_path] = {'bind': container_path, 'mode': mode}
+    return volumes
