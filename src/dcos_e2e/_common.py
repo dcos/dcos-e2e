@@ -7,8 +7,40 @@ import subprocess
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
 
-logging.basicConfig(level=logging.DEBUG)
-LOGGER = logging.getLogger(__name__)
+
+def get_logger(name: str) -> logging.Logger:
+    """
+    Return a customized logger that is able to log on DEBUG level.
+
+    Args:
+        name: Name of the logger. Setting this to ``__name__`` will log
+            the path to the file where the logger has been created.
+
+    Returns:
+        See :py:class:`logging.Logger`.
+    """
+    # This gets the root logger with a ``logging.lastResort``
+    # StreamHandler that logs on WARNING level.
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+
+    # Add a new StreamHandler that logs on DEBUG level in order
+    # to override the ``logging.lastResort`` handler.
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.DEBUG)
+
+    # Take control of the logging format
+    formatter = logging.Formatter(
+        fmt='%(asctime)s %(levelname)-8s %(name)s | %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+    )
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+    return logger
+
+
+LOGGER = get_logger(__name__)
 
 
 def run_subprocess(

@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Logs from dependencies are no longer emitted.
+
 2018.04.19.0
 ------------
 
