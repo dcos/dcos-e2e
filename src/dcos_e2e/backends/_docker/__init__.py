@@ -3,7 +3,6 @@ Helpers for creating and interacting with clusters on Docker.
 """
 
 import inspect
-import logging
 import os
 import socket
 import subprocess
@@ -20,7 +19,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from dcos_e2e._common import run_subprocess
+from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
@@ -30,8 +29,7 @@ from dcos_e2e.node import Node
 from ._containers import start_dcos_container
 from ._docker_build import build_docker_image
 
-logging.basicConfig(level=logging.DEBUG)
-LOGGER = logging.getLogger(__name__)
+LOGGER = get_logger(__name__)
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -105,6 +103,7 @@ class Docker(ClusterBackend):
     def __init__(
         self,
         workspace_dir: Optional[Path] = None,
+        custom_container_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
@@ -124,6 +123,8 @@ class Docker(ClusterBackend):
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
+            custom_container_mounts: Custom mounts add to all node containers.
+                See `volumes` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
                 See `volumes` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
@@ -150,6 +151,8 @@ class Docker(ClusterBackend):
         Attributes:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            custom_container_mounts: Custom mounts add to all node containers.
+                See `volumes` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
                 See `volumes` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
@@ -176,6 +179,7 @@ class Docker(ClusterBackend):
         """
         self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
+        self.custom_container_mounts = custom_container_mounts or {}
         self.custom_master_mounts = custom_master_mounts or {}
         self.custom_agent_mounts = custom_agent_mounts or {}
         self.custom_public_agent_mounts = custom_public_agent_mounts or {}
@@ -343,6 +347,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={
                     **common_mounts,
+                    **cluster_backend.custom_container_mounts,
                     **cluster_backend.custom_master_mounts,
                     **unique_mounts,
                 },
@@ -381,6 +386,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={
                     **agent_mounts,
+                    **cluster_backend.custom_container_mounts,
                     **cluster_backend.custom_agent_mounts,
                     **unique_mounts,
                 },
@@ -419,6 +425,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={
                     **agent_mounts,
+                    **cluster_backend.custom_container_mounts,
                     **cluster_backend.custom_public_agent_mounts,
                     **unique_mounts,
                 },

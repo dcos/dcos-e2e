@@ -36,6 +36,7 @@ homebrew
 hwclock
 init
 ip
+lastResort
 linting
 linuxbrew
 login

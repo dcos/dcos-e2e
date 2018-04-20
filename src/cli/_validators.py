@@ -3,6 +3,7 @@ Validators for CLI options.
 """
 
 import re
+import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -160,3 +161,39 @@ def validate_path_pair(
         result.append((local_path, remote_path))
 
     return result
+
+
+def validate_volumes(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Dict[str, Dict[str, str]]:
+    """
+    Turn volume definition strings into dictionaries that ``docker-py`` can
+    use.
+    """
+    for _ in (ctx, param):
+        pass
+    volumes = {}
+    for volume_definition in value:
+        parts = volume_definition.split(':')
+
+        if len(parts) == 1:
+            host_src = str(uuid.uuid4())
+            [container_dst] = parts
+            mode = 'rw'
+        elif len(parts) == 2:
+            host_src, container_dst = parts
+            mode = 'rw'
+        elif len(parts) == 3:
+            host_src, container_dst, mode = parts
+        else:
+            message = (
+                'See '
+                'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
+                'for the syntax to use.'
+            )
+            raise click.BadParameter(message=message)
+
+        volumes[host_src] = {'bind': container_dst, 'mode': mode}
+    return volumes
