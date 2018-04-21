@@ -209,15 +209,13 @@ class AWSCluster(ClusterManager):
         self._ssh_key_path.write_bytes(private_key.encode())
 
         # Wait for the AWS stack setup completion.
-        DcosCloudformationLauncher.wait(self.launcher)  # type: ignore
+        self.launcher.wait()  # type: ignore
 
         # Update the cluster_info with AWS stack information:
         # ``describe`` fetches the latest information for the stack.
         # This makes node IP addresses available to ``cluster_info``.
         # This also inserts bootstrap node information into ``cluster_info``.
-        self.cluster_info = AbstractOnpremLauncher.describe(  # type: ignore
-            self.launcher,
-        )
+        self.cluster_info = self.launcher.describe()  # type: ignore
 
     def install_dcos_from_url(
         self,
@@ -244,13 +242,7 @@ class AWSCluster(ClusterManager):
         # on top of the preliminary DC/OS config.
         dcos_config = self.launcher.config['dcos_config']
         self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
-
-        # The ``wait`` method starts the actual DC/OS installation process.
-        # We do not use ``self.launcher.wait()`` here because at the time of
-        # writing it does both, waiting for the AWS stack and installing
-        # DC/OS. This is desired to be changed by the dcos-launch team.
-        # https://jira.mesosphere.com/browse/DCOS-21660
-        AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
+        self.launcher.install_dcos()  # type: ignore
 
     def install_dcos_from_path(
         self,
