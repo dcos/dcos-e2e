@@ -35,7 +35,7 @@ EE_1_10_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_10.ee.sh')
 EE_1_11_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_11.ee.sh')
 
 
-def download_file(url: str, path: Path):
+def download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
@@ -45,7 +45,7 @@ def download_file(url: str, path: Path):
             fd.write(chunk)
 
 
-def main():
+def main() -> None:
     """
     Download artifacts.
     """
