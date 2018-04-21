@@ -48,8 +48,8 @@ install:
 - travis_retry pip install --upgrade --editable .[dev]
 cache: pip
 before_script:
+- python admin/travis_download_requirements.py "$TEST_PATTERN"
 - travis_retry make pull-images
-- travis_retry python admin/travis_download_requirements.py "$TEST_PATTERN"
 - make docs
 - make lint
 - dcos-docker doctor
