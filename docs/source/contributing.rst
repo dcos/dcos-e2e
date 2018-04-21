@@ -6,6 +6,8 @@ Contributions to this repository must pass tests and linting.
 .. contents::
   :depth: 2
 
+.. _install-contribution-dependencies:
+
 Install Contribution Dependencies
 ---------------------------------
 
@@ -49,6 +51,8 @@ and on Ubuntu with ``apt``:
 
 Linting
 -------
+
+:ref:`install-contribution-dependencies`.
 
 Run lint tools:
 
