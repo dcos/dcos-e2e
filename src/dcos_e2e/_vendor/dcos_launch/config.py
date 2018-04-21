@@ -427,6 +427,27 @@ AWS_ONPREM_SCHEMA = {
         'required': True,
         'type': 'string',
         'default_setter': lambda doc: aws.OS_SSH_INFO[doc['os_name']].user},
+    'aws_block_device_mappings': {
+        'required': False,
+        'type': 'list',
+        'valueschema': {
+            'type': 'dict',
+            'allow_unknown': True}},
+    'iam_role_permissions': {
+        'required': False,
+        'type': 'list',
+        'valueschema': {
+            'type': 'dict',
+            'schema': {
+                'Resource': {
+                    'type': 'list',
+                    'required': True},
+                'Action': {
+                    'required': True,
+                    'type': 'list'},
+                'Effect': {
+                    'required': True,
+                    'allowed': ['Allow', 'Deny']}}}},
 }
 
 
@@ -509,6 +530,18 @@ ACS_ENGINE_SCHEMA = {
     'template_parameters': {
         'type': 'dict'},
     'dcos_linux_bootstrap_url': {
+        'type': 'string',
+        'required': False},
+    'windows_image_source_url': {
+        'type': 'string',
+        'required': False},
+    'dcos_linux_repository_url': {
+        'type': 'string',
+        'required': False},
+    'dcos_linux_cluster_package_list_id': {
+        'type': 'string',
+        'required': False},
+    'provider_package_id': {
         'type': 'string',
         'required': False},
     'ssh_user': {
