@@ -49,7 +49,7 @@ install:
 cache: pip
 before_script:
 - travis_retry make pull-images
-- travis_retry python admin/travis_download_requirements.py "$TEST_PATTERN"
+- travis_wait travis_retry python admin/travis_download_requirements.py "$TEST_PATTERN"
 - make docs
 - make lint
 - dcos-docker doctor
