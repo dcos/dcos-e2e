@@ -49,12 +49,12 @@ install:
 cache: pip
 before_script:
 - travis_retry make pull-images
+- travis_retry admin/travis_download_requirements.py "$TEST_PATTERN"
 - make docs
 - make lint
 - travis_retry make EE_MASTER_ARTIFACT_URL=$EE_MASTER_ARTIFACT_URL EE_1_10_ARTIFACT_URL=$EE_1_10_ARTIFACT_URL EE_1_11_ARTIFACT_URL=$EE_1_11_ARTIFACT_URL download-artifacts
 - dcos-docker doctor
 script:
-- ./admin/travis_run_test.py "$TEST_PATTERN"
 - pytest -vvv -s "$TEST_PATTERN" --cov=src/dcos_e2e --cov=tests
 after_success:
 - codecov
