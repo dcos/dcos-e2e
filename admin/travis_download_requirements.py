@@ -47,7 +47,6 @@ def download_file(url: str, path: Path) -> None:
     chunk_size = 100 * 1024
     with open(str(path), 'wb') as file_descriptor:
         for chunk in stream.iter_content(chunk_size=chunk_size):
-            LOGGER.warn('Next chunk')
             file_descriptor.write(chunk)
 
 
