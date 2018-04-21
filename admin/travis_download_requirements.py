@@ -44,9 +44,10 @@ def download_file(url: str, path: Path) -> None:
     """
     LOGGER.warn('Downloading to ' + str(path))
     stream = requests.get(url, stream=True)
+    chunk_size = 100 * 1024
     with open(str(path), 'wb') as file_descriptor:
-        for chunk in stream.iter_content(chunk_size=1024):
-			LOGGER.warn('Next chunk')
+        for chunk in stream.iter_content(chunk_size=chunk_size):
+            LOGGER.warn('Next chunk')
             file_descriptor.write(chunk)
 
 
@@ -56,9 +57,9 @@ def main() -> None:
     """
     downloads = (
         (OSS_MASTER_ARTIFACT_URL, OSS_MASTER_ARTIFACT_PATH),
-        (OSS_1_9_ARTIFACT_URL, OSS_1_9_ARTIFACT_PATH),
-        (OSS_1_10_ARTIFACT_URL, OSS_1_10_ARTIFACT_PATH),
-        (OSS_1_11_ARTIFACT_URL, OSS_1_11_ARTIFACT_PATH),
+        # (OSS_1_9_ARTIFACT_URL, OSS_1_9_ARTIFACT_PATH),
+        # (OSS_1_10_ARTIFACT_URL, OSS_1_10_ARTIFACT_PATH),
+        # (OSS_1_11_ARTIFACT_URL, OSS_1_11_ARTIFACT_PATH),
         # (EE_MASTER_ARTIFACT_URL, EE_MASTER_ARTIFACT_PATH),
         # (EE_1_9_ARTIFACT_URL, EE_1_9_ARTIFACT_PATH),
         # (EE_1_10_ARTIFACT_URL, EE_1_10_ARTIFACT_PATH),
