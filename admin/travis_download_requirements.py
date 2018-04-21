@@ -39,6 +39,7 @@ def download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
+	print('Downloading to ' + str(path))
     stream = requests.get(url, stream=True)
     with open(str(path), 'wb') as file_descriptor:
         for chunk in stream.iter_content():
