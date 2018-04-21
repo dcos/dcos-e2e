@@ -37,12 +37,22 @@ EE_1_9_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_9.ee.sh')
 EE_1_10_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_10.ee.sh')
 EE_1_11_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_11.ee.sh')
 
+OSS_MASTER = (OSS_MASTER_ARTIFACT_URL, OSS_MASTER_ARTIFACT_PATH)
+OSS_1_9 = (OSS_1_9_ARTIFACT_URL, OSS_1_9_ARTIFACT_PATH)
+OSS_1_10 = (OSS_1_10_ARTIFACT_URL, OSS_1_10_ARTIFACT_PATH)
+OSS_1_11 = (OSS_1_11_ARTIFACT_URL, OSS_1_11_ARTIFACT_PATH)
+EE_MASTER = (EE_MASTER_ARTIFACT_URL, EE_MASTER_ARTIFACT_PATH)
+EE_1_9 = (EE_1_9_ARTIFACT_URL, EE_1_9_ARTIFACT_PATH)
+EE_1_10 = (EE_1_10_ARTIFACT_URL, EE_1_10_ARTIFACT_PATH)
+EE_1_11 = (EE_1_11_ARTIFACT_URL, EE_1_11_ARTIFACT_PATH)
+
 
 def download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
-    LOGGER.warn('Downloading to ' + str(path))
+    message = 'Downloading to ' + str(path)
+    LOGGER.warning(message)
     stream = requests.get(url, stream=True)
     chunk_size = 100 * 1024
     with open(str(path), 'wb') as file_descriptor:
@@ -55,14 +65,14 @@ def main() -> None:
     Download artifacts.
     """
     downloads = (
-        (OSS_MASTER_ARTIFACT_URL, OSS_MASTER_ARTIFACT_PATH),
-        (OSS_1_9_ARTIFACT_URL, OSS_1_9_ARTIFACT_PATH),
-        (OSS_1_10_ARTIFACT_URL, OSS_1_10_ARTIFACT_PATH),
-        (OSS_1_11_ARTIFACT_URL, OSS_1_11_ARTIFACT_PATH),
-        (EE_MASTER_ARTIFACT_URL, EE_MASTER_ARTIFACT_PATH),
-        (EE_1_9_ARTIFACT_URL, EE_1_9_ARTIFACT_PATH),
-        (EE_1_10_ARTIFACT_URL, EE_1_10_ARTIFACT_PATH),
-        (EE_1_11_ARTIFACT_URL, EE_1_11_ARTIFACT_PATH),
+        OSS_MASTER,
+        OSS_1_9,
+        OSS_1_10,
+        OSS_1_11,
+        EE_MASTER,
+        EE_1_9,
+        EE_1_10,
+        EE_1_11,
     )
 
     for url, path in downloads:
