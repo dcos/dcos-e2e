@@ -51,7 +51,8 @@ def download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
-    LOGGER.warn('Downloading to ' + str(path))
+    message = 'Downloading to ' + str(path)
+    LOGGER.warning(message)
     stream = requests.get(url, stream=True)
     chunk_size = 100 * 1024
     with open(str(path), 'wb') as file_descriptor:
