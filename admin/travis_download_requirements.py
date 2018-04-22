@@ -87,19 +87,19 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_extend_config':  # noqa: E501
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests::test_run_pytest':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters::test_two_clusters':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled':
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli':  # noqa: E501
     ALL_ARTIFACTS,
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise':
