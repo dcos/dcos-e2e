@@ -87,7 +87,7 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
-    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
+    def test_install_dcos_from_path(self) -> None:
         """
         The AWS backend requires a build artifact URL in order to launch a
         DC/OS cluster.
@@ -99,7 +99,7 @@ class TestUnsupported:
             public_agents=0,
         ) as cluster:
             with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+                cluster.install_dcos_from_path(build_artifact=Path('/foo'))
 
         expected_error = (
             'The AWS backend does not support the installation of build '
