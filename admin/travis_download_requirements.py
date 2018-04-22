@@ -9,6 +9,7 @@ need.
 import logging
 import os
 from pathlib import Path
+from typing import Dict, Tuple  # noqa: F401
 
 import requests
 
@@ -116,7 +117,7 @@ PATTERNS = {
     (OSS_1_9, ),
     'tests/test_dcos_e2e/test_node.py::TestNode':
     (),
-}
+}  # type: Dict[str, Tuple]
 
 
 def download_file(url: str, path: Path) -> None:
