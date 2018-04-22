@@ -198,7 +198,7 @@ class TestDockerVersion:
         with Cluster(
             cluster_backend=Docker(
                 docker_version=docker_version,
-                storage_driver=DockerStorageDriver.AUFS,
+                storage_driver=DockerStorageDriver.OVERLAY,
             ),
             masters=1,
             agents=0,
