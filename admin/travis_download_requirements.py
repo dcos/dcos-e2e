@@ -116,7 +116,7 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
     (OSS_1_9, ),
     'tests/test_dcos_e2e/test_node.py::TestNode':
-    (),
+    (OSS_MASTER, ),
 }  # type: Dict[str, Tuple]
 
 
