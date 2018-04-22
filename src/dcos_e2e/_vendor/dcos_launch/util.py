@@ -79,6 +79,10 @@ def get_temp_config_path(tmpdir, name, update: dict = None):
     return str(new_config_path)
 
 
+class DeploymentError(Exception):
+    pass
+
+
 class LauncherError(Exception):
     def __init__(self, error, msg):
         self.error = error
@@ -106,6 +110,10 @@ class AbstractLauncher(metaclass=abc.ABCMeta):
 
     def delete(self):
         raise NotImplementedError()
+
+    def install_dcos(self):
+        # Only implemented in onprem. For other deployment methods, dcos installation occurs in the wait() step.
+        pass
 
     def test(self, args: list, env_dict: dict, test_host: str=None, test_port: int=22, details: dict=None) -> int:
         """ Connects to master host with SSH and then run the internal integration test

@@ -3,14 +3,20 @@
 
 import logging
 
-from ..dcos_test_utils.helpers import (ApiClientSession,
-                                     RetryCommonHttpErrorsMixin)
+from ..dcos_test_utils import helpers
 
 log = logging.getLogger(__name__)
 
 
-class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
-    def __init__(self, default_url, session=None):
+class Cosmos(helpers.RetryCommonHttpErrorsMixin, helpers.ApiClientSession):
+    """ Specialized client for interacting with Cosmos (universe gateway) functionality
+
+    :param default_url: URL of the jobs service to bind to
+    :type default_url: helpers.Url
+    :param session: option session to bootstrap this session with
+    :type session: requests.Session
+    """
+    def __init__(self, default_url: helpers.Url, session=None):
         super().__init__(default_url)
         if session is not None:
             self.session = session
@@ -65,7 +71,7 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
             package.update({'options': options})
         if app_id is not None:
             package.update({'appId': app_id})
-        return self._post('install', package)
+        return self._post('/install', package)
 
     def uninstall_package(self, package_name, app_id=None):
         """Uninstall a package using the cosmos packaging API
@@ -83,7 +89,7 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
         }
         if app_id is not None:
             package.update({'appId': app_id})
-        return self._post('uninstall', package)
+        return self._post('/uninstall', package)
 
     def list_packages(self):
         """List all packages using the cosmos packaging API
@@ -92,4 +98,4 @@ class Cosmos(RetryCommonHttpErrorsMixin, ApiClientSession):
             requests.response object
         """
         self._update_headers('list')
-        return self._post('list', {})
+        return self._post('/list', {})

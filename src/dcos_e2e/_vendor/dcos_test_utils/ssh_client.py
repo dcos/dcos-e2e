@@ -7,6 +7,7 @@ import pty
 import stat
 import subprocess
 import tempfile
+import typing
 from contextlib import contextmanager
 
 import retrying
@@ -26,14 +27,14 @@ SHARED_SSH_OPTS = [
 
 
 class Tunnelled():
-    def __init__(self, opt_list: list, target: str, port: int):
-        """ Abstraction of an already instantiated SSH-tunnel
+    """ Abstraction of an already instantiated SSH-tunnel
 
-        Args:
-            opt_list: list of SSH options strings. E.G. '-oControlPath=foo'
-            target: string in the form user@host
-            port: port number to be used for SSH or SCP
-        """
+    Args:
+        opt_list: list of SSH options strings. E.G. '-oControlPath=foo'
+        target: string in the form user@host
+        port: port number to be used for SSH or SCP
+    """
+    def __init__(self, opt_list: list, target: str, port: int):
         self.opt_list = opt_list
         self.target = target
         self.port = port
@@ -54,26 +55,33 @@ class Tunnelled():
         else:
             return subprocess.check_output(run_cmd, **kwargs)
 
-    def copy_file(self, src: str, dst: str) -> None:
-        """ Copy a path from localhost to target. If path is a directory, then
-        recursive copy will be used
+    def copy_file(self, src: str, dst: str, to_remote=True) -> None:
+        """ Copy a path from localhost to target. If path is a local directory, then
+        recursive copy will be used.
 
         Args:
-            src: local path representing source data
-            dst: destination for path
+            src: local or remote representing source data
+            dst: local or remote destination path
+            to_remote: Whether copying from remote->local or local->remote
         """
         copy_command = []
-        if os.path.isdir(src):
-            copy_command.append('-r')
-        remote_full_path = '{}:{}'.format(self.target, dst)
-        copy_command += [src, remote_full_path]
+        if to_remote:
+            if os.path.isdir(src):
+                copy_command.append('-r')
+            remote_full_path = '{}:{}'.format(self.target, dst)
+            copy_command += [src, remote_full_path]
+        else:
+            remote_full_path = '{}:{}'.format(self.target, src)
+            copy_command += [remote_full_path, dst]
         cmd = ['scp'] + self.opt_list + ['-P', str(self.port)] + copy_command
-        log.debug('Copying {} to {}'.format(src, remote_full_path))
+        log.debug('Copying {} to {}'.format(*copy_command[-2:]))
         log.debug('scp command: {}'.format(cmd))
         subprocess.check_call(cmd)
 
 
 def temp_ssh_key(key: str) -> str:
+    """ Dumps an SSH key string to a temp file that will be deleted at session close and returns the path
+    """
     key_path = helpers.session_tempfile(key)
     os.chmod(str(key_path), stat.S_IREAD | stat.S_IWRITE)
     return key_path
@@ -87,6 +95,7 @@ def open_tunnel(
         control_path: str,
         key_path: str) -> Tunnelled:
     """ Provides clean setup/tear down for an SSH tunnel
+
     Args:
         user: SSH user
         key_path: path to a private SSH key
@@ -114,37 +123,76 @@ def open_tunnel(
 
 class SshClient:
     """ class for binding SSH user and key to tunnel
+
+    :param user: SSH user to connect with
+    :type user: str
+    :param key: SSH private key for user to connect with
+    :type key: str
     """
     def __init__(self, user: str, key: str):
         self.user = user
         self.key = key
         self.key_path = temp_ssh_key(key)
 
-    def tunnel(self, host: str, port: int=22):
+    def tunnel(self, host: str, port: int=22) -> typing.Generator[Tunnelled, None, None]:
+        """ wrapper for the :func:`open_tunnel` context manager
+
+        :param host: host IP to open the tunnel to
+        :type host: str
+        :param port: SSH port of the host (defaults to 22)
+        :type port: int
+        """
         with tempfile.NamedTemporaryFile() as f:
             return open_tunnel(self.user, host, port, f.name, self.key_path)
 
     def command(self, host: str, cmd: list, port: int=22, **kwargs) -> bytes:
+        """ Opens a tunnel and runs a single command
+
+        :param host: host IP to open the tunnel to
+        :type host: str
+        :param cmd: list of shell args to run on the host
+        :type cmd: list
+        :param port: SSH port of the host (defaults to 22)
+        :type port: int
+        :param kwargs: see args used in :func:`Tunnelled.command`
+        """
         with self.tunnel(host, port) as t:
             return t.command(cmd, **kwargs)
 
     def get_home_dir(self, host: str, port: int=22) -> str:
         """ Returns the SSH home dir
+
+        :param host: host IP to get the home directory from
+        :type host: str
+        :param port: SSH port of the host (defaults to 22)
+        :type port: int
         """
         return self.command(host, ['pwd'], port=port).decode().strip()
 
     @retrying.retry(wait_fixed=1000)
     def wait_for_ssh_connection(self, host: str, port: int=22) -> None:
         """ Blocks until SSH connection can be established
+
+        :param host: host IP to wait for connection to
+        :type host: str
+        :param port: SSH port of the host (defaults to 22)
+        :type port: int
         """
         self.get_home_dir(host, port)
 
     def add_ssh_user_to_docker_users(self, host: str, port: int=22):
+        """ Runs user mod on remote host to add this user to docker users
+
+        :param host: host to add usergroup memership too
+        :type host: str
+        :param port: SSH port of the host (defaults to 22)
+        :type port: int
+        """
         self.command(host, ['sudo', 'usermod', '-aG', 'docker', self.user], port=port)
 
 
 @contextmanager
-def make_slave_pty():
+def _make_slave_pty():
     master_pty, slave_pty = pty.openpty()
     yield slave_pty
     os.close(slave_pty)
@@ -168,6 +216,16 @@ def parse_ip(ip: str) -> (str, int):
 
 
 class AsyncSshClient(SshClient):
+    """ SshClient for running against a set of hosts in parallel
+
+    Args:
+        user: ssh user name
+        key: ssh private key contents
+        targets: list of host strings for SSH use (hostname:optional_port)
+        process_timeout (optional): how many seconds any given process can run for
+        parallelism (optional): how many processes to run at the same time. Rarely is
+            a SSH command CPU bound, so this number can be greater than CPU concurrency
+    """
     def __init__(
             self,
             user: str,
@@ -175,16 +233,6 @@ class AsyncSshClient(SshClient):
             targets: list,
             process_timeout=120,
             parallelism=10):
-        """ SshClient for running against a set of hosts in parallel
-
-        Args:
-            user: ssh user name
-            key: ssh private key contents
-            targets: list of host strings for SSH use (hostname:optional_port)
-            process_timeout (optional): how many seconds any given process can run for
-            parallelism (optional): how many processes to run at the same time. Rarely is
-                a SSH command CPU bound, so this number can be greater than CPU concurrency
-        """
         super().__init__(user, key)
         self.process_timeout = process_timeout
         self.__targets = targets
@@ -200,7 +248,7 @@ class AsyncSshClient(SshClient):
             dict of the command args, output, returncode, and pid
         """
         log.debug('Starting command: {}'.format(str(cmd)))
-        with make_slave_pty() as slave_pty:
+        with _make_slave_pty() as slave_pty:
             process = await asyncio.create_subprocess_exec(
                 *cmd, stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,

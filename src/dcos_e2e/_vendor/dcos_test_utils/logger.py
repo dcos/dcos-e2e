@@ -17,6 +17,7 @@ MODULE_BROWN_LIST = [
 def setup(log_level_str: str, noisy_modules: list=None):
     """ Handles the builtin python log levels and adds level below
     debug (trace) which dampened modules will log debug at
+
     Args:
         log_level_str: user-provided string to set the log-level
         noisy_modules: any additional modules that should have their level increased
