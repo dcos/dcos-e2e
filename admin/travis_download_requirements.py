@@ -101,21 +101,21 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled':
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise':
-    ALL_ARTIFACTS,
+    (EE_1_10, ),
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_oss':
-    ALL_ARTIFACTS,
+    (OSS_1_10, ),
     'tests/test_dcos_e2e/test_legacy.py::Test111::test_enterprise':
-    ALL_ARTIFACTS,
+    (EE_1_11, ),
     'tests/test_dcos_e2e/test_legacy.py::Test111::test_oss':
-    ALL_ARTIFACTS,
+    (OSS_1_11, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise':
-    ALL_ARTIFACTS,
+    (EE_1_9, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
-    ALL_ARTIFACTS,
+    (OSS_1_9, ),
     'tests/test_dcos_e2e/test_node.py::TestNode':
-    ALL_ARTIFACTS,
+    (),
 }
 
 
