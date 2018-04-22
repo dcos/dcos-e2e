@@ -77,15 +77,15 @@ PATTERNS = {
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_docker.py':
-    ALL_ARTIFACTS,
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterSize':
-    ALL_ARTIFACTS,
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_default_config':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_extend_config':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
     ALL_ARTIFACTS,
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests::test_run_pytest':  # noqa: E501
