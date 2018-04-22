@@ -67,7 +67,7 @@ PATTERNS = {
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
-    ALL_ARTIFACTS,
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
     ALL_ARTIFACTS,
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss':  # noqa: E501
