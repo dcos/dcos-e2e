@@ -192,6 +192,15 @@ class TestDockerVersion:
     def test_custom_version(self, docker_version: DockerVersion) -> None:
         """
         It is possible to set a custom version of Docker.
+
+        Running this test requires ``aufs`` to be available.
+        Depending on your system, it may be possible to make ``aufs`` available
+        using the following commands:
+
+        .. code
+
+           $ apt-get install linux-image-extra-$(uname -r)
+           $ modprobe aufs
         """
         # We specify the storage driver because `overlay2` is not compatible
         # with old versions of Docker.
