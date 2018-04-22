@@ -253,10 +253,8 @@ class DockerCluster(ClusterManager):
         # to add an variable to `dcos_generate_config.sh.in` which allows
         # `-v` mounts.
         self._genconf_dir = self._path / 'genconf'
-        # We wrap these in `Path` to work around
-        # https://github.com/PyCQA/pylint/issues/224.
-        Path(self._genconf_dir).mkdir(exist_ok=True, parents=True)
-        self._genconf_dir = Path(self._genconf_dir).resolve()
+        self._genconf_dir.mkdir(exist_ok=True, parents=True)
+        self._genconf_dir = self._genconf_dir.resolve()
         include_dir = self._path / 'include'
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
@@ -289,9 +287,7 @@ class DockerCluster(ClusterManager):
         self._public_agent_prefix = self._cluster_id + '-public-agent-'
 
         bootstrap_genconf_path = self._genconf_dir / 'serve'
-        # We wrap this in `Path` to work around
-        # https://github.com/PyCQA/pylint/issues/224.
-        Path(bootstrap_genconf_path).mkdir()
+        bootstrap_genconf_path.mkdir()
         self._bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
