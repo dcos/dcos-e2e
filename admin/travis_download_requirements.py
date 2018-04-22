@@ -132,8 +132,8 @@ def download_file(url: str, path: Path) -> None:
             content_iter,
             length=content_length / chunk_size,
             label=label,
-        ) as bar:
-            for chunk in bar:
+        ) as progress_bar:
+            for chunk in progress_bar:
                 if chunk:
                     file_descriptor.write(chunk)  # type: ignore
                     file_descriptor.flush()  # type: ignore
