@@ -69,13 +69,13 @@ PATTERNS = {
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_oss':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_docker.py':
     ALL_ARTIFACTS,
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
