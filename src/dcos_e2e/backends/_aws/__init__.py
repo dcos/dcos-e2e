@@ -131,11 +131,10 @@ class AWSCluster(ClusterManager):
 
         unique = 'dcos-e2e-{}'.format(str(uuid.uuid4()))
 
-        self._path = Path(cluster_backend.workspace_dir) / unique
-        Path(self._path).mkdir(exist_ok=True)
-        self._path = Path(self._path).resolve()
-        self._path = Path(self._path) / unique
-        Path(self._path).mkdir(exist_ok=True)
+        self._path = cluster_backend.workspace_dir / unique
+        self._path.mkdir(exist_ok=True)
+        self._path = self._path.resolve() / unique
+        self._path.mkdir(exist_ok=True)
 
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
@@ -207,7 +206,7 @@ class AWSCluster(ClusterManager):
         # Store the generated AWS SSH key to the file system.
         self._ssh_key_path = self._path / 'id_rsa'
         private_key = self.cluster_info['ssh_private_key']
-        Path(self._ssh_key_path).write_bytes(private_key.encode())
+        self._ssh_key_path.write_bytes(private_key.encode())
 
         # Wait for the AWS stack setup completion.
         DcosCloudformationLauncher.wait(self.launcher)  # type: ignore
