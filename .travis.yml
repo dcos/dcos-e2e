@@ -49,9 +49,6 @@ cache: pip
 before_script:
 - python admin/travis_download_requirements.py "$TEST_PATTERN"
 - travis_retry make pull-images
-- make docs
-- make lint
-- dcos-docker doctor
 script:
 - pytest -vvv -s "$TEST_PATTERN" --cov=src/dcos_e2e --cov=tests
 after_success:
