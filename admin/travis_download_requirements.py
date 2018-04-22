@@ -6,14 +6,12 @@ artifacts for all tests, but in the interest of speed, we only download what we
 need.
 """
 
-import logging
 import os
 from pathlib import Path
 from typing import Dict, Tuple  # noqa: F401
 
+import click
 import requests
-
-LOGGER = logging.getLogger(__name__)
 
 OSS_PATTERN = (
     'https://downloads.dcos.io/dcos/testing/{version}/dcos_generate_config.sh'
@@ -124,13 +122,21 @@ def download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
-    message = 'Downloading to ' + str(path)
-    LOGGER.warning(message)
+    label = 'Downloading to ' + str(path)
     stream = requests.get(url, stream=True)
+    content_length = int(stream.headers['Content-Length'])
     chunk_size = 100 * 1024
-    with open(str(path), 'wb') as file_descriptor:
-        for chunk in stream.iter_content(chunk_size=chunk_size):
-            file_descriptor.write(chunk)
+    with click.open_file(str(path), 'wb') as file_descriptor:
+        content_iter = stream.iter_content(chunk_size=chunk_size)
+        with click.progressbar(  # type: ignore
+            content_iter,
+            length=content_length / chunk_size,
+            label=label,
+        ) as progress_bar:
+            for chunk in progress_bar:
+                if chunk:
+                    file_descriptor.write(chunk)  # type: ignore
+                    file_descriptor.flush()  # type: ignore
 
 
 def main() -> None:
