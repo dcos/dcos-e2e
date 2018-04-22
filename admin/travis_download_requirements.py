@@ -9,6 +9,7 @@ need.
 import logging
 import os
 from pathlib import Path
+from typing import Dict, Tuple  # noqa: F401
 
 import requests
 
@@ -67,56 +68,56 @@ PATTERNS = {
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
-    ALL_ARTIFACTS,
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_oss':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_docker.py':
-    ALL_ARTIFACTS,
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterSize':
-    ALL_ARTIFACTS,
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_default_config':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_extend_config':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests::test_run_pytest':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters::test_two_clusters':  # noqa: E501
-    ALL_ARTIFACTS,
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled':
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli':  # noqa: E501
-    ALL_ARTIFACTS,
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise':
-    ALL_ARTIFACTS,
+    (EE_1_10, ),
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_oss':
-    ALL_ARTIFACTS,
+    (OSS_1_10, ),
     'tests/test_dcos_e2e/test_legacy.py::Test111::test_enterprise':
-    ALL_ARTIFACTS,
+    (EE_1_11, ),
     'tests/test_dcos_e2e/test_legacy.py::Test111::test_oss':
-    ALL_ARTIFACTS,
+    (OSS_1_11, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise':
-    ALL_ARTIFACTS,
+    (EE_1_9, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
-    ALL_ARTIFACTS,
+    (OSS_1_9, ),
     'tests/test_dcos_e2e/test_node.py::TestNode':
-    ALL_ARTIFACTS,
-}
+    (OSS_MASTER, ),
+}  # type: Dict[str, Tuple]
 
 
 def download_file(url: str, path: Path) -> None:
