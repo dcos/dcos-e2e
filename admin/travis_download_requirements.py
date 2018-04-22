@@ -128,15 +128,15 @@ def download_file(url: str, path: Path) -> None:
     chunk_size = 100 * 1024
     with click.open_file(str(path), 'wb') as file_descriptor:
         content_iter = stream.iter_content(chunk_size=chunk_size)
-        with click.progressbar(
+        with click.progressbar(  # type: ignore
             content_iter,
             length=content_length / chunk_size,
             label=label,
         ) as bar:
             for chunk in bar:
                 if chunk:
-                    file_descriptor.write(chunk)
-                    file_descriptor.flush()
+                    file_descriptor.write(chunk)  # type: ignore
+                    file_descriptor.flush()  # type: ignore
 
 
 def main() -> None:
