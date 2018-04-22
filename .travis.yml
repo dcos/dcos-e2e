@@ -5,7 +5,6 @@ addons:
   apt:
     packages:
     - linux-image-extra-$(uname -r)
-    - docker-ce
     - enchant
 language: python
 python:
@@ -42,6 +41,7 @@ env:
   # - TEST_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_oss
   # - TEST_PATTERN=tests/test_dcos_e2e/test_node.py::TestNode
 before_install:
+- apt-get install docker-ce
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
 install:
