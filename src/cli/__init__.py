@@ -908,8 +908,9 @@ def web(cluster_id: str) -> None:
     Consider using ``dcos-docker wait`` before running this command.
     """
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    master = next(iter(cluster_containers.masters))
-    web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
+    cluster = cluster_containers.cluster
+    master = next(iter(cluster.masters))
+    web_ui = 'http://' + str(master.public_ip_address)
     click.launch(web_ui)
 
 
