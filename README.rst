@@ -51,6 +51,8 @@ To upgrade from an older version, run the following command:
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+If the CLI has been installed with Homebrew, you do not need to install the library to use the CLI.
+
 Requires Python 3.5.2+.
 
 Check the Python version:
