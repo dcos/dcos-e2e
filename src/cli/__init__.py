@@ -29,6 +29,7 @@ from typing import (  # noqa: F401
 import click
 import click_spinner
 import docker
+import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -707,6 +708,7 @@ def wait(
     """
     Wait for DC/OS to start.
     """
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     click.echo('A cluster may take some time to be ready.')
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     with click_spinner.spinner():
