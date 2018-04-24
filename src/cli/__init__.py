@@ -29,7 +29,6 @@ from typing import (  # noqa: F401
 import click
 import click_spinner
 import docker
-import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -414,10 +413,11 @@ def create(
 
     artifact_path = Path(artifact).resolve()
     try:
-        enterprise = is_enterprise(
-            build_artifact=artifact_path,
-            workspace_dir=workspace_dir,
-        )
+        with click_spinner.spinner():
+            enterprise = is_enterprise(
+                build_artifact=artifact_path,
+                workspace_dir=workspace_dir,
+            )
     except subprocess.CalledProcessError as exc:
         rmtree(path=str(workspace_dir), ignore_errors=True)
         click.echo(doctor_message)
@@ -525,6 +525,12 @@ def create(
         sys.exit(exc.returncode)
 
     click.echo(cluster_id)
+    started_message = (
+        'Cluster "{cluster_id}" has started. '
+        'Run "dcos-docker wait --cluster-id {cluster_id}" to wait for DC/OS '
+        'to be ready.'
+    ).format(cluster_id=cluster_id)
+    click.echo(started_message, err=True)
 
 
 @dcos_docker.command('list')
@@ -701,7 +707,7 @@ def wait(
     """
     Wait for DC/OS to start.
     """
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    click.echo('A cluster may take some time to be ready.')
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     with click_spinner.spinner():
         if cluster_containers.is_enterprise:
