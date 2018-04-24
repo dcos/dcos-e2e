@@ -48,7 +48,7 @@ To upgrade from an older version, run the following command:
 
     brew upgrade https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
-Run ``dcos-docker doctor`` to make sure that your system is ready to go for the Docker backend:
+Run ``dcos-docker doctor`` to make sure that your system is ready to go:
 
 .. code-block:: console
 
