@@ -65,6 +65,8 @@ There are multiple DC/OS Enterprise-only features available in :ref:`dcos-docker
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
 See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on how to provide a license key.
 
+Ask your sales representative for DC/OS Enterprise release artifacts.
+
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 
 .. code-block:: console
@@ -73,6 +75,11 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
         --license-key /path/to/license.txt \
         --security-mode strict \
         --cluster-id default
+
+The command returns when the DC/OS installation process has started.
+To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait <dcos-docker-wait>` command.
+
+See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
 
 "default" Cluster ID
 --------------------
