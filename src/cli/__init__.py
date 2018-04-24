@@ -414,10 +414,11 @@ def create(
 
     artifact_path = Path(artifact).resolve()
     try:
-        enterprise = is_enterprise(
-            build_artifact=artifact_path,
-            workspace_dir=workspace_dir,
-        )
+        with click_spinner.spinner():
+            enterprise = is_enterprise(
+                build_artifact=artifact_path,
+                workspace_dir=workspace_dir,
+            )
     except subprocess.CalledProcessError as exc:
         rmtree(path=str(workspace_dir), ignore_errors=True)
         click.echo(doctor_message)
