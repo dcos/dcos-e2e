@@ -19,3 +19,8 @@ See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
 
     pip3 install git+https://github.com/mesosphere/dcos-e2e.git@master
 
+Run :ref:`dcos-docker-doctor` to make sure that your system is ready to go for the Docker backend:
+
+.. code-block:: console
+
+   $ dcos-docker doctor
