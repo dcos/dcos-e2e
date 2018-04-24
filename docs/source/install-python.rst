@@ -9,5 +9,5 @@ See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
 
 .. code:: sh
 
-    pip install git+https://github.com/mesosphere/dcos-e2e.git@master
+    pip3 install git+https://github.com/mesosphere/dcos-e2e.git@master
 
