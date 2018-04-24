@@ -3,10 +3,13 @@
 
 The ``dcos-docker`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
-A typical CLI workflow for open source DC/OS may look like this:
+A typical CLI workflow for open source DC/OS may look like the following.
+:ref:`Install the CLI <installation>`, then create, manage and destroy a cluster:
 
 .. code-block:: console
 
+   # Fix issues shown by dcos-docker doctor
+   $ dcos-docker doctor
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
    # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
@@ -23,6 +26,8 @@ Each of these and more are described in detail below.
 
 .. include:: docker-backend-requirements.rst
 
+.. _installation:
+
 Installation
 ------------
 
@@ -32,6 +37,7 @@ See "Operating System" requirements for instructions on using the CLI on Windows
 .. include:: cli-homebrew.rst
 
 .. include:: install-python.rst
+
 
 Creating a Cluster
 ------------------
