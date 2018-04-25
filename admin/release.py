@@ -50,8 +50,14 @@ def get_homebrew_formula(version: str) -> str:
         '0a3fb952bff47f68c58b5108f8c84a4e8ec62f7a2866907b8f14ef162b709c38'
     )
 
-    resource_stanzas.replace(offending_docker_url, working_docker_url)
-    resource_stanzas.replace(offending_docker_sha, working_docker_sha)
+    resource_stanzas = resource_stanzas.replace(
+        offending_docker_url,
+        working_docker_url,
+    )
+     resource_stanzas = resource_stanzas.replace(
+         offending_docker_sha,
+         working_docker_sha,
+     )
 
     pattern = dedent(
         """\
