@@ -103,6 +103,7 @@ class Docker(ClusterBackend):
     def __init__(
         self,
         workspace_dir: Optional[Path] = None,
+        custom_container_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
         custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
@@ -122,6 +123,8 @@ class Docker(ClusterBackend):
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
+            custom_container_mounts: Custom mounts add to all node containers.
+                See `volumes` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
                 See `volumes` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
@@ -148,6 +151,8 @@ class Docker(ClusterBackend):
         Attributes:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            custom_container_mounts: Custom mounts add to all node containers.
+                See `volumes` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
                 See `volumes` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
@@ -174,6 +179,7 @@ class Docker(ClusterBackend):
         """
         self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
+        self.custom_container_mounts = custom_container_mounts or {}
         self.custom_master_mounts = custom_master_mounts or {}
         self.custom_agent_mounts = custom_agent_mounts or {}
         self.custom_public_agent_mounts = custom_public_agent_mounts or {}
@@ -247,10 +253,8 @@ class DockerCluster(ClusterManager):
         # to add an variable to `dcos_generate_config.sh.in` which allows
         # `-v` mounts.
         self._genconf_dir = self._path / 'genconf'
-        # We wrap these in `Path` to work around
-        # https://github.com/PyCQA/pylint/issues/224.
-        Path(self._genconf_dir).mkdir(exist_ok=True, parents=True)
-        self._genconf_dir = Path(self._genconf_dir).resolve()
+        self._genconf_dir.mkdir(exist_ok=True, parents=True)
+        self._genconf_dir = self._genconf_dir.resolve()
         include_dir = self._path / 'include'
         certs_dir = include_dir / 'certs'
         certs_dir.mkdir(parents=True)
@@ -283,9 +287,7 @@ class DockerCluster(ClusterManager):
         self._public_agent_prefix = self._cluster_id + '-public-agent-'
 
         bootstrap_genconf_path = self._genconf_dir / 'serve'
-        # We wrap this in `Path` to work around
-        # https://github.com/PyCQA/pylint/issues/224.
-        Path(bootstrap_genconf_path).mkdir()
+        bootstrap_genconf_path.mkdir()
         self._bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
@@ -341,6 +343,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={
                     **common_mounts,
+                    **cluster_backend.custom_container_mounts,
                     **cluster_backend.custom_master_mounts,
                     **unique_mounts,
                 },
@@ -379,6 +382,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={
                     **agent_mounts,
+                    **cluster_backend.custom_container_mounts,
                     **cluster_backend.custom_agent_mounts,
                     **unique_mounts,
                 },
@@ -417,6 +421,7 @@ class DockerCluster(ClusterManager):
                 dcos_num_agents=agents + public_agents,
                 volumes={
                     **agent_mounts,
+                    **cluster_backend.custom_container_mounts,
                     **cluster_backend.custom_public_agent_mounts,
                     **unique_mounts,
                 },

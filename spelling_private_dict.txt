@@ -38,6 +38,7 @@ init
 ip
 lastResort
 linting
+linux
 linuxbrew
 login
 logout
@@ -45,6 +46,7 @@ macOS
 macos
 mesos
 mkstemp
+modprobe
 multi
 mypy
 noqa
@@ -91,6 +93,7 @@ tuple
 typeshed
 ubuntu
 ui
+uname
 untar
 url
 username

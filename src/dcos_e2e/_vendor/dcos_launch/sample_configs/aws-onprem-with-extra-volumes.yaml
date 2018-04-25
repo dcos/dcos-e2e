@@ -1,0 +1,31 @@
+---
+launch_config_version: 1
+deployment_name: dcos-onprem-with-new-stack
+platform: aws
+aws_region: us-west-2
+provider: onprem
+installer_url: https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+key_helper: true
+num_masters: 1
+num_private_agents: 1
+num_public_agents: 1
+os_name: coreos
+instance_type: m4.xlarge
+# These names can possibly interefere with instance deployment if not configured correctly
+# For more info, see: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html
+aws_block_device_mappings:
+  - DeviceName: /dev/sdc
+    Ebs:
+      VolumeSize: 2
+      DeleteOnTermination: true
+      VolumeType: gp2
+dcos_config:
+  cluster_name: My Awesome DC/OS
+  master_discovery: static
+  exhibitor_storage_backend: zookeeper
+  security: permissive
+  exhibitor_zk_path: /exhibitor
+  feature_dcos_storage_enabled: true
+  resolvers:
+    - 8.8.8.8
+    - 8.8.4.4

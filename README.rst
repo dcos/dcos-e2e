@@ -48,17 +48,37 @@ To upgrade from an older version, run the following command:
 
     brew upgrade https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
 
+Run ``dcos-docker doctor`` to make sure that your system is ready to go:
+
+.. code-block:: console
+
+   $ dcos-docker doctor
+
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+If the CLI has been installed with Homebrew, you do not need to install the library to use the CLI.
+
 Requires Python 3.5.2+.
+
+Check the Python version:
+
+.. code:: sh
+
+   python3 --version
 
 Optionally replace ``master`` with a particular version of DC/OS E2E.
 See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
 
 .. code:: sh
 
-    pip install git+https://github.com/mesosphere/dcos-e2e.git@master
+    pip3 install git+https://github.com/mesosphere/dcos-e2e.git@master
+
+Run ``dcos-docker doctor`` to make sure that your system is ready to go for the Docker backend:
+
+.. code-block:: console
+
+   $ dcos-docker doctor
 
 Python Library
 --------------
@@ -92,10 +112,12 @@ CLI
 There is also a CLI tool.
 This is useful for quickly creating, managing and destroying clusters.
 
-An typical CLI workflow may look like this:
+A typical CLI workflow may look like this:
 
 .. code-block:: console
 
+   # Fix issues shown by dcos-docker doctor
+   $ dcos-docker doctor
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
    # Without specifying a cluster ID for ``wait`` and ``run``, ``default``

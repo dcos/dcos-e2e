@@ -3,10 +3,13 @@
 
 The ``dcos-docker`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
-A typical CLI workflow for open source DC/OS may look like this:
+A typical CLI workflow for open source DC/OS may look like the following.
+:ref:`Install the CLI <installation>`, then create, manage and destroy a cluster:
 
 .. code-block:: console
 
+   # Fix issues shown by dcos-docker doctor
+   $ dcos-docker doctor
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
    default
    # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
@@ -23,6 +26,8 @@ Each of these and more are described in detail below.
 
 .. include:: docker-backend-requirements.rst
 
+.. _installation:
+
 Installation
 ------------
 
@@ -32,6 +37,7 @@ See "Operating System" requirements for instructions on using the CLI on Windows
 .. include:: cli-homebrew.rst
 
 .. include:: install-python.rst
+
 
 Creating a Cluster
 ------------------
@@ -59,6 +65,8 @@ There are multiple DC/OS Enterprise-only features available in :ref:`dcos-docker
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
 See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on how to provide a license key.
 
+Ask your sales representative for DC/OS Enterprise release artifacts.
+
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 
 .. code-block:: console
@@ -67,6 +75,11 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
         --license-key /path/to/license.txt \
         --security-mode strict \
         --cluster-id default
+
+The command returns when the DC/OS installation process has started.
+To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait <dcos-docker-wait>` command.
+
+See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
 
 "default" Cluster ID
 --------------------
@@ -177,7 +190,7 @@ Using a Custom CA Certificate
 -----------------------------
 
 On DC/OS Enterprise clusters, it is possible to use a custom CA certificate.
-See `the Custom CA certifiacte documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
+See `the Custom CA certificate documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
 It is possible to use :ref:`dcos-docker-create` to create a cluster with a custom CA certificate.
 
 #. Create or obtain the necessary files:

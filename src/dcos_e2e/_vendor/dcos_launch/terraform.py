@@ -148,7 +148,6 @@ class TerraformLauncher(util.AbstractLauncher):
         """ Nothing to do here because unlike the other launchers, create() runs and also waits for a subprocess to
         finish instead of just sending an http request to a provider.
         """
-        pass
 
     def delete(self):
         # delete the cluster

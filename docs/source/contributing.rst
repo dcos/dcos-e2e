@@ -6,6 +6,8 @@ Contributions to this repository must pass tests and linting.
 .. contents::
   :depth: 2
 
+.. _install-contribution-dependencies:
+
 Install Contribution Dependencies
 ---------------------------------
 
@@ -13,7 +15,7 @@ Install dependencies in a virtual environment.
 
 .. code:: sh
 
-    pip install --editable .[dev]
+    pip3 install --editable .[dev]
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
@@ -49,6 +51,8 @@ and on Ubuntu with ``apt``:
 
 Linting
 -------
+
+:ref:`install-contribution-dependencies`.
 
 Run lint tools:
 

@@ -5,8 +5,8 @@ installer_url: https://downloads.dcos.io/dcos/testing/master/dcos_generate_confi
 platform: aws
 provider: onprem
 aws_region: us-west-2
-os_name: cent-os-7-dcos-prereqs
-instance_type: m4.xlarge
+os_name: cent-os-7
+instance_type: m4.large
 bootstrap_os_name: cent-os-7-dcos-prereqs
 bootstrap_instance_type: m4.xlarge
 dcos_config:
@@ -16,9 +16,18 @@ dcos_config:
     - 8.8.8.8
   dns_search: mesos
   master_discovery: static
-  exhibitor_storage_backend: static
 num_masters: 1
 num_private_agents: 1
 num_public_agents: 1
 ssh_user: centos
 key_helper: true
+iam_role_permissions:
+  - Resource: '*'
+    Action:
+      - ec2:DescribeSnapshotAttribute
+      - elasticloadbalancing:*
+      - ec2:*
+    Effect: Allow
+tags:
+  KubernetesCluster: foobar-cluster
+  expiration: 24h
