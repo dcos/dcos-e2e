@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.04.25.0
+------------
+
 - Logs from dependencies are no longer emitted.
 - The ``dcos-docker`` CLI now gives more feedback to let you know that things are happening.
 
