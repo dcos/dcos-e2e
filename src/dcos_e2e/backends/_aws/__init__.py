@@ -11,8 +11,6 @@ from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Type
 
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
-from dcos_e2e._vendor.dcos_launch.aws import DcosCloudformationLauncher
-from dcos_e2e._vendor.dcos_launch.onprem import AbstractOnpremLauncher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
@@ -209,15 +207,13 @@ class AWSCluster(ClusterManager):
         self._ssh_key_path.write_bytes(private_key.encode())
 
         # Wait for the AWS stack setup completion.
-        DcosCloudformationLauncher.wait(self.launcher)  # type: ignore
+        self.launcher.wait()
 
         # Update the cluster_info with AWS stack information:
         # ``describe`` fetches the latest information for the stack.
         # This makes node IP addresses available to ``cluster_info``.
         # This also inserts bootstrap node information into ``cluster_info``.
-        self.cluster_info = AbstractOnpremLauncher.describe(  # type: ignore
-            self.launcher,
-        )
+        self.cluster_info = self.launcher.describe()
 
     def install_dcos_from_url(
         self,
@@ -244,13 +240,7 @@ class AWSCluster(ClusterManager):
         # on top of the preliminary DC/OS config.
         dcos_config = self.launcher.config['dcos_config']
         self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
-
-        # The ``wait`` method starts the actual DC/OS installation process.
-        # We do not use ``self.launcher.wait()`` here because at the time of
-        # writing it does both, waiting for the AWS stack and installing
-        # DC/OS. This is desired to be changed by the dcos-launch team.
-        # https://jira.mesosphere.com/browse/DCOS-21660
-        AbstractOnpremLauncher.wait(self.launcher)  # type: ignore
+        self.launcher.install_dcos()
 
     def install_dcos_from_path(
         self,
