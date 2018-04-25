@@ -35,6 +35,7 @@ def get_homebrew_formula(version: str) -> str:
         'https://files.pythonhosted.org/packages/77/0d'
         '/13b28b1e532e5c9ab9f5593ec757852877bbf691341b22fa807b767bc92d/'
         'docker-3.2.1.tar.gz'
+    )
     offending_docker_sha = (
         '0d698c3dc4df66c988de5df21a62cdc3450de2fa8523772779e5e23799c41f43'
     )
