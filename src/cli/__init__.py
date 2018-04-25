@@ -579,19 +579,20 @@ def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    containers = {
-        *cluster_containers.masters,
-        *cluster_containers.agents,
-        *cluster_containers.public_agents,
-    }
-    rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
-    for container in containers:
-        container.stop()
-        container.remove(v=True)
+    with click_spinner.spinner():
+        cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+        containers = {
+            *cluster_containers.masters,
+            *cluster_containers.agents,
+            *cluster_containers.public_agents,
+        }
+        rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
+        for container in containers:
+            container.stop()
+            container.remove(v=True)
 
-    client = docker.from_env(version='auto')
-    client.volumes.prune()
+        client = docker.from_env(version='auto')
+        client.volumes.prune()
     click.echo(cluster_id)
 
 
