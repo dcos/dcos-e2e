@@ -54,7 +54,7 @@ def get_homebrew_formula(version: str) -> str:
         offending_docker_url,
         working_docker_url,
     )
-     resource_stanzas = resource_stanzas.replace(
+    resource_stanzas = resource_stanzas.replace(
          offending_docker_sha,
          working_docker_sha,
      )
