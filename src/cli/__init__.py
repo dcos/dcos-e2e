@@ -8,6 +8,7 @@ import logging
 import subprocess
 import sys
 import tarfile
+import time
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -1080,12 +1081,13 @@ def setup_mac_network(configuration_dst: Path) -> None:
                 'Remove the container with port 13194 allocated. '
                 'This may be a container with the image "{docker_image_tag}". '
             ).format(docker_image_tag=docker_image_tag)
+            # TODO: List containers with this tag
             click.echo(message, err=True)
-            sys.exit(1)
+            # sys.exit(1)
 
     client.containers.run(
         image='kylemanna/openvpn',
-        restart_policy=restart_policy,
+        # restart_policy=restart_policy,
         cap_add=['NET_ADMIN'],
         environment={'dest': 'docker-for-mac.ovpn', 'DEBUG': 1},
         command='/local/helpers/run.sh',
@@ -1102,6 +1104,12 @@ def setup_mac_network(configuration_dst: Path) -> None:
             },
         },
     )
+
+    while True:
+        print('HERE')
+        time.sleep(1)
+        if configuration_src.exists():
+            break
 
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
