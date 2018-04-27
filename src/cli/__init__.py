@@ -11,7 +11,7 @@ import tarfile
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from shutil import rmtree
+from shutil import copy, rmtree
 from subprocess import CalledProcessError
 from tempfile import gettempdir
 from typing import (  # noqa: F401
@@ -1026,16 +1026,25 @@ def doctor() -> None:
         sys.exit(1)
 
 
+@click.argument(
+    'dcos_checkout_dir',
+    type=click.Path(exists=True),
+    envvar='DCOS_CHECKOUT_DIR',
+    default='.',
+)
 @dcos_docker.command('setup-mac-network')
-def setup_mac_network() -> None:
+def setup_mac_network(configuration_dst: str) -> None:
     """
     Set up a network to connect to nodes on macOS.
     """
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
+    ovpn_filename = 'docker-for-mac.ovpn'
+
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
+    configuration_src = docker_mac_network_clone / ovpn_filename
 
     docker_image_tag = 'dcos-e2e/proxy'
     client.images.build(
@@ -1047,6 +1056,13 @@ def setup_mac_network() -> None:
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
+
+    documents = Path('~/Documents').expanduser()
+    # TODO make parent dir
+    configuration_dst = documents / ovpn_filename
+
+    # TODO if config dst exists, exit
+    # TODO configurable dst
 
     try:
         client.containers.run(
@@ -1063,7 +1079,7 @@ def setup_mac_network() -> None:
                 'allocated. '
             )
             click.echo(message, err=True)
-            # sys.exit(1)
+            sys.exit(1)
 
     client.containers.run(
         image='kylemanna/openvpn',
@@ -1085,12 +1101,8 @@ def setup_mac_network() -> None:
         },
     )
 
-    ovpn_filename = 'docker-for-mac.ovpn'
-    configuration_src = docker_mac_network_clone / ovpn_filename
     import pdb; pdb.set_trace()
     # TODO Move file here
-    documents = Path('~/Documents').expanduser()
-    configuration_dst = documents / ovpn_filename
 
     message = (
         '1. Install an OpenVPN client such as Tunnelblick '
