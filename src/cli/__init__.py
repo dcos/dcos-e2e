@@ -1075,5 +1075,18 @@ def setup_mac_network() -> None:
             },
         },
     )
+
+    configuration_created_message = (
+        'OpenVPN configuration created at {configuration_dst}.'
+    ).format(configuration_dst=configuration_dst)
+
+    install_openvpn_message = (
+        ''
+    )
+
+
+
+    click.echo(message=configuration_created_message)
+    click.echo(message=configuration_created_message)
     # TODO message about dcos-docker doctor
     # TODO message in dcos-docker doctor
