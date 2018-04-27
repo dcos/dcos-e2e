@@ -1027,11 +1027,12 @@ def doctor() -> None:
         sys.exit(1)
 
 
-@click.argument(
-    'configuration_dst',
+@click.option(
+    '--configuration-dst',
     type=click.Path(exists=False),
     default='~/Documents/docker-for-mac.ovpn',
     callback=validate_ovpn_file_does_not_exist,
+    show_default=True,
     help=(
         'The destination '
     ),
