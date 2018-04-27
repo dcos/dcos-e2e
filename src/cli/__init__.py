@@ -1063,7 +1063,7 @@ def setup_mac_network() -> None:
                 'allocated. '
             )
             click.echo(message, err=True)
-            sys.exit(1)
+            # sys.exit(1)
 
     client.containers.run(
         image='kylemanna/openvpn',
@@ -1085,8 +1085,12 @@ def setup_mac_network() -> None:
         },
     )
 
+    ovpn_filename = 'docker-for-mac.ovpn'
+    configuration_src = docker_mac_network_clone / ovpn_filename
+    import pdb; pdb.set_trace()
     # TODO Move file here
-    configuration_dst = '~/Documents/foo'
+    documents = Path('~/Documents').expanduser()
+    configuration_dst = documents / ovpn_filename
 
     message = (
         '1. Install an OpenVPN client such as Tunnelblick '
