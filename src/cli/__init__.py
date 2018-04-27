@@ -1105,11 +1105,12 @@ def setup_mac_network(configuration_dst: Path) -> None:
         },
     )
 
-    while True:
-        print('HERE')
-        time.sleep(1)
-        if configuration_src.exists():
-            break
+    with click_spinner.spinner():
+        while True:
+            print('HERE')
+            time.sleep(1)
+            if configuration_src.exists():
+                break
 
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
