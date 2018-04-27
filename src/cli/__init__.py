@@ -1050,10 +1050,8 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
-    configuration_src = Path(docker_mac_network_clone / ovpn_filename)
-    if configuration_src.exists():
-        configuration_src.unlink()
 
+    # ToDO Copy clone to new temporary directory
     docker_image_tag = 'dcos-e2e/proxy'
     client.images.build(
         path=str(docker_mac_network_clone),
@@ -1072,6 +1070,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
             ports=proxy_ports,
             detach=True,
             restart_policy=restart_policy,
+            name='dcos_e2e-proxy'
         )
     except docker.errors.APIError as exc:
         if 'port is already allocated' in exc.explanation:
@@ -1111,6 +1110,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
             if configuration_src.exists():
                 break
 
+    configuration_src = Path(docker_mac_network_clone / ovpn_filename)
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
     message = (
