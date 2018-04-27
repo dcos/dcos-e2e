@@ -1036,10 +1036,14 @@ def setup_mac_network() -> None:
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
-    openvpn_image = 'kylemanna/openvpn'
     client.containers.run(
-        image=openvpn_image,
+        image='kylemanna/openvpn',
         restart_policy=restart_policy,
+        cap_add=['NET_ADMIN'],
+        environment={'dest': 'docker-for-mac.ovpn', 'DEBUG': 1},
+        command='/local/helpers/run.sh',
+        network_mode='host',
+        volumes={},
     )
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
