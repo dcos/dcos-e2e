@@ -1024,3 +1024,10 @@ def doctor() -> None:
     link_to_troubleshooting()
     if highest_level == CheckLevels.ERROR:
         sys.exit(1)
+
+
+@dcos_docker.command('setup_mac_network')
+def setup_mac_network() -> None:
+    """
+    Set up a network to connect to nodes on macOS.
+    """
