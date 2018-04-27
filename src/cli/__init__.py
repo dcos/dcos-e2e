@@ -1077,7 +1077,9 @@ def setup_mac_network(configuration_dst: Path) -> None:
             message = (
                 'Cannot start proxy container as a required port is already '
                 'allocated. '
-            )
+                'Remove the container with port 13194 allocated. '
+                'This may be a container with the image "{docker_image_tag}". '
+            ).format(docker_image_tag=docker_image_tag)
             click.echo(message, err=True)
             sys.exit(1)
 
