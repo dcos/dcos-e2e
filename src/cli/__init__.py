@@ -1056,9 +1056,17 @@ def setup_mac_network() -> None:
         },
     )
 
+    docker_image_tag = 'dcos-e2e/proxy'
+    client.images.build(
+        path=str(docker_mac_network_clone),
+        rm=True,
+        forcerm=True,
+        tag=docker_image_tag,
+    )
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
     client.containers.run(
+        image=docker_image_tag,
         command=proxy_command,
         ports=proxy_ports,
         restart_policy=restart_policy,
