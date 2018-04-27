@@ -67,6 +67,7 @@ from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
+    validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
     validate_path_pair,
     validate_volumes,
@@ -1027,16 +1028,16 @@ def doctor() -> None:
 
 
 @click.argument(
-    'dcos_checkout_dir',
-    type=click.Path(exists=True),
-    envvar='DCOS_CHECKOUT_DIR',
-    default='.',
+    'configuration_dst',
+    type=click.Path(exists=False),
+    default='~/Documents/docker-for-mac.ovpn',
 )
 @dcos_docker.command('setup-mac-network')
 def setup_mac_network(configuration_dst: str) -> None:
     """
     Set up a network to connect to nodes on macOS.
     """
+    return
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
