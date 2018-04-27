@@ -1058,7 +1058,7 @@ def setup_mac_network() -> None:
 
     client.containers.run(
         image='kylemanna/openvpn',
-        # restart_policy=restart_policy,
+        restart_policy=restart_policy,
         cap_add=['NET_ADMIN'],
         environment={'dest': 'docker-for-mac.ovpn', 'DEBUG': 1},
         command='/local/helpers/run.sh',
