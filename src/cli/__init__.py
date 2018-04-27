@@ -1033,10 +1033,10 @@ def setup_mac_network() -> None:
     """
     # This is inspired by https://github.com/wojas/docker-mac-network.
     # TODO Check for macOS
-    openvpn_image = 'kylemanna/openvpn'
     client = docker.from_env(version='auto')
-    # TODO fill this in
-    restart_policy = {}
+    restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
+
+    openvpn_image = 'kylemanna/openvpn'
     client.containers.run(
         image=openvpn_image,
         restart_policy=restart_policy,
@@ -1046,5 +1046,6 @@ def setup_mac_network() -> None:
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
     client.containers.run(
         command=proxy_command,
-        ports = proxy_ports,
+        ports=proxy_ports,
+        restart_policy=restart_policy,
     )
