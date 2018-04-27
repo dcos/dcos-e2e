@@ -1076,6 +1076,7 @@ def setup_mac_network() -> None:
         },
     )
 
+    # TODO Move file here
     configuration_dst = '~/Documents/foo'
 
     configuration_created_message = (
@@ -1102,5 +1103,5 @@ def setup_mac_network() -> None:
     click.echo(message=configuration_created_message)
     click.echo(message=install_openvpn_message)
     click.echo(message=open_openvpn_file_message)
-    # TODO message about dcos-docker doctor
+    click.echo(message=dcos_docker_doctor_message)
     # TODO message in dcos-docker doctor
