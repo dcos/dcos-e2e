@@ -1042,7 +1042,6 @@ def setup_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
     """
-    return
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
@@ -1050,7 +1049,9 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
-    configuration_src = docker_mac_network_clone / ovpn_filename
+    configuration_src = Path(docker_mac_network_clone / ovpn_filename)
+    if configuration_src.exists():
+        configuration_src.unlink()
 
     docker_image_tag = 'dcos-e2e/proxy'
     client.images.build(
@@ -1062,13 +1063,6 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
-
-    documents = Path('~/Documents').expanduser()
-    # TODO make parent dir
-    configuration_dst = documents / ovpn_filename
-
-    # TODO if config dst exists, exit
-    # TODO configurable dst
 
     try:
         client.containers.run(
@@ -1107,8 +1101,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
         },
     )
 
-    import pdb; pdb.set_trace()
-    # TODO Move file here
+    copy(src=str(configuration_src), dst=str(configuration_dst))
 
     message = (
         '1. Install an OpenVPN client such as Tunnelblick '
