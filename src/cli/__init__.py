@@ -1031,3 +1031,20 @@ def setup_mac_network() -> None:
     """
     Set up a network to connect to nodes on macOS.
     """
+    # This is inspired by https://github.com/wojas/docker-mac-network.
+    # TODO Check for macOS
+    openvpn_image = 'kylemanna/openvpn'
+    client = docker.from_env(version='auto')
+    # TODO fill this in
+    restart_policy = {}
+    client.containers.run(
+        image=openvpn_image,
+        restart_policy=restart_policy,
+    )
+
+    proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
+    proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
+    client.containers.run(
+        command=proxy_command,
+        ports = proxy_ports,
+    )
