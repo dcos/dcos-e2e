@@ -1081,12 +1081,17 @@ def setup_mac_network() -> None:
     ).format(configuration_dst=configuration_dst)
 
     install_openvpn_message = (
-        ''
+        'Install an OpenVPN client such as Tunnelblick or Shimo.'
+        '\n'
+        '- Tunnelblick: https://tunnelblick.net/downloads.html'
+        '\n'
+        '- Shimo: https://www.shimovpn.com'
     )
 
-
+    open_openvpn_file_message = ()
 
     click.echo(message=configuration_created_message)
-    click.echo(message=configuration_created_message)
+    click.echo(message=install_openvpn_message)
+    click.echo(message=open_openvpn_file_message)
     # TODO message about dcos-docker doctor
     # TODO message in dcos-docker doctor
