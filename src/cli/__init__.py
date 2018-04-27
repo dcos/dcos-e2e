@@ -1031,6 +1031,7 @@ def setup_mac_network() -> None:
     """
     Set up a network to connect to nodes on macOS.
     """
+    logging.basicConfig(level=logging.DEBUG)
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
@@ -1047,24 +1048,22 @@ def setup_mac_network() -> None:
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
-    try:
-        client.containers.run(
-            image=docker_image_tag,
-            command=proxy_command,
-            ports=proxy_ports,
-            restart_policy=restart_policy,
-        )
-    except Exception as exc:
-        import pdb; pdb.set_trace()
-        pass
+    client.containers.run(
+        image=docker_image_tag,
+        command=proxy_command,
+        ports=proxy_ports,
+        detach=True,
+        restart_policy=restart_policy,
+    )
 
     client.containers.run(
         image='kylemanna/openvpn',
-        restart_policy=restart_policy,
+        # restart_policy=restart_policy,
         cap_add=['NET_ADMIN'],
         environment={'dest': 'docker-for-mac.ovpn', 'DEBUG': 1},
         command='/local/helpers/run.sh',
         network_mode='host',
+        detach=True,
         volumes={
             str(docker_mac_network_clone): {
                 'bind': '/local',
