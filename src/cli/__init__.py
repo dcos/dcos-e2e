@@ -1032,7 +1032,6 @@ def setup_mac_network() -> None:
     Set up a network to connect to nodes on macOS.
     """
     # This is inspired by https://github.com/wojas/docker-mac-network.
-    # TODO Check for macOS
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
@@ -1043,7 +1042,16 @@ def setup_mac_network() -> None:
         environment={'dest': 'docker-for-mac.ovpn', 'DEBUG': 1},
         command='/local/helpers/run.sh',
         network_mode='host',
-        volumes={},
+        volumes={
+            str(docker_mac_network_clone): {
+                'bind': '/local',
+                'mode': 'rw',
+            },
+            str(docker_mac_network_clone / 'config'): {
+                'bind': '/etc/openvpn',
+                'mode': 'rw',
+            },
+        },
     )
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
@@ -1053,3 +1061,6 @@ def setup_mac_network() -> None:
         ports=proxy_ports,
         restart_policy=restart_policy,
     )
+
+    # TODO message about dcos-docker doctor
+    # TODO message in dcos-docker doctor
