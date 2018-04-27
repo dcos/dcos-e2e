@@ -1026,14 +1026,16 @@ def doctor() -> None:
         sys.exit(1)
 
 
-@dcos_docker.command('setup_mac_network')
+@dcos_docker.command('setup-mac-network')
 def setup_mac_network() -> None:
     """
     Set up a network to connect to nodes on macOS.
     """
-    # This is inspired by https://github.com/wojas/docker-mac-network.
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
+
+    clone_name = 'docker-mac-network-master'
+    docker_mac_network_clone = Path(__file__).parent / clone_name
 
     client.containers.run(
         image='kylemanna/openvpn',
