@@ -1031,9 +1031,13 @@ def doctor() -> None:
     'configuration_dst',
     type=click.Path(exists=False),
     default='~/Documents/docker-for-mac.ovpn',
+    callback=validate_ovpn_file_does_not_exist,
+    help=(
+        'The destination '
+    ),
 )
 @dcos_docker.command('setup-mac-network')
-def setup_mac_network(configuration_dst: str) -> None:
+def setup_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
     """

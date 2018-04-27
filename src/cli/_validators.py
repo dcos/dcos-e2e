@@ -198,20 +198,26 @@ def validate_volumes(
         volumes[host_src] = {'bind': container_dst, 'mode': mode}
     return volumes
 
+
 def validate_ovpn_file_does_not_exist(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
 ) -> str:
     """
-    XXX
+    If the given file path exists already, show an error message explaining how
+    to use the file as an OpenVPN configuration.
     """
+    # TODO if directory, add file
+    path = Path(value).expanduser()
     for _ in (ctx, param):
         pass
 
     message = (
         '"{value}" already exists so no new OpenVPN configuration was '
-        'created. '
+        'created.'
+        '\n'
+        '\n'
         'To use {value}:'
         '\n'
         '1. Install an OpenVPN client such as Tunnelblick '
@@ -226,7 +232,7 @@ def validate_ovpn_file_does_not_exist(
         '4. Run "dcos-docker doctor" to confirm that everything is working.'
     ).format(value=value)
 
-    if Path(value).exists():
+    if path.exists():
         raise click.BadParameter(message=message)
 
-    return str(value)
+    return path
