@@ -1031,7 +1031,6 @@ def setup_mac_network() -> None:
     """
     Set up a network to connect to nodes on macOS.
     """
-    logging.basicConfig(level=logging.DEBUG)
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
@@ -1079,29 +1078,18 @@ def setup_mac_network() -> None:
     # TODO Move file here
     configuration_dst = '~/Documents/foo'
 
-    configuration_created_message = (
-        'OpenVPN configuration created at {configuration_dst}.'
+    message = (
+        '1. Install an OpenVPN client such as Tunnelblick '
+        '(https://tunnelblick.net/downloads.html) '
+        'or Shimo (https://www.shimovpn.com).'
+        '\n'
+        '2. Run "open {configuration_dst}".'
+        '\n'
+        '3. In your OpenVPN client, connect to the new "docker-for-mac" '
+        'profile.'
+        '\n'
+        '4. Run "dcos-docker doctor" to confirm that everything is working.'
     ).format(configuration_dst=configuration_dst)
 
-    install_openvpn_message = (
-        'Install an OpenVPN client such as Tunnelblick or Shimo.'
-        '\n'
-        '- Tunnelblick: https://tunnelblick.net/downloads.html'
-        '\n'
-        '- Shimo: https://www.shimovpn.com'
-    )
-
-    open_openvpn_file_message = (
-        'Run "open {configuration_dst}" and then in your OpenVPN client, '
-        'connect to the new "docker-for-mac" profile.'
-    )
-
-    dcos_docker_doctor_message = (
-        'Run "dcos-docker doctor" to confirm that everything is working.'
-    )
-
-    click.echo(message=configuration_created_message)
-    click.echo(message=install_openvpn_message)
-    click.echo(message=open_openvpn_file_message)
-    click.echo(message=dcos_docker_doctor_message)
+    click.echo(message=message)
     # TODO message in dcos-docker doctor
