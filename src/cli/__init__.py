@@ -1076,6 +1076,8 @@ def setup_mac_network() -> None:
         },
     )
 
+    configuration_dst = '~/Documents/foo'
+
     configuration_created_message = (
         'OpenVPN configuration created at {configuration_dst}.'
     ).format(configuration_dst=configuration_dst)
@@ -1088,7 +1090,14 @@ def setup_mac_network() -> None:
         '- Shimo: https://www.shimovpn.com'
     )
 
-    open_openvpn_file_message = ()
+    open_openvpn_file_message = (
+        'Run "open {configuration_dst}" and then in your OpenVPN client, '
+        'connect to the new "docker-for-mac" profile.'
+    )
+
+    dcos_docker_doctor_message = (
+        'Run "dcos-docker doctor" to confirm that everything is working.'
+    )
 
     click.echo(message=configuration_created_message)
     click.echo(message=install_openvpn_message)
