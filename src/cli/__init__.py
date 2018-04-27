@@ -1047,13 +1047,23 @@ def setup_mac_network() -> None:
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
-    client.containers.run(
-        image=docker_image_tag,
-        command=proxy_command,
-        ports=proxy_ports,
-        detach=True,
-        restart_policy=restart_policy,
-    )
+
+    try:
+        client.containers.run(
+            image=docker_image_tag,
+            command=proxy_command,
+            ports=proxy_ports,
+            detach=True,
+            restart_policy=restart_policy,
+        )
+    except docker.errors.APIError as exc:
+        if 'port is already allocated' in exc.explanation:
+            message = (
+                'Cannot start proxy container as a required port is already '
+                'allocated. '
+            )
+            click.echo(message, err=True)
+            sys.exit(1)
 
     client.containers.run(
         image='kylemanna/openvpn',
