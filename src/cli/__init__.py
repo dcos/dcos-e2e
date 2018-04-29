@@ -12,7 +12,7 @@ import time
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from shutil import copy, rmtree
+from shutil import copy, rmtree, copytree
 from subprocess import CalledProcessError
 from tempfile import gettempdir, TemporaryDirectory
 from typing import (  # noqa: F401
@@ -1051,7 +1051,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
     docker_mac_network = TemporaryDirectory()
-    copy(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
+    copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
     docker_image_tag = 'dcos-e2e/proxy'
     client.images.build(
