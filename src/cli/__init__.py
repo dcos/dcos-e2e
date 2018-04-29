@@ -1126,6 +1126,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
         '\n'
         '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
         'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
+        '\n'
         '4. In your OpenVPN client, connect to the new "docker-for-mac" '
         'profile.'
         '\n'
