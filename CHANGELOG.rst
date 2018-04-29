@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.04.29.0
+------------
+
 - Added ``dcos-docker setup-mac-network`` command.
 
 2018.04.25.0

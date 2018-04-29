@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/mesosphere/dcos-e2e/archive/2018.04.25.1.tar.gz"
+  url "https://github.com/mesosphere/dcos-e2e/archive/2018.04.29.0.tar.gz"
   head "https://github.com/mesosphere/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -57,13 +57,13 @@ class Dcosdocker < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/7a/a5/668fb6807cddac958b2eec27c6012764b6b77cae84f11c77de1ffcd390a9/boto3-1.7.8.tar.gz"
-    sha256 "30879b3292f3e7766cf086e6e7595f751ffe1cf8fdba5a5fcd848571a4cff455"
+    url "https://files.pythonhosted.org/packages/6e/48/45a9b5bd6f0652598e5650cac37a96da324fcd03c45d6ffafe7201f670ea/boto3-1.7.10.tar.gz"
+    sha256 "30239a3c16da19c0a0886e7904195fb1a191dafc5773ad1656b7896577241cb5"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/d2/27/212bd110305e3e9bd64ec95ae63861afbfc47f92d3001b5e069aaa4a1cd8/botocore-1.10.8.tar.gz"
-    sha256 "fa2c9c1fb5872959cdcdf6e7a697dca5eb729698409c717a92d328a10bffbfbb"
+    url "https://files.pythonhosted.org/packages/6c/36/445661a4cfbc2eb7cf3c74c6d9308911dd37a09323a1c7b900ff34931db5/botocore-1.10.10.tar.gz"
+    sha256 "10d4880253210ad35cb1b3c3134d8698c2c2d10f15a2cf6a7be3f91b486866ff"
   end
 
   resource "Cerberus" do
@@ -107,13 +107,13 @@ class Dcosdocker < Formula
   end
 
   resource "docker" do
-    url "https://github.com/adamtheturtle/docker-py/archive/3.2.1.zip"
-    sha256 "0a3fb952bff47f68c58b5108f8c84a4e8ec62f7a2866907b8f14ef162b709c38"
+    url "https://files.pythonhosted.org/packages/e0/d7/5631c05977c51c1fc88b2eba9fd5cb0ecd7859f2ddfa7dfc653c06fcfe3a/docker-3.3.0.tar.gz"
+    sha256 "dc5cc0971a0d36fe94c5ce89bd4adb6c892713500af7b0818708229c3199911a"
   end
 
   resource "docker-pycreds" do
-    url "https://files.pythonhosted.org/packages/db/73/42d4c698e70633d99f7f7c4c87c6de45ead5ad7b36dcfccd998fd1556ac9/docker-pycreds-0.2.2.tar.gz"
-    sha256 "c7ab85de2894baff6ee8f15160cbbfa2fd3a04e56f0372c5793d24060687b299"
+    url "https://files.pythonhosted.org/packages/fc/29/f0fe6e6a055ebfc224f952d1166aea7bccd7de38ac01842fcbffe10ec0b8/docker-pycreds-0.2.3.tar.gz"
+    sha256 "e3732a03610a00461a716997670c7010bf1c214a3edc440f7d6a2a3a830ecd9d"
   end
 
   resource "docopt" do
@@ -132,8 +132,8 @@ class Dcosdocker < Formula
   end
 
   resource "google-api-python-client" do
-    url "https://files.pythonhosted.org/packages/b3/b8/5306cff119cabc076308d7bb8923d92a549594b76e0a2cfba27db93dc824/google-api-python-client-1.6.6.tar.gz"
-    sha256 "ec72991f95201996a4edcea44a079cae0292798086beaadb054d91921632fe1b"
+    url "https://files.pythonhosted.org/packages/e4/ae/67420c05e476c73ed871e5e01cffb4cff570810618422e20c0f80e543ea5/google-api-python-client-1.6.7.tar.gz"
+    sha256 "05583a386e323f428552419253765314a4b29828c3cee15be735f9ebfa5aebf2"
   end
 
   resource "httplib2" do
@@ -157,8 +157,8 @@ class Dcosdocker < Formula
   end
 
   resource "keyring" do
-    url "https://files.pythonhosted.org/packages/af/2c/bc380af0b877ccea570aadd428ae4f8f277782c4b9a11d1236ec6a2d822e/keyring-12.1.0.tar.gz"
-    sha256 "4b098f23d78e1bf8517b75a808bb0150c31c7c105bb86e159245e493acbd22aa"
+    url "https://files.pythonhosted.org/packages/a9/67/b2b53b157abf5973f795d6859f892a1dc2ac4ab1a232f57b34547be558eb/keyring-12.2.0.tar.gz"
+    sha256 "4a639773932525ff25225cace20e74580403715b3e00a8ea94a7b121dad1cfac"
   end
 
   resource "more-itertools" do
