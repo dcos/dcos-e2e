@@ -13,7 +13,7 @@ This backend has been tested with a four node cluster with 9 GB memory given to 
 IP Routing Set Up for Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On Docker for Mac this requires a tool such as `docker-mac-network <https://github.com/wojas/docker-mac-network>`__.
+Once the CLI is installed, run ``dcos-docker setup-mac-network``.
 
 ``ssh``
 ~~~~~~~
