@@ -102,11 +102,12 @@ def create_github_release(
     github_client = Github(github_token)
     org = github_client.get_organization('mesosphere')
     repository = org.get_repo('dcos-e2e')
+    changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
     repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
         release_name='Release ' + version,
-        release_message='Release ' + version,
+        release_message='See ' + changelog_url,
         type='commit',
         object=repository.get_commits()[0].sha,
     )
