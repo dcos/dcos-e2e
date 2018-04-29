@@ -197,3 +197,44 @@ def validate_volumes(
 
         volumes[host_src] = {'bind': container_dst, 'mode': mode}
     return volumes
+
+
+def validate_ovpn_file_does_not_exist(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Path:
+    """
+    If the given file path exists already, show an error message explaining how
+    to use the file as an OpenVPN configuration.
+    """
+    path = Path(value).expanduser()
+    if path.is_dir():
+        path = path / 'docker-for-mac.ovpn'
+
+    for _ in (ctx, param):
+        pass
+
+    message = (
+        '"{value}" already exists so no new OpenVPN configuration was '
+        'created.'
+        '\n'
+        '\n'
+        'To use {value}:'
+        '\n'
+        '1. Install an OpenVPN client such as Tunnelblick '
+        '(https://tunnelblick.net/downloads.html) '
+        'or Shimo (https://www.shimovpn.com).'
+        '\n'
+        '2. Run "open {value}".'
+        '\n'
+        '3. In your OpenVPN client, connect to the new "docker-for-mac" '
+        'profile.'
+        '\n'
+        '4. Run "dcos-docker doctor" to confirm that everything is working.'
+    ).format(value=value)
+
+    if path.exists():
+        raise click.BadParameter(message=message)
+
+    return path
