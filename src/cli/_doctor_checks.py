@@ -221,7 +221,7 @@ def check_networking() -> CheckLevels:
     except subprocess.CalledProcessError:
         message = 'Cannot connect to a Docker container by its IP address.'
         if docker_for_mac:
-            message += ' We recommend using "dcos-docker setup-mac-network"'
+            message += ' We recommend using "dcos-docker setup-mac-network".'
         _error(message=message)
         highest_level = CheckLevels.ERROR
 
