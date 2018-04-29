@@ -1084,6 +1084,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
             # TODO: List containers with this port allocated
             click.echo(message, err=True)
             sys.exit(1)
+        raise
 
     client.containers.run(
         image='kylemanna/openvpn',
