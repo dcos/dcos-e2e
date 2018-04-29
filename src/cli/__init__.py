@@ -1071,7 +1071,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
             ports=proxy_ports,
             detach=True,
             restart_policy=restart_policy,
-            name='dcos_e2e-proxy'
+            name='dcos_e2e-proxy',
         )
     except docker.errors.APIError as exc:
         if 'port is already allocated' in exc.explanation:
@@ -1129,4 +1129,3 @@ def setup_mac_network(configuration_dst: Path) -> None:
     ).format(configuration_dst=configuration_dst)
 
     click.echo(message=message)
-    # TODO message in dcos-docker doctor
