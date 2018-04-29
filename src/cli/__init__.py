@@ -1079,7 +1079,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
     except docker.errors.APIError as exc:
         if exc.status_code == 409:
             message = (
-                'A proxy container is already running. '
+                'Error: A proxy container is already running. '
                 'To remove this container, run: '
                 '"docker rm -f {proxy_container_name}"'
             ).format(proxy_container_name=proxy_container_name)
