@@ -1051,6 +1051,8 @@ def setup_mac_network(configuration_dst: Path) -> None:
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
     docker_mac_network = TemporaryDirectory()
+    # Use a copy of the clone so that the clone cannot be corrupted for the
+    # next run.
     copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
     docker_image_tag = 'dcos-e2e/proxy'
@@ -1063,6 +1065,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
+    proxy_container_name = 'dcos_e2e-proxy'
 
     try:
         client.containers.run(
@@ -1071,17 +1074,15 @@ def setup_mac_network(configuration_dst: Path) -> None:
             ports=proxy_ports,
             detach=True,
             restart_policy=restart_policy,
-            name='dcos_e2e-proxy',
+            name=proxy_container_name,
         )
     except docker.errors.APIError as exc:
-        if 'port is already allocated' in exc.explanation:
+        if exc.status_code == 409:
             message = (
-                'Cannot start proxy container as a required port is already '
-                'allocated. '
-                'Remove the container with port 13194 allocated. '
-                'This may be a container with the image "{docker_image_tag}". '
-            ).format(docker_image_tag=docker_image_tag)
-            # TODO: List containers with this port allocated
+                'A proxy container is already running. '
+                'To remove this container, run: '
+                '"docker rm -f {proxy_container_name}"'
+            ).format(proxy_container_name=proxy_container_name)
             click.echo(message, err=True)
             sys.exit(1)
         raise
