@@ -14,7 +14,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copy, rmtree
 from subprocess import CalledProcessError
-from tempfile import gettempdir
+from tempfile import gettempdir, TemporaryDirectory
 from typing import (  # noqa: F401
     Any,
     Callable,
@@ -1050,8 +1050,9 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
+    docker_mac_network = TemporaryDirectory()
+    copy(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
-    # ToDO Copy clone to new temporary directory
     docker_image_tag = 'dcos-e2e/proxy'
     client.images.build(
         path=str(docker_mac_network_clone),
@@ -1104,13 +1105,14 @@ def setup_mac_network(configuration_dst: Path) -> None:
         },
     )
 
+    configuration_src = Path(docker_mac_network_clone / ovpn_filename)
+
     with click_spinner.spinner():
         while True:
             time.sleep(1)
             if configuration_src.exists():
                 break
 
-    configuration_src = Path(docker_mac_network_clone / ovpn_filename)
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
     message = (
