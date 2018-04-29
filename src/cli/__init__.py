@@ -1081,7 +1081,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
                 'Remove the container with port 13194 allocated. '
                 'This may be a container with the image "{docker_image_tag}". '
             ).format(docker_image_tag=docker_image_tag)
-            # TODO: List containers with this tag
+            # TODO: List containers with this port allocated
             click.echo(message, err=True)
             # sys.exit(1)
 
