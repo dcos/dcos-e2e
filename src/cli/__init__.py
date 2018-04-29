@@ -1083,7 +1083,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
             ).format(docker_image_tag=docker_image_tag)
             # TODO: List containers with this port allocated
             click.echo(message, err=True)
-            # sys.exit(1)
+            sys.exit(1)
 
     client.containers.run(
         image='kylemanna/openvpn',
