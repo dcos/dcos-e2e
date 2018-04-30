@@ -1053,7 +1053,27 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     """
     if force:
         destroy_mac_network_containers()
-    create_mac_network(configuration_dst=configuration_dst)
+
+    with click_spinner.spinner():
+        create_mac_network(configuration_dst=configuration_dst)
+
+    message = (
+        '1. Install an OpenVPN client such as Tunnelblick '
+        '(https://tunnelblick.net/downloads.html) '
+        'or Shimo (https://www.shimovpn.com).'
+        '\n'
+        '2. Run "open {configuration_dst}".'
+        '\n'
+        '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
+        'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
+        '\n'
+        '4. In your OpenVPN client, connect to the new "docker-for-mac" '
+        'profile.'
+        '\n'
+        '5. Run "dcos-docker doctor" to confirm that everything is working.'
+    ).format(configuration_dst=configuration_dst)
+
+    click.echo(message=message)
 
 
 @dcos_docker.command('destroy-mac-network')
