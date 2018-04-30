@@ -934,7 +934,7 @@ class TestSetupMacNetwork():
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos-docker run --help`.
+        Help text is shown with `dcos-docker setup-mac-network --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -973,7 +973,7 @@ class TestDestroyMacNetwork():
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos-docker run --help`.
+        Help text is shown with `dcos-docker destroy-mac-network --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -987,6 +987,12 @@ class TestDestroyMacNetwork():
         # yapf: disable
         expected_help = dedent(
             """\
+            Usage: dcos-docker destroy-mac-network [OPTIONS]
+
+              Destroy containers created by "dcos-docker setup-mac-network".
+
+            Options:
+              --help  Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
