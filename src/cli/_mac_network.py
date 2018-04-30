@@ -138,3 +138,17 @@ def create_mac_network(configuration_dst: Path) -> None:
     ).format(configuration_dst=configuration_dst)
 
     click.echo(message=message)
+
+
+def destroy_mac_network() -> None:
+    """
+    XXX
+    """
+    for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
+        pass
+
+    message = (
+        ''
+    )
+
+    click.echo(message=message)
