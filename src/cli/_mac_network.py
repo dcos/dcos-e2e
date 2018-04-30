@@ -106,7 +106,7 @@ def create_mac_network(configuration_dst: Path) -> None:
                 'Error: A DC/OS E2E OpenVPN container is already running. '
                 'To remove this container, run: '
                 '"docker rm -f {openvpn_container_name}".'
-            ).format(proxy_container_name=_OPENVPN_CONTAINER_NAME)
+            ).format(openvpn_container_name=_OPENVPN_CONTAINER_NAME)
             click.echo(message, err=True)
             sys.exit(1)
         raise
