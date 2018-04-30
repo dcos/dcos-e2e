@@ -1054,8 +1054,19 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     if force:
         destroy_mac_network_containers()
 
-    with click_spinner.spinner():
-        create_mac_network(configuration_dst=configuration_dst)
+    try:
+        with click_spinner.spinner():
+            create_mac_network(configuration_dst=configuration_dst)
+    except docker.errors.APIError as exc:
+        import pdb; pdb.set_trace()
+        if exc.status_code == 409:
+            message = (
+                'Error: A DC/OS E2E OpenVPN container is already running. '
+                'Use --force to destroy conflicting containers.'
+            )
+            click.echo(message, err=True)
+            sys.exit(1)
+        raise
 
     message = (
         '1. Install an OpenVPN client such as Tunnelblick '
