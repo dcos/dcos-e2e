@@ -53,6 +53,7 @@ noqa
 oauth
 os
 oss
+ovpn
 parallelizable
 parallelization
 parameterization
