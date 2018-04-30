@@ -140,7 +140,7 @@ def create_mac_network(configuration_dst: Path) -> None:
 
 def destroy_mac_network_containers() -> None:
     """
-    Destroy containers created by "dcos-docker setup-mac-network".
+    Destroy containers created by ``dcos-docker setup-mac-network``.
     """
     client = docker.from_env(version='auto')
     for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
