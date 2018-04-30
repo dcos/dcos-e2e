@@ -140,10 +140,12 @@ def create_mac_network(configuration_dst: Path) -> None:
 
 def destroy_mac_network() -> None:
     """
-    XXX
+    Destroy containers created by "dcos-docker setup-mac-network".
     """
+    client = docker.from_env(version='auto')
     for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
-        pass
+        container = client.containers.get(name=name)
+        container.remove(name=name, v=True, force=True)
 
     message = (
         'The containers used to allow access to Docker for Mac\'s internal '
