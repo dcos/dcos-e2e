@@ -138,7 +138,7 @@ def create_mac_network(configuration_dst: Path) -> None:
     click.echo(message=message)
 
 
-def destroy_mac_network() -> None:
+def destroy_mac_network_containers() -> None:
     """
     Destroy containers created by "dcos-docker setup-mac-network".
     """

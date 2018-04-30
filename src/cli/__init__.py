@@ -62,7 +62,7 @@ from ._doctor_checks import (
     check_tmp_free_space,
     link_to_troubleshooting,
 )
-from ._mac_network import create_mac_network
+from ._mac_network import create_mac_network, destroy_mac_network_containers
 from ._utils import is_enterprise
 from ._validators import (
     validate_cluster_exists,
@@ -1044,3 +1044,11 @@ def setup_mac_network(configuration_dst: Path) -> None:
     This creates an OpenVPN configuration file and describes how to use it.
     """
     create_mac_network(configuration_dst=configuration_dst)
+
+
+@dcos_docker.command('destroy-mac-network')
+def destroy_mac_network() -> None:
+    """
+    Destroy containers created by "dcos-docker setup-mac-network".
+    """
+    destroy_mac_network_containers()
