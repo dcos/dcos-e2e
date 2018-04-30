@@ -1051,7 +1051,9 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
 
     This creates an OpenVPN configuration file and describes how to use it.
     """
-    create_mac_network(configuration_dst=configuration_dst, force=force)
+    if force:
+        destroy_mac_network_containers()
+    create_mac_network(configuration_dst=configuration_dst)
 
 
 @dcos_docker.command('destroy-mac-network')
@@ -1060,3 +1062,13 @@ def destroy_mac_network() -> None:
     Destroy containers created by "dcos-docker setup-mac-network".
     """
     destroy_mac_network_containers()
+    message = (
+        'The containers used to allow access to Docker for Mac\'s internal '
+        'networks have been removed.'
+        '\n'
+        '\n'
+        'It may be the case that the "docker-for-mac" profile still exists in '
+        'your OpenVPN client.'
+    )
+
+    click.echo(message=message)

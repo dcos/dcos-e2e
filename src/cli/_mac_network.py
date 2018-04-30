@@ -150,14 +150,3 @@ def destroy_mac_network_containers() -> None:
             pass
         else:
             container.remove(v=True, force=True)
-
-    message = (
-        'The containers used to allow access to Docker for Mac\'s internal '
-        'networks have been removed.'
-        '\n'
-        '\n'
-        'It may be the case that the "docker-for-mac" profile still exists in '
-        'your OpenVPN client.'
-    )
-
-    click.echo(message=message)

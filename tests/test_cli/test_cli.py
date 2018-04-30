@@ -75,17 +75,18 @@ class TestDcosDocker:
               --help         Show this message and exit.
 
             Commands:
-              create             Create a DC/OS cluster.
-              destroy            Destroy a cluster.
-              destroy-list       Destroy clusters.
-              doctor             Diagnose common issues which stop DC/OS E2E...
-              inspect            Show cluster details.
-              list               List all clusters.
-              run                Run an arbitrary command on a node.
-              setup-mac-network  Set up a network to connect to nodes on...
-              sync               Sync files from a DC/OS checkout to master...
-              wait               Wait for DC/OS to start.
-              web                Open the browser at the web UI.
+              create               Create a DC/OS cluster.
+              destroy              Destroy a cluster.
+              destroy-list         Destroy clusters.
+              destroy-mac-network  Destroy containers created by "dcos-docker...
+              doctor               Diagnose common issues which stop DC/OS E2E...
+              inspect              Show cluster details.
+              list                 List all clusters.
+              run                  Run an arbitrary command on a node.
+              setup-mac-network    Set up a network to connect to nodes on...
+              sync                 Sync files from a DC/OS checkout to master...
+              wait                 Wait for DC/OS to start.
+              web                  Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
