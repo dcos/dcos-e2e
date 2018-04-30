@@ -5,7 +5,7 @@ Tools for managing networking for Docker for Mac.
 import sys
 import time
 from pathlib import Path
-from shutil import copy, copytree
+from shutil import copy, copytree, rmtree
 from tempfile import TemporaryDirectory
 from typing import (  # noqa: F401
     Any,
@@ -35,9 +35,11 @@ def create_mac_network(configuration_dst: Path) -> None:
 
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
-    docker_mac_network = Path(TemporaryDirectory().name).resolve()
+    tmpdir = TemporaryDirectory()
+    docker_mac_network = Path(tmpdir.name).resolve()
     # Use a copy of the clone so that the clone cannot be corrupted for the
     # next run.
+    rmtree(path=tmpdir.name)
     copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
     docker_image_tag = 'dcos-e2e/proxy'
@@ -66,7 +68,7 @@ def create_mac_network(configuration_dst: Path) -> None:
             message = (
                 'Error: A proxy container is already running. '
                 'To remove this container, run: '
-                '"docker rm -f {proxy_container_name}"'
+                '"docker rm -f {proxy_container_name}".'
             ).format(proxy_container_name=proxy_container_name)
             click.echo(message, err=True)
             sys.exit(1)
