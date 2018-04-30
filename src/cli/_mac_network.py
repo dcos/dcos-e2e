@@ -69,9 +69,8 @@ def create_mac_network(configuration_dst: Path) -> None:
         if exc.status_code == 409:
             message = (
                 'Error: A proxy container is already running. '
-                'To remove this container, run: '
-                '"docker rm -f {proxy_container_name}".'
-            ).format(proxy_container_name=_PROXY_CONTAINER_NAME)
+                'Run "dcos-docker destroy-mac-network".'
+            )
             click.echo(message, err=True)
             sys.exit(1)
         raise
@@ -104,9 +103,8 @@ def create_mac_network(configuration_dst: Path) -> None:
         if exc.status_code == 409:
             message = (
                 'Error: A DC/OS E2E OpenVPN container is already running. '
-                'To remove this container, run: '
-                '"docker rm -f {openvpn_container_name}".'
-            ).format(openvpn_container_name=_OPENVPN_CONTAINER_NAME)
+                'Run "dcos-docker destroy-mac-network".'
+            )
             click.echo(message, err=True)
             sys.exit(1)
         raise
