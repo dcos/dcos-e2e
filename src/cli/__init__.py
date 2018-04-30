@@ -1036,6 +1036,11 @@ def doctor() -> None:
     show_default=True,
     help='The location to create an OpenVPN configuration file.',
 )
+@click.option(
+    '--force',
+    is_flag=True,
+    help='HELLO',
+)
 @dcos_docker.command('setup-mac-network')
 def setup_mac_network(configuration_dst: Path) -> None:
     """
