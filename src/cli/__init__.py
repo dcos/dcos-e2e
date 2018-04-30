@@ -1058,10 +1058,9 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
         with click_spinner.spinner():
             create_mac_network(configuration_dst=configuration_dst)
     except docker.errors.APIError as exc:
-        import pdb; pdb.set_trace()
         if exc.status_code == 409:
             message = (
-                'Error: A DC/OS E2E OpenVPN container is already running. '
+                'Error: A DC/OS E2E network container is already running. '
                 'Use --force to destroy conflicting containers.'
             )
             click.echo(message, err=True)
