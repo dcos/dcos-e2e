@@ -23,8 +23,8 @@ import click
 import click_spinner
 import docker
 
-_PROXY_CONTAINER_NAME = 'dcos-e2e/proxy'
-_OPENVPN_CONTAINER_NAME = 'dcos-e2e/openvpn'
+_PROXY_CONTAINER_NAME = 'dcos-e2e-proxy'
+_OPENVPN_CONTAINER_NAME = 'dcos-e2e-openvpn'
 
 
 def create_mac_network(configuration_dst: Path) -> None:
