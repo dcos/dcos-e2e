@@ -952,10 +952,41 @@ class TestSetupMacNetwork():
 
               Set up a network to connect to nodes on macOS.
 
+              This creates an OpenVPN configuration file and describes how to use it.
+
             Options:
-              --configuration-dst PATH  The destination   [default: ~/Documents/docker-for-
-                                        mac.ovpn]
+              --force                   Overwrite any files and destroy conflicting
+                                        containers from previous uses of this command.
+              --configuration-dst PATH  The location to create an OpenVPN configuration
+                                        file.  [default: ~/Documents/docker-for-mac.ovpn]
               --help                    Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestDestroyMacNetwork():
+    """
+    Tests for the ``destroy-mac-network`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker run --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-mac-network', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
             """,# noqa: E501,E261
         )
         # yapf: enable
