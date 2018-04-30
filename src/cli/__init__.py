@@ -1039,16 +1039,19 @@ def doctor() -> None:
 @click.option(
     '--force',
     is_flag=True,
-    help='HELLO',
+    help=(
+        'Overwrite any files and destroy conflicting containers from previous '
+        'uses of this command.'
+    ),
 )
 @dcos_docker.command('setup-mac-network')
-def setup_mac_network(configuration_dst: Path) -> None:
+def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     """
     Set up a network to connect to nodes on macOS.
 
     This creates an OpenVPN configuration file and describes how to use it.
     """
-    create_mac_network(configuration_dst=configuration_dst)
+    create_mac_network(configuration_dst=configuration_dst, force=force)
 
 
 @dcos_docker.command('destroy-mac-network')
