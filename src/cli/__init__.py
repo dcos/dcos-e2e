@@ -1111,9 +1111,9 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     with click_spinner.spinner():
         while True:
-            time.sleep(1)
             if configuration_src.exists():
                 break
+            time.sleep(1)
 
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
