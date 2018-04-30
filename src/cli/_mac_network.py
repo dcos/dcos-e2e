@@ -69,9 +69,8 @@ def create_mac_network(configuration_dst: Path) -> None:
         if exc.status_code == 409:
             message = (
                 'Error: A proxy container is already running. '
-                'To remove this container, run: '
-                '"docker rm -f {proxy_container_name}".'
-            ).format(proxy_container_name=_PROXY_CONTAINER_NAME)
+                'Run "dcos-docker destroy-mac-network".'
+            )
             click.echo(message, err=True)
             sys.exit(1)
         raise
@@ -104,9 +103,8 @@ def create_mac_network(configuration_dst: Path) -> None:
         if exc.status_code == 409:
             message = (
                 'Error: A DC/OS E2E OpenVPN container is already running. '
-                'To remove this container, run: '
-                '"docker rm -f {openvpn_container_name}".'
-            ).format(openvpn_container_name=_OPENVPN_CONTAINER_NAME)
+                'Run "dcos-docker destroy-mac-network".'
+            )
             click.echo(message, err=True)
             sys.exit(1)
         raise
@@ -136,5 +134,30 @@ def create_mac_network(configuration_dst: Path) -> None:
         '\n'
         '5. Run "dcos-docker doctor" to confirm that everything is working.'
     ).format(configuration_dst=configuration_dst)
+
+    click.echo(message=message)
+
+
+def destroy_mac_network_containers() -> None:
+    """
+    Destroy containers created by ``dcos-docker setup-mac-network``.
+    """
+    client = docker.from_env(version='auto')
+    for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
+        try:
+            container = client.containers.get(container_id=name)
+        except docker.errors.NotFound:
+            pass
+        else:
+            container.remove(v=True, force=True)
+
+    message = (
+        'The containers used to allow access to Docker for Mac\'s internal '
+        'networks have been removed.'
+        '\n'
+        '\n'
+        'It may be the case that the "docker-for-mac" profile still exists in '
+        'your OpenVPN client.'
+    )
 
     click.echo(message=message)
