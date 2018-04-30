@@ -2,7 +2,6 @@
 Tools for managing networking for Docker for Mac.
 """
 
-import sys
 import time
 from pathlib import Path
 from shutil import copy, copytree, rmtree
