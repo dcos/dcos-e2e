@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.04.30.2
+------------
+
 - Added ``dcos-docker destroy-mac-network`` command.
 
 2018.04.29.0
