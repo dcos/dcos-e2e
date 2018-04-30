@@ -23,6 +23,9 @@ import click
 import click_spinner
 import docker
 
+_PROXY_CONTAINER_NAME = 'dcos-e2e-proxy'
+_OPENVPN_CONTAINER_NAME = 'dcos-e2e-openvpn'
+
 
 def create_mac_network(configuration_dst: Path) -> None:
     """
@@ -52,7 +55,6 @@ def create_mac_network(configuration_dst: Path) -> None:
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
-    proxy_container_name = 'dcos_e2e-proxy'
 
     try:
         client.containers.run(
@@ -61,7 +63,7 @@ def create_mac_network(configuration_dst: Path) -> None:
             ports=proxy_ports,
             detach=True,
             restart_policy=restart_policy,
-            name=proxy_container_name,
+            name=_PROXY_CONTAINER_NAME,
         )
     except docker.errors.APIError as exc:
         if exc.status_code == 409:
@@ -69,33 +71,45 @@ def create_mac_network(configuration_dst: Path) -> None:
                 'Error: A proxy container is already running. '
                 'To remove this container, run: '
                 '"docker rm -f {proxy_container_name}".'
-            ).format(proxy_container_name=proxy_container_name)
+            ).format(proxy_container_name=_PROXY_CONTAINER_NAME)
             click.echo(message, err=True)
             sys.exit(1)
         raise
 
-    client.containers.run(
-        image='kylemanna/openvpn',
-        restart_policy=restart_policy,
-        cap_add=['NET_ADMIN'],
-        environment={
-            'dest': 'docker-for-mac.ovpn',
-            'DEBUG': 1,
-        },
-        command='/local/helpers/run.sh',
-        network_mode='host',
-        detach=True,
-        volumes={
-            str(docker_mac_network): {
-                'bind': '/local',
-                'mode': 'rw',
+    try:
+        client.containers.run(
+            image='kylemanna/openvpn',
+            restart_policy=restart_policy,
+            cap_add=['NET_ADMIN'],
+            environment={
+                'dest': 'docker-for-mac.ovpn',
+                'DEBUG': 1,
             },
-            str(docker_mac_network / 'config'): {
-                'bind': '/etc/openvpn',
-                'mode': 'rw',
+            command='/local/helpers/run.sh',
+            network_mode='host',
+            detach=True,
+            volumes={
+                str(docker_mac_network): {
+                    'bind': '/local',
+                    'mode': 'rw',
+                },
+                str(docker_mac_network / 'config'): {
+                    'bind': '/etc/openvpn',
+                    'mode': 'rw',
+                },
             },
-        },
-    )
+            name=_OPENVPN_CONTAINER_NAME,
+        )
+    except docker.errors.APIError as exc:
+        if exc.status_code == 409:
+            message = (
+                'Error: A DC/OS E2E OpenVPN container is already running. '
+                'To remove this container, run: '
+                '"docker rm -f {openvpn_container_name}".'
+            ).format(openvpn_container_name=_OPENVPN_CONTAINER_NAME)
+            click.echo(message, err=True)
+            sys.exit(1)
+        raise
 
     configuration_src = Path(docker_mac_network / 'docker-for-mac.ovpn')
 
