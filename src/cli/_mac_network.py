@@ -144,8 +144,12 @@ def destroy_mac_network_containers() -> None:
     """
     client = docker.from_env(version='auto')
     for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
-        container = client.containers.get(name=name)
-        container.remove(name=name, v=True, force=True)
+        try:
+            container = client.containers.get(container_id=name)
+        except docker.errors.NotFound:
+            pass
+        else:
+            container.remove(v=True, force=True)
 
     message = (
         'The containers used to allow access to Docker for Mac\'s internal '
