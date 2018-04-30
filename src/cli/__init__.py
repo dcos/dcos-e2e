@@ -62,6 +62,7 @@ from ._doctor_checks import (
     check_tmp_free_space,
     link_to_troubleshooting,
 )
+from ._mac_network import create_mac_network
 from ._utils import is_enterprise
 from ._validators import (
     validate_cluster_exists,
@@ -1042,4 +1043,4 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     This creates an OpenVPN configuration file and describes how to use it.
     """
-    mac_network_utils.setup_mac_network(configuration_dst=configuration_dst, )
+    create_mac_network(configuration_dst=configuration_dst)

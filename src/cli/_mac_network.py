@@ -24,7 +24,7 @@ import click_spinner
 import docker
 
 
-def setup_mac_network(configuration_dst: Path) -> None:
+def create_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
 
@@ -35,7 +35,7 @@ def setup_mac_network(configuration_dst: Path) -> None:
 
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
-    docker_mac_network = Path(str(TemporaryDirectory()))
+    docker_mac_network = Path(TemporaryDirectory().name).resolve()
     # Use a copy of the clone so that the clone cannot be corrupted for the
     # next run.
     copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
