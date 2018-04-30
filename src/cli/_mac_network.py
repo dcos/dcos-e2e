@@ -80,7 +80,7 @@ def create_mac_network(configuration_dst: Path) -> None:
         cap_add=['NET_ADMIN'],
         environment={
             'dest': 'docker-for-mac.ovpn',
-            'DEBUG': 1
+            'DEBUG': 1,
         },
         command='/local/helpers/run.sh',
         network_mode='host',
