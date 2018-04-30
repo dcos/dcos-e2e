@@ -284,3 +284,8 @@ CLI Reference
 
 .. click:: cli:setup_mac_network
   :prog: dcos-docker setup-mac-network
+
+.. _dcos-docker-destroy-mac-network:
+
+.. click:: cli:destroy_mac_network
+  :prog: dcos-docker destroy-mac-network
