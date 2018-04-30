@@ -8,13 +8,12 @@ import logging
 import subprocess
 import sys
 import tarfile
-import time
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from shutil import copy, rmtree, copytree
+from shutil import rmtree
 from subprocess import CalledProcessError
-from tempfile import gettempdir, TemporaryDirectory
+from tempfile import gettempdir
 from typing import (  # noqa: F401
     Any,
     Callable,
@@ -63,6 +62,7 @@ from ._doctor_checks import (
     check_tmp_free_space,
     link_to_troubleshooting,
 )
+from ._mac_network import create_mac_network
 from ._utils import is_enterprise
 from ._validators import (
     validate_cluster_exists,
@@ -1034,103 +1034,13 @@ def doctor() -> None:
     default='~/Documents/docker-for-mac.ovpn',
     callback=validate_ovpn_file_does_not_exist,
     show_default=True,
-    help=(
-        'The destination '
-    ),
+    help='The location to create an OpenVPN configuration file.',
 )
 @dcos_docker.command('setup-mac-network')
 def setup_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
+
+    This creates an OpenVPN configuration file and describes how to use it.
     """
-    client = docker.from_env(version='auto')
-    restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
-
-    ovpn_filename = 'docker-for-mac.ovpn'
-
-    clone_name = 'docker-mac-network-master'
-    docker_mac_network_clone = Path(__file__).parent / clone_name
-    docker_mac_network = TemporaryDirectory()
-    # Use a copy of the clone so that the clone cannot be corrupted for the
-    # next run.
-    copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
-
-    docker_image_tag = 'dcos-e2e/proxy'
-    client.images.build(
-        path=str(docker_mac_network_clone),
-        rm=True,
-        forcerm=True,
-        tag=docker_image_tag,
-    )
-
-    proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
-    proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
-    proxy_container_name = 'dcos_e2e-proxy'
-
-    try:
-        client.containers.run(
-            image=docker_image_tag,
-            command=proxy_command,
-            ports=proxy_ports,
-            detach=True,
-            restart_policy=restart_policy,
-            name=proxy_container_name,
-        )
-    except docker.errors.APIError as exc:
-        if exc.status_code == 409:
-            message = (
-                'Error: A proxy container is already running. '
-                'To remove this container, run: '
-                '"docker rm -f {proxy_container_name}"'
-            ).format(proxy_container_name=proxy_container_name)
-            click.echo(message, err=True)
-            sys.exit(1)
-        raise
-
-    client.containers.run(
-        image='kylemanna/openvpn',
-        restart_policy=restart_policy,
-        cap_add=['NET_ADMIN'],
-        environment={'dest': 'docker-for-mac.ovpn', 'DEBUG': 1},
-        command='/local/helpers/run.sh',
-        network_mode='host',
-        detach=True,
-        volumes={
-            str(docker_mac_network_clone): {
-                'bind': '/local',
-                'mode': 'rw',
-            },
-            str(docker_mac_network_clone / 'config'): {
-                'bind': '/etc/openvpn',
-                'mode': 'rw',
-            },
-        },
-    )
-
-    configuration_src = Path(docker_mac_network_clone / ovpn_filename)
-
-    with click_spinner.spinner():
-        while True:
-            time.sleep(1)
-            if configuration_src.exists():
-                break
-
-    copy(src=str(configuration_src), dst=str(configuration_dst))
-
-    message = (
-        '1. Install an OpenVPN client such as Tunnelblick '
-        '(https://tunnelblick.net/downloads.html) '
-        'or Shimo (https://www.shimovpn.com).'
-        '\n'
-        '2. Run "open {configuration_dst}".'
-        '\n'
-        '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
-        'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
-        '\n'
-        '4. In your OpenVPN client, connect to the new "docker-for-mac" '
-        'profile.'
-        '\n'
-        '5. Run "dcos-docker doctor" to confirm that everything is working.'
-    ).format(configuration_dst=configuration_dst)
-
-    click.echo(message=message)
+    create_mac_network(configuration_dst=configuration_dst)
