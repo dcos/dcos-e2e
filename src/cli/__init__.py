@@ -1034,7 +1034,7 @@ def doctor() -> None:
     default='~/Documents/docker-for-mac.ovpn',
     callback=validate_ovpn_file_does_not_exist,
     show_default=True,
-    help=('The location to create an OpenVPN configuration file.'),
+    help='The location to create an OpenVPN configuration file.',
 )
 @dcos_docker.command('setup-mac-network')
 def setup_mac_network(configuration_dst: Path) -> None:
