@@ -2,7 +2,6 @@
 Tools for managing networking for Docker for Mac.
 """
 
-import sys
 import time
 from pathlib import Path
 from shutil import copy, copytree, rmtree
@@ -19,8 +18,6 @@ from typing import (  # noqa: F401
     Union,
 )
 
-import click
-import click_spinner
 import docker
 
 _PROXY_CONTAINER_NAME = 'dcos-e2e-proxy'
@@ -56,86 +53,47 @@ def create_mac_network(configuration_dst: Path) -> None:
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
 
-    try:
-        client.containers.run(
-            image=docker_image_tag,
-            command=proxy_command,
-            ports=proxy_ports,
-            detach=True,
-            restart_policy=restart_policy,
-            name=_PROXY_CONTAINER_NAME,
-        )
-    except docker.errors.APIError as exc:
-        if exc.status_code == 409:
-            message = (
-                'Error: A proxy container is already running. '
-                'Run "dcos-docker destroy-mac-network".'
-            )
-            click.echo(message, err=True)
-            sys.exit(1)
-        raise
+    client.containers.run(
+        image=docker_image_tag,
+        command=proxy_command,
+        ports=proxy_ports,
+        detach=True,
+        restart_policy=restart_policy,
+        name=_PROXY_CONTAINER_NAME,
+    )
 
-    try:
-        client.containers.run(
-            image='kylemanna/openvpn',
-            restart_policy=restart_policy,
-            cap_add=['NET_ADMIN'],
-            environment={
-                'dest': 'docker-for-mac.ovpn',
-                'DEBUG': 1,
+    client.containers.run(
+        image='kylemanna/openvpn',
+        restart_policy=restart_policy,
+        cap_add=['NET_ADMIN'],
+        environment={
+            'dest': 'docker-for-mac.ovpn',
+            'DEBUG': 1,
+        },
+        command='/local/helpers/run.sh',
+        network_mode='host',
+        detach=True,
+        volumes={
+            str(docker_mac_network): {
+                'bind': '/local',
+                'mode': 'rw',
             },
-            command='/local/helpers/run.sh',
-            network_mode='host',
-            detach=True,
-            volumes={
-                str(docker_mac_network): {
-                    'bind': '/local',
-                    'mode': 'rw',
-                },
-                str(docker_mac_network / 'config'): {
-                    'bind': '/etc/openvpn',
-                    'mode': 'rw',
-                },
+            str(docker_mac_network / 'config'): {
+                'bind': '/etc/openvpn',
+                'mode': 'rw',
             },
-            name=_OPENVPN_CONTAINER_NAME,
-        )
-    except docker.errors.APIError as exc:
-        if exc.status_code == 409:
-            message = (
-                'Error: A DC/OS E2E OpenVPN container is already running. '
-                'Run "dcos-docker destroy-mac-network".'
-            )
-            click.echo(message, err=True)
-            sys.exit(1)
-        raise
+        },
+        name=_OPENVPN_CONTAINER_NAME,
+    )
 
     configuration_src = Path(docker_mac_network / 'docker-for-mac.ovpn')
 
-    with click_spinner.spinner():
-        while True:
-            if configuration_src.exists():
-                break
-            time.sleep(1)
+    while True:
+        if configuration_src.exists():
+            break
+        time.sleep(1)
 
     copy(src=str(configuration_src), dst=str(configuration_dst))
-
-    message = (
-        '1. Install an OpenVPN client such as Tunnelblick '
-        '(https://tunnelblick.net/downloads.html) '
-        'or Shimo (https://www.shimovpn.com).'
-        '\n'
-        '2. Run "open {configuration_dst}".'
-        '\n'
-        '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
-        'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
-        '\n'
-        '4. In your OpenVPN client, connect to the new "docker-for-mac" '
-        'profile.'
-        '\n'
-        '5. Run "dcos-docker doctor" to confirm that everything is working.'
-    ).format(configuration_dst=configuration_dst)
-
-    click.echo(message=message)
 
 
 def destroy_mac_network_containers() -> None:
@@ -150,14 +108,3 @@ def destroy_mac_network_containers() -> None:
             pass
         else:
             container.remove(v=True, force=True)
-
-    message = (
-        'The containers used to allow access to Docker for Mac\'s internal '
-        'networks have been removed.'
-        '\n'
-        '\n'
-        'It may be the case that the "docker-for-mac" profile still exists in '
-        'your OpenVPN client.'
-    )
-
-    click.echo(message=message)

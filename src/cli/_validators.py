@@ -208,6 +208,7 @@ def validate_ovpn_file_does_not_exist(
     If the given file path exists already, show an error message explaining how
     to use the file as an OpenVPN configuration.
     """
+    force = ctx.params['force']
     path = Path(value).expanduser()
     if path.is_dir():
         path = path / 'docker-for-mac.ovpn'
@@ -234,7 +235,7 @@ def validate_ovpn_file_does_not_exist(
         '4. Run "dcos-docker doctor" to confirm that everything is working.'
     ).format(value=value)
 
-    if path.exists():
+    if path.exists() and not force:
         raise click.BadParameter(message=message)
 
     return path

@@ -10,6 +10,8 @@ Next
 ------------
 
 - Added ``dcos-docker destroy-mac-network`` command.
+- Added a ``--force`` parameter to ``dcos-docker setup-mac-network`` to
+  override files and containers.
 
 2018.04.29.0
 ------------

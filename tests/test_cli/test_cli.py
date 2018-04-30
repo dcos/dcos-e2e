@@ -75,17 +75,18 @@ class TestDcosDocker:
               --help         Show this message and exit.
 
             Commands:
-              create             Create a DC/OS cluster.
-              destroy            Destroy a cluster.
-              destroy-list       Destroy clusters.
-              doctor             Diagnose common issues which stop DC/OS E2E...
-              inspect            Show cluster details.
-              list               List all clusters.
-              run                Run an arbitrary command on a node.
-              setup-mac-network  Set up a network to connect to nodes on...
-              sync               Sync files from a DC/OS checkout to master...
-              wait               Wait for DC/OS to start.
-              web                Open the browser at the web UI.
+              create               Create a DC/OS cluster.
+              destroy              Destroy a cluster.
+              destroy-list         Destroy clusters.
+              destroy-mac-network  Destroy containers created by "dcos-docker...
+              doctor               Diagnose common issues which stop DC/OS E2E...
+              inspect              Show cluster details.
+              list                 List all clusters.
+              run                  Run an arbitrary command on a node.
+              setup-mac-network    Set up a network to connect to nodes on...
+              sync                 Sync files from a DC/OS checkout to master...
+              wait                 Wait for DC/OS to start.
+              web                  Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -933,7 +934,7 @@ class TestSetupMacNetwork():
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos-docker run --help`.
+        Help text is shown with `dcos-docker setup-mac-network --help`.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -951,10 +952,47 @@ class TestSetupMacNetwork():
 
               Set up a network to connect to nodes on macOS.
 
+              This creates an OpenVPN configuration file and describes how to use it.
+
             Options:
-              --configuration-dst PATH  The destination   [default: ~/Documents/docker-for-
-                                        mac.ovpn]
+              --force                   Overwrite any files and destroy conflicting
+                                        containers from previous uses of this command.
+              --configuration-dst PATH  The location to create an OpenVPN configuration
+                                        file.  [default: ~/Documents/docker-for-mac.ovpn]
               --help                    Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestDestroyMacNetwork():
+    """
+    Tests for the ``destroy-mac-network`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker destroy-mac-network --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-mac-network', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker destroy-mac-network [OPTIONS]
+
+              Destroy containers created by "dcos-docker setup-mac-network".
+
+            Options:
+              --help  Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
