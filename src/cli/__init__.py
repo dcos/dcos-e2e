@@ -1035,29 +1035,29 @@ def doctor() -> None:
     callback=validate_ovpn_file_does_not_exist,
     show_default=True,
     help=(
-        'The destination '
+        'The location to create an OpenVPN configuration file.'
     ),
 )
 @dcos_docker.command('setup-mac-network')
 def setup_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
+
+    This creates an OpenVPN configuration file and describes how to use it.
     """
     client = docker.from_env(version='auto')
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
-    ovpn_filename = 'docker-for-mac.ovpn'
-
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
-    docker_mac_network = TemporaryDirectory()
+    docker_mac_network = Path(str(TemporaryDirectory()))
     # Use a copy of the clone so that the clone cannot be corrupted for the
     # next run.
     copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
     docker_image_tag = 'dcos-e2e/proxy'
     client.images.build(
-        path=str(docker_mac_network_clone),
+        path=str(docker_mac_network),
         rm=True,
         forcerm=True,
         tag=docker_image_tag,
@@ -1096,18 +1096,18 @@ def setup_mac_network(configuration_dst: Path) -> None:
         network_mode='host',
         detach=True,
         volumes={
-            str(docker_mac_network_clone): {
+            str(docker_mac_network): {
                 'bind': '/local',
                 'mode': 'rw',
             },
-            str(docker_mac_network_clone / 'config'): {
+            str(docker_mac_network / 'config'): {
                 'bind': '/etc/openvpn',
                 'mode': 'rw',
             },
         },
     )
 
-    configuration_src = Path(docker_mac_network_clone / ovpn_filename)
+    configuration_src = Path(docker_mac_network / 'docker-for-mac.ovpn')
 
     with click_spinner.spinner():
         while True:
