@@ -13,7 +13,7 @@ This backend has been tested with a four node cluster with 9 GB memory given to 
 IP Routing Set Up for Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once the CLI is installed, run ``dcos-docker setup-mac-network``.
+Once the CLI is installed, run :ref:`dcos-docker-setup-mac-network`.
 
 ``ssh``
 ~~~~~~~

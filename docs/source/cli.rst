@@ -279,3 +279,8 @@ CLI Reference
 
 .. click:: cli:web
   :prog: dcos-docker web
+
+.. _dcos-docker-setup-mac-network:
+
+.. click:: cli:setup_mac_network
+  :prog: dcos-docker setup-mac-network
