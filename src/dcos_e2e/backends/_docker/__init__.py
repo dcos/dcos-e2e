@@ -323,30 +323,40 @@ class DockerCluster(ClusterManager):
             **common_mounts,
         }
 
-        for master_number in range(1, masters + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-            }
+        common_anonymous_volumes = ['/var/lib/docker', '/opt']
+        agent_anonymous_volumes = ['/var/lib/mesos/slave']
+        master_volume_list = docker.utils.convert_volume_binds(
+            binds={
+                **common_mounts,
+                **cluster_backend.custom_container_mounts,
+                **cluster_backend.custom_master_mounts,
+            },
+        ) + common_anonymous_volumes
 
+        agent_volume_list = docker.utils.convert_volume_binds(
+            binds={
+                **agent_mounts,
+                **cluster_backend.custom_container_mounts,
+                **cluster_backend.custom_agent_mounts,
+            },
+        ) + common_anonymous_volumes + agent_anonymous_volumes
+
+        public_agent_volume_list = docker.utils.convert_volume_binds(
+            binds={
+                **agent_mounts,
+                **cluster_backend.custom_container_mounts,
+                **cluster_backend.custom_public_agent_mounts,
+            },
+        ) + common_anonymous_volumes + agent_anonymous_volumes
+
+        for master_number in range(1, masters + 1):
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._master_prefix,
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={
-                    **common_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_master_mounts,
-                    **unique_mounts,
-                },
+                volumes=master_volume_list,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
@@ -359,33 +369,13 @@ class DockerCluster(ClusterManager):
             )
 
         for agent_number in range(1, agents + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw',
-                },
-            }
-
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._agent_prefix,
                 container_number=agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={
-                    **agent_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_agent_mounts,
-                    **unique_mounts,
-                },
+                volumes=agent_volume_list,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
@@ -398,33 +388,13 @@ class DockerCluster(ClusterManager):
             )
 
         for public_agent_number in range(1, public_agents + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw',
-                },
-            }
-
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={
-                    **agent_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_public_agent_mounts,
-                    **unique_mounts,
-                },
+                volumes=public_agent_volume_list,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
