@@ -208,7 +208,7 @@ def validate_ovpn_file_does_not_exist(
     If the given file path exists already, show an error message explaining how
     to use the file as an OpenVPN configuration.
     """
-    force = ctx.params['force']
+    force = bool('force' in ctx.params)
     path = Path(value).expanduser()
     if path.is_dir():
         path = path / 'docker-for-mac.ovpn'
