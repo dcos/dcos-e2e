@@ -965,6 +965,27 @@ class TestSetupMacNetwork():
         # yapf: enable
         assert result.output == expected_help
 
+    def test_configuration_already_exists(self, tmpdir: local) -> None:
+        """
+        If a configuration file already exists at the given location, an error
+        is shown.
+        """
+        configuration_file = tmpdir.join('example.txt')
+        configuration_file.write('example')
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'setup-mac-network',
+                '--configuration-dst',
+                str(configuration_file),
+            ],
+            catch_exceptions=False,
+        )
+        expected_error = 'Invalid value for "--configuration-dst"'
+        assert result.exit_code == 2
+        assert expected_error in result.output
+
 
 class TestDestroyMacNetwork():
     """
