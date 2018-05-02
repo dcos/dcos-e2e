@@ -213,6 +213,12 @@ def validate_ovpn_file_does_not_exist(
     if path.is_dir():
         path = path / 'docker-for-mac.ovpn'
 
+    if path.suffix != '.ovpn':
+        message = '"{value}" does not have the suffix ".ovpn".'.format(
+            value=value,
+        )
+        raise click.BadParameter(message=message)
+
     for _ in (ctx, param):
         pass
 

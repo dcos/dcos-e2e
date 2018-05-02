@@ -965,12 +965,45 @@ class TestSetupMacNetwork():
         # yapf: enable
         assert result.output == expected_help
 
+    def test_suffix_not_ovpn(self, tmpdir: local) -> None:
+        """
+        If a configuration file does not have the 'ovpn' suffix, an error is
+        shown.
+        """
+        configuration_file = tmpdir.join('example.txt')
+        configuration_file.write('example')
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'setup-mac-network',
+                '--configuration-dst',
+                str(configuration_file),
+            ],
+            catch_exceptions=False,
+        )
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_error = dedent(
+            """\
+            Usage: dcos-docker setup-mac-network [OPTIONS]
+
+            Error: Invalid value for "--configuration-dst": "{value}" does not have the suffix ".ovpn".
+            """,# noqa: E501,E261
+        ).format(
+            value=str(configuration_file),
+        )
+        # yapf: enable
+        assert result.exit_code == 2
+        assert result.output == expected_error
+
     def test_configuration_already_exists(self, tmpdir: local) -> None:
         """
         If a configuration file already exists at the given location, an error
         is shown.
         """
-        configuration_file = tmpdir.join('example.txt')
+        configuration_file = tmpdir.join('example.ovpn')
         configuration_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
