@@ -195,7 +195,10 @@ def validate_volumes(
                 message = (
                     'Mode in "{volume_definition}" is "{mode}". '
                     'If given, the mode must be one of "ro", "rw".'
-                ).format(volume_definition=volume_definition, mode=mode)
+                ).format(
+                    volume_definition=volume_definition,
+                    mode=mode,
+                )
                 raise click.BadParameter(message=message)
         else:
             message = (
