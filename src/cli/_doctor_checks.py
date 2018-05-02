@@ -359,3 +359,14 @@ def check_selinux() -> CheckLevels:
         return CheckLevels.ERROR
 
     return CheckLevels.NONE
+
+
+def check_docker_api_version() -> CheckLevels:
+    """
+    Error if the Docker API version < 1.30.
+    This is to avoid:
+
+    docker.errors.InvalidVersion: mounts param is not supported in API versions < 1.30
+    """
+    # This is a stub
+    return CheckLevels.NONE

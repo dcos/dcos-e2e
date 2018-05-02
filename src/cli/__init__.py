@@ -53,6 +53,7 @@ from ._common import (
 from ._doctor_checks import (
     CheckLevels,
     check_1_9_sed,
+    check_docker_api_version,
     check_docker_root_free_space,
     check_memory,
     check_mount_tmp,
@@ -1012,6 +1013,7 @@ def doctor() -> None:
     """
     check_functions = [
         check_1_9_sed,
+        check_docker_api_version,
         check_docker_root_free_space,
         check_memory,
         check_mount_tmp,
