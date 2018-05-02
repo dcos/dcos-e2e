@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.05.02.0
+------------
+
 - Previously not all volumes were destroyed when destroying a cluster from the CLI or with the ``Docker`` backend.
   This has been resolved.
   To remove dangling volumes from previous versions, use ``docker volume prune``.
