@@ -284,7 +284,7 @@ class TestCreate:
         self, oss_artifact: Path, option: str
     ) -> None:
         """
-        XXX
+        Given volumes must have the mode "rw" or "ro", or no mode.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -313,7 +313,7 @@ class TestCreate:
 
     def test_custom_volume_bad_format(self, oss_artifact: Path) -> None:
         """
-        XXX
+        Given volumes must
         """
 
     def test_copy_to_master_relative(
