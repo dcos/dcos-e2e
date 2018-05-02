@@ -6,8 +6,8 @@ Changelog
 Next
 ----
 
-2018.04.30.3
-------------
+- All volumes destroyed
+- Mounts now different type
 
 2018.04.30.2
 ------------
