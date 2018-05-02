@@ -18,6 +18,7 @@ import yaml
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from docker.types import Mount
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -304,50 +305,61 @@ class DockerCluster(ClusterManager):
             docker_version=cluster_backend.docker_version,
         )
 
-        common_mounts = {
-            str(certs_dir.resolve()): {
-                'bind': '/etc/docker/certs.d',
-                'mode': 'rw',
-            },
-            str(bootstrap_genconf_path): {
-                'bind': str(self._bootstrap_tmp_path),
-                'mode': 'ro',
-            },
-        }
+        certs_mount = Mount(
+            source=str(certs_dir.resolve()),
+            target='/etc/docker/certs.d',
+            read_only=False,
+            type='bind',
+        )
 
-        agent_mounts = {
-            '/sys/fs/cgroup': {
-                'bind': '/sys/fs/cgroup',
-                'mode': 'ro',
-            },
-            **common_mounts,
-        }
+        bootstrap_genconf_mount = Mount(
+            source=str(bootstrap_genconf_path),
+            target=str(self._bootstrap_tmp_path),
+            read_only=True,
+            type='bind',
+        )
 
-        common_anonymous_volumes = ['/var/lib/docker', '/opt']
-        agent_anonymous_volumes = ['/var/lib/mesos/slave']
-        master_volume_list = docker.utils.convert_volume_binds(
-            binds={
-                **common_mounts,
-                **cluster_backend.custom_container_mounts,
-                **cluster_backend.custom_master_mounts,
-            },
-        ) + common_anonymous_volumes
+        cgroup_mount = Mount(
+            source='/sys/fs/cgroup',
+            target='/sys/fs/cgroup',
+            read_only=True,
+            type='bind',
+        )
 
-        agent_volume_list = docker.utils.convert_volume_binds(
-            binds={
-                **agent_mounts,
-                **cluster_backend.custom_container_mounts,
-                **cluster_backend.custom_agent_mounts,
-            },
-        ) + common_anonymous_volumes + agent_anonymous_volumes
+        var_lib_docker_mount = Mount(
+            source=None,
+            target='/var/lib/docker',
+        )
 
-        public_agent_volume_list = docker.utils.convert_volume_binds(
-            binds={
-                **agent_mounts,
-                **cluster_backend.custom_container_mounts,
-                **cluster_backend.custom_public_agent_mounts,
-            },
-        ) + common_anonymous_volumes + agent_anonymous_volumes
+        opt_mount = Mount(
+            source=None,
+            target='/opt',
+        )
+
+        mesos_slave_mount = Mount(
+            source=None,
+            target='/var/lib/mesos/slave',
+        )
+
+        # TODO Custom mounts...
+        agent_mounts = [
+            certs_mount,
+            bootstrap_genconf_mount,
+            cgroup_mount,
+            var_lib_docker_mount,
+            opt_mount,
+            mesos_slave_mount,
+        ]
+
+        private_agent_mounts = agent_mounts
+        public_agent_mounts = agent_mounts
+
+        master_mounts = [
+            certs_mount,
+            bootstrap_genconf_mount,
+            var_lib_docker_mount,
+            opt_mount,
+        ]
 
         for master_number in range(1, masters + 1):
             start_dcos_container(
@@ -356,7 +368,7 @@ class DockerCluster(ClusterManager):
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=master_volume_list,
+                mounts=master_mounts,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
@@ -375,7 +387,7 @@ class DockerCluster(ClusterManager):
                 container_number=agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=agent_volume_list,
+                mounts=private_agent_mounts,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
@@ -394,7 +406,7 @@ class DockerCluster(ClusterManager):
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes=public_agent_volume_list,
+                mounts=public_agent_mounts,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
