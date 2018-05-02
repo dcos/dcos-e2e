@@ -62,29 +62,35 @@ class TestDockerBackend:
         public_agent_path = Path('/etc/on_public_agent_nodes.txt')
         all_path = Path('/etc/on_all_nodes.txt')
 
-        custom_container_mounts = [
-            Mount(source=str(local_all_file), target=str(all_path)),
-        ]
-        custom_master_mounts = [
-            Mount(source=str(local_master_file), target=str(master_path)),
-        ]
+        custom_container_mount = Mount(
+            source=str(local_all_file),
+            target=str(all_path),
+            type='bind',
+        )
 
-        custom_agent_mounts = [
-            Mount(source=str(local_agent_file), target=str(agent_path)),
-        ]
+        custom_master_mount = Mount(
+            source=str(local_master_file),
+            target=str(master_path),
+            type='bind',
+        )
 
-        custom_public_agent_mounts = [
-            Mount(
-                source=str(local_public_agent_file),
-                target=str(public_agent_path),
-            ),
-        ]
+        custom_agent_mount = Mount(
+            source=str(local_agent_file),
+            target=str(agent_path),
+            type='bind',
+        )
+
+        custom_public_agent_mount = Mount(
+            source=str(local_public_agent_file),
+            target=str(public_agent_path),
+            type='bind',
+        )
 
         backend = Docker(
-            custom_container_mounts=custom_container_mounts,
-            custom_master_mounts=custom_master_mounts,
-            custom_agent_mounts=custom_agent_mounts,
-            custom_public_agent_mounts=custom_public_agent_mounts,
+            custom_container_mounts=[custom_container_mount],
+            custom_master_mounts=[custom_master_mount],
+            custom_agent_mounts=[custom_agent_mount],
+            custom_public_agent_mounts=[custom_public_agent_mount],
         )
 
         with Cluster(

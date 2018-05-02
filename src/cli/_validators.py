@@ -212,7 +212,7 @@ def validate_volumes(
         mount = docker.types.Mount(
             source=host_src,
             target=container_dst,
-            type='volume',
+            type='bind',
             read_only=read_only,
         )
         mounts.append(mount)

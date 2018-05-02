@@ -348,6 +348,7 @@ class DockerCluster(ClusterManager):
             var_lib_docker_mount,
             opt_mount,
             mesos_slave_mount,
+            *cluster_backend.custom_container_mounts,
         ]
 
         private_agent_mounts = (
@@ -362,6 +363,7 @@ class DockerCluster(ClusterManager):
             bootstrap_genconf_mount,
             var_lib_docker_mount,
             opt_mount,
+            *cluster_backend.custom_container_mounts,
             *cluster_backend.custom_master_mounts,
         ]
 
