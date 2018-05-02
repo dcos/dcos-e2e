@@ -1027,7 +1027,7 @@ class TestSetupMacNetwork():
             To use {value}:
             1. Install an OpenVPN client such as Tunnelblick (https://tunnelblick.net/downloads.html) or Shimo (https://www.shimovpn.com).
             2. Run "open {value}".
-            3. In your OpenVPN client, connect to the new "docker-for-mac" profile.
+            3. In your OpenVPN client, connect to the new "example" profile.
             4. Run "dcos-docker doctor" to confirm that everything is working.
             """,# noqa: E501,E261
         ).format(
