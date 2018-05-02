@@ -153,13 +153,13 @@ class Docker(ClusterBackend):
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
             custom_container_mounts: Custom mounts add to all node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers. See `volumes` in `Containers.run`_.
+                containers. See `mounts` in `Containers.run`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
             docker_storage_driver: The storage driver to use for Docker on the
@@ -180,10 +180,10 @@ class Docker(ClusterBackend):
         """
         self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
-        self.custom_container_mounts = custom_container_mounts or {}
-        self.custom_master_mounts = custom_master_mounts or {}
-        self.custom_agent_mounts = custom_agent_mounts or {}
-        self.custom_public_agent_mounts = custom_public_agent_mounts or {}
+        self.custom_container_mounts = custom_container_mounts or []
+        self.custom_master_mounts = custom_master_mounts or []
+        self.custom_agent_mounts = custom_agent_mounts or []
+        self.custom_public_agent_mounts = custom_public_agent_mounts or []
         self.linux_distribution = linux_distribution
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver
