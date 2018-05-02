@@ -6,7 +6,7 @@ import configparser
 import io
 import shlex
 from pathlib import Path
-from typing import Dict, List, Set, Union
+from typing import Dict, List, Set
 
 import docker
 
@@ -80,7 +80,7 @@ def start_dcos_container(
     existing_masters: Set[Node],
     container_base_name: str,
     container_number: int,
-    volumes: Union[Dict[str, Dict[str, str]], List[str]],
+    mounts: List[docker.types.Mount],
     tmpfs: Dict[str, str],
     dcos_num_masters: int,
     dcos_num_agents: int,
@@ -101,7 +101,7 @@ def start_dcos_container(
         existing_masters: The existing masters in the cluster.
         container_base_name: The start of the container name.
         container_number: The end of the container name.
-        volumes: See `volumes` on
+        mounts: See `mounts` on
             http://docker-py.readthedocs.io/en/latest/containers.html.
         tmpfs: See `tmpfs` on
             http://docker-py.readthedocs.io/en/latest/containers.html.
@@ -142,7 +142,7 @@ def start_dcos_container(
         hostname=hostname,
         extra_hosts=extra_hosts,
         image=docker_image,
-        volumes=volumes,
+        mounts=mounts,
         tmpfs=tmpfs,
         labels=labels,
         stop_signal='SIGRTMIN+3',

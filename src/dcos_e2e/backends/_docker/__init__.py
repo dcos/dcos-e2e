@@ -18,6 +18,7 @@ import yaml
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from docker.types import Mount
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -103,10 +104,10 @@ class Docker(ClusterBackend):
     def __init__(
         self,
         workspace_dir: Optional[Path] = None,
-        custom_container_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_container_mounts: Optional[List[Mount]] = None,
+        custom_master_mounts: Optional[List[Mount]] = None,
+        custom_agent_mounts: Optional[List[Mount]] = None,
+        custom_public_agent_mounts: Optional[List[Mount]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
@@ -124,13 +125,13 @@ class Docker(ClusterBackend):
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
             custom_container_mounts: Custom mounts add to all node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers. See `volumes` in `Containers.run`_.
+                containers. See `mounts` in `Containers.run`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
             storage_driver: The storage driver to use for Docker on the
@@ -152,13 +153,13 @@ class Docker(ClusterBackend):
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
             custom_container_mounts: Custom mounts add to all node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers. See `volumes` in `Containers.run`_.
+                containers. See `mounts` in `Containers.run`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
             docker_storage_driver: The storage driver to use for Docker on the
@@ -179,10 +180,10 @@ class Docker(ClusterBackend):
         """
         self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
-        self.custom_container_mounts = custom_container_mounts or {}
-        self.custom_master_mounts = custom_master_mounts or {}
-        self.custom_agent_mounts = custom_agent_mounts or {}
-        self.custom_public_agent_mounts = custom_public_agent_mounts or {}
+        self.custom_container_mounts = custom_container_mounts or []
+        self.custom_master_mounts = custom_master_mounts or []
+        self.custom_agent_mounts = custom_agent_mounts or []
+        self.custom_public_agent_mounts = custom_public_agent_mounts or []
         self.linux_distribution = linux_distribution
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver
@@ -304,49 +305,76 @@ class DockerCluster(ClusterManager):
             docker_version=cluster_backend.docker_version,
         )
 
-        common_mounts = {
-            str(certs_dir.resolve()): {
-                'bind': '/etc/docker/certs.d',
-                'mode': 'rw',
-            },
-            str(bootstrap_genconf_path): {
-                'bind': str(self._bootstrap_tmp_path),
-                'mode': 'ro',
-            },
-        }
+        certs_mount = Mount(
+            source=str(certs_dir.resolve()),
+            target='/etc/docker/certs.d',
+            read_only=False,
+            type='bind',
+        )
 
-        agent_mounts = {
-            '/sys/fs/cgroup': {
-                'bind': '/sys/fs/cgroup',
-                'mode': 'ro',
-            },
-            **common_mounts,
-        }
+        bootstrap_genconf_mount = Mount(
+            source=str(bootstrap_genconf_path),
+            target=str(self._bootstrap_tmp_path),
+            read_only=True,
+            type='bind',
+        )
+
+        cgroup_mount = Mount(
+            source='/sys/fs/cgroup',
+            target='/sys/fs/cgroup',
+            read_only=True,
+            type='bind',
+        )
+
+        var_lib_docker_mount = Mount(
+            source=None,
+            target='/var/lib/docker',
+        )
+
+        opt_mount = Mount(
+            source=None,
+            target='/opt',
+        )
+
+        mesos_slave_mount = Mount(
+            source=None,
+            target='/var/lib/mesos/slave',
+        )
+
+        agent_mounts = [
+            certs_mount,
+            bootstrap_genconf_mount,
+            cgroup_mount,
+            var_lib_docker_mount,
+            opt_mount,
+            mesos_slave_mount,
+            *cluster_backend.custom_container_mounts,
+        ]
+
+        private_agent_mounts = (
+            agent_mounts + cluster_backend.custom_agent_mounts
+        )
+        public_agent_mounts = (
+            agent_mounts + cluster_backend.custom_public_agent_mounts
+        )
+
+        master_mounts = [
+            certs_mount,
+            bootstrap_genconf_mount,
+            var_lib_docker_mount,
+            opt_mount,
+            *cluster_backend.custom_container_mounts,
+            *cluster_backend.custom_master_mounts,
+        ]
 
         for master_number in range(1, masters + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-            }
-
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._master_prefix,
                 container_number=master_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={
-                    **common_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_master_mounts,
-                    **unique_mounts,
-                },
+                mounts=master_mounts,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
@@ -359,33 +387,13 @@ class DockerCluster(ClusterManager):
             )
 
         for agent_number in range(1, agents + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw',
-                },
-            }
-
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._agent_prefix,
                 container_number=agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={
-                    **agent_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_agent_mounts,
-                    **unique_mounts,
-                },
+                mounts=private_agent_mounts,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={
@@ -398,33 +406,13 @@ class DockerCluster(ClusterManager):
             )
 
         for public_agent_number in range(1, public_agents + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw',
-                },
-            }
-
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._public_agent_prefix,
                 container_number=public_agent_number,
                 dcos_num_masters=masters,
                 dcos_num_agents=agents + public_agents,
-                volumes={
-                    **agent_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_public_agent_mounts,
-                    **unique_mounts,
-                },
+                mounts=public_agent_mounts,
                 tmpfs=node_tmpfs_mounts,
                 docker_image=docker_image_tag,
                 labels={

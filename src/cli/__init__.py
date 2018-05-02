@@ -34,6 +34,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.models.containers import Container
+from docker.types import Mount
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
@@ -364,10 +365,10 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     genconf_dir: Optional[Path],
     workspace_dir: Optional[Path],
-    custom_volume: Optional[Dict[str, Dict[str, str]]] = None,
-    custom_master_volume: Optional[Dict[str, Dict[str, str]]] = None,
-    custom_agent_volume: Optional[Dict[str, Dict[str, str]]] = None,
-    custom_public_agent_volume: Optional[Dict[str, Dict[str, str]]] = None,
+    custom_volume: List[Mount],
+    custom_master_volume: List[Mount],
+    custom_agent_volume: List[Mount],
+    custom_public_agent_volume: List[Mount],
 ) -> None:
     """
     Create a DC/OS cluster.
