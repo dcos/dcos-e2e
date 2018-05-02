@@ -1,6 +1,7 @@
 AbstractLauncher
 adam
 admin
+api
 args
 aufs
 aws
@@ -35,6 +36,7 @@ genconf
 homebrew
 hwclock
 init
+invalidversion
 ip
 lastResort
 linting

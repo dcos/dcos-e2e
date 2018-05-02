@@ -361,13 +361,36 @@ def check_selinux() -> CheckLevels:
     return CheckLevels.NONE
 
 
-def check_docker_api_version() -> CheckLevels:
+def check_docker_supports_mounts() -> CheckLevels:
     """
-    Error if the Docker API version < 1.30.
     This is to avoid:
 
     docker.errors.InvalidVersion: mounts param is not supported in API versions
     < 1.30
     """
-    # This is a stub
+    client = docker.from_env(version='auto')
+    mount = docker.types.Mount(source=None, target='/etc')
+    # Any image will do, we use this for another test so using it here saves
+    # pulling another image.
+    tiny_image = 'luca3m/sleep'
+
+    try:
+        container = client.containers.run(
+            image=tiny_image,
+            mounts=[mount],
+            detach=True,
+        )
+    except docker.errors.InvalidVersion as exc:
+        if 'mounts param is not supported' in str(exc):
+            message = (
+                'The Docker API version must be >= 1.30. '
+                'This is because DC/OS E2E uses the ``mounts`` parameter.'
+            )
+            _error(message=message)
+            return CheckLevels.ERROR
+        raise
+
+    container.stop()
+    container.remove(v=True)
+
     return CheckLevels.NONE
