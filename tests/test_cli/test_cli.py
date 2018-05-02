@@ -272,10 +272,44 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_custom_volume_bad_format(self, oss_artifact: Path) -> None:
+    @pytest.mark.parametrize(
+        'option', [
+            '--custom-volume',
+            '--custom-master-volume',
+            '--custom-agent-volume',
+            '--custom-public-agent-volume',
+        ]
+    )
+    def test_custom_volume_bad_mode(
+        self, oss_artifact: Path, option: str
+    ) -> None:
         """
         XXX
         """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                option,
+                '/opt:/opt:ab',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_message = dedent(
+            """\
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "{option}": Mode in "/opt:/opt:ab" is "ab". If given, the mode must be one of "ro", "rw".
+            """,# noqa: E501,E261
+        ).format(option=option)
+        # yapf: enable
+        assert result.output == expected_message
 
     def test_custom_volume_bad_format(self, oss_artifact: Path) -> None:
         """
