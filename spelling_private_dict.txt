@@ -68,8 +68,10 @@ pyperclip
 pytest
 reachability
 refactor
+ro
 rsa
 rtype
+rw
 sed
 src
 sshd
