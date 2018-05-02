@@ -272,6 +272,90 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
+    @pytest.mark.parametrize(
+        'option',
+        [
+            '--custom-volume',
+            '--custom-master-volume',
+            '--custom-agent-volume',
+            '--custom-public-agent-volume',
+        ],
+    )
+    def test_custom_volume_bad_mode(
+        self,
+        oss_artifact: Path,
+        option: str,
+    ) -> None:
+        """
+        Given volumes must have the mode "rw" or "ro", or no mode.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                option,
+                '/opt:/opt:ab',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_message = dedent(
+            """\
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "{option}": Mode in "/opt:/opt:ab" is "ab". If given, the mode must be one of "ro", "rw".
+            """,# noqa: E501,E261
+        ).format(option=option)
+        # yapf: enable
+        assert result.output == expected_message
+
+    @pytest.mark.parametrize(
+        'option',
+        [
+            '--custom-volume',
+            '--custom-master-volume',
+            '--custom-agent-volume',
+            '--custom-public-agent-volume',
+        ],
+    )
+    def test_custom_volume_bad_format(
+        self,
+        oss_artifact: Path,
+        option: str,
+    ) -> None:
+        """
+        Given volumes must have 0, 1 or 2 colons.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                option,
+                '/opt:/opt:/opt:rw',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_message = dedent(
+            """\
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "{option}": "/opt:/opt:/opt:rw" is not a valid volume definition. See https://docs.docker.com/engine/reference/run/#volume-shared-filesystems for the syntax to use.
+            """,# noqa: E501,E261
+        ).format(option=option)
+        # yapf: enable
+        assert result.output == expected_message
+
     def test_copy_to_master_relative(
         self,
         oss_artifact: Path,
