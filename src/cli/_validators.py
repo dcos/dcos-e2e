@@ -213,8 +213,16 @@ def validate_ovpn_file_does_not_exist(
     if path.is_dir():
         path = path / 'docker-for-mac.ovpn'
 
+    if path.suffix != '.ovpn':
+        message = '"{value}" does not have the suffix ".ovpn".'.format(
+            value=value,
+        )
+        raise click.BadParameter(message=message)
+
     for _ in (ctx, param):
         pass
+
+    profile_name = path.name[:-len('.ovpn')]
 
     message = (
         '"{value}" already exists so no new OpenVPN configuration was '
@@ -229,11 +237,14 @@ def validate_ovpn_file_does_not_exist(
         '\n'
         '2. Run "open {value}".'
         '\n'
-        '3. In your OpenVPN client, connect to the new "docker-for-mac" '
+        '3. In your OpenVPN client, connect to the new "{profile_name}" '
         'profile.'
         '\n'
         '4. Run "dcos-docker doctor" to confirm that everything is working.'
-    ).format(value=value)
+    ).format(
+        value=value,
+        profile_name=profile_name,
+    )
 
     if path.exists() and not force:
         raise click.BadParameter(message=message)
