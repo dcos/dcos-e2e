@@ -273,15 +273,18 @@ class TestCreate:
         assert result.output == expected_message
 
     @pytest.mark.parametrize(
-        'option', [
+        'option',
+        [
             '--custom-volume',
             '--custom-master-volume',
             '--custom-agent-volume',
             '--custom-public-agent-volume',
-        ]
+        ],
     )
     def test_custom_volume_bad_mode(
-        self, oss_artifact: Path, option: str
+        self,
+        oss_artifact: Path,
+        option: str,
     ) -> None:
         """
         Given volumes must have the mode "rw" or "ro", or no mode.
@@ -312,12 +315,13 @@ class TestCreate:
         assert result.output == expected_message
 
     @pytest.mark.parametrize(
-        'option', [
+        'option',
+        [
             '--custom-volume',
             '--custom-master-volume',
             '--custom-agent-volume',
             '--custom-public-agent-volume',
-        ]
+        ],
     )
     def test_custom_volume_bad_format(
         self,
