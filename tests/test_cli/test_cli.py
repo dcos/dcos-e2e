@@ -1015,9 +1015,27 @@ class TestSetupMacNetwork():
             ],
             catch_exceptions=False,
         )
-        expected_error = 'Invalid value for "--configuration-dst"'
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_error = dedent(
+            """\
+            Usage: dcos-docker setup-mac-network [OPTIONS]
+
+            Error: Invalid value for "--configuration-dst": "{value}" already exists so no new OpenVPN configuration was created.
+
+            To use {value}:
+            1. Install an OpenVPN client such as Tunnelblick (https://tunnelblick.net/downloads.html) or Shimo (https://www.shimovpn.com).
+            2. Run "open {value}".
+            3. In your OpenVPN client, connect to the new "docker-for-mac" profile.
+            4. Run "dcos-docker doctor" to confirm that everything is working.
+            """,# noqa: E501,E261
+        ).format(
+            value=str(configuration_file),
+        )
+        # yapf: enable
         assert result.exit_code == 2
-        assert expected_error in result.output
+        assert result.output == expected_error
 
 
 class TestDestroyMacNetwork():
