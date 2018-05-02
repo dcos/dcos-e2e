@@ -20,8 +20,10 @@ from typing import (  # noqa: F401
 
 import docker
 
-_PROXY_CONTAINER_NAME = 'dcos-e2e-proxy'
-_OPENVPN_CONTAINER_NAME = 'dcos-e2e-openvpn'
+# We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
+# with "make clean".
+_PROXY_CONTAINER_NAME = 'e2e-proxy'
+_OPENVPN_CONTAINER_NAME = 'e2e-openvpn'
 
 
 def create_mac_network(configuration_dst: Path) -> None:
