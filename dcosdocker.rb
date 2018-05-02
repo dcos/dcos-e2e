@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/mesosphere/dcos-e2e/archive/2018.04.30.3.tar.gz"
+  url "https://github.com/mesosphere/dcos-e2e/archive/2018.05.02.0.tar.gz"
   head "https://github.com/mesosphere/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -22,8 +22,8 @@ class Dcosdocker < Formula
   end
 
   resource "azure-common" do
-    url "https://files.pythonhosted.org/packages/53/99/8d976749438547795178295d815823f8cc7aa83abb55b60b42049ee73537/azure-common-1.1.9.zip"
-    sha256 "5124ab76357452356164ef1a10e7fe69f686eaf1647ef57b37c2ede50df2cc02"
+    url "https://files.pythonhosted.org/packages/66/bd/d5f08507b548d5b5c82bfa1dc55c28790a42bdb384cd8cf2dbc14d067442/azure-common-1.1.10.zip"
+    sha256 "95866fb8c4556cc5a5960761bf8a38df7e946501b68390d7cfc77907d5191529"
   end
 
   resource "azure-mgmt-network" do
@@ -57,13 +57,13 @@ class Dcosdocker < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/6e/48/45a9b5bd6f0652598e5650cac37a96da324fcd03c45d6ffafe7201f670ea/boto3-1.7.10.tar.gz"
-    sha256 "30239a3c16da19c0a0886e7904195fb1a191dafc5773ad1656b7896577241cb5"
+    url "https://files.pythonhosted.org/packages/be/0f/92f8cd8e40edb19d5e181d5edac142b976547fdef10d3f7b0b5644baec17/boto3-1.7.11.tar.gz"
+    sha256 "ecdbeda97ccf4c94b7dcb63219c96eeb52a5fcd12758af0760217b3b000a14f4"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/6c/36/445661a4cfbc2eb7cf3c74c6d9308911dd37a09323a1c7b900ff34931db5/botocore-1.10.10.tar.gz"
-    sha256 "10d4880253210ad35cb1b3c3134d8698c2c2d10f15a2cf6a7be3f91b486866ff"
+    url "https://files.pythonhosted.org/packages/e2/03/983a3423a998fa115a486fd4ef4756aeba45959c8b334bf86511d0690d7c/botocore-1.10.11.tar.gz"
+    sha256 "3cbcbc12e4a657fbb0ad5779b330c8869f3c53eeb737de5d476b0bb32c734981"
   end
 
   resource "Cerberus" do
@@ -167,13 +167,13 @@ class Dcosdocker < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/4f/a8/4626b184183977e470e9d6d3604c01ecd2f3463789f064aa59a2190965c0/msrest-0.4.28.tar.gz"
-    sha256 "65bdde2ea8aa3312eb4ce6142d5da65d455f561a7676eee678c1a6e00416f5a0"
+    url "https://files.pythonhosted.org/packages/9b/49/ed5c9ea20f83707f4f67fbc664082d6d9a356b44f5f64ec5a5c7e0fdb365/msrest-0.4.29.tar.gz"
+    sha256 "ce0a558173b7c7bff87dc66e24331382c81a89367ea52c52bbb934de6064cb45"
   end
 
   resource "msrestazure" do
-    url "https://files.pythonhosted.org/packages/12/4f/f7ee67d85c6fc5e1ee842cb60aeeef3617de02062e76f376a90f9b54a955/msrestazure-0.4.28.tar.gz"
-    sha256 "4e336150730f9a512f1432c4e0c5293d618ffcbf92767c07525bd8a8200fa9d5"
+    url "https://files.pythonhosted.org/packages/ec/7f/503d182b6af7728b897726cf17ce2ebca4768de9f2bd992a26f819d028a3/msrestazure-0.4.29.tar.gz"
+    sha256 "de8405f9567ffe02107254ab83cc01c43a522897eed250cdf4b06f90bec11a8f"
   end
 
   resource "oauth2client" do

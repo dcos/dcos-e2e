@@ -532,7 +532,7 @@ def create(
     started_message = (
         'Cluster "{cluster_id}" has started. '
         'Run "dcos-docker wait --cluster-id {cluster_id}" to wait for DC/OS '
-        'to be ready.'
+        'to become ready.'
     ).format(cluster_id=cluster_id)
     click.echo(started_message, err=True)
 

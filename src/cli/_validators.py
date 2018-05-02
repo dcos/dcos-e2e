@@ -3,7 +3,6 @@ Validators for CLI options.
 """
 
 import re
-import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -179,7 +178,7 @@ def validate_volumes(
         parts = volume_definition.split(':')
 
         if len(parts) == 1:
-            host_src = str(uuid.uuid4())
+            host_src = None
             [container_dst] = parts
             read_only = False
         elif len(parts) == 2:
