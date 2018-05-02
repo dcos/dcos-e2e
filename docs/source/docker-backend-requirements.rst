@@ -4,7 +4,7 @@ Requirements
 Docker
 ~~~~~~
 
-Docker must be installed.
+Docker version 17.06 or later must be installed.
 
 Plenty of memory must be given to Docker.
 On Docker for Mac, this can be done from Docker > Preferences > Advanced.

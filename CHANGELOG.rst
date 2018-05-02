@@ -13,7 +13,7 @@ Next
   This has been resolved.
   To remove dangling volumes from previous versions, use ``docker volume prune``.
 - Backwards incompatible change: ``mount`` parameters to ``Docker.__init`` now take a ``list`` of ``docker.types.Mount``\s.
-- Docker version ``1.30``\+ is required for the CLI and for the ``Docker`` backend.
+- Docker version 17.06 or later is now required for the CLI and for the ``Docker`` backend.
 
 2018.04.30.2
 ------------
