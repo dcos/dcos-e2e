@@ -195,14 +195,15 @@ def validate_volumes(
                 message = (
                     'Mode in "{volume_definition}" is "{mode}". '
                     'If given, the mode must be one of "ro", "rw".'
-                )
+                ).format(volume_definition=volume_definition, mode=mode)
                 raise click.BadParameter(message=message)
         else:
             message = (
+                '"{volume_definition}" is not a valid volume definition. '
                 'See '
                 'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
                 'for the syntax to use.'
-            )
+            ).format(volume_definition=volume_definition)
             raise click.BadParameter(message=message)
 
         mount = docker.types.Mount(
