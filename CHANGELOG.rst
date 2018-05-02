@@ -6,8 +6,9 @@ Changelog
 Next
 ----
 
-- All volumes destroyed
-- Mounts now different type
+- Previously not all volumes were destroyed when destroying a cluster from the CLI or with the ``Docker`` backend.
+  This has been resolved.
+- Backwards incompatible change: ``mount`` parameters to ``Docker.__init`` now take a ``list`` of ``docker.types.Mount``\s.
 
 2018.04.30.2
 ------------
