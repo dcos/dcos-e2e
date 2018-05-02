@@ -272,6 +272,16 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
+    def test_custom_volume_bad_format(self, oss_artifact: Path) -> None:
+        """
+        XXX
+        """
+
+    def test_custom_volume_bad_format(self, oss_artifact: Path) -> None:
+        """
+        XXX
+        """
+
     def test_copy_to_master_relative(
         self,
         oss_artifact: Path,
