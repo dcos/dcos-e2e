@@ -104,7 +104,7 @@ class Docker(ClusterBackend):
     def __init__(
         self,
         workspace_dir: Optional[Path] = None,
-        custom_container_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_container_mounts: Optional[List[Mount]] = None,
         custom_master_mounts: Optional[List[Mount]] = None,
         custom_agent_mounts: Optional[List[Mount]] = None,
         custom_public_agent_mounts: Optional[List[Mount]] = None,
