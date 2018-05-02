@@ -341,7 +341,6 @@ class DockerCluster(ClusterManager):
             target='/var/lib/mesos/slave',
         )
 
-        # TODO Custom mounts...
         agent_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
@@ -351,14 +350,19 @@ class DockerCluster(ClusterManager):
             mesos_slave_mount,
         ]
 
-        private_agent_mounts = agent_mounts
-        public_agent_mounts = agent_mounts
+        private_agent_mounts = (
+            agent_mounts + cluster_backend.custom_agent_mounts
+        )
+        public_agent_mounts = (
+            agent_mounts + cluster_backend.custom_public_agent_mounts
+        )
 
         master_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
             var_lib_docker_mount,
             opt_mount,
+            *cluster_backend.custom_master_mounts,
         ]
 
         for master_number in range(1, masters + 1):
