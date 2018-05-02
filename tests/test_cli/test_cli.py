@@ -346,7 +346,7 @@ class TestCreate:
             """\
             Usage: dcos-docker create [OPTIONS] ARTIFACT
 
-            Error: Invalid value for "--custom-volume": "/opt:/opt:/opt:rw" is not a valid volume definition. See https://docs.docker.com/engine/reference/run/#volume-shared-filesystems for the syntax to use.
+            Error: Invalid value for "{option}": "/opt:/opt:/opt:rw" is not a valid volume definition. See https://docs.docker.com/engine/reference/run/#volume-shared-filesystems for the syntax to use.
             """,# noqa: E501,E261
         ).format(option=option)
         # yapf: enable
