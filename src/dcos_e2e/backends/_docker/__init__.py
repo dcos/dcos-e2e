@@ -105,9 +105,9 @@ class Docker(ClusterBackend):
         self,
         workspace_dir: Optional[Path] = None,
         custom_container_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_master_mounts: Optional[List[Mount]] = None,
+        custom_agent_mounts: Optional[List[Mount]] = None,
+        custom_public_agent_mounts: Optional[List[Mount]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
@@ -125,13 +125,13 @@ class Docker(ClusterBackend):
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
             custom_container_mounts: Custom mounts add to all node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers. See `volumes` in `Containers.run`_.
+                containers. See `mounts` in `Containers.run`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
             storage_driver: The storage driver to use for Docker on the
