@@ -501,7 +501,7 @@ class DockerCluster(ClusterManager):
         }
 
         config_data = {**config, **extra_config}
-        config_yaml = yaml.dump(data=config_data)  # type: ignore
+        config_yaml = yaml.dump(data=config_data)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)
 
