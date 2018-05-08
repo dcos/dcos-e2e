@@ -55,7 +55,7 @@ The only supported way to use the Docker backend on Windows is using Vagrant and
 
 .. code:: ps1
 
-    ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/vagrant/Vagrantfile')) | Set-Content -LiteralPath Vagrantfile
+    ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/dcos/dcos-e2e/master/vagrant/Vagrantfile')) | Set-Content -LiteralPath Vagrantfile
 
 - By default, the :file:`Vagrantfile` installs DC/OS E2E from the most recent release at the time it is downloaded.
   To use a different release, or any Git reference, set the environment variable ``DCOS_E2E_REF``:

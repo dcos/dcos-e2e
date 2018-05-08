@@ -40,13 +40,13 @@ Then install the latest stable version:
 
 .. code:: sh
 
-    brew install https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
+    brew install https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcosdocker.rb
 
 To upgrade from an older version, run the following command:
 
 .. code:: sh
 
-    brew upgrade https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/dcosdocker.rb
+    brew upgrade https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcosdocker.rb
 
 Run ``dcos-docker doctor`` to make sure that your system is ready to go:
 
@@ -68,11 +68,11 @@ Check the Python version:
    python3 --version
 
 Optionally replace ``master`` with a particular version of DC/OS E2E.
-See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
+See `available versions <https://github.com/dcos/dcos-e2e/tags>`_.
 
 .. code:: sh
 
-    pip3 install git+https://github.com/mesosphere/dcos-e2e.git@master
+    pip3 install git+https://github.com/dcos/dcos-e2e.git@master
 
 Run ``dcos-docker doctor`` to make sure that your system is ready to go for the Docker backend:
 
@@ -129,12 +129,12 @@ A typical CLI workflow may look like this:
 
 Each of these commands and more described in detail in the `full CLI documentation <http://dcos-e2e.readthedocs.io/en/latest/cli.html>`_.
 
-.. |Build Status| image:: https://travis-ci.org/mesosphere/dcos-e2e.svg?branch=master
-   :target: https://travis-ci.org/mesosphere/dcos-e2e
-.. |codecov| image:: https://codecov.io/gh/mesosphere/dcos-e2e/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/mesosphere/dcos-e2e
-.. |Updates| image:: https://pyup.io/repos/github/mesosphere/dcos-e2e/shield.svg
-   :target: https://pyup.io/repos/github/mesosphere/dcos-e2e/
+.. |Build Status| image:: https://travis-ci.org/dcos/dcos-e2e.svg?branch=master
+   :target: https://travis-ci.org/dcos/dcos-e2e
+.. |codecov| image:: https://codecov.io/gh/dcos/dcos-e2e/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/dcos/dcos-e2e
+.. |Updates| image:: https://pyup.io/repos/github/dcos/dcos-e2e/shield.svg
+   :target: https://pyup.io/repos/github/dcos/dcos-e2e/
 .. |Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status

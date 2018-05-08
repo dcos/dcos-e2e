@@ -13,7 +13,7 @@ As well as ``master``, DC/OS E2E supports the following versions of DC/OS:
 
 Other versions may work but are not tested.
 
-See `GitHub <https://github.com/mesosphere/dcos-e2e/releases>`_ for releases.
+See `GitHub <https://github.com/dcos/dcos-e2e/releases>`_ for releases.
 
 There is no guarantee of API stability at this point.
 All backwards incompatible changes will be documented in the :doc:`changelog`.

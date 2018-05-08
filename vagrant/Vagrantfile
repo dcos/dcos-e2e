@@ -26,7 +26,7 @@ usermod -a -G docker ubuntu
 
 # Install dcos-e2e
 apt-get install -y python3-pip
-pip3 install git+https://github.com/mesosphere/dcos-e2e.git@#{dcos_e2e_git_ref}
+pip3 install git+https://github.com/dcos/dcos-e2e.git@#{dcos_e2e_git_ref}
 
 # Accept IP forwarding to Docker containers.  On the VM host, set this VM guest's IP (192.168.18.2)
 # as the gateway for routing 172.17.0.0/16.  This allows the VM host to connect to Docker containers,
