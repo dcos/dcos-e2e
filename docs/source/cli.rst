@@ -173,7 +173,7 @@ To run integration tests which are developed in the a DC/OS checkout at ``/path/
 
    $ dcos-docker create /tmp/dcos_generate_config.ee.sh --cluster-id default
    $ dcos-docker wait
-   $ dcos-docker run --sync /path/to/dcos pytest -k test_tls.py
+   $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
