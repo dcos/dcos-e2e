@@ -1,6 +1,6 @@
 Cerberus==1.2
 PyYAML==3.12
-azure-common==1.1.10
+azure-common==1.1.11
 azure-mgmt-network==2.0.0rc2
 azure-mgmt-resource==1.2.2
 azure-monitor==0.3.1
