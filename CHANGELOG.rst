@@ -6,11 +6,7 @@ Changelog
 Next
 ----
 
-2018.05.08.0
-------------
-
-2018.05.02.1
-------------
+- Expose the SSH key location in ``dcos-docker inspect``.
 
 2018.05.02.0
 ------------
