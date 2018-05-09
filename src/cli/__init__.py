@@ -747,6 +747,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
+    ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
 
     if env:
         prefixes = {
@@ -763,6 +764,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
                 )
                 click.echo(message)
         click.echo('export WEB_UI={web_ui}'.format(web_ui=web_ui))
+        click.echo('export SSH_KEY={ssh_key}'.format(ssh_key=str(ssh_key)))
         return
 
     keys = {
@@ -780,6 +782,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
+        'SSH key': str(ssh_key),
     }  # type: Dict[Any, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
