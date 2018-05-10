@@ -1061,7 +1061,8 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
         destroy_mac_network_containers()
 
     try:
-        create_mac_network(configuration_dst=configuration_dst)
+        with click_spinner.spinner():
+            create_mac_network(configuration_dst=configuration_dst)
     except docker.errors.APIError as exc:
         if exc.status_code == 409:
             message = (
