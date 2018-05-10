@@ -7,6 +7,7 @@ Next
 ----
 
 - Expose the SSH key location in ``dcos-docker inspect``.
+- Make network created by ``setup-mac-network`` now survives restarts.
 
 2018.05.02.0
 ------------
