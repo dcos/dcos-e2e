@@ -2,7 +2,9 @@
 Tools for managing networking for Docker for Mac.
 """
 
+import tarfile
 import time
+from io import BytesIO
 from pathlib import Path
 from shutil import copy, copytree, rmtree
 from tempfile import TemporaryDirectory
@@ -37,26 +39,38 @@ def create_mac_network(configuration_dst: Path) -> None:
 
     clone_name = 'docker-mac-network-master'
     docker_mac_network_clone = Path(__file__).parent / clone_name
+    openvpn_dockerfile = Path(__file__).parent / 'openvpn'
+
     tmpdir = TemporaryDirectory()
-    docker_mac_network = Path(tmpdir.name).resolve()
+    openvpn_build_path = Path(tmpdir.name).resolve()
     # Use a copy of the clone so that the clone cannot be corrupted for the
     # next run.
     rmtree(path=tmpdir.name)
+    copytree(src=str(openvpn_dockerfile), dst=str(openvpn_build_path))
+    docker_mac_network = openvpn_build_path / 'docker-mac-network-master'
     copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
-    docker_image_tag = 'dcos-e2e/proxy'
+    proxy_image_tag = 'dcos-e2e/proxy'
     client.images.build(
         path=str(docker_mac_network),
         rm=True,
         forcerm=True,
-        tag=docker_image_tag,
+        tag=proxy_image_tag,
+    )
+
+    openvpn_image_tag = 'dcos-e2e/openvpn'
+    client.images.build(
+        path=str(openvpn_build_path),
+        rm=True,
+        forcerm=True,
+        tag=openvpn_image_tag,
     )
 
     proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
     proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
 
     client.containers.run(
-        image=docker_image_tag,
+        image=proxy_image_tag,
         command=proxy_command,
         ports=proxy_ports,
         detach=True,
@@ -64,8 +78,8 @@ def create_mac_network(configuration_dst: Path) -> None:
         name=_PROXY_CONTAINER_NAME,
     )
 
-    client.containers.run(
-        image='kylemanna/openvpn',
+    openvpn_container = client.containers.run(
+        image=openvpn_image_tag,
         restart_policy=restart_policy,
         cap_add=['NET_ADMIN'],
         environment={
@@ -75,26 +89,24 @@ def create_mac_network(configuration_dst: Path) -> None:
         command='/local/helpers/run.sh',
         network_mode='host',
         detach=True,
-        volumes={
-            str(docker_mac_network): {
-                'bind': '/local',
-                'mode': 'rw',
-            },
-            str(docker_mac_network / 'config'): {
-                'bind': '/etc/openvpn',
-                'mode': 'rw',
-            },
-        },
         name=_OPENVPN_CONTAINER_NAME,
     )
 
-    configuration_src = Path(docker_mac_network / 'docker-for-mac.ovpn')
-
     while True:
-        if configuration_src.exists():
+        try:
+            raw_stream, _ = openvpn_container.get_archive(
+                path='/local/docker-for-mac.ovpn',
+            )
+        except docker.errors.NotFound:
+            time.sleep(1)
+        else:
             break
-        time.sleep(1)
 
+    temporary_extract_dst = Path(TemporaryDirectory().name).resolve()
+    tar_archive = BytesIO(b''.join((i for i in raw_stream)))
+    open_tar = tarfile.open(mode='r:', fileobj=tar_archive)
+    open_tar.extractall(path=temporary_extract_dst)
+    configuration_src = temporary_extract_dst / 'docker-for-mac.ovpn'
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
 
