@@ -60,12 +60,19 @@ Library and CLI with Python
 If the CLI has been installed with Homebrew, you do not need to install the library to use the CLI.
 
 Requires Python 3.5.2+.
+To avoid interfering with your system's Python, we recommend using a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_.
 
 Check the Python version:
 
 .. code:: sh
 
    python3 --version
+
+On Fedora, install Python development requirements:
+
+.. code:: sh
+
+   sudo dnf install python3-devel
 
 Optionally replace ``master`` with a particular version of DC/OS E2E.
 See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
