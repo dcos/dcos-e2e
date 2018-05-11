@@ -1,5 +1,6 @@
 recursive-include src/dcos_e2e/backends/_docker/resources *
 recursive-include src/dcos_e2e/_vendor *
 recursive-include src/cli/docker-mac-network-master *
+recursive-include src/cli/openvpn *
 include versioneer.py
 include src/dcos_e2e/_version.py
