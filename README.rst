@@ -78,7 +78,7 @@ On Ubuntu, install Python development requirements:
 
 .. code:: sh
 
-   apt-get install python-dev
+   apt install -y gcc python3-dev
 
 Optionally replace ``master`` with a particular version of DC/OS E2E.
 See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
