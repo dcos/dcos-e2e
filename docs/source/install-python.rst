@@ -32,7 +32,7 @@ If you are not in a virtualenv, you may have to use ``sudo`` before the followin
 
 .. code:: sh
 
-    pip3 install git+https://github.com/mesosphere/dcos-e2e.git@master
+    pip3 install --upgrade git+https://github.com/mesosphere/dcos-e2e.git@master
 
 Run :ref:`dcos-docker-doctor` to make sure that your system is ready to go for the Docker backend:
 
