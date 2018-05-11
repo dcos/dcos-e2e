@@ -11,6 +11,12 @@ Check the Python version:
 
    python3 --version
 
+On Fedora, install Python development requirements:
+
+.. code:: sh
+
+   sudo dnf install python3-devel
+
 Optionally replace ``master`` with a particular version of DC/OS E2E.
 The latest release is |release|.
 See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
