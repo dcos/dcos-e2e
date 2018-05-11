@@ -72,7 +72,7 @@ On Fedora, install Python development requirements:
 
 .. code:: sh
 
-   sudo dnf install python3-devel
+   sudo dnf install -y git python3-devel
 
 On Ubuntu, install Python development requirements:
 
