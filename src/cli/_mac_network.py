@@ -105,7 +105,7 @@ def create_mac_network(configuration_dst: Path) -> None:
     temporary_extract_dst = Path(TemporaryDirectory().name).resolve()
     tar_archive = BytesIO(b''.join((i for i in raw_stream)))
     open_tar = tarfile.open(mode='r:', fileobj=tar_archive)
-    open_tar.extractall(path=temporary_extract_dst)
+    open_tar.extractall(path=str(temporary_extract_dst))
     configuration_src = temporary_extract_dst / 'docker-for-mac.ovpn'
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
