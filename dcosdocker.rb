@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/mesosphere/dcos-e2e/archive/2018.05.11.1.tar.gz"
+  url "https://github.com/mesosphere/dcos-e2e/archive/2018.05.11.2.tar.gz"
   head "https://github.com/mesosphere/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -57,13 +57,13 @@ class Dcosdocker < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/2a/33/6f4a526e13991e6895d2a135bbbc5bdd8cb1846e450fc2c08aba96a59400/boto3-1.7.17.tar.gz"
-    sha256 "7381410ec44a8c7833522eab5b03c7ebc1692dedbcb0981a61f3142b5d69b1b7"
+    url "https://files.pythonhosted.org/packages/41/bc/dbf76863733ec02978e7f75470e3a739ffc6052ba89a0d067c45996e4d1f/boto3-1.7.19.tar.gz"
+    sha256 "b4fadc62eca3bb2c4f894f807d087058fdf93f074472f8b7db385ed66f1c0136"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/3e/57/a9354a0b8eeb8b999006afd55fc354beb8774334e00d99b5945f9fc9cf2d/botocore-1.10.17.tar.gz"
-    sha256 "e58ff5fa2d27ba5acf56fd0c3a233f4a320ecbd2a4091bda7a93449406b3ee9d"
+    url "https://files.pythonhosted.org/packages/b6/93/a8f66dc5f17e31a932f62075aa1aef9695ea6c2f22a1730b86d267c1d967/botocore-1.10.19.tar.gz"
+    sha256 "e05534810847803e30a86583702eaee0c7f4f390a7af31cca8ee7e08c39ce47c"
   end
 
   resource "Cerberus" do
