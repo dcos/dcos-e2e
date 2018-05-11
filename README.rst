@@ -83,6 +83,8 @@ On Ubuntu, install Python development requirements:
 Optionally replace ``master`` with a particular version of DC/OS E2E.
 See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
 
+If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
+
 .. code:: sh
 
     pip3 install git+https://github.com/mesosphere/dcos-e2e.git@master
