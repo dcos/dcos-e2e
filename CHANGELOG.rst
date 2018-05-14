@@ -6,14 +6,7 @@ Changelog
 Next
 ----
 
-2018.05.14.3
-------------
-
-2018.05.14.2
-------------
-
-2018.05.14.1
-------------
+- Add a ``test_host`` parameter to ``Cluster.run_integration_tests``.
 
 2018.05.14.0
 ------------
