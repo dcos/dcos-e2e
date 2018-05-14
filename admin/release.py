@@ -118,7 +118,7 @@ def commit_and_push(version: str) -> None:
     Commit and push all changes.
     """
     repo = Repo('.')
-    paths = ['dcosdocker.rb', 'CHANGELOG.rst']
+    paths = ['dcosdocker.rb', 'CHANGELOG.rst', 'Vagrantfile']
     add(paths=paths)
     message = b'Update for release ' + version.encode('utf-8')
     commit(message=message)
