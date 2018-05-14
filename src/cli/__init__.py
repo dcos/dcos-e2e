@@ -138,7 +138,11 @@ class _InspectView:
         """
         Return dictionary with information to be shown to users.
         """
-        return {'docker_container_name': self._container.name}
+        container = self._container
+        return {
+            'docker_container_name': container.name,
+            'ip_address': container.attrs['NetworkSettings']['IPAddress'],
+        }
 
 
 def _set_logging(
@@ -750,6 +754,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
 
     if env:
+        env_dict = {}
         prefixes = {
             'MASTER': cluster_containers.masters,
             'AGENT': cluster_containers.agents,
@@ -757,14 +762,15 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         }
         for prefix, containers in prefixes.items():
             for index, container in enumerate(containers):
-                message = 'export {prefix}_{index}={container_id}'.format(
-                    prefix=prefix,
-                    index=index,
-                    container_id=container.id,
-                )
-                click.echo(message)
-        click.echo('export WEB_UI={web_ui}'.format(web_ui=web_ui))
-        click.echo('export SSH_KEY={ssh_key}'.format(ssh_key=str(ssh_key)))
+                node_key = '{role}_{index}'.format(role=prefix, index=index)
+                env_dict[node_key] = container.id
+                node_ip_key = node_key + '_IP'
+                node_ip = container.attrs['NetworkSettings']['IPAddress']
+                env_dict[node_ip_key] = node_ip
+        env_dict['WEB_UI'] = web_ui
+        env_dict['SSH_KEY'] = ssh_key
+        for key, value in env_dict.items():
+            click.echo('export {key}={value}'.format(key=key, value=value))
         return
 
     keys = {
