@@ -359,6 +359,7 @@ class Cluster(ContextDecorator):
         env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
         tty: bool = False,
+        test_host: Optional[Node] = None,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -371,6 +372,7 @@ class Cluster(ContextDecorator):
             log_output_live: If ``True``, log output of the ``pytest_command``
                 live. If ``True``, ``stderr`` is merged into ``stdout`` in the
                 return value.
+            test_host: TODO.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
@@ -398,8 +400,8 @@ class Cluster(ContextDecorator):
                 map(lambda node: str(node.private_ip_address), nodes),
             )
 
-        # Tests are run on a random master node.
-        test_host = next(iter(self.masters))
+        # Tests are run on a random master node if no node is given.
+        test_host = test_host or next(iter(self.masters))
 
         environment_variables = {
             # This is needed for 1.9 (and below?)

@@ -831,6 +831,14 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'is run in the home directory. '
     ),
 )
+@click.option(
+    '--node',
+    type=str,
+    default='master_0',
+    help=(
+        'TODO'
+    ),
+)
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -840,6 +848,7 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     no_test_env: bool,
+    node: str,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -866,11 +875,10 @@ def run(
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
+    test_host = next(iter(cluster.masters))
 
     if no_test_env:
         try:
-            test_host = next(iter(cluster.masters))
-
             test_host.run(
                 args=list(node_args),
                 log_output_live=False,
@@ -887,6 +895,7 @@ def run(
             pytest_command=list(node_args),
             tty=True,
             env=env,
+            test_host=test_host,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)
