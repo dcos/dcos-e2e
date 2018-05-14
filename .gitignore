@@ -91,11 +91,6 @@ ENV/
 # Test configuration file
 configuration.yaml
 
-# From DC/OS Docker
-Vagrantfile
-vagrant/
-.vagrant/
-
 .mypy_cache/
 *.DS_Store
 node_modules/
