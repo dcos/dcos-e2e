@@ -372,7 +372,8 @@ class Cluster(ContextDecorator):
             log_output_live: If ``True``, log output of the ``pytest_command``
                 live. If ``True``, ``stderr`` is merged into ``stdout`` in the
                 return value.
-            test_host: TODO.
+            test_host: The node to run the given command on. if not given, an
+                arbitrary master node is used.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in

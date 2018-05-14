@@ -80,12 +80,21 @@ class TestIntegrationTests:
         By default commands are run on an arbitrary master node.
         """
         (master, ) = cluster.masters
+        command = ['/opt/mesosphere/bin/detect_ip']
+        result = cluster.run_integration_tests(pytest_command=command).stdout
+        assert str(master.public_ip_address).encode() == result
 
     def test_custom_node(self, cluster: Cluster) -> None:
         """
         It is possible to run commands on any node.
         """
         (agent, ) = cluster.agents
+        command = ['/opt/mesosphere/bin/detect_ip']
+        result = cluster.run_integration_tests(
+            pytest_command=command,
+            test_host=agent,
+        ).stdout
+        assert str(agent.public_ip_address).encode() == result
 
 
 class TestExtendConfig:
