@@ -22,40 +22,67 @@ class TestIntegrationTests:
     Tests for running integration tests on a node.
     """
 
-    def test_run_pytest(
-        self,
-        cluster_backend: ClusterBackend,
+    @pytest.fixture(scope='class')
+    def cluster(
         oss_artifact: Path,
-    ) -> None:
+        cluster_backend: ClusterBackend,
+    ) -> Iterator[Cluster]:
+        """
+        Return a `Cluster`.
+
+        This is class scoped as we do not intend to modify the cluster in ways
+        that make tests interfere with one another.
+        """
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=1,
+            public_agents=0,
+        ) as cluster:
+            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
+            yield cluster
+
+    def test_run_pytest(self, cluster: Cluster) -> None:
         """
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-            cluster.wait_for_dcos_oss()
-            # No error is raised with a successful command.
-            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
-            cluster.run_integration_tests(
+        cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
+        cluster.wait_for_dcos_oss()
+        # No error is raised with a successful command.
+        pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
+        cluster.run_integration_tests(
+            pytest_command=pytest_command,
+            log_output_live=True,
+        )
+
+        # An error is raised with an unsuccessful command.
+        with pytest.raises(CalledProcessError) as excinfo:
+            pytest_command = ['pytest', 'test_no_such_file.py']
+            result = cluster.run_integration_tests(
                 pytest_command=pytest_command,
                 log_output_live=True,
             )
+            # This result will not be printed if the test passes, but it
+            # may provide useful debugging information.
+            logging.debug(str(result))  # pragma: no cover
 
-            # An error is raised with an unsuccessful command.
-            with pytest.raises(CalledProcessError) as excinfo:
-                pytest_command = ['pytest', 'test_no_such_file.py']
-                result = cluster.run_integration_tests(
-                    pytest_command=pytest_command,
-                    log_output_live=True,
-                )
-                # This result will not be printed if the test passes, but it
-                # may provide useful debugging information.
-                logging.debug(str(result))  # pragma: no cover
+        # `pytest` results in an exit code of 4 when no tests are
+        # collected.
+        # See https://docs.pytest.org/en/latest/usage.html.
+        assert excinfo.value.returncode == 4
 
-            # `pytest` results in an exit code of 4 when no tests are
-            # collected.
-            # See https://docs.pytest.org/en/latest/usage.html.
-            assert excinfo.value.returncode == 4
+    def test_default_node(self, cluster: Cluster) -> None:
+        """
+        XXX
+        """
+        (master, ) = cluster.masters
+
+    def test_custom_node(self, cluster: Cluster) -> None:
+        """
+        XXX
+        """
+        (agent, ) = cluster.agents
 
 
 class TestExtendConfig:
