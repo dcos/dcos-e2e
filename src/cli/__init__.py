@@ -138,7 +138,11 @@ class _InspectView:
         """
         Return dictionary with information to be shown to users.
         """
-        return {'docker_container_name': self._container.name}
+        container = self._container
+        return {
+            'docker_container_name': container.name,
+            'ip_address': container.attrs['NetworkSettings']['IPAddress'],
+        }
 
 
 def _set_logging(
