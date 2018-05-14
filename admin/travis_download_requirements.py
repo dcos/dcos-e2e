@@ -87,7 +87,7 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
     (OSS_MASTER, ),
-    'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests::test_run_pytest':  # noqa: E501
+    'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters::test_two_clusters':  # noqa: E501
     (OSS_MASTER, ),

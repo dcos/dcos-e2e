@@ -8,7 +8,7 @@ long time to run.
 import logging
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import List
+from typing import Iterator, List
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -24,6 +24,7 @@ class TestIntegrationTests:
 
     @pytest.fixture(scope='class')
     def cluster(
+        self,
         oss_artifact: Path,
         cluster_backend: ClusterBackend,
     ) -> Iterator[Cluster]:
