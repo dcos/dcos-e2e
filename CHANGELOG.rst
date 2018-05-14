@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.05.14.0
+------------
+
 - Show IP address in ``dcos-docker inspect``.
 
 2018.05.10.0
