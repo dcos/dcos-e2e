@@ -28,7 +28,7 @@ class TestIntegrationTests:
         cluster_backend: ClusterBackend,
     ) -> Iterator[Cluster]:
         """
-        Return a `Cluster`.
+        Return a `Cluster` with DC/OS installed and running.
 
         This is class scoped as we do not intend to modify the cluster in ways
         that make tests interfere with one another.
@@ -38,17 +38,19 @@ class TestIntegrationTests:
             masters=1,
             agents=1,
             public_agents=0,
-        ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-            yield cluster
+        ) as dcos_cluster:
+            dcos_cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                log_output_live=True,
+            )
+            dcos_cluster.wait_for_dcos_oss()
+            yield dcos_cluster
 
     def test_run_pytest(self, cluster: Cluster) -> None:
         """
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-        cluster.wait_for_dcos_oss()
         # No error is raised with a successful command.
         pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
         cluster.run_integration_tests(
@@ -74,13 +76,13 @@ class TestIntegrationTests:
 
     def test_default_node(self, cluster: Cluster) -> None:
         """
-        XXX
+        By default commands are run on an arbitrary master node.
         """
         (master, ) = cluster.masters
 
     def test_custom_node(self, cluster: Cluster) -> None:
         """
-        XXX
+        It is possible to run commands on any node.
         """
         (agent, ) = cluster.agents
 
