@@ -391,6 +391,7 @@ class Cluster(ContextDecorator):
             'cd',
             '/opt/mesosphere/active/dcos-integration-test/',
             '&&',
+            *pytest_command,
         ]
 
         env = env or {}
@@ -412,8 +413,6 @@ class Cluster(ContextDecorator):
             'DCOS_DNS_ADDRESS': 'http://' + str(test_host.private_ip_address),
             **env,
         }
-
-        args += pytest_command
 
         return test_host.run(
             args=args,
