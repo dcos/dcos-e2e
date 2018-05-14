@@ -119,7 +119,8 @@ def commit_and_push(version: str) -> None:
     """
     repo = Repo('.')
     paths = ['dcosdocker.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
-    add(paths=paths)
+    _, ignored = add(paths=paths)
+    assert not ignored
     message = b'Update for release ' + version.encode('utf-8')
     commit(message=message)
     branch_name = 'master'
