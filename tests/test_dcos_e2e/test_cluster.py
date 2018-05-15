@@ -8,7 +8,7 @@ long time to run.
 import logging
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import List
+from typing import Iterator, List
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -22,40 +22,74 @@ class TestIntegrationTests:
     Tests for running integration tests on a node.
     """
 
-    def test_run_pytest(
+    @pytest.fixture(scope='class')
+    def cluster(
         self,
-        cluster_backend: ClusterBackend,
         oss_artifact: Path,
-    ) -> None:
+        cluster_backend: ClusterBackend,
+    ) -> Iterator[Cluster]:
+        """
+        Return a `Cluster` with DC/OS installed and running.
+
+        This is class scoped as we do not intend to modify the cluster in ways
+        that make tests interfere with one another.
+        """
+        with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
+            dcos_cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                log_output_live=True,
+            )
+            dcos_cluster.wait_for_dcos_oss()
+            yield dcos_cluster
+
+    def test_run_pytest(self, cluster: Cluster) -> None:
         """
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-            cluster.wait_for_dcos_oss()
-            # No error is raised with a successful command.
-            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
-            cluster.run_integration_tests(
+        # No error is raised with a successful command.
+        pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
+        cluster.run_integration_tests(
+            pytest_command=pytest_command,
+            log_output_live=True,
+        )
+
+        # An error is raised with an unsuccessful command.
+        with pytest.raises(CalledProcessError) as excinfo:
+            pytest_command = ['pytest', 'test_no_such_file.py']
+            result = cluster.run_integration_tests(
                 pytest_command=pytest_command,
                 log_output_live=True,
             )
+            # This result will not be printed if the test passes, but it
+            # may provide useful debugging information.
+            logging.debug(str(result))  # pragma: no cover
 
-            # An error is raised with an unsuccessful command.
-            with pytest.raises(CalledProcessError) as excinfo:
-                pytest_command = ['pytest', 'test_no_such_file.py']
-                result = cluster.run_integration_tests(
-                    pytest_command=pytest_command,
-                    log_output_live=True,
-                )
-                # This result will not be printed if the test passes, but it
-                # may provide useful debugging information.
-                logging.debug(str(result))  # pragma: no cover
+        # `pytest` results in an exit code of 4 when no tests are
+        # collected.
+        # See https://docs.pytest.org/en/latest/usage.html.
+        assert excinfo.value.returncode == 4
 
-            # `pytest` results in an exit code of 4 when no tests are
-            # collected.
-            # See https://docs.pytest.org/en/latest/usage.html.
-            assert excinfo.value.returncode == 4
+    def test_default_node(self, cluster: Cluster) -> None:
+        """
+        By default commands are run on an arbitrary master node.
+        """
+        (master, ) = cluster.masters
+        command = ['/opt/mesosphere/bin/detect_ip']
+        result = cluster.run_integration_tests(pytest_command=command).stdout
+        assert str(master.public_ip_address).encode() == result.strip()
+
+    def test_custom_node(self, cluster: Cluster) -> None:
+        """
+        It is possible to run commands on any node.
+        """
+        (agent, ) = cluster.agents
+        command = ['/opt/mesosphere/bin/detect_ip']
+        result = cluster.run_integration_tests(
+            pytest_command=command,
+            test_host=agent,
+        ).stdout
+        assert str(agent.public_ip_address).encode() == result.strip()
 
 
 class TestExtendConfig:
