@@ -95,19 +95,13 @@ Getting on to a Cluster Node
 ----------------------------
 
 Sometimes it is useful to get onto a cluster node.
-As the nodes are all Docker containers, it is possible to use ``docker exec``.
+.. TODO make run a ref
+As the nodes are all Docker containers, it is possible to use ``dcos-docker run`` or ``docker exec``.
 
-To find the details of the nodes, use ``dcos-docker inspect --cluster-id <your-cluster-id>``.
-Alternatively, use the ``--env`` flag to output commands to be evaluated as such:
+Getting on to a Cluster Node using :ref:dcos-docker run
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: console
-
-   $ eval $(dcos-docker inspect --cluster-id example --env)
-   $ docker exec -it $MASTER_0 /bin/bash
-   [root@dcos-e2e-5253252]# exit
-   $
-
-Which environment variables are available depends on the size of your cluster.
+.. TODO
 
 Another option is to run the following to get on to a random master node:
 
@@ -123,7 +117,28 @@ A shortcut is instead to run a command like the following:
    $ dcos-docker run systemctl list-units
 
 This is run on a random master node.
+
+To get onto a specific node...
+
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+
+Getting on to a Cluster Node using ``docker`` exec
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. TODO
+
+To find the details of the nodes, use ``dcos-docker inspect --cluster-id <your-cluster-id>``.
+Alternatively, use the ``--env`` flag to output commands to be evaluated as such:
+
+.. code-block:: console
+
+   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ docker exec -it $MASTER_0 /bin/bash
+   [root@dcos-e2e-5253252]# exit
+   $
+
+Which environment variables are available depends on the size of your cluster.
+
 
 Destroying Clusters
 -------------------
