@@ -763,18 +763,20 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
     ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
 
+    keys = {
+        'masters': cluster_containers.masters,
+        'agents': cluster_containers.agents,
+        'public_agents': cluster_containers.public_agents,
+    }
+
     if env:
         env_dict = {}
-        prefixes = {
-            'MASTER': cluster_containers.masters,
-            'AGENT': cluster_containers.agents,
-            'PUBLIC_AGENT': cluster_containers.public_agents,
-        }
-        for prefix, containers in prefixes.items():
-            for index, container in enumerate(containers):
-                node_key = '{role}_{index}'.format(role=prefix, index=index)
-                env_dict[node_key] = container.id
-                node_ip_key = node_key + '_IP'
+        for _, containers in keys.items():
+            for container in containers:
+                inspect_data = _InspectView(container).to_dict()
+                reference = inspect_data['e2e_reference'].upper()
+                env_dict[reference] = container.id
+                node_ip_key = reference + '_IP'
                 node_ip = container.attrs['NetworkSettings']['IPAddress']
                 env_dict[node_ip_key] = node_ip
         env_dict['WEB_UI'] = web_ui
@@ -782,12 +784,6 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         for key, value in env_dict.items():
             click.echo('export {key}={value}'.format(key=key, value=value))
         return
-
-    keys = {
-        'masters': cluster_containers.masters,
-        'agents': cluster_containers.agents,
-        'public_agents': cluster_containers.public_agents,
-    }
 
     nodes = {
         key: [_InspectView(container).to_dict() for container in containers]
