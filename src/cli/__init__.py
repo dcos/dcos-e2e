@@ -71,6 +71,7 @@ from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
+    validate_node_reference,
     validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
     validate_path_pair,

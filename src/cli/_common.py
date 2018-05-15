@@ -2,9 +2,10 @@
 Common code for CLI modules.
 """
 
-from typing import Set
+from typing import Dict, Set
 
 import docker
+from docker.models.containers import Container
 
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver

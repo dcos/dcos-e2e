@@ -292,7 +292,7 @@ def validate_node_reference(
         reference = inspect_data['e2e_reference']
         ip_address = inspect_data['ip_address']
         container_name = inspect_data['docker_container_name']
-        accepted = (reference, reference.upper() ip_address, container_name)
+        accepted = (reference, reference.upper(), ip_address, container_name)
         if value in accepted:
             return cluster_containers.to_node(container=container)
 
