@@ -7,6 +7,7 @@ Next
 ----
 
 - Add a ``test_host`` parameter to ``Cluster.run_integration_tests``.
+- Add the ability to specify a node to use for ``dcos-docker run``.
 
 2018.05.14.0
 ------------
