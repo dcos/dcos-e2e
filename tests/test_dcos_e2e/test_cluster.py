@@ -34,12 +34,7 @@ class TestIntegrationTests:
         This is class scoped as we do not intend to modify the cluster in ways
         that make tests interfere with one another.
         """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=1,
-            public_agents=0,
-        ) as dcos_cluster:
+        with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 log_output_live=True,
@@ -82,7 +77,7 @@ class TestIntegrationTests:
         (master, ) = cluster.masters
         command = ['/opt/mesosphere/bin/detect_ip']
         result = cluster.run_integration_tests(pytest_command=command).stdout
-        assert str(master.public_ip_address).encode() == result
+        assert str(master.public_ip_address).encode() == result.strip()
 
     def test_custom_node(self, cluster: Cluster) -> None:
         """
@@ -94,7 +89,7 @@ class TestIntegrationTests:
             pytest_command=command,
             test_host=agent,
         ).stdout
-        assert str(agent.public_ip_address).encode() == result
+        assert str(agent.public_ip_address).encode() == result.strip()
 
 
 class TestExtendConfig:
