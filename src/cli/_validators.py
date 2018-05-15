@@ -12,7 +12,11 @@ import yaml
 
 from dcos_e2e.node import Node
 
-from ._common import ClusterContainers, ContainerInspectView, existing_cluster_ids
+from ._common import (
+    ClusterContainers,
+    ContainerInspectView,
+    existing_cluster_ids,
+)
 
 
 def validate_dcos_configuration(
@@ -299,10 +303,12 @@ def validate_node_reference(
         if value in accepted:
             return cluster_containers.to_node(container=container)
 
-
     message = (
         'No such node in cluster "{cluster_id}" with IP address, Docker '
         'container ID or node reference "{value}". '
         'Node references can be seen with ``dcos_docker inspect``.'
-    ).format(cluster_id=cluster_id, value=value)
+    ).format(
+        cluster_id=cluster_id,
+        value=value
+    )
     raise click.BadParameter(message=message)

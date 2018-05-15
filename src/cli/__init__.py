@@ -9,7 +9,6 @@ import subprocess
 import sys
 import tarfile
 import uuid
-from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
@@ -33,7 +32,6 @@ import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from docker.models.containers import Container
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
