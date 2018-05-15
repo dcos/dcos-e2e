@@ -48,6 +48,7 @@ from ._common import (
     LINUX_DISTRIBUTIONS,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
+    ContainerInspectView,
     existing_cluster_ids,
 )
 from ._doctor_checks import (
@@ -122,43 +123,24 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
 
-class _InspectView:
+def _node_from_reference(
+    cluster_containers: _ClusterContainers,
+    reference: str,
+) -> Node:
     """
-    Details of a node to show in the inspect view.
+    XXX
     """
+    containers = {
+        *cluster_containers.masters,
+        *cluster_containers.agents,
+        *cluster_containers.public_agents,
+    }
 
-    def __init__(self, container: Container) -> None:
-        """
-        Args:
-            container: The Docker container which represents the node.
-        """
-        self._container = container
-
-    def to_dict(self) -> Dict[str, str]:
-        """
-        Return dictionary with information to be shown to users.
-        """
-        container = self._container
-<<<<<<< HEAD
-        node_reference = '1'
-        return {
-            'node_reference': node_reference,
-=======
-        index = container.name.split('-')[-1]
-        name_without_index = container.name[:-len('-' + index)]
-        if name_without_index.endswith('public-agent'):
-            role = 'public_agent'
-        elif name_without_index.endswith('agent'):
-            role = 'agent'
-        elif name_without_index.endswith('master'):
-            role = 'master'
-
-        return {
-            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
->>>>>>> origin/master
-            'docker_container_name': container.name,
-            'ip_address': container.attrs['NetworkSettings']['IPAddress'],
-        }
+    for container in containers:
+        inspect_data = ContainerInspectView(container).to_dict()
+        inspect_data['e2e_reference']
+        inspect_data['ip_address']
+        inspect_data['docker_container_name']
 
 
 def _set_logging(
@@ -779,7 +761,8 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         env_dict = {}
         for _, containers in keys.items():
             for container in containers:
-                inspect_data = _InspectView(container).to_dict()
+                inspect_view = ContainerInspectView(container=container)
+                inspect_data = inspect_view.to_dict()
                 reference = inspect_data['e2e_reference'].upper()
                 env_dict[reference] = container.id
                 node_ip_key = reference + '_IP'
@@ -792,7 +775,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         return
 
     nodes = {
-        key: [_InspectView(container).to_dict() for container in containers]
+        key: [
+            ContainerInspectView(container).to_dict()
+            for container in containers
+        ]
         for key, containers in keys.items()
     }
 
@@ -890,7 +876,10 @@ def run(
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
-    test_host = next(iter(cluster.masters))
+    test_host = _node_from_reference(
+        cluster_containers=cluster_containers,
+        reference=node,
+    )
 
     if no_test_env:
         try:

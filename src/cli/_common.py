@@ -43,3 +43,36 @@ def existing_cluster_ids() -> Set[str]:
     return set(
         [container.labels[CLUSTER_ID_LABEL_KEY] for container in containers],
     )
+
+
+class ContainerInspectView:
+    """
+    Details of a node from a container.
+    """
+
+    def __init__(self, container: Container) -> None:
+        """
+        Args:
+            container: The Docker container which represents the node.
+        """
+        self._container = container
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        container = self._container
+        index = container.name.split('-')[-1]
+        name_without_index = container.name[:-len('-' + index)]
+        if name_without_index.endswith('public-agent'):
+            role = 'public_agent'
+        elif name_without_index.endswith('agent'):
+            role = 'agent'
+        elif name_without_index.endswith('master'):
+            role = 'master'
+
+        return {
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
+            'docker_container_name': container.name,
+            'ip_address': container.attrs['NetworkSettings']['IPAddress'],
+        }
