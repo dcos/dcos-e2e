@@ -77,7 +77,7 @@ class TestIntegrationTests:
         (master, ) = cluster.masters
         command = ['/opt/mesosphere/bin/detect_ip']
         result = cluster.run_integration_tests(pytest_command=command).stdout
-        assert str(master.public_ip_address).encode() == result
+        assert str(master.public_ip_address).encode() == result.strip()
 
     def test_custom_node(self, cluster: Cluster) -> None:
         """
@@ -89,7 +89,7 @@ class TestIntegrationTests:
             pytest_command=command,
             test_host=agent,
         ).stdout
-        assert str(agent.public_ip_address).encode() == result
+        assert str(agent.public_ip_address).encode() == result.strip()
 
 
 class TestExtendConfig:
