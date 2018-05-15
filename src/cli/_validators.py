@@ -283,7 +283,13 @@ def validate_node_reference(
     value: Any,
 ) -> Node:
     """
-    XXX
+    Get a node from a "reference" which is one of:
+
+        * A node's IP address
+        * A node's Docker container
+        * A reference in the format "<role>_<number>"
+
+    Error if there is no such node for the cluster with a given ``cluster_id``.
     """
     cluster_id = ctx.params['cluster_id']
     cluster_containers = ClusterContainers(cluster_id=cluster_id)
