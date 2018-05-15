@@ -749,18 +749,13 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    env = {
-        'DCOS_LOGIN_UNAME': dcos_login_uname,
-        'DCOS_LOGIN_PW': dcos_login_pw,
-    }
-
     cluster_containers = ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
-    test_host = next(iter(cluster.masters))
+    node = next(iter(cluster.masters))
 
     if no_test_env:
         try:
-            test_host.run(
+            node.run(
                 args=list(node_args),
                 log_output_live=False,
                 tty=True,
@@ -771,12 +766,17 @@ def run(
 
         return
 
+    env = {
+        'DCOS_LOGIN_UNAME': dcos_login_uname,
+        'DCOS_LOGIN_PW': dcos_login_pw,
+    }
+
     try:
         cluster.run_integration_tests(
             pytest_command=list(node_args),
             tty=True,
             env=env,
-            test_host=test_host,
+            test_host=node,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)
