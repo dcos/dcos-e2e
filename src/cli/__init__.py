@@ -123,28 +123,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
 
-def _node_from_reference(
-    cluster_containers: _ClusterContainers,
-    reference: str,
-) -> Node:
-    """
-    XXX
-    """
-    containers = {
-        *cluster_containers.masters,
-        *cluster_containers.agents,
-        *cluster_containers.public_agents,
-    }
-
-    for container in containers:
-        inspect_data = ContainerInspectView(container).to_dict()
-        reference = inspect_data['e2e_reference']
-        ip_address = inspect_data['ip_address']
-        container_name = inspect_data['docker_container_name']
-        if reference in (inspect_data, ip_address, container_name):
-            return cluster_containers.to_node(container=container)
-
-
 def _set_logging(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
@@ -844,6 +822,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'container ID, a reference in the format "<role>_<number>". '
         'Node references can be seen with ``dcos_docker inspect``.'
     ),
+    callback=validate_node_reference,
 )
 @click.pass_context
 def run(
@@ -854,7 +833,7 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     no_test_env: bool,
-    node: str,
+    node: Node,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -874,21 +853,9 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    env = {
-        'DCOS_LOGIN_UNAME': dcos_login_uname,
-        'DCOS_LOGIN_PW': dcos_login_pw,
-    }
-
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    cluster = cluster_containers.cluster
-    test_host = _node_from_reference(
-        cluster_containers=cluster_containers,
-        reference=node,
-    )
-
     if no_test_env:
         try:
-            test_host.run(
+            node.run(
                 args=list(node_args),
                 log_output_live=False,
                 tty=True,
@@ -898,6 +865,14 @@ def run(
             sys.exit(exc.returncode)
 
         return
+
+    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster = cluster_containers.cluster
+
+    env = {
+        'DCOS_LOGIN_UNAME': dcos_login_uname,
+        'DCOS_LOGIN_PW': dcos_login_pw,
+    }
 
     try:
         cluster.run_integration_tests(
