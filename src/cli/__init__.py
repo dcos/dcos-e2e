@@ -836,7 +836,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     type=str,
     default='master_0',
     help=(
-        'TODO'
+        'A reference to a particular node to run the command on. '
+        'This can be one of: The node\'s IP address, the node\'s Docker '
+        'container ID, a reference in the format "<role>_<number>". '
+        'Node references can be seen with ``dcos_docker inspect``.'
     ),
 )
 @click.pass_context
