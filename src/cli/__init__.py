@@ -139,7 +139,17 @@ class _InspectView:
         Return dictionary with information to be shown to users.
         """
         container = self._container
+        index = container.name.split('-')[-1]
+        name_without_index = container.name[:-len('-' + index)]
+        if name_without_index.endswith('public-agent'):
+            role = 'public_agent'
+        elif name_without_index.endswith('agent'):
+            role = 'agent'
+        elif name_without_index.endswith('master'):
+            role = 'master'
+
         return {
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
             'docker_container_name': container.name,
             'ip_address': container.attrs['NetworkSettings']['IPAddress'],
         }
