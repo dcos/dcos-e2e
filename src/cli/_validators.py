@@ -10,7 +10,13 @@ import click
 import docker
 import yaml
 
-from ._common import existing_cluster_ids
+from dcos_e2e.node import Node
+
+from ._common import (
+    ClusterContainers,
+    ContainerInspectView,
+    existing_cluster_ids,
+)
 
 
 def validate_dcos_configuration(
@@ -269,3 +275,57 @@ def validate_ovpn_file_does_not_exist(
         raise click.BadParameter(message=message)
 
     return path
+
+
+def validate_node_reference(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Node:
+    """
+    Get a node from a "reference" which is one of:
+
+        * A node's IP address
+        * A node's Docker container
+        * A reference in the format "<role>_<number>"
+
+    Error if there is no such node for the cluster with a given ``cluster_id``.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (param, ):
+        pass
+
+    cluster_id = ctx.params['cluster_id']
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+
+    containers = {
+        *cluster_containers.masters,
+        *cluster_containers.agents,
+        *cluster_containers.public_agents,
+    }
+
+    for container in containers:
+        inspect_data = ContainerInspectView(container=container).to_dict()
+        reference = inspect_data['e2e_reference']
+        ip_address = inspect_data['ip_address']
+        container_name = inspect_data['docker_container_name']
+        container_id = inspect_data['docker_container_id']
+        accepted = (
+            reference,
+            reference.upper(),
+            ip_address,
+            container_name,
+            container_id,
+        )
+        if value in accepted:
+            return cluster_containers.to_node(container=container)
+
+    message = (
+        'No such node in cluster "{cluster_id}" with IP address, Docker '
+        'container ID or node reference "{value}". '
+        'Node references can be seen with ``dcos_docker inspect``.'
+    ).format(
+        cluster_id=cluster_id,
+        value=value,
+    )
+    raise click.BadParameter(message=message)

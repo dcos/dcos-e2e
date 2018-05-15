@@ -37,6 +37,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 from ._common import (
     CLUSTER_ID_LABEL_KEY,
@@ -69,6 +70,7 @@ from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
+    validate_node_reference,
     validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
     validate_path_pair,
@@ -654,7 +656,8 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         env_dict = {}
         for _, containers in keys.items():
             for container in containers:
-                inspect_data = ContainerInspectView(container).to_dict()
+                inspect_view = ContainerInspectView(container=container)
+                inspect_data = inspect_view.to_dict()
                 reference = inspect_data['e2e_reference'].upper()
                 env_dict[reference] = container.id
                 node_ip_key = reference + '_IP'
@@ -721,6 +724,21 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'is run in the home directory. '
     ),
 )
+@click.option(
+    '--node',
+    type=str,
+    default='master_0',
+    help=(
+        'A reference to a particular node to run the command on. '
+        'This can be one of: '
+        'The node\'s IP address, '
+        'the node\'s Docker container name, '
+        'the node\'s Docker container ID, '
+        'a reference in the format "<role>_<number>". '
+        'These details be seen with ``dcos_docker inspect``.'
+    ),
+    callback=validate_node_reference,
+)
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -730,6 +748,7 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     no_test_env: bool,
+    node: Node,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -749,10 +768,6 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    cluster_containers = ClusterContainers(cluster_id=cluster_id)
-    cluster = cluster_containers.cluster
-    node = next(iter(cluster.masters))
-
     if no_test_env:
         try:
             node.run(
@@ -765,6 +780,9 @@ def run(
             sys.exit(exc.returncode)
 
         return
+
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    cluster = cluster_containers.cluster
 
     env = {
         'DCOS_LOGIN_UNAME': dcos_login_uname,
