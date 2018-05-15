@@ -77,7 +77,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
         --cluster-id default
 
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait <dcos-docker-wait>` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
 
 See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
 
@@ -90,6 +90,19 @@ apart from ``create``,
 defaults to using "default" if no cluster ID is given.
 
 This means that you can use ``--cluster-id=default`` and then use ``dcos-docker wait`` with no arguments to wait for the ``default`` cluster.
+
+Running commands on Cluster Nodes
+---------------------------------
+
+It is possible to run commands on a cluster node in multiple ways.
+These include using :ref:`dcos-docker-run`, ``docker exec`` and ``ssh``.
+
+Running commands on a cluster node using :ref:`dcos-docker-run`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Running commands on a cluster node using ``docker exec``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 Getting on to a Cluster Node
 ----------------------------
