@@ -139,7 +139,9 @@ class _InspectView:
         Return dictionary with information to be shown to users.
         """
         container = self._container
+        node_reference = '1'
         return {
+            'node_reference': node_reference,
             'docker_container_name': container.name,
             'ip_address': container.attrs['NetworkSettings']['IPAddress'],
         }
@@ -761,7 +763,8 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
             'PUBLIC_AGENT': cluster_containers.public_agents,
         }
         for prefix, containers in prefixes.items():
-            for index, container in enumerate(containers):
+            for container in containers:
+                index = 0
                 node_key = '{role}_{index}'.format(role=prefix, index=index)
                 env_dict[node_key] = container.id
                 node_ip_key = node_key + '_IP'
