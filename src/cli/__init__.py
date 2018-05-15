@@ -37,7 +37,6 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node
 
 from ._common import (
     CLUSTER_ID_LABEL_KEY,
