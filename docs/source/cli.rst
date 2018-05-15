@@ -99,7 +99,7 @@ Sometimes it is useful to get onto a cluster node.
 As the nodes are all Docker containers, it is possible to use ``dcos-docker run`` or ``docker exec``.
 
 Getting on to a Cluster Node using :ref:dcos-docker run
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. TODO
 
@@ -123,7 +123,7 @@ To get onto a specific node...
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
 
 Getting on to a Cluster Node using ``docker`` exec
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. TODO
 

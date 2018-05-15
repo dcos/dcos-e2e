@@ -46,6 +46,7 @@ from ._common import (
     LINUX_DISTRIBUTIONS,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
+    ClusterContainers,
     ContainerInspectView,
     existing_cluster_ids,
 )
@@ -790,7 +791,7 @@ def run(
             pytest_command=list(node_args),
             tty=True,
             env=env,
-            test_host=test_host,
+            test_host=node,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)

@@ -2,6 +2,7 @@
 Common code for CLI modules.
 """
 
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Dict, Set
 
