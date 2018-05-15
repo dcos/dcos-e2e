@@ -145,8 +145,16 @@ For example, to use :ref:`dcos-docker-run` to get on to an arbitrary master node
 
 .. code-block:: console
 
-   $ 
+   $ dcos-docker run --cluster-id example bash
 
+or to use ``docker exec`` to get on to a specific node:
+
+.. code-block:: console
+
+   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ docker exec -it $MASTER_0 bash
+
+See :ref:`running-commands` for details on how to choose particular nodes.
 
 Destroying Clusters
 -------------------
