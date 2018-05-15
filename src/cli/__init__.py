@@ -138,9 +138,11 @@ def _node_from_reference(
 
     for container in containers:
         inspect_data = ContainerInspectView(container).to_dict()
-        inspect_data['e2e_reference']
-        inspect_data['ip_address']
-        inspect_data['docker_container_name']
+        reference = inspect_data['e2e_reference']
+        ip_address = inspect_data['ip_address']
+        container_name = inspect_data['docker_container_name']
+        if reference in (inspect_data, ip_address, container_name):
+            return cluster_containers.to_node(container=container)
 
 
 def _set_logging(
@@ -630,7 +632,10 @@ class _ClusterContainers:
         }
         return set(client.containers.list(filters=filters))
 
-    def _to_node(self, container: Container) -> Node:
+    def to_node(self, container: Container) -> Node:
+        """
+        Return the ``Node`` that is represented by a given ``container``.
+        """
         address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
         ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
         return Node(
@@ -675,9 +680,9 @@ class _ClusterContainers:
         Return a ``Cluster`` constructed from the containers.
         """
         return Cluster.from_nodes(
-            masters=set(map(self._to_node, self.masters)),
-            agents=set(map(self._to_node, self.agents)),
-            public_agents=set(map(self._to_node, self.public_agents)),
+            masters=set(map(self.to_node, self.masters)),
+            agents=set(map(self.to_node, self.agents)),
+            public_agents=set(map(self.to_node, self.public_agents)),
         )
 
     @property
