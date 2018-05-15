@@ -351,13 +351,6 @@ class DockerCluster(ClusterManager):
             *cluster_backend.custom_container_mounts,
         ]
 
-        private_agent_mounts = (
-            agent_mounts + cluster_backend.custom_agent_mounts
-        )
-        public_agent_mounts = (
-            agent_mounts + cluster_backend.custom_public_agent_mounts
-        )
-
         master_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
@@ -367,62 +360,43 @@ class DockerCluster(ClusterManager):
             *cluster_backend.custom_master_mounts,
         ]
 
-        for master_number in range(1, masters + 1):
-            start_dcos_container(
-                existing_masters=self.masters,
-                container_base_name=self._master_prefix,
-                container_number=master_number,
-                dcos_num_masters=masters,
-                dcos_num_agents=agents + public_agents,
-                mounts=master_mounts,
-                tmpfs=node_tmpfs_mounts,
-                docker_image=docker_image_tag,
-                labels={
-                    **cluster_backend.docker_container_labels,
-                    **cluster_backend.docker_master_labels,
-                },
-                public_key_path=public_key_path,
-                docker_storage_driver=cluster_backend.docker_storage_driver,
-                docker_version=cluster_backend.docker_version,
-            )
-
-        for agent_number in range(1, agents + 1):
-            start_dcos_container(
-                existing_masters=self.masters,
-                container_base_name=self._agent_prefix,
-                container_number=agent_number,
-                dcos_num_masters=masters,
-                dcos_num_agents=agents + public_agents,
-                mounts=private_agent_mounts,
-                tmpfs=node_tmpfs_mounts,
-                docker_image=docker_image_tag,
-                labels={
-                    **cluster_backend.docker_container_labels,
-                    **cluster_backend.docker_agent_labels,
-                },
-                public_key_path=public_key_path,
-                docker_storage_driver=cluster_backend.docker_storage_driver,
-                docker_version=cluster_backend.docker_version,
-            )
-
-        for public_agent_number in range(1, public_agents + 1):
-            start_dcos_container(
-                existing_masters=self.masters,
-                container_base_name=self._public_agent_prefix,
-                container_number=public_agent_number,
-                dcos_num_masters=masters,
-                dcos_num_agents=agents + public_agents,
-                mounts=public_agent_mounts,
-                tmpfs=node_tmpfs_mounts,
-                docker_image=docker_image_tag,
-                labels={
-                    **cluster_backend.docker_container_labels,
-                    **cluster_backend.docker_public_agent_labels,
-                },
-                public_key_path=public_key_path,
-                docker_storage_driver=cluster_backend.docker_storage_driver,
-                docker_version=cluster_backend.docker_version,
-            )
+        for nodes, prefix, labels, mounts in (
+            (
+                masters,
+                self._master_prefix,
+                cluster_backend.docker_master_labels,
+                master_mounts,
+            ),
+            (
+                agents,
+                self._agent_prefix,
+                cluster_backend.docker_agent_labels,
+                agent_mounts + cluster_backend.custom_agent_mounts,
+            ),
+            (
+                public_agents,
+                self._public_agent_prefix,
+                cluster_backend.docker_public_agent_labels,
+                agent_mounts + cluster_backend.custom_public_agent_mounts,
+            ),
+        ):
+            for container_number in range(nodes):
+                start_dcos_container(
+                    existing_masters=self.masters,
+                    container_base_name=prefix,
+                    container_number=container_number,
+                    dcos_num_masters=masters,
+                    dcos_num_agents=agents + public_agents,
+                    mounts=mounts,
+                    tmpfs=node_tmpfs_mounts,
+                    docker_image=docker_image_tag,
+                    labels=labels,
+                    public_key_path=public_key_path,
+                    docker_storage_driver=(
+                        cluster_backend.docker_storage_driver
+                    ),
+                    docker_version=cluster_backend.docker_version,
+                )
 
     def install_dcos_from_url(
         self,
