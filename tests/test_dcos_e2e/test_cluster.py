@@ -34,12 +34,7 @@ class TestIntegrationTests:
         This is class scoped as we do not intend to modify the cluster in ways
         that make tests interfere with one another.
         """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=1,
-            public_agents=0,
-        ) as dcos_cluster:
+        with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 log_output_live=True,
