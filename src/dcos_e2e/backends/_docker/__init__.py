@@ -390,7 +390,10 @@ class DockerCluster(ClusterManager):
                     mounts=mounts,
                     tmpfs=node_tmpfs_mounts,
                     docker_image=docker_image_tag,
-                    labels=labels,
+                    labels={
+                        **cluster_backend.docker_container_labels,
+                        **labels,
+                    },
                     public_key_path=public_key_path,
                     docker_storage_driver=(
                         cluster_backend.docker_storage_driver
