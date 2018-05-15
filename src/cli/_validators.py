@@ -291,6 +291,10 @@ def validate_node_reference(
 
     Error if there is no such node for the cluster with a given ``cluster_id``.
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (param, ):
+        pass
+
     cluster_id = ctx.params['cluster_id']
     cluster_containers = ClusterContainers(cluster_id=cluster_id)
 

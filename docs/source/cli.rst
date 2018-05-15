@@ -107,9 +107,10 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. code-block:: console
 
-   $ dcos-docker run systemctl list-units
+   $ dcos-docker run --cluster-id example systemctl list-units
 
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+In particular see the ``--node`` option to choose a particular node to run the command on.
 
 Running commands on a cluster node using ``docker exec``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,13 +142,13 @@ Getting on to a Cluster Node
 Sometimes it is useful to get onto a cluster node.
 To do this, you can use any of the ways of :ref:`running-commands`.
 
-For example, to use :ref:`dcos-docker-run` to get on to an arbitrary master node:
+For example, to use :ref:`dcos-docker-run` to run ``bash`` to get on to an arbitrary master node:
 
 .. code-block:: console
 
    $ dcos-docker run --cluster-id example bash
 
-or to use ``docker exec`` to get on to a specific node:
+or, similarly, to use ``docker exec`` to get on to a specific node:
 
 .. code-block:: console
 

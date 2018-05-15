@@ -78,9 +78,8 @@ from ._validators import (
 )
 
 
-def _existing_cluster_id_option(
-    command: Callable[..., None],
-) -> Callable[..., None]:
+def _existing_cluster_id_option(command: Callable[..., None],
+                                ) -> Callable[..., None]:
     """
     An option decorator for one Cluster ID.
     """
