@@ -367,7 +367,7 @@ class DockerCluster(ClusterManager):
             *cluster_backend.custom_master_mounts,
         ]
 
-        for master_number in range(1, masters + 1):
+        for master_number in range(masters):
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._master_prefix,
@@ -386,7 +386,7 @@ class DockerCluster(ClusterManager):
                 docker_version=cluster_backend.docker_version,
             )
 
-        for agent_number in range(1, agents + 1):
+        for agent_number in range(agents):
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._agent_prefix,
@@ -405,7 +405,7 @@ class DockerCluster(ClusterManager):
                 docker_version=cluster_backend.docker_version,
             )
 
-        for public_agent_number in range(1, public_agents + 1):
+        for public_agent_number in range(public_agents):
             start_dcos_container(
                 existing_masters=self.masters,
                 container_base_name=self._public_agent_prefix,
