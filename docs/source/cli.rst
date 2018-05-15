@@ -77,7 +77,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
         --cluster-id default
 
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait <dcos-docker-wait>` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
 
 See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
 
@@ -91,39 +91,70 @@ defaults to using "default" if no cluster ID is given.
 
 This means that you can use ``--cluster-id=default`` and then use ``dcos-docker wait`` with no arguments to wait for the ``default`` cluster.
 
-Getting on to a Cluster Node
-----------------------------
 
-Sometimes it is useful to get onto a cluster node.
-As the nodes are all Docker containers, it is possible to use ``docker exec``.
+.. _running-commands:
 
-To find the details of the nodes, use ``dcos-docker inspect --cluster-id <your-cluster-id>``.
-Alternatively, use the ``--env`` flag to output commands to be evaluated as such:
+Running commands on Cluster Nodes
+---------------------------------
 
-.. code-block:: console
+It is possible to run commands on a cluster node in multiple ways.
+These include using :ref:`dcos-docker-run`, ``docker exec`` and ``ssh``.
 
-   $ eval $(dcos-docker inspect --cluster-id example --env)
-   $ docker exec -it $MASTER_0 /bin/bash
-   [root@dcos-e2e-5253252]# exit
-   $
+Running commands on a cluster node using :ref:`dcos-docker-run`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Which environment variables are available depends on the size of your cluster.
-
-Another option is to run the following to get on to a random master node:
-
-.. code-block:: console
-
-   $ dcos-docker run --cluster-id example bash
-
-However, it is often not necessary to get on to a cluster node.
-A shortcut is instead to run a command like the following:
+It is possible to run the following to run a command on an arbitrary master node.
 
 .. code-block:: console
 
    $ dcos-docker run systemctl list-units
 
-This is run on a random master node.
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+
+Running commands on a cluster node using ``docker exec``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Each cluster node is a Docker container.
+This means that you can use tools such as ``docker exec`` to run commands on nodes.
+To do this, first choose the container ID of a node.
+Use :ref:`dcos-docker-inspect` to see all node container IDs.
+
+Alternatively, use the ``--env`` flag to output commands to be evaluated as such:
+
+.. code-block:: console
+
+   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ docker exec -it $MASTER_0 systemctl list-units
+
+Which environment variables are available depends on the size of your cluster.
+
+Running commands on a cluster node using ``ssh``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One SSH key allows access to all nodes in the cluster.
+See this SSH key's path and the IP addresses of nodes using :ref:`dcos-docker-inspect`.
+The available SSH user is ``root``.
+
+Getting on to a Cluster Node
+----------------------------
+
+Sometimes it is useful to get onto a cluster node.
+To do this, you can use any of the ways of :ref:`running-commands`.
+
+For example, to use :ref:`dcos-docker-run` to get on to an arbitrary master node:
+
+.. code-block:: console
+
+   $ dcos-docker run --cluster-id example bash
+
+or to use ``docker exec`` to get on to a specific node:
+
+.. code-block:: console
+
+   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ docker exec -it $MASTER_0 bash
+
+See :ref:`running-commands` for details on how to choose particular nodes.
 
 Destroying Clusters
 -------------------
@@ -162,12 +193,14 @@ Viewing Debug Information
 The CLI is quiet by default.
 To see more information, use ``-v`` or ``-vv`` after ``dcos-docker``.
 
+.. _running-integration-tests:
+
 Running Integration Tests
 -------------------------
 
-The ``dcos-docker run`` command is useful for running integration tests.
+The :ref:`dcos-docker-run` command is useful for running integration tests.
 
-To run integration tests which are developed in the a DC/OS checkout at ``/path/to/dcos``, you can use the following workflow:
+To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
 
 .. code-block:: console
 
