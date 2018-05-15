@@ -12,7 +12,7 @@ import yaml
 
 from dcos_e2e.node import Node
 
-from ._common import existing_cluster_ids
+from ._common import ClusterContainers, ContainerInspectView, existing_cluster_ids
 
 
 def validate_dcos_configuration(
@@ -281,6 +281,9 @@ def validate_node_reference(
     """
     XXX
     """
+    cluster_id = ctx.params['cluster_id']
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+
     containers = {
         *cluster_containers.masters,
         *cluster_containers.agents,

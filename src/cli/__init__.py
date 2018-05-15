@@ -567,7 +567,7 @@ def destroy(cluster_id: str) -> None:
     Destroy a cluster.
     """
     with click_spinner.spinner():
-        cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+        cluster_containers = ClusterContainers(cluster_id=cluster_id)
         containers = {
             *cluster_containers.masters,
             *cluster_containers.agents,
@@ -581,94 +581,6 @@ def destroy(cluster_id: str) -> None:
         client = docker.from_env(version='auto')
         client.volumes.prune()
     click.echo(cluster_id)
-
-
-class _ClusterContainers:
-    """
-    A representation of a cluster constructed from Docker nodes.
-    """
-
-    def __init__(self, cluster_id: str) -> None:
-        """
-        Args:
-            cluster_id: The ID of the cluster.
-        """
-        self._cluster_id_label = CLUSTER_ID_LABEL_KEY + '=' + cluster_id
-
-    def _containers_by_node_type(
-        self,
-        node_type: str,
-    ) -> Set[Container]:
-        """
-        Return all containers in this cluster of a particular node type.
-        """
-        client = docker.from_env(version='auto')
-        filters = {
-            'label': [
-                self._cluster_id_label,
-                'node_type={node_type}'.format(node_type=node_type),
-            ],
-        }
-        return set(client.containers.list(filters=filters))
-
-    def to_node(self, container: Container) -> Node:
-        """
-        Return the ``Node`` that is represented by a given ``container``.
-        """
-        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
-        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
-        return Node(
-            public_ip_address=address,
-            private_ip_address=address,
-            default_ssh_user='root',
-            ssh_key_path=ssh_key_path,
-        )
-
-    @property
-    def masters(self) -> Set[Container]:
-        """
-        Docker containers which represent master nodes.
-        """
-        return self._containers_by_node_type(node_type='master')
-
-    @property
-    def agents(self) -> Set[Container]:
-        """
-        Docker containers which represent agent nodes.
-        """
-        return self._containers_by_node_type(node_type='agent')
-
-    @property
-    def public_agents(self) -> Set[Container]:
-        """
-        Docker containers which represent public agent nodes.
-        """
-        return self._containers_by_node_type(node_type='public_agent')
-
-    @property
-    def is_enterprise(self) -> bool:
-        """
-        Return whether the cluster is a DC/OS Enterprise cluster.
-        """
-        master_container = next(iter(self.masters))
-        return bool(master_container.labels[VARIANT_LABEL_KEY] == 'ee')
-
-    @property
-    def cluster(self) -> Cluster:
-        """
-        Return a ``Cluster`` constructed from the containers.
-        """
-        return Cluster.from_nodes(
-            masters=set(map(self.to_node, self.masters)),
-            agents=set(map(self.to_node, self.agents)),
-            public_agents=set(map(self.to_node, self.public_agents)),
-        )
-
-    @property
-    def workspace_dir(self) -> Path:
-        container = next(iter(self.masters))
-        workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
-        return Path(workspace_dir)
 
 
 @dcos_docker.command('wait')
@@ -701,7 +613,7 @@ def wait(
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     click.echo('A cluster may take some time to be ready.')
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     with click_spinner.spinner():
         if cluster_containers.is_enterprise:
             cluster_containers.cluster.wait_for_dcos_ee(
@@ -730,7 +642,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
     ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
@@ -867,7 +779,7 @@ def run(
 
         return
 
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
 
     env = {
@@ -923,7 +835,7 @@ def web(cluster_id: str) -> None:
     Note that the web UI may not be available at first.
     Consider using ``dcos-docker wait`` before running this command.
     """
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     master = next(iter(cluster.masters))
     web_ui = 'http://' + str(master.public_ip_address)
@@ -963,7 +875,7 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
 
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'
