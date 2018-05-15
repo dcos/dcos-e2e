@@ -736,7 +736,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'the node\'s Docker container name, '
         'the node\'s Docker container ID, '
         'a reference in the format "<role>_<number>". '
-        'Node references can be seen with ``dcos_docker inspect``.'
+        'These details be seen with ``dcos_docker inspect``.'
     ),
     callback=validate_node_reference,
 )
