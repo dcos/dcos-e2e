@@ -866,11 +866,10 @@ def run(
 
     cluster_containers = _ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
+    test_host = next(iter(cluster.masters))
 
     if no_test_env:
         try:
-            test_host = next(iter(cluster.masters))
-
             test_host.run(
                 args=list(node_args),
                 log_output_live=False,
@@ -887,6 +886,7 @@ def run(
             pytest_command=list(node_args),
             tty=True,
             env=env,
+            test_host=test_host,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)
