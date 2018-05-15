@@ -301,7 +301,7 @@ def validate_node_reference(
     }
 
     for container in containers:
-        inspect_data = ContainerInspectView(container).to_dict()
+        inspect_data = ContainerInspectView(container=container).to_dict()
         reference = inspect_data['e2e_reference']
         ip_address = inspect_data['ip_address']
         container_name = inspect_data['docker_container_name']
