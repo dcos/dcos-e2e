@@ -309,6 +309,6 @@ def validate_node_reference(
         'Node references can be seen with ``dcos_docker inspect``.'
     ).format(
         cluster_id=cluster_id,
-        value=value
+        value=value,
     )
     raise click.BadParameter(message=message)
