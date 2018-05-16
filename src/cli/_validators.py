@@ -335,4 +335,29 @@ def validate_variant(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
-) -> bool:
+) -> str:
+    """
+    XXX
+    """
+    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
+    base_workspace_dir = workspace_dir or Path(gettempdir())
+    workspace_dir = base_workspace_dir / uuid.uuid4().hex
+
+    try:
+        with click_spinner.spinner():
+            enterprise = is_enterprise(
+                build_artifact=artifact_path,
+                workspace_dir=workspace_dir,
+            )
+    except subprocess.CalledProcessError as exc:
+        rmtree(path=str(workspace_dir), ignore_errors=True)
+        click.echo(doctor_message)
+        click.echo()
+        click.echo('Original error:')
+        click.echo(exc.stderr)
+        raise
+
+    if enterprise:
+        return 'enterprise'
+    else:
+        return 'oss'

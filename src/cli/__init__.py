@@ -364,6 +364,7 @@ def create(
     custom_master_volume: List[Mount],
     custom_agent_volume: List[Mount],
     custom_public_agent_volume: List[Mount],
+    variant: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -411,19 +412,7 @@ def create(
     )
 
     artifact_path = Path(artifact).resolve()
-    try:
-        with click_spinner.spinner():
-            enterprise = is_enterprise(
-                build_artifact=artifact_path,
-                workspace_dir=workspace_dir,
-            )
-    except subprocess.CalledProcessError as exc:
-        rmtree(path=str(workspace_dir), ignore_errors=True)
-        click.echo(doctor_message)
-        click.echo()
-        click.echo('Original error:')
-        click.echo(exc.stderr)
-        raise
+    enterprise = bool(variant == 'enterprise')
 
     if enterprise:
         superuser_username = 'admin'
