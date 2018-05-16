@@ -42,7 +42,7 @@ setup(
     include_package_data=True,
     license='Apache License 2.0',
     keywords='dcos mesos docker',
-    url='https://github.com/mesosphere/dcos-e2e',
+    url='https://github.com/dcos/dcos-e2e',
     extras_require={
         'dev': DEV_REQUIRES,
     },

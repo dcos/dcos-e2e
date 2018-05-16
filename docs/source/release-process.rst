@@ -34,6 +34,6 @@ Perform a Release
 
     .. code:: sh
 
-       curl https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/admin/release.sh | bash
+       curl https://raw.githubusercontent.com/dcos/dcos-e2e/master/admin/release.sh | bash
 
 .. _Homebrew: https://brew.sh/

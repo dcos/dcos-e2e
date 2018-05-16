@@ -26,13 +26,13 @@ On Ubuntu, install Python development requirements:
 
 Optionally replace ``master`` with a particular version of DC/OS E2E.
 The latest release is |release|.
-See `available versions <https://github.com/mesosphere/dcos-e2e/tags>`_.
+See `available versions <https://github.com/dcos/dcos-e2e/tags>`_.
 
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
 .. code:: sh
 
-    pip3 install --upgrade git+https://github.com/mesosphere/dcos-e2e.git@master
+    pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@master
 
 Run :ref:`dcos-docker-doctor` to make sure that your system is ready to go for the Docker backend:
 

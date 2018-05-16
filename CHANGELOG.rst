@@ -201,7 +201,7 @@ Next
 ------------
 
 -  Added Apache2 license.
--  Repository moved to ``https://github.com/mesosphere/dcos-e2e``.
+-  Repository moved to ``https://github.com/dcos/dcos-e2e``.
 -  Added ``run``, which is similar to ``run_as_root`` but takes a ``user`` argument.
 -  Added ``popen``, which can be used for running commands asynchronously.
 

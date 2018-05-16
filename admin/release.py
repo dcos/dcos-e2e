@@ -36,8 +36,8 @@ def get_homebrew_formula(version: str) -> str:
         class Dcosdocker < Formula
           include Language::Python::Virtualenv
 
-          url "https://github.com/mesosphere/dcos-e2e/archive/{version}.tar.gz"
-          head "https://github.com/mesosphere/dcos-e2e.git"
+          url "https://github.com/dcos/dcos-e2e/archive/{version}.tar.gz"
+          head "https://github.com/dcos/dcos-e2e.git"
           homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
           depends_on "python3"
 
