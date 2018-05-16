@@ -398,7 +398,6 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    return
     base_workspace_dir = workspace_dir or Path(gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
