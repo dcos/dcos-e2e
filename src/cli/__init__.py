@@ -332,10 +332,11 @@ def dcos_docker(verbose: None) -> None:
     multiple=True,
 )
 @click.option(
-    '--custom-public-agent-volume',
-    type=str,
+    '--variant',
+    type=click.Choice(['auto', 'oss', 'enterprise'),
     callback=validate_variant,
     help=(
+        'XXX auto gets from artifact'
     ),
 )
 def create(
