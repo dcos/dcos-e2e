@@ -9,7 +9,6 @@ import subprocess
 import sys
 import tarfile
 import uuid
-from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
@@ -18,10 +17,8 @@ from typing import (  # noqa: F401
     Any,
     Callable,
     Dict,
-    Iterable,
     List,
     Optional,
-    Set,
     Tuple,
     Union,
 )
@@ -33,7 +30,6 @@ import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from docker.models.containers import Container
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
@@ -48,6 +44,8 @@ from ._common import (
     LINUX_DISTRIBUTIONS,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
+    ClusterContainers,
+    ContainerInspectView,
     existing_cluster_ids,
 )
 from ._doctor_checks import (
@@ -65,14 +63,15 @@ from ._doctor_checks import (
     link_to_troubleshooting,
 )
 from ._mac_network import create_mac_network, destroy_mac_network_containers
-from ._utils import is_enterprise
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
+    validate_node_reference,
     validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
     validate_path_pair,
+    validate_variant,
     validate_volumes,
 )
 
@@ -120,25 +119,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
-
-
-class _InspectView:
-    """
-    Details of a node to show in the inspect view.
-    """
-
-    def __init__(self, container: Container) -> None:
-        """
-        Args:
-            container: The Docker container which represents the node.
-        """
-        self._container = container
-
-    def to_dict(self) -> Dict[str, str]:
-        """
-        Return dictionary with information to be shown to users.
-        """
-        return {'docker_container_name': self._container.name}
 
 
 def _set_logging(
@@ -351,6 +331,20 @@ def dcos_docker(verbose: None) -> None:
     ),
     multiple=True,
 )
+@click.option(
+    '--variant',
+    type=click.Choice(['auto', 'oss', 'enterprise']),
+    default='auto',
+    callback=validate_variant,
+    help=(
+        'Choose the DC/OS variant. '
+        'If the variant does not match the variant of the given artifact, '
+        'an error will occur. '
+        'Using "auto" finds the variant from the artifact. '
+        'Finding the variant from the artifact takes some time and so using '
+        'another option is a performance optimization.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -370,6 +364,7 @@ def create(
     custom_master_volume: List[Mount],
     custom_agent_volume: List[Mount],
     custom_public_agent_volume: List[Mount],
+    variant: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -417,19 +412,7 @@ def create(
     )
 
     artifact_path = Path(artifact).resolve()
-    try:
-        with click_spinner.spinner():
-            enterprise = is_enterprise(
-                build_artifact=artifact_path,
-                workspace_dir=workspace_dir,
-            )
-    except subprocess.CalledProcessError as exc:
-        rmtree(path=str(workspace_dir), ignore_errors=True)
-        click.echo(doctor_message)
-        click.echo()
-        click.echo('Original error:')
-        click.echo(exc.stderr)
-        raise
+    enterprise = bool(variant == 'enterprise')
 
     if enterprise:
         superuser_username = 'admin'
@@ -584,7 +567,7 @@ def destroy(cluster_id: str) -> None:
     Destroy a cluster.
     """
     with click_spinner.spinner():
-        cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+        cluster_containers = ClusterContainers(cluster_id=cluster_id)
         containers = {
             *cluster_containers.masters,
             *cluster_containers.agents,
@@ -598,91 +581,6 @@ def destroy(cluster_id: str) -> None:
         client = docker.from_env(version='auto')
         client.volumes.prune()
     click.echo(cluster_id)
-
-
-class _ClusterContainers:
-    """
-    A representation of a cluster constructed from Docker nodes.
-    """
-
-    def __init__(self, cluster_id: str) -> None:
-        """
-        Args:
-            cluster_id: The ID of the cluster.
-        """
-        self._cluster_id_label = CLUSTER_ID_LABEL_KEY + '=' + cluster_id
-
-    def _containers_by_node_type(
-        self,
-        node_type: str,
-    ) -> Set[Container]:
-        """
-        Return all containers in this cluster of a particular node type.
-        """
-        client = docker.from_env(version='auto')
-        filters = {
-            'label': [
-                self._cluster_id_label,
-                'node_type={node_type}'.format(node_type=node_type),
-            ],
-        }
-        return set(client.containers.list(filters=filters))
-
-    def _to_node(self, container: Container) -> Node:
-        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
-        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
-        return Node(
-            public_ip_address=address,
-            private_ip_address=address,
-            default_ssh_user='root',
-            ssh_key_path=ssh_key_path,
-        )
-
-    @property
-    def masters(self) -> Set[Container]:
-        """
-        Docker containers which represent master nodes.
-        """
-        return self._containers_by_node_type(node_type='master')
-
-    @property
-    def agents(self) -> Set[Container]:
-        """
-        Docker containers which represent agent nodes.
-        """
-        return self._containers_by_node_type(node_type='agent')
-
-    @property
-    def public_agents(self) -> Set[Container]:
-        """
-        Docker containers which represent public agent nodes.
-        """
-        return self._containers_by_node_type(node_type='public_agent')
-
-    @property
-    def is_enterprise(self) -> bool:
-        """
-        Return whether the cluster is a DC/OS Enterprise cluster.
-        """
-        master_container = next(iter(self.masters))
-        return bool(master_container.labels[VARIANT_LABEL_KEY] == 'ee')
-
-    @property
-    def cluster(self) -> Cluster:
-        """
-        Return a ``Cluster`` constructed from the containers.
-        """
-        return Cluster.from_nodes(
-            masters=set(map(self._to_node, self.masters)),
-            agents=set(map(self._to_node, self.agents)),
-            public_agents=set(map(self._to_node, self.public_agents)),
-        )
-
-    @property
-    def workspace_dir(self) -> Path:
-        container = next(iter(self.masters))
-        workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
-        return Path(workspace_dir)
 
 
 @dcos_docker.command('wait')
@@ -715,7 +613,7 @@ def wait(
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     click.echo('A cluster may take some time to be ready.')
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     with click_spinner.spinner():
         if cluster_containers.is_enterprise:
             cluster_containers.cluster.wait_for_dcos_ee(
@@ -744,26 +642,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
-
-    if env:
-        prefixes = {
-            'MASTER': cluster_containers.masters,
-            'AGENT': cluster_containers.agents,
-            'PUBLIC_AGENT': cluster_containers.public_agents,
-        }
-        for prefix, containers in prefixes.items():
-            for index, container in enumerate(containers):
-                message = 'export {prefix}_{index}={container_id}'.format(
-                    prefix=prefix,
-                    index=index,
-                    container_id=container.id,
-                )
-                click.echo(message)
-        click.echo('export WEB_UI={web_ui}'.format(web_ui=web_ui))
-        return
+    ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
 
     keys = {
         'masters': cluster_containers.masters,
@@ -771,8 +653,28 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'public_agents': cluster_containers.public_agents,
     }
 
+    if env:
+        env_dict = {}
+        for _, containers in keys.items():
+            for container in containers:
+                inspect_view = ContainerInspectView(container=container)
+                inspect_data = inspect_view.to_dict()
+                reference = inspect_data['e2e_reference'].upper()
+                env_dict[reference] = container.id
+                node_ip_key = reference + '_IP'
+                node_ip = container.attrs['NetworkSettings']['IPAddress']
+                env_dict[node_ip_key] = node_ip
+        env_dict['WEB_UI'] = web_ui
+        env_dict['SSH_KEY'] = ssh_key
+        for key, value in env_dict.items():
+            click.echo('export {key}={value}'.format(key=key, value=value))
+        return
+
     nodes = {
-        key: [_InspectView(container).to_dict() for container in containers]
+        key: [
+            ContainerInspectView(container).to_dict()
+            for container in containers
+        ]
         for key, containers in keys.items()
     }
 
@@ -780,6 +682,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
+        'SSH key': str(ssh_key),
     }  # type: Dict[Any, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
@@ -822,6 +725,21 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
         'is run in the home directory. '
     ),
 )
+@click.option(
+    '--node',
+    type=str,
+    default='master_0',
+    help=(
+        'A reference to a particular node to run the command on. '
+        'This can be one of: '
+        'The node\'s IP address, '
+        'the node\'s Docker container name, '
+        'the node\'s Docker container ID, '
+        'a reference in the format "<role>_<number>". '
+        'These details be seen with ``dcos_docker inspect``.'
+    ),
+    callback=validate_node_reference,
+)
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -831,6 +749,7 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     no_test_env: bool,
+    node: Node,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -850,19 +769,9 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    env = {
-        'DCOS_LOGIN_UNAME': dcos_login_uname,
-        'DCOS_LOGIN_PW': dcos_login_pw,
-    }
-
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
-    cluster = cluster_containers.cluster
-
     if no_test_env:
         try:
-            test_host = next(iter(cluster.masters))
-
-            test_host.run(
+            node.run(
                 args=list(node_args),
                 log_output_live=False,
                 tty=True,
@@ -873,11 +782,20 @@ def run(
 
         return
 
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    cluster = cluster_containers.cluster
+
+    env = {
+        'DCOS_LOGIN_UNAME': dcos_login_uname,
+        'DCOS_LOGIN_PW': dcos_login_pw,
+    }
+
     try:
         cluster.run_integration_tests(
             pytest_command=list(node_args),
             tty=True,
             env=env,
+            test_host=node,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)
@@ -920,7 +838,7 @@ def web(cluster_id: str) -> None:
     Note that the web UI may not be available at first.
     Consider using ``dcos-docker wait`` before running this command.
     """
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     master = next(iter(cluster.masters))
     web_ui = 'http://' + str(master.public_ip_address)
@@ -960,7 +878,7 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
 
-    cluster_containers = _ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'

@@ -6,11 +6,24 @@ Changelog
 Next
 ----
 
-2018.05.08.0
+- Add a ``--variant`` option to ``dcos-docker create`` to speed up cluster creation.
+
+2018.05.15.0
 ------------
 
-2018.05.02.1
+- Add a ``test_host`` parameter to ``Cluster.run_integration_tests``.
+- Add the ability to specify a node to use for ``dcos-docker run``.
+
+2018.05.14.0
 ------------
+
+- Show IP address in ``dcos-docker inspect``.
+
+2018.05.10.0
+------------
+
+- Expose the SSH key location in ``dcos-docker inspect``.
+- Make network created by ``setup-mac-network`` now survives restarts.
 
 2018.05.02.0
 ------------
@@ -18,7 +31,7 @@ Next
 - Previously not all volumes were destroyed when destroying a cluster from the CLI or with the ``Docker`` backend.
   This has been resolved.
   To remove dangling volumes from previous versions, use ``docker volume prune``.
-- Backwards incompatible change: ``mount`` parameters to ``Docker.__init`` now take a ``list`` of ``docker.types.Mount``\s.
+- Backwards incompatible change: ``mount`` parameters to ``Docker.__init__`` now take a ``list`` of ``docker.types.Mount``\s.
 - Docker version 17.06 or later is now required for the CLI and for the ``Docker`` backend.
 
 2018.04.30.2

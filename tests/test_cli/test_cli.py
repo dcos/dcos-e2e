@@ -1198,6 +1198,12 @@ class TestRun:
                                        will be synced before the command is run.
               --no-test-env            With this flag set, no environment variables are set
                                        and the command is run in the home directory.
+              --node TEXT              A reference to a particular node to run the command
+                                       on. This can be one of: The node's IP address, the
+                                       node's Docker container name, the node's Docker
+                                       container ID, a reference in the format
+                                       "<role>_<number>". These details be seen with
+                                       ``dcos_docker inspect``.
               --help                   Show this message and exit.
             """,# noqa: E501,E261
         )

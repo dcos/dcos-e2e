@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.05.08.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.05.15.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -22,8 +22,8 @@ class Dcosdocker < Formula
   end
 
   resource "azure-common" do
-    url "https://files.pythonhosted.org/packages/66/bd/d5f08507b548d5b5c82bfa1dc55c28790a42bdb384cd8cf2dbc14d067442/azure-common-1.1.10.zip"
-    sha256 "95866fb8c4556cc5a5960761bf8a38df7e946501b68390d7cfc77907d5191529"
+    url "https://files.pythonhosted.org/packages/92/7d/fdbcfe60d76c07a1f55733ceb18b71087ef7f5cae7dc4b46e36e85636f0b/azure-common-1.1.11.zip"
+    sha256 "a60e37117684a168022af2c5e537448ad878d4ad8e45f147512eae2102f856af"
   end
 
   resource "azure-mgmt-network" do
@@ -57,13 +57,13 @@ class Dcosdocker < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/5f/bc/95c66f34b1cea18c69f98f34ba609edf4b9c494779c6e7bbbdb2f28d80d5/boto3-1.7.14.tar.gz"
-    sha256 "a2d5c0a007ff50b4a08f402925495e18e41e336d22767a2b4fa21913fa875b2f"
+    url "https://files.pythonhosted.org/packages/41/bc/dbf76863733ec02978e7f75470e3a739ffc6052ba89a0d067c45996e4d1f/boto3-1.7.19.tar.gz"
+    sha256 "b4fadc62eca3bb2c4f894f807d087058fdf93f074472f8b7db385ed66f1c0136"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/31/f3/d0af0c1087cb8d101d0b3d516e4c8f69219eaf3b0342c8d8c227fb0791c3/botocore-1.10.14.tar.gz"
-    sha256 "2d83993e60ba56ca3ddb48a0d4da86c1cfa1f687993abe760eeb0059d10e52f6"
+    url "https://files.pythonhosted.org/packages/b6/93/a8f66dc5f17e31a932f62075aa1aef9695ea6c2f22a1730b86d267c1d967/botocore-1.10.19.tar.gz"
+    sha256 "e05534810847803e30a86583702eaee0c7f4f390a7af31cca8ee7e08c39ce47c"
   end
 
   resource "Cerberus" do
@@ -92,8 +92,8 @@ class Dcosdocker < Formula
   end
 
   resource "click-spinner" do
-    url "https://files.pythonhosted.org/packages/26/54/3fa581d2c510386b7a2e22bdd6cc8978ba0ee83fb2762c238cc7ac382f96/click-spinner-0.1.7.tar.gz"
-    sha256 "a0703b4a21a1ba377716c5c768928b6c7575c087af926d3d586818426982ea30"
+    url "https://files.pythonhosted.org/packages/4d/c4/e4cc6595266021b549f774a20329188e68b63f06896eba94c1c952027c6e/click-spinner-0.1.8.tar.gz"
+    sha256 "67b5af5e825faf82a4fc6cda77c58359abe716fb1c9bc12cc7bea9a0cae1fc8e"
   end
 
   resource "cryptography" do
@@ -237,8 +237,8 @@ class Dcosdocker < Formula
   end
 
   resource "python-dateutil" do
-    url "https://files.pythonhosted.org/packages/c5/39/4da7c2dbc4f023fba5fb2325febcadf0d0ce0efdc8bd12083a0f65d20653/python-dateutil-2.7.2.tar.gz"
-    sha256 "9d8074be4c993fbe4947878ce593052f71dac82932a677d49194d8ce9778002e"
+    url "https://files.pythonhosted.org/packages/a0/b0/a4e3241d2dee665fea11baec21389aec6886655cd4db7647ddf96c3fad15/python-dateutil-2.7.3.tar.gz"
+    sha256 "e27001de32f627c22380a688bcc43ce83504a7bc5da472209b4c70f02829f0b8"
   end
 
   resource "PyYAML" do
