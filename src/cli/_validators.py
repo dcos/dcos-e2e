@@ -346,6 +346,10 @@ def validate_variant(
     Return whether to attempt to create a cluster with the given artifact as
     "enterprise" or "oss".
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (param, ):
+        pass
+
     if value != 'auto':
         return str(value)
 
