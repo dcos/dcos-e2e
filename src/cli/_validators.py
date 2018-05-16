@@ -346,7 +346,6 @@ def validate_variant(
     Return whether to attempt to create a cluster with the given artifact as
     "enterprise" or "oss".
     """
-    import pdb; pdb.set_trace()
     if value != 'auto':
         return str(value)
 
