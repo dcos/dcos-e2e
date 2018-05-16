@@ -63,7 +63,6 @@ from ._doctor_checks import (
     link_to_troubleshooting,
 )
 from ._mac_network import create_mac_network, destroy_mac_network_containers
-from ._utils import is_enterprise
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
@@ -72,6 +71,7 @@ from ._validators import (
     validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
     validate_path_pair,
+    validate_variant,
     validate_volumes,
 )
 
@@ -333,7 +333,7 @@ def dcos_docker(verbose: None) -> None:
 )
 @click.option(
     '--variant',
-    type=click.Choice(['auto', 'oss', 'enterprise'),
+    type=click.Choice(['auto', 'oss', 'enterprise']),
     default='auto',
     callback=validate_variant,
     help=(
@@ -398,6 +398,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
+    return
     base_workspace_dir = workspace_dir or Path(gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 

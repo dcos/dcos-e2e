@@ -3,10 +3,15 @@ Validators for CLI options.
 """
 
 import re
+import subprocess
+import uuid
 from pathlib import Path
+from shutil import rmtree
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
+import click_spinner
 import docker
 import yaml
 
@@ -17,6 +22,7 @@ from ._common import (
     ContainerInspectView,
     existing_cluster_ids,
 )
+from ._utils import is_enterprise
 
 
 def validate_dcos_configuration(
@@ -337,13 +343,16 @@ def validate_variant(
     value: Any,
 ) -> str:
     """
-    XXX
+    Return whether to attempt to create a cluster with the given artifact as
+    "enterprise" or "oss".
     """
+    import pdb; pdb.set_trace()
     if value != 'auto':
-        return value
+        return str(value)
 
+    artifact_path = Path(ctx.params['artifact']).resolve()
     doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
-    base_workspace_dir = workspace_dir or Path(gettempdir())
+    base_workspace_dir = ctx.params['workspace_dir'] or Path(gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
     try:
