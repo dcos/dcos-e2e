@@ -360,7 +360,4 @@ def validate_variant(
         click.echo(exc.stderr)
         raise
 
-    if enterprise:
-        return 'enterprise'
-    else:
-        return 'oss'
+    return 'enterprise' if enterprise else 'oss'
