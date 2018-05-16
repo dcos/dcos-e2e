@@ -334,9 +334,15 @@ def dcos_docker(verbose: None) -> None:
 @click.option(
     '--variant',
     type=click.Choice(['auto', 'oss', 'enterprise'),
+    default='auto',
     callback=validate_variant,
     help=(
-        'XXX auto gets from artifact'
+        'Choose the DC/OS variant. '
+        'If the variant does not match the variant of the given artifact, '
+        'an error will occur. '
+        'Using "auto" finds the variant from the artifact. '
+        'Finding the variant from the artifact takes some time and so using '
+        'another option is a performance optimization.'
     ),
 )
 def create(
