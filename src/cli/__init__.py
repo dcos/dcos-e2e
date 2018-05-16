@@ -17,10 +17,8 @@ from typing import (  # noqa: F401
     Any,
     Callable,
     Dict,
-    Iterable,
     List,
     Optional,
-    Set,
     Tuple,
     Union,
 )
@@ -65,7 +63,6 @@ from ._doctor_checks import (
     link_to_troubleshooting,
 )
 from ._mac_network import create_mac_network, destroy_mac_network_containers
-from ._utils import is_enterprise
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
@@ -74,6 +71,7 @@ from ._validators import (
     validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
     validate_path_pair,
+    validate_variant,
     validate_volumes,
 )
 
@@ -333,6 +331,20 @@ def dcos_docker(verbose: None) -> None:
     ),
     multiple=True,
 )
+@click.option(
+    '--variant',
+    type=click.Choice(['auto', 'oss', 'enterprise']),
+    default='auto',
+    callback=validate_variant,
+    help=(
+        'Choose the DC/OS variant. '
+        'If the variant does not match the variant of the given artifact, '
+        'an error will occur. '
+        'Using "auto" finds the variant from the artifact. '
+        'Finding the variant from the artifact takes some time and so using '
+        'another option is a performance optimization.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -352,6 +364,7 @@ def create(
     custom_master_volume: List[Mount],
     custom_agent_volume: List[Mount],
     custom_public_agent_volume: List[Mount],
+    variant: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -399,19 +412,7 @@ def create(
     )
 
     artifact_path = Path(artifact).resolve()
-    try:
-        with click_spinner.spinner():
-            enterprise = is_enterprise(
-                build_artifact=artifact_path,
-                workspace_dir=workspace_dir,
-            )
-    except subprocess.CalledProcessError as exc:
-        rmtree(path=str(workspace_dir), ignore_errors=True)
-        click.echo(doctor_message)
-        click.echo()
-        click.echo('Original error:')
-        click.echo(exc.stderr)
-        raise
+    enterprise = bool(variant == 'enterprise')
 
     if enterprise:
         superuser_username = 'admin'

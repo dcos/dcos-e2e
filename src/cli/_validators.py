@@ -3,10 +3,15 @@ Validators for CLI options.
 """
 
 import re
+import subprocess
+import uuid
 from pathlib import Path
+from shutil import rmtree
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
+import click_spinner
 import docker
 import yaml
 
@@ -17,6 +22,7 @@ from ._common import (
     ContainerInspectView,
     existing_cluster_ids,
 )
+from ._utils import is_enterprise
 
 
 def validate_dcos_configuration(
@@ -329,3 +335,39 @@ def validate_node_reference(
         value=value,
     )
     raise click.BadParameter(message=message)
+
+
+def validate_variant(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> str:
+    """
+    Return whether to attempt to create a cluster with the given artifact as
+    "enterprise" or "oss".
+    """
+    if value != 'auto':
+        return str(value)
+
+    artifact_path = Path(ctx.params['artifact']).resolve()
+    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
+    base_workspace_dir = ctx.params['workspace_dir'] or Path(gettempdir())
+    workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    workspace_dir.mkdir()
+
+    try:
+        with click_spinner.spinner():
+            enterprise = is_enterprise(
+                build_artifact=artifact_path,
+                workspace_dir=workspace_dir,
+            )
+    except subprocess.CalledProcessError as exc:
+        rmtree(path=str(workspace_dir), ignore_errors=True)
+        click.echo(doctor_message)
+        click.echo()
+        click.echo('Original error:')
+        click.echo(exc.stderr)
+        raise
+
+    rmtree(path=str(workspace_dir), ignore_errors=True)
+    return 'enterprise' if enterprise else 'oss'
