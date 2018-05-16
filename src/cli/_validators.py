@@ -339,6 +339,9 @@ def validate_variant(
     """
     XXX
     """
+    if value != 'auto':
+        return value
+
     doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
     base_workspace_dir = workspace_dir or Path(gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
