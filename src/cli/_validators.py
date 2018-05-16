@@ -353,6 +353,7 @@ def validate_variant(
     doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
     base_workspace_dir = ctx.params['workspace_dir'] or Path(gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    workspace_dir.mkdir()
 
     try:
         with click_spinner.spinner():
@@ -368,4 +369,5 @@ def validate_variant(
         click.echo(exc.stderr)
         raise
 
+    rmtree(path=str(workspace_dir), ignore_errors=True)
     return 'enterprise' if enterprise else 'oss'
