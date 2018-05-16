@@ -331,6 +331,13 @@ def dcos_docker(verbose: None) -> None:
     ),
     multiple=True,
 )
+@click.option(
+    '--custom-public-agent-volume',
+    type=str,
+    callback=validate_variant,
+    help=(
+    ),
+)
 def create(
     agents: int,
     artifact: str,

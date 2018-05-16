@@ -329,3 +329,10 @@ def validate_node_reference(
         value=value,
     )
     raise click.BadParameter(message=message)
+
+
+def validate_variant(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> bool:
