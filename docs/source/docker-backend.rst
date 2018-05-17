@@ -11,22 +11,7 @@ DC/OS Installation
 :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend only support installing DC/OS via :py:meth:`~dcos_e2e.cluster.Cluster.install_dcos_from_path`.
 :py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend do not distinguish between :py:attr:`~dcos_e2e.node.Node.public_ip_address` and :py:attr:`~dcos_e2e.node.Node.private_ip_address`.
 
-Limitations
------------
-
-Docker does not represent a real DC/OS environment with complete accuracy.
-This section describes the currently known differences between the Docker backend and a real DC/OS environment.
-
-SELinux
-~~~~~~~
-
-Tests inherit the host’s environment.
-Any tests that rely on SELinux being available require it be available on the host.
-
-Storage
-~~~~~~~
-
-Docker does not support storage features expected in a real DC/OS environment.
+.. include:: docker-backend-limitations.rst
 
 Troubleshooting
 ---------------
