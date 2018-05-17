@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.05.17.0
+------------
+
 - Add a ``--variant`` option to ``dcos-docker create`` to speed up cluster creation.
 
 2018.05.15.0
