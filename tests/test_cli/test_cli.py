@@ -204,6 +204,13 @@ class TestCreate:
                                               agent node containers. See https://docs.docker
                                               .com/engine/reference/run/#volume-shared-
                                               filesystems for the syntax to use.
+              --variant [auto|oss|enterprise]
+                                              Choose the DC/OS variant. If the variant does
+                                              not match the variant of the given artifact,
+                                              an error will occur. Using "auto" finds the
+                                              variant from the artifact. Finding the variant
+                                              from the artifact takes some time and so using
+                                              another option is a performance optimization.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
