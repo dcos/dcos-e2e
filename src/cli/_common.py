@@ -2,10 +2,12 @@
 Common code for CLI modules.
 """
 
+import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Dict, Set
 
+import click
 import docker
 from docker.client import DockerClient
 from docker.models.containers import Container
@@ -43,8 +45,12 @@ def docker_client() -> DockerClient:
     """
     Return a Docker client.
     """
-    client = docker.from_env(version='auto')
-    return client
+    try:
+        return docker.from_env(version='auto')
+    except docker.errors.DockerException:
+        message = 'Error: Cannot connect to Docker.'
+        click.echo(message, err=True)
+        sys.exit(1)
 
 
 def existing_cluster_ids() -> Set[str]:
