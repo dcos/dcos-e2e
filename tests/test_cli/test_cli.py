@@ -1195,6 +1195,9 @@ class TestRun:
               Or, with sync: ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k
               test_tls.py``.
 
+              To use special characters such as single quotes in your command, wrap the
+              whole command in double quotes.
+
             Options:
               -c, --cluster-id TEXT    If not given, "default" is used.
               --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
