@@ -761,6 +761,9 @@ def run(
 
     Or, with sync:
     ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
+
+    To use special characters such as single quotes in your command, wrap the
+    whole command in double quotes.
     """  # noqa: E501
     if sync_dir is not None:
         ctx.invoke(
