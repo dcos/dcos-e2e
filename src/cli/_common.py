@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Dict, Set
 
 import docker
+from docker.client import DockerClient
 from docker.models.containers import Container
 
 from dcos_e2e.cluster import Cluster
@@ -38,11 +39,19 @@ WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 VARIANT_LABEL_KEY = 'dcos_e2e.variant'
 
 
+def docker_client() -> DockerClient:
+    """
+    Return a Docker client.
+    """
+    client = docker.from_env(version='auto')
+    return client
+
+
 def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
-    client = docker.from_env(version='auto')
+    client = docker_client()
     filters = {'label': CLUSTER_ID_LABEL_KEY}
     containers = client.containers.list(filters=filters)
     return set(
@@ -103,7 +112,7 @@ class ClusterContainers:
         """
         Return all containers in this cluster of a particular node type.
         """
-        client = docker.from_env(version='auto')
+        client = docker_client()
         filters = {
             'label': [
                 self._cluster_id_label,
