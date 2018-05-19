@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Show a formatted error rather than a traceback if Docker cannot be connected to.
+
 2018.05.17.0
 ------------
 

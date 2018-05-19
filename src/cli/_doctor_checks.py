@@ -12,7 +12,7 @@ from tempfile import gettempdir, gettempprefix
 import click
 import docker
 
-from ._common import DOCKER_STORAGE_DRIVERS
+from ._common import DOCKER_STORAGE_DRIVERS, docker_client
 
 
 class CheckLevels(IntEnum):
@@ -86,7 +86,7 @@ def check_docker_root_free_space() -> CheckLevels:
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
     tiny_image = 'luca3m/sleep'
-    client = docker.from_env(version='auto')
+    client = docker_client()
     container = client.containers.run(
         image=tiny_image,
         tty=True,
@@ -126,7 +126,7 @@ def check_storage_driver() -> CheckLevels:
     """
     Warn if the Docker storage driver is not a recommended driver.
     """
-    client = docker.from_env(version='auto')
+    client = docker_client()
     host_driver = client.info()['Driver']
     storage_driver_url = (
         'https://docs.docker.com/storage/storagedriver/select-storage-driver/'
@@ -200,7 +200,7 @@ def check_networking() -> CheckLevels:
     highest_level = CheckLevels.NONE
     # Image for a container which sleeps for a long time.
     tiny_image = 'luca3m/sleep'
-    client = docker.from_env(version='auto')
+    client = docker_client()
     docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
 
     ping_container = client.containers.run(
@@ -238,7 +238,7 @@ def check_mount_tmp() -> CheckLevels:
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
     tiny_image = 'luca3m/sleep'
-    client = docker.from_env(version='auto')
+    client = docker_client()
 
     tmp_path = Path('/tmp').resolve()
 
@@ -277,7 +277,7 @@ def check_memory() -> CheckLevels:
     """
     Show information about the memory available to Docker.
     """
-    client = docker.from_env(version='auto')
+    client = docker_client()
     docker_memory = client.info()['MemTotal']
     docker_for_mac = bool(client.info()['OperatingSystem'] == 'Docker for Mac')
     message = (
@@ -368,7 +368,7 @@ def check_docker_supports_mounts() -> CheckLevels:
     docker.errors.InvalidVersion: mounts param is not supported in API versions
     < 1.30
     """
-    client = docker.from_env(version='auto')
+    client = docker_client()
     mount = docker.types.Mount(source=None, target='/etc')
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.

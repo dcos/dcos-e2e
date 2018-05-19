@@ -22,6 +22,8 @@ from typing import (  # noqa: F401
 
 import docker
 
+from ._common import docker_client
+
 # We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
 # with "make clean".
 _PROXY_CONTAINER_NAME = 'e2e-proxy'
@@ -34,7 +36,7 @@ def create_mac_network(configuration_dst: Path) -> None:
 
     This creates an OpenVPN configuration file and describes how to use it.
     """
-    client = docker.from_env(version='auto')
+    client = docker_client()
     restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
     clone_name = 'docker-mac-network-master'
@@ -114,7 +116,7 @@ def destroy_mac_network_containers() -> None:
     """
     Destroy containers created by ``dcos-docker setup-mac-network``.
     """
-    client = docker.from_env(version='auto')
+    client = docker_client()
     for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
         try:
             container = client.containers.get(container_id=name)
