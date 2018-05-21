@@ -29,7 +29,10 @@ The following example shows how to use DC/OS Enterprise with DC/OS E2E.
     with Cluster(cluster_backend=Docker()) as cluster:
         cluster.install_dcos_from_path(
             build_artifact=ee_artifact,
-            extra_config=extra_config,
+            base_config={
+                **cluster.base_config,
+                **extra_config,
+            },
         )
         cluster.wait_for_dcos_ee(
             superuser_username=superuser_username,

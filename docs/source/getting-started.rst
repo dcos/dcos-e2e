@@ -29,8 +29,11 @@ In this example we will use a open source DC/OS artifact downloaded to :file:`/t
 
    cluster.install_dcos_from_path(
        build_artifact=oss_artifact,
-       extra_config={
-            'resolvers': ['8.8.8.8'],
+       dcos_config={
+            **cluster.base_config,
+            **{
+                'resolvers': ['8.8.8.8'],
+            },
        }
    )
 
