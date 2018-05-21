@@ -40,7 +40,6 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def install_dcos_from_url(
         self,
-        build_artifact: str,
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
@@ -48,8 +47,6 @@ class ClusterManager(abc.ABC):
         Install DC/OS from a build artifact passed as an URL string.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
-                from.
             extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration for a particular backend.

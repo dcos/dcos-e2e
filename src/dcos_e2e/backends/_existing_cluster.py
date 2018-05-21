@@ -73,7 +73,6 @@ class ExistingClusterManager(ClusterManager):
 
     def install_dcos_from_url(
         self,
-        build_artifact: str,
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
