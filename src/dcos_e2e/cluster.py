@@ -289,10 +289,17 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        return self._cluster.base_config
+
     def install_dcos_from_url(
         self,
         build_artifact: str,
-        extra_config: Optional[Dict[str, Any]] = None,
+        dcos_config: Dict[str, Any],
         log_output_live: bool = False,
     ) -> None:
         """
@@ -309,9 +316,7 @@ class Cluster(ContextDecorator):
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 
@@ -320,8 +325,6 @@ class Cluster(ContextDecorator):
                 backend provides a more efficient installation method than
                 the DC/OS advanced installation method.
         """
-        extra_config = extra_config or {}
-        dcos_config = {**self._cluster.base_config, **extra_config}
         self._cluster.install_dcos_from_url(
             build_artifact=build_artifact,
             dcos_config=dcos_config,
@@ -331,16 +334,14 @@ class Cluster(ContextDecorator):
     def install_dcos_from_path(
         self,
         build_artifact: Path,
-        extra_config: Optional[Dict[str, Any]] = None,
+        dcos_config: Dict[str, Any],
         log_output_live: bool = False,
     ) -> None:
         """
         Args:
             build_artifact: The `Path` to a build artifact to install DC/OS
                 from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 
@@ -349,8 +350,6 @@ class Cluster(ContextDecorator):
                 efficient for the given backend to use the DC/OS advanced
                 installation method that takes build artifacts by URL string.
         """
-        extra_config = extra_config or {}
-        dcos_config = {**self._cluster.base_config, **extra_config}
         self._cluster.install_dcos_from_path(
             build_artifact=build_artifact,
             dcos_config=dcos_config,

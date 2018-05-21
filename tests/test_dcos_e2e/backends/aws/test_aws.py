@@ -143,7 +143,10 @@ class TestRunIntegrationTest:
 
             cluster.install_dcos_from_url(
                 build_artifact=ee_artifact_url,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
 

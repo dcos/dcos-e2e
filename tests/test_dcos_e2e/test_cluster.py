@@ -36,6 +36,7 @@ class TestIntegrationTests:
         """
         with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
+                dcos_config=dcos_cluster.base_config,
                 build_artifact=oss_artifact,
                 log_output_live=True,
             )
@@ -181,7 +182,8 @@ class TestInstallDcosFromPathLogging:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 cluster.install_dcos_from_path(
-                    oss_artifact,
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
                     log_output_live=True,
                 )
 
@@ -202,7 +204,10 @@ class TestInstallDcosFromPathLogging:
                 masters=2,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
 
@@ -221,9 +226,15 @@ class TestMultipleClusters:
         It is possible to start two clusters.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(build_artifact=oss_artifact)
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config=cluster.base_config,
+            )
             with Cluster(cluster_backend=cluster_backend) as cluster:
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
 
 
 class TestClusterFromNodes:
@@ -294,7 +305,13 @@ class TestClusterFromNodes:
             )
 
             with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
+                cluster.install_dcos_from_url(
+                    build_artifact=oss_artifact_url,
+                    dcos_config=cluster.base_config,
+                )
 
             with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )

@@ -130,7 +130,10 @@ class TestDockerBackend:
             public_agents=0,
         ) as cluster:
             with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
+                cluster.install_dcos_from_url(
+                    build_artifact=oss_artifact_url,
+                    dcos_config=cluster.base_config,
+                )
 
         expected_error = (
             'The Docker backend does not support the installation of DC/OS '

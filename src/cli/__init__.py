@@ -505,7 +505,10 @@ def create(
         with click_spinner.spinner():
             cluster.install_dcos_from_path(
                 build_artifact=artifact_path,
-                extra_config=extra_config,
+                dcos_config={
+                    **cluster.base_config,
+                    **extra_config,
+                },
             )
     except CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)
