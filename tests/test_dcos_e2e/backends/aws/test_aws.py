@@ -129,6 +129,7 @@ class TestRunIntegrationTest:
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
         config = {
+            'installer_url': ee_artifact_url,
             'superuser_username': superuser_username,
             'superuser_password_hash': sha512_crypt.hash(superuser_password),
             'fault_domain_enabled': False,
@@ -140,9 +141,7 @@ class TestRunIntegrationTest:
             cluster_backend=AWS(linux_distribution=linux_distribution),
             masters=1,
         ) as cluster:
-
             cluster.install_dcos_from_url(
-                build_artifact=ee_artifact_url,
                 extra_config=config,
                 log_output_live=True,
             )
