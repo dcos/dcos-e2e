@@ -404,7 +404,7 @@ class DockerCluster(ClusterManager):
     def install_dcos_from_url(
         self,
         build_artifact: str,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
@@ -414,9 +414,7 @@ class DockerCluster(ClusterManager):
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: This may contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the Docker backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
@@ -467,7 +465,7 @@ class DockerCluster(ClusterManager):
     def install_dcos_from_path(
         self,
         build_artifact: Path,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
@@ -476,16 +474,13 @@ class DockerCluster(ClusterManager):
         Args:
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
-            extra_config: May contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the Docker backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.
         """
-        config_data = {**self.base_config, **extra_config}
-        config_yaml = yaml.dump(data=config_data)
+        config_yaml = yaml.dump(data=dcos_config)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)
 

@@ -246,7 +246,7 @@ class AWSCluster(ClusterManager):
     def install_dcos_from_path(
         self,
         build_artifact: Path,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
@@ -257,9 +257,7 @@ class AWSCluster(ClusterManager):
         Args:
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
-            extra_config: May contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the AWS backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
