@@ -101,6 +101,13 @@ class ClusterManager(abc.ABC):
         Return all DC/OS public agent :class:`.node.Node` s.
         """
 
+    @property
+    @abc.abstractmethod
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+
 
 class ClusterBackend(abc.ABC):
     """

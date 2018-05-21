@@ -431,25 +431,10 @@ class DockerCluster(ClusterManager):
         )
         raise NotImplementedError(message)
 
-    def install_dcos_from_path(
-        self,
-        build_artifact: Path,
-        extra_config: Dict[str, Any],
-        log_output_live: bool,
-    ) -> None:
+    @property
+    def base_config(self) -> Dict[str, Any]:
         """
-        Install DC/OS from a given build artifact.
-
-        Args:
-            build_artifact: The ``Path`` to a build artifact to install DC/OS
-                from.
-            extra_config: May contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the Docker backend.
-            log_output_live: If ``True``, log output of the installation live.
-
-        Raises:
-            CalledProcessError: There was an error installing DC/OS on a node.
+        Return a base configuration for installing DC/OS OSS.
         """
         ssh_user = self._default_ssh_user
 
@@ -477,7 +462,29 @@ class DockerCluster(ClusterManager):
             'ssh_user': ssh_user,
         }
 
-        config_data = {**config, **extra_config}
+        return config
+
+    def install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        extra_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Install DC/OS from a given build artifact.
+
+        Args:
+            build_artifact: The ``Path`` to a build artifact to install DC/OS
+                from.
+            extra_config: May contain extra installation configuration
+                variables that are applied on top of the default DC/OS
+                configuration of the Docker backend.
+            log_output_live: If ``True``, log output of the installation live.
+
+        Raises:
+            CalledProcessError: There was an error installing DC/OS on a node.
+        """
+        config_data = {**self.base_config, **extra_config}
         config_yaml = yaml.dump(data=config_data)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)
