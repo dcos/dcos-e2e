@@ -244,12 +244,14 @@ class AWSCluster(ClusterManager):
         """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
-        config = {
+        dcos_config = {
             **self.base_config,
-            **{'installer_url': build_artifact},
+            **{
+                'installer_url': build_artifact,
+            },
             **extra_config,
         }
-        self.launcher.config['dcos_config'] = config
+        self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
     def install_dcos_from_path(
