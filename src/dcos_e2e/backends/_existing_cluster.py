@@ -100,6 +100,18 @@ class ExistingClusterManager(ClusterManager):
         raise NotImplementedError
 
     @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+
+        Raises:
+            NotImplementedError: It is assumed that clusters created with the
+                :class:`ExistingCluster` backend already have an installed
+                instance of DC/OS running on them.
+        """
+        raise NotImplementedError
+
+    @property
     def masters(self) -> Set[Node]:
         """
         Return all DC/OS master :class:`dcos_e2e.node.Node` s.
