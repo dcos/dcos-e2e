@@ -2,7 +2,6 @@
 Helpers for creating and interacting with clusters on AWS.
 """
 
-import copy
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -221,9 +220,7 @@ class AWSCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        dcos_config = dict(copy.deepcopy(self.launcher.config['dcos_config']))
-        dcos_config.pop('installer_url')
-        return dcos_config
+        return dict(self.launcher.config['dcos_config'])
 
     def install_dcos_from_url(
         self,
