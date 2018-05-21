@@ -41,6 +41,7 @@ def dcos_cluster(
         cluster.install_dcos_from_path(
             build_artifact=oss_artifact,
             log_output_live=True,
+            dcos_config=cluster.base_config,
         )
         yield cluster
 

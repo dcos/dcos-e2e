@@ -36,7 +36,7 @@ class TestIntegrationTests:
         """
         with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
-                dcos_config=cluster.base_config,
+                dcos_config=dcos_cluster.base_config,
                 build_artifact=oss_artifact,
                 log_output_live=True,
             )
@@ -305,7 +305,10 @@ class TestClusterFromNodes:
             )
 
             with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
+                cluster.install_dcos_from_url(
+                    build_artifact=oss_artifact_url,
+                    dcos_config=cluster.base_config,
+                )
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(

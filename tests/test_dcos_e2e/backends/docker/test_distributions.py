@@ -59,6 +59,7 @@ def _oss_distribution_test(
     ) as cluster:
         cluster.install_dcos_from_path(
             build_artifact=oss_artifact,
+            dcos_config=cluster.base_config,
             log_output_live=True,
         )
         cluster.wait_for_dcos_oss()

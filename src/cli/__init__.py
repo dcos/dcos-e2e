@@ -507,7 +507,7 @@ def create(
                 build_artifact=artifact_path,
                 dcos_config={
                     **cluster.base_config,
-                    **extra_config
+                    **extra_config,
                 },
             )
     except CalledProcessError as exc:
