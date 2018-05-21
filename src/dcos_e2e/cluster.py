@@ -330,7 +330,10 @@ class Cluster(ContextDecorator):
         extra_config = extra_config or {}
         self._cluster.install_dcos_from_url(
             build_artifact=build_artifact,
-            dcos_config={**self.base_config, **extra_config},
+            dcos_config={
+                **self.base_config,
+                **extra_config,
+            },
             log_output_live=log_output_live,
         )
 
@@ -358,7 +361,10 @@ class Cluster(ContextDecorator):
         extra_config = extra_config or {}
         self._cluster.install_dcos_from_path(
             build_artifact=build_artifact,
-            dcos_config={**self.base_config, **extra_config},
+            dcos_config={
+                **self.base_config,
+                **extra_config,
+            },
             log_output_live=log_output_live,
         )
 
