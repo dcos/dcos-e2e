@@ -81,10 +81,6 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterSize':
     (),
-    'tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_default_config':  # noqa: E501
-    (OSS_MASTER, ),
-    'tests/test_dcos_e2e/test_cluster.py::TestExtendConfig::test_extend_config':  # noqa: E501
-    (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests':
