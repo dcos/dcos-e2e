@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.05.17.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.05.21.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -172,8 +172,8 @@ class Dcosdocker < Formula
   end
 
   resource "msrestazure" do
-    url "https://files.pythonhosted.org/packages/98/ec/8351b10f5b82459ca670b02509cc8e2128e3836aa5244a620a94537564a7/msrestazure-0.4.30.tar.gz"
-    sha256 "220353490bf0b622da595cfb4d738dba7b0249242192bcf524da331d7c11711a"
+    url "https://files.pythonhosted.org/packages/63/96/c1d9225f8cdcb024a00d9ebeebb2422dd8150032d3c402449f1d1618ce4a/msrestazure-0.4.31.tar.gz"
+    sha256 "699f83cd19a098e41b723dbd9c4765ea0886ea15508f63e2709623883e4f754d"
   end
 
   resource "oauth2client" do
@@ -222,8 +222,8 @@ class Dcosdocker < Formula
   end
 
   resource "PyJWT" do
-    url "https://files.pythonhosted.org/packages/ee/af/7f500e3e587c927c88422099ce7ed9247f89f3217cabf00d3f48fe3ad5fe/PyJWT-1.6.1.tar.gz"
-    sha256 "dacba5786fe3bf1a0ae8673874e29f9ac497860955c501289c63b15d3daae63a"
+    url "https://files.pythonhosted.org/packages/3b/fc/2a479754113cee6824129f2f39dba555c939114ef5410bfa4cfdbbed6e8e/PyJWT-1.6.3.tar.gz"
+    sha256 "c365c2c92063bdc609a9ef328958a910e249ffcad953895914b87e645412cf81"
   end
 
   resource "PyNaCl" do

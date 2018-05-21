@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.05.21.0
+------------
+
 - Show a formatted error rather than a traceback if Docker cannot be connected to.
 - Custom backends' must now implement a ``base_config`` method.
 - Custom backends' installation methods must now take ``dcos_config`` rather than ``extra_config``.
