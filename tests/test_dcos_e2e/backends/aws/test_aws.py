@@ -145,7 +145,7 @@ class TestRunIntegrationTest:
                 build_artifact=ee_artifact_url,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )

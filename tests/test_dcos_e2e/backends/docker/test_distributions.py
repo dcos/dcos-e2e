@@ -99,7 +99,7 @@ def _enterprise_distribution_test(
             build_artifact=enterprise_artifact,
             dcos_config={
                 **cluster.base_config,
-                **config
+                **config,
             },
             log_output_live=True,
         )

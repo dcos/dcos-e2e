@@ -42,7 +42,7 @@ class TestEnterpriseIntegrationTests:
                 build_artifact=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )
@@ -132,7 +132,7 @@ class TestCopyFiles:
                 build_artifact=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )
@@ -208,7 +208,7 @@ class TestCopyFiles:
                 build_artifact=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )
@@ -255,7 +255,7 @@ class TestSecurityDisabled:
                 build_artifact=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )
@@ -294,7 +294,7 @@ class TestWaitForDCOS:
                 build_artifact=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )

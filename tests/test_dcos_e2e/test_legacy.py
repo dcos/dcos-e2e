@@ -54,7 +54,7 @@ class Test19:
                 build_artifact=enterprise_1_9_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )
@@ -107,7 +107,7 @@ class Test110:
                 build_artifact=enterprise_1_10_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )
@@ -160,7 +160,7 @@ class Test111:
                 build_artifact=enterprise_1_11_artifact,
                 dcos_config={
                     **cluster.base_config,
-                    **config
+                    **config,
                 },
                 log_output_live=True,
             )
