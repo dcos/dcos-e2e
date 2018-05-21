@@ -158,7 +158,7 @@ class TestExtendConfig:
             public_agents=0,
             cluster_backend=cluster_backend,
         ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
+            cluster.install_dcos_from_path(build_artifact=oss_artifact)
             (master, ) = cluster.masters
             cluster.wait_for_dcos_oss()
             with pytest.raises(CalledProcessError):
@@ -275,7 +275,7 @@ class TestInstallDcosFromPathLogging:
                 masters=2,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(oss_artifact)
+                cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
 
@@ -294,9 +294,9 @@ class TestMultipleClusters:
         It is possible to start two clusters.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
+            cluster.install_dcos_from_path(build_artifact=oss_artifact)
             with Cluster(cluster_backend=cluster_backend) as cluster:
-                cluster.install_dcos_from_path(oss_artifact)
+                cluster.install_dcos_from_path(build_artifact=oss_artifact)
 
 
 class TestClusterFromNodes:
