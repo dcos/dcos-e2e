@@ -221,9 +221,9 @@ class AWSCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        config = dict(copy.deepcopy(self.launcher.config['dcos_config']))
-        config.pop('installer_url')
-        return config
+        dcos_config = dict(copy.deepcopy(self.launcher.config['dcos_config']))
+        dcos_config.pop('installer_url')
+        return dcos_config
 
     def install_dcos_from_url(
         self,
