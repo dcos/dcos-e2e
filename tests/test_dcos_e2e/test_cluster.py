@@ -204,7 +204,10 @@ class TestInstallDcosFromPathLogging:
                 masters=2,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
 
@@ -223,9 +226,15 @@ class TestMultipleClusters:
         It is possible to start two clusters.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(build_artifact=oss_artifact)
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config=cluster.base_config,
+            )
             with Cluster(cluster_backend=cluster_backend) as cluster:
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
 
 
 class TestClusterFromNodes:
@@ -299,4 +308,7 @@ class TestClusterFromNodes:
                 cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
 
             with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
