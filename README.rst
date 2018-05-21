@@ -113,7 +113,12 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
     with Cluster(cluster_backend=Docker()) as cluster:
         cluster.install_dcos_from_path(
             build_artifact=oss_artifact,
-            extra_config={'check_time': True},
+            dcos_config={
+                **cluster.base_config,
+                **{
+                    'check_time': True,
+                },
+            },
         )
         (master, ) = cluster.masters
         result = master.run(args=['echo', '1'])
