@@ -289,6 +289,13 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        return self._cluster.base_config
+
     def install_dcos_from_url(
         self,
         build_artifact: str,
@@ -321,10 +328,9 @@ class Cluster(ContextDecorator):
                 the DC/OS advanced installation method.
         """
         extra_config = extra_config or {}
-        dcos_config = {**self._cluster.base_config, **extra_config}
         self._cluster.install_dcos_from_url(
             build_artifact=build_artifact,
-            dcos_config=dcos_config,
+            dcos_config={**self.base_config, **extra_config},
             log_output_live=log_output_live,
         )
 
@@ -350,10 +356,9 @@ class Cluster(ContextDecorator):
                 installation method that takes build artifacts by URL string.
         """
         extra_config = extra_config or {}
-        dcos_config = {**self._cluster.base_config, **extra_config}
         self._cluster.install_dcos_from_path(
             build_artifact=build_artifact,
-            dcos_config=dcos_config,
+            dcos_config={**self.base_config, **extra_config},
             log_output_live=log_output_live,
         )
 
