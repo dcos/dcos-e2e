@@ -97,7 +97,10 @@ def _enterprise_distribution_test(
     ) as cluster:
         cluster.install_dcos_from_path(
             build_artifact=enterprise_artifact,
-            dcos_config={**cluster.base_config, **config},
+            dcos_config={
+                **cluster.base_config,
+                **config
+            },
             log_output_live=True,
         )
         cluster.wait_for_dcos_ee(

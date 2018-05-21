@@ -40,7 +40,10 @@ class TestEnterpriseIntegrationTests:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                dcos_config={**cluster.base_config, **config},
+                dcos_config={
+                    **cluster.base_config,
+                    **config
+                },
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(
@@ -127,7 +130,10 @@ class TestCopyFiles:
 
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                dcos_config={**cluster.base_config, **config},
+                dcos_config={
+                    **cluster.base_config,
+                    **config
+                },
                 log_output_live=True,
             )
 
@@ -200,7 +206,10 @@ class TestCopyFiles:
 
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                dcos_config={**cluster.base_config, **config},
+                dcos_config={
+                    **cluster.base_config,
+                    **config
+                },
                 log_output_live=True,
             )
 
@@ -244,7 +253,10 @@ class TestSecurityDisabled:
         ) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                dcos_config={**cluster.base_config, **config},
+                dcos_config={
+                    **cluster.base_config,
+                    **config
+                },
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(
@@ -280,7 +292,10 @@ class TestWaitForDCOS:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                dcos_config={**cluster.base_config, **config},
+                dcos_config={
+                    **cluster.base_config,
+                    **config
+                },
                 log_output_live=True,
             )
             (master, ) = cluster.masters
