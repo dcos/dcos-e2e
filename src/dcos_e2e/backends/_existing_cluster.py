@@ -73,7 +73,6 @@ class ExistingClusterManager(ClusterManager):
 
     def install_dcos_from_url(
         self,
-        build_artifact: str,
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
@@ -92,6 +91,18 @@ class ExistingClusterManager(ClusterManager):
         log_output_live: bool,
     ) -> None:
         """
+        Raises:
+            NotImplementedError: It is assumed that clusters created with the
+                :class:`ExistingCluster` backend already have an installed
+                instance of DC/OS running on them.
+        """
+        raise NotImplementedError
+
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+
         Raises:
             NotImplementedError: It is assumed that clusters created with the
                 :class:`ExistingCluster` backend already have an installed

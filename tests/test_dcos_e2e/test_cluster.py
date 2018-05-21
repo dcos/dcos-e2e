@@ -347,7 +347,6 @@ class TestClusterFromNodes:
     def test_install_dcos(
         self,
         oss_artifact: Path,
-        oss_artifact_url: str,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
@@ -367,7 +366,7 @@ class TestClusterFromNodes:
             )
 
             with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
+                cluster.install_dcos_from_url()
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(build_artifact=oss_artifact)

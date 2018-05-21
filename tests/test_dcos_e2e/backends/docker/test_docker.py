@@ -118,10 +118,10 @@ class TestDockerBackend:
                     result = node.run(args=args)
                     assert result.stdout.decode() == content
 
-    def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
+    def test_install_dcos_from_url(self) -> None:
         """
-        The Docker backend requires a build artifact in order
-        to launch a DC/OS cluster.
+        The Docker backend requires a build artifact in order to launch a
+        DC/OS cluster.
         """
         with Cluster(
             cluster_backend=Docker(),
@@ -130,11 +130,11 @@ class TestDockerBackend:
             public_agents=0,
         ) as cluster:
             with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
+                cluster.install_dcos_from_url()
 
         expected_error = (
-            'The Docker backend does not support the installation of DC/OS '
-            'by build artifacts passed via URL string. This is because a more '
+            'The Docker backend does not support the installation of DC/OS by '
+            'build artifacts passed via URL string. This is because a more '
             'efficient installation method exists in `install_dcos_from_path`.'
         )
 

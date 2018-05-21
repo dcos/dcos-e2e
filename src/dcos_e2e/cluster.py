@@ -291,7 +291,6 @@ class Cluster(ContextDecorator):
 
     def install_dcos_from_url(
         self,
-        build_artifact: str,
         extra_config: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
     ) -> None:
@@ -303,26 +302,23 @@ class Cluster(ContextDecorator):
         dedicated DC/OS hosts with the necessary installation files.
 
         Since the bootstrap host is different from the host initiating the
-        cluster creation passing the ``build_artifact`` via URL string
-        saves the time of copying the ``build_artifact`` to the bootstrap host.
+        cluster creation, passing the build artifact via URL string
+        saves the time of copying the build artifact to the bootstrap host.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
-                from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
+            extra_config: Implementations may come with a "base" configuration.
+                This dictionary can contain extra installation configuration
+                variables.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 
         Raises:
-            NotImplementedError: `NotImplementedError` because the given
-                backend provides a more efficient installation method than
-                the DC/OS advanced installation method.
+            NotImplementedError: If the given backend provides a more efficient
+                installation method than the DC/OS advanced installation
+                method.
         """
         self._cluster.install_dcos_from_url(
-            build_artifact=build_artifact,
-            extra_config=extra_config if extra_config else {},
+            extra_config=extra_config or {},
             log_output_live=log_output_live,
         )
 

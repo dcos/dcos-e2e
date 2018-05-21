@@ -215,9 +215,15 @@ class AWSCluster(ClusterManager):
         # This also inserts bootstrap node information into ``cluster_info``.
         self.cluster_info = self.launcher.describe()
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        return dict(self.launcher.config['dcos_config'])
+
     def install_dcos_from_url(
         self,
-        build_artifact: str,
         extra_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
@@ -225,21 +231,16 @@ class AWSCluster(ClusterManager):
         Install DC/OS from a URL.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
-                from.
             extra_config: This may contain extra installation configuration
                 variables that are applied on top of the default DC/OS
                 configuration of the AWS backend.
             log_output_live: If ``True``, log output of the installation live.
         """
-        # In order to install DC/OS with the preliminary dcos-launch
-        # config the ``build_artifact`` URL is overwritten.
-        self.launcher.config['installer_url'] = build_artifact
-
-        # The DC/OS config parameters from ``extra_config`` are applied
-        # on top of the preliminary DC/OS config.
-        dcos_config = self.launcher.config['dcos_config']
-        self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
+        dcos_config = {
+            **self.base_config,
+            **extra_config,
+        }
+        self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
     def install_dcos_from_path(
