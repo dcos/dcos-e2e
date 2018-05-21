@@ -36,6 +36,7 @@ class TestIntegrationTests:
         """
         with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
+                dcos_config=cluster.base_config,
                 build_artifact=oss_artifact,
                 log_output_live=True,
             )
@@ -181,7 +182,8 @@ class TestInstallDcosFromPathLogging:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 cluster.install_dcos_from_path(
-                    oss_artifact,
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
                     log_output_live=True,
                 )
 
