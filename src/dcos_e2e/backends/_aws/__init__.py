@@ -225,7 +225,7 @@ class AWSCluster(ClusterManager):
     def install_dcos_from_url(
         self,
         build_artifact: str,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
@@ -234,24 +234,19 @@ class AWSCluster(ClusterManager):
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: This may contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the AWS backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
         """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
-        self.launcher.config['dcos_config'] = {
-            **self.base_config,
-            **extra_config,
-        }
+        self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
     def install_dcos_from_path(
         self,
         build_artifact: Path,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
@@ -262,9 +257,7 @@ class AWSCluster(ClusterManager):
         Args:
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
-            extra_config: May contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the AWS backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:

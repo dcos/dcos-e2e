@@ -320,9 +320,11 @@ class Cluster(ContextDecorator):
                 backend provides a more efficient installation method than
                 the DC/OS advanced installation method.
         """
+        extra_config = extra_config or {}
+        dcos_config = {**self._cluster.base_config, **extra_config}
         self._cluster.install_dcos_from_url(
             build_artifact=build_artifact,
-            extra_config=extra_config if extra_config else {},
+            dcos_config=dcos_config,
             log_output_live=log_output_live,
         )
 
@@ -347,9 +349,11 @@ class Cluster(ContextDecorator):
                 efficient for the given backend to use the DC/OS advanced
                 installation method that takes build artifacts by URL string.
         """
+        extra_config = extra_config or {}
+        dcos_config = {**self._cluster.base_config, **extra_config}
         self._cluster.install_dcos_from_path(
             build_artifact=build_artifact,
-            extra_config=extra_config if extra_config else {},
+            dcos_config=dcos_config,
             log_output_live=log_output_live,
         )
 
