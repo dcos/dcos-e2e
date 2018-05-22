@@ -99,7 +99,10 @@ class TestUnsupported:
             public_agents=0,
         ) as cluster:
             with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_path(build_artifact=Path('/foo'))
+                cluster.install_dcos_from_path(
+                    build_artifact=Path('/foo'),
+                    dcos_config=cluster.base_config,
+                )
 
         expected_error = (
             'The AWS backend does not support the installation of build '
