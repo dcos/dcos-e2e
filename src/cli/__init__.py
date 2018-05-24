@@ -764,7 +764,7 @@ def run(
     dcos_login_pw: str,
     no_test_env: bool,
     node: Node,
-    env,
+    env: Dict[str, str],
 ) -> None:
     """
     Run an arbitrary command on a node.

@@ -381,14 +381,17 @@ def validate_environment_variable(
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
 ) -> Dict[str, str]:
+    """
+    Validate that environment variables are set as expected.
+    """
     env = {}
     for definition in value:
         try:
-            key, val = definition.split('=')
+            key, val = definition.split(sep='=', maxsplit=1)
         except ValueError:
             message = (
-                'NOOOO'
-            )
+                '"{definition}" does not match the format "<KEY>=<VALUE>".'
+            ).format(definition=definition)
             raise click.BadParameter(message=message)
         env[key] = val
     return env
