@@ -750,9 +750,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     type=str,
     callback=validate_environment_variable,
     multiple=True,
-    help=(
-        'TODO env var'
-    ),
+    help='Set environment variables in the format "<KEY>=<VALUE>"',
 )
 @click.pass_context
 def run(
