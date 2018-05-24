@@ -158,6 +158,8 @@ def check_storage_driver() -> CheckLevels:
             "The host's Docker storage driver is \"{host_driver}\". "
             'aufs is not available. '
             'Change your storage driver to one of: {supported_drivers}. '
+            'Alternatively try using the `--docker-storage-driver` option '
+            'with `overlay` or `overlay2`. '
             'See {help_url}.'
         ).format(
             host_driver=host_driver,
