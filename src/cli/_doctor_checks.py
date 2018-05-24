@@ -99,7 +99,10 @@ def check_docker_root_free_space() -> CheckLevels:
     container.stop()
     container.remove(v=True)
 
-    _, information = output.decode().strip().split('\n')
+    output_lines = output.decode().strip().split('\n')
+    # We skip the first line which is headers.
+    # Sometimes the information is split across multiple lines.
+    information = ' '.join(line for line in output_lines[1:])
     _, _, _, avail, _, _ = information.split()
     available_bytes = int(avail)
     available_gigabytes = available_bytes / 1024 / 1024
