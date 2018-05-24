@@ -787,7 +787,6 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
-    import pdb; pdb.set_trace()
     if no_test_env:
         try:
             node.run(
