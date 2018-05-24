@@ -375,3 +375,28 @@ def validate_variant(
 
     rmtree(path=str(workspace_dir), ignore_errors=True)
     return 'enterprise' if enterprise else 'oss'
+
+
+def validate_environment_variable(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Dict[str, str]:
+    """
+    Validate that environment variables are set as expected.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (param, ctx):
+        pass
+
+    env = {}
+    for definition in value:
+        try:
+            key, val = definition.split(sep='=', maxsplit=1)
+        except ValueError:
+            message = (
+                '"{definition}" does not match the format "<KEY>=<VALUE>".'
+            ).format(definition=definition)
+            raise click.BadParameter(message=message)
+        env[key] = val
+    return env
