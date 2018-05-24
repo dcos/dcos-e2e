@@ -99,6 +99,7 @@ def check_docker_root_free_space() -> CheckLevels:
     container.stop()
     container.remove(v=True)
 
+    output_lines = output.decode().strip().split('\n')
     # We skip the first line which is headers.
     # Sometimes the information is split across multiple lines.
     information = ' '.join(line for line in output_lines[1:])
