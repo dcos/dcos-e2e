@@ -22,6 +22,7 @@ RUN yum install -y \
 		tree \
 		unzip \
 		which \
+                xfsprogs \
 		xz \
 && ( \
 cd /lib/systemd/system/sysinit.target.wants/; \
