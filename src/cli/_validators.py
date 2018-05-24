@@ -385,6 +385,10 @@ def validate_environment_variable(
     """
     Validate that environment variables are set as expected.
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (param, ctx):
+        pass
+
     env = {}
     for definition in value:
         try:
