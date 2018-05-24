@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.05.24.2
+------------
+
 - Add ``--env`` option to ``dcos-docker run``.
 
 2018.05.24.1
