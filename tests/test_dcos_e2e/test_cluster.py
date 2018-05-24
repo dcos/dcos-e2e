@@ -304,14 +304,17 @@ class TestClusterFromNodes:
                 public_agents=cluster.public_agents,
             )
 
+            dcos_config = cluster.base_config
+            assert dcos_config == {}
+
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_url(
                     build_artifact=oss_artifact_url,
-                    dcos_config=cluster.base_config,
+                    dcos_config=dcos_config,
                 )
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
-                    dcos_config=cluster.base_config,
+                    dcos_config=dcos_config,
                 )
