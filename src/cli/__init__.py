@@ -68,6 +68,7 @@ from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
+    validate_environment_variable,
     validate_node_reference,
     validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
@@ -744,6 +745,15 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     ),
     callback=validate_node_reference,
 )
+@click.option(
+    '--env',
+    type=str,
+    callback=validate_environment_variable,
+    multiple=True,
+    help=(
+        'TODO env var'
+    ),
+)
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -754,6 +764,7 @@ def run(
     dcos_login_pw: str,
     no_test_env: bool,
     node: Node,
+    env,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -776,6 +787,7 @@ def run(
             dcos_checkout_dir=str(sync_dir),
         )
 
+    import pdb; pdb.set_trace()
     if no_test_env:
         try:
             node.run(
@@ -783,6 +795,7 @@ def run(
                 log_output_live=False,
                 tty=True,
                 shell=True,
+                env=env,
             )
         except subprocess.CalledProcessError as exc:
             sys.exit(exc.returncode)
@@ -795,6 +808,7 @@ def run(
     env = {
         'DCOS_LOGIN_UNAME': dcos_login_uname,
         'DCOS_LOGIN_PW': dcos_login_pw,
+        **env,
     }
 
     try:

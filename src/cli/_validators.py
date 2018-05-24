@@ -375,3 +375,20 @@ def validate_variant(
 
     rmtree(path=str(workspace_dir), ignore_errors=True)
     return 'enterprise' if enterprise else 'oss'
+
+def validate_environment_variable(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Dict[str, str]:
+    env = {}
+    for definition in value:
+        try:
+            key, val = definition.split('=')
+        except ValueError:
+            message = (
+                'NOOOO'
+            )
+            raise click.BadParameter(message=message)
+        env[key] = val
+    return env

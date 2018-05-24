@@ -6,11 +6,13 @@ Changelog
 Next
 ----
 
+- Add ``--env`` option to ``dcos-docker run``.
+
 2018.05.24.1
 ------------
 
-2018.05.24.0
-------------
+- Make ``xfs_info`` available on nodes, meaning that preflight checks can be run on nodes with XFS.
+- Fix ``dcos-docker doctor`` for cases where ``df`` produces very long results.
 
 2018.05.21.0
 ------------
