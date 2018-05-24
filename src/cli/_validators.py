@@ -376,6 +376,7 @@ def validate_variant(
     rmtree(path=str(workspace_dir), ignore_errors=True)
     return 'enterprise' if enterprise else 'oss'
 
+
 def validate_environment_variable(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
