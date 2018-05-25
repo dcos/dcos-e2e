@@ -65,6 +65,7 @@ plugins
 postflight
 powershell
 pragma
+preflight
 py
 pyperclip
 pytest
