@@ -2,8 +2,6 @@
 
 |codecov|
 
-|Updates|
-
 |Documentation Status|
 
 DC/OS E2E
@@ -153,8 +151,6 @@ Each of these commands and more described in detail in the `full CLI documentati
    :target: https://travis-ci.org/dcos/dcos-e2e
 .. |codecov| image:: https://codecov.io/gh/dcos/dcos-e2e/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/dcos/dcos-e2e
-.. |Updates| image:: https://pyup.io/repos/github/dcos/dcos-e2e/shield.svg
-   :target: https://pyup.io/repos/github/dcos/dcos-e2e/
 .. |Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
