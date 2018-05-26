@@ -1214,6 +1214,8 @@ class TestRun:
                                        container ID, a reference in the format
                                        "<role>_<number>". These details be seen with
                                        ``dcos_docker inspect``.
+              --env TEXT               Set environment variables in the format
+                                       "<KEY>=<VALUE>"
               --help                   Show this message and exit.
             """,# noqa: E501,E261
         )
