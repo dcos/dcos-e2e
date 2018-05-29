@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.05.24.2.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.05.29.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -292,8 +292,8 @@ class Dcosdocker < Formula
   end
 
   resource "websocket-client" do
-    url "https://files.pythonhosted.org/packages/c9/bb/8d3dd9063cfe0cd5d03fe6a1f74ddd948f384e9c1eff0eb978f3976a7d27/websocket_client-0.47.0.tar.gz"
-    sha256 "a453dc4dfa6e0db3d8fd7738a308a88effe6240c59f3226eb93e8f020c216149"
+    url "https://files.pythonhosted.org/packages/28/85/df04ec21c622728316b591c2852fd20a0e74324eeb6ca26f351844ba815f/websocket_client-0.48.0.tar.gz"
+    sha256 "18f1170e6a1b5463986739d9fd45c4308b0d025c1b2f9b88788d8f69e8a5eb4a"
   end
 
 
