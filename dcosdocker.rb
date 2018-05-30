@@ -1,14 +1,14 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.05.29.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.05.30.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
 
   resource "adal" do
-    url "https://files.pythonhosted.org/packages/94/9e/260454da9b20e53530f8bbd42acdaf8d31b8e5ab0d4ee927ae160e5361a2/adal-0.6.0.tar.gz"
-    sha256 "e9cb6da6d1cdaf222d519337894ed8fc35ed702554da94819a21d0f5a8b6ce40"
+    url "https://files.pythonhosted.org/packages/6c/5e/2d3c937cfb5630db6fb37cbc1558c1af60564ad3706beb08193ff4f6158c/adal-1.0.0.tar.gz"
+    sha256 "73967435fe2c95f4f7430e0138066e89a7536f71e5a7440835e326d310742376"
   end
 
   resource "asn1crypto" do
