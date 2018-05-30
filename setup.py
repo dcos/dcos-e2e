@@ -8,7 +8,11 @@ from setuptools import find_packages, setup
 DEPENDENCY_LINKS = []
 
 with open('requirements.txt') as requirements:
-    INSTALL_REQUIRES = []
+    # Keyring is not a direct dependency but without it some users get:
+    #
+    # Cannot load 'keyring' on your system (either not installed, or not
+    # configured correctly): No module named 'keyring'
+    INSTALL_REQUIRES = ['keyring']
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
