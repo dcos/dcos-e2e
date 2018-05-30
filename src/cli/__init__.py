@@ -135,13 +135,15 @@ def _set_logging(
     for _ in (ctx, param):
         pass
 
-    value = min(value, 2)
+    value = min(value, 3)
     value = max(value, 0)
     verbosity_map = {
         0: logging.WARNING,
-        1: logging.DEBUG,
-        2: logging.INFO,
+        1: logging.INFO,
+        2: logging.DEBUG,
+        3: logging.NOTSET,
     }
+    # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(value or 0)])
 
 
