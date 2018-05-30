@@ -9,6 +9,8 @@ Next
 2018.05.29.0
 ------------
 
+- Do not pin ``setuptools`` to an exact version.
+
 2018.05.24.2
 ------------
 
