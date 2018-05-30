@@ -97,6 +97,8 @@ lint: \
     isort \
     linkcheck \
     mypy \
+    pip-extra-reqs \
+    pip-missing-reqs \
     pydocstyle \
     pylint \
     pyroma \
