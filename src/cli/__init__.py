@@ -143,8 +143,8 @@ def _set_logging(
         2: logging.DEBUG,
         3: logging.NOTSET,
     }
-    # Disable logging calls of severity lvl or below.
-    logging.disable(lvl=verbosity_map[int(value or 0)])
+    # Disable logging calls of the given severity level or below.
+    logging.disable(verbosity_map[int(value or 0)])
 
 
 @click.option(
