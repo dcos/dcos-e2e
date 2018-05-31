@@ -136,7 +136,7 @@ class ClusterContainers:
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_ssh_user='root',
+            default_user='root',
             ssh_key_path=ssh_key_path,
         )
 
