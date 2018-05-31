@@ -40,9 +40,199 @@ def dcos_node(cluster_backend: ClusterBackend) -> Iterator[Node]:
         yield master
 
 
-class TestNode:
+class TestStringRepresentation:
     """
-    Tests for interacting with cluster nodes.
+    Tests for the string representation of a ``Node``.
+    """
+
+    def test_string_representation(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        The string representation has the expected format.
+        """
+        string = 'Node(public_ip={public_ip}, private_ip={private_ip})'.format(
+            public_ip=dcos_node.public_ip_address,
+            private_ip=dcos_node.private_ip_address,
+        )
+        assert string == str(dcos_node)
+
+
+class TestSendFile:
+    """
+    Tests for ``Node.send_file``.
+    """
+
+    def test_send_file(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node as the default user.
+        """
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        master_destination_path = Path('/etc/new_dir/on_master_node.txt')
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == content
+
+    def test_send_file_custom_user(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node as a custom user.
+        """
+        testuser = str(uuid.uuid4().hex)
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        master_destination = '/home/{user}/on_master_node.txt'.format(
+            user=testuser,
+        )
+        master_destination_path = Path(master_destination)
+
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+            user=testuser,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args, user=testuser)
+        assert result.stdout.decode() == content
+
+        # Implicitly asserts SSH connection closed by ``send_file``.
+        dcos_node.run(args=['userdel', '-r', testuser])
+
+
+class TestPopen:
+    """
+    Tests for ``Node.popen``.
+    """
+
+    def test_popen(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        It is possible to run commands as the default user asynchronously.
+        """
+        proc_1 = dcos_node.popen(
+            args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
+            shell=True,
+        )
+
+        proc_2 = dcos_node.popen(
+            args=[
+                '(mkfifo /tmp/pipe | true)',
+                '&&',
+                '(echo $USER > /tmp/pipe)',
+            ],
+            shell=True,
+        )
+
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            stdout, _ = proc_1.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_1.kill()
+            stdout, _ = proc_1.communicate()
+
+        return_code_1 = proc_1.poll()
+
+        # Needed to cleanly terminate second subprocess
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            proc_2.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_2.kill()
+            proc_2.communicate()
+            raise
+
+        return_code_2 = proc_2.poll()
+
+        assert stdout.strip().decode() == dcos_node.default_user
+        assert return_code_1 == 0
+        assert return_code_2 == 0
+
+        dcos_node.run(['rm', '-f', '/tmp/pipe'])
+
+    def test_popen_custom_user(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        It is possible to run commands as a custom user asynchronously.
+        """
+        testuser = str(uuid.uuid4().hex)
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        proc_1 = dcos_node.popen(
+            args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
+            user=testuser,
+            shell=True,
+        )
+
+        proc_2 = dcos_node.popen(
+            args=[
+                '(mkfifo /tmp/pipe | true)',
+                '&&',
+                '(echo $USER > /tmp/pipe)',
+            ],
+            user=testuser,
+            shell=True,
+        )
+
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            stdout, _ = proc_1.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_1.kill()
+            stdout, _ = proc_1.communicate()
+
+        return_code_1 = proc_1.poll()
+
+        # Needed to cleanly terminate second subprocess
+        try:
+            # An arbitrary timeout to avoid infinite wait times.
+            proc_2.communicate(timeout=15)
+        except TimeoutExpired:  # pragma: no cover
+            proc_2.kill()
+            proc_2.communicate()
+            raise
+
+        return_code_2 = proc_2.poll()
+
+        assert stdout.strip().decode() == testuser
+        assert return_code_1 == 0
+        assert return_code_2 == 0
+
+        dcos_node.run(['rm', '-f', '/tmp/pipe'], user=testuser)
+        dcos_node.run(args=['userdel', '-r', testuser])
+
+
+class TestRun:
+    """
+    Tests for ``Node.run``.
     """
 
     def test_run_literal(
@@ -238,175 +428,3 @@ class TestNode:
             '`log_output_live` cannot be `True` if `pipe_output` is `False`.'
         )
         assert str(excinfo.value) == expected_message
-
-    def test_popen(
-        self,
-        dcos_node: Node,
-    ) -> None:
-        """
-        It is possible to run commands as the default user asynchronously.
-        """
-        proc_1 = dcos_node.popen(
-            args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
-            shell=True,
-        )
-
-        proc_2 = dcos_node.popen(
-            args=[
-                '(mkfifo /tmp/pipe | true)',
-                '&&',
-                '(echo $USER > /tmp/pipe)',
-            ],
-            shell=True,
-        )
-
-        try:
-            # An arbitrary timeout to avoid infinite wait times.
-            stdout, _ = proc_1.communicate(timeout=15)
-        except TimeoutExpired:  # pragma: no cover
-            proc_1.kill()
-            stdout, _ = proc_1.communicate()
-
-        return_code_1 = proc_1.poll()
-
-        # Needed to cleanly terminate second subprocess
-        try:
-            # An arbitrary timeout to avoid infinite wait times.
-            proc_2.communicate(timeout=15)
-        except TimeoutExpired:  # pragma: no cover
-            proc_2.kill()
-            proc_2.communicate()
-            raise
-
-        return_code_2 = proc_2.poll()
-
-        assert stdout.strip().decode() == dcos_node.default_user
-        assert return_code_1 == 0
-        assert return_code_2 == 0
-
-        dcos_node.run(['rm', '-f', '/tmp/pipe'])
-
-    def test_popen_custom_user(
-        self,
-        dcos_node: Node,
-    ) -> None:
-        """
-        It is possible to run commands as a custom user asynchronously.
-        """
-        testuser = str(uuid.uuid4().hex)
-        dcos_node.run(args=['useradd', testuser])
-        dcos_node.run(
-            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
-            shell=True,
-        )
-
-        proc_1 = dcos_node.popen(
-            args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
-            user=testuser,
-            shell=True,
-        )
-
-        proc_2 = dcos_node.popen(
-            args=[
-                '(mkfifo /tmp/pipe | true)',
-                '&&',
-                '(echo $USER > /tmp/pipe)',
-            ],
-            user=testuser,
-            shell=True,
-        )
-
-        try:
-            # An arbitrary timeout to avoid infinite wait times.
-            stdout, _ = proc_1.communicate(timeout=15)
-        except TimeoutExpired:  # pragma: no cover
-            proc_1.kill()
-            stdout, _ = proc_1.communicate()
-
-        return_code_1 = proc_1.poll()
-
-        # Needed to cleanly terminate second subprocess
-        try:
-            # An arbitrary timeout to avoid infinite wait times.
-            proc_2.communicate(timeout=15)
-        except TimeoutExpired:  # pragma: no cover
-            proc_2.kill()
-            proc_2.communicate()
-            raise
-
-        return_code_2 = proc_2.poll()
-
-        assert stdout.strip().decode() == testuser
-        assert return_code_1 == 0
-        assert return_code_2 == 0
-
-        dcos_node.run(['rm', '-f', '/tmp/pipe'], user=testuser)
-        dcos_node.run(args=['userdel', '-r', testuser])
-
-    def test_send_file(
-        self,
-        dcos_node: Node,
-        tmpdir: local,
-    ) -> None:
-        """
-        It is possible to send a file to a cluster node as the default user.
-        """
-        content = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
-        master_destination_path = Path('/etc/new_dir/on_master_node.txt')
-        dcos_node.send_file(
-            local_path=Path(str(local_file)),
-            remote_path=master_destination_path,
-        )
-        args = ['cat', str(master_destination_path)]
-        result = dcos_node.run(args=args)
-        assert result.stdout.decode() == content
-
-    def test_send_file_custom_user(
-        self,
-        dcos_node: Node,
-        tmpdir: local,
-    ) -> None:
-        """
-        It is possible to send a file to a cluster node as a custom user.
-        """
-        testuser = str(uuid.uuid4().hex)
-        dcos_node.run(args=['useradd', testuser])
-        dcos_node.run(
-            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
-            shell=True,
-        )
-
-        content = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
-        master_destination = '/home/{user}/on_master_node.txt'.format(
-            user=testuser,
-        )
-        master_destination_path = Path(master_destination)
-
-        dcos_node.send_file(
-            local_path=Path(str(local_file)),
-            remote_path=master_destination_path,
-            user=testuser,
-        )
-        args = ['cat', str(master_destination_path)]
-        result = dcos_node.run(args=args, user=testuser)
-        assert result.stdout.decode() == content
-
-        # Implicitly asserts SSH connection closed by ``send_file``.
-        dcos_node.run(args=['userdel', '-r', testuser])
-
-    def test_string_representation(
-        self,
-        dcos_node: Node,
-    ) -> None:
-        """
-        The string representation has the expected format.
-        """
-        string = 'Node(public_ip={public_ip}, private_ip={private_ip})'.format(
-            public_ip=dcos_node.public_ip_address,
-            private_ip=dcos_node.private_ip_address,
-        )
-        assert string == str(dcos_node)
