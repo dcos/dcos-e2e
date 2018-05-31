@@ -306,7 +306,7 @@ class TestNode:
 
         return_code_2 = proc_2.poll()
 
-        assert stdout.strip().decode() == master.default_ssh_user
+        assert stdout.strip().decode() == master.default_user
         assert return_code_1 == 0
         assert return_code_2 == 0
 

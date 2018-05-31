@@ -228,7 +228,7 @@ class DockerCluster(ClusterManager):
                 installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
-        self._default_ssh_user = 'root'
+        self._default_user = 'root'
 
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -434,7 +434,7 @@ class DockerCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        ssh_user = self._default_ssh_user
+        ssh_user = self._default_user
 
         def ip_list(nodes: Set[Node]) -> List[str]:
             return list(map(lambda node: str(node.public_ip_address), nodes))
@@ -565,7 +565,7 @@ class DockerCluster(ClusterManager):
                 Node(
                     public_ip_address=container_ip_address,
                     private_ip_address=container_ip_address,
-                    default_ssh_user=self._default_ssh_user,
+                    default_user=self._default_user,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
                 ),
             )

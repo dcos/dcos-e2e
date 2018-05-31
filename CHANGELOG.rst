@@ -6,8 +6,7 @@ Changelog
 Next
 ----
 
-2018.05.30.0
-------------
+- Change ``Node.default_ssh_user`` to ``Node.default_user``.
 
 2018.05.29.0
 ------------

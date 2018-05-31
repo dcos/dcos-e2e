@@ -138,7 +138,7 @@ class AWSCluster(ClusterManager):
             Distribution.CENTOS_7: 'centos',
             Distribution.COREOS: 'core',
         }
-        self._default_ssh_user = ssh_user[cluster_backend.linux_distribution]
+        self._default_user = ssh_user[cluster_backend.linux_distribution]
 
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
@@ -295,7 +295,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(master.get('public_ip')),
                 private_ip_address=IPv4Address(master.get('private_ip')),
-                default_ssh_user=self._default_ssh_user,
+                default_user=self._default_user,
                 ssh_key_path=self._ssh_key_path,
             )
             nodes.add(node)
@@ -313,7 +313,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(priv_agent.get('public_ip')),
                 private_ip_address=IPv4Address(priv_agent.get('private_ip')),
-                default_ssh_user=self._default_ssh_user,
+                default_user=self._default_user,
                 ssh_key_path=self._ssh_key_path,
             )
             nodes.add(node)
@@ -331,7 +331,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(pub_agent.get('public_ip')),
                 private_ip_address=IPv4Address(pub_agent.get('private_ip')),
-                default_ssh_user=self._default_ssh_user,
+                default_user=self._default_user,
                 ssh_key_path=self._ssh_key_path,
             )
             nodes.add(node)
