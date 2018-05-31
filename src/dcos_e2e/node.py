@@ -4,6 +4,7 @@ Tools for managing DC/OS cluster nodes.
 
 import stat
 import subprocess
+from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
 from shlex import quote
@@ -12,6 +13,14 @@ from typing import Any, Dict, List, Optional
 import paramiko
 
 from ._common import run_subprocess
+
+
+class Transport(Enum):
+    """
+    Transports for communicating with nodes.
+    """
+
+    SSH = 1
 
 
 class Node:
@@ -25,6 +34,7 @@ class Node:
         private_ip_address: IPv4Address,
         default_ssh_user: str,
         ssh_key_path: Path,
+        transport: Transport = Transport.SSH,
     ) -> None:
         """
         Args:
@@ -34,6 +44,7 @@ class Node:
             default_ssh_user: The default username to use for SSH connections.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``default_ssh_user`` user.
+            transport: The transport to use to communicate with the node.
 
         Attributes:
             public_ip_address: The public IP address of the node.
@@ -46,6 +57,7 @@ class Node:
         self.default_ssh_user = default_ssh_user
         ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
+        self._default_transport = transport
 
     def __str__(self) -> str:
         """
