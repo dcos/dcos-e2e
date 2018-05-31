@@ -24,3 +24,10 @@ Sending a File to a Node
 ------------------------
 
 .. automethod:: dcos_e2e.node.Node.send_file
+
+Transports
+----------
+
+.. autoclass:: dcos_e2e.node.Transport
+   :members:
+   :undoc-members:
