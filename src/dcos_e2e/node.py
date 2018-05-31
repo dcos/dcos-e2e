@@ -74,7 +74,7 @@ class Node:
         self,
         args: List[str],
         user: str,
-        env: Optional[Dict[str, Any]],
+        env: Dict[str, Any],
         shell: bool,
         tty: bool,
     ) -> List[str]:
@@ -99,8 +99,6 @@ class Node:
         Returns:
             The full SSH command to be run.
         """
-        env = dict(env or {})
-
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
 
@@ -181,6 +179,8 @@ class Node:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
         """
+        env = dict(env or {})
+
         if user is None:
             user = self.default_user
 
@@ -225,6 +225,8 @@ class Node:
         Returns:
             The pipe object attached to the specified process.
         """
+        env = dict(env or {})
+
         if user is None:
             user = self.default_user
 
@@ -260,18 +262,18 @@ class Node:
         if user is None:
             user = self.default_user
 
+        self.run(
+            args=['mkdir', '--parents',
+                  str(remote_path.parent)],
+            user=user,
+        )
+
         with paramiko.SSHClient() as ssh_client:
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh_client.connect(
                 str(self.public_ip_address),
                 username=user,
                 key_filename=str(self._ssh_key_path),
-            )
-
-            self.run(
-                args=['mkdir', '--parents',
-                      str(remote_path.parent)],
-                user=user,
             )
 
             with ssh_client.open_sftp() as sftp:
