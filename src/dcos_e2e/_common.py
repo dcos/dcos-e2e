@@ -129,8 +129,8 @@ def run_subprocess(
                 log(line.rstrip().decode('ascii', 'backslashreplace'))
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
-                process.returncode,
-                args,
+                returncode=process.returncode,
+                cmd=args,
                 output=stdout,
                 stderr=stderr,
             )
