@@ -62,6 +62,7 @@ parameterization
 pluggable
 plugin
 plugins
+popen
 postflight
 powershell
 pragma
