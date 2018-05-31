@@ -16,18 +16,16 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
 
 
 @pytest.fixture(scope='module')
-def dcos_cluster(
-    oss_artifact: Path,
-    cluster_backend: ClusterBackend,
-) -> Iterator[Cluster]:
+def dcos_node(cluster_backend: ClusterBackend) -> Iterator[Node]:
     """
-    Return a `Cluster`.
+    Return a ``Node``.
 
     This is module scoped as we do not intend to modify the cluster in ways
     that make tests interfere with one another.
@@ -38,12 +36,8 @@ def dcos_cluster(
         agents=0,
         public_agents=0,
     ) as cluster:
-        cluster.install_dcos_from_path(
-            build_artifact=oss_artifact,
-            log_output_live=True,
-            dcos_config=cluster.base_config,
-        )
-        yield cluster
+        (master, ) = cluster.masters
+        yield master
 
 
 class TestNode:
@@ -53,14 +47,12 @@ class TestNode:
 
     def test_run_literal(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         When shell=False, preserve arguments as literal values.
         """
-        (master, ) = dcos_cluster.masters
-
-        echo_result = master.run(
+        echo_result = dcos_node.run(
             args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
         )
         assert echo_result.returncode == 0
@@ -69,14 +61,12 @@ class TestNode:
 
     def test_run_shell(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         When shell=True, interpret spaces and special characters.
         """
-        (master, ) = dcos_cluster.masters
-
-        echo_result = master.run(
+        echo_result = dcos_node.run(
             args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
             shell=True,
         )
@@ -86,35 +76,31 @@ class TestNode:
 
     def test_run_remote_env(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         Remote environment variables are available.
         """
-        (master, ) = dcos_cluster.masters
-
-        echo_result = master.run(args=['echo', '$USER'], shell=True)
+        echo_result = dcos_node.run(args=['echo', '$USER'], shell=True)
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'root'
         assert echo_result.stderr == b''
 
     def test_run_custom_user(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         Commands can be run as a custom user.
         """
-        (master, ) = dcos_cluster.masters
-
         testuser = str(uuid.uuid4().hex)
-        master.run(args=['useradd', testuser])
-        master.run(
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
             args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
             shell=True,
         )
 
-        echo_result = master.run(
+        echo_result = dcos_node.run(
             args=['echo', '$USER'],
             user=testuser,
             shell=True,
@@ -123,18 +109,16 @@ class TestNode:
         assert echo_result.stdout.strip().decode() == testuser
         assert echo_result.stderr == b''
 
-        master.run(args=['userdel', '-r', testuser])
+        dcos_node.run(args=['userdel', '-r', testuser])
 
     def test_run_pass_env(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         Environment variables can be passed to the remote execution
         """
-        (master, ) = dcos_cluster.masters
-
-        echo_result = master.run(
+        echo_result = dcos_node.run(
             args=['echo', '$MYVAR'],
             env={'MYVAR': 'hello, world'},
             shell=True,
@@ -146,15 +130,13 @@ class TestNode:
     def test_run_error(
         self,
         caplog: LogCaptureFixture,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
-        (master, ) = dcos_cluster.masters
-
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(args=['unset_command'])
+            dcos_node.run(args=['unset_command'])
 
         exception = excinfo.value
         assert exception.returncode == 127
@@ -179,15 +161,13 @@ class TestNode:
     def test_run_error_shell(
         self,
         caplog: LogCaptureFixture,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
-        (master, ) = dcos_cluster.masters
-
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(args=['unset_command'], shell=True)
+            dcos_node.run(args=['unset_command'], shell=True)
 
         exception = excinfo.value
         assert exception.returncode == 127
@@ -211,17 +191,15 @@ class TestNode:
     def test_run_log_output_live(
         self,
         caplog: LogCaptureFixture,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         With `log_output_live`, stdout and stderr are merged and logged.
         """
-        (master, ) = dcos_cluster.masters
-
         # With `log_output_live`, output is logged and stderr is merged
         # into stdout.
         with pytest.raises(CalledProcessError) as excinfo:
-            master.run(
+            dcos_node.run(
                 args=['unset_command'],
                 log_output_live=True,
             )
@@ -244,15 +222,13 @@ class TestNode:
         )
         assert bool(len(debug_messages & matching_messages))
 
-    def test_log_output_live_and_tty(self, dcos_cluster: Cluster) -> None:
+    def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
         """
         A ``ValueError`` is raised if ``tty`` is ``True`` and
     ``log_output_live`` is ``True``.
         """
-        (master, ) = dcos_cluster.masters
-
         with pytest.raises(ValueError) as excinfo:
-            master.run(
+            dcos_node.run(
                 args=['echo', '1'],
                 log_output_live=True,
                 tty=True,
@@ -265,19 +241,17 @@ class TestNode:
 
     def test_popen(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         It is possible to run commands as the default user asynchronously.
         """
-        (master, ) = dcos_cluster.masters
-
-        proc_1 = master.popen(
+        proc_1 = dcos_node.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
             shell=True,
         )
 
-        proc_2 = master.popen(
+        proc_2 = dcos_node.popen(
             args=[
                 '(mkfifo /tmp/pipe | true)',
                 '&&',
@@ -306,35 +280,33 @@ class TestNode:
 
         return_code_2 = proc_2.poll()
 
-        assert stdout.strip().decode() == master.default_user
+        assert stdout.strip().decode() == dcos_node.default_user
         assert return_code_1 == 0
         assert return_code_2 == 0
 
-        master.run(['rm', '-f', '/tmp/pipe'])
+        dcos_node.run(['rm', '-f', '/tmp/pipe'])
 
     def test_popen_custom_user(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         It is possible to run commands as a custom user asynchronously.
         """
-        (master, ) = dcos_cluster.masters
-
         testuser = str(uuid.uuid4().hex)
-        master.run(args=['useradd', testuser])
-        master.run(
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
             args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
             shell=True,
         )
 
-        proc_1 = master.popen(
+        proc_1 = dcos_node.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
             user=testuser,
             shell=True,
         )
 
-        proc_2 = master.popen(
+        proc_2 = dcos_node.popen(
             args=[
                 '(mkfifo /tmp/pipe | true)',
                 '&&',
@@ -368,12 +340,12 @@ class TestNode:
         assert return_code_1 == 0
         assert return_code_2 == 0
 
-        master.run(['rm', '-f', '/tmp/pipe'], user=testuser)
-        master.run(args=['userdel', '-r', testuser])
+        dcos_node.run(['rm', '-f', '/tmp/pipe'], user=testuser)
+        dcos_node.run(args=['userdel', '-r', testuser])
 
     def test_send_file(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
         tmpdir: local,
     ) -> None:
         """
@@ -383,28 +355,25 @@ class TestNode:
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
         master_destination_path = Path('/etc/new_dir/on_master_node.txt')
-        (master, ) = dcos_cluster.masters
-        master.send_file(
+        dcos_node.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
-        result = master.run(args=args)
+        result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
     def test_send_file_custom_user(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
         tmpdir: local,
     ) -> None:
         """
         It is possible to send a file to a cluster node as a custom user.
         """
-        (master, ) = dcos_cluster.masters
-
         testuser = str(uuid.uuid4().hex)
-        master.run(args=['useradd', testuser])
-        master.run(
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
             args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
             shell=True,
         )
@@ -416,29 +385,28 @@ class TestNode:
             user=testuser,
         )
         master_destination_path = Path(master_destination)
-        (master, ) = dcos_cluster.masters
-        master.send_file(
+
+        dcos_node.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
             user=testuser,
         )
         args = ['cat', str(master_destination_path)]
-        result = master.run(args=args, user=testuser)
+        result = dcos_node.run(args=args, user=testuser)
         assert result.stdout.decode() == content
 
         # Implicitly asserts SSH connection closed by ``send_file``.
-        master.run(args=['userdel', '-r', testuser])
+        dcos_node.run(args=['userdel', '-r', testuser])
 
     def test_string_representation(
         self,
-        dcos_cluster: Cluster,
+        dcos_node: Node,
     ) -> None:
         """
         The string representation has the expected format.
         """
-        (master, ) = dcos_cluster.masters
         string = 'Node(public_ip={public_ip}, private_ip={private_ip})'.format(
-            public_ip=master.public_ip_address,
-            private_ip=master.private_ip_address,
+            public_ip=dcos_node.public_ip_address,
+            private_ip=dcos_node.private_ip_address,
         )
-        assert string == str(master)
+        assert string == str(dcos_node)
