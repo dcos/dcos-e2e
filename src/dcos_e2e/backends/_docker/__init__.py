@@ -233,6 +233,7 @@ class DockerCluster(ClusterManager):
             cluster_backend: Details of the specific Docker backend to use.
         """
         self._default_user = 'root'
+        self._default_transport = cluster_backend.transport
 
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -571,6 +572,7 @@ class DockerCluster(ClusterManager):
                     private_ip_address=container_ip_address,
                     default_user=self._default_user,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
+                    default_transport=self._default_transport,
                 ),
             )
         return nodes
