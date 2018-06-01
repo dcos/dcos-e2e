@@ -42,8 +42,8 @@ from ._common import (
     DOCKER_STORAGE_DRIVERS,
     DOCKER_VERSIONS,
     LINUX_DISTRIBUTIONS,
-    VARIANT_LABEL_KEY,
     TRANSPORTS,
+    VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
     ContainerInspectView,
@@ -94,8 +94,9 @@ def _existing_cluster_id_option(command: Callable[..., None],
     )(command)  # type: Callable[..., None]
     return function
 
+
 def _node_transport_option(command: Callable[..., None],
-                                ) -> Callable[..., None]:
+                           ) -> Callable[..., None]:
     """
     An option decorator for node transport options.
     """
@@ -108,6 +109,7 @@ def _node_transport_option(command: Callable[..., None],
         help='The communication transport to use.',
     )(command)  # type: Callable[..., None]
     return function
+
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
