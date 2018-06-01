@@ -141,7 +141,7 @@ class TestPopen:
             args=[
                 '(mkfifo /tmp/pipe | true)',
                 '&&',
-                '(echo $USER > /tmp/pipe)',
+                '(echo $HOME > /tmp/pipe)',
             ],
             shell=True,
         )
@@ -166,7 +166,7 @@ class TestPopen:
 
         return_code_2 = proc_2.poll()
 
-        assert stdout.strip().decode() == dcos_node.default_user
+        assert stdout.strip().decode() == '/' + dcos_node.default_user
         assert return_code_1 == 0
         assert return_code_2 == 0
 
@@ -196,7 +196,7 @@ class TestPopen:
             args=[
                 '(mkfifo /tmp/pipe | true)',
                 '&&',
-                '(echo $USER > /tmp/pipe)',
+                '(echo $HOME > /tmp/pipe)',
             ],
             user=testuser,
             shell=True,
@@ -222,7 +222,7 @@ class TestPopen:
 
         return_code_2 = proc_2.poll()
 
-        assert stdout.strip().decode() == testuser
+        assert stdout.strip().decode() == '/home/' + testuser
         assert return_code_1 == 0
         assert return_code_2 == 0
 
