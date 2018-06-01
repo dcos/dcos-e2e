@@ -129,6 +129,9 @@ class _NodeTransport(abc.ABC):
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
 
         Returns:
             The representation of the finished process.
@@ -162,6 +165,9 @@ class _NodeTransport(abc.ABC):
                 (e.g. $, &&, >). This means the caller must quote arguments if
                 they may contain these special characters, including
                 whitespace.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
 
         Returns:
             The pipe object attached to the specified process.
@@ -183,6 +189,9 @@ class _NodeTransport(abc.ABC):
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
             user: The name of the remote user to send the file.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
         """
 
 
@@ -223,6 +232,9 @@ class _SSHTransport(_NodeTransport):
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
 
         Returns:
             The representation of the finished process.
@@ -270,6 +282,9 @@ class _SSHTransport(_NodeTransport):
                 (e.g. $, &&, >). This means the caller must quote arguments if
                 they may contain these special characters, including
                 whitespace.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
 
         Returns:
             The pipe object attached to the specified process.
@@ -304,6 +319,9 @@ class _SSHTransport(_NodeTransport):
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
             user: The name of the remote user to send the file.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
         """
         with paramiko.SSHClient() as ssh_client:
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
