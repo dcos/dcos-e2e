@@ -103,7 +103,7 @@ def _node_transport_option(command: Callable[..., None],
     function = click.option(
         '--transport',
         type=click.Choice(sorted(TRANSPORTS.keys())),
-        callback=lambda ctx, param, value: TRANSPORTS[value],
+        callback=lambda ctx, param, value: TRANSPORTS[str(value)],
         default='ssh',
         show_default=True,
         help='The communication transport to use.',
