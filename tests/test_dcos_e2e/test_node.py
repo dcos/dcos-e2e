@@ -9,27 +9,31 @@ from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
 
 import pytest
+from _pytest.fixtures import SubRequest
 from _pytest.logging import LogCaptureFixture
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
-from dcos_e2e.backends import ClusterBackend
+from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
 
 
-@pytest.fixture(scope='module')
-def dcos_node(cluster_backend: ClusterBackend) -> Iterator[Node]:
+@pytest.fixture(scope='module', params=list(Transport))
+def dcos_node(request: SubRequest) -> Iterator[Node]:
     """
     Return a ``Node``.
 
     This is module scoped as we do not intend to modify the cluster in ways
     that make tests interfere with one another.
     """
+    # We use the Docker backend because it is currently the only one which
+    # supports all transports.
+    cluster_backend = Docker(transport=request.param)
     with Cluster(
         cluster_backend=cluster_backend,
         masters=1,

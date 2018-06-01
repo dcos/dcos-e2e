@@ -25,7 +25,7 @@ from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 from ._containers import start_dcos_container
 from ._docker_build import build_docker_image
@@ -115,6 +115,7 @@ class Docker(ClusterBackend):
         docker_master_labels: Optional[Dict[str, str]] = None,
         docker_agent_labels: Optional[Dict[str, str]] = None,
         docker_public_agent_labels: Optional[Dict[str, str]] = None,
+        transport: Transport = Transport.SSH,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -148,6 +149,7 @@ class Docker(ClusterBackend):
             docker_public_agent_labels: Docker labels to add to the cluster
                 public agent node containers. Akin to the dictionary option in
                 `Containers.run`_.
+            transport: The transport to use for communicating with nodes.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -174,6 +176,7 @@ class Docker(ClusterBackend):
             docker_public_agent_labels: Docker labels to add to the cluster
                 public agent node containers. Akin to the dictionary option in
                 `Containers.run`_.
+            transport: The transport to use for communicating with nodes.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
@@ -191,6 +194,7 @@ class Docker(ClusterBackend):
         self.docker_master_labels = docker_master_labels or {}
         self.docker_agent_labels = docker_agent_labels or {}
         self.docker_public_agent_labels = docker_public_agent_labels or {}
+        self.transport = transport
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
