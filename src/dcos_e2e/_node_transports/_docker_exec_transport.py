@@ -72,6 +72,7 @@ class DockerExecTransport(NodeTransport):
             str(public_ip_address)
         ]
         cmd = args
+        # TODO - can this be common to all?
         if shell:
             cmd = 'bash -c {cmd}'.format(
                 # TODO Do we need shlex.quote?
