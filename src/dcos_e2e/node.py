@@ -46,12 +46,14 @@ class Node:
             private_ip_address: The IP address used by the DC/OS component
                 running on this node.
             default_user: The default username to use for connections.
+            default_transport: The transport used to communicate with the node.
         """
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address
         self.default_user = default_user
         ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
+        self.default_transport = Transport.SSH
 
     def __str__(self) -> str:
         """
@@ -102,6 +104,8 @@ class Node:
         Raises:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
+            ValueError: ``log_output_live`` and ``tty`` are both set to
+                ``True``.
         """
         env = dict(env or {})
 
@@ -112,11 +116,10 @@ class Node:
             message = '`log_output_live` and `tty` cannot both be `True`.'
             raise ValueError(message)
 
-        transport = Transport.SSH
         node_transports = {
             Transport.SSH: SSHTransport,
         }
-        node_transport = node_transports[transport]()
+        node_transport = node_transports[self.default_transport]()
         return node_transport.run(
             args=args,
             user=user,
@@ -160,11 +163,10 @@ class Node:
         if user is None:
             user = self.default_user
 
-        transport = Transport.SSH
         node_transports = {
             Transport.SSH: SSHTransport,
         }
-        node_transport = node_transports[transport]()
+        node_transport = node_transports[self.default_transport]()
         return node_transport.popen(
             args=args,
             user=user,
@@ -198,11 +200,10 @@ class Node:
             user=user,
         )
 
-        transport = Transport.SSH
         node_transports = {
             Transport.SSH: SSHTransport,
         }
-        node_transport = node_transports[transport]()
+        node_transport = node_transports[self.default_transport]()
         return node_transport.send_file(
             local_path=local_path,
             remote_path=remote_path,
