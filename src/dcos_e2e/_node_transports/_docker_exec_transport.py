@@ -5,12 +5,10 @@ Utilities to connect to nodes with Docker exec.
 import subprocess
 from ipaddress import IPv4Address
 from pathlib import Path
-from shlex import quote
 from typing import Any, Dict, List
 
-import paramiko
+import docker
 
-from dcos_e2e._common import run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
 
 
@@ -62,6 +60,13 @@ class DockerExecTransport(NodeTransport):
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
         """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [self._container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(self.public_ip_address)
+        ]
 
     def popen(
         self,
@@ -93,6 +98,13 @@ class DockerExecTransport(NodeTransport):
         Returns:
             The pipe object attached to the specified process.
         """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [self._container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(self.public_ip_address)
+        ]
 
     def send_file(
         self,
@@ -113,3 +125,10 @@ class DockerExecTransport(NodeTransport):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
         """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [self._container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(self.public_ip_address)
+        ]

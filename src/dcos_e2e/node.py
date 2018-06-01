@@ -201,7 +201,8 @@ class Node:
             user = self.default_user
 
         self.run(
-            args=['mkdir', '--parents', str(remote_path.parent)],
+            args=['mkdir', '--parents',
+                  str(remote_path.parent)],
             user=user,
         )
 

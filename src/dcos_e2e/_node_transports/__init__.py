@@ -2,8 +2,8 @@
 Classes to communicate with nodes.
 """
 
-from ._ssh_transport import SSHTransport
 from ._docker_exec_transport import DockerExecTransport
+from ._ssh_transport import SSHTransport
 
 __all__ = [
     'SSHTransport',
