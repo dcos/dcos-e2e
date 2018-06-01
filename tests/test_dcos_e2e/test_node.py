@@ -31,7 +31,7 @@ def dcos_node(request: SubRequest) -> Iterator[Node]:
     This is module scoped as we do not intend to modify the cluster in ways
     that make tests interfere with one another.
     """
-    # We use the Docker backend because it is currrently the only one which
+    # We use the Docker backend because it is currently the only one which
     # supports all transports.
     cluster_backend = Docker(transport=request.param)
     with Cluster(
