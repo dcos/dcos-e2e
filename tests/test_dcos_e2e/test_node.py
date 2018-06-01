@@ -343,10 +343,10 @@ class TestRun:
         exception = excinfo.value
         assert exception.returncode == 1
         assert exception.stdout.strip() == b''
-        expected_stderr = (
+        error_message = (
             'rm: cannot remove ‘does_not_exist’: No such file or directory'
         )
-        assert exception.stderr.decode().strip() == expected_stderr
+        assert exception.stderr.decode().strip() == error_message
         # The stderr output is not in the debug log output.
         debug_messages = set(
             filter(
@@ -356,7 +356,7 @@ class TestRun:
         )
         matching_messages = set(
             filter(
-                lambda record: expected_stderr in record.getMessage(),
+                lambda record: 'No such file' in record.getMessage(),
                 caplog.records,
             ),
         )
@@ -373,15 +373,15 @@ class TestRun:
         # With `log_output_live`, output is logged and stderr is merged
         # into stdout.
         with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(
-                args=['unset_command'],
-                log_output_live=True,
-            )
+            dcos_node.run(args=['rm', 'does_not_exist'], log_output_live=True)
 
         exception = excinfo.value
+        assert exception.returncode == 1
         assert exception.stderr == b''
-        assert b'command not found' in exception.stdout
-        error_message = 'unset_command'
+        error_message = (
+            'rm: cannot remove ‘does_not_exist’: No such file or directory'
+        )
+        assert exception.stdout.decode().strip() == error_message
         debug_messages = set(
             filter(
                 lambda record: record.levelno == logging.DEBUG,
@@ -390,7 +390,7 @@ class TestRun:
         )
         matching_messages = set(
             filter(
-                lambda record: error_message in record.getMessage(),
+                lambda record: 'No such file' in record.getMessage(),
                 caplog.records,
             ),
         )
