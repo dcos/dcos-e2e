@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 import docker
 
 from dcos_e2e._node_transports._base_classes import NodeTransport
+from ._docker_tools import container_exec
 
 
 class DockerExecTransport(NodeTransport):
@@ -62,11 +63,60 @@ class DockerExecTransport(NodeTransport):
         """
         client = docker.from_env(version='auto')
         containers = client.containers.list()
-        [self._container] = [
+        [container] = [
             container for container in containers
             if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(self.public_ip_address)
+            str(public_ip_address)
         ]
+        cmd = args
+        if shell:
+            cmd = 'bash -c {cmd}'.format(
+                # TODO Do we need shlex.quote?
+                cmd=shlex.quote(' '.join(args)),
+            )
+
+        result = container_exec(
+            container=container,
+            cmd=cmd,
+            user=user,
+            environment=env,
+            stream=log_output_live,
+            tty=tty,
+        )
+
+        stdout = b''
+        stderr = b''
+
+        # TODO figure out streamed output
+        if log_output_live:
+            # result.communicate()
+            # TODO document this - None given for exit code with stream=True!
+            # exit_code = 0
+            for line in result.output:
+                LOGGER.debug(
+                    line.rstrip().decode('ascii', 'backslashreplace'),
+                )
+                stdout += line
+            exit_code = result.communicate()
+        else:
+            exit_code = result.poll()
+            stdout = result.output
+
+        if exit_code != 0:
+            raise subprocess.CalledProcessError(
+                returncode=exit_code,
+                cmd=args,
+                output=b'',
+                stderr=stdout,
+            )
+
+        return subprocess.CompletedProcess(
+            args=args,
+            returncode=exit_code,
+            stdout=stdout,
+            stderr=stderr,
+        )
+
 
     def popen(
         self,
@@ -100,10 +150,10 @@ class DockerExecTransport(NodeTransport):
         """
         client = docker.from_env(version='auto')
         containers = client.containers.list()
-        [self._container] = [
+        [container] = [
             container for container in containers
             if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(self.public_ip_address)
+            str(public_ip_address)
         ]
 
     def send_file(
@@ -127,8 +177,8 @@ class DockerExecTransport(NodeTransport):
         """
         client = docker.from_env(version='auto')
         containers = client.containers.list()
-        [self._container] = [
+        [container] = [
             container for container in containers
             if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(self.public_ip_address)
+            str(public_ip_address)
         ]
