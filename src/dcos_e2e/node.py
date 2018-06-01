@@ -14,6 +14,7 @@ import paramiko
 
 from ._common import run_subprocess
 
+
 def _compose_ssh_command(
     args: List[str],
     user: str,
@@ -236,7 +237,6 @@ class Node:
             public_ip=self.public_ip_address,
             private_ip=self.private_ip_address,
         )
-
 
     def run(
         self,
