@@ -31,6 +31,7 @@ class Node:
         private_ip_address: IPv4Address,
         default_user: str,
         ssh_key_path: Path,
+        default_transport: Transport = Transport.SSH,
     ) -> None:
         """
         Args:
@@ -40,6 +41,8 @@ class Node:
             default_user: The default username to use for connections.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``default_user`` user.
+            default_transport: The transport to use for communicating with
+                nodes.
 
         Attributes:
             public_ip_address: The public IP address of the node.
@@ -53,7 +56,7 @@ class Node:
         self.default_user = default_user
         ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
-        self.default_transport = Transport.SSH
+        self.default_transport = default_transport
 
     def __str__(self) -> str:
         """
