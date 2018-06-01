@@ -9,7 +9,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ._node_transports import SSHTransport
+from ._node_transports import DockerExecTransport, SSHTransport
 
 
 class Transport(Enum):

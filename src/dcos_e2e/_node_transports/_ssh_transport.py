@@ -89,7 +89,7 @@ def _compose_ssh_command(
     return ssh_args
 
 
-class _SSHTransport(NodeTransport):
+class SSHTransport(NodeTransport):
     """
     An SSH transport for nodes.
     """
