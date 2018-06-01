@@ -1,5 +1,5 @@
 """
-Abstract base classes.
+Abstract base classes for cluster backends.
 """
 
 import abc
