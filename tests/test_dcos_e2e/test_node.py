@@ -338,14 +338,16 @@ class TestRun:
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(args=['unset_command'], shell=shell)
+            dcos_node.run(args=['rm', 'does_not_exist'], shell=shell)
 
         exception = excinfo.value
-        assert exception.returncode == 127
-        assert exception.stdout == b''
-        assert b'command not found' in exception.stderr
-        # The error which caused this exception is not in the debug log output.
-        error_message = 'unset_command'
+        assert exception.returncode == 1
+        assert exception.stdout.strip() == b''
+        expected_stderr = (
+            'rm: cannot remove ‘does_not_exist’: No such file or directory'
+        )
+        assert exception.stderr.decode().strip() == expected_stderr
+        # The stderr output is not in the debug log output.
         debug_messages = set(
             filter(
                 lambda record: record.levelno == logging.DEBUG,
@@ -354,7 +356,7 @@ class TestRun:
         )
         matching_messages = set(
             filter(
-                lambda record: error_message in record.getMessage(),
+                lambda record: expected_stderr in record.getMessage(),
                 caplog.records,
             ),
         )
