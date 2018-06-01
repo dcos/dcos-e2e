@@ -211,6 +211,8 @@ class TestCreate:
                                               variant from the artifact. Finding the variant
                                               from the artifact takes some time and so using
                                               another option is a performance optimization.
+              --transport [ssh]               The communication transport to use.  [default:
+                                              ssh]
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
