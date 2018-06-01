@@ -92,6 +92,9 @@ def _compose_ssh_command(
 
 
 class _NodeTransport(abc.ABC):
+    """
+    A base class for node communication transports.
+    """
 
     @abc.abstractmethod
     def run(
@@ -183,9 +186,9 @@ class _NodeTransport(abc.ABC):
         """
 
 class _SSHTransport(_NodeTransport):
-
-    def __init__(self) -> None:
-        pass
+    """
+    XXX
+    """
 
     def run(
         self,
