@@ -327,52 +327,24 @@ class TestRun:
         assert echo_result.stdout.strip() == b'hello, world'
         assert echo_result.stderr == b''
 
+    @pytest.mark.parametrize('shell', [True, False])
     def test_run_error(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
+        shell: bool
     ) -> None:
         """
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(args=['unset_command'])
+            dcos_node.run(args=['unset_command'], shell=shell)
 
         exception = excinfo.value
         assert exception.returncode == 127
         assert exception.stdout == b''
         assert b'command not found' in exception.stderr
         # The error which caused this exception is not in the debug log output.
-        error_message = 'unset_command'
-        debug_messages = set(
-            filter(
-                lambda record: record.levelno == logging.DEBUG,
-                caplog.records,
-            ),
-        )
-        matching_messages = set(
-            filter(
-                lambda record: error_message in record.getMessage(),
-                caplog.records,
-            ),
-        )
-        assert not bool(len(debug_messages & matching_messages))
-
-    def test_run_error_shell(
-        self,
-        caplog: LogCaptureFixture,
-        dcos_node: Node,
-    ) -> None:
-        """
-        Commands which return a non-0 code raise a ``CalledProcessError``.
-        """
-        with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(args=['unset_command'], shell=True)
-
-        exception = excinfo.value
-        assert exception.returncode == 127
-        assert exception.stdout == b''
-        assert b'command not found' in exception.stderr
         error_message = 'unset_command'
         debug_messages = set(
             filter(
@@ -425,7 +397,7 @@ class TestRun:
     def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
         """
         A ``ValueError`` is raised if ``tty`` is ``True`` and
-    ``log_output_live`` is ``True``.
+        ``log_output_live`` is ``True``.
         """
         with pytest.raises(ValueError) as excinfo:
             dcos_node.run(
