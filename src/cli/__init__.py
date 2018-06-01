@@ -35,13 +35,14 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 from ._common import (
     CLUSTER_ID_LABEL_KEY,
     DOCKER_STORAGE_DRIVERS,
     DOCKER_VERSIONS,
     LINUX_DISTRIBUTIONS,
+    TRANSPORTS,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
@@ -90,6 +91,22 @@ def _existing_cluster_id_option(command: Callable[..., None],
         callback=validate_cluster_exists,
         default=None,
         help='If not given, "default" is used.',
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def _node_transport_option(command: Callable[..., None],
+                           ) -> Callable[..., None]:
+    """
+    An option decorator for node transport options.
+    """
+    function = click.option(
+        '--transport',
+        type=click.Choice(sorted(TRANSPORTS.keys())),
+        callback=lambda ctx, param, value: TRANSPORTS[str(value)],
+        default='ssh',
+        show_default=True,
+        help='The communication transport to use.',
     )(command)  # type: Callable[..., None]
     return function
 
@@ -349,6 +366,7 @@ def dcos_docker(verbose: None) -> None:
         'another option is a performance optimization.'
     ),
 )
+@_node_transport_option
 def create(
     agents: int,
     artifact: str,
@@ -369,6 +387,7 @@ def create(
     custom_agent_volume: List[Mount],
     custom_public_agent_volume: List[Mount],
     variant: str,
+    transport: Transport,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -460,6 +479,7 @@ def create(
         docker_agent_labels={'node_type': 'agent'},
         docker_public_agent_labels={'node_type': 'public_agent'},
         workspace_dir=workspace_dir,
+        transport=transport,
     )
 
     try:

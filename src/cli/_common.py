@@ -16,7 +16,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -34,6 +34,10 @@ DOCKER_STORAGE_DRIVERS = {
     'aufs': DockerStorageDriver.AUFS,
     'overlay': DockerStorageDriver.OVERLAY,
     'overlay2': DockerStorageDriver.OVERLAY_2,
+}
+
+TRANSPORTS = {
+    'ssh': Transport.SSH,
 }
 
 CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
