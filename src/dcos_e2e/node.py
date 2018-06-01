@@ -133,9 +133,6 @@ class _NodeTransport(abc.ABC):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
 
-        Returns:
-            The representation of the finished process.
-
         Raises:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
@@ -168,9 +165,6 @@ class _NodeTransport(abc.ABC):
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
-
-        Returns:
-            The pipe object attached to the specified process.
         """
 
     @abc.abstractmethod
