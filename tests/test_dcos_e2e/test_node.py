@@ -235,7 +235,7 @@ class TestRun:
     Tests for ``Node.run``.
     """
 
-    def test_run_literal(
+    def test_literal(
         self,
         dcos_node: Node,
     ) -> None:
@@ -249,7 +249,7 @@ class TestRun:
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
         assert echo_result.stderr == b''
 
-    def test_run_shell(
+    def test_shell(
         self,
         dcos_node: Node,
     ) -> None:
@@ -274,7 +274,7 @@ class TestRun:
         assert echo_result.stdout.strip() == b'Hello,\nWorld!'
         assert echo_result.stderr.strip() == b'1'
 
-    def test_run_remote_env(
+    def test_remote_env(
         self,
         dcos_node: Node,
     ) -> None:
@@ -286,7 +286,7 @@ class TestRun:
         assert echo_result.stdout.strip() == b'/root'
         assert echo_result.stderr == b''
 
-    def test_run_custom_user(
+    def test_custom_user(
         self,
         dcos_node: Node,
     ) -> None:
@@ -311,7 +311,7 @@ class TestRun:
 
         dcos_node.run(args=['userdel', '-r', testuser])
 
-    def test_run_pass_env(
+    def test_pass_env(
         self,
         dcos_node: Node,
     ) -> None:
@@ -329,7 +329,7 @@ class TestRun:
 
     @pytest.mark.parametrize('shell', [True, False])
     @pytest.mark.parametrize('log_output_live', [True, False])
-    def test_run_error(
+    def test_error(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
