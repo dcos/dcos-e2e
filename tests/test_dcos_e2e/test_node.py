@@ -261,21 +261,20 @@ class TestRun:
         When shell=True, interpret spaces and special characters.
         """
         echo_result = dcos_node.run(
-            args=[
-                'echo',
-                'Hello, ',
-                '&&',
-                'echo',
-                'World!',
-                '&&',
-                'echo',
-                '1',
-                '1>&2 ',
-            ],
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
             shell=True,
         )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'Hello,\nWorld!'
+        assert echo_result.stderr.strip() == b''
+
+    def test_stderr(self, dcos_node: Node) -> None:
+        """
+        ``stderr`` is send to the result's ``stderr`` property.
+        """
+        echo_result = dcos_node.run(args=['echo', '1', '1>&2'], shell=True)
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip() == b''
         assert echo_result.stderr.strip() == b'1'
 
     def test_remote_env(
