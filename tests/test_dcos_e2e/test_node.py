@@ -328,25 +328,35 @@ class TestRun:
         assert echo_result.stderr == b''
 
     @pytest.mark.parametrize('shell', [True, False])
+    @pytest.mark.parametrize('log_output_live', [True, False])
     def test_run_error(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
-        shell: bool
+        shell: bool,
+        log_output_live: bool,
     ) -> None:
         """
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(args=['rm', 'does_not_exist'], shell=shell)
+            dcos_node.run(
+                args=['rm', 'does_not_exist'],
+                shell=shell,
+                log_output_live=log_output_live,
+            )
 
         exception = excinfo.value
         assert exception.returncode == 1
-        assert exception.stdout.strip() == b''
-        expected_stderr = (
+        error_message = (
             'rm: cannot remove ‘does_not_exist’: No such file or directory'
         )
-        assert exception.stderr.decode().strip() == expected_stderr
+        if log_output_live:
+            assert exception.stderr.strip() == b''
+            assert exception.stdout.decode().strip() == error_message
+        else:
+            assert exception.stdout.strip() == b''
+            assert exception.stderr.decode().strip() == error_message
         # The stderr output is not in the debug log output.
         debug_messages = set(
             filter(
@@ -356,45 +366,11 @@ class TestRun:
         )
         matching_messages = set(
             filter(
-                lambda record: expected_stderr in record.getMessage(),
+                lambda record: 'No such file' in record.getMessage(),
                 caplog.records,
             ),
         )
-        assert not bool(len(debug_messages & matching_messages))
-
-    def test_run_log_output_live(
-        self,
-        caplog: LogCaptureFixture,
-        dcos_node: Node,
-    ) -> None:
-        """
-        With `log_output_live`, stdout and stderr are merged and logged.
-        """
-        # With `log_output_live`, output is logged and stderr is merged
-        # into stdout.
-        with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(
-                args=['unset_command'],
-                log_output_live=True,
-            )
-
-        exception = excinfo.value
-        assert exception.stderr == b''
-        assert b'command not found' in exception.stdout
-        error_message = 'unset_command'
-        debug_messages = set(
-            filter(
-                lambda record: record.levelno == logging.DEBUG,
-                caplog.records,
-            ),
-        )
-        matching_messages = set(
-            filter(
-                lambda record: error_message in record.getMessage(),
-                caplog.records,
-            ),
-        )
-        assert bool(len(debug_messages & matching_messages))
+        assert bool(len(debug_messages & matching_messages)) is log_output_live
 
     def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
         """
