@@ -2,6 +2,7 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import abc
 import stat
 import subprocess
 from enum import Enum
@@ -89,6 +90,123 @@ def _compose_ssh_command(
 
     return ssh_args
 
+
+class _NodeTransport(abc.ABC):
+
+    @abc.abstractmethod
+    def run(
+        self,
+        args: List[str],
+        user: str,
+        log_output_live: bool,
+        env: Dict[str, Any],
+        shell: bool,
+        tty: bool,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> subprocess.CompletedProcess:
+        pass
+
+    @abc.abstractmethod
+    def popen(
+        self,
+        args: List[str],
+        user: str,
+        env: Dict[str, Any],
+        shell: bool,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> subprocess.Popen:
+        pass
+
+    @abc.abstractmethod
+    def send_file(
+        self,
+        local_path: Path,
+        remote_path: Path,
+        user: str,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> None:
+        pass
+
+class _SSHTransport(_NodeTransport):
+
+    def __init__(self) -> None:
+        pass
+
+    def run(
+        self,
+        args: List[str],
+        user: str,
+        log_output_live: bool,
+        env: Dict[str, Any],
+        shell: bool,
+        tty: bool,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> subprocess.CompletedProcess:
+        ssh_args = _compose_ssh_command(
+            args=args,
+            user=user,
+            env=env,
+            shell=shell,
+            tty=tty,
+            ssh_key_path=ssh_key_path,
+            public_ip_address=public_ip_address,
+        )
+
+        return run_subprocess(
+            args=ssh_args,
+            log_output_live=log_output_live,
+            pipe_output=not tty,
+        )
+
+    def popen(
+        self,
+        args: List[str],
+        user: str,
+        env: Dict[str, Any],
+        shell: bool,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> subprocess.Popen:
+        ssh_args = _compose_ssh_command(
+            args=args,
+            user=user,
+            env=env,
+            shell=shell,
+            tty=False,
+            ssh_key_path=ssh_key_path,
+            public_ip_address=public_ip_address,
+        )
+        return subprocess.Popen(
+            args=ssh_args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+    def send_file(
+        self,
+        local_path: Path,
+        remote_path: Path,
+        user: str,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> None:
+        with paramiko.SSHClient() as ssh_client:
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(
+                str(public_ip_address),
+                username=user,
+                key_filename=str(ssh_key_path),
+            )
+
+            with ssh_client.open_sftp() as sftp:
+                sftp.put(
+                    localpath=str(local_path),
+                    remotepath=str(remote_path),
+                )
 
 class Transport(Enum):
     """
@@ -186,20 +304,20 @@ class Node:
         if user is None:
             user = self.default_user
 
-        ssh_args = _compose_ssh_command(
+        transport = Transport.SSH
+        node_transports = {
+            Transport.SSH: _SSHTransport,
+        }
+        node_transport = node_transports[transport]()
+        return node_transport.run(
             args=args,
             user=user,
+            log_output_live=log_output_live,
             env=env,
             shell=shell,
             tty=tty,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
-        )
-
-        return run_subprocess(
-            args=ssh_args,
-            log_output_live=log_output_live,
-            pipe_output=not tty,
         )
 
     def popen(
@@ -234,19 +352,18 @@ class Node:
         if user is None:
             user = self.default_user
 
-        ssh_args = _compose_ssh_command(
+        transport = Transport.SSH
+        node_transports = {
+            Transport.SSH: _SSHTransport,
+        }
+        node_transport = node_transports[transport]()
+        return node_transport.popen(
             args=args,
             user=user,
             env=env,
             shell=shell,
-            tty=False,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
-        )
-        return subprocess.Popen(
-            args=ssh_args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
         )
 
     def send_file(
@@ -274,16 +391,15 @@ class Node:
             user=user,
         )
 
-        with paramiko.SSHClient() as ssh_client:
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(
-                str(self.public_ip_address),
-                username=user,
-                key_filename=str(self._ssh_key_path),
-            )
-
-            with ssh_client.open_sftp() as sftp:
-                sftp.put(
-                    localpath=str(local_path),
-                    remotepath=str(remote_path),
-                )
+        transport = Transport.SSH
+        node_transports = {
+            Transport.SSH: _SSHTransport,
+        }
+        node_transport = node_transports[transport]()
+        return node_transport.send_file(
+            local_path=local_path,
+            remote_path=remote_path,
+            user=user,
+            ssh_key_path=self._ssh_key_path,
+            public_ip_address=self.public_ip_address,
+        )
