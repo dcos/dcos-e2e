@@ -387,7 +387,5 @@ class TestRun:
                 tty=True,
             )
 
-        expected_message = (
-            '`log_output_live` cannot be `True` if `pipe_output` is `False`.'
-        )
+        expected_message = '`log_output_live` and `tty` cannot both be `True`.'
         assert str(excinfo.value) == expected_message

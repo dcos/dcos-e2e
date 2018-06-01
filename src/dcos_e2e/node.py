@@ -108,6 +108,10 @@ class Node:
         if user is None:
             user = self.default_user
 
+        if log_output_live and tty:
+            message = '`log_output_live` and `tty` cannot both be `True`.'
+            raise ValueError(message)
+
         transport = Transport.SSH
         node_transports = {
             Transport.SSH: SSHTransport,
