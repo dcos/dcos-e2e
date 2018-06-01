@@ -18,6 +18,7 @@ class Transport(Enum):
     """
 
     SSH = 1
+    DOCKER_EXEC = 2
 
 
 class Node:
@@ -121,6 +122,7 @@ class Node:
 
         node_transports = {
             Transport.SSH: SSHTransport,
+            Transport.DOCKER_EXEC: DockerExecTransport,
         }
         node_transport = node_transports[self.default_transport]()
         return node_transport.run(
@@ -168,6 +170,7 @@ class Node:
 
         node_transports = {
             Transport.SSH: SSHTransport,
+            Transport.DOCKER_EXEC: DockerExecTransport,
         }
         node_transport = node_transports[self.default_transport]()
         return node_transport.popen(
@@ -198,13 +201,13 @@ class Node:
             user = self.default_user
 
         self.run(
-            args=['mkdir', '--parents',
-                  str(remote_path.parent)],
+            args=['mkdir', '--parents', str(remote_path.parent)],
             user=user,
         )
 
         node_transports = {
             Transport.SSH: SSHTransport,
+            Transport.DOCKER_EXEC: DockerExecTransport,
         }
         node_transport = node_transports[self.default_transport]()
         return node_transport.send_file(
