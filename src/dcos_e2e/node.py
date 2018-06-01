@@ -123,7 +123,7 @@ class Node:
             public_ip_address: The public IP address of the node.
             private_ip_address: The IP address used by the DC/OS component
                 running on this node.
-            default_user: The default username to use for SSH connections.
+            default_user: The default username to use for connections.
         """
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address
@@ -156,7 +156,7 @@ class Node:
 
         Args:
             args: The command to run on the node.
-            user: The username to SSH as. If ``None`` then the
+            user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live. If ``True``, stderr
                 is merged into stdout in the return value.
@@ -214,7 +214,7 @@ class Node:
 
         Args:
             args: The command to run on the node.
-            user: The user to open a pipe for a command for over SSH.
+            user: The user to open a pipe for a command for over.
                 If `None` the ``default_user`` is used instead.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
