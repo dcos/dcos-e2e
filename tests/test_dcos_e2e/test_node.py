@@ -281,9 +281,9 @@ class TestRun:
         """
         Remote environment variables are available.
         """
-        echo_result = dcos_node.run(args=['echo', '$USER'], shell=True)
+        echo_result = dcos_node.run(args=['echo', '$HOME'], shell=True)
         assert echo_result.returncode == 0
-        assert echo_result.stdout.strip() == b'root'
+        assert echo_result.stdout.strip() == b'/root'
         assert echo_result.stderr == b''
 
     def test_run_custom_user(
@@ -301,12 +301,12 @@ class TestRun:
         )
 
         echo_result = dcos_node.run(
-            args=['echo', '$USER'],
+            args=['echo', '$HOME'],
             user=testuser,
             shell=True,
         )
         assert echo_result.returncode == 0
-        assert echo_result.stdout.strip().decode() == testuser
+        assert echo_result.stdout.strip().decode() == '/home/' + testuser
         assert echo_result.stderr == b''
 
         dcos_node.run(args=['userdel', '-r', testuser])
