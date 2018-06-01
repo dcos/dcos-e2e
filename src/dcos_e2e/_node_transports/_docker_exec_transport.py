@@ -2,6 +2,7 @@
 Utilities to connect to nodes with Docker exec.
 """
 
+import shlex
 import subprocess
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -9,9 +10,11 @@ from typing import Any, Dict, List
 
 import docker
 
+from dcos_e2e._common import get_logger
 from dcos_e2e._node_transports._base_classes import NodeTransport
 from ._docker_tools import container_exec
 
+LOGGER = get_logger(__name__)
 
 class DockerExecTransport(NodeTransport):
     """
@@ -106,8 +109,8 @@ class DockerExecTransport(NodeTransport):
             raise subprocess.CalledProcessError(
                 returncode=exit_code,
                 cmd=args,
-                output=b'',
-                stderr=stdout,
+                output=stdout,
+                stderr=b'',
             )
 
         return subprocess.CompletedProcess(
