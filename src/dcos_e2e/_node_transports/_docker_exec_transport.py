@@ -129,10 +129,12 @@ class DockerExecTransport(NodeTransport):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
 
-        Returns:
-            The pipe object attached to the specified process.
+        Raises:
+            ``NotImplementedError``: ``popen`` is not supported with this
+            transport.
         """
-        raise NotImplementedError
+        message = '`popen` is not supported with this transport.'
+        raise NotImplementedError(message)
 
     def send_file(
         self,

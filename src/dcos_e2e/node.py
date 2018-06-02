@@ -9,7 +9,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ._node_transports import DockerExecTransport, SSHTransport
+from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
 
 
 class Transport(Enum):
@@ -70,6 +70,12 @@ class Node:
             private_ip=self.private_ip_address,
         )
 
+    def _get_node_transport(self, transport: Transport) -> NodeTransport:
+        if transport == Transport.SSH:
+            return SSHTransport()
+
+        return DockerExecTransport()
+
     def run(
         self,
         args: List[str],
@@ -122,11 +128,9 @@ class Node:
             message = '`log_output_live` and `tty` cannot both be `True`.'
             raise ValueError(message)
 
-        node_transports = {
-            Transport.SSH: SSHTransport,
-            Transport.DOCKER_EXEC: DockerExecTransport,
-        }
-        node_transport = node_transports[self.default_transport]()
+        node_transport = self._get_node_transport(
+            transport=self.default_transport,
+        )
         return node_transport.run(
             args=args,
             user=user,
@@ -171,11 +175,9 @@ class Node:
         if user is None:
             user = self.default_user
 
-        node_transports = {
-            Transport.SSH: SSHTransport,
-            Transport.DOCKER_EXEC: DockerExecTransport,
-        }
-        node_transport = node_transports[self.default_transport]()
+        node_transport = self._get_node_transport(
+            transport=self.default_transport,
+        )
         return node_transport.popen(
             args=args,
             user=user,
@@ -208,11 +210,9 @@ class Node:
             user=user,
         )
 
-        node_transports = {
-            Transport.SSH: SSHTransport,
-            Transport.DOCKER_EXEC: DockerExecTransport,
-        }
-        node_transport = node_transports[self.default_transport]()
+        node_transport = self._get_node_transport(
+            transport=self.default_transport,
+        )
         return node_transport.send_file(
             local_path=local_path,
             remote_path=remote_path,
