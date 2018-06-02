@@ -100,6 +100,8 @@ class DockerExecTransport(NodeTransport):
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
         """
+        # TODO document this - None given for exit code with stream=True!
+
         client = docker.from_env(version='auto')
         containers = client.containers.list()
         [container] = [
@@ -120,10 +122,7 @@ class DockerExecTransport(NodeTransport):
         stdout = b''
         stderr = b''
 
-        # TODO figure out streamed output
         if log_output_live:
-            # result.communicate()
-            # TODO document this - None given for exit code with stream=True!
             # exit_code = 0
             for line in result.output:
                 LOGGER.debug(
