@@ -90,6 +90,7 @@ subnet
 subpackages
 subprocess
 symlink
+systemctl
 systemd
 tarfile
 tempfile
