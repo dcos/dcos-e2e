@@ -152,8 +152,8 @@ class TestPopen:
         echo_result = dcos_node.popen(args=['echo', '1', '1>&2'], shell=True)
         stdout, stderr = echo_result.communicate()
         assert echo_result.returncode == 0
-        assert stdout.strip().decode() == 1
-        assert stderr.strip().decode() == ''
+        assert stdout.strip().decode() == ''
+        assert stderr.strip().decode() == '1'
 
     def test_custom_user(
         self,

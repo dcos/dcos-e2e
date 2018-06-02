@@ -22,7 +22,6 @@ def _compose_docker_command(
     args: List[str],
     user: str,
     env: Dict[str, Any],
-    tty: bool,
     public_ip_address: IPv4Address,
 ) -> List[str]:
     """
@@ -36,8 +35,6 @@ def _compose_docker_command(
         env: Environment variables to be set on the node before running
             the command. A mapping of environment variable names to
             values.
-        tty: If ``True``, allocate a pseudo-tty. This means that the users
-            terminal is attached to the streams of the process.
         public_ip_address: The public IP address of the node.
 
     Returns:
@@ -50,9 +47,6 @@ def _compose_docker_command(
         if container.attrs['NetworkSettings']['IPAddress'] ==
         str(public_ip_address)
     ]
-
-    if tty:
-        ssh_args.append('-t')
 
     docker_exec_args = [
         'docker',
@@ -187,6 +181,12 @@ class DockerExecTransport(NodeTransport):
             NotImplementedError: ``popen`` is not supported with this
             transport.
         """
+        cmd = _compose_docker_command(
+            args=args,
+            user=user,
+            env=env,
+            public_ip_address=public_ip_address,
+        )
 
         return subprocess.Popen(
             args=cmd,
