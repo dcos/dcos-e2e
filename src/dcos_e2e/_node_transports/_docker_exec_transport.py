@@ -33,15 +33,15 @@ def container_exec(
     """
 
     exec_id = container.client.api.exec_create(
-        container.id,
-        cmd,
+        container=container.id,
+        cmd=cmd,
         tty=tty,
         user=user,
         environment=environment,
     )['Id']
 
     output = container.client.api.exec_start(
-        exec_id,
+        exec_id=exec_id,
         tty=tty,
         stream=stream,
     )
