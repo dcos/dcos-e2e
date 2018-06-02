@@ -58,11 +58,6 @@ class ContainerExec(object):
     def poll(self):
         return self.client.api.exec_inspect(self.id)['ExitCode']
 
-    def communicate(self, line_prefix=b''):
-        for data in self.output:
-            pass
-        return self.poll()
-
 
 class DockerExecTransport(NodeTransport):
     """
@@ -135,7 +130,7 @@ class DockerExecTransport(NodeTransport):
                     line.rstrip().decode('ascii', 'backslashreplace'),
                 )
                 stdout += line
-            exit_code = result.communicate()
+            exit_code = result.poll()
         else:
             exit_code = result.poll()
             stdout = result.output
