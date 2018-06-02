@@ -19,22 +19,18 @@ from dcos_e2e._node_transports._base_classes import NodeTransport
 LOGGER = get_logger(__name__)
 
 
-
 def container_exec(
     container,
     cmd,
-    tty=False,
-    user='',
-    detach=False,
-    stream=False,
-    socket=False,
-    environment=None,
-    workdir=None
+    tty,
+    user,
+    stream,
+    environment,
 ):
     """
-  An enhanced version of #docker.Container.exec_run() which returns an object
-  that can be properly inspected for the status of the executed commands.
-  """
+    An enhanced version of #docker.Container.exec_run() which returns an object
+    that can be properly inspected for the status of the executed commands.
+    """
 
     exec_id = container.client.api.exec_create(
         container.id,
@@ -42,11 +38,14 @@ def container_exec(
         tty=tty,
         user=user,
         environment=environment,
-        workdir=workdir,
     )['Id']
 
     output = container.client.api.exec_start(
-        exec_id, detach=detach, tty=tty, stream=stream, socket=socket
+        exec_id,
+        detach=False,
+        tty=tty,
+        stream=stream,
+        socket=False,
     )
 
     return ContainerExec(container.client, exec_id, output)
