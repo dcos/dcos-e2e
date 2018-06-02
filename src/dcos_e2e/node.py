@@ -77,6 +77,7 @@ class Node:
         """
         return {
             Transport.SSH: SSHTransport,
+            Transport.DOCKER_EXEC: DockerExecTransport,
         }[transport]()
 
     def run(

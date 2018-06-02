@@ -7,7 +7,6 @@ import subprocess
 import tarfile
 from ipaddress import IPv4Address
 from pathlib import Path
-from shlex import quote
 from typing import Any, Dict, List
 
 import docker
@@ -146,9 +145,8 @@ class DockerExecTransport(NodeTransport):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
 
-        Raises:
-            NotImplementedError: ``popen`` is not supported with this
-            transport.
+        Returns:
+            The pipe object attached to the specified process.
         """
         docker_exec_args = _compose_docker_command(
             args=args,
