@@ -129,10 +129,7 @@ class TestPopen:
     Tests for ``Node.popen``.
     """
 
-    def test_popen(
-        self,
-        dcos_node: Node,
-    ) -> None:
+    def test_async(self, dcos_node: Node) -> None:
         """
         It is possible to run commands as the default user asynchronously.
         """
@@ -176,12 +173,9 @@ class TestPopen:
 
         dcos_node.run(['rm', '-f', '/tmp/pipe'])
 
-    def test_popen_custom_user(
-        self,
-        dcos_node: Node,
-    ) -> None:
+    def test_custom_user(self, dcos_node: Node) -> None:
         """
-        It is possible to run commands as a custom user asynchronously.
+        It is possible to run commands as a custom user.
         """
         testuser = str(uuid.uuid4().hex)
         dcos_node.run(args=['useradd', testuser])
@@ -232,6 +226,9 @@ class TestPopen:
 
         dcos_node.run(['rm', '-f', '/tmp/pipe'], user=testuser)
         dcos_node.run(args=['userdel', '-r', testuser])
+
+    def test_shell(self, dcos_node: Node) -> None:
+        pass
 
 
 class TestRun:
