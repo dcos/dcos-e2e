@@ -19,45 +19,6 @@ from dcos_e2e._node_transports._base_classes import NodeTransport
 LOGGER = get_logger(__name__)
 
 
-def container_exec(
-    container,
-    cmd,
-    tty,
-    user,
-    environment,
-):
-    """
-    An enhanced version of #docker.Container.exec_run() which returns an object
-    that can be properly inspected for the status of the executed commands.
-    """
-
-    exec_id = container.client.api.exec_create(
-        container=container.id,
-        cmd=cmd,
-        tty=tty,
-        user=user,
-        environment=environment,
-    )['Id']
-
-    output = container.client.api.exec_start(
-        exec_id=exec_id,
-        tty=tty,
-        stream=True,
-    )
-
-    return ContainerExec(container.client, exec_id, output)
-
-
-class ContainerExec(object):
-    def __init__(self, client, id, output):
-        self.client = client
-        self.id = id
-        self.output = output
-
-    def poll(self):
-        return self.client.api.exec_inspect(self.id)['ExitCode']
-
-
 class DockerExecTransport(NodeTransport):
     """
     A Docker exec transport for nodes.
@@ -107,17 +68,24 @@ class DockerExecTransport(NodeTransport):
             str(public_ip_address)
         ]
 
-        result = container_exec(
-            container=container,
+        exec_id = client.api.exec_create(
+            container=container.id,
             cmd=args,
+            tty=tty,
             user=user,
             environment=env,
+        )['Id']
+
+        output = client.api.exec_start(
+            exec_id=exec_id,
             tty=tty,
+            stream=True,
         )
 
         stdout = b''
+        stderr = b''
 
-        for line in result.output:
+        for line in output:
             if log_output_live:
                 LOGGER.debug(
                     line.rstrip().decode('ascii', 'backslashreplace'),
@@ -127,13 +95,13 @@ class DockerExecTransport(NodeTransport):
             # See https://github.com/docker/docker-py/issues/704.
             stdout += line
 
-        exit_code = result.poll()
+        exit_code = client.api.exec_inspect(exec_id)['ExitCode']
         if exit_code != 0:
             raise subprocess.CalledProcessError(
                 returncode=exit_code,
                 cmd=args,
                 output=stdout,
-                stderr=b'',
+                stderr=stderr,
             )
 
         return subprocess.CompletedProcess(
