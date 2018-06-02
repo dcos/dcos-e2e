@@ -111,6 +111,9 @@ class Node:
                 ``True``.
         """
         env = dict(env or {})
+        if shell:
+            args = ['/bin/sh', '-c', ' '.join(args)]
+
 
         if user is None:
             user = self.default_user
@@ -128,7 +131,6 @@ class Node:
             user=user,
             log_output_live=log_output_live,
             env=env,
-            shell=shell,
             tty=tty,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
@@ -162,6 +164,8 @@ class Node:
             The pipe object attached to the specified process.
         """
         env = dict(env or {})
+        if shell:
+            args = ['/bin/sh', '-c', ' '.join(args)]
 
         if user is None:
             user = self.default_user
@@ -174,7 +178,6 @@ class Node:
             args=args,
             user=user,
             env=env,
-            shell=shell,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
         )
