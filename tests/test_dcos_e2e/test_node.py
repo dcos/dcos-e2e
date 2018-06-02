@@ -144,6 +144,16 @@ class TestPopen:
         assert stdout.strip() == b'Hello,  && echo World!'
         assert stderr == b''
 
+    def test_stderr(self, dcos_node: Node) -> None:
+        """
+        ``stderr`` is send to the result's ``stderr`` property.
+        """
+        echo_result = dcos_node.popen(args=['echo', '1', '1>&2'], shell=True)
+        stdout, stderr = echo_result.communicate()
+        assert echo_result.returncode == 0
+        assert stdout.strip().decode() == ''
+        assert stderr.strip().decode() == '1'
+
     def test_custom_user(
         self,
         dcos_node: Node,
