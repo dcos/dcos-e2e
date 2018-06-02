@@ -23,7 +23,8 @@ from dcos_e2e.node import Node, Transport
 # pylint: disable=redefined-outer-name
 
 
-@pytest.fixture(scope='module', params=list(Transport))
+# # @pytest.fixture(scope='module', params=list(Transport))
+@pytest.fixture(scope='module', params=[Transport.DOCKER_EXEC])
 def dcos_node(request: SubRequest) -> Iterator[Node]:
     """
     Return a ``Node``.

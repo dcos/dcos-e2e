@@ -7,6 +7,7 @@ import subprocess
 import tarfile
 from ipaddress import IPv4Address
 from pathlib import Path
+from shlex import quote
 from typing import Any, Dict, List
 
 import docker
@@ -133,8 +134,33 @@ class DockerExecTransport(NodeTransport):
             NotImplementedError: ``popen`` is not supported with this
             transport.
         """
-        message = '`popen` is not supported with this transport.'
-        raise NotImplementedError(message)
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(public_ip_address)
+        ]
+
+        cmd = [
+            'docker',
+            'exec',
+            '--user',
+            user,
+        ]
+
+        for key, value in env.items():
+            set_env = ['--env', '{key}={value}'.format(key=key, value=str(value))]
+            cmd += set_env
+
+        cmd.append(container.id)
+        cmd += args
+
+        return subprocess.Popen(
+            args=cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
 
     def send_file(
         self,
