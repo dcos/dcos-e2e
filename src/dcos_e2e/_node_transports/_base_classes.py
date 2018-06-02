@@ -21,7 +21,6 @@ class NodeTransport(abc.ABC):
         user: str,
         log_output_live: bool,
         env: Dict[str, Any],
-        shell: bool,
         tty: bool,
         ssh_key_path: Path,
         public_ip_address: IPv4Address,
@@ -37,12 +36,6 @@ class NodeTransport(abc.ABC):
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            shell: If ``False`` (the default), each argument is passed as a
-                literal value to the command.  If True, the command line is
-                interpreted as a shell command, with a special meaning applied
-                to some characters (e.g. $, &&, >). This means the caller must
-                quote arguments if they may contain these special characters,
-                including whitespace.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
@@ -62,7 +55,6 @@ class NodeTransport(abc.ABC):
         args: List[str],
         user: str,
         env: Dict[str, Any],
-        shell: bool,
         ssh_key_path: Path,
         public_ip_address: IPv4Address,
     ) -> subprocess.Popen:
@@ -74,12 +66,6 @@ class NodeTransport(abc.ABC):
             user: The user to open a pipe for a command for over.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to values.
-            shell: If False, each argument is passed as a literal value to the
-                command.  If True, the command line is interpreted as a shell
-                command, with a special meaning applied to some characters
-                (e.g. $, &&, >). This means the caller must quote arguments if
-                they may contain these special characters, including
-                whitespace.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
