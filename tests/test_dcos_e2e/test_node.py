@@ -403,13 +403,29 @@ class TestRun:
         """
         XXX
         """
+        import textwrap
+        script = textwrap.dedent(
+            """
+            if tty -s
+            then
+            echo Terminal > foo.txt
+            else
+            echo Not on a terminal > foo.txt
+            fi
+            """
+
+        )
         result = dcos_node.run(
-            args=['echo', '1'],
+            args=[script],
+            # args=['echo', '1'],
             tty=True,
+            shell=True,
         )
 
         assert result.stdout is None
-        import pdb; pdb.set_trace()
+        res2 = dcos_node.run(args=['cat', 'foo.txt'])
+        assert res2.stdout == 'Interactive'
+        # import pdb; pdb.set_trace()
 
     def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
         """
