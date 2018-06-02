@@ -27,7 +27,6 @@ class DockerExecTransport(NodeTransport):
         user: str,
         log_output_live: bool,
         env: Dict[str, Any],
-        shell: bool,
         tty: bool,
         ssh_key_path: Path,
         public_ip_address: IPv4Address,
@@ -43,12 +42,6 @@ class DockerExecTransport(NodeTransport):
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            shell: If ``False`` (the default), each argument is passed as a
-                literal value to the command.  If True, the command line is
-                interpreted as a shell command, with a special meaning applied
-                to some characters (e.g. $, &&, >). This means the caller must
-                quote arguments if they may contain these special characters,
-                including whitespace.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
@@ -71,17 +64,10 @@ class DockerExecTransport(NodeTransport):
             if container.attrs['NetworkSettings']['IPAddress'] ==
             str(public_ip_address)
         ]
-        cmd = args
-        # TODO - can this be common to all?
-        if shell:
-            cmd = 'bash -c {cmd}'.format(
-                # TODO Do we need shlex.quote?
-                cmd=shlex.quote(' '.join(args)),
-            )
 
         result = container_exec(
             container=container,
-            cmd=cmd,
+            cmd=args,
             user=user,
             environment=env,
             stream=log_output_live,
@@ -127,7 +113,6 @@ class DockerExecTransport(NodeTransport):
         args: List[str],
         user: str,
         env: Dict[str, Any],
-        shell: bool,
         ssh_key_path: Path,
         public_ip_address: IPv4Address,
     ) -> subprocess.Popen:
@@ -139,12 +124,6 @@ class DockerExecTransport(NodeTransport):
             user: The user to open a pipe for a command for over.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to values.
-            shell: If False, each argument is passed as a literal value to the
-                command.  If True, the command line is interpreted as a shell
-                command, with a special meaning applied to some characters
-                (e.g. $, &&, >). This means the caller must quote arguments if
-                they may contain these special characters, including
-                whitespace.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
