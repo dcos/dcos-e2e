@@ -75,10 +75,14 @@ class Node:
         Return an instance of a node transport class which correlates to the
         given transport.
         """
-        return {
+        transport_dict = {
             Transport.SSH: SSHTransport,
             Transport.DOCKER_EXEC: DockerExecTransport,
-        }[transport]()
+        }
+
+        transport_cls = transport_dict[transport]
+        # See https://github.com/python/mypy/issues/5135.
+        return transport_cls()  # type: ignore
 
     def run(
         self,
