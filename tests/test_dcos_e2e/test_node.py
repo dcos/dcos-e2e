@@ -300,12 +300,8 @@ class TestRun:
         """
         echo_result = dcos_node.run(args=['echo', '1', '1>&2'], shell=True)
         assert echo_result.returncode == 0
-        if dcos_node.default_transport == Transport.DOCKER_EXEC:
-            assert echo_result.stdout.strip() == b'1'
-            assert echo_result.stderr.strip() == b''
-        else:
-            assert echo_result.stdout.strip() == b''
-            assert echo_result.stderr.strip() == b'1'
+        assert echo_result.stdout.strip() == b''
+        assert echo_result.stderr.strip() == b'1'
 
     def test_remote_env(
         self,
@@ -384,10 +380,8 @@ class TestRun:
         error_message = (
             'rm: cannot remove ‘does_not_exist’: No such file or directory'
         )
-        transport = dcos_node.default_transport
 
-        # The Docker exec transport combines stdout and stderr into stdout.
-        if log_output_live or transport == Transport.DOCKER_EXEC:
+        if log_output_live:
             assert exception.stderr.strip() == b''
             assert exception.stdout.decode().strip() == error_message
         else:

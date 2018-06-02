@@ -12,7 +12,7 @@ from typing import Any, Dict, List
 
 import docker
 
-from dcos_e2e._common import get_logger
+from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
 
 LOGGER = get_logger(__name__)
@@ -22,6 +22,7 @@ def _compose_docker_command(
     args: List[str],
     user: str,
     env: Dict[str, Any],
+    tty: bool,
     public_ip_address: IPv4Address,
 ) -> List[str]:
     """
@@ -35,6 +36,8 @@ def _compose_docker_command(
         env: Environment variables to be set on the node before running
             the command. A mapping of environment variable names to
             values.
+        tty: If ``True``, allocate a pseudo-tty. This means that the users
+            terminal is attached to the streams of the process.
         public_ip_address: The public IP address of the node.
 
     Returns:
@@ -54,6 +57,9 @@ def _compose_docker_command(
         '--user',
         user,
     ]
+
+    if tty:
+        docker_exec_args.append('--tty')
 
     for key, value in env.items():
         set_env = ['--env', '{key}={value}'.format(key=key, value=str(value))]
@@ -106,55 +112,18 @@ class DockerExecTransport(NodeTransport):
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
         """
-        client = docker.from_env(version='auto')
-        containers = client.containers.list()
-        [container] = [
-            container for container in containers
-            if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(public_ip_address)
-        ]
-
-        exec_id = client.api.exec_create(
-            container=container.id,
-            cmd=args,
-            tty=tty,
+        docker_exec_args = _compose_docker_command(
+            args=args,
             user=user,
-            environment=env,
-        )['Id']
-
-        output = client.api.exec_start(
-            exec_id=exec_id,
+            env=env,
+            public_ip_address=public_ip_address,
             tty=tty,
-            stream=True,
         )
 
-        stdout = b''
-        stderr = b''
-
-        for line in output:
-            if log_output_live:
-                LOGGER.debug(
-                    line.rstrip().decode('ascii', 'backslashreplace'),
-                )
-            # We put everything into stdout because there is no way to separate
-            # stdout and stderr.
-            # See https://github.com/docker/docker-py/issues/704.
-            stdout += line
-
-        exit_code = client.api.exec_inspect(exec_id)['ExitCode']
-        if exit_code != 0:
-            raise subprocess.CalledProcessError(
-                returncode=exit_code,
-                cmd=args,
-                output=stdout,
-                stderr=stderr,
-            )
-
-        return subprocess.CompletedProcess(
-            args=args,
-            returncode=exit_code,
-            stdout=stdout,
-            stderr=stderr,
+        return run_subprocess(
+            args=docker_exec_args,
+            log_output_live=log_output_live,
+            pipe_output=not tty,
         )
 
     def popen(
@@ -181,15 +150,16 @@ class DockerExecTransport(NodeTransport):
             NotImplementedError: ``popen`` is not supported with this
             transport.
         """
-        cmd = _compose_docker_command(
+        docker_exec_args = _compose_docker_command(
             args=args,
             user=user,
             env=env,
             public_ip_address=public_ip_address,
+            tty=False,
         )
 
         return subprocess.Popen(
-            args=cmd,
+            args=docker_exec_args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
