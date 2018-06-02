@@ -129,11 +129,10 @@ class DockerExecTransport(NodeTransport):
                     line.rstrip().decode('ascii', 'backslashreplace'),
                 )
                 stdout += line
-            exit_code = result.poll()
         else:
-            exit_code = result.poll()
             stdout = result.output
 
+        exit_code = result.poll()
         if exit_code != 0:
             raise subprocess.CalledProcessError(
                 returncode=exit_code,
