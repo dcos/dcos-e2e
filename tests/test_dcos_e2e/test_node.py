@@ -129,9 +129,83 @@ class TestPopen:
     Tests for ``Node.popen``.
     """
 
+    def test_literal(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        When shell=False, preserve arguments as literal values.
+        """
+        echo_result = dcos_node.popen(
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
+        )
+        stdout, stderr = echo_result.communicate()
+        assert echo_result.returncode == 0
+        assert stdout.strip() == b'Hello,  && echo World!'
+        assert stderr == b''
+
+    def test_custom_user(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        Commands can be run as a custom user.
+        """
+        testuser = str(uuid.uuid4().hex)
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        echo_result = dcos_node.popen(
+            args=['echo', '$HOME'],
+            user=testuser,
+            shell=True,
+        )
+        stdout, stderr = echo_result.communicate()
+        assert echo_result.returncode == 0
+        assert stdout.strip().decode() == '/home/' + testuser
+        assert stderr.strip().decode() == ''
+
+        dcos_node.run(args=['userdel', '-r', testuser])
+
+    def test_shell(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        When shell=True, interpret spaces and special characters.
+        """
+        echo_result = dcos_node.popen(
+            args=['echo', 'Hello, ', '&&', 'echo', 'World!'],
+            shell=True,
+        )
+        stdout, stderr = echo_result.communicate()
+        assert echo_result.returncode == 0
+        assert stdout.strip().decode() == 'Hello,\nWorld!'
+        assert stderr.strip().decode() == ''
+
+    def test_pass_env(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        Environment variables can be passed to the remote execution
+        """
+        echo_result = dcos_node.popen(
+            args=['echo', '$MYVAR'],
+            env={'MYVAR': 'hello, world'},
+            shell=True,
+        )
+        stdout, stderr = echo_result.communicate()
+        assert echo_result.returncode == 0
+        assert stdout.strip().decode() == 'hello, world'
+        assert stderr.strip().decode() == ''
+
     def test_async(self, dcos_node: Node) -> None:
         """
-        It is possible to run commands as the default user asynchronously.
+        It is possible to run commands asynchronously.
         """
         proc_1 = dcos_node.popen(
             args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
@@ -172,63 +246,6 @@ class TestPopen:
         assert return_code_2 == 0
 
         dcos_node.run(['rm', '-f', '/tmp/pipe'])
-
-    def test_custom_user(self, dcos_node: Node) -> None:
-        """
-        It is possible to run commands as a custom user.
-        """
-        testuser = str(uuid.uuid4().hex)
-        dcos_node.run(args=['useradd', testuser])
-        dcos_node.run(
-            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
-            shell=True,
-        )
-
-        proc_1 = dcos_node.popen(
-            args=['(mkfifo /tmp/pipe | true)', '&&', '(cat /tmp/pipe)'],
-            user=testuser,
-            shell=True,
-        )
-
-        proc_2 = dcos_node.popen(
-            args=[
-                '(mkfifo /tmp/pipe | true)',
-                '&&',
-                '(echo $HOME > /tmp/pipe)',
-            ],
-            user=testuser,
-            shell=True,
-        )
-
-        try:
-            # An arbitrary timeout to avoid infinite wait times.
-            stdout, _ = proc_1.communicate(timeout=15)
-        except TimeoutExpired:  # pragma: no cover
-            proc_1.kill()
-            stdout, _ = proc_1.communicate()
-
-        return_code_1 = proc_1.poll()
-
-        # Needed to cleanly terminate second subprocess
-        try:
-            # An arbitrary timeout to avoid infinite wait times.
-            proc_2.communicate(timeout=15)
-        except TimeoutExpired:  # pragma: no cover
-            proc_2.kill()
-            proc_2.communicate()
-            raise
-
-        return_code_2 = proc_2.poll()
-
-        assert stdout.strip().decode() == '/home/' + testuser
-        assert return_code_1 == 0
-        assert return_code_2 == 0
-
-        dcos_node.run(['rm', '-f', '/tmp/pipe'], user=testuser)
-        dcos_node.run(args=['userdel', '-r', testuser])
-
-    def test_shell(self, dcos_node: Node) -> None:
-        pass
 
 
 class TestRun:
@@ -307,7 +324,7 @@ class TestRun:
         )
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip().decode() == '/home/' + testuser
-        assert echo_result.stderr == b''
+        assert echo_result.stderr.strip().decode() == ''
 
         dcos_node.run(args=['userdel', '-r', testuser])
 
@@ -324,8 +341,8 @@ class TestRun:
             shell=True,
         )
         assert echo_result.returncode == 0
-        assert echo_result.stdout.strip() == b'hello, world'
-        assert echo_result.stderr == b''
+        assert echo_result.stdout.strip().decode() == 'hello, world'
+        assert echo_result.stderr.strip().decode() == ''
 
     @pytest.mark.parametrize('shell', [True, False])
     @pytest.mark.parametrize('log_output_live', [True, False])

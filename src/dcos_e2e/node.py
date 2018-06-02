@@ -114,7 +114,6 @@ class Node:
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
 
-
         if user is None:
             user = self.default_user
 
