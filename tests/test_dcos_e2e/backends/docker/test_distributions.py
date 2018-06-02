@@ -196,7 +196,7 @@ class TestUbuntu1604:
         DC/OS OSS can start up on Ubuntu 16.04.
         """
         _oss_distribution_test(
-            distribution=Distribution.COREOS,
+            distribution=Distribution.UBUNTU_16_04,
             oss_artifact=oss_artifact,
         )
 
@@ -209,7 +209,7 @@ class TestUbuntu1604:
         DC/OS Enterprise can start up on Ubuntu 16.04.
         """
         _enterprise_distribution_test(
-            distribution=Distribution.COREOS,
+            distribution=Distribution.UBUNTU_16_04,
             enterprise_artifact=enterprise_artifact,
             license_key_contents=license_key_contents,
         )
