@@ -24,7 +24,6 @@ def container_exec(
     cmd,
     tty,
     user,
-    stream,
     environment,
 ):
     """
@@ -43,7 +42,7 @@ def container_exec(
     output = container.client.api.exec_start(
         exec_id=exec_id,
         tty=tty,
-        stream=stream,
+        stream=True,
     )
 
     return ContainerExec(container.client, exec_id, output)
@@ -113,7 +112,6 @@ class DockerExecTransport(NodeTransport):
             cmd=args,
             user=user,
             environment=env,
-            stream=True,
             tty=tty,
         )
 
