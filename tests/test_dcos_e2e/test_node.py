@@ -23,8 +23,7 @@ from dcos_e2e.node import Node, Transport
 # pylint: disable=redefined-outer-name
 
 
-# # @pytest.fixture(scope='module', params=list(Transport))
-@pytest.fixture(scope='module', params=[Transport.DOCKER_EXEC])
+@pytest.fixture(scope='module', params=list(Transport))
 def dcos_node(request: SubRequest) -> Iterator[Node]:
     """
     Return a ``Node``.
@@ -295,8 +294,7 @@ class TestRun:
 
     def test_stderr(self, dcos_node: Node) -> None:
         """
-        ``stderr`` is send to the result's ``stderr`` property, apart from with
-        the Docker exec transport.
+        ``stderr`` is send to the result's ``stderr`` property.
         """
         echo_result = dcos_node.run(args=['echo', '1', '1>&2'], shell=True)
         assert echo_result.returncode == 0
@@ -380,7 +378,6 @@ class TestRun:
         error_message = (
             'rm: cannot remove ‘does_not_exist’: No such file or directory'
         )
-
         if log_output_live:
             assert exception.stderr.strip() == b''
             assert exception.stdout.decode().strip() == error_message
