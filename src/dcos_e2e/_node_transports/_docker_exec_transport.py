@@ -4,8 +4,6 @@ Utilities to connect to nodes with Docker exec.
 
 import io
 import subprocess
-# tools.py
-import sys
 import tarfile
 from ipaddress import IPv4Address
 from pathlib import Path
