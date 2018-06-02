@@ -7,6 +7,7 @@ Next
 ----
 
 - Change ``Node.default_ssh_user`` to ``Node.default_user``.
+- Add a ``docker exec`` transport to ``Node`` operations.
 
 2018.05.29.0
 ------------
