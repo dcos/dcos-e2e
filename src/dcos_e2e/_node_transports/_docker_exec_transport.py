@@ -55,29 +55,12 @@ class ContainerExec(object):
         self.id = id
         self.output = output
 
-    def inspect(self):
-        return self.client.api.exec_inspect(self.id)
-
     def poll(self):
-        return self.inspect()['ExitCode']
+        return self.client.api.exec_inspect(self.id)['ExitCode']
 
     def communicate(self, line_prefix=b''):
         for data in self.output:
-            if not data: continue
-            offset = 0
-            while offset < len(data):
-                sys.stdout.buffer.write(line_prefix)
-                nl = data.find(b'\n', offset)
-                if nl >= 0:
-                    slice = data[offset:nl + 1]
-                    offset = nl + 1
-                else:
-                    slice = data[offset:]
-                    offset += len(slice)
-                sys.stdout.buffer.write(slice)
-            sys.stdout.flush()
-        while self.poll() is None:
-            raise RuntimeError('Hm could that really happen?')
+            pass
         return self.poll()
 
 
