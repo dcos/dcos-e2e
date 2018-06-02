@@ -13,9 +13,64 @@ import docker
 
 from dcos_e2e._common import get_logger
 from dcos_e2e._node_transports._base_classes import NodeTransport
-from ._docker_tools import container_exec
 
 LOGGER = get_logger(__name__)
+
+# tools.py
+import sys
+
+
+def container_exec(container, cmd, stdout=True, stderr=True, stdin=False,
+                   tty=False, privileged=False, user='', detach=False,
+                   stream=False, socket=False, environment=None, workdir=None):
+  """
+  An enhanced version of #docker.Container.exec_run() which returns an object
+  that can be properly inspected for the status of the executed commands.
+  """
+
+  exec_id = container.client.api.exec_create(
+    container.id, cmd, stdout=stdout, stderr=stderr, stdin=stdin, tty=tty,
+    privileged=privileged, user=user, environment=environment,
+    workdir=workdir)['Id']
+
+  output = container.client.api.exec_start(
+    exec_id, detach=detach, tty=tty, stream=stream, socket=socket)
+
+  return ContainerExec(container.client, exec_id, output)
+
+
+class ContainerExec(object):
+
+  def __init__(self, client, id, output):
+    self.client = client
+    self.id = id
+    self.output = output
+
+  def inspect(self):
+    return self.client.api.exec_inspect(self.id)
+
+  def poll(self):
+    return self.inspect()['ExitCode']
+
+  def communicate(self, line_prefix=b''):
+    for data in self.output:
+      if not data: continue
+      offset = 0
+      while offset < len(data):
+        sys.stdout.buffer.write(line_prefix)
+        nl = data.find(b'\n', offset)
+        if nl >= 0:
+          slice = data[offset:nl+1]
+          offset = nl+1
+        else:
+          slice = data[offset:]
+          offset += len(slice)
+        sys.stdout.buffer.write(slice)
+      sys.stdout.flush()
+    while self.poll() is None:
+      raise RuntimeError('Hm could that really happen?')
+    return self.poll()
+
 
 class DockerExecTransport(NodeTransport):
     """
