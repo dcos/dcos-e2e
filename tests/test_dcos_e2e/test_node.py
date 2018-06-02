@@ -399,6 +399,18 @@ class TestRun:
         )
         assert bool(len(debug_messages & matching_messages)) is log_output_live
 
+    def test_tty(self, dcos_node: Node) -> None:
+        """
+        XXX
+        """
+        result = dcos_node.run(
+            args=['echo', '1'],
+            tty=True,
+        )
+
+        assert result.stdout is None
+        import pdb; pdb.set_trace()
+
     def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
         """
         A ``ValueError`` is raised if ``tty`` is ``True`` and
