@@ -130,7 +130,7 @@ class DockerExecTransport(NodeTransport):
             public_ip_address: The public IP address of the node.
 
         Raises:
-            ``NotImplementedError``: ``popen`` is not supported with this
+            NotImplementedError: ``popen`` is not supported with this
             transport.
         """
         message = '`popen` is not supported with this transport.'
