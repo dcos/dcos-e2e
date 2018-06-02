@@ -42,10 +42,8 @@ def container_exec(
 
     output = container.client.api.exec_start(
         exec_id,
-        detach=False,
         tty=tty,
         stream=stream,
-        socket=False,
     )
 
     return ContainerExec(container.client, exec_id, output)
