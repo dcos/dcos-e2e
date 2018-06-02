@@ -38,6 +38,7 @@ hwclock
 init
 invalidversion
 ip
+keyring
 lastResort
 linting
 linux
