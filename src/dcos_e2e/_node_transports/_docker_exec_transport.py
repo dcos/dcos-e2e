@@ -2,8 +2,9 @@
 Utilities to connect to nodes with Docker exec.
 """
 
-import shlex
+import io
 import subprocess
+import tarfile
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List
@@ -165,3 +166,9 @@ class DockerExecTransport(NodeTransport):
             if container.attrs['NetworkSettings']['IPAddress'] ==
             str(public_ip_address)
         ]
+        tarstream = io.BytesIO()
+        with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
+            tar.add(name=str(local_path), arcname='/' + remote_path.name)
+        tarstream.seek(0)
+
+        container.put_archive(path=str(remote_path.parent), data=tarstream)
