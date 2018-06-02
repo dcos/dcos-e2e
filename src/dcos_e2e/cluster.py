@@ -29,7 +29,7 @@ def _wait_for_ssh(node: Node) -> None:
     Retry for up to one minute (arbitrary) until SSH is available on the given
     node.
     """
-    node.run(args=['echo'])
+    node.run(args=['systemctl', 'status', 'sshd'])
 
 
 class Cluster(ContextDecorator):
