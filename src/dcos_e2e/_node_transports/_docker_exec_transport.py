@@ -18,6 +18,59 @@ from dcos_e2e._node_transports._base_classes import NodeTransport
 LOGGER = get_logger(__name__)
 
 
+def _compose_docker_command(
+    args: List[str],
+    user: str,
+    env: Dict[str, Any],
+    tty: bool,
+    public_ip_address: IPv4Address,
+) -> List[str]:
+    """
+    Return a command to run ``args`` on a node using ``docker exec``. We do not
+    use ``docker-py`` because ``stdout`` and ``stderr`` cannot be separated in
+    ``docker-py`` https://github.com/docker/docker-py/issues/704.
+
+    Args:
+        args: The command to run on a node.
+        user: The user that the command will be run for.
+        env: Environment variables to be set on the node before running
+            the command. A mapping of environment variable names to
+            values.
+        tty: If ``True``, allocate a pseudo-tty. This means that the users
+            terminal is attached to the streams of the process.
+        public_ip_address: The public IP address of the node.
+
+    Returns:
+        The full ``docker exec`` command to be run.
+    """
+    client = docker.from_env(version='auto')
+    containers = client.containers.list()
+    [container] = [
+        container for container in containers
+        if container.attrs['NetworkSettings']['IPAddress'] ==
+        str(public_ip_address)
+    ]
+
+    if tty:
+        ssh_args.append('-t')
+
+    docker_exec_args = [
+        'docker',
+        'exec',
+        '--user',
+        user,
+    ]
+
+    for key, value in env.items():
+        set_env = ['--env', '{key}={value}'.format(key=key, value=str(value))]
+        docker_exec_args += set_env
+
+    docker_exec_args.append(container.id)
+    docker_exec_args += args
+
+    return docker_exec_args
+
+
 class DockerExecTransport(NodeTransport):
     """
     A Docker exec transport for nodes.
@@ -134,27 +187,6 @@ class DockerExecTransport(NodeTransport):
             NotImplementedError: ``popen`` is not supported with this
             transport.
         """
-        client = docker.from_env(version='auto')
-        containers = client.containers.list()
-        [container] = [
-            container for container in containers
-            if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(public_ip_address)
-        ]
-
-        cmd = [
-            'docker',
-            'exec',
-            '--user',
-            user,
-        ]
-
-        for key, value in env.items():
-            set_env = ['--env', '{key}={value}'.format(key=key, value=str(value))]
-            cmd += set_env
-
-        cmd.append(container.id)
-        cmd += args
 
         return subprocess.Popen(
             args=cmd,
