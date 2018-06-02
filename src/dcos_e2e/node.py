@@ -74,7 +74,9 @@ class Node:
         Return an instance of a node transport class which correlates to the
         given transport.
         """
-        return SSHTransport()
+        return {
+            Transport.SSH: SSHTransport,
+        }[transport]()
 
     def run(
         self,
