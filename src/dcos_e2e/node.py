@@ -9,7 +9,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ._node_transports import NodeTransport, SSHTransport
+from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
 
 
 class Transport(Enum):
@@ -18,6 +18,7 @@ class Transport(Enum):
     """
 
     SSH = 1
+    DOCKER_EXEC = 2
 
 
 class Node:
@@ -74,9 +75,14 @@ class Node:
         Return an instance of a node transport class which correlates to the
         given transport.
         """
-        return {
+        transport_dict = {
             Transport.SSH: SSHTransport,
-        }[transport]()
+            Transport.DOCKER_EXEC: DockerExecTransport,
+        }
+
+        transport_cls = transport_dict[transport]
+        # See https://github.com/python/mypy/issues/5135.
+        return transport_cls()  # type: ignore
 
     def run(
         self,
