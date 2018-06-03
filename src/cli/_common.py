@@ -108,12 +108,13 @@ class ClusterContainers:
     A representation of a cluster constructed from Docker nodes.
     """
 
-    def __init__(self, cluster_id: str) -> None:
+    def __init__(self, cluster_id: str, transport: Transport) -> None:
         """
         Args:
             cluster_id: The ID of the cluster.
         """
         self._cluster_id_label = CLUSTER_ID_LABEL_KEY + '=' + cluster_id
+        self._transport = transport
 
     def _containers_by_node_type(
         self,
@@ -142,6 +143,7 @@ class ClusterContainers:
             private_ip_address=address,
             default_user='root',
             ssh_key_path=ssh_key_path,
+            transport=self._transport,
         )
 
     @property

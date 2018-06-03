@@ -599,7 +599,11 @@ def destroy(cluster_id: str) -> None:
     Destroy a cluster.
     """
     with click_spinner.spinner():
-        cluster_containers = ClusterContainers(cluster_id=cluster_id)
+        transport = Transport.SSH
+        cluster_containers = ClusterContainers(
+            cluster_id=cluster_id,
+            transport=transport,
+        )
         containers = {
             *cluster_containers.masters,
             *cluster_containers.agents,
@@ -645,7 +649,11 @@ def wait(
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     click.echo('A cluster may take some time to be ready.')
-    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    transport = Transport.SSH
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
     with click_spinner.spinner():
         if cluster_containers.is_enterprise:
             cluster_containers.cluster.wait_for_dcos_ee(
@@ -674,7 +682,11 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
-    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    transport = Transport.SSH
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
     ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
@@ -826,7 +838,11 @@ def run(
 
         return
 
-    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    transport = Transport.SSH
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
     cluster = cluster_containers.cluster
 
     env = {
@@ -883,7 +899,11 @@ def web(cluster_id: str) -> None:
     Note that the web UI may not be available at first.
     Consider using ``dcos-docker wait`` before running this command.
     """
-    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    transport = Transport.SSH
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
     cluster = cluster_containers.cluster
     master = next(iter(cluster.masters))
     web_ui = 'http://' + str(master.public_ip_address)
@@ -923,7 +943,11 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
 
-    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    transport = Transport.SSH
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
     cluster = cluster_containers.cluster
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'
