@@ -699,10 +699,11 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
-    transport = Transport.SSH
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
-        transport=transport,
+        # The transport here is not relevant as we do not make calls to the
+        # cluster.
+        transport=Transport.DOCKER_EXEC,
     )
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
@@ -808,6 +809,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     multiple=True,
     help='Set environment variables in the format "<KEY>=<VALUE>"',
 )
+@_node_transport_option
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -819,6 +821,7 @@ def run(
     no_test_env: bool,
     node: Node,
     env: Dict[str, str],
+    transport: Transport,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -849,13 +852,13 @@ def run(
                 tty=True,
                 shell=True,
                 env=env,
+                transport=transport,
             )
         except subprocess.CalledProcessError as exc:
             sys.exit(exc.returncode)
 
         return
 
-    transport = Transport.SSH
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,
@@ -874,6 +877,7 @@ def run(
             tty=True,
             env=env,
             test_host=node,
+            transport=transport,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)
