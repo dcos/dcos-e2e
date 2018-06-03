@@ -920,10 +920,10 @@ def web(cluster_id: str) -> None:
     Note that the web UI may not be available at first.
     Consider using ``dcos-docker wait`` before running this command.
     """
-    transport = Transport.SSH
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
-        transport=transport,
+        # The transport is not used so does not matter.
+        transport=Transport.DOCKER_EXEC,
     )
     cluster = cluster_containers.cluster
     master = next(iter(cluster.masters))
