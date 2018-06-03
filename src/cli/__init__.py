@@ -639,30 +639,47 @@ def destroy(cluster_id: str) -> None:
         'By default, on a DC/OS Enterprise cluster, `admin` is used.'
     ),
 )
+@click.option(
+    '--skip-http-checks',
+    is_flag=True,
+    help=(
+        'Do not wait for checks which require an HTTP connection to the '
+        'cluster. '
+        'If this flag is used, this command may return before DC/OS is fully '
+        'ready. '
+        'Use this flag in cases where an HTTP connection cannot be made to '
+        'the cluster. '
+        'For example this is useful on macOS without a VPN set up.'
+    ),
+)
+@_node_transport_option
 def wait(
     cluster_id: str,
     superuser_username: str,
     superuser_password: str,
+    transport: Transport,
+    skip_http_checks: bool,
 ) -> None:
     """
     Wait for DC/OS to start.
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     click.echo('A cluster may take some time to be ready.')
-    transport = Transport.SSH
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,
     )
+    http_checks = not skip_http_checks
     with click_spinner.spinner():
         if cluster_containers.is_enterprise:
             cluster_containers.cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
+                http_checks=http_checks,
             )
             return
 
-        cluster_containers.cluster.wait_for_dcos_oss()
+        cluster_containers.cluster.wait_for_dcos_oss(http_checks=http_checks)
 
 
 @dcos_docker.command('inspect')
