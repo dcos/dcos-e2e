@@ -16,7 +16,7 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-from .node import Node
+from .node import Node, Transport
 
 
 @retry(
@@ -380,6 +380,7 @@ class Cluster(ContextDecorator):
         log_output_live: bool = False,
         tty: bool = False,
         test_host: Optional[Node] = None,
+        transport: Optional[Transport] = None,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -398,6 +399,8 @@ class Cluster(ContextDecorator):
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
             The result of the ``pytest`` command.
@@ -441,6 +444,7 @@ class Cluster(ContextDecorator):
             env=environment_variables,
             tty=tty,
             shell=True,
+            transport=transport,
         )
 
     def destroy(self) -> None:

@@ -219,14 +219,15 @@ class Node:
         if user is None:
             user = self.default_user
 
+        transport = transport or self.default_transport
+        node_transport = self._get_node_transport(transport=transport)
         self.run(
             args=['mkdir', '--parents',
                   str(remote_path.parent)],
             user=user,
+            transport=transport,
         )
 
-        transport = transport or self.default_transport
-        node_transport = self._get_node_transport(transport=transport)
         return node_transport.send_file(
             local_path=local_path,
             remote_path=remote_path,
