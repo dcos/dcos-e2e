@@ -211,8 +211,11 @@ class TestCreate:
                                               variant from the artifact. Finding the variant
                                               from the artifact takes some time and so using
                                               another option is a performance optimization.
-              --transport [docker-exec|ssh]   The communication transport to use.  [default:
-                                              ssh]
+              --transport [docker-exec|ssh]   The communication transport to use. On macOS
+                                              the SSH transport requires IP routing to be
+                                              set up. See "dcos-docker setup-mac-network".It
+                                              also requires the "ssh" command to be
+                                              available.  [default: ssh]
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
