@@ -115,6 +115,7 @@ vendoring
 versioning
 virtualization
 vm
+vpn
 whitespace
 wildcard
 workflow
