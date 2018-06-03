@@ -639,17 +639,20 @@ def destroy(cluster_id: str) -> None:
         'By default, on a DC/OS Enterprise cluster, `admin` is used.'
     ),
 )
+@_node_transport_option
 def wait(
     cluster_id: str,
     superuser_username: str,
     superuser_password: str,
+    transport: Transport,
 ) -> None:
     """
     Wait for DC/OS to start.
+
+    Using the "docker-exec" transport may leave
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     click.echo('A cluster may take some time to be ready.')
-    transport = Transport.SSH
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,
