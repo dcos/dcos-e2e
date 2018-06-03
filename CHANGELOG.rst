@@ -8,6 +8,7 @@ Next
 
 - Change ``Node.default_ssh_user`` to ``Node.default_user``.
 - Add a ``docker exec`` transport to ``Node`` operations.
+- Add a ``--transport`` option to ``dcos-docker create`` with a new ``docker-exec`` option.
 
 2018.05.29.0
 ------------
