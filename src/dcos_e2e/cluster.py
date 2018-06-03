@@ -196,7 +196,7 @@ class Cluster(ContextDecorator):
         self,
         superuser_username: str,
         superuser_password: str,
-        health_checks: bool = True,
+        http_checks: bool = True,
     ) -> None:
         """
         Wait until the DC/OS Enterprise boot process has completed.
