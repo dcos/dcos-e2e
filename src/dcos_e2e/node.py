@@ -92,6 +92,7 @@ class Node:
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
         tty: bool = False,
+        transport: Optional[Transport] = None,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -115,6 +116,8 @@ class Node:
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
             The representation of the finished process.
@@ -136,9 +139,8 @@ class Node:
             message = '`log_output_live` and `tty` cannot both be `True`.'
             raise ValueError(message)
 
-        node_transport = self._get_node_transport(
-            transport=self.default_transport,
-        )
+        transport = transport or self.default_transport
+        node_transport = self._get_node_transport(transport=transport)
         return node_transport.run(
             args=args,
             user=user,
@@ -155,6 +157,7 @@ class Node:
         user: Optional[str] = None,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
+        transport: Optional[Transport] = None,
     ) -> subprocess.Popen:
         """
         Open a pipe to a command run on a node as the given user.
@@ -172,6 +175,8 @@ class Node:
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
             The pipe object attached to the specified process.
@@ -183,9 +188,8 @@ class Node:
         if user is None:
             user = self.default_user
 
-        node_transport = self._get_node_transport(
-            transport=self.default_transport,
-        )
+        transport = transport or self.default_transport
+        node_transport = self._get_node_transport(transport=transport)
         return node_transport.popen(
             args=args,
             user=user,
@@ -199,6 +203,7 @@ class Node:
         local_path: Path,
         remote_path: Path,
         user: Optional[str] = None,
+        transport: Optional[Transport] = None,
     ) -> None:
         """
         Copy a file to this node.
@@ -208,6 +213,8 @@ class Node:
             remote_path: The path on the node to place the file.
             user: The name of the remote user to send the file. If ``None``,
                 the ``default_user`` is used instead.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
         """
         if user is None:
             user = self.default_user
@@ -218,9 +225,8 @@ class Node:
             user=user,
         )
 
-        node_transport = self._get_node_transport(
-            transport=self.default_transport,
-        )
+        transport = transport or self.default_transport
+        node_transport = self._get_node_transport(transport=transport)
         return node_transport.send_file(
             local_path=local_path,
             remote_path=remote_path,
