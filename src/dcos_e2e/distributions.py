@@ -14,4 +14,3 @@ class Distribution(Enum):
 
     CENTOS_7 = 1
     COREOS = 2
-    UBUNTU_16_04 = 3
