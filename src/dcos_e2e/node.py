@@ -117,7 +117,7 @@ class Node:
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
             transport: The transport to use for communicating with nodes. If
-                ``None``, the ``Node``\ 's ``default_transport`` is used.
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
             The representation of the finished process.
@@ -176,7 +176,7 @@ class Node:
                 quote arguments if they may contain these special characters,
                 including whitespace.
             transport: The transport to use for communicating with nodes. If
-                ``None``, the ``Node``\ 's ``default_transport`` is used.
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
             The pipe object attached to the specified process.
@@ -214,7 +214,7 @@ class Node:
             user: The name of the remote user to send the file. If ``None``,
                 the ``default_user`` is used instead.
             transport: The transport to use for communicating with nodes. If
-                ``None``, the ``Node``\ 's ``default_transport`` is used.
+                ``None``, the ``Node``'s ``default_transport`` is used.
         """
         if user is None:
             user = self.default_user
