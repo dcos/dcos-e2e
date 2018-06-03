@@ -112,6 +112,7 @@ class ClusterContainers:
         """
         Args:
             cluster_id: The ID of the cluster.
+            transport: The transport to use for communication with nodes.
         """
         self._cluster_id_label = CLUSTER_ID_LABEL_KEY + '=' + cluster_id
         self._transport = transport
