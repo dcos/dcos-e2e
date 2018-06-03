@@ -15,7 +15,7 @@ import click_spinner
 import docker
 import yaml
 
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 from ._common import (
     ClusterContainers,
@@ -302,7 +302,10 @@ def validate_node_reference(
         pass
 
     cluster_id = ctx.params['cluster_id']
-    cluster_containers = ClusterContainers(cluster_id=cluster_id)
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=Transport.DOCKER_EXEC,
+    )
 
     containers = {
         *cluster_containers.masters,

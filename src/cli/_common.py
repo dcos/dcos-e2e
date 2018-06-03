@@ -143,7 +143,7 @@ class ClusterContainers:
             private_ip_address=address,
             default_user='root',
             ssh_key_path=ssh_key_path,
-            transport=self._transport,
+            default_transport=self._transport,
         )
 
     @property
