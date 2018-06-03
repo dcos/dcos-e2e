@@ -37,6 +37,7 @@ DOCKER_STORAGE_DRIVERS = {
 
 TRANSPORTS = {
     'ssh': Transport.SSH,
+    'docker-exec': Transport.DOCKER_EXEC,
 }
 
 CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
