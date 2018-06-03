@@ -106,7 +106,12 @@ def _node_transport_option(command: Callable[..., None],
         callback=lambda ctx, param, value: TRANSPORTS[str(value)],
         default='ssh',
         show_default=True,
-        help='The communication transport to use.',
+        help=(
+            'The communication transport to use. '
+            'On macOS the SSH transport requires IP routing to be set up. '
+            'See "dcos-docker setup-mac-network".'
+            'It also requires the "ssh" command to be available.'
+        ),
     )(command)  # type: Callable[..., None]
     return function
 
