@@ -399,25 +399,6 @@ class TestRun:
         )
         assert bool(len(debug_messages & matching_messages)) is log_output_live
 
-    def test_tty(self, dcos_node: Node) -> None:
-        """
-        Exercise TTY code.
-
-        This is of course not a good test for whether a tty is invoked.
-        In fact, when we echo ``tty`` in this mode, the SSH transport says "not
-        a tty".
-
-        However, using "systemctl list-units" from the CLI shows us that it
-        works.
-        """
-        result = dcos_node.run(
-            args=['echo', '1'],
-            tty=True,
-            shell=True,
-        )
-
-        assert result.stdout is None
-
     def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
         """
         A ``ValueError`` is raised if ``tty`` is ``True`` and

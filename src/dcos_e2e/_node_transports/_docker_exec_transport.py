@@ -57,7 +57,12 @@ def _compose_docker_command(
         user,
     ]
 
-    if tty:
+    # We do not cover this case in tests because our test suite is not a true
+    # terminal.
+    #
+    # This is useful in the CLI for running interactive commands.
+    if tty:  # pragma: no cover
+        docker_exec_args.append('--interactive')
         docker_exec_args.append('--tty')
 
     for key, value in env.items():
