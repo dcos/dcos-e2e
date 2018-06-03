@@ -133,9 +133,16 @@ class Cluster(ContextDecorator):
                 shell=True,
             )
 
-    def wait_for_dcos_oss(self) -> None:
+    def wait_for_dcos_oss(self, http_checks: bool = True) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
+
+        Args:
+            http_checks: Whether or not to wait for checks which involve HTTP.
+                If this is `False`, this function may return before DC/OS is
+                fully ready. This is useful in cases where an HTTP connection
+                cannot be made to the cluster. For example, this is useful on
+                macOS without a VPN set up.
 
         Raises:
             RetryError: Raised if any cluster component did not become
@@ -143,6 +150,8 @@ class Cluster(ContextDecorator):
         """
 
         self._wait_for_dcos_diagnostics()
+        if not http_checks:
+            return
 
         # The dcos-diagnostics check is not yet sufficient to determine
         # when a CLI login would be possible with DC/OS OSS. It only
@@ -187,6 +196,7 @@ class Cluster(ContextDecorator):
         self,
         superuser_username: str,
         superuser_password: str,
+        http_checks: bool = True,
     ) -> None:
         """
         Wait until the DC/OS Enterprise boot process has completed.
@@ -194,6 +204,11 @@ class Cluster(ContextDecorator):
         Args:
             superuser_username: Username of the default superuser.
             superuser_password: Password of the default superuser.
+            http_checks: Whether or not to wait for checks which involve HTTP.
+                If this is `False`, this function may return before DC/OS is
+                fully ready. This is useful in cases where an HTTP connection
+                cannot be made to the cluster. For example, this is useful on
+                macOS without a VPN set up.
 
         Raises:
             RetryError: Raised if any cluster component did not become
@@ -201,6 +216,8 @@ class Cluster(ContextDecorator):
         """
 
         self._wait_for_dcos_diagnostics()
+        if not http_checks:
+            return
 
         # The dcos-diagnostics check is not yet sufficient to determine
         # when a CLI login would be possible with Enterprise DC/OS. It only

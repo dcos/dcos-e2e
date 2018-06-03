@@ -137,6 +137,14 @@ class TestCopyFiles:
                 log_output_live=True,
             )
 
+            # We exercise the "http_checks=False" code here but we do not test
+            # its functionality. It is a temporary measure while we wait for
+            # more thorough dcos-checks.
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+                http_checks=False,
+            )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,

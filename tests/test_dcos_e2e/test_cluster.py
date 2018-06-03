@@ -40,6 +40,10 @@ class TestIntegrationTests:
                 build_artifact=oss_artifact,
                 log_output_live=True,
             )
+            # We exercise the "http_checks=False" code here but we do not test
+            # its functionality. It is a temporary measure while we wait for
+            # more thorough dcos-checks.
+            dcos_cluster.wait_for_dcos_oss(http_checks=False)
             dcos_cluster.wait_for_dcos_oss()
             yield dcos_cluster
 
