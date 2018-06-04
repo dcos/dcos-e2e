@@ -3,8 +3,10 @@ Utilities to connect to nodes with Docker exec.
 """
 
 import io
+import os
 import subprocess
 import tarfile
+import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List
@@ -186,6 +188,42 @@ class DockerExecTransport(NodeTransport):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
         """
+        # `remote_path` may be a tmpfs mount.
+        # At the time of writing, for example, `/tmp` is a tmpfs mount.
+        # Copying files to tmpfs mounts fails silently.
+        # See https://github.com/moby/moby/issues/22020.
+
+        # Therefore, we create a temporary directory within our home directory,
+        # and we put the file there.
+        # We then move the file from the temporary directory to the intended
+        # destination.
+        # We then remove the temporary directory.
+
+        home_path = self.run(
+            args=['bash', '-c', 'echo $HOME'],
+            user=user,
+            log_output_live=False,
+            env={},
+            tty=False,
+            ssh_key_path=ssh_key_path,
+            public_ip_address=public_ip_address,
+        ).stdout.strip().decode()
+
+        tmp_path = '{home}/dcos-docker-{uuid}'.format(
+            home=home_path,
+            uuid=uuid.uuid4().hex
+        )
+
+        self.run(
+            args=['mkdir', tmp_path],
+            user=user,
+            log_output_live=False,
+            env={},
+            tty=False,
+            ssh_key_path=ssh_key_path,
+            public_ip_address=public_ip_address,
+        )
+
         client = docker.from_env(version='auto')
         containers = client.containers.list()
         [container] = [
@@ -198,4 +236,23 @@ class DockerExecTransport(NodeTransport):
             tar.add(name=str(local_path), arcname='/' + remote_path.name)
         tarstream.seek(0)
 
-        container.put_archive(path=str(remote_path.parent), data=tarstream)
+        container.put_archive(path=tmp_path, data=tarstream)
+        self.run(
+            args=['mv', os.path.join(tmp_path, remote_path.name), str(remote_path.parent)],
+            user=user,
+            log_output_live=False,
+            env={},
+            tty=False,
+            ssh_key_path=ssh_key_path,
+            public_ip_address=public_ip_address,
+        )
+
+        self.run(
+            args=['rm', '-rf', tmp_path],
+            user=user,
+            log_output_live=False,
+            env={},
+            tty=False,
+            ssh_key_path=ssh_key_path,
+            public_ip_address=public_ip_address,
+        )
