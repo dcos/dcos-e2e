@@ -215,7 +215,9 @@ class TestCreate:
                                               the SSH transport requires IP routing to be
                                               set up. See "dcos-docker setup-mac-network".It
                                               also requires the "ssh" command to be
-                                              available.  [default: ssh]
+                                              available. This can be provided by setting the
+                                              `DCOS_DOCKER_TRANSPORT` environment variable.
+                                              [default: ssh]
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -879,14 +881,28 @@ class TestWait:
               Wait for DC/OS to start.
 
             Options:
-              -c, --cluster-id TEXT      If not given, "default" is used.
-              --superuser-username TEXT  The superuser username is needed only on DC/OS
-                                         Enterprise clusters. By default, on a DC/OS
-                                         Enterprise cluster, `admin` is used.
-              --superuser-password TEXT  The superuser password is needed only on DC/OS
-                                         Enterprise clusters. By default, on a DC/OS
-                                         Enterprise cluster, `admin` is used.
-              --help                     Show this message and exit.
+              -c, --cluster-id TEXT          If not given, "default" is used.
+              --superuser-username TEXT      The superuser username is needed only on DC/OS
+                                             Enterprise clusters. By default, on a DC/OS
+                                             Enterprise cluster, `admin` is used.
+              --superuser-password TEXT      The superuser password is needed only on DC/OS
+                                             Enterprise clusters. By default, on a DC/OS
+                                             Enterprise cluster, `admin` is used.
+              --skip-http-checks             Do not wait for checks which require an HTTP
+                                             connection to the cluster. If this flag is
+                                             used, this command may return before DC/OS is
+                                             fully ready. Use this flag in cases where an
+                                             HTTP connection cannot be made to the cluster.
+                                             For example this is useful on macOS without a
+                                             VPN set up.
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -1204,24 +1220,33 @@ class TestRun:
               whole command in double quotes.
 
             Options:
-              -c, --cluster-id TEXT    If not given, "default" is used.
-              --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
-                                       environment variable to.
-              --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` environment
-                                       variable to.
-              --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
-                                       will be synced before the command is run.
-              --no-test-env            With this flag set, no environment variables are set
-                                       and the command is run in the home directory.
-              --node TEXT              A reference to a particular node to run the command
-                                       on. This can be one of: The node's IP address, the
-                                       node's Docker container name, the node's Docker
-                                       container ID, a reference in the format
-                                       "<role>_<number>". These details be seen with
-                                       ``dcos_docker inspect``.
-              --env TEXT               Set environment variables in the format
-                                       "<KEY>=<VALUE>"
-              --help                   Show this message and exit.
+              -c, --cluster-id TEXT          If not given, "default" is used.
+              --dcos-login-uname TEXT        The username to set the ``DCOS_LOGIN_UNAME``
+                                             environment variable to.
+              --dcos-login-pw TEXT           The password to set the ``DCOS_LOGIN_PW``
+                                             environment variable to.
+              --sync-dir PATH                The path to a DC/OS checkout. Part of this
+                                             checkout will be synced before the command is
+                                             run.
+              --no-test-env                  With this flag set, no environment variables
+                                             are set and the command is run in the home
+                                             directory.
+              --node TEXT                    A reference to a particular node to run the
+                                             command on. This can be one of: The node's IP
+                                             address, the node's Docker container name, the
+                                             node's Docker container ID, a reference in the
+                                             format "<role>_<number>". These details be seen
+                                             with ``dcos_docker inspect``.
+              --env TEXT                     Set environment variables in the format
+                                             "<KEY>=<VALUE>"
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
