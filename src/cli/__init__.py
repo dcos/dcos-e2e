@@ -944,7 +944,9 @@ def web(cluster_id: str) -> None:
 )
 @_node_transport_option
 def sync_code(
-    cluster_id: str, dcos_checkout_dir: str, transport: Transport,
+    cluster_id: str,
+    dcos_checkout_dir: str,
+    transport: Transport,
 ) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
@@ -1028,6 +1030,7 @@ def sync_code(
     )
 
     node_test_py_pattern = node_test_dir / '*.py'
+    tar_path = '/tmp/dcos_e2e_tmp.tar'
     for master in cluster.masters:
         master.run(
             args=['rm', '-rf', str(node_test_py_pattern)],
@@ -1046,17 +1049,12 @@ def sync_code(
 
                 master.send_file(
                     local_path=Path(tmp_file.name),
-                    remote_path=Path('/tmp/tests.tar'),
+                    remote_path=Path(tar_path),
                 )
 
-            master.run(
-                args=[
-                    'tar', '-C',
-                    str(node_destination), '-xvf', '/tmp/tests.tar',
-                ],
-            )
-
-            master.run(args=['rm', '/tmp/tests.tar'])
+            tar_args = ['tar', '-C', str(node_destination), '-xvf', tar_path]
+            master.run(args=tar_args)
+            master.run(args=['rm', tar_path])
 
 
 @dcos_docker.command('doctor')
