@@ -986,14 +986,6 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
         local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
     )
 
-    node_test_py_pattern = node_test_dir / '*.py'
-    for master in cluster.masters:
-        master.run(
-            args=['rm', '-rf', str(node_test_py_pattern)],
-            # We use a wildcard character, `*`, so we need shell expansion.
-            shell=True,
-        )
-
     test_tarstream = _tar_with_filter(
         path=local_test_dir,
         tar_filter=_cache_filter,
@@ -1002,16 +994,26 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
         path=local_bootstrap_dir,
         tar_filter=_cache_filter,
     )
-    for master_container in cluster_containers.masters:
-        master_container.put_archive(
-            path=str(node_test_dir),
-            data=test_tarstream,
+
+    node_test_py_pattern = node_test_dir / '*.py'
+    for master in cluster.masters:
+        master.run(
+            args=['rm', '-rf', str(node_test_py_pattern)],
+            # We use a wildcard character, `*`, so we need shell expansion.
+            shell=True,
         )
 
-        master_container.put_archive(
-            path=str(node_bootstrap_dir),
-            data=bootstrap_tarstream,
-        )
+        for tarstream in (test_tarstream, bootstrap_tarstream):
+            master.send_file(
+                local_path=test_filepath,
+                remote_path=Path('/tmp/tests.tar'),
+                user=cluster.default_ssh_user,
+            )
+
+            master.run(
+                args=['tar', '-C', str(node_test_dir), '-xvf', '/tmp/tests.tar'],
+                user=cluster.default_ssh_user,
+            )
 
 
 @dcos_docker.command('doctor')
