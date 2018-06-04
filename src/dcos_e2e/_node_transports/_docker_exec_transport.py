@@ -210,7 +210,7 @@ class DockerExecTransport(NodeTransport):
         ).stdout.strip().decode()
 
         tmp_path = '{home}/dcos-docker-{uuid}'.format(
-            home=home_path, uuid=uuid.uuid4().hex
+            home=home_path, uuid=uuid.uuid4().hex,
         )
 
         self.run(
@@ -240,7 +240,7 @@ class DockerExecTransport(NodeTransport):
             args=[
                 'mv',
                 os.path.join(tmp_path, remote_path.name),
-                str(remote_path.parent)
+                str(remote_path.parent),
             ],
             user=user,
             log_output_live=False,

@@ -944,7 +944,7 @@ def web(cluster_id: str) -> None:
 )
 @_node_transport_option
 def sync_code(
-    cluster_id: str, dcos_checkout_dir: str, transport: Transport
+    cluster_id: str, dcos_checkout_dir: str, transport: Transport,
 ) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
@@ -969,16 +969,20 @@ def sync_code(
     #
     # The manual test cases we want to work are:
     # * Sync a DC/OS Enterprise checkout and run a test - it should work.
-    # * Delete a test file, sync, try to run this test file - it should fail with "file not found".
+    # * Delete a test file, sync, try to run this test file - it should fail
+    #   with "file not found".
     # * Add a test file, sync, try to run this test file - it should work.
-    # * Add `assert False`, sync, to a test file and run this test file - it should fail.
-    # * Test bootstrap sync with no changes (a partial test that nothing breaks):
+    # * Add `assert False`, sync, to a test file and run this test file - it
+    #   should fail.
+    # * Test bootstrap sync with no changes (a partial test that nothing
+    #   breaks):
     #   - Sync
     #   - `dcos-docker run systemctl restart dcos-mesos-master`
     #   - `dcos-docker run journalctl -f -u dcos-mesos-master`
     #   - We expect to see no assertion error.
     # * Test bootstrap sync with some changes
-    #   - Add `assert False` to `packages/bootstrap/extra/dcos_internal_utils/bootstrap.py`
+    #   - Add `assert False` to
+    #     `packages/bootstrap/extra/dcos_internal_utils/bootstrap.py`
     #   - `dcos-docker run systemctl restart dcos-mesos-master`
     #   - `dcos-docker run journalctl -f -u dcos-mesos-master`
     #   - We expect to see the assertion error.
@@ -1048,11 +1052,11 @@ def sync_code(
             master.run(
                 args=[
                     'tar', '-C',
-                    str(node_destination), '-xvf', '/tmp/tests.tar'
+                    str(node_destination), '-xvf', '/tmp/tests.tar',
                 ],
             )
 
-            master.run(args=['rm', '/tmp/tests.tar'], )
+            master.run(args=['rm', '/tmp/tests.tar'])
 
 
 @dcos_docker.command('doctor')
