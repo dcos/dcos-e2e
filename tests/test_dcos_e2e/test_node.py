@@ -88,6 +88,35 @@ class TestSendFile:
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
+    def test_send_file_tar_archive(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        TODO
+        """
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.py')
+        local_file.write(content)
+
+        from cli import _tar_with_filter, _cache_filter
+        tarstream = _tar_with_filter(
+            path=Path(str(tmpdir)),
+            tar_filter=_cache_filter,
+        )
+        local_file = tmpdir.join('arc.tar')
+        local_file.write(tarstream.getvalue())
+
+        master_destination_path = Path('/tmp/tests.tar')
+
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+        )
+
+        dcos_node.run(args=['stat', str(master_destination_path)])
+
     def test_send_file_custom_user(
         self,
         dcos_node: Node,

@@ -942,7 +942,8 @@ def web(cluster_id: str) -> None:
     envvar='DCOS_CHECKOUT_DIR',
     default='.',
 )
-def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
+@_node_transport_option
+def sync_code(cluster_id: str, dcos_checkout_dir: str, transport: Transport) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
 
@@ -990,7 +991,6 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
 
-    transport = Transport.SSH
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,
