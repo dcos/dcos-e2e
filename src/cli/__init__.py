@@ -848,6 +848,7 @@ def run(
             sync_code,
             cluster_id=cluster_id,
             dcos_checkout_dir=str(sync_dir),
+            transport=transport,
         )
 
     if no_test_env:
