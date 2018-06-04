@@ -224,9 +224,20 @@ def check_networking() -> CheckLevels:
             stderr=subprocess.DEVNULL,
         )
     except subprocess.CalledProcessError:
-        message = 'Cannot connect to a Docker container by its IP address.'
+        message = (
+            'Cannot connect to a Docker container by its IP address. '
+            'This is needed for features such as connecting to the web UI and '
+            'using the DC/OS CLI. '
+            'To use some parts of this CLI without resolving this issue, use '
+            'the "--transport docker-exec" option on many of the available '
+            'commands, and the --skip-http-checks flag on the "wait" command.'
+        )
         if docker_for_mac:
-            message += ' We recommend using "dcos-docker setup-mac-network".'
+            message += (
+                ' '
+                'We recommend using "dcos-docker setup-mac-network" to '
+                'resolve this issue.'
+            )
         _error(message=message)
         highest_level = CheckLevels.ERROR
 
