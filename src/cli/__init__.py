@@ -8,11 +8,11 @@ import logging
 import subprocess
 import sys
 import tarfile
+import tempfile
 import uuid
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
-from tempfile import gettempdir
 from typing import (  # noqa: F401
     Any,
     Callable,
@@ -429,7 +429,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    base_workspace_dir = workspace_dir or Path(gettempdir())
+    base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
     doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
@@ -957,6 +957,29 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
     If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is
     used.
     """
+
+    # This is not covered by automated tests, and it is non-trivial.
+    #
+    # In the following instructions, running a test might look like:
+    #
+    # `dcos-docker run pytest <test_filename>`
+    #
+    # The manual test cases we want to work are:
+    # * Sync a DC/OS Enterprise checkout and run a test - it should work.
+    # * Delete a test file, sync, try to run this test file - it should fail with "file not found".
+    # * Add a test file, sync, try to run this test file - it should work.
+    # * Add `assert False`, sync, to a test file and run this test file - it should fail.
+    # * Test bootstrap sync with no changes (a partial test that nothing breaks):
+    #   - Sync
+    #   - `dcos-docker run systemctl restart dcos-mesos-master`
+    #   - `dcos-docker run journalctl -f -u dcos-mesos-master`
+    #   - We expect to see no assertion error.
+    # * Test bootstrap sync with some changes
+    #   - Add `assert False` to `packages/bootstrap/extra/dcos_internal_utils/bootstrap.py`
+    #   - `dcos-docker run systemctl restart dcos-mesos-master`
+    #   - `dcos-docker run journalctl -f -u dcos-mesos-master`
+    #   - We expect to see the assertion error.
+
     local_packages = Path(dcos_checkout_dir) / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
     if not Path(local_test_dir).exists():
@@ -1006,17 +1029,28 @@ def sync_code(cluster_id: str, dcos_checkout_dir: str) -> None:
             shell=True,
         )
 
-        for tarstream in (test_tarstream, bootstrap_tarstream):
-            master.send_file(
-                local_path=test_filepath,
-                remote_path=Path('/tmp/tests.tar'),
-                user=cluster.default_ssh_user,
-            )
+        for tarstream, node_destination in (
+            (test_tarstream, node_test_dir),
+            (bootstrap_tarstream, node_bootstrap_dir),
+        ):
+
+            with tempfile.NamedTemporaryFile() as tmp_file:
+                tmp_file.write(tarstream.getvalue())
+                tmp_file.flush()
+
+                master.send_file(
+                    local_path=Path(tmp_file.name),
+                    remote_path=Path('/tmp/tests.tar'),
+                )
 
             master.run(
-                args=['tar', '-C', str(node_test_dir), '-xvf', '/tmp/tests.tar'],
-                user=cluster.default_ssh_user,
+                args=[
+                    'tar', '-C',
+                    str(node_destination), '-xvf', '/tmp/tests.tar'
+                ],
             )
+
+            master.run(args=['rm', '/tmp/tests.tar'], )
 
 
 @dcos_docker.command('doctor')
