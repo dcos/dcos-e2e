@@ -681,8 +681,15 @@ class TestDestroy:
               Destroy a cluster.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
-              --help                 Show this message and exit.
+              -c, --cluster-id TEXT          If not given, "default" is used.
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -732,7 +739,14 @@ class TestDestroyList:
               To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
 
             Options:
-              --help  Show this message and exit.
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable

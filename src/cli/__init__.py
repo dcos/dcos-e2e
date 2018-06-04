@@ -571,10 +571,12 @@ def list_clusters() -> None:
     nargs=-1,
     type=str,
 )
+@_node_transport_option
 @click.pass_context
 def destroy_list(
     ctx: click.core.Context,
     cluster_ids: List[str],
+    transport: Transport,
 ) -> None:
     """
     Destroy clusters.
@@ -597,12 +599,12 @@ def destroy_list(
 
 @dcos_docker.command('destroy')
 @_existing_cluster_id_option
-def destroy(cluster_id: str) -> None:
+@_node_transport_option
+def destroy(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.
     """
     with click_spinner.spinner():
-        transport = Transport.SSH
         cluster_containers = ClusterContainers(
             cluster_id=cluster_id,
             transport=transport,
