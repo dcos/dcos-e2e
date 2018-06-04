@@ -594,6 +594,7 @@ def destroy_list(
         ctx.invoke(
             destroy,
             cluster_id=cluster_id,
+            transport=transport,
         )
 
 
