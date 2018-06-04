@@ -20,7 +20,9 @@ pytest-cov==2.5.1  # Measure code coverage
 pytest-timeout==1.2.1
 requests-mock==1.5.0
 sphinx-autodoc-typehints==1.3.0
-sphinx-click==1.2.0
+# We require fixes from https://github.com/click-contrib/sphinx-click/pull/27
+--find-links git+https://github.com/adamtheturtle/sphinx-click.git@fix-envvar-duplicates#egg=sphinx-click-1.2.1
+sphinx-click==1.2.1
 sphinx-paramlinks==0.3.4
 sphinx==1.7.4
 sphinxcontrib-spelling==4.1.0
