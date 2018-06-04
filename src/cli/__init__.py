@@ -943,7 +943,9 @@ def web(cluster_id: str) -> None:
     default='.',
 )
 @_node_transport_option
-def sync_code(cluster_id: str, dcos_checkout_dir: str, transport: Transport) -> None:
+def sync_code(
+    cluster_id: str, dcos_checkout_dir: str, transport: Transport
+) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
 
