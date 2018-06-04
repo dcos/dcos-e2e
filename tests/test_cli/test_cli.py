@@ -953,8 +953,15 @@ class TestSync:
               If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
-              --help                 Show this message and exit.
+              -c, --cluster-id TEXT          If not given, "default" is used.
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable

@@ -88,6 +88,28 @@ class TestSendFile:
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
+    def test_send_file_to_tmp_directory(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node to a directory that
+        is mounted as tmpfs.
+        See ``DockerExecTransport.send_file`` for details.
+        """
+        content = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(content)
+        master_destination_path = Path('/tmp/mydir/on_master_node.txt')
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == content
+
     def test_send_file_custom_user(
         self,
         dcos_node: Node,
