@@ -25,7 +25,10 @@ with open('requirements.txt') as requirements:
 with open('dev-requirements.txt') as dev_requirements:
     DEV_REQUIRES = []
     for line in dev_requirements.readlines():
-        if not line.startswith('#'):
+        if line.startswith('--find-links '):
+            _, link = line.split('--find-links ')
+            DEPENDENCY_LINKS.append(link)
+        elif not line.startswith('#'):
             DEV_REQUIRES.append(line)
 
 with open('README.rst') as f:
