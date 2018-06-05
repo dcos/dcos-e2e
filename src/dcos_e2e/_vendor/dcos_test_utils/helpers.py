@@ -1,6 +1,7 @@
 """Various helpers for test runners and integration testing directly
 """
 import atexit
+import functools
 import logging
 import os
 import tempfile
@@ -31,9 +32,7 @@ log = logging.getLogger(__name__)
 CI_CREDENTIALS = {'token': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik9UQkVOakZFTWtWQ09VRTRPRVpGTlRNMFJrWXlRa015Tnprd1JrSkVRemRCTWpBM1FqYzVOZyJ9.eyJlbWFpbCI6ImFsYmVydEBiZWtzdGlsLm5ldCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczovL2Rjb3MuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTA5OTY0NDk5MDExMTA4OTA1MDUwIiwiYXVkIjoiM3lGNVRPU3pkbEk0NVExeHNweHplb0dCZTlmTnhtOW0iLCJleHAiOjIwOTA4ODQ5NzQsImlhdCI6MTQ2MDE2NDk3NH0.OxcoJJp06L1z2_41_p65FriEGkPzwFB_0pA9ULCvwvzJ8pJXw9hLbmsx-23aY2f-ydwJ7LSibL9i5NbQSR2riJWTcW4N7tLLCCMeFXKEK4hErN2hyxz71Fl765EjQSO5KD1A-HsOPr3ZZPoGTBjE0-EFtmXkSlHb1T2zd0Z8T5Z2-q96WkFoT6PiEdbrDA-e47LKtRmqsddnPZnp0xmMQdTr2MjpVgvqG7TlRvxDcYc-62rkwQXDNSWsW61FcKfQ-TRIZSf2GS9F9esDF4b5tRtrXcBNaorYa9ql0XAWH5W_ct4ylRNl3vwkYKWa4cmPvOqT5Wlj9Tf0af4lNO40PQ'}     # noqa
 
 
-def check_json(response: requests.Response):
-    """ Simple method which will raise an error if response has non-existent or empty JSON
-    """
+def check_json(response):
     response.raise_for_status()
     try:
         json_response = response.json()
@@ -67,8 +66,6 @@ class Url:
 
     @classmethod
     def from_string(cls, url_str: str):
-        """ Creates a Url object from a string like 'http://foo.bar/baz?=qux'
-        """
         u = urlsplit(url_str)
         if ':' in u.netloc:
             host, port = u.netloc.split(':')
@@ -78,9 +75,7 @@ class Url:
         return cls(u.scheme, host, u.path, u.query, u.fragment, port)
 
     @property
-    def netloc(self) -> str:
-        """ Property which returns the a string of the form IP:port
-        """
+    def netloc(self):
         return '{}:{}'.format(self.host, self.port) if self.port else self.host
 
     def __str__(self):
@@ -108,11 +103,12 @@ class ApiClientSession:
     a default Url and a request wrapper. This class only differs from requests.Session
     in that the cookies are cleared after each request (but not purged from the response)
     so that the request state may be more well-defined betweens tests sharing this object
-
-    :param default_url: The base URL to which all requests will be appended to
-    :type default_url: Url
     """
     def __init__(self, default_url: Url):
+        """
+        Args:
+            default_url: Url object to wihch requests can be made
+        """
         self.default_url = default_url
         self.session = requests.Session()
 
@@ -121,27 +117,23 @@ class ApiClientSession:
         """ Direct wrapper for requests.session.request. This method is kept deliberatly
         simple so that child classes can alter this behavior without much copying
 
-        :param method: the HTTP verb
-        :type method: str
-        :param path_extension: the extension to the path that is set as the default Url
-        :type path_extension: str
-        :param scheme: scheme to be used instead of that included with self.default_url
-        :type scheme: str
-        :param host: host to be used instead of that included with self.default_url
-        :type host: str
-        :param query: query to be used instead of that included with self.default_url
-        :type query: str
-        :param fragment: fragment to be used instead of that included with self.default_url
-        :type fragment: str
-        :param port: port to be used instead of that included with self.default_url
-        :type port: int, str
+        Args:
+            method: the HTTP verb
+            path_extension: the extension to the path that is set as the default Url
+            scheme: scheme to be used instead of that included with self.default_url
+            host: host to be used instead of that included with self.default_url
+            query: query to be used instead of that included with self.default_url
+            fragment: fragment to be used instead of that included with self.default_url
+            port: port to be used instead of that included with self.default_url
 
-        :param **kwargs: anything that can be passed to requests.request
+        Keyword Args:
+            **kwargs: anything that can be passed to requests.request
 
-        :returns: requests.Response -- response object from the request
+        Returns:
+            requests.Response
         """
 
-        final_path = self.default_url.path + path_extension
+        final_path = path_join(self.default_url.path, path_extension)
 
         request_url = str(self.default_url.copy(
             scheme=scheme,
@@ -156,39 +148,32 @@ class ApiClientSession:
         self.session.cookies.clear()
         return r
 
+    @functools.wraps(api_request)
     def get(self, *args, **kwargs):
-        """ GET method for :func:`~dcos_test_utils.helpers.ApiClientSession.api_request` method
-        """
         return self.api_request('GET', *args, **kwargs)
 
+    @functools.wraps(api_request)
     def post(self, *args, **kwargs):
-        """ POST method for :func:`~dcos_test_utils.helpers.ApiClientSession.api_request` method
-        """
         return self.api_request('POST', *args, **kwargs)
 
+    @functools.wraps(api_request)
     def put(self, *args, **kwargs):
-        """ PUT method for :func:`~dcos_test_utils.helpers.ApiClientSession.api_request` method
-        """
         return self.api_request('PUT', *args, **kwargs)
 
+    @functools.wraps(api_request)
     def patch(self, *args, **kwargs):
-        """ PATCH method for :func:`~dcos_test_utils.helpers.ApiClientSession.api_request` method
-        """
         return self.api_request('PATCH', *args, **kwargs)
 
+    @functools.wraps(api_request)
     def delete(self, *args, **kwargs):
-        """ DELETE method for :func:`~dcos_test_utils.helpers.ApiClientSession.api_request` method
-        """
         return self.api_request('DELETE', *args, **kwargs)
 
+    @functools.wraps(api_request)
     def head(self, *args, **kwargs):
-        """ HEAD method for :func:`~dcos_test_utils.helpers.ApiClientSession.api_request` method
-        """
         return self.api_request('HEAD', *args, **kwargs)
 
+    @functools.wraps(api_request)
     def options(self, *args, **kwargs):
-        """ OPTIONS method for :func:`~dcos_test_utils.helpers.ApiClientSession.api_request` method
-        """
         return self.api_request('OPTIONS', *args, **kwargs)
 
 
@@ -235,9 +220,6 @@ class ARNodeApiClientMixin:
         Admin Router has both a master and agent process and so this wrapper accepts a
         node argument. node must be a host in self.master or self.all_slaves. If given,
         the request will be made to the Admin Router endpoint for that node type
-
-        :param node: IP of a master or agent
-        :type node: str
         """
         if node is not None:
             assert port is None, 'node is intended to retrieve port; cannot set both simultaneously'
@@ -279,7 +261,7 @@ def session_tempfile(data):
     return temp_path
 
 
-def marathon_app_id_to_mesos_dns_subdomain(app_id: str):
+def marathon_app_id_to_mesos_dns_subdomain(app_id):
     """Return app_id's subdomain as it would appear in a Mesos DNS A record.
 
     >>> marathon_app_id_to_mesos_dns_subdomain('/app-1')
@@ -293,7 +275,5 @@ def marathon_app_id_to_mesos_dns_subdomain(app_id: str):
     return '-'.join(reversed(app_id.strip('/').split('/')))
 
 
-def assert_response_ok(r: requests.Response):
-    """ Simple helper to print out the status code and response content if a response is not OK
-    """
+def assert_response_ok(r):
     assert r.ok, 'status_code: {} content: {}'.format(r.status_code, r.content)
