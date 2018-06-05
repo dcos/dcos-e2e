@@ -14,12 +14,18 @@ IP Routing Set Up for Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 On macOS, hosts cannot connect to containers IP addresses by default.
-Once the CLI is installed, run :ref:`dcos-docker-setup-mac-network`.
+This is required, for example, to access the web UI, to SSH to nodes and to use the DC/OS CLI.
+
+Once the CLI is installed, run :ref:`dcos-docker-setup-mac-network` to set up IP routing.
+
+Without this, it is still possible to use some features.
+In the library, specify :paramref:`~dcos_e2e.backends.Docker.transport` as :py:class:`dcos_e2e.node.Transport.DOCKER_EXEC`.
+In the CLI, specify the ``--transport`` and ``--skip-http-checks`` options where available.
 
 ``ssh``
 ~~~~~~~
 
-The ``ssh`` command must be available.
+The ``ssh`` command must be available to use the :py:class:`~dcos_e2e.node.Transport.SSH` transport.
 
 Operating System
 ~~~~~~~~~~~~~~~~
