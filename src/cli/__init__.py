@@ -855,8 +855,8 @@ def run(
         columns, rows = click.get_terminal_size()
         # See https://github.com/moby/moby/issues/35407.
         env = {
-            'COLUMNS': columns,
-            'LINES': rows,
+            'COLUMNS': str(columns),
+            'LINES': str(rows),
             **env,
         }
 
