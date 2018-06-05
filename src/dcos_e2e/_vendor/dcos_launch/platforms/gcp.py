@@ -9,11 +9,12 @@ import typing
 from functools import wraps
 
 import yaml
-from ...dcos_test_utils.helpers import Host
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from oauth2client.service_account import ServiceAccountCredentials
 from retrying import retry
+
+from ...dcos_test_utils.helpers import Host
 
 log = logging.getLogger(__name__)
 

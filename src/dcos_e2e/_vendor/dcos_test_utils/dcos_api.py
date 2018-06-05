@@ -120,7 +120,7 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         to create a new DcosApiSession instance
         """
         api = cls(**cls.get_args_from_env())
-        api._authenticate_default_user()
+        api.login_default_user()
         return api
 
     @staticmethod
@@ -207,24 +207,26 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
             log.info('Public slave list set as: {}'.format(self.public_slaves))
 
     @retrying.retry(wait_fixed=5000, stop_max_delay=120 * 1000)
-    def _authenticate_default_user(self):
-        """retry default auth user because in some deployments,
-        the auth endpoint might not be routable immediately
-        after Admin Router is up. DcosUser.authenticate()
-        will raise exception if authorization fails
-
+    def login_default_user(self):
+        """retry default user login because in some deployments,
+        the login endpoint might not be routable immediately
+        after Admin Router is up.
         We wait 5 seconds between retries to avoid DoS-ing the IAM.
+
+        Raises:
+            requests.HTTPException: In case the login fails due to wrong
+                username or password of the default user.
         """
         if self.auth_user is None:
             return
-        log.info('Attempting authentication')
-        # explicitly use a session with no user authentication for requesting auth headers
+        log.info('Attempting default user login')
+        # Explicitly request the default user authentication token by logging in.
         r = self.post('/acs/api/v1/auth/login', json=self.auth_user.credentials, auth=None)
         r.raise_for_status()
-        log.info('Received authentication blob: {}'.format(r.json()))
+        log.info('Received authentication token: {}'.format(r.json()))
         self.auth_user.auth_token = r.json()['token']
         self.auth_user.auth_cookie = r.cookies['dcos-acs-auth-cookie']
-        log.info('Authentication successful')
+        log.info('Login successful')
         # Set requests auth
         self.session.auth = DcosAuth(self.auth_user.auth_token)
 
@@ -425,7 +427,7 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         * all explicitly declared nodes register to register
         """
         self._wait_for_adminrouter_up()
-        self._authenticate_default_user()
+        self.login_default_user()
         wait_for_hosts = os.getenv('WAIT_FOR_HOSTS', 'true') == 'true'
         master_list_set = self.master_list is not None
         slave_list_set = self.slave_list is not None
@@ -466,7 +468,7 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         new.auth_user = None
         if user is not None:
             new.auth_user = user
-            new._authenticate_default_user()
+            new.login_default_user()
         return new
 
     @property

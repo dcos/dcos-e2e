@@ -37,6 +37,7 @@ def generate_acs_engine_template(
         windows_admin_user: str,
         windows_admin_password: str,
         linux_admin_user: str,
+        acs_engine_dcos_orchestrator_release: str,
         ):
     """ Generates the template provided to ACS-engine
     """
@@ -46,7 +47,7 @@ def generate_acs_engine_template(
         "properties": {
             "orchestratorProfile": {
                 "orchestratorType": "DCOS",
-                "orchestratorVersion": "1.11.0"
+                "orchestratorRelease": acs_engine_dcos_orchestrator_release
             },
             "masterProfile": {
                 "count": num_masters,
@@ -72,7 +73,7 @@ def generate_acs_engine_template(
                     "name": "linpub",
                     "count": num_linux_public_agents,
                     "vmSize": linux_public_vm_size,
-                    "osType": "linux",
+                    "osType": "Linux",
                     "dnsPrefix": "linpub" + unique_id,
                     "ports": [80, 443, 22]
                 },
@@ -80,7 +81,7 @@ def generate_acs_engine_template(
                     "name": "linpri",
                     "count": num_linux_private_agents,
                     "vmSize": linux_private_vm_size,
-                    "osType": "linux"
+                    "osType": "Linux"
                 }
             ],
             "windowsProfile": {
@@ -128,8 +129,6 @@ def run_acs_engine(acs_engine_url: str, acs_engine_template):
     cluster_name = acs_engine_template['properties']['masterProfile']['dnsPrefix']
     with open(os.path.join(tmpdir, '_output/{}/azuredeploy.json'.format(cluster_name)), 'r') as f:
         arm_template = json.load(f)
-    arm_template['variables']['agentWindowsOffer'] = 'WindowsServerSemiAnnual'
-    arm_template['variables']['agentWindowsSku'] = 'Datacenter-Core-1709-with-Containers-smalldisk'
     with open(os.path.join(tmpdir, '_output/{}/azuredeploy.parameters.json'.format(cluster_name)), 'r') as f:
         arm_template_parameters_raw = json.load(f)
     arm_template_parameters = dict()
@@ -179,23 +178,24 @@ class ACSEngineLauncher(dcos_launch.util.AbstractLauncher):
             self.config['linux_public_vm_size'],
             self.config['windows_admin_user'],
             self.config['windows_admin_password'],
-            self.config['linux_admin_user'])
+            self.config['linux_admin_user'],
+            self.config['acs_engine_dcos_orchestrator_release'])
         windows_image_source_url = self.config.get('windows_image_source_url')
         if windows_image_source_url:
             acs_engine_template["properties"]["windowsProfile"]["WindowsImageSourceUrl"] = windows_image_source_url
+        else:
+            # Use the official Azure image if a custom VHD was not specified
+            # via the windows_image_source_url config option
+            windows_publisher = self.config.get('windows_publisher')
+            windows_offer = self.config.get('windows_offer')
+            windows_sku = self.config.get('windows_sku')
+            acs_engine_template["properties"]["windowsProfile"]["WindowsPublisher"] = windows_publisher
+            acs_engine_template["properties"]["windowsProfile"]["WindowsOffer"] = windows_offer
+            acs_engine_template["properties"]["windowsProfile"]["WindowsSku"] = windows_sku
         linux_bs_url = self.config.get('dcos_linux_bootstrap_url')
-        linux_repository_url = self.config.get('dcos_linux_repository_url')
-        linux_cluster_package_list_id = self.config.get('dcos_linux_cluster_package_list_id')
-        provider_package_id = self.config.get('provider_package_id')
         arm_template, self.config['template_parameters'] = run_acs_engine(self.config['acs_engine_tarball_url'], acs_engine_template)  # noqa
         if linux_bs_url:
             self.config['template_parameters']['dcosBootstrapURL'] = linux_bs_url
-        if linux_repository_url:
-            self.config['template_parameters']['dcosRepositoryURL'] = linux_repository_url
-        if linux_cluster_package_list_id:
-            self.config['template_parameters']['dcosClusterPackageListID'] = linux_cluster_package_list_id
-        if provider_package_id:
-            self.config['template_parameters']['dcosProviderPackageID'] = provider_package_id
         self.azure_wrapper.deploy_template_to_new_resource_group(
             self.config.get('template_url'),
             self.config['deployment_name'],

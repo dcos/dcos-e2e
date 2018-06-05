@@ -10,8 +10,8 @@ import logging
 import re
 
 import requests
-
 import retrying
+
 from azure.common.credentials import ServicePrincipalCredentials
 from azure.common.exceptions import CloudError
 from azure.mgmt.network import NetworkManagementClient
@@ -20,9 +20,8 @@ from azure.mgmt.resource.resources.v2016_02_01.models import (DeploymentMode,
                                                               DeploymentProperties,
                                                               ResourceGroup)
 from azure.monitor import MonitorClient
-from ...dcos_test_utils.helpers import Host
-
 from ...dcos_launch.util import DeploymentError
+from ...dcos_test_utils.helpers import Host
 
 log = logging.getLogger(__name__)
 
@@ -332,6 +331,15 @@ class DcosAzureResourceGroup:
 
 
 class HybridDcosAzureResourceGroup(DcosAzureResourceGroup):
+    @property
+    def master_nics(self):
+        for resource in self.list_resources("resourceType eq 'Microsoft.Network/networkInterfaces'"):
+            if 'bootstrap' in resource.name:
+                # Skipping the bootstrap NICs
+                continue
+            assert 'master' in resource.name, 'Expected to find master NICs, not: {}'.format(resource.name)
+            yield self.azure_wrapper.nmc.network_interfaces.get(self.group_name, resource.name)
+
     def get_master_ips(self):
         public_lb_ip = self.public_master_lb_fqdn
         return [nic_to_host(nic, public_lb_ip) for nic in self.master_nics]

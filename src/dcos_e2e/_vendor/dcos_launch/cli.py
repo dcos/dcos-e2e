@@ -29,7 +29,7 @@ Options:
             passed from the local environment into the test environment.
   -L LEVEL --log-level=LEVEL
             One of: critical, error, warning, info, debug, and trace
-            [default: info].
+            [default: debug].
 """
 import os
 import sys
