@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.06.05.0
+------------
+
 - Change ``Node.default_ssh_user`` to ``Node.default_user``.
 - Add a ``docker exec`` transport to ``Node`` operations.
 - Add a ``--transport`` options to multiple ``dcos-docker`` commands.
