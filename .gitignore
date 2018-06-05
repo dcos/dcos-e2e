@@ -17,6 +17,7 @@ eggs/
 .eggs/
 lib/
 lib64/
+!src/dcos_e2e/backends/_vagrant/resources/dcos-vagrant/lib
 parts/
 sdist/
 var/
