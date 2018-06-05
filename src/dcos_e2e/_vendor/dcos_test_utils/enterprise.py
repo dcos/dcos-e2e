@@ -78,7 +78,7 @@ class EnterpriseApiSession(MesosNodeClientMixin, dcos_api.DcosApiSession):
         api = cls(**cls.get_args_from_env())
         if api.ssl_enabled:
             api.set_ca_cert()
-        api._authenticate_default_user()
+        api.login_default_user()
         api.set_initial_resource_ids()
         return api
 

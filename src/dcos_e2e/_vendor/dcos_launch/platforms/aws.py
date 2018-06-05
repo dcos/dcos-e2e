@@ -16,18 +16,15 @@ PublicAgentStack: thin wrapper for public agent stack in a zen template
 BareClusterCfStack: Represents a homogeneous cluster of hosts with a specific AMI
 """
 import copy
-import functools
 import logging
-import time
-
-import pkg_resources
 
 import boto3
-import retrying
+import pkg_resources
 from botocore.exceptions import ClientError, WaiterError
-from ...dcos_test_utils.helpers import Host, SshInfo
+from retrying import retry
 
 from ... import dcos_launch
+from ...dcos_test_utils.helpers import Host, SshInfo
 
 log = logging.getLogger(__name__)
 
@@ -48,48 +45,27 @@ def tag_dict_to_aws_format(tag_dict: dict):
     return [{'Key': k, 'Value': v} for k, v in tag_dict.items()]
 
 
-def retry_boto_rate_limits(boto_fn, wait=2, timeout=60 * 60):
-    """Decorator to make boto functions resilient to AWS rate limiting and throttling.
-    If one of these errors is encounterd, the function will sleep for a geometrically
-    increasing amount of time
+def retry_on_rate_limiting(e: Exception):
+    """ Returns 'True' if a rate limiting error occurs and raises the exception otherwise
     """
-    @functools.wraps(boto_fn)
-    def ignore_rate_errors(*args, **kwargs):
-        local_wait = copy.copy(wait)
-        local_timeout = copy.copy(timeout)
-        while local_timeout > 0:
-            next_time = time.time() + local_wait
-            try:
-                return boto_fn(*args, **kwargs)
-            except (ClientError, WaiterError) as e:
-                if isinstance(e, ClientError):
-                    error_code = e.response['Error']['Code']
-                elif isinstance(e, WaiterError):
-                    error_code = e.last_response['Error']['Code']
-                else:
-                    raise
-                if error_code in ['Throttling', 'RequestLimitExceeded']:
-                    log.warn('AWS API Limiting error: {}'.format(error_code))
-                    log.warn('Sleeping for {} seconds before retrying'.format(local_wait))
-                    time_to_next = next_time - time.time()
-                    if time_to_next > 0:
-                        time.sleep(time_to_next)
-                    else:
-                        local_timeout += time_to_next
-                    local_timeout -= local_wait
-                    local_wait *= 2
-                    continue
-                raise
-        raise Exception('Rate-limit timeout encountered waiting for {}'.format(boto_fn.__name__))
-    return ignore_rate_errors
+    if isinstance(e, ClientError):
+        error_code = e.response['Error']['Code']
+    elif isinstance(e, WaiterError):
+        error_code = e.last_response['Error']['Code']
+    else:
+        raise e
+    if error_code in ['Throttling', 'RequestLimitExceeded']:
+        log.warning('AWS API Limiting error: {}'.format(error_code))
+        return True
+    raise e
 
 
-@retry_boto_rate_limits
+@retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000, retry_on_exception=retry_on_rate_limiting)
 def instances_to_hosts(instances):
     return [Host(i.private_ip_address, i.public_ip_address) for i in instances]
 
 
-@retry_boto_rate_limits
+@retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000, retry_on_exception=retry_on_rate_limiting)
 def fetch_stack(stack_name, boto_wrapper):
     log.debug('Attemping to fetch AWS Stack: {}'.format(stack_name))
     stack = boto_wrapper.resource('cloudformation').Stack(stack_name)
@@ -112,11 +88,13 @@ class BotoWrapper:
         self.region = region
         self.session = boto3.session.Session()
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def client(self, name):
         return self.session.client(service_name=name, region_name=self.region)
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def resource(self, name, region=None):
         region = self.region if region is None else region
         return self.session.resource(service_name=name, region_name=region)
@@ -128,30 +106,37 @@ class BotoWrapper:
         key = self.client('ec2').create_key_pair(KeyName=key_name)
         return key['KeyMaterial']
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def get_service_resources(self, service, resource_name):
         """Return resources and boto wrapper in every region for the given boto3 service and resource type."""
         for region in aws_region_names:
-            for resource in getattr(self.resource(service, region['id']), resource_name).all():
-                yield resource
+            # line below is needed because function get_all_stacks needs to copy the boto wrapper with the correct
+            # region when initializing each CfStack object
+            self.region = region['id']
+            yield from getattr(self.resource(service, region['id']), resource_name).all()
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def get_all_stacks(self):
         """Get all AWS CloudFormation stacks in all regions."""
         for stack in self.get_service_resources('cloudformation', 'stacks'):
-            yield CfStack(stack.stack_name, self)
+            yield CfStack(stack.stack_name, copy.deepcopy(self))
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def get_all_buckets(self):
         """Get all S3 buckets in all regions."""
         yield from self.get_service_resources('s3', 'buckets')
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def get_all_keypairs(self):
         """Get all EC2 key pairs in all regions."""
         yield from self.get_service_resources('ec2', 'key_pairs')
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def delete_key_pair(self, key_name):
         log.info('Deleting KeyPair: {}'.format(key_name))
         self.resource('ec2').KeyPair(key_name).delete()
@@ -215,12 +200,14 @@ class BotoWrapper:
         log.info('Created subnet with ID: {}'.format(subnet_id))
         return subnet_id
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def delete_subnet(self, subnet_id):
         log.info('Deleting subnet: {}'.format(subnet_id))
         self.client('ec2').delete_subnet(SubnetId=subnet_id)
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def delete_internet_gateway(self, gateway_id):
         ig = self.resource('ec2').InternetGateway(gateway_id)
         for vpc in ig.attachments:
@@ -230,12 +217,14 @@ class BotoWrapper:
         log.info('Deleting internet gateway: {}'.format(gateway_id))
         ig.delete()
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def delete_vpc(self, vpc_id):
         log.info('Deleting vpc: {}'.format(vpc_id))
         self.client('ec2').delete_vpc(VpcId=vpc_id)
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def get_auto_scaling_instances(self, asg_physical_resource_id):
         """ Returns instance objects as described here:
         http://boto3.readthedocs.io/en/latest/reference/services/ec2.html#instance
@@ -246,7 +235,8 @@ class BotoWrapper:
                     AutoScalingGroupNames=[asg_physical_resource_id])
                 ['AutoScalingGroups'] for i in asg['Instances']]
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def empty_and_delete_bucket(self, bucket_id):
         """ Buckets must be empty to be deleted. Additionally, there is no high-level
         method to check if buckets exist, so the try/except statement is required
@@ -275,7 +265,7 @@ class CfStack:
     def name(self):
         return self.stack.stack_name
 
-    def wait_for_complete(self, transition_states: list, end_states: list):
+    def wait_for_complete(self, transition_states: list, end_states: list) -> str:
         """
         Note: Do not use unwrapped boto waiter class, it has very poor error handling
 
@@ -290,34 +280,40 @@ class CfStack:
         UPDATE_COMPLETE, UPDATE_ROLLBACK_IN_PROGRESS
         UPDATE_ROLLBACK_FAILED, UPDATE_ROLLBACK_COMPLETE
         UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS
+
         :param transition_states: as long as the current state is in one of these, the wait continues
         :param end_states: when the current state becomes one of these, the wait stops as the operation completed
+
         """
         log.info('Waiting for stack operation to complete')
 
-        @retrying.retry(wait_fixed=60 * 1000,
-                        retry_on_result=lambda res: res is False,
-                        retry_on_exception=lambda ex: False)
+        # wait for 60 seconds before retry
+        @retry(wait_fixed=60 * 1000, retry_on_result=lambda result: result is None, retry_on_exception=lambda ex: False)
         def wait_loop():
+            self.refresh_stack()
             stack_status = self.get_status()
             if stack_status in end_states:
-                return True
+                log.info("Final stack status: " + stack_status)
+                return stack_status
+            log.info("Stack status {status}. Continuing to wait... ".format(status=stack_status))
             if stack_status not in transition_states:
                 for event in self.get_stack_events():
                     log.error('Stack Events: {}'.format(event))
                 raise Exception('StackStatus changed unexpectedly to: {}'.format(stack_status))
-            log.info('Continuing to wait...')
-            return False
 
-        wait_loop()
+        status = wait_loop()
 
-    @retry_boto_rate_limits
+        return status
+
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def get_stack_events(self):
         log.debug('Requesting stack events')
         return self.boto_wrapper.client('cloudformation').describe_stack_events(
             StackName=self.stack.stack_id)['StackEvents']
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def update_tags(self, tags: dict):
         cf_tags = tag_dict_to_aws_format(tags)
         new_keys = tags.keys()
@@ -330,10 +326,17 @@ class CfStack:
                                  UsePreviousTemplate=True,
                                  Tags=cf_tags)
 
-    @retry_boto_rate_limits
-    def get_status(self):
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
+    def refresh_stack(self):
         # we need to refresh the stack to get the latest info
         self.stack = self.boto_wrapper.resource('cloudformation').Stack(self.name)
+        return self.stack
+
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
+    def get_status(self):
+        self.refresh_stack()
         return self.stack.stack_status
 
     def get_parameter(self, param):
@@ -345,14 +348,15 @@ class CfStack:
         raise KeyError('Key not found in template parameters: {}. Parameters: {}'.
                        format(param, self.stack.parameters))
 
-    @retry_boto_rate_limits
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def delete(self):
         log.info('Deleting stack: {}'.format(self.stack.stack_name))
         self.stack.delete()
         log.info('Delete successfully initiated for {}'.format(self.stack.stack_name))
 
 
-class CleanupS3BucketMixin:
+class CleanupS3BucketMixin(CfStack):
     """ Exhibitor S3 Buckets are not deleted with the rest of the resources
     in the cloudformation template so this method must be used to prevent
     leaking cloud resources.
@@ -364,9 +368,10 @@ class CleanupS3BucketMixin:
         except Exception:
             # Exhibitor S3 Bucket might not be a resource
             log.exception('Failed to get S3 bucket physical ID')
+        super().delete()
 
 
-class DcosCfStack(CleanupS3BucketMixin, CfStack):
+class DcosCfStack(CleanupS3BucketMixin):
     """ This abstraction will work for a simple DC/OS template.
     A simple template has its exhibitor bucket and auto scaling groups
     for each of the master, public agent, and private agent groups
@@ -380,7 +385,9 @@ class DcosCfStack(CleanupS3BucketMixin, CfStack):
             'AdminLocation': admin_location,
             'PublicSlaveInstanceCount': str(public_agents),
             'SlaveInstanceCount': str(private_agents)}
+
         boto_wrapper.create_stack(stack_name, parameters, template_url=template_url)
+
         return cls(stack_name, boto_wrapper), SSH_INFO['coreos']
 
     @property
@@ -408,7 +415,7 @@ class DcosCfStack(CleanupS3BucketMixin, CfStack):
         return instances_to_hosts(self.public_agent_instances)
 
 
-class MasterStack(CleanupS3BucketMixin, CfStack):
+class MasterStack(CleanupS3BucketMixin):
     @property
     def instances(self):
         yield from self.boto_wrapper.get_auto_scaling_instances(
