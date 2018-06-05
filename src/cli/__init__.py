@@ -851,6 +851,15 @@ def run(
             transport=transport,
         )
 
+    if transport == Transport.DOCKER_EXEC:
+        columns, rows = click.get_terminal_size()
+        # See https://github.com/moby/moby/issues/35407.
+        env = {
+            'COLUMNS': columns,
+            'LINES': rows,
+            **env,
+        }
+
     if no_test_env:
         try:
             node.run(
