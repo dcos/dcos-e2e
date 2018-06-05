@@ -27,9 +27,17 @@ def main() -> None:
         sha=vendored_test_utils_sha,
     )
 
+    # We have a fix at https://github.com/click-contrib/sphinx-click/pull/27
+    # that we require.
+    sphinx_click = (
+        'git+https://github.com/adamtheturtle/sphinx-click@'
+        'fix-envvar-duplicates'
+    )
+
     package_name_to_uri = {
         'dcos_launch': launch,
         'dcos_test_utils': test_utils,
+        'sphinx_click': sphinx_click,
     }
 
     target_directory = Path('src/dcos_e2e/_vendor')
