@@ -109,3 +109,5 @@ license-key.txt
 release/
 
 *pyre
+
+dcos_generate_*.sh

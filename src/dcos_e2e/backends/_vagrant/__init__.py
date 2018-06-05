@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple, Type
 
 from .._base_classes import ClusterBackend, ClusterManager
-from ..node import Node
+from dcos_e2e.node import Node
+from dcos_e2e._common import run_subprocess
 
 
 class Vagrant(ClusterBackend):
@@ -49,7 +50,29 @@ class VagrantCluster(ClusterManager):
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
         """
-        pass
+        # Document taht we need Virtualbox guest additions
+        # Write a configuration file
+        #
+        # Trying with Virtualbox 5.1.18, if it does work, find latest version that it works with and
+        # submit a bug report to DC/OS Vagrant
+        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
+        config_file_path = dcos_vagrant_path / 'VagrantConfig-1m-1a-1p.yaml'
+        artifact_path = dcos_vagrant_path / 'dcos_generate_config.oss.sh'
+        dcos_config_path = dcos_vagrant_path / 'etc' / 'config-1.11.0.yaml'
+        license_key_path = Path('/tmp/license-key.txt')
+        import os
+        run_subprocess(
+            args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
+            cwd=str(dcos_vagrant_path),
+            env={
+                'DCOS_MACHINE_CONFIG_PATH': str(config_file_path.relative_to(dcos_vagrant_path)),
+                'DCOS_GENERATE_CONFIG_PATH': str(artifact_path.relative_to(dcos_vagrant_path)),
+                'DCOS_CONFIG_PATH': str(dcos_config_path.relative_to(dcos_vagrant_path)),
+                'DCOS_LICENSE_KEY_CONTENTS': license_key_path.read_text(),
+                'PATH': os.environ['PATH'],
+            },
+            log_output_live=True,
+        )
 
     def install_dcos_from_url(
         self,
@@ -66,6 +89,7 @@ class VagrantCluster(ClusterManager):
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
         """
+        raise NotImplementedError
 
     def install_dcos_from_path(
         self,
@@ -81,6 +105,7 @@ class VagrantCluster(ClusterManager):
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
         """
+
 
     def destroy(self) -> None:
         """
