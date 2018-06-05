@@ -1,16 +1,19 @@
 import json
 import logging
 
-from .. import dcos_launch
-from ..dcos_launch import util as ___vendorize__0
-dcos_launch.util = ___vendorize__0
+from retrying import retry
+
+from .. import dcos_test_utils
+from ..dcos_test_utils import onprem as ___vendorize__0
+dcos_test_utils.onprem = ___vendorize__0
+from ..dcos_launch import util
 from ..dcos_launch import onprem
 from ..dcos_launch.platforms import aws
 
 log = logging.getLogger(__name__)
 
 
-class DcosCloudformationLauncher(dcos_launch.util.AbstractLauncher):
+class DcosCloudformationLauncher(util.AbstractLauncher):
     def __init__(self, config: dict, env=None):
         self.boto_wrapper = aws.BotoWrapper(
             config['aws_region'])
@@ -37,7 +40,7 @@ class DcosCloudformationLauncher(dcos_launch.util.AbstractLauncher):
                 tags=self.config.get('tags'))
         except Exception as ex:
             self.delete_temp_resources(temp_resources)
-            raise dcos_launch.util.LauncherError('ProviderError', None) from ex
+            raise util.LauncherError('ProviderError', None) from ex
         self.config.update({
             'stack_id': stack.stack_id,
             'temp_resources': temp_resources})
@@ -81,18 +84,37 @@ class DcosCloudformationLauncher(dcos_launch.util.AbstractLauncher):
 
     def describe(self):
         return {
-            'masters': dcos_launch.util.convert_host_list(self.stack.get_master_ips()),
-            'private_agents': dcos_launch.util.convert_host_list(self.stack.get_private_agent_ips()),
-            'public_agents': dcos_launch.util.convert_host_list(self.stack.get_public_agent_ips())}
+            'masters': util.convert_host_list(self.stack.get_master_ips()),
+            'private_agents': util.convert_host_list(self.stack.get_private_agent_ips()),
+            'public_agents': util.convert_host_list(self.stack.get_public_agent_ips())}
 
     def delete(self):
+        # If the stack is in the middle of another operation (probably because its tags were being updated), wait for
+        # the operation to complete before trying to delete it
+        if 'IN_PROGRESS' in self.stack.get_status():
+            self.stack.wait_for_complete(transition_states=['ROLLBACK_IN_PROGRESS', 'UPDATE_IN_PROGRESS',
+                                                            'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS',
+                                                            'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS',
+                                                            'UPDATE_ROLLBACK_IN_PROGRESS'],
+                                         end_states=['CREATE_COMPLETE', 'ROLLBACK_FAILED', 'ROLLBACK_COMPLETE',
+                                                     'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_FAILED',
+                                                     'UPDATE_ROLLBACK_COMPLETE'])
         self.stack.delete()
-        if len(self.config['temp_resources']) > 0:
-            # must wait for stack to be deleted before removing
-            # network resources on which it depends
-            self.stack.wait_for_complete(
-                transition_states=['CREATE_COMPLETE', 'UPDATE_COMPLETE', 'DELETE_IN_PROGRESS'],
-                end_states=['DELETE_COMPLETE'])
+        # we must wait for the stack to be deleted for 2 reasons:
+        # 1. required to remove network resources on which it depends
+        # 2. to make sure it successfully deletes. If not (for example got interrupted by tagging), we retry deleting
+        status = self.stack.wait_for_complete(
+            transition_states=[
+                'DELETE_IN_PROGRESS', 'CREATE_COMPLETE', 'ROLLBACK_IN_PROGRESS', 'UPDATE_IN_PROGRESS',
+                'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS', 'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS',
+                'UPDATE_ROLLBACK_IN_PROGRESS'
+            ],
+            end_states=['DELETE_COMPLETE', 'ROLLBACK_FAILED', 'ROLLBACK_COMPLETE', 'UPDATE_COMPLETE',
+                        'UPDATE_ROLLBACK_FAILED', 'UPDATE_ROLLBACK_COMPLETE'])
+        if status != 'DELETE_COMPLETE':
+            log.info('Deletion was interrupted by another operation (most likely tagging). Retrying to delete...')
+            self.delete()
+        elif len(self.config['temp_resources']) > 0:
             self.delete_temp_resources(self.config['temp_resources'])
 
     def delete_temp_resources(self, temp_resources):
@@ -115,8 +137,8 @@ class DcosCloudformationLauncher(dcos_launch.util.AbstractLauncher):
         if not self.config['key_helper']:
             return {}
         if 'KeyName' in self.config['template_parameters']:
-            raise dcos_launch.util.LauncherError('KeyHelperError', 'KeyName cannot be set in '
-                                                 'template_parameters when key_helper is true')
+            raise util.LauncherError('KeyHelperError', 'KeyName cannot be set in '
+                                     'template_parameters when key_helper is true')
         key_name = self.config['deployment_name']
         private_key = self.boto_wrapper.create_key_pair(key_name)
         self.config.update({'ssh_private_key': private_key})
@@ -128,7 +150,7 @@ class DcosCloudformationLauncher(dcos_launch.util.AbstractLauncher):
         try:
             return aws.fetch_stack(self.config['stack_id'], self.boto_wrapper)
         except Exception as ex:
-            raise dcos_launch.util.LauncherError('StackNotFound', None) from ex
+            raise util.LauncherError('StackNotFound', None) from ex
 
 
 class OnPremLauncher(DcosCloudformationLauncher, onprem.AbstractOnpremLauncher):
@@ -152,7 +174,7 @@ class OnPremLauncher(DcosCloudformationLauncher, onprem.AbstractOnpremLauncher):
         }
         if not self.config['key_helper']:
             template_parameters['KeyName'] = self.config['aws_key_name']
-        template_body = dcos_launch.platforms.aws.template_by_instance_type(self.config['instance_type'])
+        template_body = aws.template_by_instance_type(self.config['instance_type'])
         template_body_json = json.loads(template_body)
         if 'aws_block_device_mappings' in self.config:
             log.warning(
@@ -178,3 +200,49 @@ class OnPremLauncher(DcosCloudformationLauncher, onprem.AbstractOnpremLauncher):
 
     def get_bootstrap_host(self):
         return self.stack.get_bootstrap_ip()
+
+    def get_onprem_cluster(self):
+        num_masters = int(self.config['num_masters'])
+        num_private_agents = int(self.config['num_private_agents'])
+        num_public_agents = int(self.config['num_public_agents'])
+
+        @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+               retry_on_result=lambda res: res[1])
+        def _get_cluster():
+            """ Whenever an AWS rate limiting error occurs, for a reason still unknown, there's a strong possibility
+            that the hosts will not be found inside the stack. So here we implement a retrying logic with exponential
+            backoff that asserts all the cluster hosts are found in the stack.
+            """
+            cluster = dcos_test_utils.onprem.OnpremCluster.from_hosts(
+                bootstrap_host=self.get_bootstrap_host(),
+                cluster_hosts=self.get_cluster_hosts(),
+                num_masters=num_masters,
+                num_private_agents=num_private_agents,
+                num_public_agents=num_public_agents)
+
+            num_masters_found = len(cluster.masters)
+            num_private_agents_found = len(cluster.private_agents)
+            num_public_agents_found = len(cluster.public_agents)
+            bootstrap_host_found = bool(cluster.bootstrap_host)
+
+            cluster_matches_config = (num_masters_found == num_masters and
+                                      num_private_agents_found == num_private_agents and
+                                      num_public_agents_found == num_public_agents and
+                                      bootstrap_host_found)
+
+            if not cluster_matches_config:
+                msg = ("Not all required hosts were found:\n"
+                       "\tmaster count: expected {}, found {}\n"
+                       "\tprivate agent count: expected {}, found {}\n"
+                       "\tpublic agent count: expected {}, found {}\n"
+                       "\tbootstrap host found: {}".format(num_masters, num_masters_found,
+                                                           num_private_agents, num_private_agents_found,
+                                                           num_public_agents, num_public_agents_found,
+                                                           bootstrap_host_found))
+                log.info("Stack not ready yet for DC/OS installation. " + msg)
+                self.stack.refresh_stack()
+
+            return cluster, not cluster_matches_config
+
+        cluster, _ = _get_cluster()
+        return cluster

@@ -1,3 +1,10 @@
+""" This module is intended to provide a thin wrapper for the dcos-cli *binary*
+
+The dcos-cli in some versions is highly dependent upon state and is not the most direct
+interface for interacting with a DC/OS cluster. Under the hood, the CLI is just a helper
+for making calls to the HTTP REST APIs so often users will get better results by using
+the :class:`~dcos_test_utils.dcos_api.DcosApiSession` object for direct API access
+"""
 import logging
 import os
 import platform
@@ -14,8 +21,12 @@ DCOS_CLI_URL = os.getenv('DCOS_CLI_URL', 'https://downloads.dcos.io/binaries/cli
 
 
 class DcosCli():
+    """ This wrapper assists in setting up the CLI and running CLI commands in subprocesses
 
-    def __init__(self, cli_path):
+    :param cli_path: path to a binary with executable permissions already set
+    :type cli_path: str
+    """
+    def __init__(self, cli_path: str):
         self.path = os.path.abspath(os.path.expanduser(cli_path))
         updated_env = os.environ.copy()
         # make sure the designated CLI is on top of the PATH
@@ -40,7 +51,12 @@ class DcosCli():
         self.env = updated_env
 
     @classmethod
-    def new_cli(cls, download_url=DCOS_CLI_URL):
+    def new_cli(cls, download_url: str=DCOS_CLI_URL):
+        """ This method will download and correctly set the permission for a new dcos-cli binary
+
+        :param download_url: URL of the dcos-cli binary to be used. If not set, a stable cli will be used
+        :type download_url: str
+        """
         tmpdir = tempfile.mkdtemp()
         dcos_cli_path = os.path.join(tmpdir, "dcos")
         requests.packages.urllib3.disable_warnings()
@@ -57,17 +73,20 @@ class DcosCli():
 
     @staticmethod
     def clear_cli_dir():
+        """ The CLI can be heavily dependent on state stored in ~/.dcos which
+        should be cleaned up if other dcos-cli sessions aren't intended to access that state
+        """
         shutil.rmtree(os.path.expanduser("~/.dcos"))
 
-    def exec_command(self, cmd, stdin=None):
+    def exec_command(self, cmd: str, stdin=None) -> tuple:
         """Execute CLI command and processes result.
 
         This method expects that process won't block.
 
         :param cmd: Program and arguments
-        :type cmd: [str]
+        :type cmd: str
         :param stdin: File to use for stdin
-        :type stdin: file
+        :type stdin: File
         :returns: A tuple with stdout and stderr
         :rtype: (str, str)
         """
@@ -89,7 +108,19 @@ class DcosCli():
 
         return (stdout, stderr)
 
-    def setup_enterprise(self, url, username=None, password=None):
+    def setup_enterprise(self, url: str, username: str=None, password: str=None):
+        """ This method does the CLI setup for a Mesosphere Enterprise DC/OS cluster
+
+        Note:
+            This is not an idempotent operation and can only be ran once per CLI state-session
+
+        :param url: URL of EE DC/OS cluster to setup the CLI with
+        :type  url: str
+        :param username: username to login with
+        :type username: str
+        :param password: password to use with username
+        :type password: str
+        """
         if not username:
             username = os.environ['DCOS_LOGIN_UNAME']
         if not password:
@@ -103,6 +134,13 @@ class DcosCli():
             ["dcos", "package", "install", "dcos-enterprise-cli", "--cli", "--global", "--yes"])
 
     def login_enterprise(self, username=None, password=None):
+        """ Authenticates the CLI with the setup Mesosphere Enterprise DC/OS cluster
+
+        :param username: username to login with
+        :type username: str
+        :param password: password to use with username
+        :type password: str
+        """
         if not username:
             username = os.environ['DCOS_LOGIN_UNAME']
         if not password:
@@ -114,16 +152,24 @@ class DcosCli():
 
 
 class DcosCliConfiguration:
-    """Represents helper for simple access to the CLI configuration"""
+    """Represents helper for simple access to the CLI configuration
 
+    :param cli: DcosCli object to grab config data from
+    :type cli: DcosCli
+    """
     NOT_FOUND_MSG = "Property '{}' doesn't exist"
 
     def __init__(self, cli: DcosCli):
         self.cli = cli
 
-    def get(self, key, default=None):
-        """Retrieves configuration value from CLI"""
+    def get(self, key: str, default: str=None):
+        """Retrieves configuration value from CLI
 
+        :param key: key to grab from CLI config
+        :type key: str
+        :param default: value to return if key not present
+        :type default: str
+        """
         try:
             stdout, _ = self.cli.exec_command(
                 ["dcos", "config", "show", key])
@@ -134,8 +180,14 @@ class DcosCliConfiguration:
             else:
                 raise e
 
-    def set(self, name, value):
-        """Sets configuration option"""
+    def set(self, name: str, value: str):
+        """Sets configuration option
+
+        :param name: key to set in CLI config
+        :type name: str
+        :param default: value to set
+        :type default: str
+        """
         self.cli.exec_command(
             ["dcos", "config", "set", name, value])
 
