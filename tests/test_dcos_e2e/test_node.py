@@ -3,6 +3,7 @@ Tests for managing DC/OS cluster nodes.
 """
 
 import logging
+import textwrap
 import uuid
 from pathlib import Path
 from subprocess import CalledProcessError, TimeoutExpired
@@ -298,6 +299,38 @@ class TestRun:
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
         assert echo_result.stderr == b''
+
+    @pytest.mark.parametrize('tty', [True, False])
+    def test_tty(
+        self,
+        dcos_node: Node,
+        tty: bool,
+    ) -> None:
+        """
+        If the ``tty`` parameter is set to ``True``, a TTY is created.
+        """
+        filename = uuid.uuid4().hex
+        script = textwrap.dedent(
+            """
+            if [ -t 1 ]
+            then
+            echo True > {filename}
+            else
+            echo False > {filename}
+            fi
+            """
+        ).format(filename=filename)
+        echo_result = dcos_node.run(
+            args=[script],
+            tty=tty,
+            shell=True,
+        )
+
+        assert echo_result.returncode == 0
+        run_result = dcos_node.run(
+            args=['cat', filename],
+        )
+        assert run_result.stdout.strip().decode() == str(tty)
 
     def test_shell(
         self,
