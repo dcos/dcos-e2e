@@ -5,6 +5,9 @@ Setup script for DC/OS End to End tests.
 import versioneer
 from setuptools import find_packages, setup
 
+# Avoid dependency links because they are not supported by Read The Docs.
+#
+# Also, they require users to use ``--process-dependency-links``.
 DEPENDENCY_LINKS = []
 
 with open('requirements.txt') as requirements:
@@ -25,10 +28,7 @@ with open('requirements.txt') as requirements:
 with open('dev-requirements.txt') as dev_requirements:
     DEV_REQUIRES = []
     for line in dev_requirements.readlines():
-        if line.startswith('--find-links '):
-            _, link = line.split('--find-links ')
-            DEPENDENCY_LINKS.append(link)
-        elif not line.startswith('#'):
+        if not line.startswith('#'):
             DEV_REQUIRES.append(line)
 
 with open('README.rst') as f:
@@ -59,6 +59,9 @@ setup(
         'Programming Language :: Python :: 3.5',
         'License :: OSI Approved :: Apache License 2.0',
     ],
+    # Avoid dependency links because they are not supported by Read The Docs.
+    #
+    # Also, they require users to use ``--process-dependency-links``.
     dependency_links=DEPENDENCY_LINKS,
     entry_points="""
         [console_scripts]
