@@ -41,11 +41,8 @@ def _compose_ssh_command(
         The full SSH command to be run.
     """
     ssh_args = ['ssh']
-    # We do not cover this case in tests because our test suite is not a true
-    # terminal.
-    #
-    # This is useful in the CLI for running interactive commands.
-    if tty:  # pragma: no cover
+
+    if tty:
         ssh_args.append('-t')
 
     ssh_args += [
