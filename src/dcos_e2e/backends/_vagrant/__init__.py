@@ -133,16 +133,12 @@ class VagrantCluster(ClusterManager):
         """
         import vagrant
 
-        vag = vagrant.Vagrant()
-
-        # TODO(mh): Do we need Transport.VAGRANT instead of Transport.SSH?
-        #           Is it enough to find where vagrant stores ssh key?
-
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
+        client = vagrant.Vagrant(root=str(dcos_vagrant_path))
         vagrant_internal_path = dcos_vagrant_path / '.vagrant' / 'dcos'
         ip_address = IPv4Address('192.168.65.90')
 
-        ssh_key_path = dcos_vagrant_path / '.vagrant/machines/m1/virtualbox/private_key'
+        ssh_key_path = Path(client.keyfile())
         nodes = set([])
         nodes.add(
             Node(
