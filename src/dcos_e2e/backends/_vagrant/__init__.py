@@ -73,19 +73,20 @@ class VagrantCluster(ClusterManager):
         artifact_path = dcos_vagrant_path / 'dcos_generate_config.oss.sh'
         dcos_config_path = dcos_vagrant_path / 'etc' / 'config-1.11.0.yaml'
         license_key_path = Path('/tmp/license-key.txt')
+        return
         import os
-        # run_subprocess(
-        #     args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
-        #     cwd=str(dcos_vagrant_path),
-        #     env={
-        #         'DCOS_MACHINE_CONFIG_PATH': str(config_file_path.relative_to(dcos_vagrant_path)),
-        #         'DCOS_GENERATE_CONFIG_PATH': str(artifact_path.relative_to(dcos_vagrant_path)),
-        #         'DCOS_CONFIG_PATH': str(dcos_config_path.relative_to(dcos_vagrant_path)),
-        #         'DCOS_LICENSE_KEY_CONTENTS': license_key_path.read_text(),
-        #         'PATH': os.environ['PATH'],
-        #     },
-        #     log_output_live=True,
-        # )
+        run_subprocess(
+            args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
+            cwd=str(dcos_vagrant_path),
+            env={
+                'DCOS_MACHINE_CONFIG_PATH': str(config_file_path.relative_to(dcos_vagrant_path)),
+                'DCOS_GENERATE_CONFIG_PATH': str(artifact_path.relative_to(dcos_vagrant_path)),
+                'DCOS_CONFIG_PATH': str(dcos_config_path.relative_to(dcos_vagrant_path)),
+                'DCOS_LICENSE_KEY_CONTENTS': license_key_path.read_text(),
+                'PATH': os.environ['PATH'],
+            },
+            log_output_live=True,
+        )
 
     def install_dcos_from_url(
         self,
@@ -130,6 +131,9 @@ class VagrantCluster(ClusterManager):
         """
         Return all DC/OS master :class:`.node.Node` s.
         """
+        import vagrant
+
+        vag = vagrant.Vagrant()
 
         # TODO(mh): Do we need Transport.VAGRANT instead of Transport.SSH?
         #           Is it enough to find where vagrant stores ssh key?
@@ -138,13 +142,14 @@ class VagrantCluster(ClusterManager):
         vagrant_internal_path = dcos_vagrant_path / '.vagrant' / 'dcos'
         ip_address = IPv4Address('192.168.65.90')
 
+        ssh_key_path = dcos_vagrant_path / '.vagrant/machines/m1/virtualbox/private_key'
         nodes = set([])
         nodes.add(
             Node(
                 public_ip_address=ip_address,
                 private_ip_address=ip_address,
                 default_user='vagrant',
-                ssh_key_path=vagrant_internal_path / 'public_key_vagrant.pub',
+                ssh_key_path=ssh_key_path,
                 default_transport=self._default_transport,
             ),
         )
@@ -156,15 +161,18 @@ class VagrantCluster(ClusterManager):
         """
         Return all DC/OS agent :class:`.node.Node` s.
         """
+        return set([])
 
     @property
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public agent :class:`.node.Node` s.
         """
+        return set([])
 
     @property
     def base_config(self) -> Dict[str, Any]:
         """
         Return a base configuration for installing DC/OS OSS.
         """
+        return {}
