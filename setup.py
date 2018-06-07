@@ -11,11 +11,15 @@ from setuptools import find_packages, setup
 DEPENDENCY_LINKS = []
 
 with open('requirements.txt') as requirements:
+    INSTALL_REQUIRES = []
     # Keyring is not a direct dependency but without it some users get:
     #
     # Cannot load 'keyring' on your system (either not installed, or not
     # configured correctly): No module named 'keyring'
-    INSTALL_REQUIRES = ['keyring']
+    INSTALL_REQUIRES.append('keyring')
+    # Similarly, without the following, some users get:
+    # The 'secretstorage' distribution was not found and is required by keyring
+    INSTALL_REQUIRES.append('secretstorage')
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
