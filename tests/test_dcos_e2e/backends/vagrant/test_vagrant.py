@@ -55,7 +55,7 @@ class TestRunIntegrationTest:
                 log_output_live=True,
             )
 
-            cluster.wait_for_dcos()
+            cluster.wait_for_dcos_oss()
 
             # No error is raised with a successful command.
             cluster.run_integration_tests(
