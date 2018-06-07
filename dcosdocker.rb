@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.06.05.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.06.07.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -112,8 +112,8 @@ class Dcosdocker < Formula
   end
 
   resource "docker-pycreds" do
-    url "https://files.pythonhosted.org/packages/fc/29/f0fe6e6a055ebfc224f952d1166aea7bccd7de38ac01842fcbffe10ec0b8/docker-pycreds-0.2.3.tar.gz"
-    sha256 "e3732a03610a00461a716997670c7010bf1c214a3edc440f7d6a2a3a830ecd9d"
+    url "https://files.pythonhosted.org/packages/9e/7a/109e0a3cc3c19534edd843c16e792c67911b5b4072fdd34ddce90d49f355/docker-pycreds-0.3.0.tar.gz"
+    sha256 "8b0e956c8d206f832b06aa93a710ba2c3bcbacb5a314449c040b0b814355bbff"
   end
 
   resource "docopt" do
