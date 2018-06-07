@@ -26,6 +26,9 @@ def get_homebrew_formula(version: str) -> str:
     # Cannot load 'keyring' on your system (either not installed, or not
     # configured correctly): No module named 'keyring'
     requirements.append('keyring')
+    # Similarly, without the following, some users get:
+    # The 'secretstorage' distribution was not found and is required by keyring
+    requirements.append('secretstorage')
     first = requirements[0]
 
     args = ['poet', first]
