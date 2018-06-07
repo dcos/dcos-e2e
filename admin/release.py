@@ -21,6 +21,11 @@ def get_homebrew_formula(version: str) -> str:
     requirements_file = Path(__file__).parent.parent / 'requirements.txt'
     lines = requirements_file.read_text().strip().split('\n')
     requirements = [line for line in lines if not line.startswith('#')]
+    # Keyring is not a direct dependency but without it some users get:
+    #
+    # Cannot load 'keyring' on your system (either not installed, or not
+    # configured correctly): No module named 'keyring'
+    requirement.append('keyring')
     first = requirements[0]
 
     args = ['poet', first]
