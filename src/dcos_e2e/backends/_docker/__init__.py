@@ -2,7 +2,6 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
-import os
 import socket
 import subprocess
 import uuid
