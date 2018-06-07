@@ -670,7 +670,14 @@ def wait(
     Wait for DC/OS to start.
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    click.echo('A cluster may take some time to be ready.')
+    message = (
+        'A cluster may take some time to be ready.\n'
+        'The amount of time it takes to start a cluster depends on a variety '
+        'of factors.\n'
+        'If you are concerned that this is hanging, try "dcos-docker doctor" '
+        'to diagnose common issues.'
+    )
+    click.echo(message)
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,

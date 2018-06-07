@@ -318,7 +318,7 @@ class TestRun:
             else
             echo False > {filename}
             fi
-            """
+            """,
         ).format(filename=filename)
         echo_result = dcos_node.run(
             args=[script],
@@ -327,9 +327,7 @@ class TestRun:
         )
 
         assert echo_result.returncode == 0
-        run_result = dcos_node.run(
-            args=['cat', filename],
-        )
+        run_result = dcos_node.run(args=['cat', filename])
         assert run_result.stdout.strip().decode() == str(tty)
 
     def test_shell(
