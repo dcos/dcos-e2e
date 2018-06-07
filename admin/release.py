@@ -25,7 +25,7 @@ def get_homebrew_formula(version: str) -> str:
     #
     # Cannot load 'keyring' on your system (either not installed, or not
     # configured correctly): No module named 'keyring'
-    requirement.append('keyring')
+    requirements.append('keyring')
     first = requirements[0]
 
     args = ['poet', first]
