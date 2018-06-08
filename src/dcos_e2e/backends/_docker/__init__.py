@@ -2,8 +2,6 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
-import inspect
-import os
 import socket
 import subprocess
 import uuid
@@ -267,9 +265,7 @@ class DockerCluster(ClusterManager):
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
 
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
+        ip_detect_src = Path(__file__).parent / 'resources' / 'ip_detect'
         ip_detect_dst = Path('/genconf/ip-detect')
         files_to_copy_to_installer.append((ip_detect_src, ip_detect_dst))
 
