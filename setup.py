@@ -20,6 +20,16 @@ with open('requirements.txt') as requirements:
     # Similarly, without the following, some users get:
     # The 'secretstorage' distribution was not found and is required by keyring
     INSTALL_REQUIRES.append('secretstorage')
+    # At the time of writing, ``requests`` and ``cryptography`` have
+    # dependencies which ``pip`` does not resolve well.
+    # ``cryptography`` gives us the latest version of ``idna`` available, which
+    # at the time of writing is version ``2.7``.
+    # ``requests`` requires that the ``idna`` version is ``<2.7``.
+    # Therefore, we pin ``requests``'s ``idna`` requirement.
+    #
+    # We do this here and not in ``requirements.txt`` to keep
+    # ``requirements.txt`` for direct dependencies only.
+    INSTALL_REQUIRES.append('idna<2.7,>=2.5')
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
