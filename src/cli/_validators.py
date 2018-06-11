@@ -4,6 +4,7 @@ Validators for CLI options.
 
 import re
 import subprocess
+import sys
 import uuid
 from pathlib import Path
 from shutil import rmtree
@@ -372,9 +373,12 @@ def validate_variant(
         rmtree(path=str(workspace_dir), ignore_errors=True)
         click.echo(doctor_message)
         click.echo()
-        click.echo('Original error:')
-        click.echo(exc.stderr)
+        click.echo('Original error:', err=True)
+        click.echo(exc.stderr, err=True)
         raise
+    except ValueError as exc:
+        click.echo(str(exc), err=True)
+        sys.exit(1)
 
     rmtree(path=str(workspace_dir), ignore_errors=True)
     return 'enterprise' if enterprise else 'oss'
