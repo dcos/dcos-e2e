@@ -681,7 +681,8 @@ class TestDestroy:
               Destroy a cluster.
 
             Options:
-              -c, --cluster-id TEXT          [default: default]
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                              the SSH transport requires IP routing to be set
                                              up. See "dcos-docker setup-mac-network".It also
@@ -849,7 +850,7 @@ class TestInspect:
               exec -it $MASTER_0`` to enter the first master, for example.
 
             Options:
-              -c, --cluster-id TEXT  [default: default]
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
               --env                  Show details in an environment variable format to eval.
               --help                 Show this message and exit.
             """,# noqa: E501,E261
@@ -895,7 +896,8 @@ class TestWait:
               Wait for DC/OS to start.
 
             Options:
-              -c, --cluster-id TEXT          [default: default]
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --superuser-username TEXT      The superuser username is needed only on DC/OS
                                              Enterprise clusters. By default, on a DC/OS
                                              Enterprise cluster, `admin` is used.
@@ -967,7 +969,8 @@ class TestSync:
               If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
 
             Options:
-              -c, --cluster-id TEXT          [default: default]
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                              the SSH transport requires IP routing to be set
                                              up. See "dcos-docker setup-mac-network".It also
@@ -1052,7 +1055,7 @@ class TestWeb:
               docker wait`` before running this command.
 
             Options:
-              -c, --cluster-id TEXT  [default: default]
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
               --help                 Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -1241,7 +1244,8 @@ class TestRun:
               whole command in double quotes.
 
             Options:
-              -c, --cluster-id TEXT          [default: default]
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --dcos-login-uname TEXT        The username to set the ``DCOS_LOGIN_UNAME``
                                              environment variable to.
               --dcos-login-pw TEXT           The password to set the ``DCOS_LOGIN_PW``
