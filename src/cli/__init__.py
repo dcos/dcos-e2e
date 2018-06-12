@@ -375,6 +375,17 @@ def dcos_docker(verbose: None) -> None:
         'another option is a performance optimization.'
     ),
 )
+@click.option(
+    '--wait-for-dcos',
+    is_flag=True,
+    help=(
+        'Wait for DC/OS after creating the cluster. '
+        'This is equivalent to using "dcos-docker wait" after this command. '
+        'On DC/OS Enterprise clusters, this uses the default superuser '
+        'username and password: admin / admin. '
+        'To connect using different credentials, use "dcos-docker wait".'
+    ),
+)
 @_node_transport_option
 def create(
     agents: int,
@@ -397,6 +408,7 @@ def create(
     custom_public_agent_volume: List[Mount],
     variant: str,
     transport: Transport,
+    wait_for_dcos: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
