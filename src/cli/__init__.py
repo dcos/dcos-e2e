@@ -258,12 +258,12 @@ def dcos_docker(verbose: None) -> None:
     '-c',
     '--cluster-id',
     type=str,
-    default=uuid.uuid4().hex,
+    default='default',
     callback=validate_cluster_id,
     help=(
         'A unique identifier for the cluster. '
-        'Defaults to a random value. '
-        'Use the value "default" to use this cluster for other'
+        'Use the value "default" to use this cluster for other commands '
+        'without specifying --cluster-id.'
     ),
 )
 @click.option(
