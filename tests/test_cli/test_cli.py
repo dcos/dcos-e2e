@@ -211,6 +211,14 @@ class TestCreate:
                                               variant from the artifact. Finding the variant
                                               from the artifact takes some time and so using
                                               another option is a performance optimization.
+              --wait-for-dcos                 Wait for DC/OS after creating the cluster.
+                                              This is equivalent to using "dcos-docker wait"
+                                              after this command. "dcos-docker wait" has
+                                              various options available and so may be more
+                                              appropriate for your use case. If the chosen
+                                              transport is "docker-exec", this will skip
+                                              HTTP checks and so the cluster may not be
+                                              fully ready.
               --transport [docker-exec|ssh]   The communication transport to use. On macOS
                                               the SSH transport requires IP routing to be
                                               set up. See "dcos-docker setup-mac-network".It
