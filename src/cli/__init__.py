@@ -383,8 +383,8 @@ def dcos_docker(verbose: None) -> None:
         'This is equivalent to using "dcos-docker wait" after this command. '
         '"dcos-docker wait" has various options available and so may be more '
         'appropriate for your use case. '
-        'If the chosen transport is "docker", this will skip HTTP checks and '
-        'so the cluster may not be fully ready.'
+        'If the chosen transport is "docker-exec", this will skip HTTP checks '
+        'and so the cluster may not be fully ready.'
     ),
 )
 @_node_transport_option
