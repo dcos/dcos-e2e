@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.06.12.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.06.12.1.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -172,8 +172,8 @@ class Dcosdocker < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/9b/49/ed5c9ea20f83707f4f67fbc664082d6d9a356b44f5f64ec5a5c7e0fdb365/msrest-0.4.29.tar.gz"
-    sha256 "ce0a558173b7c7bff87dc66e24331382c81a89367ea52c52bbb934de6064cb45"
+    url "https://files.pythonhosted.org/packages/c2/fb/24f120cb5ed06f82af1c32213270833ccfa045c202b7bb842834de11f1cc/msrest-0.5.0.tar.gz"
+    sha256 "8b0d2921f62d80ba76a264ddc0fb8cdbf8f525943e22dc47d12802ada092c2cb"
   end
 
   resource "msrestazure" do

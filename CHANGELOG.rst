@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.06.12.1
+------------
+
 - Add a ``--wait`` flag to ``dcos-docker create`` to also wait for the cluster.
 
 2018.06.12.0
