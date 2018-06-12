@@ -381,12 +381,14 @@ def dcos_docker(verbose: None) -> None:
     help=(
         'Wait for DC/OS after creating the cluster. '
         'This is equivalent to using "dcos-docker wait" after this command. '
-        'On DC/OS Enterprise clusters, this uses the default superuser '
-        'username and password: admin / admin. '
-        'To connect using different credentials, use "dcos-docker wait".'
+        '"dcos-docker wait" has various options available and so may be more '
+        'appropriate for your use case. '
+        'If the chosen transport is "docker", this will skip HTTP checks and '
+        'so the cluster may not be fully ready.'
     ),
 )
 @_node_transport_option
+@click.pass_context
 def create(
     agents: int,
     artifact: str,
@@ -409,6 +411,7 @@ def create(
     variant: str,
     transport: Transport,
     wait_for_dcos: bool,
+    ctx: click.core.Context,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -561,6 +564,16 @@ def create(
         sys.exit(exc.returncode)
 
     click.echo(cluster_id)
+
+    if wait_for_dcos:
+        ctx.invoke(
+            wait,
+            cluster_id=cluster_id,
+            transport=transport,
+            skip_http_checks=bool(transport == Transport.DOCKER_EXEC),
+        )
+        return
+
     started_message = (
         'Cluster "{cluster_id}" has started. '
         'Run "dcos-docker wait --cluster-id {cluster_id}" to wait for DC/OS '
