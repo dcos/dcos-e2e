@@ -1,5 +1,5 @@
-CLI on Linux With Linux
-~~~~~~~~~~~~~~~~~~~~~~~
+CLI on Linux With Linuxbrew
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 One way to install the CLI on Linux is with `Linuxbrew`_.
 Install `Linuxbrew`_, then install the latest stable version:
