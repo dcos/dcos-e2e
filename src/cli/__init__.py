@@ -390,6 +390,7 @@ def dcos_docker(verbose: None) -> None:
 @_node_transport_option
 @click.pass_context
 def create(
+    ctx: click.core.Context,
     agents: int,
     artifact: str,
     cluster_id: str,
@@ -411,7 +412,6 @@ def create(
     variant: str,
     transport: Transport,
     wait_for_dcos: bool,
-    ctx: click.core.Context,
 ) -> None:
     """
     Create a DC/OS cluster.
