@@ -138,10 +138,8 @@ A typical CLI workflow may look like this:
 
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
+   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0
    default
-   # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
-   # is automatically used.
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
