@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.06.12.0
+------------
+
 - ``dcos-docker create`` now creates clusters with the ``--cluster-id`` "default" by default.
 
 2018.06.05.0
