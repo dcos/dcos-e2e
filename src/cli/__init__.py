@@ -91,7 +91,7 @@ def _existing_cluster_id_option(command: Callable[..., None],
         callback=validate_cluster_exists,
         default='default',
         show_default=True,
-	help='The ID of the cluster to use.',
+        help='The ID of the cluster to use.',
     )(command)  # type: Callable[..., None]
     return function
 
