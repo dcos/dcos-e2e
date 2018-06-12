@@ -89,8 +89,8 @@ def _existing_cluster_id_option(command: Callable[..., None],
         '--cluster-id',
         type=str,
         callback=validate_cluster_exists,
-        default=None,
-        help='If not given, "default" is used.',
+        default='default',
+        show_default=True,
     )(command)  # type: Callable[..., None]
     return function
 

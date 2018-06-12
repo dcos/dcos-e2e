@@ -98,12 +98,6 @@ def validate_cluster_exists(
     for _ in (ctx, param):
         pass
 
-    if value is None:
-        if 'default' in existing_cluster_ids():
-            return 'default'
-        message = '--cluster-id was not given and no cluster "default" exists'
-        raise click.BadParameter(message)
-
     cluster_id = str(value)
     if cluster_id not in existing_cluster_ids():
         message = 'Cluster "{value}" does not exist'.format(value=value)

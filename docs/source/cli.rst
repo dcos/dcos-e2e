@@ -74,7 +74,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
    $ dcos-docker create /path/to/dcos_generate_config.ee.sh \
         --license-key /path/to/license.txt \
-        --security-mode strict \
+        --security-mode strict
 
 The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
