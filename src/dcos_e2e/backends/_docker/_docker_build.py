@@ -51,10 +51,13 @@ def build_docker_image(
     base_dockerfile = _base_dockerfile(linux_distribution=linux_distribution)
     docker_dockerfile = _docker_dockerfile()
 
-    docker_versions = {
-        DockerVersion.v1_11_2: '1.11.2',
-        DockerVersion.v1_13_1: '1.13.1',
-        DockerVersion.v17_12_1_ce: '17.12.1-ce',
+    docker_urls = {
+        DockerVersion.v1_11_2:
+        'https://get.docker.com/builds/Linux/x86_64/docker-1.11.2.tgz',
+        DockerVersion.v1_13_1:
+        'https://get.docker.com/builds/Linux/x86_64/docker-1.13.1.tgz',
+        DockerVersion.v17_12_1_ce:
+        'https://download.docker.com/linux/static/stable/x86_64/docker-17.12.1-ce.tgz',  # noqa: E501
     }
 
     client.images.build(
@@ -69,5 +72,5 @@ def build_docker_image(
         rm=True,
         forcerm=True,
         tag=tag,
-        buildargs={'DOCKER_VERSION': docker_versions[docker_version]},
+        buildargs={'DOCKER_URL': docker_urls[docker_version]},
     )

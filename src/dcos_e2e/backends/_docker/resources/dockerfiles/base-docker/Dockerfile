@@ -1,11 +1,16 @@
+# This is a method of installing Docker, and setting up Docker-in-Docker which
+# works across the platforms we currently support.
+#
+# CoreOS does not provide a package manager.
+# CentOS and Ubuntu include different package managers.
+
 FROM mesosphere/dcos-docker:base
 
 ENV TERM xterm
 ENV LANG en_US.UTF-8
-ARG DOCKER_VERSION
+ARG DOCKER_URL
 
-# install dind and docker
-RUN curl -sSL --fail "https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION}.tgz" | tar xvzf - -C /usr/bin/ --strip 1 \
+RUN curl -sSL --fail "${DOCKER_URL}" | tar xvzf - -C /usr/bin/ --strip 1 \
 	&& chmod +x /usr/bin/docker* \
 	&& groupadd -r nogroup \
 	&& groupadd -r docker \
