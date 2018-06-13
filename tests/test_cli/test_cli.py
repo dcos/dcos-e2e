@@ -143,7 +143,7 @@ class TestCreate:
                               If none of these are set, ``license_key_contents`` is not given.
 
             Options:
-              --docker-version [1.11.2|1.13.1|17.12.1-ce]
+              --docker-version [1.13.1|17.12.1-ce]
                                               The Docker version to install on the nodes.
                                               [default: 1.13.1]
               --linux-distribution [centos-7|coreos]
