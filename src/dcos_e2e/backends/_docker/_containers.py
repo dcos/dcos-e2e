@@ -185,6 +185,5 @@ def start_dcos_container(
         # Work around https://jira.mesosphere.com/browse/DCOS_OSS-1361.
         ['systemd-tmpfiles', '--create', '--prefix', '/run/log/journal'],
     ]:
-        container.exec_run(cmd=cmd)
         exit_code, output = container.exec_run(cmd=cmd)
         assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
