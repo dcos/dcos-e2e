@@ -9,7 +9,7 @@ RUN curl -sSL --fail "https://download.docker.com/linux/static/stable/x86_64/doc
 	&& chmod +x /usr/bin/docker* \
 	&& groupadd -r nogroup \
 	&& groupadd -r docker \
-	&& gpasswd -a "root" docker || true \
+	&& (gpasswd -a "root" docker || true) \
 	&& rm -f /etc/securetty \
 	&& ln -vf /bin/true /usr/sbin/modprobe \
 	&& ln -vf /bin/true /sbin/modprobe
