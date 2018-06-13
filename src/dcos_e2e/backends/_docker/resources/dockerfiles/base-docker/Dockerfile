@@ -12,8 +12,8 @@ ARG DOCKER_URL
 
 RUN curl -sSL --fail "${DOCKER_URL}" | tar xvzf - -C /usr/bin/ --strip 1 \
 	&& chmod +x /usr/bin/docker* \
-	&& groupadd -r nogroup \
-	&& groupadd -r docker \
+	&& (getent group nogroup || groupadd -r nogroup) \
+	&& (getent group docker || groupadd -r docker) \
 	&& (gpasswd -a "root" docker || true) \
 	&& rm -f /etc/securetty \
 	&& ln -vf /bin/true /usr/sbin/modprobe \

@@ -71,6 +71,10 @@ PATTERNS = {
     (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss':  # noqa: E501
     (OSS_MASTER, ),
+    'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_oss':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise':  # noqa: E501
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_docker.py':
     (),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
