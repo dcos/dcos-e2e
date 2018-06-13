@@ -4,12 +4,6 @@ ENV DOCKER_VERSION 1.13.1
 ENV TERM xterm
 ENV LANG en_US.UTF-8
 
-# install dind and docker
-RUN curl -sSL --fail "https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION}.tgz" | tar xvzf - -C /usr/bin/ --strip 1 \
-	&& chmod +x /usr/bin/docker* \
-	&& groupadd -r nogroup \
-	&& groupadd -r docker \
-	&& (gpasswd -a "root" docker || true) \
-	&& rm -f /etc/securetty \
-	&& ln -vf /bin/true /usr/sbin/modprobe \
-	&& ln -vf /bin/true /sbin/modprobe
+RUN rpm --import "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xee6d536cf7dc86e2d7d56f59a178ac6c6238f52e"
+RUN yum-config-manager --add-repo "https://packages.docker.com/1.13/yum/repo/main/centos/7"
+RUN yum install -y "docker-engine-1.13.1.cs9"
