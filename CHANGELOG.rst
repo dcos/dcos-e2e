@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add Ubuntu support to the Docker backend.
+
 2018.06.12.1
 ------------
 
