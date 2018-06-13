@@ -181,7 +181,6 @@ def start_dcos_container(
         ['mkdir', '--parents', '/root/.ssh'],
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ['rm', '-f', '/run/nologin', '||', 'true'],
-        ['systemctl', 'enable', 'sshd'],
         ['systemctl', 'start', 'sshd'],
         # Work around https://jira.mesosphere.com/browse/DCOS_OSS-1361.
         ['systemd-tmpfiles', '--create', '--prefix', '/run/log/journal'],
