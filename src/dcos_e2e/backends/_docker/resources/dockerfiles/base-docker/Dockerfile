@@ -1,8 +1,8 @@
 FROM mesosphere/dcos-docker:base
 
-ENV DOCKER_VERSION 1.13.1
 ENV TERM xterm
 ENV LANG en_US.UTF-8
+ARG DOCKER_VERSION
 
 # install dind and docker
 RUN curl -sSL --fail "https://get.docker.com/builds/Linux/x86_64/docker-${DOCKER_VERSION}.tgz" | tar xvzf - -C /usr/bin/ --strip 1 \
