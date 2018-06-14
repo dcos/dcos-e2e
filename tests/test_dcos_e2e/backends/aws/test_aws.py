@@ -167,3 +167,35 @@ class TestRunIntegrationTest:
                 },
                 log_output_live=True,
             )
+
+
+class TestCustomKeyPair:
+    """
+    XXX
+    """
+
+    def test_custom_key_pair(self):
+        """
+        XXX
+        """
+
+        private, public = generate_key_pair()
+        boto.upload_public_key(name='foo', contents=public.read_text())
+        backend = AWS(
+            aws_key_pair=('foo', private)
+        )
+
+        with Cluster(
+            cluster_backend=backend,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            node = Node(
+                public_ip_address=master.public_ip_address,
+                private_ip_address=master.private_ip_address,
+                default_user=master.default_user,
+                ssh_key_path=private,
+            )
+
+            node.run(args=['echo', '1'])
