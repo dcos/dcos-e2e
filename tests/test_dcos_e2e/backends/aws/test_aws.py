@@ -208,12 +208,12 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
 class TestCustomKeyPair:
     """
-    XXX
+    Tests for passing a custom key pair to the AWS backend.
     """
 
     def test_custom_key_pair(self, tmpdir: local):
         """
-        XXX
+        It is possible to pass a custom key pair to the AWS backend.
         """
         key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
         private_key_path = Path(tmpdir.join('private_key'))
