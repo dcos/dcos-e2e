@@ -453,6 +453,12 @@ class Cluster(ContextDecorator):
         """
         self._cluster.destroy()
 
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+        self._cluster.destroy_node(node=node)
+
     def __exit__(
         self,
         exc_type: Optional[type],

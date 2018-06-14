@@ -247,3 +247,5 @@ class TestCustomKeyPair:
                 node.run(args=['echo', '1'])
         finally:
             ec2.delete_key_pair(KeyName=key_name)
+
+# TODO test notimplementederror destroy

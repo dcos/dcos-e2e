@@ -326,6 +326,14 @@ class TestClusterFromNodes:
 
 class TestDestroyNode:
     """
-    Tests for creating a `Cluster` with the `Cluster.from_nodes` method.
+    Tests for destroying nodes.
     """
 
+    def test_destroy_node(self, cluster_backend: ClusterBackend) -> None:
+        """
+        It is possible to destroy a node in the cluster.
+        """
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            (agent, ) = cluster.agents
+            cluster.destroy_node(node=agent)
+            assert not cluster.agents
