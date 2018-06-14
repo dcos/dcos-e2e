@@ -170,17 +170,51 @@ class TestRunIntegrationTest:
             )
 
 
+def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
+    """
+    Write an RSA key pair for connecting to nodes via SSH.
+
+    Args:
+        public_key_path: Path to write public key to.
+        private_key_path: Path to a private key file to write.
+    """
+    rsa_key_pair = rsa.generate_private_key(
+        backend=default_backend(),
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    public_key = rsa_key_pair.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH,
+    )
+
+    private_key = rsa_key_pair.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+
+    public_key_path.write_bytes(data=public_key)
+    private_key_path.write_bytes(data=private_key)
+
+
 class TestCustomKeyPair:
     """
     XXX
     """
 
-    def test_custom_key_pair(self):
+    def test_custom_key_pair(self, tmpdir: local):
         """
         XXX
         """
         key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
-        private_key_path, public_key_path = generate_key_pair()
+        private_key_path = tmpdir.join('private_key')
+        public_key_path = tmpdir.join('public_key')
+        _write_key_pair(
+            public_key_path=public_key_path,
+            private_key_path=private_key_path,
+        )
         ec2 = boto3.client('ec2')
         ec2.import_key_pair(
             KeyName=key_name,
