@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.06.12.1.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.06.14.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -16,14 +16,19 @@ class Dcosdocker < Formula
     sha256 "9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49"
   end
 
+  resource "atomicwrites" do
+    url "https://files.pythonhosted.org/packages/a1/e1/2d9bc76838e6e6667fde5814aa25d7feb93d6fa471bf6816daac2596e8b2/atomicwrites-1.1.5.tar.gz"
+    sha256 "240831ea22da9ab882b551b31d4225591e5e447a68c5e188db5b89ca1d487585"
+  end
+
   resource "attrs" do
     url "https://files.pythonhosted.org/packages/e4/ac/a04671e118b57bee87dabca1e0f2d3bda816b7a551036012d0ca24190e71/attrs-18.1.0.tar.gz"
     sha256 "e0d0eb91441a3b53dab4d9b743eafc1ac44476296a2053b6ca3af0b139faf87b"
   end
 
   resource "azure-common" do
-    url "https://files.pythonhosted.org/packages/92/7d/fdbcfe60d76c07a1f55733ceb18b71087ef7f5cae7dc4b46e36e85636f0b/azure-common-1.1.11.zip"
-    sha256 "a60e37117684a168022af2c5e537448ad878d4ad8e45f147512eae2102f856af"
+    url "https://files.pythonhosted.org/packages/b0/e1/d8e553832dce1056e094f2d88f895376955534b9206e51f00ab3d52db034/azure-common-1.1.12.zip"
+    sha256 "3f2b0a0325b22df43ae840399a0b23c0256cb4f7deadb506a335bad516034b54"
   end
 
   resource "azure-mgmt-network" do
@@ -57,13 +62,18 @@ class Dcosdocker < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/29/12/b40f309ed4ff2f828f937a3d1a6165d76916c40ecefa0d2d68a9853d2dd6/boto3-1.7.21.tar.gz"
-    sha256 "320c10fd451c22dcf52123bc93719919ca2632f5d5b26bcf85fc31361a70b55d"
+    url "https://files.pythonhosted.org/packages/fd/2a/c400529c184026b37b26ba0c94950751139d4700943e28aba2e2b3cd6d59/boto3-1.7.37.tar.gz"
+    sha256 "a3091a1d1e050785152e9a62892c457b7cb2378cf0b28246fdab93cd7857b4e2"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/59/13/ae5023a89edd747b235723abba841eba865067412a7ba4ac7ff36128d469/botocore-1.10.21.tar.gz"
-    sha256 "be3e7067912342b4af144afd720d16cf5a0f24d773e202695dffaca96ab11d04"
+    url "https://files.pythonhosted.org/packages/1d/fd/df04f88c6bd2f96fe54fa0a132d10f5bfbd91e687b59090be3944a3ffbe0/botocore-1.10.37.tar.gz"
+    sha256 "a909051fc9fc9a84674951cb4f54973659a53827f4e9e989cdae2a6a107bee1c"
+  end
+
+  resource "cachetools" do
+    url "https://files.pythonhosted.org/packages/87/41/b3e00059f3c34b57a653d2120d213715abb4327b36fee22e59c1da977d25/cachetools-2.1.0.tar.gz"
+    sha256 "90f1d559512fc073483fe573ef5ceb39bf6ad3d39edc98dc55178a2b2b176fa3"
   end
 
   resource "Cerberus" do
@@ -132,8 +142,18 @@ class Dcosdocker < Formula
   end
 
   resource "google-api-python-client" do
-    url "https://files.pythonhosted.org/packages/e4/ae/67420c05e476c73ed871e5e01cffb4cff570810618422e20c0f80e543ea5/google-api-python-client-1.6.7.tar.gz"
-    sha256 "05583a386e323f428552419253765314a4b29828c3cee15be735f9ebfa5aebf2"
+    url "https://files.pythonhosted.org/packages/5e/48/68c64f848b7beaa49bfaa98c3436f34b40a244ab96e8afec3926ac024a19/google-api-python-client-1.7.3.tar.gz"
+    sha256 "e32d30563b90c4f88ff042d4d891b5e8ed1f6cdca0adab95e9c2ce2603087436"
+  end
+
+  resource "google-auth" do
+    url "https://files.pythonhosted.org/packages/a2/39/0c3d41aa96c1bdb9dcc4f646909b82e4c0ed9a1a398e869627a21a0563c4/google-auth-1.5.0.tar.gz"
+    sha256 "1745c9066f698eac3da99cef082914495fb71bc09597ba7626efbbb64c4acc57"
+  end
+
+  resource "google-auth-httplib2" do
+    url "https://files.pythonhosted.org/packages/e7/32/ac7f30b742276b4911a1439c5291abab1b797ccfd30bc923c5ad67892b13/google-auth-httplib2-0.0.3.tar.gz"
+    sha256 "098fade613c25b4527b2c08fa42d11f3c2037dda8995d86de0745228e965d445"
   end
 
   resource "httplib2" do
@@ -142,8 +162,8 @@ class Dcosdocker < Formula
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/f4/bd/0467d62790828c23c47fc1dfa1b1f052b24efdf5290f071c7a91d0d82fd3/idna-2.6.tar.gz"
-    sha256 "2c6a5de3089009e3da7c5dde64a141dbc8551d5b7f6cf4ed7c2568d0cc520a8f"
+    url "https://files.pythonhosted.org/packages/65/c4/80f97e9c9628f3cac9b98bfca0402ede54e0563b56482e3e6e45c43c4935/idna-2.7.tar.gz"
+    sha256 "684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16"
   end
 
   resource "isodate" do
@@ -177,8 +197,8 @@ class Dcosdocker < Formula
   end
 
   resource "msrestazure" do
-    url "https://files.pythonhosted.org/packages/63/96/c1d9225f8cdcb024a00d9ebeebb2422dd8150032d3c402449f1d1618ce4a/msrestazure-0.4.31.tar.gz"
-    sha256 "699f83cd19a098e41b723dbd9c4765ea0886ea15508f63e2709623883e4f754d"
+    url "https://files.pythonhosted.org/packages/0b/fb/fc7b158312a1d54323fe287161b5ed20d21c1d617fcbb220fca0b5351392/msrestazure-0.4.32.tar.gz"
+    sha256 "6a1704d93c2d9cb977db7e806977c8aa311d313d5244c31eabea91a58f2ec25c"
   end
 
   resource "oauth2client" do
@@ -237,8 +257,8 @@ class Dcosdocker < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/b2/85/24954df0ea8156599563b753de54383a5d702081093b7953334e4701b8d8/pytest-3.5.1.tar.gz"
-    sha256 "54713b26c97538db6ff0703a12b19aeaeb60b5e599de542e7fca0ec83b9038e8"
+    url "https://files.pythonhosted.org/packages/46/0e/d06d37d546bd181358eb3fb24b9c097609dae9a8cc0ed5756eefddd47841/pytest-3.6.1.tar.gz"
+    sha256 "32c49a69566aa7c333188149ad48b58ac11a426d5352ea3d8f6ce843f88199cb"
   end
 
   resource "python-dateutil" do
@@ -252,8 +272,8 @@ class Dcosdocker < Formula
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/b0/e1/eab4fc3752e3d240468a8c0b284607899d2fbfb236a56b7377a329aa8d09/requests-2.18.4.tar.gz"
-    sha256 "9c443e7324ba5b85070c4a818ade28bfabedf16ea10206da1132edaa6dda237e"
+    url "https://files.pythonhosted.org/packages/75/27/82da3fa4ea7a8c3526c48eaafe427352ff9c931633b917c2251826a43697/requests-2.19.0.tar.gz"
+    sha256 "cc408268d0e21589bcc2b2c248e42932b8c4d112f499c12c92e99e2178a6134c"
   end
 
   resource "requests-oauthlib" do
@@ -297,8 +317,8 @@ class Dcosdocker < Formula
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/ee/11/7c59620aceedcc1ef65e156cc5ce5a24ef87be4107c2b74458464e437a5d/urllib3-1.22.tar.gz"
-    sha256 "cc44da8e1145637334317feebd728bd869a35285b93cbb4cca2577da7e62db4f"
+    url "https://files.pythonhosted.org/packages/3c/d2/dc5471622bd200db1cd9319e02e71bc655e9ea27b8e0ce65fc69de0dac15/urllib3-1.23.tar.gz"
+    sha256 "a68ac5e15e76e7e5dd2b8f94007233e01effe3e50e8daddf69acfd81cb686baf"
   end
 
   resource "websocket-client" do

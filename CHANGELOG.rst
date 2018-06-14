@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.06.14.0
+------------
+
 - Add Ubuntu support to the Docker backend.
 - Add ``aws_key_pair`` parameter to the AWS backend.
 
