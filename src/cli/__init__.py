@@ -645,9 +645,6 @@ def destroy(cluster_id: str, transport: Transport) -> None:
         for container in containers:
             container.stop()
             container.remove(v=True)
-
-        client = docker_client()
-        client.volumes.prune()
     click.echo(cluster_id)
 
 
