@@ -5,7 +5,6 @@ Run tests and linters on Travis CI.
 import os
 import subprocess
 import sys
-from pathlib import Path
 
 import pytest
 
@@ -21,7 +20,7 @@ def run_test(test_pattern: str) -> None:
             '-vvv',
             '--exitfirst',
             '--capture',
-            'no'
+            'no',
             test_pattern,
             '--cov',
             'src/dcos_e2e',
@@ -35,6 +34,7 @@ def run_test(test_pattern: str) -> None:
 if __name__ == '__main__':
     CI_PATTERN = os.environ.get('CI_PATTERN')
     if CI_PATTERN:
+        download_artifacts(test_pattern=CI_PATTERN)
         run_test(test_pattern=CI_PATTERN)
     else:
         subprocess.check_call(['make', 'lint'])
