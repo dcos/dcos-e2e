@@ -8,7 +8,7 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
 from typing import Optional  # noqa: F401
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Set, Tuple, Type
 
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401

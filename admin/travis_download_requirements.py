@@ -65,6 +65,8 @@ PATTERNS = {
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported':
     (),
+    'tests/test_dcos_e2e/backends/aws/test_aws.py::TestCustomKeyPair':
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501

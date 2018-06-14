@@ -7,11 +7,18 @@ from pathlib import Path
 
 import boto3
 import pytest
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from passlib.hash import sha512_crypt
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e.node import Node
 
 
 class TestDefaults:
@@ -209,18 +216,19 @@ class TestCustomKeyPair:
         XXX
         """
         key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
-        private_key_path = tmpdir.join('private_key')
-        public_key_path = tmpdir.join('public_key')
+        private_key_path = Path(tmpdir.join('private_key'))
+        public_key_path = Path(tmpdir.join('public_key'))
         _write_key_pair(
             public_key_path=public_key_path,
             private_key_path=private_key_path,
         )
-        ec2 = boto3.client('ec2')
+        backend = AWS(aws_key_pair=(key_name, private_key_path))
+        region_name = backend.aws_region
+        ec2 = boto3.client('ec2', region_name=region_name)
         ec2.import_key_pair(
             KeyName=key_name,
             PublicKeyMaterial=public_key_path.read_bytes(),
         )
-        backend = AWS(aws_key_pair=(key_name, private_key_path))
 
         try:
             with Cluster(
