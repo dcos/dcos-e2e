@@ -549,6 +549,23 @@ class DockerCluster(ClusterManager):
 
         rmtree(path=str(self._path), ignore_errors=True)
 
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+        client = docker.from_env(version='auto')
+        for prefix in (
+            self._master_prefix,
+            self._agent_prefix,
+            self._public_agent_prefix,
+        ):
+            containers = client.containers.list(filters={'name': prefix})
+            for container in containers:
+                container.stop()
+                container.remove(v=True)
+
+        rmtree(path=str(self._path), ignore_errors=True)
+
     def _nodes(self, container_base_name: str) -> Set[Node]:
         """
         Args:

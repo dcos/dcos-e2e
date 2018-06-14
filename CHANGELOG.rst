@@ -9,11 +9,14 @@ Next
 2018.06.14.1
 ------------
 
+- Add ``Cluster.remove_node``.
+
 2018.06.14.0
 ------------
 
 - Add Ubuntu support to the Docker backend.
 - Add ``aws_key_pair`` parameter to the AWS backend.
+- Fix Linuxbrew installation on Ubuntu.
 
 2018.06.12.1
 ------------
