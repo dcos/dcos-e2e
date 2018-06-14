@@ -532,20 +532,26 @@ class DockerCluster(ClusterManager):
                     LOGGER.error(ex.stderr)
                     raise
 
+    def _destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(node.public_ip_address)
+        ]
+        container.stop()
+        container.remove(v=True)
+
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
-        client = docker.from_env(version='auto')
-        for prefix in (
-            self._master_prefix,
-            self._agent_prefix,
-            self._public_agent_prefix,
-        ):
-            containers = client.containers.list(filters={'name': prefix})
-            for container in containers:
-                container.stop()
-                container.remove(v=True)
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            self._destroy_node(node=node)
 
         rmtree(path=str(self._path), ignore_errors=True)
 
