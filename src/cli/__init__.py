@@ -47,7 +47,6 @@ from ._common import (
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
     ContainerInspectView,
-    docker_client,
     existing_cluster_ids,
 )
 from ._doctor_checks import (
