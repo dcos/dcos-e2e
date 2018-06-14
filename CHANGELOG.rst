@@ -7,6 +7,7 @@ Next
 ----
 
 - Add Ubuntu support to the Docker backend.
+- Add ``aws_key_pair`` parameter to the AWS backend.
 
 2018.06.12.1
 ------------

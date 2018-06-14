@@ -15,6 +15,7 @@ env:
   - TEST_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults
   - TEST_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest
   - TEST_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported
+  - TEST_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestCustomKeyPair
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise
   - TEST_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
