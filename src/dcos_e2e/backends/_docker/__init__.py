@@ -536,16 +536,8 @@ class DockerCluster(ClusterManager):
         """
         Destroy all nodes in the cluster.
         """
-        client = docker.from_env(version='auto')
-        for prefix in (
-            self._master_prefix,
-            self._agent_prefix,
-            self._public_agent_prefix,
-        ):
-            containers = client.containers.list(filters={'name': prefix})
-            for container in containers:
-                container.stop()
-                container.remove(v=True)
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            self.destroy_node(node=node)
 
         rmtree(path=str(self._path), ignore_errors=True)
 

@@ -322,3 +322,10 @@ class TestClusterFromNodes:
                     build_artifact=oss_artifact,
                     dcos_config=dcos_config,
                 )
+
+
+class TestDestroyNode:
+    """
+    Tests for creating a `Cluster` with the `Cluster.from_nodes` method.
+    """
+
