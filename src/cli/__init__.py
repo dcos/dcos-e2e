@@ -47,7 +47,6 @@ from ._common import (
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
     ContainerInspectView,
-    docker_client,
     existing_cluster_ids,
 )
 from ._doctor_checks import (
@@ -645,9 +644,6 @@ def destroy(cluster_id: str, transport: Transport) -> None:
         for container in containers:
             container.stop()
             container.remove(v=True)
-
-        client = docker_client()
-        client.volumes.prune()
     click.echo(cluster_id)
 
 
