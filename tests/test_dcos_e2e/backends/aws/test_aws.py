@@ -179,11 +179,13 @@ class TestCustomKeyPair:
         XXX
         """
 
-        private, public = generate_key_pair()
-        boto.upload_public_key(name='foo', contents=public.read_text())
-        backend = AWS(
-            aws_key_pair=('foo', private)
+        key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
+        private_key_path, public_key_path = generate_key_pair()
+        client.import_key_pair(
+            KeyName=key_name,
+            PublicKeyMaterial=public_key_path.read_bytes(),
         )
+        backend = AWS(aws_key_pair=(key_name, private_key_path))
 
         with Cluster(
             cluster_backend=backend,
@@ -195,7 +197,7 @@ class TestCustomKeyPair:
                 public_ip_address=master.public_ip_address,
                 private_ip_address=master.private_ip_address,
                 default_user=master.default_user,
-                ssh_key_path=private,
+                ssh_key_path=private_key_path,
             )
 
             node.run(args=['echo', '1'])
