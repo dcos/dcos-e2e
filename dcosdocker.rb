@@ -1,10 +1,11 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.06.14.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.06.14.1.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
+  depends_on "pkg-config"
 
   resource "adal" do
     url "https://files.pythonhosted.org/packages/74/51/f6513df23ded7b931076f8d679777b7a97b60027853023a1ef00047cf555/adal-1.0.1.tar.gz"
