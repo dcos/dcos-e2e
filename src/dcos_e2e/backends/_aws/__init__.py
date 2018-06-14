@@ -291,6 +291,15 @@ class AWSCluster(ClusterManager):
         )
         raise NotImplementedError(message)
 
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a nodes in the cluster. This is not implemented.
+
+        Raises:
+            NotImplementedError
+        """
+        raise NotImplementedError
+
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
