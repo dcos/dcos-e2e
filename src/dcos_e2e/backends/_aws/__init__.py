@@ -47,7 +47,8 @@ class AWS(ClusterBackend):
                 the identifier of an existing SSH public key on AWS KeyPairs
                 and the path is the local path to the corresponding private
                 key. The private key can then be used to connect to the
-                cluster.
+                cluster. If this is not given, a new key pair will be
+                generated.
 
         Attributes:
             admin_location: The IP address range from which the AWS nodes can
@@ -57,6 +58,11 @@ class AWS(ClusterBackend):
             linux_distribution: The Linux distribution to boot DC/OS on.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            aws_key_pair: An optional tuple of (name, path) where the name is
+                the identifier of an existing SSH public key on AWS KeyPairs
+                and the path is the local path to the corresponding private
+                key. The private key can then be used to connect to the
+                cluster.
 
         Raises:
             NotImplementedError: In case an unsupported Linux distribution has
@@ -84,6 +90,7 @@ class AWS(ClusterBackend):
         self.linux_distribution = linux_distribution
         self.aws_region = aws_region
         self.admin_location = admin_location
+        self.aws_key_pair = aws_key_pair
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
@@ -163,7 +170,6 @@ class AWSCluster(ClusterManager):
             # This is replaced later before the DC/OS installation.
             'installer_url': 'https://example.com',
             'instance_type': 'm4.large',
-            'key_helper': True,
             'launch_config_version': 1,
             'num_masters': masters,
             'num_private_agents': agents,
@@ -172,6 +178,13 @@ class AWSCluster(ClusterManager):
             'platform': 'aws',
             'provider': 'onprem',
         }
+
+        if cluster_backend.aws_key_pair is None:
+            launch_config['key_helper'] = True
+        else:
+            aws_key_name, local_key_path = cluster_backend.aws_key_pair
+            launch_config['ssh_private_key_filename'] = str(local_key_path)
+            launch_config['aws_key_name'] = aws_key_name
 
         # Work around ``ip_detect_public_filename`` being ignored.
         # https://jira.mesosphere.com/browse/DCOS-21960
