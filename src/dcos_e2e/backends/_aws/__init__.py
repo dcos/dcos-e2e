@@ -28,6 +28,7 @@ class AWS(ClusterBackend):
         admin_location: str = '0.0.0.0/0',
         linux_distribution: Distribution = Distribution.CENTOS_7,
         workspace_dir: Optional[Path] = None,
+        aws_key_pair: Optional[Tuple[str, Path]] = None,
     ) -> None:
         """
         Create a configuration for an AWS cluster backend.
@@ -42,6 +43,11 @@ class AWS(ClusterBackend):
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
+            aws_key_pair: An optional tuple of (name, path) where the name is
+                the identifier of an existing SSH public key on AWS KeyPairs
+                and the path is the local path to the corresponding private
+                key. The private key can then be used to connect to the
+                cluster.
 
         Attributes:
             admin_location: The IP address range from which the AWS nodes can
