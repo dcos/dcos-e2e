@@ -222,17 +222,20 @@ class TestCustomKeyPair:
         )
         backend = AWS(aws_key_pair=(key_name, private_key_path))
 
-        with Cluster(
-            cluster_backend=backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            node = Node(
-                public_ip_address=master.public_ip_address,
-                private_ip_address=master.private_ip_address,
-                default_user=master.default_user,
-                ssh_key_path=private_key_path,
-            )
+        try:
+            with Cluster(
+                cluster_backend=backend,
+                agents=0,
+                public_agents=0,
+            ) as cluster:
+                (master, ) = cluster.masters
+                node = Node(
+                    public_ip_address=master.public_ip_address,
+                    private_ip_address=master.private_ip_address,
+                    default_user=master.default_user,
+                    ssh_key_path=private_key_path,
+                )
 
-            node.run(args=['echo', '1'])
+                node.run(args=['echo', '1'])
+        finally:
+            ec2.delete_key_pair(KeyName=key_name)
