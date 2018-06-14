@@ -337,3 +337,5 @@ class TestDestroyNode:
             (agent, ) = cluster.agents
             cluster.destroy_node(node=agent)
             assert not cluster.agents
+            with pytest.raises(CalledProcessError):
+                agent.run(args=['echo', '1'])
