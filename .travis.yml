@@ -50,6 +50,6 @@ cache: pip
 before_script:
 - travis_retry make pull-images
 script:
-- admin/run_script.py
+- python admin/run_script.py
 after_success:
 - codecov
