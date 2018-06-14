@@ -5,6 +5,7 @@ Tests for the Docker backend.
 import uuid
 from pathlib import Path
 
+import boto3
 import pytest
 from passlib.hash import sha512_crypt
 
@@ -178,10 +179,10 @@ class TestCustomKeyPair:
         """
         XXX
         """
-
         key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
         private_key_path, public_key_path = generate_key_pair()
-        client.import_key_pair(
+        ec2 = boto3.client('ec2')
+        ec2.import_key_pair(
             KeyName=key_name,
             PublicKeyMaterial=public_key_path.read_bytes(),
         )
