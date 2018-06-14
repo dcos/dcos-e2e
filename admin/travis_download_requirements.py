@@ -116,7 +116,7 @@ PATTERNS = {
 }  # type: Dict[str, Tuple]
 
 
-def download_file(url: str, path: Path) -> None:
+def _download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
@@ -137,15 +137,10 @@ def download_file(url: str, path: Path) -> None:
                     file_descriptor.flush()  # type: ignore
 
 
-def main() -> None:
+def download_artifacts(test_pattern: str) -> None:
     """
     Download artifacts.
     """
-    pattern = os.environ['TEST_PATTERN']
-    downloads = PATTERNS[pattern]
+    downloads = PATTERNS[test_pattern]
     for url, path in downloads:
-        download_file(url=url, path=path)
-
-
-if __name__ == '__main__':
-    main()
+        _download_file(url=url, path=path)
