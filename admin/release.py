@@ -48,6 +48,7 @@ def get_homebrew_formula(version: str) -> str:
           head "https://github.com/dcos/dcos-e2e.git"
           homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
           depends_on "python3"
+          depends_on "pkg-config"
 
         {resource_stanzas}
 
