@@ -216,8 +216,8 @@ class TestCustomKeyPair:
         It is possible to pass a custom key pair to the AWS backend.
         """
         key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
-        private_key_path = Path(tmpdir.join('private_key'))
-        public_key_path = Path(tmpdir.join('public_key'))
+        private_key_path = Path(str(tmpdir.join('private_key')))
+        public_key_path = Path(str(tmpdir.join('public_key')))
         _write_key_pair(
             public_key_path=public_key_path,
             private_key_path=private_key_path,
