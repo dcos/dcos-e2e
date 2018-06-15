@@ -102,7 +102,7 @@ class Node:
         tempdir = Path(gettempdir())
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = tempdir / 'config.yaml'
-        config_file_path.write_text(data=config_yaml)
+        Path(config_file_path).write_text(data=config_yaml)
 
         remote_genconf_dir = 'genconf'
         remote_genconf_path = Path('/') / remote_genconf_dir

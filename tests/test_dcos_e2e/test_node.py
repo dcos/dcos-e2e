@@ -469,7 +469,11 @@ class TestRun:
 
 
 class TestAdvancedInstallationMethod:
-    def test_install_dcos(self, oss_artifact_url: str):
+    """
+    XXX
+    """
+
+    def test_install_dcos(self, oss_artifact_url: str) -> None:
         """
         XXX
         """
