@@ -48,20 +48,6 @@ from ._common import (
     ContainerInspectView,
     existing_cluster_ids,
 )
-from ._doctor_checks import (
-    CheckLevels,
-    check_1_9_sed,
-    check_docker_root_free_space,
-    check_docker_supports_mounts,
-    check_memory,
-    check_mount_tmp,
-    check_networking,
-    check_selinux,
-    check_ssh,
-    check_storage_driver,
-    check_tmp_free_space,
-    link_to_troubleshooting,
-)
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
@@ -73,6 +59,7 @@ from ._validators import (
     validate_variant,
     validate_volumes,
 )
+from .commands.doctor import doctor
 from .commands.mac_network import destroy_mac_network, setup_mac_network
 
 
@@ -1097,30 +1084,6 @@ def sync_code(
             master.run(args=['rm', tar_path])
 
 
-@dcos_docker.command('doctor')
-def doctor() -> None:
-    """
-    Diagnose common issues which stop DC/OS E2E from working correctly.
-    """
-    check_functions = [
-        check_1_9_sed,
-        check_docker_root_free_space,
-        check_docker_supports_mounts,
-        check_memory,
-        check_mount_tmp,
-        check_networking,
-        check_selinux,
-        check_ssh,
-        check_storage_driver,
-        check_tmp_free_space,
-    ]
-
-    highest_level = max(function() for function in check_functions)
-
-    link_to_troubleshooting()
-    if highest_level == CheckLevels.ERROR:
-        sys.exit(1)
-
-
 dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(destroy_mac_network)
+dcos_docker.add_command(doctor)
