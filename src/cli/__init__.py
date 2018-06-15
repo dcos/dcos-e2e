@@ -3,7 +3,6 @@ A CLI for controlling DC/OS clusters on Docker.
 """
 
 import io
-import json
 import logging
 import subprocess
 import sys
@@ -45,11 +44,10 @@ from ._common import (
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
-    ContainerInspectView,
     existing_cluster_ids,
 )
+from ._options import existing_cluster_id_option
 from ._validators import (
-    validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
     validate_environment_variable,
@@ -60,24 +58,8 @@ from ._validators import (
     validate_volumes,
 )
 from .commands.doctor import doctor
+from .commands.inspect_cluster import inspect_cluster
 from .commands.mac_network import destroy_mac_network, setup_mac_network
-
-
-def _existing_cluster_id_option(command: Callable[..., None],
-                                ) -> Callable[..., None]:
-    """
-    An option decorator for one Cluster ID.
-    """
-    function = click.option(
-        '-c',
-        '--cluster-id',
-        type=str,
-        callback=validate_cluster_exists,
-        default='default',
-        show_default=True,
-        help='The ID of the cluster to use.',
-    )(command)  # type: Callable[..., None]
-    return function
 
 
 def _node_transport_option(command: Callable[..., None],
@@ -609,7 +591,7 @@ def destroy_list(
 
 
 @dcos_docker.command('destroy')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @_node_transport_option
 def destroy(cluster_id: str, transport: Transport) -> None:
     """
@@ -633,7 +615,7 @@ def destroy(cluster_id: str, transport: Transport) -> None:
 
 
 @dcos_docker.command('wait')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @click.option(
     '--superuser-username',
     type=str,
@@ -702,77 +684,8 @@ def wait(
         cluster_containers.cluster.wait_for_dcos_oss(http_checks=http_checks)
 
 
-@dcos_docker.command('inspect')
-@_existing_cluster_id_option
-@click.option(
-    '--env',
-    is_flag=True,
-    help='Show details in an environment variable format to eval.',
-)
-def inspect_cluster(cluster_id: str, env: bool) -> None:
-    """
-    Show cluster details.
-
-    To quickly get environment variables to use with Docker tooling, use the
-    ``--env`` flag.
-
-    Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
-    ``docker exec -it $MASTER_0`` to enter the first master, for example.
-    """
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        # The transport here is not relevant as we do not make calls to the
-        # cluster.
-        transport=Transport.DOCKER_EXEC,
-    )
-    master = next(iter(cluster_containers.masters))
-    web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
-    ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
-
-    keys = {
-        'masters': cluster_containers.masters,
-        'agents': cluster_containers.agents,
-        'public_agents': cluster_containers.public_agents,
-    }
-
-    if env:
-        env_dict = {}
-        for _, containers in keys.items():
-            for container in containers:
-                inspect_view = ContainerInspectView(container=container)
-                inspect_data = inspect_view.to_dict()
-                reference = inspect_data['e2e_reference'].upper()
-                env_dict[reference] = container.id
-                node_ip_key = reference + '_IP'
-                node_ip = container.attrs['NetworkSettings']['IPAddress']
-                env_dict[node_ip_key] = node_ip
-        env_dict['WEB_UI'] = web_ui
-        env_dict['SSH_KEY'] = ssh_key
-        for key, value in env_dict.items():
-            click.echo('export {key}={value}'.format(key=key, value=value))
-        return
-
-    nodes = {
-        key: [
-            ContainerInspectView(container).to_dict()
-            for container in containers
-        ]
-        for key, containers in keys.items()
-    }
-
-    data = {
-        'Cluster ID': cluster_id,
-        'Web UI': web_ui,
-        'Nodes': nodes,
-        'SSH key': str(ssh_key),
-    }  # type: Dict[Any, Any]
-    click.echo(
-        json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
-    )
-
-
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @click.option(
     '--dcos-login-uname',
     type=str,
@@ -942,7 +855,7 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
 
 
 @dcos_docker.command('web')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 def web(cluster_id: str) -> None:
     """
     Open the browser at the web UI.
@@ -962,7 +875,7 @@ def web(cluster_id: str) -> None:
 
 
 @dcos_docker.command('sync')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @click.argument(
     'dcos_checkout_dir',
     type=click.Path(exists=True),
@@ -1087,3 +1000,4 @@ def sync_code(
 dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
+dcos_docker.add_command(inspect_cluster)
