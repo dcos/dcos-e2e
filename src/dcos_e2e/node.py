@@ -92,19 +92,29 @@ class Node:
         build_artifact: str,
         dcos_config: Dict[str, Any],
         role: str,
+        user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
     ) -> None:
         """
-        XXX
+        TODO
+
+        Args:
+            build_artifact: TODO
+            dcos_config: TODO
+            role: TODO
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        # TODO use default transport
-        # TODO log output live option
         node_build_artifact = '/dcos_generate_config.sh'
         self.run(
             args=['curl', '-f', build_artifact, '-o', node_build_artifact],
             log_output_live=log_output_live,
             transport=transport,
+            user=user,
         )
 
         tempdir = Path(gettempdir())
@@ -125,6 +135,7 @@ class Node:
             local_path=config_file_path,
             remote_path=remote_genconf_path / 'config.yaml',
             transport=transport,
+            user=user,
         )
 
         genconf_args = [
@@ -143,12 +154,14 @@ class Node:
             log_output_live=True,
             shell=True,
             transport=transport,
+            user=user,
         )
 
         self.run(
             args=['rm', node_build_artifact],
             log_output_live=log_output_live,
             transport=transport,
+            user=user,
         )
 
         setup_args = [
@@ -165,6 +178,7 @@ class Node:
             args=setup_args, shell=True,
             log_output_live=log_output_live,
             transport=transport,
+            user=user,
         )
 
     def run(
