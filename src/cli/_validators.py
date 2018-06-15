@@ -225,59 +225,6 @@ def validate_volumes(
     return mounts
 
 
-def validate_ovpn_file_does_not_exist(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> Path:
-    """
-    If the given file path exists already, show an error message explaining how
-    to use the file as an OpenVPN configuration.
-    """
-    force = bool('force' in ctx.params)
-    path = Path(value).expanduser()
-    if path.is_dir():
-        path = path / 'docker-for-mac.ovpn'
-
-    if path.suffix != '.ovpn':
-        message = '"{value}" does not have the suffix ".ovpn".'.format(
-            value=value,
-        )
-        raise click.BadParameter(message=message)
-
-    for _ in (ctx, param):
-        pass
-
-    profile_name = path.name[:-len('.ovpn')]
-
-    message = (
-        '"{value}" already exists so no new OpenVPN configuration was '
-        'created.'
-        '\n'
-        '\n'
-        'To use {value}:'
-        '\n'
-        '1. Install an OpenVPN client such as Tunnelblick '
-        '(https://tunnelblick.net/downloads.html) '
-        'or Shimo (https://www.shimovpn.com).'
-        '\n'
-        '2. Run "open {value}".'
-        '\n'
-        '3. In your OpenVPN client, connect to the new "{profile_name}" '
-        'profile.'
-        '\n'
-        '4. Run "dcos-docker doctor" to confirm that everything is working.'
-    ).format(
-        value=value,
-        profile_name=profile_name,
-    )
-
-    if path.exists() and not force:
-        raise click.BadParameter(message=message)
-
-    return path
-
-
 def validate_node_reference(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
