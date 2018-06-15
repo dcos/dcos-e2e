@@ -12,15 +12,7 @@ import uuid
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
-from typing import (  # noqa: F401
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import click
 import click_spinner
