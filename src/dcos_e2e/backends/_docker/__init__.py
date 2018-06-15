@@ -267,12 +267,6 @@ class DockerCluster(ClusterManager):
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
 
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_dst = Path('/genconf/ip-detect')
-        files_to_copy_to_installer.append((ip_detect_src, ip_detect_dst))
-
         public_key_path = ssh_dir / 'id_rsa.pub'
         _write_key_pair(
             public_key_path=public_key_path,
@@ -444,6 +438,11 @@ class DockerCluster(ClusterManager):
         def ip_list(nodes: Set[Node]) -> List[str]:
             return list(map(lambda node: str(node.public_ip_address), nodes))
 
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        ip_detect_src = current_parent / 'resources' / 'ip-detect'
+        ip_detect_contents = Path(ip_detect_src).read_text()
+
         config = {
             'agent_list': ip_list(nodes=self.agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
@@ -463,6 +462,10 @@ class DockerCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
+            # This is not a documented option.
+            # Users are instructed to instead provide a filename with
+            # 'ip_detect_contents_filename'.
+            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
         return config
