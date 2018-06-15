@@ -443,7 +443,6 @@ class DockerCluster(ClusterManager):
         ip_detect_src = current_parent / 'resources' / 'ip-detect'
         ip_detect_contents = ip_detect_src.read_text()
 
-
         config = {
             'agent_list': ip_list(nodes=self.agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
@@ -463,6 +462,9 @@ class DockerCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
+            # This is not a documented option.
+            # Users are instructed to instead provide a filename with
+            # 'ip_detect_contents_filename'.
             'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
