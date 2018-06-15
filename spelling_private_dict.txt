@@ -42,6 +42,7 @@ ip
 journalctl
 keyring
 lastResort
+linters
 linting
 linux
 linuxbrew

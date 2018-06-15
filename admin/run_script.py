@@ -1,16 +1,15 @@
 """
-Download requirements for a test pattern.
-
-This separates the download step from the test step. We could download all
-artifacts for all tests, but in the interest of speed, we only download what we
-need.
+Run tests and linters on Travis CI.
 """
 
 import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Dict, Tuple  # noqa: F401
 
 import click
+import pytest
 import requests
 
 OSS_PATTERN = (
@@ -118,7 +117,7 @@ PATTERNS = {
 }  # type: Dict[str, Tuple]
 
 
-def download_file(url: str, path: Path) -> None:
+def _download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
@@ -139,15 +138,41 @@ def download_file(url: str, path: Path) -> None:
                     file_descriptor.flush()  # type: ignore
 
 
-def main() -> None:
+def download_artifacts(test_pattern: str) -> None:
     """
     Download artifacts.
     """
-    pattern = os.environ['TEST_PATTERN']
-    downloads = PATTERNS[pattern]
+    downloads = PATTERNS[test_pattern]
     for url, path in downloads:
-        download_file(url=url, path=path)
+        _download_file(url=url, path=path)
+
+
+def run_test(test_pattern: str) -> None:
+    """
+    Run pytest with a given test pattern.
+    """
+    result = pytest.main(
+        [
+            '-vvv',
+            '--exitfirst',
+            '--capture',
+            'no',
+            test_pattern,
+            '--cov',
+            'src/dcos_e2e',
+            '--cov',
+            'tests',
+        ],
+    )
+    sys.exit(result)
 
 
 if __name__ == '__main__':
-    main()
+    CI_PATTERN = os.environ.get('CI_PATTERN')
+    if CI_PATTERN:
+        download_artifacts(test_pattern=CI_PATTERN)
+        run_test(test_pattern=CI_PATTERN)
+    else:
+        subprocess.check_call(['make', 'lint'])
+        subprocess.check_call(['dcos-docker', 'doctor'])
+        subprocess.check_call(['make', 'docs'])
