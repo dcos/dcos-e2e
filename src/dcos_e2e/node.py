@@ -93,6 +93,9 @@ class Node:
         dcos_config: Dict[str, Any],
         role: str,
     ) -> None:
+        # TODO Transport option
+        # TODO use default transport
+        # TODO log output live option
         node_build_artifact = '/dcos_generate_config.sh'
         self.run(
             args=['curl', '-f', build_artifact, '-o', node_build_artifact],
@@ -112,6 +115,9 @@ class Node:
         )
 
         genconf_args = [
+            'cd',
+            '/',
+            '&&',
             'bash',
             node_build_artifact,
             '--offline',
@@ -119,8 +125,10 @@ class Node:
             '--genconf',
         ]
 
-        import pdb; pdb.set_trace()
-        self.run(args=genconf_args, log_output_live=True)
+        self.run(
+            args=genconf_args,
+            log_output_live=True,
+        )
 
         self.run(args=['rm', node_build_artifact])
 
