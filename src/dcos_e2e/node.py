@@ -147,7 +147,7 @@ class Node:
             '--no-block-dcos-setup',
             role,
         ]
-        self.run(args=[setup_args], shell=True)
+        self.run(args=setup_args, shell=True)
 
     def run(
         self,
