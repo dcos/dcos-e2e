@@ -93,10 +93,9 @@ class Node:
         dcos_config: Dict[str, Any],
         role: str,
     ) -> None:
-        output_file = 'dcos_generate_config.sh'
+        node_build_artifact = '/dcos_generate_config.sh'
         self.run(
-            args=['curl', '-f', build_artifact, '-o', output_file],
-            log_output_live=True,
+            args=['curl', '-f', build_artifact, '-o', node_build_artifact],
         )
 
         tempdir = Path(gettempdir())
@@ -111,6 +110,19 @@ class Node:
             local_path=config_file_path,
             remote_path=remote_genconf_path / 'config.yaml',
         )
+
+        genconf_args = [
+            'bash',
+            node_build_artifact,
+            '--offline',
+            '-v',
+            '--genconf',
+        ]
+
+        import pdb; pdb.set_trace()
+        self.run(args=genconf_args, log_output_live=True)
+
+        self.run(args=['rm', node_build_artifact])
 
     def run(
         self,

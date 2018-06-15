@@ -489,3 +489,4 @@ class TestAdvancedInstallationMethod:
                     role='master',
                 )
             cluster.wait_for_dcos_oss()
+
