@@ -127,6 +127,16 @@ class ExistingClusterManager(ClusterManager):
         """
         return self._public_agents
 
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroying an existing cluster node is the responsibility of the
+        caller.
+
+        Raises:
+            NotImplementedError: When called.
+        """
+        raise NotImplementedError
+
     def destroy(self) -> None:
         """
         Destroying an existing cluster is the responsibility of the caller.
