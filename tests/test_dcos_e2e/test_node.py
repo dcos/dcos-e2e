@@ -470,12 +470,12 @@ class TestRun:
 
 class TestAdvancedInstallationMethod:
     """
-    XXX
+    Test installing DC/OS on a node.
     """
 
     def test_install_dcos(self, oss_artifact_url: str) -> None:
         """
-        XXX
+        It is possible to install DC/OS on a node.
         """
         with Cluster(
             cluster_backend=Docker(),
