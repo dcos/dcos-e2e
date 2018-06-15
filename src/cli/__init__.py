@@ -50,6 +50,7 @@ from ._validators import (
 )
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
+from .commands.list_clusters import list_clusters
 from .commands.mac_network import destroy_mac_network, setup_mac_network
 
 
@@ -515,15 +516,6 @@ def create(
     click.echo(started_message, err=True)
 
 
-@dcos_docker.command('list')
-def list_clusters() -> None:
-    """
-    List all clusters.
-    """
-    for cluster_id in existing_cluster_ids():
-        click.echo(cluster_id)
-
-
 @dcos_docker.command('destroy-list')
 @click.argument(
     'cluster_ids',
@@ -968,3 +960,4 @@ dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
 dcos_docker.add_command(inspect_cluster)
+dcos_docker.add_command(list_clusters)
