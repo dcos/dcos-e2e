@@ -249,7 +249,7 @@ class TestClusterFromNodes:
     def test_cluster_from_nodes(self, cluster_backend: ClusterBackend) -> None:
         """
         It is possible to create a cluster from existing nodes, but not destroy
-        it.
+        it, or any nodes in it.
         """
         cluster = Cluster(
             cluster_backend=cluster_backend,
@@ -283,6 +283,9 @@ class TestClusterFromNodes:
 
         with pytest.raises(NotImplementedError):
             duplicate_cluster.destroy()
+
+        with pytest.raises(NotImplementedError):
+            duplicate_cluster.destroy_node(node=duplicate_master)
 
         cluster.destroy()
 
@@ -322,3 +325,20 @@ class TestClusterFromNodes:
                     build_artifact=oss_artifact,
                     dcos_config=dcos_config,
                 )
+
+
+class TestDestroyNode:
+    """
+    Tests for destroying nodes.
+    """
+
+    def test_destroy_node(self, cluster_backend: ClusterBackend) -> None:
+        """
+        It is possible to destroy a node in the cluster.
+        """
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            (agent, ) = cluster.agents
+            cluster.destroy_node(node=agent)
+            assert not cluster.agents
+            with pytest.raises(CalledProcessError):
+                agent.run(args=['echo', '1'])

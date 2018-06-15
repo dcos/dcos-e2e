@@ -71,6 +71,12 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+
+    @abc.abstractmethod
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.

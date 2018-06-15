@@ -120,6 +120,15 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
+    def test_destroy_node(self):
+        """
+        Destroying a particular node is not supported on the AWS backend.
+        """
+        with Cluster(cluster_backend=AWS()) as cluster:
+            (agent, ) = cluster.agents
+            with pytest.raises(NotImplementedError):
+                cluster.destroy_node(node=agent)
+
 
 class TestRunIntegrationTest:
     """

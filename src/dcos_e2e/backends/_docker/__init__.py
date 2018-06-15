@@ -532,7 +532,7 @@ class DockerCluster(ClusterManager):
                     LOGGER.error(ex.stderr)
                     raise
 
-    def _destroy_node(self, node: Node) -> None:
+    def destroy_node(self, node: Node) -> None:
         """
         Destroy a node in the cluster.
         """
@@ -551,7 +551,7 @@ class DockerCluster(ClusterManager):
         Destroy all nodes in the cluster.
         """
         for node in {*self.masters, *self.agents, *self.public_agents}:
-            self._destroy_node(node=node)
+            self.destroy_node(node=node)
 
         rmtree(path=str(self._path), ignore_errors=True)
 
