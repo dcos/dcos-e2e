@@ -7,7 +7,10 @@ import subprocess
 from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional
+
+import yaml
 
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
 
@@ -83,6 +86,31 @@ class Node:
         transport_cls = transport_dict[transport]
         # See https://github.com/python/mypy/issues/5135.
         return transport_cls()  # type: ignore
+
+    def install_dcos(
+        self,
+        build_artifact: str,
+        dcos_config: Dict[str, Any],
+        role: str,
+    ) -> None:
+        output_file = 'dcos_generate_config.sh'
+        self.run(
+            args=['curl', '-f', build_artifact, '-o', output_file],
+            log_output_live=True,
+        )
+
+        tempdir = Path(gettempdir())
+        config_yaml = yaml.dump(data=dcos_config)
+        config_file_path = tempdir / 'config.yaml'
+        config_file_path.write_text(data=config_yaml)
+
+        remote_genconf_dir = 'genconf'
+        remote_genconf_path = Path('/') / remote_genconf_dir
+
+        self.send_file(
+            local_path=config_file_path,
+            remote_path=remote_genconf_path / 'config.yaml',
+        )
 
     def run(
         self,

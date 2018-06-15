@@ -469,15 +469,14 @@ class TestRun:
 
 
 class TestAdvancedInstallationMethod:
-
-    def test_install_dcos(self):
+    def test_install_dcos(self, oss_artifact_url: str):
         """
         XXX
         """
         with Cluster(
-                cluster_backend=Docker(),
-                agents=0,
-                public_agents=0,
+            cluster_backend=Docker(),
+            agents=0,
+            public_agents=0,
         ) as cluster:
             for node in cluster.masters:
                 node.install_dcos(
