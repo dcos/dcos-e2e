@@ -2,6 +2,8 @@ from typing import Callable, Optional, Union
 
 import click
 
+from cli._common import existing_cluster_ids
+
 
 def _validate_cluster_exists(
     ctx: click.core.Context,
