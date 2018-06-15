@@ -46,10 +46,11 @@ from ._common import (
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
     ContainerInspectView,
+    existing_cluster_id_option,
     existing_cluster_ids,
 )
+from ._options import existing_cluster_id_option
 from ._validators import (
-    validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
     validate_environment_variable,
@@ -61,23 +62,6 @@ from ._validators import (
 )
 from .commands.doctor import doctor
 from .commands.mac_network import destroy_mac_network, setup_mac_network
-
-
-def _existing_cluster_id_option(command: Callable[..., None],
-                                ) -> Callable[..., None]:
-    """
-    An option decorator for one Cluster ID.
-    """
-    function = click.option(
-        '-c',
-        '--cluster-id',
-        type=str,
-        callback=validate_cluster_exists,
-        default='default',
-        show_default=True,
-        help='The ID of the cluster to use.',
-    )(command)  # type: Callable[..., None]
-    return function
 
 
 def _node_transport_option(command: Callable[..., None],
@@ -609,7 +593,7 @@ def destroy_list(
 
 
 @dcos_docker.command('destroy')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @_node_transport_option
 def destroy(cluster_id: str, transport: Transport) -> None:
     """
@@ -633,7 +617,7 @@ def destroy(cluster_id: str, transport: Transport) -> None:
 
 
 @dcos_docker.command('wait')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @click.option(
     '--superuser-username',
     type=str,
@@ -703,7 +687,7 @@ def wait(
 
 
 @dcos_docker.command('inspect')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @click.option(
     '--env',
     is_flag=True,
@@ -772,7 +756,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
 
 
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @click.option(
     '--dcos-login-uname',
     type=str,
@@ -942,7 +926,7 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
 
 
 @dcos_docker.command('web')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 def web(cluster_id: str) -> None:
     """
     Open the browser at the web UI.
@@ -962,7 +946,7 @@ def web(cluster_id: str) -> None:
 
 
 @dcos_docker.command('sync')
-@_existing_cluster_id_option
+@existing_cluster_id_option
 @click.argument(
     'dcos_checkout_dir',
     type=click.Path(exists=True),
