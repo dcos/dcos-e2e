@@ -466,3 +466,23 @@ class TestRun:
 
         expected_message = '`log_output_live` and `tty` cannot both be `True`.'
         assert str(excinfo.value) == expected_message
+
+
+class TestAdvancedInstallationMethod:
+
+    def test_install_dcos(self):
+        """
+        XXX
+        """
+        with Cluster(
+                cluster_backend=Docker(),
+                agents=0,
+                public_agents=0,
+        ) as cluster:
+            for node in cluster.masters:
+                node.install_dcos(
+                    build_artifact=oss_artifact_url,
+                    dcos_config=cluster.base_config,
+                    role='master',
+                )
+            cluster.wait_for_dcos_oss()
