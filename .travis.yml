@@ -27,12 +27,13 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
-  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters::test_two_clusters
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestDestroyNode
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
-  - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest
+  - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled
-  - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli
+  - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test110::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111::test_enterprise
@@ -40,7 +41,6 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_node.py
->>>>>>> origin/master
 before_install:
 - sudo modprobe aufs
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
