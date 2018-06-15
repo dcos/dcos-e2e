@@ -101,7 +101,12 @@ class Node:
             args=['curl', '-f', build_artifact, '-o', node_build_artifact],
         )
 
+        # TODO add bootstrap URL location as /genconf/serve
         tempdir = Path(gettempdir())
+        dcos_config = {
+            **dcos_config,
+            **{'bootstrap_url': 'file:///genconf/serve'}
+        }
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = tempdir / 'config.yaml'
         Path(config_file_path).write_text(data=config_yaml)
@@ -128,9 +133,21 @@ class Node:
         self.run(
             args=genconf_args,
             log_output_live=True,
+            shell=True,
         )
 
         self.run(args=['rm', node_build_artifact])
+
+        setup_args = [
+            'cd',
+            '/',
+            '&&',
+            'bash',
+            'genconf/serve/dcos_install.sh',
+            '--no-block-dcos-setup',
+            role,
+        ]
+        self.run(args=[setup_args], shell=True)
 
     def run(
         self,
