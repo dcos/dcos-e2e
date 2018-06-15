@@ -25,7 +25,6 @@ from typing import (  # noqa: F401
 
 import click
 import click_spinner
-import docker
 import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -63,19 +62,18 @@ from ._doctor_checks import (
     check_tmp_free_space,
     link_to_troubleshooting,
 )
-from ._mac_network import create_mac_network, destroy_mac_network_containers
 from ._validators import (
     validate_cluster_exists,
     validate_cluster_id,
     validate_dcos_configuration,
     validate_environment_variable,
     validate_node_reference,
-    validate_ovpn_file_does_not_exist,
     validate_path_is_directory,
     validate_path_pair,
     validate_variant,
     validate_volumes,
 )
+from .commands.mac_network import destroy_mac_network, setup_mac_network
 
 
 def _existing_cluster_id_option(command: Callable[..., None],
@@ -1124,77 +1122,5 @@ def doctor() -> None:
         sys.exit(1)
 
 
-@click.option(
-    '--configuration-dst',
-    type=click.Path(exists=False),
-    default='~/Documents/docker-for-mac.ovpn',
-    callback=validate_ovpn_file_does_not_exist,
-    show_default=True,
-    help='The location to create an OpenVPN configuration file.',
-)
-@click.option(
-    '--force',
-    is_flag=True,
-    help=(
-        'Overwrite any files and destroy conflicting containers from previous '
-        'uses of this command.'
-    ),
-)
-@dcos_docker.command('setup-mac-network')
-def setup_mac_network(configuration_dst: Path, force: bool) -> None:
-    """
-    Set up a network to connect to nodes on macOS.
-
-    This creates an OpenVPN configuration file and describes how to use it.
-    """
-    if force:
-        destroy_mac_network_containers()
-
-    try:
-        with click_spinner.spinner():
-            create_mac_network(configuration_dst=configuration_dst)
-    except docker.errors.APIError as exc:
-        if exc.status_code == 409:
-            message = (
-                'Error: A DC/OS E2E network container is already running. '
-                'Use --force to destroy conflicting containers.'
-            )
-            click.echo(message, err=True)
-            sys.exit(1)
-        raise
-
-    message = (
-        '1. Install an OpenVPN client such as Tunnelblick '
-        '(https://tunnelblick.net/downloads.html) '
-        'or Shimo (https://www.shimovpn.com).'
-        '\n'
-        '2. Run "open {configuration_dst}".'
-        '\n'
-        '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
-        'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
-        '\n'
-        '4. In your OpenVPN client, connect to the new "docker-for-mac" '
-        'profile.'
-        '\n'
-        '5. Run "dcos-docker doctor" to confirm that everything is working.'
-    ).format(configuration_dst=configuration_dst)
-
-    click.echo(message=message)
-
-
-@dcos_docker.command('destroy-mac-network')
-def destroy_mac_network() -> None:
-    """
-    Destroy containers created by "dcos-docker setup-mac-network".
-    """
-    destroy_mac_network_containers()
-    message = (
-        'The containers used to allow access to Docker for Mac\'s internal '
-        'networks have been removed.'
-        '\n'
-        '\n'
-        'It may be the case that the "docker-for-mac" profile still exists in '
-        'your OpenVPN client.'
-    )
-
-    click.echo(message=message)
+dcos_docker.add_command(setup_mac_network)
+dcos_docker.add_command(destroy_mac_network)
