@@ -92,20 +92,27 @@ class Node:
         build_artifact: str,
         dcos_config: Dict[str, Any],
         role: str,
+        log_output_live: bool = False,
+        transport: Optional[Transport] = None,
     ) -> None:
-        # TODO Transport option
+        """
+        XXX
+        """
         # TODO use default transport
         # TODO log output live option
         node_build_artifact = '/dcos_generate_config.sh'
         self.run(
             args=['curl', '-f', build_artifact, '-o', node_build_artifact],
+            log_output_live=log_output_live,
+            transport=transport,
         )
 
-        # TODO add bootstrap URL location as /genconf/serve
         tempdir = Path(gettempdir())
         dcos_config = {
             **dcos_config,
-            **{'bootstrap_url': 'file:///genconf/serve'}
+            **{
+                'bootstrap_url': 'file:///genconf/serve'
+            }
         }
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = tempdir / 'config.yaml'
@@ -117,6 +124,7 @@ class Node:
         self.send_file(
             local_path=config_file_path,
             remote_path=remote_genconf_path / 'config.yaml',
+            transport=transport,
         )
 
         genconf_args = [
@@ -134,9 +142,14 @@ class Node:
             args=genconf_args,
             log_output_live=True,
             shell=True,
+            transport=transport,
         )
 
-        self.run(args=['rm', node_build_artifact])
+        self.run(
+            args=['rm', node_build_artifact],
+            log_output_live=log_output_live,
+            transport=transport,
+        )
 
         setup_args = [
             'cd',
@@ -147,7 +160,12 @@ class Node:
             '--no-block-dcos-setup',
             role,
         ]
-        self.run(args=setup_args, shell=True)
+
+        self.run(
+            args=setup_args, shell=True,
+            log_output_live=log_output_live,
+            transport=transport,
+        )
 
     def run(
         self,
