@@ -3,6 +3,7 @@ Tools for inspecting existing clusters.
 """
 
 import json
+from typing import Any, Dict  # noqa: F401
 
 import click
 

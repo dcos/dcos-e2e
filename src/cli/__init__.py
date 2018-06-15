@@ -12,15 +12,7 @@ import uuid
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
-from typing import (  # noqa: F401
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import click
 import click_spinner
@@ -40,13 +32,12 @@ from ._common import (
     DOCKER_STORAGE_DRIVERS,
     DOCKER_VERSIONS,
     LINUX_DISTRIBUTIONS,
-    TRANSPORTS,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
     existing_cluster_ids,
 )
-from ._options import existing_cluster_id_option
+from ._options import existing_cluster_id_option, node_transport_option
 from ._validators import (
     validate_cluster_id,
     validate_dcos_configuration,
@@ -60,30 +51,6 @@ from ._validators import (
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
 from .commands.mac_network import destroy_mac_network, setup_mac_network
-
-
-def _node_transport_option(command: Callable[..., None],
-                           ) -> Callable[..., None]:
-    """
-    An option decorator for node transport options.
-    """
-    function = click.option(
-        '--transport',
-        type=click.Choice(sorted(TRANSPORTS.keys())),
-        callback=lambda ctx, param, value: TRANSPORTS[str(value)],
-        default='ssh',
-        show_default=True,
-        envvar='DCOS_DOCKER_TRANSPORT',
-        help=(
-            'The communication transport to use. '
-            'On macOS the SSH transport requires IP routing to be set up. '
-            'See "dcos-docker setup-mac-network".'
-            'It also requires the "ssh" command to be available. '
-            'This can be provided by setting the `DCOS_DOCKER_TRANSPORT` '
-            'environment variable.'
-        ),
-    )(command)  # type: Callable[..., None]
-    return function
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -353,7 +320,7 @@ def dcos_docker(verbose: None) -> None:
         'and so the cluster may not be fully ready.'
     ),
 )
-@_node_transport_option
+@node_transport_option
 @click.pass_context
 def create(
     ctx: click.core.Context,
@@ -563,7 +530,7 @@ def list_clusters() -> None:
     nargs=-1,
     type=str,
 )
-@_node_transport_option
+@node_transport_option
 @click.pass_context
 def destroy_list(
     ctx: click.core.Context,
@@ -592,7 +559,7 @@ def destroy_list(
 
 @dcos_docker.command('destroy')
 @existing_cluster_id_option
-@_node_transport_option
+@node_transport_option
 def destroy(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.
@@ -647,7 +614,7 @@ def destroy(cluster_id: str, transport: Transport) -> None:
         'For example this is useful on macOS without a VPN set up.'
     ),
 )
-@_node_transport_option
+@node_transport_option
 def wait(
     cluster_id: str,
     superuser_username: str,
@@ -742,7 +709,7 @@ def wait(
     multiple=True,
     help='Set environment variables in the format "<KEY>=<VALUE>"',
 )
-@_node_transport_option
+@node_transport_option
 @click.pass_context
 def run(
     ctx: click.core.Context,
@@ -882,7 +849,7 @@ def web(cluster_id: str) -> None:
     envvar='DCOS_CHECKOUT_DIR',
     default='.',
 )
-@_node_transport_option
+@node_transport_option
 def sync_code(
     cluster_id: str,
     dcos_checkout_dir: str,
