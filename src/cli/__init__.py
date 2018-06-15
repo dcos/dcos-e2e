@@ -4,6 +4,7 @@ A CLI for controlling DC/OS clusters on Docker.
 
 import io
 import json
+import logging
 import subprocess
 import sys
 import tarfile
@@ -21,8 +22,6 @@ from typing import (  # noqa: F401
     Tuple,
     Union,
 )
-
-import logging
 
 import click
 import click_spinner
@@ -76,6 +75,7 @@ from ._validators import (
 )
 from .commands.mac_network import destroy_mac_network, setup_mac_network
 
+
 def _set_logging(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
@@ -115,6 +115,7 @@ def dcos_docker(verbose: None) -> None:
     # We "use" variables to satisfy linting tools.
     for _ in (verbose, ):
         pass
+
 
 def _existing_cluster_id_option(command: Callable[..., None],
                                 ) -> Callable[..., None]:
