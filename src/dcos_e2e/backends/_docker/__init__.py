@@ -441,7 +441,7 @@ class DockerCluster(ClusterManager):
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
         ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_contents = ip_detect_src.read_text()
+        ip_detect_contents = Path(ip_detect_src).read_text()
 
         config = {
             'agent_list': ip_list(nodes=self.agents),
