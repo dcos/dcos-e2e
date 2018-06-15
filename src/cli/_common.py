@@ -36,11 +36,6 @@ DOCKER_STORAGE_DRIVERS = {
     'overlay2': DockerStorageDriver.OVERLAY_2,
 }
 
-TRANSPORTS = {
-    'ssh': Transport.SSH,
-    'docker-exec': Transport.DOCKER_EXEC,
-}
-
 CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 VARIANT_LABEL_KEY = 'dcos_e2e.variant'
