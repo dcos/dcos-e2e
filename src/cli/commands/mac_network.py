@@ -26,7 +26,6 @@ import click_spinner
 import docker
 
 from cli._common import docker_client
-from cli.cli_main import dcos_docker
 
 # We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
 # with "make clean".
@@ -199,7 +198,7 @@ def _destroy_mac_network_containers() -> None:
         'uses of this command.'
     ),
 )
-@dcos_docker.command('setup-mac-network')
+@click.command('setup-mac-network')
 def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     """
     Set up a network to connect to nodes on macOS.
@@ -241,7 +240,7 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     click.echo(message=message)
 
 
-@dcos_docker.command('destroy-mac-network')
+@click.command('destroy-mac-network')
 def destroy_mac_network() -> None:
     """
     Destroy containers created by "dcos-docker setup-mac-network".
