@@ -1,38 +1,8 @@
-import click
 import logging
-import io
-import json
-import logging
-import subprocess
-import sys
-import tarfile
-import tempfile
-import uuid
-from pathlib import Path
-from shutil import rmtree
-from subprocess import CalledProcessError
-from typing import (  # noqa: F401
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
+from typing import Optional, Union
 
 import click
-import click_spinner
-import urllib3
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
-from docker.types import Mount
-from passlib.hash import sha512_crypt
 
-from dcos_e2e.backends import Docker
-from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node, Transport
 
 def _set_logging(
     ctx: click.core.Context,

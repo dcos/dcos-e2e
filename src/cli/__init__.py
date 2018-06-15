@@ -4,7 +4,6 @@ A CLI for controlling DC/OS clusters on Docker.
 
 import io
 import json
-import logging
 import subprocess
 import sys
 import tarfile
@@ -32,6 +31,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
+from cli.cli_main import dcos_docker
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node, Transport
@@ -74,7 +74,6 @@ from ._validators import (
     validate_volumes,
 )
 from .commands.mac_network import destroy_mac_network, setup_mac_network
-from cli.cli_main import dcos_docker
 
 
 def _existing_cluster_id_option(command: Callable[..., None],
@@ -145,8 +144,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
-
-
 
 
 @dcos_docker.command('create')

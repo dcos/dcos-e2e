@@ -25,8 +25,8 @@ import click
 import click_spinner
 import docker
 
-from cli.cli_main import dcos_docker
 from cli._common import docker_client
+from cli.cli_main import dcos_docker
 
 # We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
 # with "make clean".
@@ -34,7 +34,7 @@ _PROXY_CONTAINER_NAME = 'e2e-proxy'
 _OPENVPN_CONTAINER_NAME = 'e2e-openvpn'
 
 
-def validate_ovpn_file_does_not_exist(
+def _validate_ovpn_file_does_not_exist(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
@@ -87,7 +87,7 @@ def validate_ovpn_file_does_not_exist(
     return path
 
 
-def create_mac_network(configuration_dst: Path) -> None:
+def _create_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
 
@@ -169,7 +169,7 @@ def create_mac_network(configuration_dst: Path) -> None:
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
 
-def destroy_mac_network_containers() -> None:
+def _destroy_mac_network_containers() -> None:
     """
     Destroy containers created by ``dcos-docker setup-mac-network``.
     """
@@ -187,7 +187,7 @@ def destroy_mac_network_containers() -> None:
     '--configuration-dst',
     type=click.Path(exists=False),
     default='~/Documents/docker-for-mac.ovpn',
-    callback=validate_ovpn_file_does_not_exist,
+    callback=_validate_ovpn_file_does_not_exist,
     show_default=True,
     help='The location to create an OpenVPN configuration file.',
 )
@@ -207,11 +207,11 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     This creates an OpenVPN configuration file and describes how to use it.
     """
     if force:
-        destroy_mac_network_containers()
+        _destroy_mac_network_containers()
 
     try:
         with click_spinner.spinner():
-            create_mac_network(configuration_dst=configuration_dst)
+            _create_mac_network(configuration_dst=configuration_dst)
     except docker.errors.APIError as exc:
         if exc.status_code == 409:
             message = (
@@ -246,7 +246,7 @@ def destroy_mac_network() -> None:
     """
     Destroy containers created by "dcos-docker setup-mac-network".
     """
-    destroy_mac_network_containers()
+    _destroy_mac_network_containers()
     message = (
         'The containers used to allow access to Docker for Mac\'s internal '
         'networks have been removed.'
