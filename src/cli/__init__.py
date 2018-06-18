@@ -1,7 +1,6 @@
 """
 A CLI for controlling DC/OS clusters on Docker.
 """
-
 import io
 import logging
 import subprocess
@@ -10,6 +9,7 @@ import tarfile
 import tempfile
 import uuid
 from pathlib import Path
+from shutil import rmtree
 from subprocess import CalledProcessError
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -22,6 +22,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
+from cli._utils import is_enterprise
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node, Transport
@@ -43,7 +44,6 @@ from ._validators import (
     validate_environment_variable,
     validate_path_is_directory,
     validate_path_pair,
-    validate_variant,
     validate_volumes,
 )
 from .commands.destroy import destroy, destroy_list
@@ -121,6 +121,43 @@ def dcos_docker(verbose: None) -> None:
     # We "use" variables to satisfy linting tools.
     for _ in (verbose, ):
         pass
+
+
+def _get_variant(artifact_path: Path, workspace_dir: Path) -> str:
+    """
+    Get the variant of a DC/OS artifact.
+
+    Args:
+        artifact_path: The path to an artifact to get the DC/OS variant of.
+        workspace_dir: A directory to work in, given that this function uses
+            large files.
+
+    Returns:
+        "oss" or "enterprise" as appropriate.
+
+    Raises:
+        CalledProcessError: There was an error unpacking the artifact.
+    """
+    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
+
+    try:
+        with click_spinner.spinner():
+            enterprise = is_enterprise(
+                build_artifact=artifact_path,
+                workspace_dir=workspace_dir,
+            )
+    except subprocess.CalledProcessError as exc:
+        rmtree(path=str(workspace_dir), ignore_errors=True)
+        click.echo(doctor_message)
+        click.echo()
+        click.echo('Original error:', err=True)
+        click.echo(exc.stderr, err=True)
+        raise
+    except ValueError as exc:
+        click.echo(str(exc), err=True)
+        sys.exit(1)
+
+    return 'enterprise' if enterprise else 'oss'
 
 
 @dcos_docker.command('create')
@@ -298,7 +335,6 @@ def dcos_docker(verbose: None) -> None:
     '--variant',
     type=click.Choice(['auto', 'oss', 'enterprise']),
     default='auto',
-    callback=validate_variant,
     help=(
         'Choose the DC/OS variant. '
         'If the variant does not match the variant of the given artifact, '
@@ -393,6 +429,12 @@ def create(
 
     artifact_path = Path(artifact).resolve()
     enterprise = bool(variant == 'enterprise')
+
+    if variant == 'auto':
+        variant = _get_variant(
+            artifact_path=artifact_path,
+            workspace_dir=workspace_dir,
+        )
 
     if enterprise:
         superuser_username = 'admin'
