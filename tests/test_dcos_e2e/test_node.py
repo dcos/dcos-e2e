@@ -488,6 +488,7 @@ class TestAdvancedInstallationMethod:
         ) as cluster:
             for nodes, role in (
                 (cluster.masters, Role.MASTER),
+                (cluster.agents, Role.AGENT),
                 (cluster.public_agents, Role.PUBLIC_AGENT),
             ):
                 for node in nodes:
