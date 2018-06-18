@@ -296,35 +296,35 @@ class TestClusterFromNodes:
         cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If a user attempts to install DC/OS on is called on a `Cluster` created
-        from existing nodes, a `NotImplementedError` is raised.
+        DC/OS can be installed on an existing cluster from a URL and not by a
+        path.
         """
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
             agents=0,
             public_agents=0,
-        ) as cluster:
+        ) as original_cluster:
             cluster = Cluster.from_nodes(
-                masters=cluster.masters,
-                agents=cluster.agents,
-                public_agents=cluster.public_agents,
+                masters=original_cluster.masters,
+                agents=original_cluster.agents,
+                public_agents=original_cluster.public_agents,
             )
 
-            dcos_config = cluster.base_config
-            assert dcos_config == {}
-
-            with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_url(
-                    build_artifact=oss_artifact_url,
-                    dcos_config=dcos_config,
-                )
+            assert cluster.base_config == {}
 
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
                     dcos_config=dcos_config,
                 )
+
+            cluster.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=original_cluster.base_config,
+            )
+
+            cluster.wait_for_dcos_oss()
 
 
 class TestDestroyNode:
