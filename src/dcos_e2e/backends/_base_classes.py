@@ -38,14 +38,18 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a build artifact passed as an URL string.
+        Install DC/OS from a URL with a bootstrap node.
+
+        If a method which implements this abstract method raises a
+        ``NotImplementedError``, users of the backend can still install DC/OS
+        from a URL in an inefficient manner.
 
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS

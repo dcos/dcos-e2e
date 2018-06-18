@@ -14,6 +14,9 @@ import click
 import docker
 
 from cli._common import DOCKER_STORAGE_DRIVERS, docker_client
+from dcos_e2e.backends import Docker
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.docker_versions import DockerVersion
 
 
 class _CheckLevels(IntEnum):
@@ -413,6 +416,56 @@ def _check_docker_supports_mounts() -> _CheckLevels:
     return _CheckLevels.NONE
 
 
+def _check_can_mount_in_docker() -> _CheckLevels:
+    """
+    Check for an incompatibility between some systemd versions and some
+    versions of Docker.
+    """
+    docker_client()
+
+    cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
+    args = ['docker', 'run', '-v', '/foo', 'alpine']
+
+    error_message_substring = 'no subsystem for mount'
+    with Cluster(cluster_backend=cluster_backend) as cluster:
+        (public_agent, ) = cluster.public_agents
+        try:
+            public_agent.run(args=args)
+        except subprocess.CalledProcessError as exc:
+            if error_message_substring not in exc.stderr.decode():
+                raise
+
+            message = (
+                'An issue has been detected which means that, for some '
+                'versions of Docker inside DC/OS nodes, it will not be '
+                'possible to create containers with mounts. '
+                'Some functionality may be affected by this, for example '
+                'extracting the DC/OS installer on a node.'
+                '\n'
+                'This issue is likely because the host\'s version of systemd '
+                'is greater than version 232, which causes the following '
+                'known issue: '
+                'https://github.com/opencontainers/runc/issues/1175.'
+                '\n'
+                'Newer versions of Docker, work well with new versions of '
+                'systemd. '
+                'To avoid issues caused by this incompatibility, do one of '
+                'the following:'
+                '\n* Set ``systemd.legacy_systemd_cgroup_controller=yes`` as '
+                'a kernel parameter on your host.'
+                '\n* Use versions of Docker newer than 1.13.1 inside the '
+                'DC/OS nodes.'
+                ' To do this in the ``dcos-docker`` CLI, use the '
+                '``--docker-version`` option on ``dcos-docker create``.'
+                ' To do this in the Python library, pass a '
+                '``docker_version`` parameter to the ``Docker`` backend class.'
+            )
+            _warn(message=message)
+            return _CheckLevels.WARNING
+
+    return _CheckLevels.NONE
+
+
 @click.command('doctor')
 def doctor() -> None:
     """
@@ -429,6 +482,7 @@ def doctor() -> None:
         _check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
+        _check_can_mount_in_docker,
     ]
 
     highest_level = max(function() for function in check_functions)

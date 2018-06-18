@@ -318,6 +318,7 @@ class DockerCluster(ClusterManager):
             type='bind',
         )
 
+        # Mount cgroups into agents for Mesos DRF.
         cgroup_mount = Mount(
             source='/sys/fs/cgroup',
             target='/sys/fs/cgroup',
@@ -400,15 +401,15 @@ class DockerCluster(ClusterManager):
                     docker_version=cluster_backend.docker_version,
                 )
 
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a URL. This is not supported and simply raises a
-        ``NotImplementedError``.
+        Install DC/OS from a URL with a bootstrap node.
+        This is not supported and simply raises a ``NotImplementedError``.
 
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
@@ -419,14 +420,9 @@ class DockerCluster(ClusterManager):
         Raises:
             NotImplementedError: ``NotImplementedError`` because the Docker
                 backend does not support the DC/OS advanced installation
-                method.
+                method with a bootstrap node.
         """
-        message = (
-            'The Docker backend does not support the installation of DC/OS '
-            'by build artifacts passed via URL string. This is because a more '
-            'efficient installation method exists in `install_dcos_from_path`.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError
 
     @property
     def base_config(self) -> Dict[str, Any]:

@@ -18,7 +18,8 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.docker_versions import DockerVersion
+from dcos_e2e.node import Node, Role, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
@@ -466,3 +467,30 @@ class TestRun:
 
         expected_message = '`log_output_live` and `tty` cannot both be `True`.'
         assert str(excinfo.value) == expected_message
+
+
+class TestAdvancedInstallationMethod:
+    """
+    Test installing DC/OS on a node.
+    """
+
+    def test_install_dcos(self, oss_artifact_url: str) -> None:
+        """
+        It is possible to install DC/OS on a node.
+        """
+        # We use a specific version of Docker on the nodes because else we may
+        # hit https://github.com/opencontainers/runc/issues/1175.
+        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            for nodes, role in (
+                (cluster.masters, Role.MASTER),
+                (cluster.agents, Role.AGENT),
+                (cluster.public_agents, Role.PUBLIC_AGENT),
+            ):
+                for node in nodes:
+                    node.install_dcos(
+                        build_artifact=oss_artifact_url,
+                        dcos_config=cluster.base_config,
+                        role=role,
+                    )
+            cluster.wait_for_dcos_oss()
