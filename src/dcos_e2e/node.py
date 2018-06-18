@@ -118,6 +118,9 @@ class Node:
         Instead, the artifact is downloaded to this node and then extracted on
         this node, and then DC/OS is installed.
 
+        Run ``dcos-docker doctor`` to see if your host is incompatible with
+        this method.
+
         Args:
             build_artifact: The URL to a build artifact to be installed on the
                 node.

@@ -477,9 +477,12 @@ class TestAdvancedInstallationMethod:
         """
         It is possible to install DC/OS on a node.
         """
+        # We use a specific version of Docker on the nodes because else we may
+        # hit https://github.com/opencontainers/runc/issues/1175.
+        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
         with Cluster(
-            cluster_backend=Docker(),
-            agents=0,
+            cluster_backend=cluster_backend,
+            agents=1,
             public_agents=1,
         ) as cluster:
             for nodes, role in (
