@@ -10,7 +10,6 @@ import tarfile
 import tempfile
 import uuid
 from pathlib import Path
-from shutil import rmtree
 from subprocess import CalledProcessError
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -35,7 +34,6 @@ from ._common import (
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
-    existing_cluster_ids,
 )
 from ._options import existing_cluster_id_option, node_transport_option
 from ._validators import (
@@ -48,6 +46,7 @@ from ._validators import (
     validate_variant,
     validate_volumes,
 )
+from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
 from .commands.list_clusters import list_clusters
@@ -516,63 +515,6 @@ def create(
     click.echo(started_message, err=True)
 
 
-@dcos_docker.command('destroy-list')
-@click.argument(
-    'cluster_ids',
-    nargs=-1,
-    type=str,
-)
-@node_transport_option
-@click.pass_context
-def destroy_list(
-    ctx: click.core.Context,
-    cluster_ids: List[str],
-    transport: Transport,
-) -> None:
-    """
-    Destroy clusters.
-
-    To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
-    """
-    for cluster_id in cluster_ids:
-        if cluster_id not in existing_cluster_ids():
-            warning = 'Cluster "{cluster_id}" does not exist'.format(
-                cluster_id=cluster_id,
-            )
-            click.echo(warning, err=True)
-            continue
-
-        ctx.invoke(
-            destroy,
-            cluster_id=cluster_id,
-            transport=transport,
-        )
-
-
-@dcos_docker.command('destroy')
-@existing_cluster_id_option
-@node_transport_option
-def destroy(cluster_id: str, transport: Transport) -> None:
-    """
-    Destroy a cluster.
-    """
-    with click_spinner.spinner():
-        cluster_containers = ClusterContainers(
-            cluster_id=cluster_id,
-            transport=transport,
-        )
-        containers = {
-            *cluster_containers.masters,
-            *cluster_containers.agents,
-            *cluster_containers.public_agents,
-        }
-        rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
-        for container in containers:
-            container.stop()
-            container.remove(v=True)
-    click.echo(cluster_id)
-
-
 @dcos_docker.command('wait')
 @existing_cluster_id_option
 @click.option(
@@ -961,3 +903,5 @@ dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
 dcos_docker.add_command(inspect_cluster)
 dcos_docker.add_command(list_clusters)
+dcos_docker.add_command(destroy)
+dcos_docker.add_command(destroy_list)
