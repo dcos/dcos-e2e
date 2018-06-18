@@ -422,12 +422,7 @@ class DockerCluster(ClusterManager):
                 backend does not support the DC/OS advanced installation
                 method.
         """
-        message = (
-            'The Docker backend does not support the installation of DC/OS '
-            'by build artifacts passed via URL string. This is because a more '
-            'efficient installation method exists in `install_dcos_from_path`.'
-        )
-        raise NotImplementedError(message)
+
 
     @property
     def base_config(self) -> Dict[str, Any]:
