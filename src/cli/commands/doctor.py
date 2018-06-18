@@ -442,7 +442,7 @@ def _check_can_mount_in_docker() -> _CheckLevels:
         try:
             public_agent.run(args=args)
         except subprocess.CalledProcessError as exc:
-            if error_message_substring not in exc.stderr:
+            if error_message_substring not in exc.stderr.decode():
                 raise
 
             message = (
@@ -465,6 +465,10 @@ def _check_can_mount_in_docker() -> _CheckLevels:
                 'a kernel parameter on your host.'
                 '\n* Use versions of Docker newer than 1.13.1 inside the '
                 'DC/OS nodes.'
+                '  To do this in the ``dcos-docker`` CLI, use the '
+                '``--docker-version`` option on ``dcos-docker create``.\n\n'
+                '  To do this in the Python library, pass a '
+                '``docker_version`` parameter to the ``Docker`` backend class.'
             )
             _warn(message=message)
             return _CheckLevels.WARNING
