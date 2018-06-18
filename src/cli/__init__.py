@@ -7,10 +7,6 @@ from typing import Optional, Union
 
 import click
 
-from dcos_e2e.node import Transport
-
-from ._common import ClusterContainers
-from ._options import existing_cluster_id_option
 from .commands.create import create
 from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
@@ -20,6 +16,7 @@ from .commands.mac_network import destroy_mac_network, setup_mac_network
 from .commands.run_command import run
 from .commands.sync import sync_code
 from .commands.wait import wait
+from .commands.web import web
 
 
 def _set_logging(
@@ -63,26 +60,6 @@ def dcos_docker(verbose: None) -> None:
         pass
 
 
-@dcos_docker.command('web')
-@existing_cluster_id_option
-def web(cluster_id: str) -> None:
-    """
-    Open the browser at the web UI.
-
-    Note that the web UI may not be available at first.
-    Consider using ``dcos-docker wait`` before running this command.
-    """
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        # The transport is not used so does not matter.
-        transport=Transport.DOCKER_EXEC,
-    )
-    cluster = cluster_containers.cluster
-    master = next(iter(cluster.masters))
-    web_ui = 'http://' + str(master.public_ip_address)
-    click.launch(web_ui)
-
-
 dcos_docker.add_command(create)
 dcos_docker.add_command(destroy)
 dcos_docker.add_command(destroy_list)
@@ -94,3 +71,4 @@ dcos_docker.add_command(run)
 dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(sync_code)
 dcos_docker.add_command(wait)
+dcos_docker.add_command(web)
