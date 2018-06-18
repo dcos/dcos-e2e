@@ -360,11 +360,12 @@ def web(cluster_id: str) -> None:
     click.launch(web_ui)
 
 
-dcos_docker.add_command(setup_mac_network)
+dcos_docker.add_command(create)
+dcos_docker.add_command(destroy)
+dcos_docker.add_command(destroy_list)
 dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
 dcos_docker.add_command(inspect_cluster)
 dcos_docker.add_command(list_clusters)
-dcos_docker.add_command(destroy)
-dcos_docker.add_command(destroy_list)
+dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(sync_code)

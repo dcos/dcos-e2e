@@ -2,6 +2,9 @@
 Tools for creating a DC/OS cluster.
 """
 import sys
+from shutil import rmtree
+from cli._utils import is_enterprise
+import subprocess
 import tempfile
 import uuid
 from pathlib import Path
