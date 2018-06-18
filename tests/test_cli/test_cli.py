@@ -1259,8 +1259,8 @@ class TestRun:
               --dcos-login-pw TEXT           The password to set the ``DCOS_LOGIN_PW``
                                              environment variable to.
               --sync-dir PATH                The path to a DC/OS checkout. Part of this
-                                             checkout will be synced before the command is
-                                             run.
+                                             checkout will be synced to all master nodes
+                                             before the command is run.
               --no-test-env                  With this flag set, no environment variables
                                              are set and the command is run in the home
                                              directory.
