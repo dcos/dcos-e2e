@@ -2,6 +2,11 @@
 Checks for showing up common sources of errors with the Docker backend.
 """
 
+import shlex
+from dcos_e2e.docker_versions import DockerVersion
+from dcos_e2e.docker_storage_drivers import DockerStorageDriver
+import io
+import configparser
 import shutil
 import subprocess
 import sys
@@ -415,23 +420,27 @@ def _check_docker_supports_mounts() -> _CheckLevels:
 
 def _check_can_mount_in_docker() -> _CheckLevels:
     client = docker_client()
-    docker_dockerfile = Path(__file__).parent / 'docker-doctor'
-    image, _ = client.images.build(
-        path=str(docker_dockerfile),
-        rm=True,
-        forcerm=True,
-        buildargs={'DOCKER_URL': 'https://get.docker.com/builds/Linux/x86_64/docker-1.13.1.tgz'},
-    )
-    container = client.containers.run(
-        image=image,
-        detach=True,
-        command=['sleep', '100'],
-    )
-    exitcode, output = container.exec_run(cmd=['docker', 'run', '-v', '/foo', 'alpine'])
-    import pdb; pdb.set_trace()
-    container.stop()
-    container.remove(v=True)
-    client.images.remove(image=image.id)
+    # TODO do this without using ``Cluster``.
+    from dcos_e2e.cluster import Cluster
+    from dcos_e2e.backends import Docker
+    from dcos_e2e.docker_versions import DockerVersion
+    cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
+    args = [
+        'docker',
+        'run',
+        '-v',
+        '/foo',
+        'alpine'
+    ]
+    with Cluster(
+        cluster_backend=cluster_backend,
+    ) as cluster:
+        (public_agent, ) = cluster.public_agents
+        try:
+            public_agent.run(args=args)
+        except subprocess.CalledProcessError as exc:
+            import pdb; pdb.set_trace()
+            pass
 
     return _CheckLevels.NONE
 
