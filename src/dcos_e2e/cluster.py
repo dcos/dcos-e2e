@@ -333,7 +333,7 @@ class Cluster(ContextDecorator):
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            dcos_config: The DC/OS configuration to use.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 

@@ -121,8 +121,8 @@ class Node:
         Args:
             build_artifact: The URL to a build artifact to be installed on the
                 node.
-            dcos_config: The DC/OS
-            role: TODO
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
