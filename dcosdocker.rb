@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.06.14.1.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.06.18.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -183,8 +183,8 @@ class Dcosdocker < Formula
   end
 
   resource "keyring" do
-    url "https://files.pythonhosted.org/packages/d8/07/e862b57168e088f3ba880fba2471f05f78c19e75b1632be0143d116e7fa3/keyring-12.2.1.tar.gz"
-    sha256 "4498eaa2e32fc69a8b36749116b670c379d36a1a9ad4ab107df1e19c8a120ffe"
+    url "https://files.pythonhosted.org/packages/b9/4d/fcfebaffd107d73dc7105625fde6f0682f0c7d1d783edf8211c5a2cdad06/keyring-13.0.0.tar.gz"
+    sha256 "dd188c7d40e6778e18d330a96d0bef77bffc109dad82270133e3969908016862"
   end
 
   resource "more-itertools" do
