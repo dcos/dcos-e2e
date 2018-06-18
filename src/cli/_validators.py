@@ -3,21 +3,14 @@ Validators for CLI options.
 """
 
 import re
-import subprocess
-import sys
-import uuid
 from pathlib import Path
-from shutil import rmtree
-from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
-import click_spinner
 import docker
 import yaml
 
 from ._common import existing_cluster_ids
-from ._utils import is_enterprise
 
 
 def validate_dcos_configuration(
@@ -197,49 +190,6 @@ def validate_volumes(
         )
         mounts.append(mount)
     return mounts
-
-
-def validate_variant(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> str:
-    """
-    Return whether to attempt to create a cluster with the given artifact as
-    "enterprise" or "oss".
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (param, ):
-        pass
-
-    if value != 'auto':
-        return str(value)
-
-    artifact_path = Path(ctx.params['artifact']).resolve()
-    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
-    base_workspace_dir = ctx.params['workspace_dir'] or Path(gettempdir())
-    workspace_dir = base_workspace_dir / uuid.uuid4().hex
-    workspace_dir.mkdir()
-
-    try:
-        with click_spinner.spinner():
-            enterprise = is_enterprise(
-                build_artifact=artifact_path,
-                workspace_dir=workspace_dir,
-            )
-    except subprocess.CalledProcessError as exc:
-        rmtree(path=str(workspace_dir), ignore_errors=True)
-        click.echo(doctor_message)
-        click.echo()
-        click.echo('Original error:', err=True)
-        click.echo(exc.stderr, err=True)
-        raise
-    except ValueError as exc:
-        click.echo(str(exc), err=True)
-        sys.exit(1)
-
-    rmtree(path=str(workspace_dir), ignore_errors=True)
-    return 'enterprise' if enterprise else 'oss'
 
 
 def validate_environment_variable(
