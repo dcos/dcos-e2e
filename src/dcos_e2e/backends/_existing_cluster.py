@@ -71,7 +71,7 @@ class ExistingClusterManager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
