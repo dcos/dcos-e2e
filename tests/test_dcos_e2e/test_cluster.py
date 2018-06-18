@@ -310,8 +310,6 @@ class TestClusterFromNodes:
                 public_agents=original_cluster.public_agents,
             )
 
-            assert cluster.base_config == {}
-
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,

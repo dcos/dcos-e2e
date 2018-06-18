@@ -311,6 +311,7 @@ class Cluster(ContextDecorator):
         """
         Return a base configuration for installing DC/OS OSS.
         """
+
         def ip_list(nodes: Set[Node]) -> List[str]:
             return list(map(lambda node: str(node.private_ip_address), nodes))
 
