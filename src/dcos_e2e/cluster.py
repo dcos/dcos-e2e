@@ -311,7 +311,19 @@ class Cluster(ContextDecorator):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        return self._cluster.base_config
+
+        def ip_list(nodes: Set[Node]) -> List[str]:
+            return list(map(lambda node: str(node.private_ip_address), nodes))
+
+        config = {
+            'agent_list': ip_list(nodes=self.agents),
+            'master_list': ip_list(nodes=self.masters),
+            'public_agent_list': ip_list(nodes=self.public_agents),
+        }
+        return {
+            **config,
+            **self._cluster.base_config,
+        }
 
     def install_dcos_from_url(
         self,

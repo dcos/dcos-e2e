@@ -112,6 +112,9 @@ class ClusterManager(abc.ABC):
     def base_config(self) -> Dict[str, Any]:
         """
         Return a base configuration for installing DC/OS OSS.
+
+        This does not need to include the lists of IP addresses for each node
+        type.
         """
 
 
