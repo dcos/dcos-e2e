@@ -7,9 +7,22 @@ import subprocess
 from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional
 
+import yaml
+
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
+
+
+class Role(Enum):
+    """
+    Roles of DC/OS nodes.
+    """
+
+    MASTER = 'master'
+    AGENT = 'slave'
+    PUBLIC_AGENT = 'slave_public'
 
 
 class Transport(Enum):
@@ -83,6 +96,114 @@ class Node:
         transport_cls = transport_dict[transport]
         # See https://github.com/python/mypy/issues/5135.
         return transport_cls()  # type: ignore
+
+    def install_dcos(
+        self,
+        build_artifact: str,
+        dcos_config: Dict[str, Any],
+        role: Role,
+        user: Optional[str] = None,
+        log_output_live: bool = False,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is downloaded to this node and then extracted on
+        this node, and then DC/OS is installed.
+
+        Run ``dcos-docker doctor`` to see if your host is incompatible with
+        this method.
+
+        Args:
+            build_artifact: The URL to a build artifact to be installed on the
+                node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+        """
+        node_build_artifact = '/dcos_generate_config.sh'
+        self.run(
+            args=['curl', '-f', build_artifact, '-o', node_build_artifact],
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+        )
+
+        tempdir = Path(gettempdir())
+        dcos_config = {
+            **dcos_config,
+            **{
+                'bootstrap_url': 'file:///genconf/serve',
+            },
+        }
+        config_yaml = yaml.dump(data=dcos_config)
+        config_file_path = tempdir / 'config.yaml'
+        Path(config_file_path).write_text(data=config_yaml)
+
+        remote_genconf_dir = 'genconf'
+        remote_genconf_path = Path('/') / remote_genconf_dir
+
+        self.send_file(
+            local_path=config_file_path,
+            remote_path=remote_genconf_path / 'config.yaml',
+            transport=transport,
+            user=user,
+        )
+
+        genconf_args = [
+            'cd',
+            '/',
+            '&&',
+            'bash',
+            node_build_artifact,
+            '--offline',
+            '-v',
+            '--genconf',
+        ]
+
+        self.run(
+            args=genconf_args,
+            log_output_live=True,
+            shell=True,
+            transport=transport,
+            user=user,
+        )
+
+        self.run(
+            args=['rm', node_build_artifact],
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+        )
+
+        setup_args = [
+            'cd',
+            '/',
+            '&&',
+            'bash',
+            'genconf/serve/dcos_install.sh',
+            '--no-block-dcos-setup',
+            role.value,
+        ]
+
+        self.run(
+            args=setup_args,
+            shell=True,
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+        )
 
     def run(
         self,

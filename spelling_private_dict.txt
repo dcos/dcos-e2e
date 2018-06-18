@@ -129,6 +129,7 @@ wildcard
 workflow
 workspace
 xfail
+yaml
 yapf
 yml
 zookeeper
