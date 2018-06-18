@@ -34,13 +34,13 @@ from ._common import (
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
+    ContainerInspectView,
 )
 from ._options import existing_cluster_id_option, node_transport_option
 from ._validators import (
     validate_cluster_id,
     validate_dcos_configuration,
     validate_environment_variable,
-    validate_node_reference,
     validate_path_is_directory,
     validate_path_pair,
     validate_variant,
@@ -585,6 +585,62 @@ def wait(
         cluster_containers.cluster.wait_for_dcos_oss(http_checks=http_checks)
 
 
+def _get_node(cluster_id: str, node_reference: str) -> Node:
+    """
+    Get a node from a "reference".
+
+    Args:
+        cluster_id: The ID of a cluster.
+        node_reference: One of:
+            * A node's IP address
+            * A node's Docker container
+            * A reference in the format "<role>_<number>"
+
+    Returns:
+        The ``Node`` from the given cluster with the given ID.
+
+    Raises:
+        click.BadParameter: There is no such node.
+    """
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=Transport.DOCKER_EXEC,
+    )
+
+    containers = {
+        *cluster_containers.masters,
+        *cluster_containers.agents,
+        *cluster_containers.public_agents,
+    }
+
+    for container in containers:
+        inspect_data = ContainerInspectView(container=container).to_dict()
+        reference = inspect_data['e2e_reference']
+        ip_address = inspect_data['ip_address']
+        container_name = inspect_data['docker_container_name']
+        container_id = inspect_data['docker_container_id']
+        accepted = (
+            reference,
+            reference.upper(),
+            ip_address,
+            container_name,
+            container_id,
+        )
+
+        if node_reference in accepted:
+            return cluster_containers.to_node(container=container)
+
+    message = (
+        'No such node in cluster "{cluster_id}" with IP address, Docker '
+        'container ID or node reference "{node_reference}". '
+        'Node references can be seen with ``dcos_docker inspect``.'
+    ).format(
+        cluster_id=cluster_id,
+        node_reference=node_reference,
+    )
+    raise click.BadParameter(message=message)
+
+
 @dcos_docker.command('run', context_settings=dict(ignore_unknown_options=True))
 @existing_cluster_id_option
 @click.option(
@@ -609,7 +665,8 @@ def wait(
     type=click.Path(exists=True),
     help=(
         'The path to a DC/OS checkout. '
-        'Part of this checkout will be synced before the command is run.'
+        'Part of this checkout will be synced to all master nodes before the '
+        'command is run.'
     ),
     callback=validate_path_is_directory,
 )
@@ -634,7 +691,6 @@ def wait(
         'a reference in the format "<role>_<number>". '
         'These details be seen with ``dcos_docker inspect``.'
     ),
-    callback=validate_node_reference,
 )
 @click.option(
     '--env',
@@ -653,7 +709,7 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     no_test_env: bool,
-    node: Node,
+    node: str,
     env: Dict[str, str],
     transport: Transport,
 ) -> None:
@@ -671,6 +727,8 @@ def run(
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
     """  # noqa: E501
+    host = _get_node(cluster_id=cluster_id, node_reference=node)
+
     if sync_dir is not None:
         ctx.invoke(
             sync_code,
@@ -690,7 +748,7 @@ def run(
 
     if no_test_env:
         try:
-            node.run(
+            host.run(
                 args=list(node_args),
                 log_output_live=False,
                 tty=True,
@@ -720,7 +778,7 @@ def run(
             pytest_command=list(node_args),
             tty=True,
             env=env,
-            test_host=node,
+            test_host=host,
             transport=transport,
         )
     except subprocess.CalledProcessError as exc:
