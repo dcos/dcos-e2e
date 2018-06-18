@@ -6,7 +6,7 @@ import logging
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 import click
 
@@ -14,10 +14,7 @@ from dcos_e2e.node import Node, Transport
 
 from ._common import ClusterContainers, ContainerInspectView
 from ._options import existing_cluster_id_option, node_transport_option
-from ._validators import (
-    validate_environment_variable,
-    validate_path_is_directory,
-)
+from ._validators import validate_path_is_directory
 from .commands.create import create
 from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
@@ -26,6 +23,31 @@ from .commands.list_clusters import list_clusters
 from .commands.mac_network import destroy_mac_network, setup_mac_network
 from .commands.sync import sync_code
 from .commands.wait import wait
+
+
+def _validate_environment_variable(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Dict[str, str]:
+    """
+    Validate that environment variables are set as expected.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (param, ctx):
+        pass
+
+    env = {}
+    for definition in value:
+        try:
+            key, val = definition.split(sep='=', maxsplit=1)
+        except ValueError:
+            message = (
+                '"{definition}" does not match the format "<KEY>=<VALUE>".'
+            ).format(definition=definition)
+            raise click.BadParameter(message=message)
+        env[key] = val
+    return env
 
 
 def _set_logging(
@@ -179,7 +201,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 @click.option(
     '--env',
     type=str,
-    callback=validate_environment_variable,
+    callback=_validate_environment_variable,
     multiple=True,
     help='Set environment variables in the format "<KEY>=<VALUE>"',
 )
