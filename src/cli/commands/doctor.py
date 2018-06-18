@@ -421,10 +421,15 @@ def _check_docker_supports_mounts() -> _CheckLevels:
 def _check_can_mount_in_docker() -> _CheckLevels:
     client = docker_client()
     # TODO do this without using ``Cluster``.
+    from docker.types import Mount
     from dcos_e2e.cluster import Cluster
     from dcos_e2e.backends import Docker
     from dcos_e2e.docker_versions import DockerVersion
-    cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
+
+    cluster_backend = Docker(
+        docker_version=DockerVersion.v1_13_1,
+        custom_public_agent_mounts=systemd_mounts,
+    )
     args = [
         'docker',
         'run',
@@ -432,6 +437,8 @@ def _check_can_mount_in_docker() -> _CheckLevels:
         '/foo',
         'alpine'
     ]
+
+    error_message_substring = 'no subsystem for mount'
     with Cluster(
         cluster_backend=cluster_backend,
     ) as cluster:
@@ -439,8 +446,32 @@ def _check_can_mount_in_docker() -> _CheckLevels:
         try:
             public_agent.run(args=args)
         except subprocess.CalledProcessError as exc:
-            import pdb; pdb.set_trace()
-            pass
+            if error_message_substring not in exc.stderr:
+                raise
+
+            message = (
+                'An issue has been detected which means that, for some '
+                'versions of Docker inside DC/OS nodes, it will not be '
+                'possible to create containers with mounts. '
+                'Some functionality may be affected by this, for example '
+                'extracting the DC/OS installer on a node.'
+                '\n'
+                'This issue is likely because the host\'s version of systemd '
+                'is greater than version 232, which causes the following '
+                'known issue: '
+                'https://github.com/opencontainers/runc/issues/1175.'
+                '\n'
+                'Newer versions of Docker, work well with new versions of '
+                'systemd. '
+                'To avoid issues caused by this incompatibility, do one of '
+                'the following:'
+                '\n*  Set ``systemd.legacy_systemd_cgroup_controller=yes`` as '
+                'a kernel parameter on your host.'
+                '\n* Use versions of Docker newer than 1.13.1 inside the '
+                'DC/OS nodes.'
+            )
+            _warn(message=message)
+            return _CheckLevels.WARNING
 
     return _CheckLevels.NONE
 
