@@ -141,8 +141,8 @@ class Node:
         dcos_config = {
             **dcos_config,
             **{
-                'bootstrap_url': 'file:///genconf/serve'
-            }
+                'bootstrap_url': 'file:///genconf/serve',
+            },
         }
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = tempdir / 'config.yaml'
@@ -195,7 +195,8 @@ class Node:
         ]
 
         self.run(
-            args=setup_args, shell=True,
+            args=setup_args,
+            shell=True,
             log_output_live=log_output_live,
             transport=transport,
             user=user,
