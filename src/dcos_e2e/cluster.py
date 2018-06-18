@@ -367,7 +367,7 @@ class Cluster(ContextDecorator):
                 (self.public_agents, Role.PUBLIC_AGENT),
             ):
                 for node in nodes:
-                    node.install_dcos(
+                    node.install_dcos_from_url(
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
                         role=role,

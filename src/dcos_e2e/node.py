@@ -97,7 +97,7 @@ class Node:
         # See https://github.com/python/mypy/issues/5135.
         return transport_cls()  # type: ignore
 
-    def install_dcos(
+    def install_dcos_from_url(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
