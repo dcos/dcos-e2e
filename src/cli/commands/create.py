@@ -1,13 +1,12 @@
 """
 Tools for creating a DC/OS cluster.
 """
-import sys
-from shutil import rmtree
-from cli._utils import is_enterprise
 import subprocess
+import sys
 import tempfile
 import uuid
 from pathlib import Path
+from shutil import rmtree
 from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -28,6 +27,7 @@ from cli._common import (
     WORKSPACE_DIR_LABEL_KEY,
 )
 from cli._options import node_transport_option
+from cli._utils import is_enterprise
 from cli._validators import (
     validate_cluster_id,
     validate_dcos_configuration,
@@ -35,6 +35,7 @@ from cli._validators import (
     validate_path_pair,
     validate_volumes,
 )
+from cli.commands.wait import wait
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
