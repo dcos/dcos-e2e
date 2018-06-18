@@ -2,17 +2,49 @@
 Tools for syncing code to a node.
 """
 
+import io
+import tarfile
 import tempfile
 from pathlib import Path
+from typing import Callable, Optional
 
 import click
 
 from dcos_e2e.node import Transport
 
+from ._common import ClusterContainers
 from ._options import existing_cluster_id_option, node_transport_option
 
 
-@dcos_docker.command('sync')
+def _tar_with_filter(
+    path: Path,
+    tar_filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
+) -> io.BytesIO:
+    """
+    Return a tar of a files in a given directory, which are not filtered out
+    by the ``filter``.
+    """
+    tarstream = io.BytesIO()
+    with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
+        tar.add(name=str(path), arcname='/', filter=tar_filter)
+    tarstream.seek(0)
+
+    return tarstream
+
+
+def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
+    """
+    Filter for ``tarfile.TarFile.add`` which removes Python and pytest cache
+    files.
+    """
+    if '__pycache__' in tar_info.name:
+        return None
+    if tar_info.name.endswith('.pyc'):
+        return None
+    return tar_info
+
+
+@click.command('sync')
 @existing_cluster_id_option
 @click.argument(
     'dcos_checkout_dir',

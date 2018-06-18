@@ -2,17 +2,15 @@
 A CLI for controlling DC/OS clusters on Docker.
 """
 
-import io
 import logging
 import subprocess
 import sys
-import tarfile
 import tempfile
 import uuid
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
 import click_spinner
@@ -827,34 +825,6 @@ def run(
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)
-
-
-def _tar_with_filter(
-    path: Path,
-    tar_filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
-) -> io.BytesIO:
-    """
-    Return a tar of a files in a given directory, which are not filtered out
-    by the ``filter``.
-    """
-    tarstream = io.BytesIO()
-    with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
-        tar.add(name=str(path), arcname='/', filter=tar_filter)
-    tarstream.seek(0)
-
-    return tarstream
-
-
-def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
-    """
-    Filter for ``tarfile.TarFile.add`` which removes Python and pytest cache
-    files.
-    """
-    if '__pycache__' in tar_info.name:
-        return None
-    if tar_info.name.endswith('.pyc'):
-        return None
-    return tar_info
 
 
 @dcos_docker.command('web')
