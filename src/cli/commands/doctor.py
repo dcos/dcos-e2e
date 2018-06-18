@@ -417,6 +417,10 @@ def _check_docker_supports_mounts() -> _CheckLevels:
 
 
 def _check_can_mount_in_docker() -> _CheckLevels:
+    """
+    Check for an incompatibility between some systemd versions and some
+    versions of Docker.
+    """
     docker_client()
 
     cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
