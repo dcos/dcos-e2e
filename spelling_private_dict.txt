@@ -12,6 +12,7 @@ bootstrap
 breakpoint
 calledprocesserror
 centos
+cgroups
 changelog
 ci
 cli
@@ -27,6 +28,7 @@ dict
 diff
 dir
 dockerfile
+drf
 enum
 env
 eval
