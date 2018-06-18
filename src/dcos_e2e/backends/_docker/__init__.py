@@ -318,6 +318,7 @@ class DockerCluster(ClusterManager):
             type='bind',
         )
 
+        # Mount cgroups into agents for Mesos DRF.
         cgroup_mount = Mount(
             source='/sys/fs/cgroup',
             target='/sys/fs/cgroup',

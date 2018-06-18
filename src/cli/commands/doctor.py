@@ -413,22 +413,46 @@ def _check_docker_supports_mounts() -> _CheckLevels:
     return _CheckLevels.NONE
 
 
+def _check_can_mount_in_docker() -> _CheckLevels:
+    client = docker_client()
+    docker_dockerfile = Path(__file__).parent / 'docker-doctor'
+    image, _ = client.images.build(
+        path=str(docker_dockerfile),
+        rm=True,
+        forcerm=True,
+        buildargs={'DOCKER_URL': 'https://get.docker.com/builds/Linux/x86_64/docker-1.13.1.tgz'},
+    )
+    container = client.containers.run(
+        image=image,
+        detach=True,
+        command=['sleep', '100'],
+    )
+    exitcode, output = container.exec_run(cmd=['docker', 'run', '-v', '/foo', 'alpine'])
+    import pdb; pdb.set_trace()
+    container.stop()
+    container.remove(v=True)
+    client.images.remove(image=image.id)
+
+    return _CheckLevels.NONE
+
+
 @click.command('doctor')
 def doctor() -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     check_functions = [
-        _check_1_9_sed,
-        _check_docker_root_free_space,
-        _check_docker_supports_mounts,
-        _check_memory,
-        _check_mount_tmp,
-        _check_networking,
-        _check_selinux,
-        _check_ssh,
-        _check_storage_driver,
-        _check_tmp_free_space,
+        # _check_1_9_sed,
+        # _check_docker_root_free_space,
+        # _check_docker_supports_mounts,
+        # _check_memory,
+        # _check_mount_tmp,
+        # _check_networking,
+        # _check_selinux,
+        # _check_ssh,
+        # _check_storage_driver,
+        # _check_tmp_free_space,
+        _check_can_mount_in_docker,
     ]
 
     highest_level = max(function() for function in check_functions)
