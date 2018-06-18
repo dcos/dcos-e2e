@@ -427,12 +427,10 @@ class DockerCluster(ClusterManager):
     @property
     def base_config(self) -> Dict[str, Any]:
         """
-        Return a base configuration for installing DC/OS OSS.
+        Return a base configuration for installing DC/OS OSS, not including the
+        list of nodes.
         """
         ssh_user = self._default_user
-
-        def ip_list(nodes: Set[Node]) -> List[str]:
-            return list(map(lambda node: str(node.public_ip_address), nodes))
 
         current_file = inspect.stack()[0][1]
         current_parent = Path(os.path.abspath(current_file)).parent
@@ -440,7 +438,6 @@ class DockerCluster(ClusterManager):
         ip_detect_contents = Path(ip_detect_src).read_text()
 
         config = {
-            'agent_list': ip_list(nodes=self.agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
             # "Time is not synchronized / marked as bad by the kernel.".
@@ -452,9 +449,7 @@ class DockerCluster(ClusterManager):
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
             'master_discovery': 'static',
-            'master_list': ip_list(nodes=self.masters),
             'process_timeout': 10000,
-            'public_agent_list': ip_list(nodes=self.public_agents),
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
