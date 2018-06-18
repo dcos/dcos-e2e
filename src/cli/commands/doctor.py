@@ -420,16 +420,12 @@ def _check_docker_supports_mounts() -> _CheckLevels:
 
 def _check_can_mount_in_docker() -> _CheckLevels:
     client = docker_client()
-    # TODO do this without using ``Cluster``.
     from docker.types import Mount
     from dcos_e2e.cluster import Cluster
     from dcos_e2e.backends import Docker
     from dcos_e2e.docker_versions import DockerVersion
 
-    cluster_backend = Docker(
-        docker_version=DockerVersion.v1_13_1,
-        custom_public_agent_mounts=systemd_mounts,
-    )
+    cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
     args = [
         'docker',
         'run',
