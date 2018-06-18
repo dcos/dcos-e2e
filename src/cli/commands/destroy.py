@@ -2,15 +2,15 @@
 Tools for destroying clusters.
 """
 
+from shutil import rmtree
 from typing import List
 
 import click
 import click_spinner
 
-from cli._common import existing_cluster_ids, ClusterContainers
+from cli._common import ClusterContainers, existing_cluster_ids
 from cli._options import existing_cluster_id_option, node_transport_option
 from dcos_e2e.node import Transport
-from shutil import rmtree
 
 
 @click.command('destroy-list')

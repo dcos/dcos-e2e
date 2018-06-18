@@ -46,6 +46,7 @@ from ._validators import (
     validate_variant,
     validate_volumes,
 )
+from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
 from .commands.list_clusters import list_clusters
@@ -902,3 +903,5 @@ dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
 dcos_docker.add_command(inspect_cluster)
 dcos_docker.add_command(list_clusters)
+dcos_docker.add_command(destroy)
+dcos_docker.add_command(destroy_list)
