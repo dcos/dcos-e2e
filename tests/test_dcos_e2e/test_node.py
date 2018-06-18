@@ -18,7 +18,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Node, Transport, Role
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
@@ -482,10 +482,14 @@ class TestAdvancedInstallationMethod:
             agents=0,
             public_agents=0,
         ) as cluster:
-            for node in cluster.masters:
-                node.install_dcos(
-                    build_artifact=oss_artifact_url,
-                    dcos_config=cluster.base_config,
-                    role='master',
-                )
+            for nodes, role in (
+                (cluster.masters, Role.MASTER),
+                (cluster.public_agents, Role.PUBLIC_AGENT),
+            ):
+                for node in nodes:
+                    node.install_dcos(
+                        build_artifact=oss_artifact_url,
+                        dcos_config=cluster.base_config,
+                        role=role,
+                    )
             cluster.wait_for_dcos_oss()

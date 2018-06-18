@@ -15,6 +15,16 @@ import yaml
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
 
 
+class Role(Enum):
+    """
+    Roles of DC/OS nodes.
+    """
+
+    MASTER = 'master'
+    AGENT = 'slave'
+    PUBLIC_AGENT = 'slave_public'
+
+
 class Transport(Enum):
     """
     Transports for communicating with nodes.
@@ -91,17 +101,27 @@ class Node:
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
-        role: str,
+        role: Role,
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
     ) -> None:
         """
-        TODO
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is downloaded to this node and then extracted on
+        this node, and then DC/OS is installed.
 
         Args:
-            build_artifact: TODO
-            dcos_config: TODO
+            build_artifact: The URL to a build artifact to be installed on the
+                node.
+            dcos_config: The DC/OS
             role: TODO
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
@@ -171,7 +191,7 @@ class Node:
             'bash',
             'genconf/serve/dcos_install.sh',
             '--no-block-dcos-setup',
-            role,
+            role.value,
         ]
 
         self.run(
