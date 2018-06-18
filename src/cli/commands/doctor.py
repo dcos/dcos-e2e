@@ -2,11 +2,6 @@
 Checks for showing up common sources of errors with the Docker backend.
 """
 
-import shlex
-from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.docker_storage_drivers import DockerStorageDriver
-import io
-import configparser
 import shutil
 import subprocess
 import sys
@@ -19,6 +14,9 @@ import click
 import docker
 
 from cli._common import DOCKER_STORAGE_DRIVERS, docker_client
+from dcos_e2e.backends import Docker
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.docker_versions import DockerVersion
 
 
 class _CheckLevels(IntEnum):
@@ -419,25 +417,13 @@ def _check_docker_supports_mounts() -> _CheckLevels:
 
 
 def _check_can_mount_in_docker() -> _CheckLevels:
-    client = docker_client()
-    from docker.types import Mount
-    from dcos_e2e.cluster import Cluster
-    from dcos_e2e.backends import Docker
-    from dcos_e2e.docker_versions import DockerVersion
+    docker_client()
 
     cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
-    args = [
-        'docker',
-        'run',
-        '-v',
-        '/foo',
-        'alpine'
-    ]
+    args = ['docker', 'run', '-v', '/foo', 'alpine']
 
     error_message_substring = 'no subsystem for mount'
-    with Cluster(
-        cluster_backend=cluster_backend,
-    ) as cluster:
+    with Cluster(cluster_backend=cluster_backend) as cluster:
         (public_agent, ) = cluster.public_agents
         try:
             public_agent.run(args=args)
