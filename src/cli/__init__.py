@@ -34,7 +34,6 @@ from ._common import (
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
-    existing_cluster_ids,
 )
 from ._options import existing_cluster_id_option, node_transport_option
 from ._validators import (
