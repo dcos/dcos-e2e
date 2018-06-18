@@ -481,11 +481,7 @@ class TestAdvancedInstallationMethod:
         # We use a specific version of Docker on the nodes because else we may
         # hit https://github.com/opencontainers/runc/issues/1175.
         cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
-        with Cluster(
-            cluster_backend=cluster_backend,
-            agents=1,
-            public_agents=1,
-        ) as cluster:
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             for nodes, role in (
                 (cluster.masters, Role.MASTER),
                 (cluster.agents, Role.AGENT),

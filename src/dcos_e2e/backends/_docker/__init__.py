@@ -424,7 +424,6 @@ class DockerCluster(ClusterManager):
         """
         raise NotImplementedError
 
-
     @property
     def base_config(self) -> Dict[str, Any]:
         """

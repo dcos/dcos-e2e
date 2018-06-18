@@ -16,7 +16,7 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-from .node import Node, Transport
+from .node import Node, Role, Transport
 
 
 @retry(
@@ -349,12 +349,18 @@ class Cluster(ContextDecorator):
                 log_output_live=log_output_live,
             )
         except NotImplementedError:
-            for node in {*self.masters, *self.agents, *self.public_agents}:
-                node.install_dcos(
-                    build_artifact=build_artifact,
-                    dcos_config=dcos_config,
-                    log_output_live=log_output_live,
-                )
+            for nodes, role in (
+                (self.masters, Role.MASTER),
+                (self.agents, Role.AGENT),
+                (self.public_agents, Role.PUBLIC_AGENT),
+            ):
+                for node in nodes:
+                    node.install_dcos(
+                        build_artifact=build_artifact,
+                        dcos_config=dcos_config,
+                        role=role,
+                        log_output_live=log_output_live,
+                    )
 
     def install_dcos_from_path(
         self,
