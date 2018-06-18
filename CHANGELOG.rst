@@ -7,6 +7,7 @@ Next
 ----
 
 - Add ``dcos-docker doctor`` check for a version conflict between systemd and Docker.
+- Allow installing DC/OS by a URL on the Docker backend, and a cluster ``from_nodes``.
 
 2018.06.14.1
 ------------
