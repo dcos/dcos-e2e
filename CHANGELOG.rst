@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add ``dcos-docker doctor`` check for a version conflict between systemd and Docker.
+
 2018.06.14.1
 ------------
 
