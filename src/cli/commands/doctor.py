@@ -482,16 +482,16 @@ def doctor() -> None:
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     check_functions = [
-        # _check_1_9_sed,
-        # _check_docker_root_free_space,
-        # _check_docker_supports_mounts,
-        # _check_memory,
-        # _check_mount_tmp,
-        # _check_networking,
-        # _check_selinux,
-        # _check_ssh,
-        # _check_storage_driver,
-        # _check_tmp_free_space,
+        _check_1_9_sed,
+        _check_docker_root_free_space,
+        _check_docker_supports_mounts,
+        _check_memory,
+        _check_mount_tmp,
+        _check_networking,
+        _check_selinux,
+        _check_ssh,
+        _check_storage_driver,
+        _check_tmp_free_space,
         _check_can_mount_in_docker,
     ]
 
