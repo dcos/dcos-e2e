@@ -343,7 +343,7 @@ class Cluster(ContextDecorator):
                 If `True`, stderr is merged into stdout in the return value.
         """
         try:
-            self._cluster.install_dcos_from_url(
+            self._cluster.install_dcos_from_url_with_bootstrap_node(
                 build_artifact=build_artifact,
                 dcos_config=dcos_config,
                 log_output_live=log_output_live,

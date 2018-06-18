@@ -38,14 +38,14 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a build artifact passed as an URL string.
+        Install DC/OS from a URL with a bootstrap node.
 
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
