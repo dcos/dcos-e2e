@@ -245,7 +245,7 @@ class AWSCluster(ClusterManager):
         # We include ``ip_detect_contents`` so that we can install DC/OS
         # without putting an IP detect script on nodes.
         ip_detect_contents = dedent(
-            """
+            """\
             #!/bin/sh
             set -o nounset -o errexit
 
