@@ -7,8 +7,11 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
+from textwrap import dedent
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Tuple, Type
+
+import yaml
 
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
@@ -239,7 +242,35 @@ class AWSCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        return dict(self.launcher.config['dcos_config'])
+        # We include ``ip_detect_contents`` so that we can install DC/OS
+        # without putting an IP detect script on nodes.
+        ip_detect_contents = dedent(
+            """
+            #!/bin/sh
+            set -o nounset -o errexit
+
+            if [ -e /etc/environment ]
+            then
+              set -o allexport
+              source /etc/environment
+              set +o allexport
+            fi
+
+            get_private_ip_from_metaserver()
+            {
+                curl -fsSL http://169.254.169.254/latest/meta-data/local-ipv4
+            }
+
+            echo ${COREOS_PRIVATE_IPV4:-$(get_private_ip_from_metaserver)}
+            """,
+        )
+        ip_detect_contents = yaml.dump(ip_detect_contents)
+        return {
+            **dict(self.launcher.config['dcos_config']),
+            **{
+                'id_detect_contents': ip_detect_contents,
+            },
+        }
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
