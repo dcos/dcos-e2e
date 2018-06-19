@@ -153,6 +153,7 @@ class Node:
             remote_path=remote_genconf_path / 'config.yaml',
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         genconf_args = [
@@ -172,6 +173,7 @@ class Node:
             shell=True,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         self.run(
@@ -179,6 +181,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         setup_args = [
@@ -197,6 +200,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
     def install_dcos_from_path(
@@ -238,7 +242,7 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        workspace_dir = Path('/home/dcos-e2e')
+        workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
@@ -328,6 +332,7 @@ class Node:
         shell: bool = False,
         tty: bool = False,
         transport: Optional[Transport] = None,
+        sudo: bool = True,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -353,6 +358,7 @@ class Node:
                 the returned ``subprocess.CompletedProcess``.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use "sudo" to run commands.
 
         Returns:
             The representation of the finished process.
@@ -366,6 +372,9 @@ class Node:
         env = dict(env or {})
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
+
+        if sudo:
+            args = ['sudo'] + args
 
         if user is None:
             user = self.default_user
@@ -439,6 +448,7 @@ class Node:
         remote_path: Path,
         user: Optional[str] = None,
         transport: Optional[Transport] = None,
+        sudo: bool = False,
     ) -> None:
         """
         Copy a file to this node.
@@ -450,17 +460,20 @@ class Node:
                 the ``default_user`` is used instead.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use sudo to create the directory which holds the
+                remote file.
         """
         if user is None:
             user = self.default_user
 
         transport = transport or self.default_transport
         node_transport = self._get_node_transport(transport=transport)
+        mkdir_args = ['mkdir', '--parents', str(remote_path.parent)]
         self.run(
-            args=['mkdir', '--parents',
-                  str(remote_path.parent)],
+            args=mkdir_args,
             user=user,
             transport=transport,
+            sudo=sudo,
         )
 
         return node_transport.send_file(
