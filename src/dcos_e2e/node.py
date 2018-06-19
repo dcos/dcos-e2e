@@ -107,21 +107,27 @@ class Node:
         transport: Optional[Transport] = None,
     ) -> None:
         """
-        XXX
+        DC/OS advanced installation procedure carried out
+        remotely without a bootstrap node from a
+        ``build_artifact`` stored on the remote node.
         """
         tempdir = Path(gettempdir())
+
+        remote_genconf_dir = 'genconf'
+        remote_genconf_path = remote_build_artifact.parent / remote_genconf_dir
+        serve_dir_path = remote_genconf_path / 'serve'
         dcos_config = {
             **dcos_config,
             **{
-                'bootstrap_url': 'file:///genconf/serve',
+                'bootstrap_url':
+                'file://{serve_dir_path}'.format(
+                    serve_dir_path=serve_dir_path,
+                ),
             },
         }
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = tempdir / 'config.yaml'
         Path(config_file_path).write_text(data=config_yaml)
-
-        remote_genconf_dir = 'genconf'
-        remote_genconf_path = Path('/') / remote_genconf_dir
 
         self.send_file(
             local_path=config_file_path,
@@ -132,7 +138,7 @@ class Node:
 
         genconf_args = [
             'cd',
-            '/',
+            str(remote_build_artifact.parent),
             '&&',
             'bash',
             str(remote_build_artifact),
@@ -158,7 +164,7 @@ class Node:
 
         setup_args = [
             'cd',
-            '/',
+            str(remote_build_artifact.parent),
             '&&',
             'bash',
             'genconf/serve/dcos_install.sh',
