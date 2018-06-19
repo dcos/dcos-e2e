@@ -99,7 +99,7 @@ class Node:
 
     def _install_dcos_from_node_path(
         self,
-        build_artifact: Path,
+        remote_build_artifact: Path,
         dcos_config: Dict[str, Any],
         role: Role,
         user: Optional[str] = None,
@@ -109,6 +109,70 @@ class Node:
         """
         XXX
         """
+        tempdir = Path(gettempdir())
+        dcos_config = {
+            **dcos_config,
+            **{
+                'bootstrap_url': 'file:///genconf/serve',
+            },
+        }
+        config_yaml = yaml.dump(data=dcos_config)
+        config_file_path = tempdir / 'config.yaml'
+        Path(config_file_path).write_text(data=config_yaml)
+
+        remote_genconf_dir = 'genconf'
+        remote_genconf_path = Path('/') / remote_genconf_dir
+
+        self.send_file(
+            local_path=config_file_path,
+            remote_path=remote_genconf_path / 'config.yaml',
+            transport=transport,
+            user=user,
+        )
+
+        genconf_args = [
+            'cd',
+            '/',
+            '&&',
+            'bash',
+            str(remote_build_artifact),
+            '--offline',
+            '-v',
+            '--genconf',
+        ]
+
+        self.run(
+            args=genconf_args,
+            log_output_live=True,
+            shell=True,
+            transport=transport,
+            user=user,
+        )
+
+        self.run(
+            args=['rm', str(remote_build_artifact)],
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+        )
+
+        setup_args = [
+            'cd',
+            '/',
+            '&&',
+            'bash',
+            'genconf/serve/dcos_install.sh',
+            '--no-block-dcos-setup',
+            role.value,
+        ]
+
+        self.run(
+            args=setup_args,
+            shell=True,
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+        )
 
     def install_dcos_from_path(
         self,
@@ -145,77 +209,20 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_build_artifact = '/dcos_generate_config.sh'
+        node_build_artifact = Path('/dcos_generate_config.sh')
         self.send_file(
             local_path=build_artifact,
-            remote_path=Path(node_build_artifact),
+            remote_path=node_build_artifact,
             transport=transport,
             user=user,
         )
-
-        tempdir = Path(gettempdir())
-        dcos_config = {
-            **dcos_config,
-            **{
-                'bootstrap_url': 'file:///genconf/serve',
-            },
-        }
-        config_yaml = yaml.dump(data=dcos_config)
-        config_file_path = tempdir / 'config.yaml'
-        Path(config_file_path).write_text(data=config_yaml)
-
-        remote_genconf_dir = 'genconf'
-        remote_genconf_path = Path('/') / remote_genconf_dir
-
-        self.send_file(
-            local_path=config_file_path,
-            remote_path=remote_genconf_path / 'config.yaml',
-            transport=transport,
+        self._install_dcos_from_node_path(
+            remote_build_artifact=node_build_artifact,
+            dcos_config=dcos_config,
             user=user,
-        )
-
-        genconf_args = [
-            'cd',
-            '/',
-            '&&',
-            'bash',
-            node_build_artifact,
-            '--offline',
-            '-v',
-            '--genconf',
-        ]
-
-        self.run(
-            args=genconf_args,
-            log_output_live=True,
-            shell=True,
-            transport=transport,
-            user=user,
-        )
-
-        self.run(
-            args=['rm', node_build_artifact],
+            role=role,
             log_output_live=log_output_live,
             transport=transport,
-            user=user,
-        )
-
-        setup_args = [
-            'cd',
-            '/',
-            '&&',
-            'bash',
-            'genconf/serve/dcos_install.sh',
-            '--no-block-dcos-setup',
-            role.value,
-        ]
-
-        self.run(
-            args=setup_args,
-            shell=True,
-            log_output_live=log_output_live,
-            transport=transport,
-            user=user,
         )
 
     def install_dcos_from_url(
@@ -253,77 +260,26 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_build_artifact = '/dcos_generate_config.sh'
+        node_build_artifact = Path('/dcos_generate_config.sh')
         self.run(
-            args=['curl', '-f', build_artifact, '-o', node_build_artifact],
+            args=[
+                'curl',
+                '-f',
+                build_artifact,
+                '-o',
+                str(node_build_artifact),
+            ],
             log_output_live=log_output_live,
             transport=transport,
             user=user,
         )
-
-        tempdir = Path(gettempdir())
-        dcos_config = {
-            **dcos_config,
-            **{
-                'bootstrap_url': 'file:///genconf/serve',
-            },
-        }
-        config_yaml = yaml.dump(data=dcos_config)
-        config_file_path = tempdir / 'config.yaml'
-        Path(config_file_path).write_text(data=config_yaml)
-
-        remote_genconf_dir = 'genconf'
-        remote_genconf_path = Path('/') / remote_genconf_dir
-
-        self.send_file(
-            local_path=config_file_path,
-            remote_path=remote_genconf_path / 'config.yaml',
-            transport=transport,
+        self._install_dcos_from_node_path(
+            remote_build_artifact=node_build_artifact,
+            dcos_config=dcos_config,
             user=user,
-        )
-
-        genconf_args = [
-            'cd',
-            '/',
-            '&&',
-            'bash',
-            node_build_artifact,
-            '--offline',
-            '-v',
-            '--genconf',
-        ]
-
-        self.run(
-            args=genconf_args,
-            log_output_live=True,
-            shell=True,
-            transport=transport,
-            user=user,
-        )
-
-        self.run(
-            args=['rm', node_build_artifact],
+            role=role,
             log_output_live=log_output_live,
             transport=transport,
-            user=user,
-        )
-
-        setup_args = [
-            'cd',
-            '/',
-            '&&',
-            'bash',
-            'genconf/serve/dcos_install.sh',
-            '--no-block-dcos-setup',
-            role.value,
-        ]
-
-        self.run(
-            args=setup_args,
-            shell=True,
-            log_output_live=log_output_live,
-            transport=transport,
-            user=user,
         )
 
     def run(
