@@ -95,31 +95,6 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
-    def test_install_dcos_from_path(self) -> None:
-        """
-        The AWS backend requires a build artifact URL in order to launch a
-        DC/OS cluster.
-        """
-        with Cluster(
-            cluster_backend=AWS(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_path(
-                    build_artifact=Path('/foo'),
-                    dcos_config=cluster.base_config,
-                )
-
-        expected_error = (
-            'The AWS backend does not support the installation of build '
-            'artifacts passed via path. This is because a more efficient'
-            'installation method exists in ``install_dcos_from_url``.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
     def test_destroy_node(self):
         """
         Destroying a particular node is not supported on the AWS backend.
@@ -256,3 +231,33 @@ class TestCustomKeyPair:
                 node.run(args=['echo', '1'])
         finally:
             ec2.delete_key_pair(KeyName=key_name)
+
+
+class TestDCOSInstallation:
+    """
+    Test installing DC/OS.
+    """
+
+    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
+        """
+        It is not possible to install DC/OS on an AWS backend from a path.
+        """
+        with Cluster(
+            cluster_backend=AWS(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            with pytest.raises(NotImplementedError) as excinfo:
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
+
+        expected_error = (
+            'The AWS backend does not support the installation of build '
+            'artifacts passed via path. This is because a more efficient'
+            'installation method exists in ``install_dcos_from_url``.'
+        )
+
+        assert str(excinfo.value) == expected_error
