@@ -90,7 +90,7 @@ class VagrantCluster(ClusterManager):
             log_output_live=True,
         )
 
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
@@ -121,6 +121,7 @@ class VagrantCluster(ClusterManager):
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
         """
+        raise NotImplementedError
 
 
     def destroy(self) -> None:
