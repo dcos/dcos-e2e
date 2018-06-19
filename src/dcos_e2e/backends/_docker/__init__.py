@@ -382,7 +382,6 @@ class DockerCluster(ClusterManager):
         ):
             for container_number in range(nodes):
                 start_dcos_container(
-                    existing_masters=self.masters,
                     container_base_name=prefix,
                     container_number=container_number,
                     mounts=mounts,

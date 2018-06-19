@@ -1,5 +1,5 @@
 """
-Tests for the Docker backend.
+Tests for the AWS backend.
 """
 
 import uuid
