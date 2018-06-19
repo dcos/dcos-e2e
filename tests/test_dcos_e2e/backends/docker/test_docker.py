@@ -371,12 +371,17 @@ class TestLabels:
                 assert master_key not in node_labels
                 assert agent_key not in node_labels
 
+
 class TestEtcHosts:
     """
+    Test the creation of ``/etc/hosts``.
     """
 
-    def test_etc_hosts(self) -> None:
+    def test_registry_hosts(self) -> None:
         """
+        One master has 127.0.0.1 in its ``/etc/hosts`` file mapping to
+        ``registry.local``. All other nodes have that master's IP address
+        mapping to ``registry.local``.
         """
         with Cluster(cluster_backend=Docker()) as cluster:
             nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
@@ -397,6 +402,8 @@ class TestEtcHosts:
                 node for node, registry_address in registries.items()
                 if registry_address == '127.0.0.1'
             ]
+
+            assert registry_node in cluster.masters
 
             assert set(registries.values()) == {
                 '127.0.0.1',
