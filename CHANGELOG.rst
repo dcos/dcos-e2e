@@ -6,6 +6,36 @@ Changelog
 Next
 ----
 
+- Add platform-independent DC/OS installation method from ``Path`` and URL on ``Node``.
+
+2018.06.18.0
+------------
+
+- Add ``dcos-docker doctor`` check for a version conflict between systemd and Docker.
+- Allow installing DC/OS by a URL on the Docker backend, and a cluster ``from_nodes``.
+
+2018.06.14.1
+------------
+
+- Add ``Cluster.remove_node``.
+
+2018.06.14.0
+------------
+
+- Add Ubuntu support to the Docker backend.
+- Add ``aws_key_pair`` parameter to the AWS backend.
+- Fix Linuxbrew installation on Ubuntu.
+
+2018.06.12.1
+------------
+
+- Add a ``--wait`` flag to ``dcos-docker create`` to also wait for the cluster.
+
+2018.06.12.0
+------------
+
+- ``dcos-docker create`` now creates clusters with the ``--cluster-id`` "default" by default.
+
 2018.06.05.0
 ------------
 

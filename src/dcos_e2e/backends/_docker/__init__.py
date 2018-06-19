@@ -266,10 +266,6 @@ class DockerCluster(ClusterManager):
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
 
-        ip_detect_src = Path(__file__).parent / 'resources' / 'ip_detect'
-        ip_detect_dst = Path('/genconf/ip-detect')
-        files_to_copy_to_installer.append((ip_detect_src, ip_detect_dst))
-
         public_key_path = ssh_dir / 'id_rsa.pub'
         _write_key_pair(
             public_key_path=public_key_path,
@@ -321,6 +317,7 @@ class DockerCluster(ClusterManager):
             type='bind',
         )
 
+        # Mount cgroups into agents for Mesos DRF.
         cgroup_mount = Mount(
             source='/sys/fs/cgroup',
             target='/sys/fs/cgroup',
@@ -387,8 +384,6 @@ class DockerCluster(ClusterManager):
                     existing_masters=self.masters,
                     container_base_name=prefix,
                     container_number=container_number,
-                    dcos_num_masters=masters,
-                    dcos_num_agents=agents + public_agents,
                     mounts=mounts,
                     tmpfs=node_tmpfs_mounts,
                     docker_image=docker_image_tag,
@@ -403,15 +398,15 @@ class DockerCluster(ClusterManager):
                     docker_version=cluster_backend.docker_version,
                 )
 
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a URL. This is not supported and simply raises a
-        ``NotImplementedError``.
+        Install DC/OS from a URL with a bootstrap node.
+        This is not supported and simply raises a ``NotImplementedError``.
 
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
@@ -422,27 +417,24 @@ class DockerCluster(ClusterManager):
         Raises:
             NotImplementedError: ``NotImplementedError`` because the Docker
                 backend does not support the DC/OS advanced installation
-                method.
+                method with a bootstrap node.
         """
-        message = (
-            'The Docker backend does not support the installation of DC/OS '
-            'by build artifacts passed via URL string. This is because a more '
-            'efficient installation method exists in `install_dcos_from_path`.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError
 
     @property
     def base_config(self) -> Dict[str, Any]:
         """
-        Return a base configuration for installing DC/OS OSS.
+        Return a base configuration for installing DC/OS OSS, not including the
+        list of nodes.
         """
         ssh_user = self._default_user
 
-        def ip_list(nodes: Set[Node]) -> List[str]:
-            return list(map(lambda node: str(node.public_ip_address), nodes))
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        ip_detect_src = current_parent / 'resources' / 'ip-detect'
+        ip_detect_contents = Path(ip_detect_src).read_text()
 
         config = {
-            'agent_list': ip_list(nodes=self.agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
             # "Time is not synchronized / marked as bad by the kernel.".
@@ -454,12 +446,14 @@ class DockerCluster(ClusterManager):
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
             'master_discovery': 'static',
-            'master_list': ip_list(nodes=self.masters),
             'process_timeout': 10000,
-            'public_agent_list': ip_list(nodes=self.public_agents),
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
+            # This is not a documented option.
+            # Users are instructed to instead provide a filename with
+            # 'ip_detect_contents_filename'.
+            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
         return config
@@ -529,20 +523,26 @@ class DockerCluster(ClusterManager):
                     LOGGER.error(ex.stderr)
                     raise
 
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(node.public_ip_address)
+        ]
+        container.stop()
+        container.remove(v=True)
+
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
-        client = docker.from_env(version='auto')
-        for prefix in (
-            self._master_prefix,
-            self._agent_prefix,
-            self._public_agent_prefix,
-        ):
-            containers = client.containers.list(filters={'name': prefix})
-            for container in containers:
-                container.stop()
-                container.remove(v=True)
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            self.destroy_node(node=node)
 
         rmtree(path=str(self._path), ignore_errors=True)
 

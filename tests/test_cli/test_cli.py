@@ -146,7 +146,7 @@ class TestCreate:
               --docker-version [1.11.2|1.13.1|17.12.1-ce]
                                               The Docker version to install on the nodes.
                                               [default: 1.13.1]
-              --linux-distribution [centos-7|coreos]
+              --linux-distribution [centos-7|coreos|ubuntu-16.04]
                                               The Linux distribution to use on the nodes.
                                               [default: centos-7]
               --docker-storage-driver [aufs|overlay|overlay2]
@@ -165,9 +165,9 @@ class TestCreate:
                                               The security mode to use for a DC/OS
                                               Enterprise cluster. This overrides any
                                               security mode set in ``--extra-config``.
-              -c, --cluster-id TEXT           A unique identifier for the cluster. Defaults
-                                              to a random value. Use the value "default" to
-                                              use this cluster for other
+              -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
+                                              value "default" to use this cluster for other
+                                              commands without specifying --cluster-id.
               --license-key PATH              This is ignored if using open source DC/OS. If
                                               using DC/OS Enterprise, this defaults to the
                                               value of the `DCOS_LICENSE_KEY_PATH`
@@ -211,6 +211,14 @@ class TestCreate:
                                               variant from the artifact. Finding the variant
                                               from the artifact takes some time and so using
                                               another option is a performance optimization.
+              --wait-for-dcos                 Wait for DC/OS after creating the cluster.
+                                              This is equivalent to using "dcos-docker wait"
+                                              after this command. "dcos-docker wait" has
+                                              various options available and so may be more
+                                              appropriate for your use case. If the chosen
+                                              transport is "docker-exec", this will skip
+                                              HTTP checks and so the cluster may not be
+                                              fully ready.
               --transport [docker-exec|ssh]   The communication transport to use. On macOS
                                               the SSH transport requires IP routing to be
                                               set up. See "dcos-docker setup-mac-network".It
@@ -681,7 +689,8 @@ class TestDestroy:
               Destroy a cluster.
 
             Options:
-              -c, --cluster-id TEXT          If not given, "default" is used.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                              the SSH transport requires IP routing to be set
                                              up. See "dcos-docker setup-mac-network".It also
@@ -849,7 +858,7 @@ class TestInspect:
               exec -it $MASTER_0`` to enter the first master, for example.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
               --env                  Show details in an environment variable format to eval.
               --help                 Show this message and exit.
             """,# noqa: E501,E261
@@ -880,7 +889,7 @@ class TestWait:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos-docker inspect --help`.
+        Help text is shown with `dcos-docker wait --help`.
         """
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['wait', '--help'])
@@ -895,7 +904,8 @@ class TestWait:
               Wait for DC/OS to start.
 
             Options:
-              -c, --cluster-id TEXT          If not given, "default" is used.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --superuser-username TEXT      The superuser username is needed only on DC/OS
                                              Enterprise clusters. By default, on a DC/OS
                                              Enterprise cluster, `admin` is used.
@@ -967,7 +977,8 @@ class TestSync:
               If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
 
             Options:
-              -c, --cluster-id TEXT          If not given, "default" is used.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                              the SSH transport requires IP routing to be set
                                              up. See "dcos-docker setup-mac-network".It also
@@ -1052,7 +1063,7 @@ class TestWeb:
               docker wait`` before running this command.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
               --help                 Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -1241,14 +1252,15 @@ class TestRun:
               whole command in double quotes.
 
             Options:
-              -c, --cluster-id TEXT          If not given, "default" is used.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
               --dcos-login-uname TEXT        The username to set the ``DCOS_LOGIN_UNAME``
                                              environment variable to.
               --dcos-login-pw TEXT           The password to set the ``DCOS_LOGIN_PW``
                                              environment variable to.
               --sync-dir PATH                The path to a DC/OS checkout. Part of this
-                                             checkout will be synced before the command is
-                                             run.
+                                             checkout will be synced to all master nodes
+                                             before the command is run.
               --no-test-env                  With this flag set, no environment variables
                                              are set and the command is run in the home
                                              directory.

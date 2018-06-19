@@ -29,10 +29,12 @@ Windows is not currently supported, but we provide instructions on using DC/OS E
 .. _Docker backend: http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html
 .. _backends: http://dcos-e2e.readthedocs.io/en/latest/backends.html
 
-CLI macOS With Homebrew
-~~~~~~~~~~~~~~~~~~~~~~~
+CLI on macOS With Homebrew or Linux with Linuxbrew
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To install the CLI on macOS, install `Homebrew`_.
+To install the CLI on Linux, install `Linuxbrew`_.
+Or, if you prefer, see "Library and CLI with Python" below for an alternative.
 
 Then install the latest stable version:
 
@@ -55,7 +57,7 @@ Run ``dcos-docker doctor`` to make sure that your system is ready to go:
 Library and CLI with Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If the CLI has been installed with Homebrew, you do not need to install the library to use the CLI.
+If the CLI has been installed with Homebrew or Linuxbrew, you do not need to install the library to use the CLI.
 
 Requires Python 3.5.2+.
 To avoid interfering with your system's Python, we recommend using a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_.
@@ -136,10 +138,8 @@ A typical CLI workflow may look like this:
 
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
+   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0
    default
-   # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
-   # is automatically used.
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
@@ -155,3 +155,4 @@ Each of these commands and more described in detail in the `full CLI documentati
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 .. _Homebrew: https://brew.sh
+.. _Linuxbrew: https://linuxbrew.sh

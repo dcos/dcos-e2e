@@ -10,10 +10,8 @@ A typical CLI workflow for open source DC/OS may look like the following.
 
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0 --cluster-id default
+   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0
    default
-   # Without specifying a cluster ID for ``wait`` and ``run``, ``default``
-   # is automatically used.
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
@@ -31,10 +29,13 @@ Each of these and more are described in detail below.
 Installation
 ------------
 
-The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
+The CLI can be installed with Homebrew on macOS or Linuxbrew on Linux.
+The library and CLI can be installed together with ``pip`` on any Linux and macOS.
 See "Operating System" requirements for instructions on using the CLI on Windows in a Vagrant VM.
 
 .. include:: cli-homebrew.rst
+
+.. include:: cli-linuxbrew.rst
 
 .. include:: install-python.rst
 
@@ -73,8 +74,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
    $ dcos-docker create /path/to/dcos_generate_config.ee.sh \
         --license-key /path/to/license.txt \
-        --security-mode strict \
-        --cluster-id default
+        --security-mode strict
 
 The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
@@ -85,12 +85,8 @@ See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on 
 --------------------
 
 It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
-As a convenience, any command which takes a ``cluster-id`` option,
-apart from ``create``,
-defaults to using "default" if no cluster ID is given.
-
-This means that you can use ``--cluster-id=default`` and then use ``dcos-docker wait`` with no arguments to wait for the ``default`` cluster.
-
+Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
+This means that you can use ``dcos-docker wait`` with no arguments to wait for the ``default`` cluster.
 
 .. _running-commands:
 
@@ -205,7 +201,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. code-block:: console
 
-   $ dcos-docker create /tmp/dcos_generate_config.ee.sh --cluster-id default
+   $ dcos-docker create /tmp/dcos_generate_config.ee.sh
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
@@ -256,7 +252,6 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
           --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
           --license-key /path/to/license.txt \
           --extra-config config.yml \
-          --cluster-id default
 
 #. Verify that everything has worked.
 

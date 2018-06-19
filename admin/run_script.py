@@ -1,16 +1,15 @@
 """
-Download requirements for a test pattern.
-
-This separates the download step from the test step. We could download all
-artifacts for all tests, but in the interest of speed, we only download what we
-need.
+Run tests and linters on Travis CI.
 """
 
 import os
+import subprocess
+import sys
 from pathlib import Path
 from typing import Dict, Tuple  # noqa: F401
 
 import click
+import pytest
 import requests
 
 OSS_PATTERN = (
@@ -65,12 +64,18 @@ PATTERNS = {
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported':
     (),
+    'tests/test_dcos_e2e/backends/aws/test_aws.py::TestCustomKeyPair':
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss':  # noqa: E501
     (OSS_MASTER, ),
+    'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_oss':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise':  # noqa: E501
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_docker.py':
     (),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
@@ -81,17 +86,19 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests':
     (OSS_MASTER, ),
-    'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters::test_two_clusters':  # noqa: E501
+    'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters':
     (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_cluster.py::TestDestroyNode':
+    (),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
     (EE_MASTER, ),
-    'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests::test_run_pytest':  # noqa: E501
+    'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests':
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled':
     (EE_MASTER, ),
-    'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS::test_auth_with_cli':  # noqa: E501
+    'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS':
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise':
     (EE_1_10, ),
@@ -110,7 +117,7 @@ PATTERNS = {
 }  # type: Dict[str, Tuple]
 
 
-def download_file(url: str, path: Path) -> None:
+def _download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
@@ -131,15 +138,41 @@ def download_file(url: str, path: Path) -> None:
                     file_descriptor.flush()  # type: ignore
 
 
-def main() -> None:
+def download_artifacts(test_pattern: str) -> None:
     """
     Download artifacts.
     """
-    pattern = os.environ['TEST_PATTERN']
-    downloads = PATTERNS[pattern]
+    downloads = PATTERNS[test_pattern]
     for url, path in downloads:
-        download_file(url=url, path=path)
+        _download_file(url=url, path=path)
+
+
+def run_test(test_pattern: str) -> None:
+    """
+    Run pytest with a given test pattern.
+    """
+    result = pytest.main(
+        [
+            '-vvv',
+            '--exitfirst',
+            '--capture',
+            'no',
+            test_pattern,
+            '--cov',
+            'src/dcos_e2e',
+            '--cov',
+            'tests',
+        ],
+    )
+    sys.exit(result)
 
 
 if __name__ == '__main__':
-    main()
+    CI_PATTERN = os.environ.get('CI_PATTERN')
+    if CI_PATTERN:
+        download_artifacts(test_pattern=CI_PATTERN)
+        run_test(test_pattern=CI_PATTERN)
+    else:
+        subprocess.check_call(['make', 'lint'])
+        subprocess.check_call(['dcos-docker', 'doctor'])
+        subprocess.check_call(['make', 'docs'])

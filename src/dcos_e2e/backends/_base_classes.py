@@ -38,14 +38,18 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a build artifact passed as an URL string.
+        Install DC/OS from a URL with a bootstrap node.
+
+        If a method which implements this abstract method raises a
+        ``NotImplementedError``, users of the backend can still install DC/OS
+        from a URL in an inefficient manner.
 
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
@@ -68,6 +72,12 @@ class ClusterManager(abc.ABC):
             build_artifact: The path to a build artifact to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
+        """
+
+    @abc.abstractmethod
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
         """
 
     @abc.abstractmethod
@@ -102,6 +112,9 @@ class ClusterManager(abc.ABC):
     def base_config(self) -> Dict[str, Any]:
         """
         Return a base configuration for installing DC/OS OSS.
+
+        This does not need to include the lists of IP addresses for each node
+        type.
         """
 
 

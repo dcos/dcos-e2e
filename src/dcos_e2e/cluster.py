@@ -16,7 +16,7 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-from .node import Node, Transport
+from .node import Node, Role, Transport
 
 
 @retry(
@@ -311,7 +311,19 @@ class Cluster(ContextDecorator):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        return self._cluster.base_config
+
+        def ip_list(nodes: Set[Node]) -> List[str]:
+            return list(map(lambda node: str(node.private_ip_address), nodes))
+
+        config = {
+            'agent_list': ip_list(nodes=self.agents),
+            'master_list': ip_list(nodes=self.masters),
+            'public_agent_list': ip_list(nodes=self.public_agents),
+        }
+        return {
+            **config,
+            **self._cluster.base_config,
+        }
 
     def install_dcos_from_url(
         self,
@@ -320,33 +332,47 @@ class Cluster(ContextDecorator):
         log_output_live: bool = False,
     ) -> None:
         """
-        Installs DC/OS using the DC/OS advanced installation method if
-        supported by the backend.
+        Installs DC/OS using the DC/OS advanced installation method.
 
-        This method spins up a persistent bootstrap host that supplies all
-        dedicated DC/OS hosts with the necessary installation files.
+        If supported by the cluster backend, this method spins up a persistent
+        bootstrap host that supplies all dedicated DC/OS hosts with the
+        necessary installation files.
 
         Since the bootstrap host is different from the host initiating the
         cluster creation passing the ``build_artifact`` via URL string
         saves the time of copying the ``build_artifact`` to the bootstrap host.
 
+        However, some backends may not support using a bootstrap node. For
+        these backends, each node will download and extract the build
+        artifact. This may be very slow, as the build artifact is downloaded to
+        and extracted on each node, one at a time.
+
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            dcos_config: The DC/OS configuration to use.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
-
-        Raises:
-            NotImplementedError: `NotImplementedError` because the given
-                backend provides a more efficient installation method than
-                the DC/OS advanced installation method.
         """
-        self._cluster.install_dcos_from_url(
-            build_artifact=build_artifact,
-            dcos_config=dcos_config,
-            log_output_live=log_output_live,
-        )
+        try:
+            self._cluster.install_dcos_from_url_with_bootstrap_node(
+                build_artifact=build_artifact,
+                dcos_config=dcos_config,
+                log_output_live=log_output_live,
+            )
+        except NotImplementedError:
+            for nodes, role in (
+                (self.masters, Role.MASTER),
+                (self.agents, Role.AGENT),
+                (self.public_agents, Role.PUBLIC_AGENT),
+            ):
+                for node in nodes:
+                    node.install_dcos_from_url(
+                        build_artifact=build_artifact,
+                        dcos_config=dcos_config,
+                        role=role,
+                        log_output_live=log_output_live,
+                    )
 
     def install_dcos_from_path(
         self,
@@ -435,6 +461,9 @@ class Cluster(ContextDecorator):
             'SLAVE_HOSTS': ip_addresses(self.agents),
             'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
             'DCOS_DNS_ADDRESS': 'http://' + str(test_host.private_ip_address),
+            # This is only used by DC/OS 1.9 integration tests
+            'DCOS_NUM_MASTERS': len(self.masters),
+            'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
             **env,
         }
 
@@ -452,6 +481,12 @@ class Cluster(ContextDecorator):
         Destroy all nodes in the cluster.
         """
         self._cluster.destroy()
+
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+        self._cluster.destroy_node(node=node)
 
     def __exit__(
         self,

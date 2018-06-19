@@ -71,7 +71,7 @@ class ExistingClusterManager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-    def install_dcos_from_url(
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
@@ -126,6 +126,16 @@ class ExistingClusterManager(ClusterManager):
         Return all DC/OS public agent :class:`dcos_e2e.node.Node` s.
         """
         return self._public_agents
+
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroying an existing cluster node is the responsibility of the
+        caller.
+
+        Raises:
+            NotImplementedError: When called.
+        """
+        raise NotImplementedError
 
     def destroy(self) -> None:
         """
