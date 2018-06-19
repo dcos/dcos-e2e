@@ -250,6 +250,7 @@ class Node:
             remote_path=node_build_artifact,
             transport=transport,
             user=user,
+            sudo=True,
         )
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
@@ -471,6 +472,20 @@ class Node:
         mkdir_args = ['mkdir', '--parents', str(remote_path.parent)]
         self.run(
             args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
+
+        chown_args = [
+            'chown',
+            '-R',
+            '{user}:root'.format(user=user),
+            str(remote_path.parent),
+        ]
+
+        self.run(
+            args=chown_args,
             user=user,
             transport=transport,
             sudo=sudo,
