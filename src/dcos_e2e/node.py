@@ -224,7 +224,7 @@ class Node:
         Instead, the artifact is sent to this node and then extracted on this
         node, and then DC/OS is installed.
 
-        This creates a folder ``/dcos-e2e`` on this node which contains the
+        This creates a folder in ``/dcos-e2e`` on this node which contains the
         DC/OS installation files that can be removed safely after the DC/OS
         installation has finished.
 
