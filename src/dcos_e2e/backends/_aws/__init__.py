@@ -268,7 +268,7 @@ class AWSCluster(ClusterManager):
         return {
             **dict(self.launcher.config['dcos_config']),
             **{
-                'id_detect_contents': ip_detect_contents,
+                'ip_detect_contents': ip_detect_contents,
             },
         }
 
