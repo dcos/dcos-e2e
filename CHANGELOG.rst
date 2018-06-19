@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add platform-independent DC/OS installation method from ``Path`` and URL on ``Node``.
+
 2018.06.18.0
 ------------
 
