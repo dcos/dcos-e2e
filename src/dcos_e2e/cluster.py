@@ -393,7 +393,7 @@ class Cluster(ContextDecorator):
                 efficient for the given backend to use the DC/OS advanced
                 installation method that takes build artifacts by URL string.
         """
-        self._cluster.install_dcos_from_path(
+        self._cluster.install_dcos_from_path_with_bootstrap_node(
             build_artifact=build_artifact,
             dcos_config=dcos_config,
             log_output_live=log_output_live,
