@@ -342,17 +342,14 @@ class TestLabels:
         public_agent_value = uuid.uuid4().hex
         public_agent_labels = {public_agent_key: public_agent_value}
 
-        with Cluster(
-            cluster_backend=Docker(
-                docker_container_labels=cluster_labels,
-                docker_master_labels=master_labels,
-                docker_agent_labels=agent_labels,
-                docker_public_agent_labels=public_agent_labels,
-            ),
-            masters=1,
-            agents=1,
-            public_agents=1,
-        ) as cluster:
+        cluster_backend = Docker(
+            docker_container_labels=cluster_labels,
+            docker_master_labels=master_labels,
+            docker_agent_labels=agent_labels,
+            docker_public_agent_labels=public_agent_labels,
+        )
+
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             for node in cluster.masters:
                 node_labels = self._get_labels(node=node)
                 assert node_labels[cluster_key] == cluster_value
@@ -373,3 +370,42 @@ class TestLabels:
                 assert node_labels[public_agent_key] == public_agent_value
                 assert master_key not in node_labels
                 assert agent_key not in node_labels
+
+
+class TestEtcHosts:
+    """
+    Test the creation of ``/etc/hosts``.
+    """
+
+    def test_registry_hosts(self) -> None:
+        """
+        One master has 127.0.0.1 in its ``/etc/hosts`` file mapping to
+        ``registry.local``. All other nodes have that master's IP address
+        mapping to ``registry.local``.
+        """
+        with Cluster(cluster_backend=Docker()) as cluster:
+            nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+
+            registries = {}
+
+            for node in nodes:
+                etc_hosts = node.run(args=['cat', '/etc/hosts'])
+                etc_hosts_contents = etc_hosts.stdout.strip().decode()
+                for line in etc_hosts_contents.split('\n'):
+                    split_line = line.split()
+                    address = split_line[0]
+                    hosts = split_line[1:]
+                    if hosts == ['registry.local']:
+                        registries[node] = address
+
+            [registry_node] = [
+                node for node, registry_address in registries.items()
+                if registry_address == '127.0.0.1'
+            ]
+
+            assert registry_node in cluster.masters
+
+            assert set(registries.values()) == {
+                '127.0.0.1',
+                str(registry_node.private_ip_address),
+            }
