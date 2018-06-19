@@ -315,9 +315,7 @@ class TestRun:
             shell=True,
         )
 
-        sudoers_line = '{user} ALL=(ALL) NOPASSWD: ALL'.format(
-            user=testuser,
-        )
+        sudoers_line = '{user} ALL=(ALL) NOPASSWD: ALL'.format(user=testuser)
 
         echo_result = dcos_node.run(
             args=['echo "' + sudoers_line + '">> /etc/sudoers'],
@@ -326,7 +324,6 @@ class TestRun:
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip().decode() == ''
         assert echo_result.stderr.strip().decode() == ''
-
 
         echo_result = dcos_node.run(
             args=['echo', '$(whoami)'],
