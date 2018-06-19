@@ -224,12 +224,12 @@ class Node:
         Instead, the artifact is sent to this node and then extracted on this
         node, and then DC/OS is installed.
 
+        This creates a folder ``/dcos-e2e`` on this node which contains the
+        DC/OS installation files that can be removed safely after the DC/OS
+        installation has finished.
+
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
-
-        This creates a folder in ``/home/dcos-e2e`` on this node which contains
-        the DC/OS installation files that can be removed safely after the DC/OS
-        installation has finished.
 
         Args:
             build_artifact: The path to a build artifact to be installed on the
@@ -300,7 +300,7 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        workspace_dir = Path('/home/dcos-e2e')
+        workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(
