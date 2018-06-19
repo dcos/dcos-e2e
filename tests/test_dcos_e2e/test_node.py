@@ -301,6 +301,51 @@ class TestRun:
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
         assert echo_result.stderr == b''
 
+    def test_sudo(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        When sudo is given as ``True``, the given command has sudo prefixed.
+        """
+        testuser = str(uuid.uuid4().hex)
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        sudoers_line = '{user} ALL=(ALL) NOPASSWD: ALL'.format(user=testuser)
+
+        echo_result = dcos_node.run(
+            args=['echo "' + sudoers_line + '">> /etc/sudoers'],
+            shell=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == ''
+        assert echo_result.stderr.strip().decode() == ''
+
+        echo_result = dcos_node.run(
+            args=['echo', '$(whoami)'],
+            user=testuser,
+            shell=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == testuser
+        assert echo_result.stderr.strip().decode() == ''
+
+        echo_result = dcos_node.run(
+            args=['echo', '$(whoami)'],
+            user=testuser,
+            shell=True,
+            sudo=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == 'root'
+        assert echo_result.stderr.strip().decode() == ''
+
+        dcos_node.run(args=['userdel', '-r', testuser])
+
     @pytest.mark.parametrize('tty', [True, False])
     def test_tty(
         self,

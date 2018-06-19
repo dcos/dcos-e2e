@@ -333,7 +333,7 @@ class Node:
         shell: bool = False,
         tty: bool = False,
         transport: Optional[Transport] = None,
-        sudo: bool = True,
+        sudo: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
