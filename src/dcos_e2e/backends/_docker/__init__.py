@@ -385,8 +385,6 @@ class DockerCluster(ClusterManager):
                     existing_masters=self.masters,
                     container_base_name=prefix,
                     container_number=container_number,
-                    dcos_num_masters=masters,
-                    dcos_num_agents=agents + public_agents,
                     mounts=mounts,
                     tmpfs=node_tmpfs_mounts,
                     docker_image=docker_image_tag,

@@ -474,9 +474,9 @@ class TestAdvancedInstallationMethod:
     Test installing DC/OS on a node.
     """
 
-    def test_install_dcos(self, oss_artifact_url: str) -> None:
+    def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
         """
-        It is possible to install DC/OS on a node.
+        It is possible to install DC/OS on a node from a URL.
         """
         # We use a specific version of Docker on the nodes because else we may
         # hit https://github.com/opencontainers/runc/issues/1175.
@@ -488,7 +488,7 @@ class TestAdvancedInstallationMethod:
                 (cluster.public_agents, Role.PUBLIC_AGENT),
             ):
                 for node in nodes:
-                    node.install_dcos(
+                    node.install_dcos_from_url(
                         build_artifact=oss_artifact_url,
                         dcos_config=cluster.base_config,
                         role=role,
