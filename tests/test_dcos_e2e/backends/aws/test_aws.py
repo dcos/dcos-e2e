@@ -235,20 +235,14 @@ class TestCustomKeyPair:
 
 class TestDCOSInstallation:
     """
-    Test the platform-independent DC/OS installation on AWS.
+    Test installing DC/OS.
     """
 
     def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
         """
-        The AWS backend requires a build artifact path in order to launch
-        a DC/OS cluster.
+        It is possible to install DC/OS on an AWS cluster from a local path.
         """
-        with Cluster(
-            cluster_backend=AWS(),
-            masters=1,
-            agents=1,
-            public_agents=1,
-        ) as cluster:
+        with Cluster(cluster_backend=AWS()) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
