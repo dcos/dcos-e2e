@@ -81,10 +81,6 @@ class VagrantCluster(ClusterManager):
             args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
             cwd=str(dcos_vagrant_path),
             env={
-                'DCOS_MACHINE_CONFIG_PATH': str(config_file_path.relative_to(dcos_vagrant_path)),
-                'DCOS_GENERATE_CONFIG_PATH': str(artifact_path.relative_to(dcos_vagrant_path)),
-                'DCOS_CONFIG_PATH': str(dcos_config_path.relative_to(dcos_vagrant_path)),
-                'DCOS_LICENSE_KEY_CONTENTS': license_key_path.read_text(),
                 'PATH': os.environ['PATH'],
             },
             log_output_live=True,
