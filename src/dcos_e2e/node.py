@@ -322,6 +322,7 @@ class Node:
         shell: bool = False,
         tty: bool = False,
         transport: Optional[Transport] = None,
+        sudo: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -347,6 +348,7 @@ class Node:
                 the returned ``subprocess.CompletedProcess``.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use "sudo" to run commands.
 
         Returns:
             The representation of the finished process.
@@ -360,6 +362,9 @@ class Node:
         env = dict(env or {})
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
+
+        if sudo:
+            args = ['sudo'] + args
 
         if user is None:
             user = self.default_user
