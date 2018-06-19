@@ -97,6 +97,7 @@ submodules
 subnet
 subpackages
 subprocess
+sudo
 symlink
 systemctl
 systemd
