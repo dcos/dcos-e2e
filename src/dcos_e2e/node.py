@@ -108,9 +108,27 @@ class Node:
         transport: Optional[Transport] = None,
     ) -> None:
         """
-        DC/OS advanced installation procedure carried out
-        remotely without a bootstrap node from a
-        ``build_artifact`` stored on the remote node.
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is extracted on this node, and then DC/OS is
+        installed.
+
+        Args:
+            remote_build_artifact: The path on the node to a build artifact to
+                be installed on the node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
         """
         tempdir = Path(gettempdir())
 

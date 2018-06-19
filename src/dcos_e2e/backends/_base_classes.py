@@ -59,7 +59,7 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def install_dcos_from_path(
+    def install_dcos_from_path_with_bootstrap_node(
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
