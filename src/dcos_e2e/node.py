@@ -4,6 +4,7 @@ Tools for managing DC/OS cluster nodes.
 
 import stat
 import subprocess
+import uuid
 from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -215,7 +216,8 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_build_artifact = Path('/dcos_generate_config.sh')
+        node_artifact_parent = Path('/') / 'dcos-e2e' / uuid.uuid4().hex
+        node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
             local_path=build_artifact,
             remote_path=node_build_artifact,
@@ -255,6 +257,10 @@ class Node:
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
 
+        This creates a folder ``/dcos-e2e`` on this node which contains the
+        DC/OS installation files that can be removed safely after the DC/OS
+        installation has finished.
+
         Args:
             build_artifact: The URL to a build artifact to be installed on the
                 node.
@@ -266,7 +272,8 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_build_artifact = Path('/dcos_generate_config.sh')
+        node_artifact_parent = Path('/') / 'dcos-e2e' / uuid.uuid4().hex
+        node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(
             args=[
                 'curl',
