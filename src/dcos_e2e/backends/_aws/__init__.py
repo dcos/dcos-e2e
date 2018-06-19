@@ -262,7 +262,7 @@ class AWSCluster(ClusterManager):
         self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
-    def install_dcos_from_path(
+    def install_dcos_from_path_with_bootstrap_node(
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
