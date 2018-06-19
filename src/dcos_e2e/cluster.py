@@ -461,6 +461,9 @@ class Cluster(ContextDecorator):
             'SLAVE_HOSTS': ip_addresses(self.agents),
             'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
             'DCOS_DNS_ADDRESS': 'http://' + str(test_host.private_ip_address),
+            # This is only used by DC/OS 1.9 integration tests
+            'DCOS_NUM_MASTERS': len(self.masters),
+            'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
             **env,
         }
 
