@@ -108,9 +108,27 @@ class Node:
         transport: Optional[Transport] = None,
     ) -> None:
         """
-        DC/OS advanced installation procedure carried out
-        remotely without a bootstrap node from a
-        ``build_artifact`` stored on the remote node.
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is extracted on this node, and then DC/OS is
+        installed.
+
+        Args:
+            remote_build_artifact: The path on the node to a build artifact to
+                be installed on the node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
         """
         tempdir = Path(gettempdir())
 
@@ -205,6 +223,10 @@ class Node:
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
 
+        This creates a folder in ``/home/dcos-e2e`` on this node which contains
+        the DC/OS installation files that can be removed safely after the DC/OS
+        installation has finished.
+
         Args:
             build_artifact: The path to a build artifact to be installed on the
                 node.
@@ -216,7 +238,8 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_artifact_parent = Path('/') / 'dcos-e2e' / uuid.uuid4().hex
+        workspace_dir = Path('/home/dcos-e2e')
+        node_artifact_parent = workspace_dir / uuid.uuid4().hex
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
             local_path=build_artifact,
@@ -257,8 +280,8 @@ class Node:
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
 
-        This creates a folder ``/dcos-e2e`` on this node which contains the
-        DC/OS installation files that can be removed safely after the DC/OS
+        This creates a folder in ``/home/dcos-e2e`` on this node which contains
+        the DC/OS installation files that can be removed safely after the DC/OS
         installation has finished.
 
         Args:
@@ -272,7 +295,8 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_artifact_parent = Path('/') / 'dcos-e2e' / uuid.uuid4().hex
+        workspace_dir = Path('/home/dcos-e2e')
+        node_artifact_parent = workspace_dir / uuid.uuid4().hex
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(
             args=[
