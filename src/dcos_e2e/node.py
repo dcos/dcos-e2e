@@ -285,8 +285,8 @@ class Node:
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
 
-        This creates a folder in ``/home/dcos-e2e`` on this node which contains
-        the DC/OS installation files that can be removed safely after the DC/OS
+        This creates a folder in ``/dcos-e2e`` on this node which contains the
+        DC/OS installation files that can be removed safely after the DC/OS
         installation has finished.
 
         Args:
