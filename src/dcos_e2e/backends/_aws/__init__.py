@@ -262,16 +262,16 @@ class AWSCluster(ClusterManager):
         self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
-    def install_dcos_from_path(
+    def install_dcos_from_path_with_bootstrap_node(
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a given build artifact. This is not supported and
-        simply raises a his is not supported and simply raises a
-        ``NotImplementedError``.
+        Install DC/OS from a given build artifact with a bootstrap node.
+        This is not supported and simply raises a his is not supported and
+        simply raises a ``NotImplementedError``.
 
         Args:
             build_artifact: The ``Path`` to a build artifact to install DC/OS
@@ -284,12 +284,7 @@ class AWSCluster(ClusterManager):
                 backend does not support the DC/OS advanced installation
                 method.
         """
-        message = (
-            'The AWS backend does not support the installation of build '
-            'artifacts passed via path. This is because a more efficient'
-            'installation method exists in ``install_dcos_from_url``.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError
 
     def destroy_node(self, node: Node) -> None:
         """
