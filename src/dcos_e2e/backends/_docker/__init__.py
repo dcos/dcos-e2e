@@ -2,6 +2,7 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
+import inspect
 import os
 import socket
 import subprocess
