@@ -249,6 +249,7 @@ class Node:
             args=mkdir_args,
             user=user,
             transport=transport,
+            sudo=True,
         )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
@@ -313,6 +314,7 @@ class Node:
             args=mkdir_args,
             user=user,
             transport=transport,
+            sudo=True,
         )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(
