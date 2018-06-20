@@ -270,6 +270,9 @@ class TestClusterFromNodes:
             (duplicate_master, ) = duplicate_cluster.masters
             (duplicate_agent, ) = duplicate_cluster.agents
             (duplicate_public_agent, ) = duplicate_cluster.public_agents
+            assert 'master_list' in duplicate_cluster.base_config
+            assert 'agent_list' in duplicate_cluster.base_config
+            assert 'public_agent_list' in duplicate_cluster.base_config
 
             duplicate_master.run(args=['touch', 'example_master_file'])
             duplicate_agent.run(args=['touch', 'example_agent_file'])
