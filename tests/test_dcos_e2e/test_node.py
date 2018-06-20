@@ -149,6 +149,51 @@ class TestSendFile:
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
 
+    def test_sudo(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to use sudo to .
+        """
+        testuser = str(uuid.uuid4().hex)
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        sudoers_line = '{user} ALL=(ALL) NOPASSWD: ALL'.format(user=testuser)
+        dcos_node.run(
+            args=['echo "' + sudoers_line + '">> /etc/sudoers'],
+            shell=True,
+        )
+
+        random = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(random)
+        master_destination_dir = '/etc/{testuser}/{random}'.format(
+            testuser=testuser,
+            random=random,
+        )
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
+        with pytest.raises(CalledProcessError):
+            dcos_node.send_file(
+                local_path=Path(str(local_file)),
+                remote_path=master_destination_path,
+                user=testuser,
+            )
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+            user=testuser,
+            sudo=True,
+        )
+
+        # Implicitly asserts SSH connection closed by ``send_file``.
+        dcos_node.run(args=['userdel', '-r', testuser])
+
 
 class TestPopen:
     """
