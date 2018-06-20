@@ -444,6 +444,7 @@ class Node:
         remote_path: Path,
         user: Optional[str] = None,
         transport: Optional[Transport] = None,
+        sudo: bool = False,
     ) -> None:
         """
         Copy a file to this node.
@@ -455,6 +456,8 @@ class Node:
                 the ``default_user`` is used instead.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use sudo to create the directory which holds the
+                remote file.
         """
         if user is None:
             user = self.default_user
@@ -466,12 +469,40 @@ class Node:
             args=mkdir_args,
             user=user,
             transport=transport,
+            sudo=sudo,
         )
 
-        return node_transport.send_file(
+        original_parent_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
+        original_parent_result = self.run(
+            args=original_parent_cmd,
+            shell=True,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
+
+        original_parent = original_parent_result.stdout.decode().strip()
+
+        chown_args = ['chown', '-R', user, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
+
+        node_transport.send_file(
             local_path=local_path,
             remote_path=remote_path,
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
+        )
+
+        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
         )
