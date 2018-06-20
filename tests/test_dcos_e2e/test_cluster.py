@@ -289,15 +289,13 @@ class TestClusterFromNodes:
 
         cluster.destroy()
 
-    def test_install_dcos(
+    def test_install_dcos_from_url(
         self,
-        oss_artifact: Path,
         oss_artifact_url: str,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
-        DC/OS can be installed on an existing cluster from a URL and not from a
-        path.
+        DC/OS can be installed on an existing cluster from a URL.
         """
         with Cluster(
             cluster_backend=cluster_backend,
@@ -311,14 +309,35 @@ class TestClusterFromNodes:
                 public_agents=original_cluster.public_agents,
             )
 
-            with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_path(
-                    build_artifact=oss_artifact,
-                    dcos_config=original_cluster.base_config,
-                )
-
             cluster.install_dcos_from_url(
                 build_artifact=oss_artifact_url,
+                dcos_config=original_cluster.base_config,
+            )
+
+            cluster.wait_for_dcos_oss()
+
+    def test_install_dcos_from_path(
+        self,
+        oss_artifact: Path,
+        cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        DC/OS can be installed on an existing cluster from a path.
+        """
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as original_cluster:
+            cluster = Cluster.from_nodes(
+                masters=original_cluster.masters,
+                agents=original_cluster.agents,
+                public_agents=original_cluster.public_agents,
+            )
+
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
                 dcos_config=original_cluster.base_config,
             )
 
