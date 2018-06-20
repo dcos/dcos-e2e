@@ -81,7 +81,11 @@ class TestSendFile:
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
-        master_destination_path = Path('/etc/new_dir/on_master_node.txt')
+        master_destination_path = Path(
+            '/etc/{random}/on_master_node.txt'.format(
+                random=uuid.uuid4().hex,
+            )
+        )
         dcos_node.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
@@ -112,7 +116,7 @@ class TestSendFile:
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
-    def test_send_file_custom_user(
+    def test_custom_user(
         self,
         dcos_node: Node,
         tmpdir: local,
