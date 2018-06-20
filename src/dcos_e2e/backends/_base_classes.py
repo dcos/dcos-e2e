@@ -68,6 +68,10 @@ class ClusterManager(abc.ABC):
         """
         Install DC/OS from a build artifact passed as a file system `Path`.
 
+        If a method which implements this abstract method raises a
+        ``NotImplementedError``, users of the backend can still install DC/OS
+        from a path in an inefficient manner.
+
         Args:
             build_artifact: The path to a build artifact to install DC/OS from.
             dcos_config: The DC/OS configuration to use.

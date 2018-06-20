@@ -153,6 +153,7 @@ class Node:
             remote_path=remote_genconf_path / 'config.yaml',
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         genconf_args = [
@@ -172,6 +173,7 @@ class Node:
             shell=True,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         self.run(
@@ -179,6 +181,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         setup_args = [
@@ -197,6 +200,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
     def install_dcos_from_path(
@@ -245,6 +249,7 @@ class Node:
             args=mkdir_args,
             user=user,
             transport=transport,
+            sudo=True,
         )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
@@ -252,6 +257,7 @@ class Node:
             remote_path=node_build_artifact,
             transport=transport,
             user=user,
+            sudo=True,
         )
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
@@ -308,6 +314,7 @@ class Node:
             args=mkdir_args,
             user=user,
             transport=transport,
+            sudo=True,
         )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(

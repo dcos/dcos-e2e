@@ -240,24 +240,12 @@ class TestDCOSInstallation:
 
     def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
         """
-        It is not possible to install DC/OS on an AWS backend from a path.
+        It is possible to install DC/OS on an AWS cluster from a local path.
         """
-        with Cluster(
-            cluster_backend=AWS(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_path(
-                    build_artifact=oss_artifact,
-                    dcos_config=cluster.base_config,
-                )
+        with Cluster(cluster_backend=AWS()) as cluster:
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config=cluster.base_config,
+            )
 
-        expected_error = (
-            'The AWS backend does not support the installation of build '
-            'artifacts passed via path. This is because a more efficient'
-            'installation method exists in ``install_dcos_from_url``.'
-        )
-
-        assert str(excinfo.value) == expected_error
+            cluster.wait_for_dcos_oss()
