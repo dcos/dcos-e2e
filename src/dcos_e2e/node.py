@@ -240,6 +240,12 @@ class Node:
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+        )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
             local_path=build_artifact,
@@ -297,6 +303,12 @@ class Node:
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+        )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(
             args=[
@@ -472,23 +484,23 @@ class Node:
             sudo=sudo,
         )
 
-        original_parent_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
-        original_parent_result = self.run(
-            args=original_parent_cmd,
+        stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
+        stat_result = self.run(
+            args=stat_cmd,
             shell=True,
             user=user,
             transport=transport,
             sudo=sudo,
         )
 
-        original_parent = original_parent_result.stdout.decode().strip()
+        original_parent = stat_result.stdout.decode().strip()
 
         chown_args = ['chown', '-R', user, str(remote_path.parent)]
         self.run(
             args=chown_args,
             user=user,
             transport=transport,
-            sudo=sudo,
+            sudo=True,
         )
 
         node_transport.send_file(
@@ -504,5 +516,5 @@ class Node:
             args=chown_args,
             user=user,
             transport=transport,
-            sudo=sudo,
+            sudo=True,
         )
