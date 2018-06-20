@@ -129,22 +129,22 @@ class TestSendFile:
             shell=True,
         )
 
-        content = str(uuid.uuid4())
+        random = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
-        master_destination = '/home/{user}/on_master_node.txt'.format(
-            user=testuser,
+        local_file.write(random)
+        master_destination_dir = '/home/{testuser}/{random}'.format(
+            testuser=testuser,
+            random=random,
         )
-        master_destination_path = Path(master_destination)
-
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
             user=testuser,
         )
-        args = ['cat', str(master_destination_path)]
-        result = dcos_node.run(args=args, user=testuser)
-        assert result.stdout.decode() == content
+        args = ['stat', '-c', '"%U"', master_destination_dir]
+        result = dcos_node.run(args=args, shell=True)
+        assert result.stdout.decode().strip() == testuser
 
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
