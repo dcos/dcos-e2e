@@ -477,13 +477,18 @@ class Node:
             sudo=sudo,
         )
 
-        chown_args = [
-            'chown',
-            '-R',
-            '{user}:root'.format(user=user),
-            str(remote_path.parent),
-        ]
+        original_parent_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
+        original_parent_result = self.run(
+            args=original_parent_cmd,
+            shell=True,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
 
+        original_parent = original_parent_result.stdout.decode().strip()
+
+        chown_args = ['chown', '-R', user, str(remote_path.parent)]
         self.run(
             args=chown_args,
             user=user,
@@ -491,10 +496,18 @@ class Node:
             sudo=sudo,
         )
 
-        return node_transport.send_file(
+        node_transport.send_file(
             local_path=local_path,
             remote_path=remote_path,
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
+        )
+
+        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
         )
