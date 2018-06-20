@@ -296,7 +296,8 @@ class TestClusterFromNodes:
         cluster_backend: ClusterBackend,
     ) -> None:
         """
-        DC/OS can be installed on an existing cluster from a URL and not
+        DC/OS can be installed on an existing cluster from a URL and not from a
+        path.
         """
         with Cluster(
             cluster_backend=cluster_backend,
@@ -313,7 +314,7 @@ class TestClusterFromNodes:
             with pytest.raises(NotImplementedError):
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
-                    dcos_config=cluster.base_config,
+                    dcos_config=original_cluster.base_config,
                 )
 
             cluster.install_dcos_from_url(
