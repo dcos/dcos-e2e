@@ -498,7 +498,6 @@ class Node:
         chown_args = ['chown', '-R', user, str(remote_path.parent)]
         self.run(
             args=chown_args,
-            user=user,
             transport=transport,
             sudo=True,
         )
@@ -514,7 +513,6 @@ class Node:
         chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
         self.run(
             args=chown_args,
-            user=user,
             transport=transport,
             sudo=True,
         )
