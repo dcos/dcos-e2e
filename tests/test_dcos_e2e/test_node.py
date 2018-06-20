@@ -25,7 +25,7 @@ from dcos_e2e.node import Node, Role, Transport
 # pylint: disable=redefined-outer-name
 
 
-@pytest.fixture(scope='module', params=list(Transport))
+@pytest.fixture(scope='module', params=[Transport.SSH])
 def dcos_node(request: SubRequest) -> Iterator[Node]:
     """
     Return a ``Node``.
@@ -142,7 +142,7 @@ class TestSendFile:
             remote_path=master_destination_path,
             user=testuser,
         )
-        args = ['stat', '-c', '"%U"', master_destination_dir]
+        args = ['stat', '-c', '"%U"', str(master_destination_path)]
         result = dcos_node.run(args=args, shell=True)
         assert result.stdout.decode().strip() == testuser
 
@@ -155,7 +155,8 @@ class TestSendFile:
         tmpdir: local,
     ) -> None:
         """
-        It is possible to use sudo to .
+        It is possible to use sudo to send a file to a directory which the
+        user does not have access to.
         """
         testuser = str(uuid.uuid4().hex)
         dcos_node.run(args=['useradd', testuser])
@@ -190,6 +191,10 @@ class TestSendFile:
             user=testuser,
             sudo=True,
         )
+
+        args = ['stat', '-c', '"%U"', str(master_destination_path)]
+        result = dcos_node.run(args=args, shell=True)
+        assert result.stdout.decode().strip() == 'root'
 
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
