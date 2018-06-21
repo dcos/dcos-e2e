@@ -114,7 +114,16 @@ class BotoWrapper:
             # line below is needed because function get_all_stacks needs to copy the boto wrapper with the correct
             # region when initializing each CfStack object
             self.region = region['id']
-            yield from getattr(self.resource(service, region['id']), resource_name).all()
+            # It is common to have access to an account, but not all regions. In that case, we still want to be able
+            # to pull whatever resources we can from the regions we have access to
+            try:
+                yield from getattr(self.resource(service, region['id']), resource_name).all()
+            except ClientError as e:
+                if e.response['Error']['Code'] == 'UnauthorizedOperation':
+                    log.error("Failed getting resources ({}) for region {} with exception: {}".format(
+                        resource_name, self.region, repr(e)))
+                else:
+                    raise e
 
     @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
            retry_on_exception=retry_on_rate_limiting)
