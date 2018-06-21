@@ -16,8 +16,8 @@ def main() -> None:
     We use our own script as we want the vendored ``dcos_launch`` to use the
     vendored ``dcos_test_utils``.
     """
-    vendored_launch_sha = '5600317196cd88edb4a54bf31e501ddbe26198af'
-    vendored_test_utils_sha = 'a4cd8815fde6624a645c83eef85abde88b73a38f'
+    vendored_launch_sha = '09c1d53652d8e91aad5f1c246ef24646de2eb4c1'
+    vendored_test_utils_sha = '00f1a62ef673ebc34e29d9db488dd06b0c1ae4ec'
 
     launch = 'git+https://github.com/dcos/dcos-launch@{sha}'.format(
         sha=vendored_launch_sha,
@@ -27,9 +27,17 @@ def main() -> None:
         sha=vendored_test_utils_sha,
     )
 
+    # We have a fix at https://github.com/click-contrib/sphinx-click/pull/27
+    # that we require.
+    sphinx_click = (
+        'git+https://github.com/adamtheturtle/sphinx-click@'
+        'fix-envvar-duplicates'
+    )
+
     package_name_to_uri = {
         'dcos_launch': launch,
         'dcos_test_utils': test_utils,
+        'sphinx_click': sphinx_click,
     }
 
     target_directory = Path('src/dcos_e2e/_vendor')

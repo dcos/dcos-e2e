@@ -11,6 +11,12 @@ Contributions to this repository must pass tests and linting.
 Install Contribution Dependencies
 ---------------------------------
 
+On Ubuntu, install system requirements:
+
+.. code:: sh
+
+   apt install -y gcc python3-dev
+
 Install dependencies in a virtual environment.
 
 .. code:: sh
@@ -34,7 +40,7 @@ and on Ubuntu with ``apt``:
 
 .. code:: sh
 
-    apt-get install -y enchant
+    apt install -y enchant
 
 Linting Bash requires `shellcheck`_:
 This can be installed on macOS, for example, with `Homebrew`_:

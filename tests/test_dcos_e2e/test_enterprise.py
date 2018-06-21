@@ -40,7 +40,10 @@ class TestEnterpriseIntegrationTests:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(
@@ -127,10 +130,21 @@ class TestCopyFiles:
 
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
 
+            # We exercise the "http_checks=False" code here but we do not test
+            # its functionality. It is a temporary measure while we wait for
+            # more thorough dcos-checks.
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+                http_checks=False,
+            )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
@@ -200,7 +214,10 @@ class TestCopyFiles:
 
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
 
@@ -244,7 +261,10 @@ class TestSecurityDisabled:
         ) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(
@@ -280,7 +300,10 @@ class TestWaitForDCOS:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
             (master, ) = cluster.masters

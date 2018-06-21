@@ -8,7 +8,7 @@ long time to run.
 import logging
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import List
+from typing import Iterator, List
 
 import pytest
 from _pytest.logging import LogCaptureFixture
@@ -22,113 +22,79 @@ class TestIntegrationTests:
     Tests for running integration tests on a node.
     """
 
-    def test_run_pytest(
+    @pytest.fixture(scope='class')
+    def cluster(
         self,
-        cluster_backend: ClusterBackend,
         oss_artifact: Path,
-    ) -> None:
+        cluster_backend: ClusterBackend,
+    ) -> Iterator[Cluster]:
+        """
+        Return a `Cluster` with DC/OS installed and running.
+
+        This is class scoped as we do not intend to modify the cluster in ways
+        that make tests interfere with one another.
+        """
+        with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
+            dcos_cluster.install_dcos_from_path(
+                dcos_config=dcos_cluster.base_config,
+                build_artifact=oss_artifact,
+                log_output_live=True,
+            )
+            # We exercise the "http_checks=False" code here but we do not test
+            # its functionality. It is a temporary measure while we wait for
+            # more thorough dcos-checks.
+            dcos_cluster.wait_for_dcos_oss(http_checks=False)
+            dcos_cluster.wait_for_dcos_oss()
+            yield dcos_cluster
+
+    def test_run_pytest(self, cluster: Cluster) -> None:
         """
         Integration tests can be run with `pytest`.
         Errors are raised from `pytest`.
         """
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(oss_artifact, log_output_live=True)
-            cluster.wait_for_dcos_oss()
-            # No error is raised with a successful command.
-            pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
-            cluster.run_integration_tests(
+        # No error is raised with a successful command.
+        pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
+        cluster.run_integration_tests(
+            pytest_command=pytest_command,
+            log_output_live=True,
+        )
+
+        # An error is raised with an unsuccessful command.
+        with pytest.raises(CalledProcessError) as excinfo:
+            pytest_command = ['pytest', 'test_no_such_file.py']
+            result = cluster.run_integration_tests(
                 pytest_command=pytest_command,
                 log_output_live=True,
             )
+            # This result will not be printed if the test passes, but it
+            # may provide useful debugging information.
+            logging.debug(str(result))  # pragma: no cover
 
-            # An error is raised with an unsuccessful command.
-            with pytest.raises(CalledProcessError) as excinfo:
-                pytest_command = ['pytest', 'test_no_such_file.py']
-                result = cluster.run_integration_tests(
-                    pytest_command=pytest_command,
-                    log_output_live=True,
-                )
-                # This result will not be printed if the test passes, but it
-                # may provide useful debugging information.
-                logging.debug(str(result))  # pragma: no cover
+        # `pytest` results in an exit code of 4 when no tests are
+        # collected.
+        # See https://docs.pytest.org/en/latest/usage.html.
+        assert excinfo.value.returncode == 4
 
-            # `pytest` results in an exit code of 4 when no tests are
-            # collected.
-            # See https://docs.pytest.org/en/latest/usage.html.
-            assert excinfo.value.returncode == 4
-
-
-class TestExtendConfig:
-    """
-    Tests for extending the configuration file.
-    """
-
-    @pytest.fixture
-    def path(self) -> str:
+    def test_default_node(self, cluster: Cluster) -> None:
         """
-        Return the path to a file which will exist on a cluster only if a
-        particular configuration variable is given.
+        By default commands are run on an arbitrary master node.
         """
-        return '/opt/mesosphere/etc/docker_credentials'
+        (master, ) = cluster.masters
+        command = ['/opt/mesosphere/bin/detect_ip']
+        result = cluster.run_integration_tests(pytest_command=command).stdout
+        assert str(master.public_ip_address).encode() == result.strip()
 
-    def test_extend_config(
-        self,
-        path: str,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
-    ) -> None:
+    def test_custom_node(self, cluster: Cluster) -> None:
         """
-        This example demonstrates that it is possible to create a cluster
-        with an extended configuration file.
-
-        See ``test_default`` for evidence that the custom configuration is
-        used.
+        It is possible to run commands on any node.
         """
-        config = {
-            'cluster_docker_credentials': {
-                'auths': {
-                    'https://index.docker.io/v1/': {
-                        'auth': 'redacted',
-                    },
-                },
-            },
-            'cluster_docker_credentials_enabled': True,
-        }
-
-        with Cluster(
-            agents=0,
-            public_agents=0,
-            cluster_backend=cluster_backend,
-        ) as cluster:
-            cluster.install_dcos_from_path(
-                oss_artifact,
-                extra_config=config,
-            )
-            cluster.wait_for_dcos_oss()
-            (master, ) = cluster.masters
-            master.run(args=['test', '-f', path])
-
-    def test_default_config(
-        self,
-        path: str,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
-    ) -> None:
-        """
-        The example file does not exist with the standard configuration.
-        This demonstrates that ``test_extend_config`` actually changes the
-        configuration.
-        """
-        with Cluster(
-            agents=0,
-            public_agents=0,
-            cluster_backend=cluster_backend,
-        ) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
-            (master, ) = cluster.masters
-            cluster.wait_for_dcos_oss()
-            with pytest.raises(CalledProcessError):
-                master.run(args=['test', '-f', path])
+        (agent, ) = cluster.agents
+        command = ['/opt/mesosphere/bin/detect_ip']
+        result = cluster.run_integration_tests(
+            pytest_command=command,
+            test_host=agent,
+        ).stdout
+        assert str(agent.public_ip_address).encode() == result.strip()
 
 
 class TestClusterSize:
@@ -220,7 +186,8 @@ class TestInstallDcosFromPathLogging:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 cluster.install_dcos_from_path(
-                    oss_artifact,
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
                     log_output_live=True,
                 )
 
@@ -241,7 +208,10 @@ class TestInstallDcosFromPathLogging:
                 masters=2,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
 
@@ -260,9 +230,15 @@ class TestMultipleClusters:
         It is possible to start two clusters.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(oss_artifact)
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config=cluster.base_config,
+            )
             with Cluster(cluster_backend=cluster_backend) as cluster:
-                cluster.install_dcos_from_path(oss_artifact)
+                cluster.install_dcos_from_path(
+                    build_artifact=oss_artifact,
+                    dcos_config=cluster.base_config,
+                )
 
 
 class TestClusterFromNodes:
@@ -273,7 +249,7 @@ class TestClusterFromNodes:
     def test_cluster_from_nodes(self, cluster_backend: ClusterBackend) -> None:
         """
         It is possible to create a cluster from existing nodes, but not destroy
-        it.
+        it, or any nodes in it.
         """
         cluster = Cluster(
             cluster_backend=cluster_backend,
@@ -294,6 +270,9 @@ class TestClusterFromNodes:
             (duplicate_master, ) = duplicate_cluster.masters
             (duplicate_agent, ) = duplicate_cluster.agents
             (duplicate_public_agent, ) = duplicate_cluster.public_agents
+            assert 'master_list' in duplicate_cluster.base_config
+            assert 'agent_list' in duplicate_cluster.base_config
+            assert 'public_agent_list' in duplicate_cluster.base_config
 
             duplicate_master.run(args=['touch', 'example_master_file'])
             duplicate_agent.run(args=['touch', 'example_agent_file'])
@@ -308,32 +287,78 @@ class TestClusterFromNodes:
         with pytest.raises(NotImplementedError):
             duplicate_cluster.destroy()
 
+        with pytest.raises(NotImplementedError):
+            duplicate_cluster.destroy_node(node=duplicate_master)
+
         cluster.destroy()
 
-    def test_install_dcos(
+    def test_install_dcos_from_url(
         self,
-        oss_artifact: Path,
         oss_artifact_url: str,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
-        If a user attempts to install DC/OS on is called on a `Cluster` created
-        from existing nodes, a `NotImplementedError` is raised.
+        DC/OS can be installed on an existing cluster from a URL.
         """
         with Cluster(
             cluster_backend=cluster_backend,
             masters=1,
             agents=0,
             public_agents=0,
-        ) as cluster:
+        ) as original_cluster:
             cluster = Cluster.from_nodes(
-                masters=cluster.masters,
-                agents=cluster.agents,
-                public_agents=cluster.public_agents,
+                masters=original_cluster.masters,
+                agents=original_cluster.agents,
+                public_agents=original_cluster.public_agents,
             )
 
-            with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
+            cluster.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=original_cluster.base_config,
+            )
 
-            with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_path(build_artifact=oss_artifact)
+            cluster.wait_for_dcos_oss()
+
+    def test_install_dcos_from_path(
+        self,
+        oss_artifact: Path,
+        cluster_backend: ClusterBackend,
+    ) -> None:
+        """
+        DC/OS can be installed on an existing cluster from a path.
+        """
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as original_cluster:
+            cluster = Cluster.from_nodes(
+                masters=original_cluster.masters,
+                agents=original_cluster.agents,
+                public_agents=original_cluster.public_agents,
+            )
+
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config=original_cluster.base_config,
+            )
+
+            cluster.wait_for_dcos_oss()
+
+
+class TestDestroyNode:
+    """
+    Tests for destroying nodes.
+    """
+
+    def test_destroy_node(self, cluster_backend: ClusterBackend) -> None:
+        """
+        It is possible to destroy a node in the cluster.
+        """
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            (agent, ) = cluster.agents
+            cluster.destroy_node(node=agent)
+            assert not cluster.agents
+            with pytest.raises(CalledProcessError):
+                agent.run(args=['echo', '1'])

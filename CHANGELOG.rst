@@ -6,7 +6,121 @@ Changelog
 Next
 ----
 
+2018.06.21.0
+------------
+
+2018.06.20.0
+------------
+
+- Add platform-independent DC/OS installation method from ``Path`` and URL on ``Node``.
+
+2018.06.18.0
+------------
+
+- Add ``dcos-docker doctor`` check for a version conflict between systemd and Docker.
+- Allow installing DC/OS by a URL on the Docker backend, and a cluster ``from_nodes``.
+
+2018.06.14.1
+------------
+
+- Add ``Cluster.remove_node``.
+
+2018.06.14.0
+------------
+
+- Add Ubuntu support to the Docker backend.
+- Add ``aws_key_pair`` parameter to the AWS backend.
+- Fix Linuxbrew installation on Ubuntu.
+
+2018.06.12.1
+------------
+
+- Add a ``--wait`` flag to ``dcos-docker create`` to also wait for the cluster.
+
+2018.06.12.0
+------------
+
+- ``dcos-docker create`` now creates clusters with the ``--cluster-id`` "default" by default.
+
+2018.06.05.0
+------------
+
+- Change ``Node.default_ssh_user`` to ``Node.default_user``.
+- Add a ``docker exec`` transport to ``Node`` operations.
+- Add a ``--transport`` options to multiple ``dcos-docker`` commands.
+
+2018.05.29.0
+------------
+
+- Do not pin ``setuptools`` to an exact version.
+
+2018.05.24.2
+------------
+
+- Add ``--env`` option to ``dcos-docker run``.
+
+2018.05.24.1
+------------
+
+- Make ``xfs_info`` available on nodes, meaning that preflight checks can be run on nodes with XFS.
+- Fix ``dcos-docker doctor`` for cases where ``df`` produces very long results.
+
+2018.05.21.0
+------------
+
+- Show a formatted error rather than a traceback if Docker cannot be connected to.
+- Custom backends' must now implement a ``base_config`` method.
+- Custom backends' installation methods must now take ``dcos_config`` rather than ``extra_config``.
+- ``Cluster.install_dcos_from_url`` and ``Cluster.install_dcos_from_path`` now take ``dcos_config`` rather than ``extra_config``.
+
+2018.05.17.0
+------------
+
+- Add a ``--variant`` option to ``dcos-docker create`` to speed up cluster creation.
+
+2018.05.15.0
+------------
+
+- Add a ``test_host`` parameter to ``Cluster.run_integration_tests``.
+- Add the ability to specify a node to use for ``dcos-docker run``.
+
+2018.05.14.0
+------------
+
+- Show IP address in ``dcos-docker inspect``.
+
+2018.05.10.0
+------------
+
+- Expose the SSH key location in ``dcos-docker inspect``.
+- Make network created by ``setup-mac-network`` now survives restarts.
+
+2018.05.02.0
+------------
+
+- Previously not all volumes were destroyed when destroying a cluster from the CLI or with the ``Docker`` backend.
+  This has been resolved.
+  To remove dangling volumes from previous versions, use ``docker volume prune``.
+- Backwards incompatible change: ``mount`` parameters to ``Docker.__init__`` now take a ``list`` of ``docker.types.Mount``\s.
+- Docker version 17.06 or later is now required for the CLI and for the ``Docker`` backend.
+
+2018.04.30.2
+------------
+
+- Added ``dcos-docker destroy-mac-network`` command.
+- Added a ``--force`` parameter to ``dcos-docker setup-mac-network`` to
+  override files and containers.
+
+2018.04.29.0
+------------
+
+- Added ``dcos-docker setup-mac-network`` command.
+
+2018.04.25.0
+------------
+
 - Logs from dependencies are no longer emitted.
+- The ``dcos-docker`` CLI now gives more feedback to let you know that things are happening.
 
 2018.04.19.0
 ------------
@@ -157,7 +271,7 @@ Next
 ------------
 
 -  Added Apache2 license.
--  Repository moved to ``https://github.com/mesosphere/dcos-e2e``.
+-  Repository moved to ``https://github.com/dcos/dcos-e2e``.
 -  Added ``run``, which is similar to ``run_as_root`` but takes a ``user`` argument.
 -  Added ``popen``, which can be used for running commands asynchronously.
 

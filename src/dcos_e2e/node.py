@@ -4,14 +4,35 @@ Tools for managing DC/OS cluster nodes.
 
 import stat
 import subprocess
+import uuid
+from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
-from shlex import quote
+from tempfile import gettempdir
 from typing import Any, Dict, List, Optional
 
-import paramiko
+import yaml
 
-from ._common import run_subprocess
+from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
+
+
+class Role(Enum):
+    """
+    Roles of DC/OS nodes.
+    """
+
+    MASTER = 'master'
+    AGENT = 'slave'
+    PUBLIC_AGENT = 'slave_public'
+
+
+class Transport(Enum):
+    """
+    Transports for communicating with nodes.
+    """
+
+    SSH = 1
+    DOCKER_EXEC = 2
 
 
 class Node:
@@ -23,29 +44,34 @@ class Node:
         self,
         public_ip_address: IPv4Address,
         private_ip_address: IPv4Address,
-        default_ssh_user: str,
+        default_user: str,
         ssh_key_path: Path,
+        default_transport: Transport = Transport.SSH,
     ) -> None:
         """
         Args:
             public_ip_address: The public IP address of the node.
             private_ip_address: The IP address used by the DC/OS component
                 running on this node.
-            default_ssh_user: The default username to use for SSH connections.
+            default_user: The default username to use for connections.
             ssh_key_path: The path to an SSH key which can be used to SSH to
-                the node as the ``default_ssh_user`` user.
+                the node as the ``default_user`` user.
+            default_transport: The transport to use for communicating with
+                nodes.
 
         Attributes:
             public_ip_address: The public IP address of the node.
             private_ip_address: The IP address used by the DC/OS component
                 running on this node.
-            default_ssh_user: The default username to use for SSH connections.
+            default_user: The default username to use for connections.
+            default_transport: The transport used to communicate with the node.
         """
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address
-        self.default_ssh_user = default_ssh_user
+        self.default_user = default_user
         ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
+        self.default_transport = default_transport
 
     def __str__(self) -> str:
         """
@@ -58,77 +84,259 @@ class Node:
             private_ip=self.private_ip_address,
         )
 
-    def _compose_ssh_command(
-        self,
-        args: List[str],
-        user: str,
-        env: Optional[Dict[str, Any]],
-        shell: bool,
-        tty: bool,
-    ) -> List[str]:
+    def _get_node_transport(self, transport: Transport) -> NodeTransport:
         """
-        Return a command to run `args` on this node over SSH.
+        Return an instance of a node transport class which correlates to the
+        given transport.
+        """
+        transport_dict = {
+            Transport.SSH: SSHTransport,
+            Transport.DOCKER_EXEC: DockerExecTransport,
+        }
+
+        transport_cls = transport_dict[transport]
+        # See https://github.com/python/mypy/issues/5135.
+        return transport_cls()  # type: ignore
+
+    def _install_dcos_from_node_path(
+        self,
+        remote_build_artifact: Path,
+        dcos_config: Dict[str, Any],
+        role: Role,
+        user: Optional[str] = None,
+        log_output_live: bool = False,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is extracted on this node, and then DC/OS is
+        installed.
 
         Args:
-            args: The command to run on this node.
-            user: The user that the command will be run for over SSH.
-            env: Environment variables to be set on the node before running
-                the command. A mapping of environment variable names to
-                values.
-            shell: If False, each argument is passed as a literal value to the
-                command. If True, the command line is interpreted as a shell
-                command, with a special meaning applied to some characters
-                (e.g. $, &&, >). This means the caller must quote arguments if
-                they may contain these special characters, including
-                whitespace.
-            tty: If ``True``, allocate a pseudo-tty. This means that the users
-                terminal is attached to the streams of the process.
-
-        Returns:
-            The full SSH command to be run.
+            remote_build_artifact: The path on the node to a build artifact to
+                be installed on the node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        env = dict(env or {})
+        tempdir = Path(gettempdir())
 
-        if shell:
-            args = ['/bin/sh', '-c', ' '.join(args)]
+        remote_genconf_dir = 'genconf'
+        remote_genconf_path = remote_build_artifact.parent / remote_genconf_dir
+        serve_dir_path = remote_genconf_path / 'serve'
+        dcos_config = {
+            **dcos_config,
+            **{
+                'bootstrap_url':
+                'file://{serve_dir_path}'.format(
+                    serve_dir_path=serve_dir_path,
+                ),
+            },
+        }
+        config_yaml = yaml.dump(data=dcos_config)
+        config_file_path = tempdir / 'config.yaml'
+        Path(config_file_path).write_text(data=config_yaml)
 
-        ssh_args = ['ssh']
-        if tty:
-            ssh_args.append('-t')
+        self.send_file(
+            local_path=config_file_path,
+            remote_path=remote_genconf_path / 'config.yaml',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
 
-        ssh_args += [
-            # This makes sure that only keys passed with the -i option are
-            # used. Needed when there are already keys present in the SSH
-            # key chain, which cause `Error: Too many Authentication
-            # Failures`.
-            '-o',
-            'IdentitiesOnly=yes',
-            # The node may be an unknown host.
-            '-o',
-            'StrictHostKeyChecking=no',
-            # Use an SSH key which is authorized.
-            '-i',
-            str(self._ssh_key_path),
-            # Run commands as the specified user.
-            '-l',
-            user,
-            # Bypass password checking.
-            '-o',
-            'PreferredAuthentications=publickey',
-            # Do not add this node to the standard known hosts file.
-            '-o',
-            'UserKnownHostsFile=/dev/null',
-            # Ignore warnings about remote host identification changes and new
-            # hosts being added to the known hosts file in particular.
-            '-o',
-            'LogLevel=ERROR',
-            str(self.public_ip_address),
-        ] + [
-            '{key}={value}'.format(key=k, value=quote(str(v)))
-            for k, v in env.items()
-        ] + [quote(arg) for arg in args]
+        genconf_args = [
+            'cd',
+            str(remote_build_artifact.parent),
+            '&&',
+            'bash',
+            str(remote_build_artifact),
+            '--offline',
+            '-v',
+            '--genconf',
+        ]
 
-        return ssh_args
+        self.run(
+            args=genconf_args,
+            log_output_live=True,
+            shell=True,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        self.run(
+            args=['rm', str(remote_build_artifact)],
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        setup_args = [
+            'cd',
+            str(remote_build_artifact.parent),
+            '&&',
+            'bash',
+            'genconf/serve/dcos_install.sh',
+            '--no-block-dcos-setup',
+            role.value,
+        ]
+
+        self.run(
+            args=setup_args,
+            shell=True,
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+    def install_dcos_from_path(
+        self,
+        build_artifact: Path,
+        dcos_config: Dict[str, Any],
+        role: Role,
+        user: Optional[str] = None,
+        log_output_live: bool = False,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is sent to this node and then extracted on this
+        node, and then DC/OS is installed.
+
+        This creates a folder in ``/dcos-e2e`` on this node which contains the
+        DC/OS installation files that can be removed safely after the DC/OS
+        installation has finished.
+
+        Run ``dcos-docker doctor`` to see if your host is incompatible with
+        this method.
+
+        Args:
+            build_artifact: The path to a build artifact to be installed on the
+                node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+        """
+        workspace_dir = Path('/dcos-e2e')
+        node_artifact_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+        )
+        node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
+        self.send_file(
+            local_path=build_artifact,
+            remote_path=node_build_artifact,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+        self._install_dcos_from_node_path(
+            remote_build_artifact=node_build_artifact,
+            dcos_config=dcos_config,
+            user=user,
+            role=role,
+            log_output_live=log_output_live,
+            transport=transport,
+        )
+
+    def install_dcos_from_url(
+        self,
+        build_artifact: str,
+        dcos_config: Dict[str, Any],
+        role: Role,
+        user: Optional[str] = None,
+        log_output_live: bool = False,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is downloaded to this node and then extracted on
+        this node, and then DC/OS is installed.
+
+        Run ``dcos-docker doctor`` to see if your host is incompatible with
+        this method.
+
+        This creates a folder in ``/dcos-e2e`` on this node which contains the
+        DC/OS installation files that can be removed safely after the DC/OS
+        installation has finished.
+
+        Args:
+            build_artifact: The URL to a build artifact to be installed on the
+                node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+        """
+        workspace_dir = Path('/dcos-e2e')
+        node_artifact_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+        )
+        node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
+        self.run(
+            args=[
+                'curl',
+                '-f',
+                build_artifact,
+                '-o',
+                str(node_build_artifact),
+            ],
+            log_output_live=log_output_live,
+            transport=transport,
+            user=user,
+        )
+        self._install_dcos_from_node_path(
+            remote_build_artifact=node_build_artifact,
+            dcos_config=dcos_config,
+            user=user,
+            role=role,
+            log_output_live=log_output_live,
+            transport=transport,
+        )
 
     def run(
         self,
@@ -138,14 +346,16 @@ class Node:
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
         tty: bool = False,
+        transport: Optional[Transport] = None,
+        sudo: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
 
         Args:
             args: The command to run on the node.
-            user: The username to SSH as. If ``None`` then the
-                ``default_ssh_user`` is used instead.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
             log_output_live: If ``True``, log output live. If ``True``, stderr
                 is merged into stdout in the return value.
             env: Environment variables to be set on the node before running
@@ -161,6 +371,9 @@ class Node:
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use "sudo" to run commands.
 
         Returns:
             The representation of the finished process.
@@ -168,22 +381,33 @@ class Node:
         Raises:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
+            ValueError: ``log_output_live`` and ``tty`` are both set to
+                ``True``.
         """
-        if user is None:
-            user = self.default_ssh_user
+        env = dict(env or {})
+        if shell:
+            args = ['/bin/sh', '-c', ' '.join(args)]
 
-        ssh_args = self._compose_ssh_command(
+        if sudo:
+            args = ['sudo'] + args
+
+        if user is None:
+            user = self.default_user
+
+        if log_output_live and tty:
+            message = '`log_output_live` and `tty` cannot both be `True`.'
+            raise ValueError(message)
+
+        transport = transport or self.default_transport
+        node_transport = self._get_node_transport(transport=transport)
+        return node_transport.run(
             args=args,
             user=user,
-            env=env,
-            shell=shell,
-            tty=tty,
-        )
-
-        return run_subprocess(
-            args=ssh_args,
             log_output_live=log_output_live,
-            pipe_output=not tty,
+            env=env,
+            tty=tty,
+            ssh_key_path=self._ssh_key_path,
+            public_ip_address=self.public_ip_address,
         )
 
     def popen(
@@ -192,14 +416,15 @@ class Node:
         user: Optional[str] = None,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
+        transport: Optional[Transport] = None,
     ) -> subprocess.Popen:
         """
         Open a pipe to a command run on a node as the given user.
 
         Args:
             args: The command to run on the node.
-            user: The user to open a pipe for a command for over SSH.
-                If `None` the ``default_ssh_user`` is used instead.
+            user: The user to open a pipe for a command for over.
+                If `None` the ``default_user`` is used instead.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
@@ -209,24 +434,27 @@ class Node:
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
             The pipe object attached to the specified process.
         """
-        if user is None:
-            user = self.default_ssh_user
+        env = dict(env or {})
+        if shell:
+            args = ['/bin/sh', '-c', ' '.join(args)]
 
-        ssh_args = self._compose_ssh_command(
+        if user is None:
+            user = self.default_user
+
+        transport = transport or self.default_transport
+        node_transport = self._get_node_transport(transport=transport)
+        return node_transport.popen(
             args=args,
             user=user,
             env=env,
-            shell=shell,
-            tty=False,
-        )
-        return subprocess.Popen(
-            args=ssh_args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            ssh_key_path=self._ssh_key_path,
+            public_ip_address=self.public_ip_address,
         )
 
     def send_file(
@@ -234,6 +462,8 @@ class Node:
         local_path: Path,
         remote_path: Path,
         user: Optional[str] = None,
+        transport: Optional[Transport] = None,
+        sudo: bool = False,
     ) -> None:
         """
         Copy a file to this node.
@@ -241,29 +471,55 @@ class Node:
         Args:
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
-            user: The name of the remote user to send the file via
-                secure copy. If `None` the ``default_ssh_user`` is
-                used instead.
+            user: The name of the remote user to send the file. If ``None``,
+                the ``default_user`` is used instead.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use sudo to create the directory which holds the
+                remote file.
         """
         if user is None:
-            user = self.default_ssh_user
+            user = self.default_user
 
-        with paramiko.SSHClient() as ssh_client:
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(
-                str(self.public_ip_address),
-                username=user,
-                key_filename=str(self._ssh_key_path),
-            )
+        transport = transport or self.default_transport
+        node_transport = self._get_node_transport(transport=transport)
+        mkdir_args = ['mkdir', '--parents', str(remote_path.parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
 
-            self.run(
-                args=['mkdir', '--parents',
-                      str(remote_path.parent)],
-                user=user,
-            )
+        stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
+        stat_result = self.run(
+            args=stat_cmd,
+            shell=True,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
 
-            with ssh_client.open_sftp() as sftp:
-                sftp.put(
-                    localpath=str(local_path),
-                    remotepath=str(remote_path),
-                )
+        original_parent = stat_result.stdout.decode().strip()
+
+        chown_args = ['chown', '-R', user, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            transport=transport,
+            sudo=True,
+        )
+
+        node_transport.send_file(
+            local_path=local_path,
+            remote_path=remote_path,
+            user=user,
+            ssh_key_path=self._ssh_key_path,
+            public_ip_address=self.public_ip_address,
+        )
+
+        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            transport=transport,
+            sudo=True,
+        )

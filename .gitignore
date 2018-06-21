@@ -17,6 +17,8 @@ eggs/
 .eggs/
 lib/
 lib64/
+!src/dcos_e2e/backends/_vagrant/resources/dcos-vagrant/lib
+!src/dcos_e2e/backends/_vagrant/resources/dcos-vagrant/vendor/semi_semantic/lib
 parts/
 sdist/
 var/
@@ -91,11 +93,6 @@ ENV/
 # Test configuration file
 configuration.yaml
 
-# From DC/OS Docker
-Vagrantfile
-vagrant/
-.vagrant/
-
 .mypy_cache/
 *.DS_Store
 node_modules/
@@ -112,3 +109,7 @@ license-key.txt
 
 # Virtualenv for release
 release/
+
+*pyre
+
+dcos_generate_*.sh

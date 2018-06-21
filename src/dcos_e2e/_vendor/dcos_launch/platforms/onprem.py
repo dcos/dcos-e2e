@@ -6,6 +6,7 @@ import os
 import sys
 
 import retrying
+
 from ...dcos_launch import util
 from ...dcos_test_utils import onprem, ssh_client
 
@@ -86,6 +87,7 @@ def install_dcos(
         log.info('Installing prerequisites on cluster hosts')
         check_results(
             all_client.run_command('run', [util.read_file(prereqs_script_path)]), node_client, 'install_prereqs')
+        log.info('Prerequisites installed.')
     # download install script from boostrap host and run it
     remote_script_path = '/tmp/install_dcos.sh'
     log.info('Starting preflight')
@@ -132,7 +134,7 @@ def do_genconf(
     # copy config to genconf/
     ssh_tunnel.copy_file(genconf_dir, installer_dir)
     # try --genconf
-    log.info('Runnnig --genconf command...')
+    log.info('Running --genconf command...')
     ssh_tunnel.command(['sudo', 'bash', installer_path, '--genconf'], stdout=sys.stdout.buffer)
     # if OK we just need to restart nginx
     host_share_path = os.path.join(installer_dir, 'genconf/serve')
@@ -237,30 +239,51 @@ def do_postflight(client: ssh_client.AsyncSshClient):
     """ Runs a script that will check if DC/OS is operational without needing to authenticate
     """
     postflight_script = """
-T=900
-if [ -f /opt/mesosphere/etc/dcos-diagnostics-runner-config.json ]; then
-    for check_type in node-poststart cluster; do
-        until OUT=$(sudo /opt/mesosphere/bin/dcos-shell /opt/mesosphere/bin/dcos-diagnostics check $check_type) \
-                || [[ T -eq 0 ]]; do
-            sleep 1
-            let T=T-1
-        done
-        RETCODE=$?
-        echo $OUT
-        if [[ RETCODE -ne 0 ]]; then
-            exit $RETCODE
-        fi
-        T=900
-    done
-else
-    until OUT=$(sudo /opt/mesosphere/bin/./3dt --diag) || [[ T -eq 0 ]]; do
+function run_command_until_success() {
+    # Run $@ until it exits 0 or until it has been tried 900 times. Prints shell output and returns the status of the
+    # last attempted run.
+    cmd=$@
+    max_runs=900
+
+    runs=$max_runs
+    until out=$($cmd) || [[ runs -eq 0 ]]; do
         sleep 1
-        let T=T-1
+        let runs=runs-1
     done
+    retcode=$?
+
+    echo "$out"
+    return $retcode
+}
+
+function run_checks() {
+    # Run checks with the base command $@ until they succeed or have been tried 900 times. Prints shell output and
+    # returns the status of the last attempted check run.
+    check_cmd=$@
+
+    for check_type in node-poststart cluster; do
+        run_command_until_success $check_cmd $check_type
+        check_status=$?
+        if [[ check_status -ne 0 ]]; then
+            break
+        fi
+    done
+
+    return $check_status
+}
+
+if [ -f /opt/mesosphere/bin/dcos-check-runner ]; then
+    # Cluster with dcos-check-runner available.
+    run_checks sudo /opt/mesosphere/bin/dcos-shell /opt/mesosphere/bin/dcos-check-runner check
     RETCODE=$?
-    for value in $OUT; do
-        echo $value
-    done
+elif [ -f /opt/mesosphere/etc/dcos-diagnostics-runner-config.json ]; then
+    # Older version cluster with dcos-diagnostics checks available.
+    run_checks sudo /opt/mesosphere/bin/dcos-shell /opt/mesosphere/bin/dcos-diagnostics check
+    RETCODE=$?
+else
+    # Even older version cluster without checks.
+    run_command_until_success sudo /opt/mesosphere/bin/3dt --diag
+    RETCODE=$?
 fi
 exit $RETCODE
 """

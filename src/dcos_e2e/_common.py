@@ -72,14 +72,7 @@ def run_subprocess(
     Raises:
         subprocess.CalledProcessError: See :py:func:`subprocess.run`.
         Exception: An exception was raised in getting the output from the call.
-        ValueError: ``log_output_live`` is ``True`` and ``pipe_output`` is
-            ``False``.
     """
-    if log_output_live and not pipe_output:
-        raise ValueError(
-            '`log_output_live` cannot be `True` if `pipe_output` is `False`.',
-        )
-
     process_stdout = PIPE if pipe_output else None
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
@@ -129,8 +122,8 @@ def run_subprocess(
                 log(line.rstrip().decode('ascii', 'backslashreplace'))
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
-                process.returncode,
-                args,
+                returncode=process.returncode,
+                cmd=args,
                 output=stdout,
                 stderr=stderr,
             )

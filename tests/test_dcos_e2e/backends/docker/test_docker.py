@@ -14,6 +14,7 @@ from typing import Dict
 # are disabled.
 import docker
 import pytest
+from docker.types import Mount
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker, NoMockAddress
 from retry import retry
@@ -61,45 +62,35 @@ class TestDockerBackend:
         public_agent_path = Path('/etc/on_public_agent_nodes.txt')
         all_path = Path('/etc/on_all_nodes.txt')
 
-        custom_container_mounts = {
-            str(local_all_file): {
-                'bind': str(all_path),
-                'mode': 'rw',
-            },
-        }
-        custom_master_mounts = {
-            str(local_master_file): {
-                'bind': str(master_path),
-                'mode': 'rw',
-            },
-        }
+        custom_container_mount = Mount(
+            source=str(local_all_file),
+            target=str(all_path),
+            type='bind',
+        )
 
-        custom_master_mounts = {
-            str(local_master_file): {
-                'bind': str(master_path),
-                'mode': 'rw',
-            },
-        }
+        custom_master_mount = Mount(
+            source=str(local_master_file),
+            target=str(master_path),
+            type='bind',
+        )
 
-        custom_agent_mounts = {
-            str(local_agent_file): {
-                'bind': str(agent_path),
-                'mode': 'rw',
-            },
-        }
+        custom_agent_mount = Mount(
+            source=str(local_agent_file),
+            target=str(agent_path),
+            type='bind',
+        )
 
-        custom_public_agent_mounts = {
-            str(local_public_agent_file): {
-                'bind': str(public_agent_path),
-                'mode': 'rw',
-            },
-        }
+        custom_public_agent_mount = Mount(
+            source=str(local_public_agent_file),
+            target=str(public_agent_path),
+            type='bind',
+        )
 
         backend = Docker(
-            custom_container_mounts=custom_container_mounts,
-            custom_master_mounts=custom_master_mounts,
-            custom_agent_mounts=custom_agent_mounts,
-            custom_public_agent_mounts=custom_public_agent_mounts,
+            custom_container_mounts=[custom_container_mount],
+            custom_master_mounts=[custom_master_mount],
+            custom_agent_mounts=[custom_agent_mount],
+            custom_public_agent_mounts=[custom_public_agent_mount],
         )
 
         with Cluster(
@@ -129,25 +120,17 @@ class TestDockerBackend:
 
     def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
         """
-        The Docker backend requires a build artifact in order
-        to launch a DC/OS cluster.
+        It is possible to install DC/OS on a cluster with a Docker backend.
         """
-        with Cluster(
-            cluster_backend=Docker(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_url(build_artifact=oss_artifact_url)
-
-        expected_error = (
-            'The Docker backend does not support the installation of DC/OS '
-            'by build artifacts passed via URL string. This is because a more '
-            'efficient installation method exists in `install_dcos_from_path`.'
-        )
-
-        assert str(excinfo.value) == expected_error
+        # We use a specific version of Docker on the nodes because else we may
+        # hit https://github.com/opencontainers/runc/issues/1175.
+        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            cluster.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=cluster.base_config,
+            )
+            cluster.wait_for_dcos_oss()
 
 
 class TestDockerVersion:
@@ -359,17 +342,14 @@ class TestLabels:
         public_agent_value = uuid.uuid4().hex
         public_agent_labels = {public_agent_key: public_agent_value}
 
-        with Cluster(
-            cluster_backend=Docker(
-                docker_container_labels=cluster_labels,
-                docker_master_labels=master_labels,
-                docker_agent_labels=agent_labels,
-                docker_public_agent_labels=public_agent_labels,
-            ),
-            masters=1,
-            agents=1,
-            public_agents=1,
-        ) as cluster:
+        cluster_backend = Docker(
+            docker_container_labels=cluster_labels,
+            docker_master_labels=master_labels,
+            docker_agent_labels=agent_labels,
+            docker_public_agent_labels=public_agent_labels,
+        )
+
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             for node in cluster.masters:
                 node_labels = self._get_labels(node=node)
                 assert node_labels[cluster_key] == cluster_value

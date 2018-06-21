@@ -30,6 +30,7 @@ class Test19:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_9_artifact,
+                dcos_config=cluster.base_config,
                 log_output_live=True,
             )
             cluster.wait_for_dcos_oss()
@@ -52,7 +53,10 @@ class Test19:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_1_9_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(
@@ -77,6 +81,7 @@ class Test110:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_10_artifact,
+                dcos_config=cluster.base_config,
                 log_output_live=True,
             )
             cluster.wait_for_dcos_oss()
@@ -102,7 +107,10 @@ class Test110:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_1_10_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(
@@ -127,6 +135,7 @@ class Test111:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_11_artifact,
+                dcos_config=cluster.base_config,
                 log_output_live=True,
             )
             cluster.wait_for_dcos_oss()
@@ -152,7 +161,10 @@ class Test111:
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=enterprise_1_11_artifact,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(

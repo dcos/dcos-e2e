@@ -21,6 +21,14 @@ def get_homebrew_formula(version: str) -> str:
     requirements_file = Path(__file__).parent.parent / 'requirements.txt'
     lines = requirements_file.read_text().strip().split('\n')
     requirements = [line for line in lines if not line.startswith('#')]
+    # Keyring is not a direct dependency but without it some users get:
+    #
+    # Cannot load 'keyring' on your system (either not installed, or not
+    # configured correctly): No module named 'keyring'
+    requirements.append('keyring')
+    # Similarly, without the following, some users get:
+    # The 'secretstorage' distribution was not found and is required by keyring
+    requirements.append('secretstorage')
     first = requirements[0]
 
     args = ['poet', first]
@@ -36,10 +44,11 @@ def get_homebrew_formula(version: str) -> str:
         class Dcosdocker < Formula
           include Language::Python::Virtualenv
 
-          url "https://github.com/mesosphere/dcos-e2e/archive/{version}.tar.gz"
-          head "https://github.com/mesosphere/dcos-e2e.git"
+          url "https://github.com/dcos/dcos-e2e/archive/{version}.tar.gz"
+          head "https://github.com/dcos/dcos-e2e.git"
           homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
           depends_on "python3"
+          depends_on "pkg-config"
 
         {resource_stanzas}
 
@@ -102,11 +111,12 @@ def create_github_release(
     github_client = Github(github_token)
     org = github_client.get_organization('mesosphere')
     repository = org.get_repo('dcos-e2e')
+    changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
     repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
         release_name='Release ' + version,
-        release_message='Release ' + version,
+        release_message='See ' + changelog_url,
         type='commit',
         object=repository.get_commits()[0].sha,
     )
@@ -117,8 +127,9 @@ def commit_and_push(version: str) -> None:
     Commit and push all changes.
     """
     repo = Repo('.')
-    paths = ['dcosdocker.rb', 'CHANGELOG.rst']
-    add(paths=paths)
+    paths = ['dcosdocker.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
+    _, ignored = add(paths=paths)
+    assert not ignored
     message = b'Update for release ' + version.encode('utf-8')
     commit(message=message)
     branch_name = 'master'

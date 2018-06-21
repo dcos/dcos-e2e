@@ -16,7 +16,7 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-from .node import Node
+from .node import Node, Role, Transport
 
 
 @retry(
@@ -29,7 +29,7 @@ def _wait_for_ssh(node: Node) -> None:
     Retry for up to one minute (arbitrary) until SSH is available on the given
     node.
     """
-    node.run(args=['echo'])
+    node.run(args=['systemctl', 'status', 'sshd'])
 
 
 class Cluster(ContextDecorator):
@@ -133,9 +133,16 @@ class Cluster(ContextDecorator):
                 shell=True,
             )
 
-    def wait_for_dcos_oss(self) -> None:
+    def wait_for_dcos_oss(self, http_checks: bool = True) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
+
+        Args:
+            http_checks: Whether or not to wait for checks which involve HTTP.
+                If this is `False`, this function may return before DC/OS is
+                fully ready. This is useful in cases where an HTTP connection
+                cannot be made to the cluster. For example, this is useful on
+                macOS without a VPN set up.
 
         Raises:
             RetryError: Raised if any cluster component did not become
@@ -143,6 +150,8 @@ class Cluster(ContextDecorator):
         """
 
         self._wait_for_dcos_diagnostics()
+        if not http_checks:
+            return
 
         # The dcos-diagnostics check is not yet sufficient to determine
         # when a CLI login would be possible with DC/OS OSS. It only
@@ -187,6 +196,7 @@ class Cluster(ContextDecorator):
         self,
         superuser_username: str,
         superuser_password: str,
+        http_checks: bool = True,
     ) -> None:
         """
         Wait until the DC/OS Enterprise boot process has completed.
@@ -194,6 +204,11 @@ class Cluster(ContextDecorator):
         Args:
             superuser_username: Username of the default superuser.
             superuser_password: Password of the default superuser.
+            http_checks: Whether or not to wait for checks which involve HTTP.
+                If this is `False`, this function may return before DC/OS is
+                fully ready. This is useful in cases where an HTTP connection
+                cannot be made to the cluster. For example, this is useful on
+                macOS without a VPN set up.
 
         Raises:
             RetryError: Raised if any cluster component did not become
@@ -201,6 +216,8 @@ class Cluster(ContextDecorator):
         """
 
         self._wait_for_dcos_diagnostics()
+        if not http_checks:
+            return
 
         # The dcos-diagnostics check is not yet sufficient to determine
         # when a CLI login would be possible with Enterprise DC/OS. It only
@@ -289,56 +306,85 @@ class Cluster(ContextDecorator):
         """
         return self._cluster.public_agents
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+
+        def ip_list(nodes: Set[Node]) -> List[str]:
+            return list(map(lambda node: str(node.private_ip_address), nodes))
+
+        config = {
+            'agent_list': ip_list(nodes=self.agents),
+            'master_list': ip_list(nodes=self.masters),
+            'public_agent_list': ip_list(nodes=self.public_agents),
+        }
+        return {
+            **config,
+            **self._cluster.base_config,
+        }
+
     def install_dcos_from_url(
         self,
         build_artifact: str,
-        extra_config: Optional[Dict[str, Any]] = None,
+        dcos_config: Dict[str, Any],
         log_output_live: bool = False,
     ) -> None:
         """
-        Installs DC/OS using the DC/OS advanced installation method if
-        supported by the backend.
+        Installs DC/OS using the DC/OS advanced installation method.
 
-        This method spins up a persistent bootstrap host that supplies all
-        dedicated DC/OS hosts with the necessary installation files.
+        If supported by the cluster backend, this method spins up a persistent
+        bootstrap host that supplies all dedicated DC/OS hosts with the
+        necessary installation files.
 
         Since the bootstrap host is different from the host initiating the
         cluster creation passing the ``build_artifact`` via URL string
         saves the time of copying the ``build_artifact`` to the bootstrap host.
 
+        However, some backends may not support using a bootstrap node. For
+        these backends, each node will download and extract the build
+        artifact. This may be very slow, as the build artifact is downloaded to
+        and extracted on each node, one at a time.
+
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
-
-        Raises:
-            NotImplementedError: `NotImplementedError` because the given
-                backend provides a more efficient installation method than
-                the DC/OS advanced installation method.
         """
-        self._cluster.install_dcos_from_url(
-            build_artifact=build_artifact,
-            extra_config=extra_config if extra_config else {},
-            log_output_live=log_output_live,
-        )
+        try:
+            self._cluster.install_dcos_from_url_with_bootstrap_node(
+                build_artifact=build_artifact,
+                dcos_config=dcos_config,
+                log_output_live=log_output_live,
+            )
+        except NotImplementedError:
+            for nodes, role in (
+                (self.masters, Role.MASTER),
+                (self.agents, Role.AGENT),
+                (self.public_agents, Role.PUBLIC_AGENT),
+            ):
+                for node in nodes:
+                    node.install_dcos_from_url(
+                        build_artifact=build_artifact,
+                        dcos_config=dcos_config,
+                        role=role,
+                        log_output_live=log_output_live,
+                    )
 
     def install_dcos_from_path(
         self,
         build_artifact: Path,
-        extra_config: Optional[Dict[str, Any]] = None,
+        dcos_config: Dict[str, Any],
         log_output_live: bool = False,
     ) -> None:
         """
         Args:
             build_artifact: The `Path` to a build artifact to install DC/OS
                 from.
-            extra_config: Implementations may come with a "base"
-                configuration. This dictionary can contain extra installation
-                configuration variables.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 
@@ -347,11 +393,25 @@ class Cluster(ContextDecorator):
                 efficient for the given backend to use the DC/OS advanced
                 installation method that takes build artifacts by URL string.
         """
-        self._cluster.install_dcos_from_path(
-            build_artifact=build_artifact,
-            extra_config=extra_config if extra_config else {},
-            log_output_live=log_output_live,
-        )
+        try:
+            self._cluster.install_dcos_from_path_with_bootstrap_node(
+                build_artifact=build_artifact,
+                dcos_config=dcos_config,
+                log_output_live=log_output_live,
+            )
+        except NotImplementedError:
+            for nodes, role in (
+                (self.masters, Role.MASTER),
+                (self.agents, Role.AGENT),
+                (self.public_agents, Role.PUBLIC_AGENT),
+            ):
+                for node in nodes:
+                    node.install_dcos_from_path(
+                        build_artifact=build_artifact,
+                        dcos_config=dcos_config,
+                        role=role,
+                        log_output_live=log_output_live,
+                    )
 
     def run_integration_tests(
         self,
@@ -359,6 +419,8 @@ class Cluster(ContextDecorator):
         env: Optional[Dict[str, Any]] = None,
         log_output_live: bool = False,
         tty: bool = False,
+        test_host: Optional[Node] = None,
+        transport: Optional[Transport] = None,
     ) -> subprocess.CompletedProcess:
         """
         Run integration tests on a random master node.
@@ -371,10 +433,14 @@ class Cluster(ContextDecorator):
             log_output_live: If ``True``, log output of the ``pytest_command``
                 live. If ``True``, ``stderr`` is merged into ``stdout`` in the
                 return value.
+            test_host: The node to run the given command on. if not given, an
+                arbitrary master node is used.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
             The result of the ``pytest`` command.
@@ -389,6 +455,7 @@ class Cluster(ContextDecorator):
             'cd',
             '/opt/mesosphere/active/dcos-integration-test/',
             '&&',
+            *pytest_command,
         ]
 
         env = env or {}
@@ -398,8 +465,8 @@ class Cluster(ContextDecorator):
                 map(lambda node: str(node.private_ip_address), nodes),
             )
 
-        # Tests are run on a random master node.
-        test_host = next(iter(self.masters))
+        # Tests are run on a random master node if no node is given.
+        test_host = test_host or next(iter(self.masters))
 
         environment_variables = {
             # This is needed for 1.9 (and below?)
@@ -408,10 +475,11 @@ class Cluster(ContextDecorator):
             'SLAVE_HOSTS': ip_addresses(self.agents),
             'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
             'DCOS_DNS_ADDRESS': 'http://' + str(test_host.private_ip_address),
+            # This is only used by DC/OS 1.9 integration tests
+            'DCOS_NUM_MASTERS': len(self.masters),
+            'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
             **env,
         }
-
-        args += pytest_command
 
         return test_host.run(
             args=args,
@@ -419,6 +487,7 @@ class Cluster(ContextDecorator):
             env=environment_variables,
             tty=tty,
             shell=True,
+            transport=transport,
         )
 
     def destroy(self) -> None:
@@ -426,6 +495,12 @@ class Cluster(ContextDecorator):
         Destroy all nodes in the cluster.
         """
         self._cluster.destroy()
+
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+        self._cluster.destroy_node(node=node)
 
     def __exit__(
         self,

@@ -75,16 +75,18 @@ class TestDcosDocker:
               --help         Show this message and exit.
 
             Commands:
-              create        Create a DC/OS cluster.
-              destroy       Destroy a cluster.
-              destroy-list  Destroy clusters.
-              doctor        Diagnose common issues which stop DC/OS E2E...
-              inspect       Show cluster details.
-              list          List all clusters.
-              run           Run an arbitrary command on a node.
-              sync          Sync files from a DC/OS checkout to master...
-              wait          Wait for DC/OS to start.
-              web           Open the browser at the web UI.
+              create               Create a DC/OS cluster.
+              destroy              Destroy a cluster.
+              destroy-list         Destroy clusters.
+              destroy-mac-network  Destroy containers created by "dcos-docker...
+              doctor               Diagnose common issues which stop DC/OS E2E...
+              inspect              Show cluster details.
+              list                 List all clusters.
+              run                  Run an arbitrary command on a node.
+              setup-mac-network    Set up a network to connect to nodes on...
+              sync                 Sync files from a DC/OS checkout to master...
+              wait                 Wait for DC/OS to start.
+              web                  Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -163,9 +165,9 @@ class TestCreate:
                                               The security mode to use for a DC/OS
                                               Enterprise cluster. This overrides any
                                               security mode set in ``--extra-config``.
-              -c, --cluster-id TEXT           A unique identifier for the cluster. Defaults
-                                              to a random value. Use the value "default" to
-                                              use this cluster for other
+              -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
+                                              value "default" to use this cluster for other
+                                              commands without specifying --cluster-id.
               --license-key PATH              This is ignored if using open source DC/OS. If
                                               using DC/OS Enterprise, this defaults to the
                                               value of the `DCOS_LICENSE_KEY_PATH`
@@ -202,6 +204,28 @@ class TestCreate:
                                               agent node containers. See https://docs.docker
                                               .com/engine/reference/run/#volume-shared-
                                               filesystems for the syntax to use.
+              --variant [auto|oss|enterprise]
+                                              Choose the DC/OS variant. If the variant does
+                                              not match the variant of the given artifact,
+                                              an error will occur. Using "auto" finds the
+                                              variant from the artifact. Finding the variant
+                                              from the artifact takes some time and so using
+                                              another option is a performance optimization.
+              --wait-for-dcos                 Wait for DC/OS after creating the cluster.
+                                              This is equivalent to using "dcos-docker wait"
+                                              after this command. "dcos-docker wait" has
+                                              various options available and so may be more
+                                              appropriate for your use case. If the chosen
+                                              transport is "docker-exec", this will skip
+                                              HTTP checks and so the cluster may not be
+                                              fully ready.
+              --transport [docker-exec|ssh]   The communication transport to use. On macOS
+                                              the SSH transport requires IP routing to be
+                                              set up. See "dcos-docker setup-mac-network".It
+                                              also requires the "ssh" command to be
+                                              available. This can be provided by setting the
+                                              `DCOS_DOCKER_TRANSPORT` environment variable.
+                                              [default: ssh]
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -267,6 +291,90 @@ class TestCreate:
             Error: Invalid value for "--copy-to-master": "/some/path" does not exist.
             """,# noqa: E501,E261
         )
+        # yapf: enable
+        assert result.output == expected_message
+
+    @pytest.mark.parametrize(
+        'option',
+        [
+            '--custom-volume',
+            '--custom-master-volume',
+            '--custom-agent-volume',
+            '--custom-public-agent-volume',
+        ],
+    )
+    def test_custom_volume_bad_mode(
+        self,
+        oss_artifact: Path,
+        option: str,
+    ) -> None:
+        """
+        Given volumes must have the mode "rw" or "ro", or no mode.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                option,
+                '/opt:/opt:ab',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_message = dedent(
+            """\
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "{option}": Mode in "/opt:/opt:ab" is "ab". If given, the mode must be one of "ro", "rw".
+            """,# noqa: E501,E261
+        ).format(option=option)
+        # yapf: enable
+        assert result.output == expected_message
+
+    @pytest.mark.parametrize(
+        'option',
+        [
+            '--custom-volume',
+            '--custom-master-volume',
+            '--custom-agent-volume',
+            '--custom-public-agent-volume',
+        ],
+    )
+    def test_custom_volume_bad_format(
+        self,
+        oss_artifact: Path,
+        option: str,
+    ) -> None:
+        """
+        Given volumes must have 0, 1 or 2 colons.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'create',
+                str(oss_artifact),
+                option,
+                '/opt:/opt:/opt:rw',
+            ],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 2
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_message = dedent(
+            """\
+            Usage: dcos-docker create [OPTIONS] ARTIFACT
+
+            Error: Invalid value for "{option}": "/opt:/opt:/opt:rw" is not a valid volume definition. See https://docs.docker.com/engine/reference/run/#volume-shared-filesystems for the syntax to use.
+            """,# noqa: E501,E261
+        ).format(option=option)
         # yapf: enable
         assert result.output == expected_message
 
@@ -581,8 +689,16 @@ class TestDestroy:
               Destroy a cluster.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
-              --help                 Show this message and exit.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -632,7 +748,14 @@ class TestDestroyList:
               To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
 
             Options:
-              --help  Show this message and exit.
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -735,7 +858,7 @@ class TestInspect:
               exec -it $MASTER_0`` to enter the first master, for example.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
               --env                  Show details in an environment variable format to eval.
               --help                 Show this message and exit.
             """,# noqa: E501,E261
@@ -766,7 +889,7 @@ class TestWait:
 
     def test_help(self) -> None:
         """
-        Help text is shown with `dcos-docker inspect --help`.
+        Help text is shown with `dcos-docker wait --help`.
         """
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['wait', '--help'])
@@ -781,14 +904,29 @@ class TestWait:
               Wait for DC/OS to start.
 
             Options:
-              -c, --cluster-id TEXT      If not given, "default" is used.
-              --superuser-username TEXT  The superuser username is needed only on DC/OS
-                                         Enterprise clusters. By default, on a DC/OS
-                                         Enterprise cluster, `admin` is used.
-              --superuser-password TEXT  The superuser password is needed only on DC/OS
-                                         Enterprise clusters. By default, on a DC/OS
-                                         Enterprise cluster, `admin` is used.
-              --help                     Show this message and exit.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
+              --superuser-username TEXT      The superuser username is needed only on DC/OS
+                                             Enterprise clusters. By default, on a DC/OS
+                                             Enterprise cluster, `admin` is used.
+              --superuser-password TEXT      The superuser password is needed only on DC/OS
+                                             Enterprise clusters. By default, on a DC/OS
+                                             Enterprise cluster, `admin` is used.
+              --skip-http-checks             Do not wait for checks which require an HTTP
+                                             connection to the cluster. If this flag is
+                                             used, this command may return before DC/OS is
+                                             fully ready. Use this flag in cases where an
+                                             HTTP connection cannot be made to the cluster.
+                                             For example this is useful on macOS without a
+                                             VPN set up.
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -839,8 +977,16 @@ class TestSync:
               If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
-              --help                 Show this message and exit.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -917,8 +1063,152 @@ class TestWeb:
               docker wait`` before running this command.
 
             Options:
-              -c, --cluster-id TEXT  If not given, "default" is used.
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
               --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestSetupMacNetwork():
+    """
+    Tests for the ``setup-mac-network`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker setup-mac-network --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['setup-mac-network', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker setup-mac-network [OPTIONS]
+
+              Set up a network to connect to nodes on macOS.
+
+              This creates an OpenVPN configuration file and describes how to use it.
+
+            Options:
+              --force                   Overwrite any files and destroy conflicting
+                                        containers from previous uses of this command.
+              --configuration-dst PATH  The location to create an OpenVPN configuration
+                                        file.  [default: ~/Documents/docker-for-mac.ovpn]
+              --help                    Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+    def test_suffix_not_ovpn(self, tmpdir: local) -> None:
+        """
+        If a configuration file does not have the 'ovpn' suffix, an error is
+        shown.
+        """
+        configuration_file = tmpdir.join('example.txt')
+        configuration_file.write('example')
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'setup-mac-network',
+                '--configuration-dst',
+                str(configuration_file),
+            ],
+            catch_exceptions=False,
+        )
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_error = dedent(
+            """\
+            Usage: dcos-docker setup-mac-network [OPTIONS]
+
+            Error: Invalid value for "--configuration-dst": "{value}" does not have the suffix ".ovpn".
+            """,# noqa: E501,E261
+        ).format(
+            value=str(configuration_file),
+        )
+        # yapf: enable
+        assert result.exit_code == 2
+        assert result.output == expected_error
+
+    def test_configuration_already_exists(self, tmpdir: local) -> None:
+        """
+        If a configuration file already exists at the given location, an error
+        is shown.
+        """
+        configuration_file = tmpdir.join('example.ovpn')
+        configuration_file.write('example')
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            [
+                'setup-mac-network',
+                '--configuration-dst',
+                str(configuration_file),
+            ],
+            catch_exceptions=False,
+        )
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_error = dedent(
+            """\
+            Usage: dcos-docker setup-mac-network [OPTIONS]
+
+            Error: Invalid value for "--configuration-dst": "{value}" already exists so no new OpenVPN configuration was created.
+
+            To use {value}:
+            1. Install an OpenVPN client such as Tunnelblick (https://tunnelblick.net/downloads.html) or Shimo (https://www.shimovpn.com).
+            2. Run "open {value}".
+            3. In your OpenVPN client, connect to the new "example" profile.
+            4. Run "dcos-docker doctor" to confirm that everything is working.
+            """,# noqa: E501,E261
+        ).format(
+            value=str(configuration_file),
+        )
+        # yapf: enable
+        assert result.exit_code == 2
+        assert result.output == expected_error
+
+
+class TestDestroyMacNetwork():
+    """
+    Tests for the ``destroy-mac-network`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker destroy-mac-network --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-mac-network', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker destroy-mac-network [OPTIONS]
+
+              Destroy containers created by "dcos-docker setup-mac-network".
+
+            Options:
+              --help  Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -958,17 +1248,38 @@ class TestRun:
               Or, with sync: ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k
               test_tls.py``.
 
+              To use special characters such as single quotes in your command, wrap the
+              whole command in double quotes.
+
             Options:
-              -c, --cluster-id TEXT    If not given, "default" is used.
-              --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
-                                       environment variable to.
-              --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` environment
-                                       variable to.
-              --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
-                                       will be synced before the command is run.
-              --no-test-env            With this flag set, no environment variables are set
-                                       and the command is run in the home directory.
-              --help                   Show this message and exit.
+              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                             default]
+              --dcos-login-uname TEXT        The username to set the ``DCOS_LOGIN_UNAME``
+                                             environment variable to.
+              --dcos-login-pw TEXT           The password to set the ``DCOS_LOGIN_PW``
+                                             environment variable to.
+              --sync-dir PATH                The path to a DC/OS checkout. Part of this
+                                             checkout will be synced to all master nodes
+                                             before the command is run.
+              --no-test-env                  With this flag set, no environment variables
+                                             are set and the command is run in the home
+                                             directory.
+              --node TEXT                    A reference to a particular node to run the
+                                             command on. This can be one of: The node's IP
+                                             address, the node's Docker container name, the
+                                             node's Docker container ID, a reference in the
+                                             format "<role>_<number>". These details be seen
+                                             with ``dcos_docker inspect``.
+              --env TEXT                     Set environment variables in the format
+                                             "<KEY>=<VALUE>"
+              --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                             the SSH transport requires IP routing to be set
+                                             up. See "dcos-docker setup-mac-network".It also
+                                             requires the "ssh" command to be available.
+                                             This can be provided by setting the
+                                             `DCOS_DOCKER_TRANSPORT` environment variable.
+                                             [default: ssh]
+              --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable

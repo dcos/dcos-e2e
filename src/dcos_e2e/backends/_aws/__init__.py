@@ -7,8 +7,11 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
+from textwrap import dedent
 from typing import Optional  # noqa: F401
-from typing import Any, Dict, Set, Type
+from typing import Any, Dict, Set, Tuple, Type
+
+import yaml
 
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
@@ -28,6 +31,7 @@ class AWS(ClusterBackend):
         admin_location: str = '0.0.0.0/0',
         linux_distribution: Distribution = Distribution.CENTOS_7,
         workspace_dir: Optional[Path] = None,
+        aws_key_pair: Optional[Tuple[str, Path]] = None,
     ) -> None:
         """
         Create a configuration for an AWS cluster backend.
@@ -42,6 +46,12 @@ class AWS(ClusterBackend):
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
+            aws_key_pair: An optional tuple of (name, path) where the name is
+                the identifier of an existing SSH public key on AWS KeyPairs
+                and the path is the local path to the corresponding private
+                key. The private key can then be used to connect to the
+                cluster. If this is not given, a new key pair will be
+                generated.
 
         Attributes:
             admin_location: The IP address range from which the AWS nodes can
@@ -51,6 +61,11 @@ class AWS(ClusterBackend):
             linux_distribution: The Linux distribution to boot DC/OS on.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            aws_key_pair: An optional tuple of (name, path) where the name is
+                the identifier of an existing SSH public key on AWS KeyPairs
+                and the path is the local path to the corresponding private
+                key. The private key can then be used to connect to the
+                cluster.
 
         Raises:
             NotImplementedError: In case an unsupported Linux distribution has
@@ -78,6 +93,7 @@ class AWS(ClusterBackend):
         self.linux_distribution = linux_distribution
         self.aws_region = aws_region
         self.admin_location = admin_location
+        self.aws_key_pair = aws_key_pair
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
@@ -138,7 +154,7 @@ class AWSCluster(ClusterManager):
             Distribution.CENTOS_7: 'centos',
             Distribution.COREOS: 'core',
         }
-        self._default_ssh_user = ssh_user[cluster_backend.linux_distribution]
+        self._default_user = ssh_user[cluster_backend.linux_distribution]
 
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
@@ -157,7 +173,6 @@ class AWSCluster(ClusterManager):
             # This is replaced later before the DC/OS installation.
             'installer_url': 'https://example.com',
             'instance_type': 'm4.large',
-            'key_helper': True,
             'launch_config_version': 1,
             'num_masters': masters,
             'num_private_agents': agents,
@@ -166,6 +181,13 @@ class AWSCluster(ClusterManager):
             'platform': 'aws',
             'provider': 'onprem',
         }
+
+        if cluster_backend.aws_key_pair is None:
+            launch_config['key_helper'] = True
+        else:
+            aws_key_name, local_key_path = cluster_backend.aws_key_pair
+            launch_config['ssh_private_key_filename'] = str(local_key_path)
+            launch_config['aws_key_name'] = aws_key_name
 
         # Work around ``ip_detect_public_filename`` being ignored.
         # https://jira.mesosphere.com/browse/DCOS-21960
@@ -215,10 +237,45 @@ class AWSCluster(ClusterManager):
         # This also inserts bootstrap node information into ``cluster_info``.
         self.cluster_info = self.launcher.describe()
 
-    def install_dcos_from_url(
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        # We include ``ip_detect_contents`` so that we can install DC/OS
+        # without putting an IP detect script on nodes.
+        ip_detect_contents = dedent(
+            """\
+            #!/bin/sh
+            set -o nounset -o errexit
+
+            if [ -e /etc/environment ]
+            then
+              set -o allexport
+              source /etc/environment
+              set +o allexport
+            fi
+
+            get_private_ip_from_metaserver()
+            {
+                curl -fsSL http://169.254.169.254/latest/meta-data/local-ipv4
+            }
+
+            echo ${COREOS_PRIVATE_IPV4:-$(get_private_ip_from_metaserver)}
+            """,
+        )
+        ip_detect_contents = yaml.dump(ip_detect_contents)
+        return {
+            **dict(self.launcher.config['dcos_config']),
+            **{
+                'ip_detect_contents': ip_detect_contents,
+            },
+        }
+
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
@@ -227,38 +284,30 @@ class AWSCluster(ClusterManager):
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: This may contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the AWS backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
         """
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
-
-        # The DC/OS config parameters from ``extra_config`` are applied
-        # on top of the preliminary DC/OS config.
-        dcos_config = self.launcher.config['dcos_config']
-        self.launcher.config['dcos_config'] = {**dcos_config, **extra_config}
+        self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
-    def install_dcos_from_path(
+    def install_dcos_from_path_with_bootstrap_node(
         self,
         build_artifact: Path,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a given build artifact. This is not supported and
-        simply raises a his is not supported and simply raises a
-        ``NotImplementedError``.
+        Install DC/OS from a given build artifact with a bootstrap node.
+        This is not supported and simply raises a his is not supported and
+        simply raises a ``NotImplementedError``.
 
         Args:
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
-            extra_config: May contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the AWS backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
@@ -266,12 +315,16 @@ class AWSCluster(ClusterManager):
                 backend does not support the DC/OS advanced installation
                 method.
         """
-        message = (
-            'The AWS backend does not support the installation of build '
-            'artifacts passed via path. This is because a more efficient'
-            'installation method exists in ``install_dcos_from_url``.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError
+
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a nodes in the cluster. This is not implemented.
+
+        Raises:
+            NotImplementedError
+        """
+        raise NotImplementedError
 
     def destroy(self) -> None:
         """
@@ -296,7 +349,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(master.get('public_ip')),
                 private_ip_address=IPv4Address(master.get('private_ip')),
-                default_ssh_user=self._default_ssh_user,
+                default_user=self._default_user,
                 ssh_key_path=self._ssh_key_path,
             )
             nodes.add(node)
@@ -314,7 +367,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(priv_agent.get('public_ip')),
                 private_ip_address=IPv4Address(priv_agent.get('private_ip')),
-                default_ssh_user=self._default_ssh_user,
+                default_user=self._default_user,
                 ssh_key_path=self._ssh_key_path,
             )
             nodes.add(node)
@@ -332,7 +385,7 @@ class AWSCluster(ClusterManager):
             node = Node(
                 public_ip_address=IPv4Address(pub_agent.get('public_ip')),
                 private_ip_address=IPv4Address(pub_agent.get('private_ip')),
-                default_ssh_user=self._default_ssh_user,
+                default_user=self._default_user,
                 ssh_key_path=self._ssh_key_path,
             )
             nodes.add(node)

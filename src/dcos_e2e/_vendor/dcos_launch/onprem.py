@@ -6,9 +6,10 @@ import shutil
 import typing
 
 import pkg_resources
+import yaml
 
 from .. import dcos_launch
-import yaml
+from ..dcos_launch import config
 from ..dcos_launch import util
 from ..dcos_launch.platforms import onprem as platforms_onprem
 from ..dcos_test_utils import onprem
@@ -189,10 +190,17 @@ echo "{{\\"fault_domain\\":{{\\"region\\":{{\\"name\\": \\"$REGION\\"}},\\"zone\
             installer_path = platforms_onprem.prepare_bootstrap(t, self.config['installer_url'])
             complete_config, genconf_dir = self.get_completed_onprem_config()
             platforms_onprem.do_genconf(t, genconf_dir, installer_path)
+
+        prereqs_script = ''
+        if self.config['prereqs_script_filename'] == 'unset' and self.config['install_prereqs']:
+            prereqs_script = config.expand_path(
+                pkg_resources.resource_filename(dcos_launch.__name__, 'scripts/install_prereqs.sh'),
+                self.config['config_dir'])
+
         platforms_onprem.install_dcos(
             cluster,
             self.get_ssh_client(),
-            self.config['prereqs_script_filename'] if self.config['install_prereqs'] else None,
+            prereqs_script,
             complete_config['bootstrap_url'] + '/dcos_install.sh',
             self.config['onprem_install_parallelism'])
 

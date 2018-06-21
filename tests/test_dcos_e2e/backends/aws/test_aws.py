@@ -1,16 +1,24 @@
 """
-Tests for the Docker backend.
+Tests for the AWS backend.
 """
 
 import uuid
 from pathlib import Path
 
+import boto3
 import pytest
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from passlib.hash import sha512_crypt
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e.node import Node
 
 
 class TestDefaults:
@@ -87,27 +95,14 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
-    def test_install_dcos_from_path(self) -> None:
+    def test_destroy_node(self):
         """
-        The AWS backend requires a build artifact URL in order to launch a
-        DC/OS cluster.
+        Destroying a particular node is not supported on the AWS backend.
         """
-        with Cluster(
-            cluster_backend=AWS(),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            with pytest.raises(NotImplementedError) as excinfo:
-                cluster.install_dcos_from_path(build_artifact=Path('/foo'))
-
-        expected_error = (
-            'The AWS backend does not support the installation of build '
-            'artifacts passed via path. This is because a more efficient'
-            'installation method exists in ``install_dcos_from_url``.'
-        )
-
-        assert str(excinfo.value) == expected_error
+        with Cluster(cluster_backend=AWS()) as cluster:
+            (agent, ) = cluster.agents
+            with pytest.raises(NotImplementedError):
+                cluster.destroy_node(node=agent)
 
 
 class TestRunIntegrationTest:
@@ -143,7 +138,10 @@ class TestRunIntegrationTest:
 
             cluster.install_dcos_from_url(
                 build_artifact=ee_artifact_url,
-                extra_config=config,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
                 log_output_live=True,
             )
 
@@ -161,3 +159,93 @@ class TestRunIntegrationTest:
                 },
                 log_output_live=True,
             )
+
+
+def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
+    """
+    Write an RSA key pair for connecting to nodes via SSH.
+
+    Args:
+        public_key_path: Path to write public key to.
+        private_key_path: Path to a private key file to write.
+    """
+    rsa_key_pair = rsa.generate_private_key(
+        backend=default_backend(),
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    public_key = rsa_key_pair.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH,
+    )
+
+    private_key = rsa_key_pair.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+
+    public_key_path.write_bytes(data=public_key)
+    private_key_path.write_bytes(data=private_key)
+
+
+class TestCustomKeyPair:
+    """
+    Tests for passing a custom key pair to the AWS backend.
+    """
+
+    def test_custom_key_pair(self, tmpdir: local):
+        """
+        It is possible to pass a custom key pair to the AWS backend.
+        """
+        key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
+        private_key_path = Path(str(tmpdir.join('private_key')))
+        public_key_path = Path(str(tmpdir.join('public_key')))
+        _write_key_pair(
+            public_key_path=public_key_path,
+            private_key_path=private_key_path,
+        )
+        backend = AWS(aws_key_pair=(key_name, private_key_path))
+        region_name = backend.aws_region
+        ec2 = boto3.client('ec2', region_name=region_name)
+        ec2.import_key_pair(
+            KeyName=key_name,
+            PublicKeyMaterial=public_key_path.read_bytes(),
+        )
+
+        try:
+            with Cluster(
+                cluster_backend=backend,
+                agents=0,
+                public_agents=0,
+            ) as cluster:
+                (master, ) = cluster.masters
+                node = Node(
+                    public_ip_address=master.public_ip_address,
+                    private_ip_address=master.private_ip_address,
+                    default_user=master.default_user,
+                    ssh_key_path=private_key_path,
+                )
+
+                node.run(args=['echo', '1'])
+        finally:
+            ec2.delete_key_pair(KeyName=key_name)
+
+
+class TestDCOSInstallation:
+    """
+    Test installing DC/OS.
+    """
+
+    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
+        """
+        It is possible to install DC/OS on an AWS cluster from a local path.
+        """
+        with Cluster(cluster_backend=AWS()) as cluster:
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config=cluster.base_config,
+            )
+
+            cluster.wait_for_dcos_oss()

@@ -5,11 +5,9 @@ import os
 import sys
 import uuid
 
-import pkg_resources
 import requests
 
 import cerberus
-from .. import dcos_launch
 import yaml
 from ..dcos_launch import util
 from ..dcos_launch.platforms import aws, gcp
@@ -104,7 +102,11 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
         config_dir: path for the config file for resolving relative
             file links
     """
+    owner = os.environ.get('USER')
+    if owner:
+        user_config.setdefault('tags', {'owner': owner})
     # validate against the fields common to all configs
+    user_config['config_dir'] = config_dir
     validator = LaunchValidator(COMMON_SCHEMA, config_dir=config_dir, allow_unknown=True)
     if not validator.validate(user_config):
         _raise_errors(validator)
@@ -196,6 +198,10 @@ COMMON_SCHEMA = {
             'acs-engine',
             'onprem',
             'terraform']},
+    'config_dir': {
+        'type': 'string',
+        'required': False
+    },
     'launch_config_version': {
         'type': 'integer',
         'required': True,
@@ -356,11 +362,8 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'validator': _validate_fault_domain_helper
     },
     'prereqs_script_filename': {
-        'coerce': 'expand_local_path',
-        'required': False,
-        'default_setter':
-            lambda doc: pkg_resources.resource_filename(dcos_launch.__name__, 'scripts/install_prereqs.sh') \
-            if doc['install_prereqs'] else ''
+        'type': 'string',
+        'default': 'unset'
     },
     'install_prereqs': {
         'type': 'boolean',
@@ -471,15 +474,22 @@ ACS_ENGINE_SCHEMA = {
     'deployment_name': {
         'type': 'string',
         'required': True},
+    'acs_version': {
+        'type': 'string',
+        'default_setter': lambda doc: get_latest_github_release('Azure', 'acs-engine', '0.16.2')
+    },
     'acs_engine_tarball_url': {
         'type': 'string',
-        'required': True,
-        'default': get_platform_dependent_url(
-            'https://github.com/Azure/acs-engine/releases/download/v0.12.1/acs-engine-v0.12.1-{}-amd64.tar.gz',
+        'default_setter': lambda doc: get_platform_dependent_url(
+            'https://github.com/Azure/acs-engine/releases/download/v{0}/acs-engine-v{0}-{1}-amd64.tar.gz'.
+                format(doc['acs_version'], '{}'),
             'No ACS-Engine distribution for {}'.format(sys.platform))},
     'acs_template_filename': {
         'type': 'string',
         'required': False},
+    'acs_engine_dcos_orchestrator_release': {
+        'type': 'string',
+        'default': '1.11'},
     'platform': {
         'type': 'string',
         'readonly': True,
@@ -532,16 +542,19 @@ ACS_ENGINE_SCHEMA = {
     'dcos_linux_bootstrap_url': {
         'type': 'string',
         'required': False},
+    'windows_publisher': {
+        'type': 'string',
+        'default': 'MicrosoftWindowsServer'
+    },
+    'windows_offer': {
+        'type': 'string',
+        'default': 'WindowsServerSemiAnnual'
+    },
+    'windows_sku': {
+        'type': 'string',
+        'default': 'Datacenter-Core-1803-with-Containers-smalldisk'
+    },
     'windows_image_source_url': {
-        'type': 'string',
-        'required': False},
-    'dcos_linux_repository_url': {
-        'type': 'string',
-        'required': False},
-    'dcos_linux_cluster_package_list_id': {
-        'type': 'string',
-        'required': False},
-    'provider_package_id': {
         'type': 'string',
         'required': False},
     'ssh_user': {
@@ -627,14 +640,12 @@ def set_key_helper(platform: str, terraform_config: dict):
     raise Exception('Platform {} unrecognized'.format(platform))
 
 
-def get_latest_terraform_version(doc: dict):
-    default = '0.11.6'
+def get_latest_github_release(org: str, repo: str, default: str):
     try:
-        response = requests.get('https://api.github.com/repos/hashicorp/terraform/releases/latest')
+        response = requests.get('https://api.github.com/repos/{}/{}/releases/latest'.format(org, repo))
         return response.json()['tag_name'][1:]
     except Exception as e:
-        log.error('Failed to get latest terraform version. Defaulting to {}. Error details: {}'.format(default,
-                                                                                                       repr(e)))
+        log.error('Failed to get latest {} version. Defaulting to {}. Error details: {}'.format(repo, default, repr(e)))
         return default
 
 
@@ -644,10 +655,11 @@ TERRAFORM_COMMON_SCHEMA = {
         'default': False},
     'terraform_version': {
         'type': 'string',
-        'default_setter': get_latest_terraform_version
+        'default_setter': lambda doc: get_latest_github_release('hashicorp', 'terraform', '0.11.6')
     },
     'terraform_tarball_url': {
         'type': 'string',
+        'readonly': True,
         'default_setter': lambda doc: get_platform_dependent_url(
             'https://releases.hashicorp.com/terraform/{0}/terraform_{0}_{1}_amd64.zip'.format(doc['terraform_version'],
                                                                                               sys.platform),

@@ -18,13 +18,14 @@ import yaml
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from docker.types import Mount
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 from ._containers import start_dcos_container
 from ._docker_build import build_docker_image
@@ -103,10 +104,10 @@ class Docker(ClusterBackend):
     def __init__(
         self,
         workspace_dir: Optional[Path] = None,
-        custom_container_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_master_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
-        custom_public_agent_mounts: Optional[Dict[str, Dict[str, str]]] = None,
+        custom_container_mounts: Optional[List[Mount]] = None,
+        custom_master_mounts: Optional[List[Mount]] = None,
+        custom_agent_mounts: Optional[List[Mount]] = None,
+        custom_public_agent_mounts: Optional[List[Mount]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
         docker_version: DockerVersion = DockerVersion.v1_13_1,
         storage_driver: Optional[DockerStorageDriver] = None,
@@ -114,6 +115,7 @@ class Docker(ClusterBackend):
         docker_master_labels: Optional[Dict[str, str]] = None,
         docker_agent_labels: Optional[Dict[str, str]] = None,
         docker_public_agent_labels: Optional[Dict[str, str]] = None,
+        transport: Transport = Transport.SSH,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -124,13 +126,13 @@ class Docker(ClusterBackend):
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
             custom_container_mounts: Custom mounts add to all node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers. See `volumes` in `Containers.run`_.
+                containers. See `mounts` in `Containers.run`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
             storage_driver: The storage driver to use for Docker on the
@@ -147,18 +149,19 @@ class Docker(ClusterBackend):
             docker_public_agent_labels: Docker labels to add to the cluster
                 public agent node containers. Akin to the dictionary option in
                 `Containers.run`_.
+            transport: The transport to use for communicating with nodes.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
             custom_container_mounts: Custom mounts add to all node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_agent_mounts: Custom mounts add to agent node containers.
-                See `volumes` in `Containers.run`_.
+                See `mounts` in `Containers.run`_.
             custom_public_agent_mounts: Custom mounts add to public agent node
-                containers. See `volumes` in `Containers.run`_.
+                containers. See `mounts` in `Containers.run`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
             docker_version: The Docker version to install on the cluster nodes.
             docker_storage_driver: The storage driver to use for Docker on the
@@ -173,16 +176,17 @@ class Docker(ClusterBackend):
             docker_public_agent_labels: Docker labels to add to the cluster
                 public agent node containers. Akin to the dictionary option in
                 `Containers.run`_.
+            transport: The transport to use for communicating with nodes.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
         """
         self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
-        self.custom_container_mounts = custom_container_mounts or {}
-        self.custom_master_mounts = custom_master_mounts or {}
-        self.custom_agent_mounts = custom_agent_mounts or {}
-        self.custom_public_agent_mounts = custom_public_agent_mounts or {}
+        self.custom_container_mounts = custom_container_mounts or []
+        self.custom_master_mounts = custom_master_mounts or []
+        self.custom_agent_mounts = custom_agent_mounts or []
+        self.custom_public_agent_mounts = custom_public_agent_mounts or []
         self.linux_distribution = linux_distribution
         fallback_driver = _get_fallback_storage_driver()
         self.docker_storage_driver = storage_driver or fallback_driver
@@ -190,6 +194,7 @@ class Docker(ClusterBackend):
         self.docker_master_labels = docker_master_labels or {}
         self.docker_agent_labels = docker_agent_labels or {}
         self.docker_public_agent_labels = docker_public_agent_labels or {}
+        self.transport = transport
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -227,7 +232,8 @@ class DockerCluster(ClusterManager):
                 installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
-        self._default_ssh_user = 'root'
+        self._default_user = 'root'
+        self._default_transport = cluster_backend.transport
 
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -260,12 +266,6 @@ class DockerCluster(ClusterManager):
         certs_dir.mkdir(parents=True)
         ssh_dir = include_dir / 'ssh'
         ssh_dir.mkdir(parents=True)
-
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_dst = Path('/genconf/ip-detect')
-        files_to_copy_to_installer.append((ip_detect_src, ip_detect_dst))
 
         public_key_path = ssh_dir / 'id_rsa.pub'
         _write_key_pair(
@@ -304,195 +304,137 @@ class DockerCluster(ClusterManager):
             docker_version=cluster_backend.docker_version,
         )
 
-        common_mounts = {
-            str(certs_dir.resolve()): {
-                'bind': '/etc/docker/certs.d',
-                'mode': 'rw',
-            },
-            str(bootstrap_genconf_path): {
-                'bind': str(self._bootstrap_tmp_path),
-                'mode': 'ro',
-            },
-        }
+        certs_mount = Mount(
+            source=str(certs_dir.resolve()),
+            target='/etc/docker/certs.d',
+            read_only=False,
+            type='bind',
+        )
 
-        agent_mounts = {
-            '/sys/fs/cgroup': {
-                'bind': '/sys/fs/cgroup',
-                'mode': 'ro',
-            },
-            **common_mounts,
-        }
+        bootstrap_genconf_mount = Mount(
+            source=str(bootstrap_genconf_path),
+            target=str(self._bootstrap_tmp_path),
+            read_only=True,
+            type='bind',
+        )
 
-        for master_number in range(1, masters + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-            }
+        # Mount cgroups into agents for Mesos DRF.
+        cgroup_mount = Mount(
+            source='/sys/fs/cgroup',
+            target='/sys/fs/cgroup',
+            read_only=True,
+            type='bind',
+        )
 
-            start_dcos_container(
-                existing_masters=self.masters,
-                container_base_name=self._master_prefix,
-                container_number=master_number,
-                dcos_num_masters=masters,
-                dcos_num_agents=agents + public_agents,
-                volumes={
-                    **common_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_master_mounts,
-                    **unique_mounts,
-                },
-                tmpfs=node_tmpfs_mounts,
-                docker_image=docker_image_tag,
-                labels={
-                    **cluster_backend.docker_container_labels,
-                    **cluster_backend.docker_master_labels,
-                },
-                public_key_path=public_key_path,
-                docker_storage_driver=cluster_backend.docker_storage_driver,
-                docker_version=cluster_backend.docker_version,
-            )
+        var_lib_docker_mount = Mount(
+            source=None,
+            target='/var/lib/docker',
+        )
 
-        for agent_number in range(1, agents + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw',
-                },
-            }
+        opt_mount = Mount(
+            source=None,
+            target='/opt',
+        )
 
-            start_dcos_container(
-                existing_masters=self.masters,
-                container_base_name=self._agent_prefix,
-                container_number=agent_number,
-                dcos_num_masters=masters,
-                dcos_num_agents=agents + public_agents,
-                volumes={
-                    **agent_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_agent_mounts,
-                    **unique_mounts,
-                },
-                tmpfs=node_tmpfs_mounts,
-                docker_image=docker_image_tag,
-                labels={
-                    **cluster_backend.docker_container_labels,
-                    **cluster_backend.docker_agent_labels,
-                },
-                public_key_path=public_key_path,
-                docker_storage_driver=cluster_backend.docker_storage_driver,
-                docker_version=cluster_backend.docker_version,
-            )
+        mesos_slave_mount = Mount(
+            source=None,
+            target='/var/lib/mesos/slave',
+        )
 
-        for public_agent_number in range(1, public_agents + 1):
-            unique_mounts = {
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/docker',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/opt',
-                    'mode': 'rw',
-                },
-                str(uuid.uuid4()): {
-                    'bind': '/var/lib/mesos/slave',
-                    'mode': 'rw',
-                },
-            }
+        agent_mounts = [
+            certs_mount,
+            bootstrap_genconf_mount,
+            cgroup_mount,
+            var_lib_docker_mount,
+            opt_mount,
+            mesos_slave_mount,
+            *cluster_backend.custom_container_mounts,
+        ]
 
-            start_dcos_container(
-                existing_masters=self.masters,
-                container_base_name=self._public_agent_prefix,
-                container_number=public_agent_number,
-                dcos_num_masters=masters,
-                dcos_num_agents=agents + public_agents,
-                volumes={
-                    **agent_mounts,
-                    **cluster_backend.custom_container_mounts,
-                    **cluster_backend.custom_public_agent_mounts,
-                    **unique_mounts,
-                },
-                tmpfs=node_tmpfs_mounts,
-                docker_image=docker_image_tag,
-                labels={
-                    **cluster_backend.docker_container_labels,
-                    **cluster_backend.docker_public_agent_labels,
-                },
-                public_key_path=public_key_path,
-                docker_storage_driver=cluster_backend.docker_storage_driver,
-                docker_version=cluster_backend.docker_version,
-            )
+        master_mounts = [
+            certs_mount,
+            bootstrap_genconf_mount,
+            var_lib_docker_mount,
+            opt_mount,
+            *cluster_backend.custom_container_mounts,
+            *cluster_backend.custom_master_mounts,
+        ]
 
-    def install_dcos_from_url(
+        for nodes, prefix, labels, mounts in (
+            (
+                masters,
+                self._master_prefix,
+                cluster_backend.docker_master_labels,
+                master_mounts,
+            ),
+            (
+                agents,
+                self._agent_prefix,
+                cluster_backend.docker_agent_labels,
+                agent_mounts + cluster_backend.custom_agent_mounts,
+            ),
+            (
+                public_agents,
+                self._public_agent_prefix,
+                cluster_backend.docker_public_agent_labels,
+                agent_mounts + cluster_backend.custom_public_agent_mounts,
+            ),
+        ):
+            for container_number in range(nodes):
+                start_dcos_container(
+                    container_base_name=prefix,
+                    container_number=container_number,
+                    mounts=mounts,
+                    tmpfs=node_tmpfs_mounts,
+                    docker_image=docker_image_tag,
+                    labels={
+                        **cluster_backend.docker_container_labels,
+                        **labels,
+                    },
+                    public_key_path=public_key_path,
+                    docker_storage_driver=(
+                        cluster_backend.docker_storage_driver
+                    ),
+                    docker_version=cluster_backend.docker_version,
+                )
+
+    def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
-        extra_config: Dict[str, Any],
+        dcos_config: Dict[str, Any],
         log_output_live: bool,
     ) -> None:
         """
-        Install DC/OS from a URL. This is not supported and simply raises a
-        ``NotImplementedError``.
+        Install DC/OS from a URL with a bootstrap node.
+        This is not supported and simply raises a ``NotImplementedError``.
 
         Args:
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
-            extra_config: This may contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the Docker backend.
+            dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
             NotImplementedError: ``NotImplementedError`` because the Docker
                 backend does not support the DC/OS advanced installation
-                method.
+                method with a bootstrap node.
         """
-        message = (
-            'The Docker backend does not support the installation of DC/OS '
-            'by build artifacts passed via URL string. This is because a more '
-            'efficient installation method exists in `install_dcos_from_path`.'
-        )
-        raise NotImplementedError(message)
+        raise NotImplementedError
 
-    def install_dcos_from_path(
-        self,
-        build_artifact: Path,
-        extra_config: Dict[str, Any],
-        log_output_live: bool,
-    ) -> None:
+    @property
+    def base_config(self) -> Dict[str, Any]:
         """
-        Install DC/OS from a given build artifact.
-
-        Args:
-            build_artifact: The ``Path`` to a build artifact to install DC/OS
-                from.
-            extra_config: May contain extra installation configuration
-                variables that are applied on top of the default DC/OS
-                configuration of the Docker backend.
-            log_output_live: If ``True``, log output of the installation live.
-
-        Raises:
-            CalledProcessError: There was an error installing DC/OS on a node.
+        Return a base configuration for installing DC/OS OSS, not including the
+        list of nodes.
         """
-        ssh_user = self._default_ssh_user
+        ssh_user = self._default_user
 
-        def ip_list(nodes: Set[Node]) -> List[str]:
-            return list(map(lambda node: str(node.public_ip_address), nodes))
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        ip_detect_src = current_parent / 'resources' / 'ip-detect'
+        ip_detect_contents = Path(ip_detect_src).read_text()
 
         config = {
-            'agent_list': ip_list(nodes=self.agents),
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
             # "Time is not synchronized / marked as bad by the kernel.".
@@ -504,16 +446,37 @@ class DockerCluster(ClusterManager):
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
             'master_discovery': 'static',
-            'master_list': ip_list(nodes=self.masters),
             'process_timeout': 10000,
-            'public_agent_list': ip_list(nodes=self.public_agents),
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
+            # This is not a documented option.
+            # Users are instructed to instead provide a filename with
+            # 'ip_detect_contents_filename'.
+            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
-        config_data = {**config, **extra_config}
-        config_yaml = yaml.dump(data=config_data)  # type: ignore
+        return config
+
+    def install_dcos_from_path_with_bootstrap_node(
+        self,
+        build_artifact: Path,
+        dcos_config: Dict[str, Any],
+        log_output_live: bool,
+    ) -> None:
+        """
+        Install DC/OS from a given build artifact.
+
+        Args:
+            build_artifact: The ``Path`` to a build artifact to install DC/OS
+                from.
+            dcos_config: The DC/OS configuration to use.
+            log_output_live: If ``True``, log output of the installation live.
+
+        Raises:
+            CalledProcessError: There was an error installing DC/OS on a node.
+        """
+        config_yaml = yaml.dump(data=dcos_config)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)
 
@@ -560,20 +523,26 @@ class DockerCluster(ClusterManager):
                     LOGGER.error(ex.stderr)
                     raise
 
+    def destroy_node(self, node: Node) -> None:
+        """
+        Destroy a node in the cluster.
+        """
+        client = docker.from_env(version='auto')
+        containers = client.containers.list()
+        [container] = [
+            container for container in containers
+            if container.attrs['NetworkSettings']['IPAddress'] ==
+            str(node.public_ip_address)
+        ]
+        container.stop()
+        container.remove(v=True)
+
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
-        client = docker.from_env(version='auto')
-        for prefix in (
-            self._master_prefix,
-            self._agent_prefix,
-            self._public_agent_prefix,
-        ):
-            containers = client.containers.list(filters={'name': prefix})
-            for container in containers:
-                container.stop()
-                container.remove(v=True)
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            self.destroy_node(node=node)
 
         rmtree(path=str(self._path), ignore_errors=True)
 
@@ -598,8 +567,9 @@ class DockerCluster(ClusterManager):
                 Node(
                     public_ip_address=container_ip_address,
                     private_ip_address=container_ip_address,
-                    default_ssh_user=self._default_ssh_user,
+                    default_user=self._default_user,
                     ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
+                    default_transport=self._default_transport,
                 ),
             )
         return nodes

@@ -4,7 +4,7 @@ Requirements
 Docker
 ~~~~~~
 
-Docker must be installed.
+Docker version 17.06 or later must be installed.
 
 Plenty of memory must be given to Docker.
 On Docker for Mac, this can be done from Docker > Preferences > Advanced.
@@ -13,12 +13,19 @@ This backend has been tested with a four node cluster with 9 GB memory given to 
 IP Routing Set Up for Docker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-On Docker for Mac this requires a tool such as `docker-mac-network <https://github.com/wojas/docker-mac-network>`__.
+On macOS, hosts cannot connect to containers IP addresses by default.
+This is required, for example, to access the web UI, to SSH to nodes and to use the DC/OS CLI.
+
+Once the CLI is installed, run :ref:`dcos-docker-setup-mac-network` to set up IP routing.
+
+Without this, it is still possible to use some features.
+In the library, specify :paramref:`~dcos_e2e.backends.Docker.transport` as :py:class:`dcos_e2e.node.Transport.DOCKER_EXEC`.
+In the CLI, specify the ``--transport`` and ``--skip-http-checks`` options where available.
 
 ``ssh``
 ~~~~~~~
 
-The ``ssh`` command must be available.
+The ``ssh`` command must be available to use the :py:class:`~dcos_e2e.node.Transport.SSH` transport.
 
 Operating System
 ~~~~~~~~~~~~~~~~
@@ -54,7 +61,7 @@ The only supported way to use the Docker backend on Windows is using Vagrant and
 
 .. code:: ps1
 
-    ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/mesosphere/dcos-e2e/master/vagrant/Vagrantfile')) | Set-Content -LiteralPath Vagrantfile
+    ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/dcos/dcos-e2e/master/vagrant/Vagrantfile')) | Set-Content -LiteralPath Vagrantfile
 
 - By default, the :file:`Vagrantfile` installs DC/OS E2E from the most recent release at the time it is downloaded.
   To use a different release, or any Git reference, set the environment variable ``DCOS_E2E_REF``:
