@@ -5,11 +5,9 @@ import os
 import sys
 import uuid
 
-import pkg_resources
 import requests
 
 import cerberus
-from .. import dcos_launch
 import yaml
 from ..dcos_launch import util
 from ..dcos_launch.platforms import aws, gcp
@@ -108,6 +106,7 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
     if owner:
         user_config.setdefault('tags', {'owner': owner})
     # validate against the fields common to all configs
+    user_config['config_dir'] = config_dir
     validator = LaunchValidator(COMMON_SCHEMA, config_dir=config_dir, allow_unknown=True)
     if not validator.validate(user_config):
         _raise_errors(validator)
@@ -199,6 +198,10 @@ COMMON_SCHEMA = {
             'acs-engine',
             'onprem',
             'terraform']},
+    'config_dir': {
+        'type': 'string',
+        'required': False
+    },
     'launch_config_version': {
         'type': 'integer',
         'required': True,
@@ -359,11 +362,8 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'validator': _validate_fault_domain_helper
     },
     'prereqs_script_filename': {
-        'coerce': 'expand_local_path',
-        'required': False,
-        'default_setter':
-            lambda doc: pkg_resources.resource_filename(dcos_launch.__name__, 'scripts/install_prereqs.sh') \
-            if doc['install_prereqs'] else ''
+        'type': 'string',
+        'default': 'unset'
     },
     'install_prereqs': {
         'type': 'boolean',
