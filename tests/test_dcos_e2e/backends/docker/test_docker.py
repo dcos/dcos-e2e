@@ -370,3 +370,27 @@ class TestLabels:
                 assert node_labels[public_agent_key] == public_agent_value
                 assert master_key not in node_labels
                 assert agent_key not in node_labels
+
+
+class TestNetworks:
+    """
+    Tests for Docker container networks.
+    """
+
+    def test_default(self):
+        """
+        By default, the only network a container is in is the Docker default
+        bridge network.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            container = _get_container_from_node(master)
+            networks = container.attrs['NetworkSettings']['Networks']
+            assert networks.keys() == set(['bridge'])
+            bridge_ip_address = networks['bridge']['IPAddress']
+            assert bridge_ip_address == str(master.public_ip_address)
+            assert bridge_ip_address == str(master.private_ip_address)
