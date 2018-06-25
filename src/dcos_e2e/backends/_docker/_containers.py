@@ -133,6 +133,8 @@ def start_dcos_container(
         network.connect(container)
     container.start()
 
+    container.start()
+
     disable_systemd_support_cmd = (
         "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
         '/var/lib/dcos/mesos-slave-common'
