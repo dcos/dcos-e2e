@@ -214,13 +214,7 @@ class DockerExecTransport(NodeTransport):
             public_ip_address=public_ip_address,
         )
 
-        client = docker.from_env(version='auto')
-        containers = client.containers.list()
-        [container] = [
-            container for container in containers
-            if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(public_ip_address)
-        ]
+        container = _get_container_from_ip_address(public_ip_address)
         tarstream = io.BytesIO()
         with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
             tar.add(name=str(local_path), arcname='/' + remote_path.name)
