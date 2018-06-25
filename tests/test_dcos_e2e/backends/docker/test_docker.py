@@ -22,7 +22,7 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 
 @retry(
@@ -402,9 +402,11 @@ class TestNetworks:
         finally:
             network.remove()
 
+    @pytest.mark.parametrize('transport', list(Transport))
     def test_custom_docker_network(
         self,
         docker_network: docker.models.networks.Network,
+        transport: Transport,
     ) -> None:
         """
         When a network is specified on the Docker backend,
@@ -424,6 +426,10 @@ class TestNetworks:
             custom_network_ip = networks[docker_network.name]['IPAddress']
             assert custom_network_ip == str(master.public_ip_address)
             assert custom_network_ip == str(master.private_ip_address)
+            # We check that we can run commands with a custom network on all
+            # transports.
+            master.run(args=['ls'], transport=transport)
+            # master.send_file
 
     def test_default(self) -> None:
         """
@@ -442,3 +448,4 @@ class TestNetworks:
             bridge_ip_address = networks['bridge']['IPAddress']
             assert bridge_ip_address == str(master.public_ip_address)
             assert bridge_ip_address == str(master.private_ip_address)
+
