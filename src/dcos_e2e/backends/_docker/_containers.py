@@ -113,7 +113,7 @@ def start_dcos_container(
     environment = {'container': hostname}
 
     client = docker.from_env(version='auto')
-    container = client.containers.run(
+    container = client.containers.create(
         name=hostname,
         privileged=True,
         detach=True,
@@ -127,6 +127,8 @@ def start_dcos_container(
         stop_signal='SIGRTMIN+3',
         command=['/sbin/init'],
     )
+
+    container.start()
 
     disable_systemd_support_cmd = (
         "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
