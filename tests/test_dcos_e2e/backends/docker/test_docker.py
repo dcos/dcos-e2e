@@ -309,19 +309,6 @@ class TestLabels:
     Tests for setting labels on Docker containers.
     """
 
-    def _get_labels(self, node: Node) -> Dict[str, str]:
-        """
-        Return the labels on the container which maps to ``node``.
-        """
-        client = docker.from_env(version='auto')
-        containers = client.containers.list()
-        [container] = [
-            container for container in containers
-            if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(node.public_ip_address)
-        ]
-        return dict(container.labels)
-
     def test_custom(self) -> None:
         """
         It is possible to set node Docker container labels.
@@ -351,21 +338,21 @@ class TestLabels:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             for node in cluster.masters:
-                node_labels = self._get_labels(node=node)
+                node_labels = dict(_get_container_from_node(node=node).labels)
                 assert node_labels[cluster_key] == cluster_value
                 assert node_labels[master_key] == master_value
                 assert agent_key not in node_labels
                 assert public_agent_key not in node_labels
 
             for node in cluster.agents:
-                node_labels = self._get_labels(node=node)
+                node_labels = dict(_get_container_from_node(node=node).labels)
                 assert node_labels[cluster_key] == cluster_value
                 assert node_labels[agent_key] == agent_value
                 assert master_key not in node_labels
                 assert public_agent_key not in node_labels
 
             for node in cluster.public_agents:
-                node_labels = self._get_labels(node=node)
+                node_labels = dict(_get_container_from_node(node=node).labels)
                 assert node_labels[cluster_key] == cluster_value
                 assert node_labels[public_agent_key] == public_agent_value
                 assert master_key not in node_labels
@@ -377,42 +364,44 @@ class TestNetworks:
     Tests for running DC/OS with a custom Docker bridge network.
 
     TODO tests:
-        - Give no network to the backend class - two clusters have different networks - network cleaned up when cluster destroyed
-        - Give network settings to backend class - two clusters can have different network - no network cleanup
+        - Give no network to the backend class - two clusters have different
+        networks - network cleaned up when cluster destroyed
+        - Give network settings to backend class - two clusters can have
+        different network - no network cleanup
     """
-    def test_custom_bridge_network(self, oss_artifact: Path):
-        network_name = 'dcos-e2e-network-{random}'.format(random=uuid.uuid4())
-        docker_backend = Docker(
-            network={
-                'name': network_name,
-                'subnet': '172.28.0.0/16',
-                'iprange': '172.28.0.0/24',
-                'gateway': '172.28.0.254',
-            },
+    def test_custom_bridge_network(self):
+        ipam_pool = docker.types.IPAMPool(
+            subnet='172.28.0.0/16',
+            iprange='172.28.0.0/24',
+            gateway='172.28.0.254',
         )
-        with Cluster(
-            cluster_backend=docker_backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            client = docker.from_env(version='auto')
-            containers = client.containers.list()
-            [container] = [
-                container for container in containers
-                if container.attrs['NetworkSettings']['IPAddress'] ==
-                str(next(iter(cluster.masters)).public_ip_address)
-            ]
-            networks = container.attrs['NetworkSettings']['Networks'].keys()
-            assert networks == set([network_name])
+        client = docker.from_env(version='auto')
+        network = client.networks.create(
+            name='dcos-e2e-network-{random}'.format(random=uuid.uuid4()),
+            driver='bridge',
+            ipam=docker.types.IPAMConfig(pool_configs=[ipam_pool]),
+            attachable=False,
+        )
+        try:
+            with Cluster(
+                cluster_backend=Docker(network=network),
+                agents=0,
+                public_agents=0,
+            ) as cluster:
+                (master, ) = cluster.masters
+                container = _get_container_from_node(master)
+                networks = container.attrs['NetworkSettings']['Networks']
+                assert networks.keys() == set([network.name])
+        finally:
+            network.remove()
 
-def _non_bridge_networks_from_container(container) -> Set[str]:
-    pass
 
-def _get_container_from_node(node: Node) -> docker.types.container:
+def _get_container_from_node(node: Node) -> docker.models.containers.Container:
     client = docker.from_env(version='auto')
     containers = client.containers.list()
-    for container in containers:
-        networks = container.attrs['NetworkSettings']['Networks']
-        for network in networks:
-            if network['IPAddress'] == str(node.public_ip_address):
-                return container
+    [container] = [
+        container for container in containers
+        if container.attrs['NetworkSettings']['IPAddress'] ==
+        str(node.public_ip_address)
+    ]
+    return container

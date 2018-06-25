@@ -6,7 +6,7 @@ import configparser
 import io
 import shlex
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import docker
 
@@ -85,7 +85,7 @@ def start_dcos_container(
     public_key_path: Path,
     docker_storage_driver: DockerStorageDriver,
     docker_version: DockerVersion,
-    network_id: str,
+    network: Optional[docker.models.networks.Network] = None,
 ) -> None:
     """
     Start a master, agent or public agent container.
@@ -128,8 +128,9 @@ def start_dcos_container(
         stop_signal='SIGRTMIN+3',
         command=['/sbin/init'],
     )
-    # client.networks.get('bridge').disconnect(container)
-    client.networks.get(network_id).connect(container)
+    if network:
+        client.networks.get('bridge').disconnect(container)
+        network.connect(container)
     container.start()
 
     disable_systemd_support_cmd = (
