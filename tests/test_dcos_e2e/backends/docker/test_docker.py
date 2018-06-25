@@ -407,14 +407,3 @@ class TestNetworks:
                 assert networks.keys() == set([network.name])
         finally:
             network.remove()
-
-
-def _get_container_from_node(node: Node) -> docker.models.containers.Container:
-    client = docker.from_env(version='auto')
-    containers = client.containers.list()
-    [container] = [
-        container for container in containers
-        if container.attrs['NetworkSettings']['IPAddress'] ==
-        str(node.public_ip_address)
-    ]
-    return container
