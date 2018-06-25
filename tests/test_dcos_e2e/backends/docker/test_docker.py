@@ -44,12 +44,15 @@ def _get_container_from_node(node: Node) -> docker.models.containers.Container:
     """
     client = docker.from_env(version='auto')
     containers = client.containers.list()
-    [container] = [
-        container for container in containers
-        if container.attrs['NetworkSettings']['IPAddress'] ==
-        str(node.public_ip_address)
-    ]
-    return container
+    matching_containers = []
+    for container in containers:
+        networks = container.attrs['NetworkSettings']['Networks']
+        for net in networks:
+            if networks[net]['IPAddress'] == str(node.public_ip_address):
+                matching_containers.append(container)
+
+    assert len(matching_containers) == 1
+    return matching_containers[0]
 
 
 class TestDockerBackend:
@@ -378,7 +381,7 @@ class TestNetworks:
     """
 
     @pytest.fixture()
-    def docker_network():
+    def docker_network(self):
         """
         Return a Docker network.
         """
@@ -399,7 +402,16 @@ class TestNetworks:
         finally:
             network.remove()
 
-    def test_custom_bridge_network(self, docker_network: XXX) -> None:
+    def test_custom_docker_network(
+        self,
+        docker_network: docker.models.networks.Network,
+    ) -> None:
+        """
+        When a network is specified on the Docker backend,
+        each container is connected to the default bridge network
+        docker0 and in addition it also connected to the custom
+        network.
+        """
         with Cluster(
             cluster_backend=Docker(network=docker_network),
             agents=0,
@@ -408,7 +420,10 @@ class TestNetworks:
             (master, ) = cluster.masters
             container = _get_container_from_node(master)
             networks = container.attrs['NetworkSettings']['Networks']
-            assert networks.keys() == set([network.name])
+            assert networks.keys() == set(['bridge', docker_network.name])
+            custom_network_ip = networks[docker_network.name]['IPAddress']
+            assert custom_network_ip == str(master.public_ip_address)
+            assert custom_network_ip == str(master.private_ip_address)
 
     def test_default(self) -> None:
         """
