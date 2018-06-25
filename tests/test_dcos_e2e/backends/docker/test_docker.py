@@ -377,13 +377,17 @@ class TestNetworks:
     Tests for Docker container networks.
     """
 
-    def test_custom_bridge_network(self):
+    @pytest.fixture()
+    def docker_network():
+        """
+        Return a Docker network.
+        """
+        client = docker.from_env(version='auto')
         ipam_pool = docker.types.IPAMPool(
             subnet='172.28.0.0/16',
             iprange='172.28.0.0/24',
             gateway='172.28.0.254',
         )
-        client = docker.from_env(version='auto')
         network = client.networks.create(
             name='dcos-e2e-network-{random}'.format(random=uuid.uuid4()),
             driver='bridge',
@@ -391,19 +395,22 @@ class TestNetworks:
             attachable=False,
         )
         try:
-            with Cluster(
-                cluster_backend=Docker(network=network),
-                agents=0,
-                public_agents=0,
-            ) as cluster:
-                (master, ) = cluster.masters
-                container = _get_container_from_node(master)
-                networks = container.attrs['NetworkSettings']['Networks']
-                assert networks.keys() == set([network.name])
+            yield network
         finally:
             network.remove()
 
-    def test_default(self):
+    def test_custom_bridge_network(self, docker_network: XXX) -> None:
+        with Cluster(
+            cluster_backend=Docker(network=docker_network),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            container = _get_container_from_node(master)
+            networks = container.attrs['NetworkSettings']['Networks']
+            assert networks.keys() == set([network.name])
+
+    def test_default(self) -> None:
         """
         By default, the only network a container is in is the Docker default
         bridge network.
