@@ -374,14 +374,9 @@ class TestLabels:
 
 class TestNetworks:
     """
-    Tests for running DC/OS with a custom Docker bridge network.
-
-    TODO tests:
-        - Give no network to the backend class - two clusters have different
-        networks - network cleaned up when cluster destroyed
-        - Give network settings to backend class - two clusters can have
-        different network - no network cleanup
+    Tests for Docker container networks.
     """
+
     def test_custom_bridge_network(self):
         ipam_pool = docker.types.IPAMPool(
             subnet='172.28.0.0/16',
@@ -407,3 +402,21 @@ class TestNetworks:
                 assert networks.keys() == set([network.name])
         finally:
             network.remove()
+
+    def test_default(self):
+        """
+        By default, the only network a container is in is the Docker default
+        bridge network.
+        """
+        with Cluster(
+            cluster_backend=Docker(),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            container = _get_container_from_node(master)
+            networks = container.attrs['NetworkSettings']['Networks']
+            assert networks.keys() == set(['bridge'])
+            bridge_ip_address = networks['bridge']['IPAddress']
+            assert bridge_ip_address == str(master.public_ip_address)
+            assert bridge_ip_address == str(master.private_ip_address)
