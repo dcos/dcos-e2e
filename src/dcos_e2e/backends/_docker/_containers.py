@@ -129,10 +129,7 @@ def start_dcos_container(
         command=['/sbin/init'],
     )
     if network:
-        client.networks.get('bridge').disconnect(container)
         network.connect(container)
-    container.start()
-
     container.start()
 
     disable_systemd_support_cmd = (

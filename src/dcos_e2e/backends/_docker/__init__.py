@@ -570,7 +570,9 @@ class DockerCluster(ClusterManager):
         nodes = set([])
         for container in containers:
             networks = container.attrs['NetworkSettings']['Networks']
-            [network_name] = list(networks.keys() - set(['bridge']))
+            network_name = 'bridge'
+            if len(networks) != 1:
+                [network_name] = list(networks.keys() - set(['bridge']))
             container_ip_address = IPv4Address(
                 networks[network_name]['IPAddress'],
             )
