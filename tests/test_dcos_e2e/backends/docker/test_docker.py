@@ -8,7 +8,6 @@ sibling modules.
 import subprocess
 import uuid
 from pathlib import Path
-from typing import Dict
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
@@ -37,6 +36,20 @@ def _wait_for_docker(node: Node) -> None:
     node.
     """
     node.run(args=['docker', 'info'])
+
+
+def _get_container_from_node(node: Node) -> docker.models.containers.Container:
+    """
+    Return the container which represents the given ``node``.
+    """
+    client = docker.from_env(version='auto')
+    containers = client.containers.list()
+    [container] = [
+        container for container in containers
+        if container.attrs['NetworkSettings']['IPAddress'] ==
+        str(node.public_ip_address)
+    ]
+    return container
 
 
 class TestDockerBackend:
