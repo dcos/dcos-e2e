@@ -85,6 +85,7 @@ def start_dcos_container(
     public_key_path: Path,
     docker_storage_driver: DockerStorageDriver,
     docker_version: DockerVersion,
+    network_id: str,
 ) -> None:
     """
     Start a master, agent or public agent container.
@@ -113,7 +114,7 @@ def start_dcos_container(
     environment = {'container': hostname}
 
     client = docker.from_env(version='auto')
-    container = client.containers.run(
+    container = client.containers.create(
         name=hostname,
         privileged=True,
         detach=True,
@@ -127,6 +128,9 @@ def start_dcos_container(
         stop_signal='SIGRTMIN+3',
         command=['/sbin/init'],
     )
+    # client.networks.get('bridge').disconnect(container)
+    client.networks.get(network_id).connect(container)
+    container.start()
 
     disable_systemd_support_cmd = (
         "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "

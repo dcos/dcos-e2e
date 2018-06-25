@@ -370,3 +370,37 @@ class TestLabels:
                 assert node_labels[public_agent_key] == public_agent_value
                 assert master_key not in node_labels
                 assert agent_key not in node_labels
+
+
+class TestNetworks:
+    """
+    Tests for running DC/OS with a custom Docker bridge network.
+
+    TODO tests:
+        - Give no network to the backend class - two clusters have different networks - network cleaned up when cluster destroyed
+        - Give network settings to backend class - two clusters can have different network - no network cleanup
+    """
+    def test_custom_bridge_network(self, oss_artifact: Path):
+        network_name = 'dcos-e2e-network-{random}'.format(random=uuid.uuid4())
+        docker_backend = Docker(
+            network={
+                'name': network_name,
+                'subnet': '172.28.0.0/16',
+                'iprange': '172.28.0.0/24',
+                'gateway': '172.28.0.254',
+            },
+        )
+        with Cluster(
+            cluster_backend=docker_backend,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            client = docker.from_env(version='auto')
+            containers = client.containers.list()
+            [container] = [
+                container for container in containers
+                if container.attrs['NetworkSettings']['IPAddress'] ==
+                str(next(iter(cluster.masters)).public_ip_address)
+            ]
+            networks = container.attrs['NetworkSettings']['Networks'].keys()
+            assert networks == set([network_name])
