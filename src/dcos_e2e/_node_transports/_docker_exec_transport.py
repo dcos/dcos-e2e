@@ -7,7 +7,7 @@ import os
 import subprocess
 import tarfile
 import uuid
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, ip_address
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -44,13 +44,7 @@ def _compose_docker_command(
     Returns:
         The full ``docker exec`` command to be run.
     """
-    client = docker.from_env(version='auto')
-    containers = client.containers.list()
-    [container] = [
-        container for container in containers
-        if container.attrs['NetworkSettings']['IPAddress'] ==
-        str(public_ip_address)
-    ]
+    container = _get_container_from_ip_address(public_ip_address)
 
     docker_exec_args = [
         'docker',
@@ -256,3 +250,22 @@ class DockerExecTransport(NodeTransport):
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
         )
+
+
+def _get_container_from_ip_address(
+    ip_addr: ip_address,
+) -> docker.models.containers.Container:
+    """
+    Return the container which represents the given ``node``.
+    """
+    client = docker.from_env(version='auto')
+    containers = client.containers.list()
+    matching_containers = []
+    for container in containers:
+        networks = container.attrs['NetworkSettings']['Networks']
+        for net in networks:
+            if networks[net]['IPAddress'] == str(ip_addr):
+                matching_containers.append(container)
+
+    assert len(matching_containers) == 1
+    return matching_containers[0]

@@ -402,11 +402,9 @@ class TestNetworks:
         finally:
             network.remove()
 
-    @pytest.mark.parametrize('transport', list(Transport))
     def test_custom_docker_network(
         self,
         docker_network: docker.models.networks.Network,
-        transport: Transport,
     ) -> None:
         """
         When a network is specified on the Docker backend,
@@ -426,10 +424,34 @@ class TestNetworks:
             custom_network_ip = networks[docker_network.name]['IPAddress']
             assert custom_network_ip == str(master.public_ip_address)
             assert custom_network_ip == str(master.private_ip_address)
-            # We check that we can run commands with a custom network on all
-            # transports.
-            master.run(args=['ls'], transport=transport)
-            # master.send_file
+
+    @pytest.mark.parametrize('transport', list(Transport))
+    def test_transport(
+        self,
+        docker_network: docker.models.networks.Network,
+        transport: Transport,
+        tmpdir: local,
+    ) -> None:
+        with Cluster(
+            cluster_backend=Docker(network=docker_network),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            content = str(uuid.uuid4())
+            local_file = tmpdir.join('example_file.txt')
+            local_file.write(content)
+            random = uuid.uuid4().hex
+            master_destination_dir = '/etc/{random}'.format(random=random)
+            master_destination_path = Path(master_destination_dir) / 'file.txt'
+            master.send_file(
+                local_path=Path(str(local_file)),
+                remote_path=master_destination_path,
+                transport=transport,
+            )
+            args = ['cat', str(master_destination_path)]
+            result = master.run(args=args, transport=transport)
+            assert result.stdout.decode() == content
 
     def test_default(self) -> None:
         """
@@ -448,4 +470,3 @@ class TestNetworks:
             bridge_ip_address = networks['bridge']['IPAddress']
             assert bridge_ip_address == str(master.public_ip_address)
             assert bridge_ip_address == str(master.private_ip_address)
-
