@@ -404,3 +404,15 @@ class TestNetworks:
             ]
             networks = container.attrs['NetworkSettings']['Networks'].keys()
             assert networks == set([network_name])
+
+def _non_bridge_networks_from_container(container) -> Set[str]:
+    pass
+
+def _get_container_from_node(node: Node) -> docker.types.container:
+    client = docker.from_env(version='auto')
+    containers = client.containers.list()
+    for container in containers:
+        networks = container.attrs['NetworkSettings']['Networks']
+        for network in networks:
+            if network['IPAddress'] == str(node.public_ip_address):
+                return container
