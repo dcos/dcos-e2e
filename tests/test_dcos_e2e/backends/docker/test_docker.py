@@ -380,6 +380,20 @@ class TestLabels:
 class TestNetworks:
     """
     Tests for Docker container networks.
+
+    On macOS, by default, it is not possible to SSH to containers without
+    forwarded ports.
+
+    We therefore recommend that people use ``dcos-docker setup-mac-network``.
+    This makes it possible to SSH to containers in the default network range.
+
+    However, in these tests, we use custom networks.
+    Using the VPN created by ``dcos-docker setup-mac-network`` it is not
+    possible to SSH to containers on custom networks.
+    See https://github.com/wojas/docker-mac-network#openvpn for details.
+
+    Therefore, we use the ``Transport.DOCKER_EXEC`` transport to communicate
+    with nodes.
     """
 
     @pytest.fixture()
@@ -418,7 +432,10 @@ class TestNetworks:
         The ``Node``'s IP addresses correspond to the custom network.
         """
         with Cluster(
-            cluster_backend=Docker(network=docker_network),
+            cluster_backend=Docker(
+                network=docker_network,
+                transport=Transport.DOCKER_EXEC,
+            ),
             agents=0,
             public_agents=0,
         ) as cluster:
@@ -430,19 +447,20 @@ class TestNetworks:
             assert custom_network_ip == str(master.public_ip_address)
             assert custom_network_ip == str(master.private_ip_address)
 
-    @pytest.mark.parametrize('transport', list(Transport))
-    def test_transport(
+    def test_docker_exec_transport(
         self,
         docker_network: Network,
-        transport: Transport,
         tmpdir: local,
     ) -> None:
         """
-        ``Node`` operations with all transports work even if the node is on a
-        custom network.
+        ``Node`` operations with the Docker exec transport work even if the
+        node is on a custom network.
         """
         with Cluster(
-            cluster_backend=Docker(network=docker_network),
+            cluster_backend=Docker(
+                network=docker_network,
+                transport=Transport.DOCKER_EXEC,
+            ),
             agents=0,
             public_agents=0,
         ) as cluster:
@@ -456,10 +474,10 @@ class TestNetworks:
             master.send_file(
                 local_path=Path(str(local_file)),
                 remote_path=master_destination_path,
-                transport=transport,
+                transport=Transport.DOCKER_EXEC,
             )
             args = ['cat', str(master_destination_path)]
-            result = master.run(args=args, transport=transport)
+            result = master.run(args=args, transport=Transport.DOCKER_EXEC)
             assert result.stdout.decode() == content
 
     def test_default(self) -> None:
