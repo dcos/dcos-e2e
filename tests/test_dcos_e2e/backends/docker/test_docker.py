@@ -403,9 +403,9 @@ class TestNetworks:
         """
         client = docker.from_env(version='auto')
         ipam_pool = docker.types.IPAMPool(
-            subnet='172.28.0.0/16',
-            iprange='172.28.0.0/4',
-            gateway='172.28.0.3',
+            subnet='172.28.0.0/29',
+            iprange='172.28.0.0/29',
+            gateway='172.28.0.1',
         )
         network = client.networks.create(
             # The container name prefix "dcos-e2e-" matches the prefix used in
@@ -503,6 +503,7 @@ class TestNetworks:
             network=docker_network,
             transport=Transport.DOCKER_EXEC,
         )
+
         with Cluster(
             cluster_backend=docker_backend,
             masters=3,
@@ -514,9 +515,19 @@ class TestNetworks:
             original_cluster.destroy_node(master)
             with Cluster(
                 cluster_backend=docker_backend,
-                masters=1,
+                masters=3,
                 agents=0,
                 public_agents=0,
             ) as temporary_cluster:
-                temporary_master = next(iter(temporary_cluster.masters))
-                assert temporary_master.private_ip_address == replaced_master_ip
+                [temporary_master] = [
+                    master for master in temporary_cluster.masters if
+                    master.private_ip_address == replaced_master_ip
+                ]
+                new_cluster = Cluster.from_nodes(
+                    masters=original_cluster.masters.union(set([temporary_master])),
+                    agents=original_cluster.agents,
+                    public_agents=original_cluster.public_agents,
+                )
+
+                for master in new_cluster.masters:
+                    print(str(master.public_ip_address))
