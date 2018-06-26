@@ -8,12 +8,14 @@ sibling modules.
 import subprocess
 import uuid
 from pathlib import Path
+from typing import Iterator
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 import docker
 import pytest
 from docker.types import Mount
+from docker.models.networks import Network
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker, NoMockAddress
 from retry import retry
@@ -381,7 +383,7 @@ class TestNetworks:
     """
 
     @pytest.fixture()
-    def docker_network(self):
+    def docker_network(self) -> Iterator[Network]:
         """
         Return a Docker network.
         """
@@ -404,7 +406,7 @@ class TestNetworks:
 
     def test_custom_docker_network(
         self,
-        docker_network: docker.models.networks.Network,
+        docker_network: Network,
     ) -> None:
         """
         When a network is specified on the Docker backend,
@@ -428,7 +430,7 @@ class TestNetworks:
     @pytest.mark.parametrize('transport', list(Transport))
     def test_transport(
         self,
-        docker_network: docker.models.networks.Network,
+        docker_network: Network,
         transport: Transport,
         tmpdir: local,
     ) -> None:

@@ -95,7 +95,6 @@ lint: \
     doc8 \
     flake8 \
     isort \
-    linkcheck \
     mypy \
     pip-extra-reqs \
     pip-missing-reqs \
