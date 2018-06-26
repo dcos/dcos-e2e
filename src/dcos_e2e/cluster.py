@@ -28,10 +28,7 @@ def _wait_for_ssh(node: Node) -> None:
     """
     Retry up to five times (arbitrary) until SSH is available on the given
     node.
-
-    # TODO not really waiting up to one minute because each try takes time to time out
     """
-    print('Waiting')
     node.run(args=['systemctl', 'status', 'sshd'])
 
 
