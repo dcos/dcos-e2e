@@ -113,6 +113,7 @@ clean:
 	# Ignore errors in case there are no containers to remove.
 	- docker stop $$(docker ps -a -q --filter="name=dcos-e2e") | :
 	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-e2e") | :
+	- docker network rm $$(docker network ls -q --filter="name=dcos-e2e") | :
 
 # Fix some linting errors.
 .PHONY: fix-lint

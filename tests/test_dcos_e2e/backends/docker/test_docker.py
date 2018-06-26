@@ -8,11 +8,13 @@ sibling modules.
 import subprocess
 import uuid
 from pathlib import Path
+from typing import Iterator
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 import docker
 import pytest
+from docker.models.networks import Network
 from docker.types import Mount
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker, NoMockAddress
@@ -22,7 +24,7 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Transport
 
 
 @retry(
@@ -44,12 +46,15 @@ def _get_container_from_node(node: Node) -> docker.models.containers.Container:
     """
     client = docker.from_env(version='auto')
     containers = client.containers.list()
-    [container] = [
-        container for container in containers
-        if container.attrs['NetworkSettings']['IPAddress'] ==
-        str(node.public_ip_address)
-    ]
-    return container
+    matching_containers = []
+    for container in containers:
+        networks = container.attrs['NetworkSettings']['Networks']
+        for net in networks:
+            if networks[net]['IPAddress'] == str(node.public_ip_address):
+                matching_containers.append(container)
+
+    assert len(matching_containers) == 1
+    return matching_containers[0]
 
 
 class TestDockerBackend:
@@ -377,7 +382,87 @@ class TestNetworks:
     Tests for Docker container networks.
     """
 
-    def test_default(self):
+    @pytest.fixture()
+    def docker_network(self) -> Iterator[Network]:
+        """
+        Return a Docker network.
+        """
+        client = docker.from_env(version='auto')
+        ipam_pool = docker.types.IPAMPool(
+            subnet='172.28.0.0/16',
+            iprange='172.28.0.0/24',
+            gateway='172.28.0.254',
+        )
+        network = client.networks.create(
+            # The container name prefix "dcos-e2e-" matches the prefix used in
+            # the "clean" Makefile target.
+            name='dcos-e2e-network-{random}'.format(random=uuid.uuid4()),
+            driver='bridge',
+            ipam=docker.types.IPAMConfig(pool_configs=[ipam_pool]),
+            attachable=False,
+        )
+        try:
+            yield network
+        finally:
+            network.remove()
+
+    def test_custom_docker_network(
+        self,
+        docker_network: Network,
+    ) -> None:
+        """
+        When a network is specified on the Docker backend, each container is
+        connected to the default bridge network ``docker0`` and in addition it
+        also connected to the custom network.
+
+        The ``Node``'s IP addresses correspond to the custom network.
+        """
+        with Cluster(
+            cluster_backend=Docker(network=docker_network),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            container = _get_container_from_node(master)
+            networks = container.attrs['NetworkSettings']['Networks']
+            assert networks.keys() == set(['bridge', docker_network.name])
+            custom_network_ip = networks[docker_network.name]['IPAddress']
+            assert custom_network_ip == str(master.public_ip_address)
+            assert custom_network_ip == str(master.private_ip_address)
+
+    @pytest.mark.parametrize('transport', list(Transport))
+    def test_transport(
+        self,
+        docker_network: Network,
+        transport: Transport,
+        tmpdir: local,
+    ) -> None:
+        """
+        ``Node`` operations with all transports work even if the node is on a
+        custom network.
+        """
+        with Cluster(
+            cluster_backend=Docker(network=docker_network),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            content = str(uuid.uuid4())
+            local_file = tmpdir.join('example_file.txt')
+            local_file.write(content)
+            random = uuid.uuid4().hex
+            master_destination_dir = '/etc/{random}'.format(random=random)
+            master_destination_path = Path(master_destination_dir) / 'file.txt'
+            master.send_file(
+                local_path=Path(str(local_file)),
+                remote_path=master_destination_path,
+                transport=transport,
+            )
+            args = ['cat', str(master_destination_path)]
+            result = master.run(args=args, transport=transport)
+            assert result.stdout.decode() == content
+
+    def test_default(self) -> None:
         """
         By default, the only network a container is in is the Docker default
         bridge network.

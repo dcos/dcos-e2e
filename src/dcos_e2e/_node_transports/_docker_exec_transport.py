@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import docker
+from docker.models.containers import Container
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
@@ -44,13 +45,7 @@ def _compose_docker_command(
     Returns:
         The full ``docker exec`` command to be run.
     """
-    client = docker.from_env(version='auto')
-    containers = client.containers.list()
-    [container] = [
-        container for container in containers
-        if container.attrs['NetworkSettings']['IPAddress'] ==
-        str(public_ip_address)
-    ]
+    container = _get_container_from_ip_address(public_ip_address)
 
     docker_exec_args = [
         'docker',
@@ -220,13 +215,7 @@ class DockerExecTransport(NodeTransport):
             public_ip_address=public_ip_address,
         )
 
-        client = docker.from_env(version='auto')
-        containers = client.containers.list()
-        [container] = [
-            container for container in containers
-            if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(public_ip_address)
-        ]
+        container = _get_container_from_ip_address(public_ip_address)
         tarstream = io.BytesIO()
         with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
             tar.add(name=str(local_path), arcname='/' + remote_path.name)
@@ -256,3 +245,20 @@ class DockerExecTransport(NodeTransport):
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
         )
+
+
+def _get_container_from_ip_address(ip_address: IPv4Address) -> Container:
+    """
+    Return the ``Container`` with the given ``ip_address``.
+    """
+    client = docker.from_env(version='auto')
+    containers = client.containers.list()
+    matching_containers = []
+    for container in containers:
+        networks = container.attrs['NetworkSettings']['Networks']
+        for net in networks:
+            if networks[net]['IPAddress'] == str(ip_address):
+                matching_containers.append(container)
+
+    assert len(matching_containers) == 1
+    return matching_containers[0]

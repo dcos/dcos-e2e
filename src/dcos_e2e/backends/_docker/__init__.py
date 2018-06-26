@@ -116,6 +116,7 @@ class Docker(ClusterBackend):
         docker_agent_labels: Optional[Dict[str, str]] = None,
         docker_public_agent_labels: Optional[Dict[str, str]] = None,
         transport: Transport = Transport.SSH,
+        network: Optional[docker.models.networks.Network] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -150,6 +151,8 @@ class Docker(ClusterBackend):
                 public agent node containers. Akin to the dictionary option in
                 `Containers.run`_.
             transport: The transport to use for communicating with nodes.
+            network: The Docker network containers will be connected to. If no
+                network is specified the ``docker0`` bridge network is used.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -177,6 +180,9 @@ class Docker(ClusterBackend):
                 public agent node containers. Akin to the dictionary option in
                 `Containers.run`_.
             transport: The transport to use for communicating with nodes.
+            network: The Docker network containers will be connected to. If no
+                network is specified the ``docker0`` bridge network is used.
+
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
@@ -195,6 +201,7 @@ class Docker(ClusterBackend):
         self.docker_agent_labels = docker_agent_labels or {}
         self.docker_public_agent_labels = docker_public_agent_labels or {}
         self.transport = transport
+        self.network = network
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -396,6 +403,7 @@ class DockerCluster(ClusterManager):
                         cluster_backend.docker_storage_driver
                     ),
                     docker_version=cluster_backend.docker_version,
+                    network=cluster_backend.network,
                 )
 
     def install_dcos_from_url_with_bootstrap_node(
@@ -529,13 +537,12 @@ class DockerCluster(ClusterManager):
         """
         client = docker.from_env(version='auto')
         containers = client.containers.list()
-        [container] = [
-            container for container in containers
-            if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(node.public_ip_address)
-        ]
-        container.stop()
-        container.remove(v=True)
+        for container in containers:
+            networks = container.attrs['NetworkSettings']['Networks']
+            for net in networks:
+                if networks[net]['IPAddress'] == str(node.public_ip_address):
+                    container.stop()
+                    container.remove(v=True)
 
     def destroy(self) -> None:
         """
@@ -560,8 +567,12 @@ class DockerCluster(ClusterManager):
 
         nodes = set([])
         for container in containers:
+            networks = container.attrs['NetworkSettings']['Networks']
+            network_name = 'bridge'
+            if len(networks) != 1:
+                [network_name] = list(networks.keys() - set(['bridge']))
             container_ip_address = IPv4Address(
-                container.attrs['NetworkSettings']['IPAddress'],
+                networks[network_name]['IPAddress'],
             )
             nodes.add(
                 Node(
