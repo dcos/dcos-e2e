@@ -180,8 +180,9 @@ class Docker(ClusterBackend):
                 public agent node containers. Akin to the dictionary option in
                 `Containers.run`_.
             transport: The transport to use for communicating with nodes.
-            network: The docker network used for ``Node`` containers if
-                specified.
+            network: The Docker network containers will be connected to. If no
+                network is specified the ``docker0`` bridge network is used.
+
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
