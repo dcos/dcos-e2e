@@ -14,8 +14,8 @@ from typing import Iterator
 # are disabled.
 import docker
 import pytest
-from docker.types import Mount
 from docker.models.networks import Network
+from docker.types import Mount
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker, NoMockAddress
 from retry import retry

@@ -109,6 +109,8 @@ def start_dcos_container(
         docker_version: The Docker version to use on the node.
         docker_storage_driver: The storage driver to use for Docker on the
             node.
+        network: The network a container is connected to other than the default
+            ``docker0`` bridge network.
     """
     hostname = container_base_name + str(container_number)
     environment = {'container': hostname}
