@@ -7,11 +7,12 @@ import os
 import subprocess
 import tarfile
 import uuid
-from ipaddress import IPv4Address, IPv6Address
+from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 import docker
+from docker.models.containers import Container
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
@@ -246,10 +247,9 @@ class DockerExecTransport(NodeTransport):
         )
 
 
-def _get_container_from_ip_address(ip_addr: Union[IPv4Address, IPv6Address],
-                                   ) -> docker.models.containers.Container:
+def _get_container_from_ip_address(ip_address: IPv4Address) -> Container:
     """
-    Return the container which represents the given ``node``.
+    Return the ``Container`` with the given ``ip_address``.
     """
     client = docker.from_env(version='auto')
     containers = client.containers.list()
@@ -257,7 +257,7 @@ def _get_container_from_ip_address(ip_addr: Union[IPv4Address, IPv6Address],
     for container in containers:
         networks = container.attrs['NetworkSettings']['Networks']
         for net in networks:
-            if networks[net]['IPAddress'] == str(ip_addr):
+            if networks[net]['IPAddress'] == str(ip_address):
                 matching_containers.append(container)
 
     assert len(matching_containers) == 1
