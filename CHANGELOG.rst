@@ -6,8 +6,7 @@ Changelog
 Next
 ----
 
-2018.06.21.0
-------------
+- Add a ``network`` parameter to the ``Docker`` backend.
 
 2018.06.20.0
 ------------
