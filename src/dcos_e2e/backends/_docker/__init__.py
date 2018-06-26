@@ -541,11 +541,8 @@ class DockerCluster(ClusterManager):
             networks = container.attrs['NetworkSettings']['Networks']
             for net in networks:
                 if networks[net]['IPAddress'] == str(node.public_ip_address):
-                    node_container = container
-                    break
-        assert node_container
-        node_container.stop()
-        node_container.remove(v=True)
+                    container.stop()
+                    container.remove(v=True)
 
     def destroy(self) -> None:
         """
