@@ -7,9 +7,9 @@ import os
 import subprocess
 import tarfile
 import uuid
-from ipaddress import IPv4Address, ip_address
+from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import docker
 
@@ -246,9 +246,8 @@ class DockerExecTransport(NodeTransport):
         )
 
 
-def _get_container_from_ip_address(
-    ip_addr: ip_address,
-) -> docker.models.containers.Container:
+def _get_container_from_ip_address(ip_addr: Union[IPv4Address, IPv6Address],
+                                   ) -> docker.models.containers.Container:
     """
     Return the container which represents the given ``node``.
     """
