@@ -167,6 +167,8 @@ class Node:
             '--genconf',
         ]
 
+        import pdb; pdb.set_trace()
+
         self.run(
             args=genconf_args,
             log_output_live=True,
@@ -259,6 +261,8 @@ class Node:
             user=user,
             sudo=True,
         )
+        ls_stdout = self.run(args=['ls', str(node_build_artifact)]).stdout
+        print(ls_stdout)
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
