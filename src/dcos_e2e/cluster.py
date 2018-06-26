@@ -21,12 +21,12 @@ from .node import Node, Role, Transport
 
 @retry(
     exceptions=(subprocess.CalledProcessError),
-    tries=60,
+    tries=5,
     delay=1,
 )
 def _wait_for_ssh(node: Node) -> None:
     """
-    Retry for up to one minute (arbitrary) until SSH is available on the given
+    Retry up to five times (arbitrary) until SSH is available on the given
     node.
 
     # TODO not really waiting up to one minute because each try takes time to time out
