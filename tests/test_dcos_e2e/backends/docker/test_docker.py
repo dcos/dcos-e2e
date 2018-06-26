@@ -405,7 +405,7 @@ class TestNetworks:
         ipam_pool = docker.types.IPAMPool(
             subnet='172.28.0.0/16',
             iprange='172.28.0.0/4',
-            gateway='172.28.0.254',
+            gateway='172.28.0.3',
         )
         network = client.networks.create(
             # The container name prefix "dcos-e2e-" matches the prefix used in
@@ -499,7 +499,10 @@ class TestNetworks:
             assert bridge_ip_address == str(master.private_ip_address)
 
     def test_same_ip(self, docker_network: Network) -> None:
-        docker_backend = Docker(network=docker_network)
+        docker_backend = Docker(
+            network=docker_network,
+            transport=Transport.DOCKER_EXEC,
+        )
         with Cluster(
             cluster_backend=docker_backend,
             masters=3,
