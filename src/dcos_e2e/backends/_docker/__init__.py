@@ -153,6 +153,10 @@ class Docker(ClusterBackend):
             transport: The transport to use for communicating with nodes.
             network: The Docker network containers will be connected to. If no
                 network is specified the ``docker0`` bridge network is used.
+                It may not be possible to SSH to containers on a
+                custom network on macOS.
+                Therefore, it is recommended that you use this in conjunction
+                with the ``transport`` parameter.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -182,6 +186,10 @@ class Docker(ClusterBackend):
             transport: The transport to use for communicating with nodes.
             network: The Docker network containers will be connected to. If no
                 network is specified the ``docker0`` bridge network is used.
+                It may not be possible to SSH to containers on a
+                custom network on macOS.
+                Therefore, it is recommended that you use this in conjunction
+                with the ``transport`` parameter.
 
 
         .. _Containers.run:
