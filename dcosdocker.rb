@@ -1,7 +1,7 @@
 class Dcosdocker < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.06.21.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.06.26.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -183,8 +183,8 @@ class Dcosdocker < Formula
   end
 
   resource "keyring" do
-    url "https://files.pythonhosted.org/packages/b9/4d/fcfebaffd107d73dc7105625fde6f0682f0c7d1d783edf8211c5a2cdad06/keyring-13.0.0.tar.gz"
-    sha256 "dd188c7d40e6778e18d330a96d0bef77bffc109dad82270133e3969908016862"
+    url "https://files.pythonhosted.org/packages/79/84/c8b8f4711b40196b6ba44bb98348717122326bb8167dc05293bf74c608a2/keyring-13.1.0.tar.gz"
+    sha256 "971699318f8a882da4193f0c2f87ae974e34c777fdfb59f89b50105cd678f4d9"
   end
 
   resource "more-itertools" do
@@ -193,13 +193,13 @@ class Dcosdocker < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/c2/fb/24f120cb5ed06f82af1c32213270833ccfa045c202b7bb842834de11f1cc/msrest-0.5.0.tar.gz"
-    sha256 "8b0d2921f62d80ba76a264ddc0fb8cdbf8f525943e22dc47d12802ada092c2cb"
+    url "https://files.pythonhosted.org/packages/cc/c6/631db25929c963dd0a8c1b01dce3acb3d9ff89fae138fed2ed4710dad6fb/msrest-0.5.1.tar.gz"
+    sha256 "bb509ee6228eba9062024de5396a2e50856b9cd3aba411870468faf24c872b00"
   end
 
   resource "msrestazure" do
-    url "https://files.pythonhosted.org/packages/0b/fb/fc7b158312a1d54323fe287161b5ed20d21c1d617fcbb220fca0b5351392/msrestazure-0.4.32.tar.gz"
-    sha256 "6a1704d93c2d9cb977db7e806977c8aa311d313d5244c31eabea91a58f2ec25c"
+    url "https://files.pythonhosted.org/packages/e7/dd/cea2d0c20effb72702bd9d570cd25ebc1078aefda4957915ad8934d699dc/msrestazure-0.4.33.tar.gz"
+    sha256 "4d8b33686021bcdf9bffc3ad0b120d1ce10d33e2535649897217fb9532b57e53"
   end
 
   resource "oauth2client" do
