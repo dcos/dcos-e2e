@@ -394,6 +394,8 @@ class TestNetworks:
             gateway='172.28.0.254',
         )
         network = client.networks.create(
+            # The container name prefix "dcos-e2e-" matches the prefix used in
+            # the "clean" Makefile target.
             name='dcos-e2e-network-{random}'.format(random=uuid.uuid4()),
             driver='bridge',
             ipam=docker.types.IPAMConfig(pool_configs=[ipam_pool]),
@@ -409,10 +411,11 @@ class TestNetworks:
         docker_network: Network,
     ) -> None:
         """
-        When a network is specified on the Docker backend,
-        each container is connected to the default bridge network
-        docker0 and in addition it also connected to the custom
-        network.
+        When a network is specified on the Docker backend, each container is
+        connected to the default bridge network ``docker0`` and in addition it
+        also connected to the custom network.
+
+        The ``Node``'s IP addresses correspond to the custom network.
         """
         with Cluster(
             cluster_backend=Docker(network=docker_network),
@@ -434,6 +437,10 @@ class TestNetworks:
         transport: Transport,
         tmpdir: local,
     ) -> None:
+        """
+        ``Node`` operations with all transports work even if the node is on a
+        custom network.
+        """
         with Cluster(
             cluster_backend=Docker(network=docker_network),
             agents=0,
