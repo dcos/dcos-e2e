@@ -61,6 +61,7 @@ htmlhelp_basename = 'DCOSE2Edoc'
 autoclass_content = 'init'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.5', None),
+    'docker': ('http://docker-py.readthedocs.io/en/stable', None),
 }
 nitpicky = True
 warning_is_error = True
@@ -68,7 +69,6 @@ nitpick_ignore = [
     ('py:exc', 'RetryError'),
     # See https://bugs.python.org/issue31024 for why Sphinx cannot find this.
     ('py:class', 'typing.Tuple'),
-    ('py:class', 'docker.types.services.Mount'),
 ]
 
 html_show_copyright = False
