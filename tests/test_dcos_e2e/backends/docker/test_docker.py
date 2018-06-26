@@ -390,7 +390,7 @@ class TestNetworks:
         client = docker.from_env(version='auto')
         ipam_pool = docker.types.IPAMPool(
             subnet='172.28.0.0/16',
-            iprange='172.28.0.0/24',
+            iprange='172.28.0.0/4',
             gateway='172.28.0.254',
         )
         network = client.networks.create(
@@ -479,3 +479,23 @@ class TestNetworks:
             bridge_ip_address = networks['bridge']['IPAddress']
             assert bridge_ip_address == str(master.public_ip_address)
             assert bridge_ip_address == str(master.private_ip_address)
+
+    def test_same_ip(self, docker_network: Network) -> None:
+        docker_backend = Docker(network=docker_network)
+        with Cluster(
+            cluster_backend=docker_backend,
+            masters=3,
+            agents=0,
+            public_agents=0,
+        ) as original_cluster:
+            master = next(iter(original_cluster.masters))
+            replaced_master_ip = master.private_ip_address
+            original_cluster.destroy_node(master)
+            with Cluster(
+                cluster_backend=docker_backend,
+                masters=1,
+                agents=0,
+                public_agents=0,
+            ) as temporary_cluster:
+                temporary_master = next(iter(temporary_cluster.masters))
+                assert temporary_master.private_ip_address == replaced_master_ip
