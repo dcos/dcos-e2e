@@ -24,7 +24,7 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node, Role, Transport
+from dcos_e2e.node import Node, Transport
 
 
 @retry(
@@ -375,27 +375,6 @@ class TestLabels:
                 assert node_labels[public_agent_key] == public_agent_value
                 assert master_key not in node_labels
                 assert agent_key not in node_labels
-
-
-class TestInstallTransport:
-    """
-    XXX
-    """
-    def test_foo(
-        self,
-        oss_artifact: Path,
-    ) -> None:
-        with Cluster(
-            cluster_backend=Docker(transport=Transport.DOCKER_EXEC),
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            master.install_dcos_from_path(
-                build_artifact=oss_artifact,
-                dcos_config=cluster.base_config,
-                role=Role.MASTER,
-            )
 
 
 class TestNetworks:
