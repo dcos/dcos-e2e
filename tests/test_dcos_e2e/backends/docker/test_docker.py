@@ -6,6 +6,7 @@ sibling modules.
 """
 
 import subprocess
+import textwrap
 import uuid
 from pathlib import Path
 from typing import Iterator
@@ -14,6 +15,7 @@ from typing import Iterator
 # are disabled.
 import docker
 import pytest
+import yaml
 from docker.models.networks import Network
 from docker.types import Mount
 from py.path import local  # pylint: disable=no-name-in-module, import-error
@@ -498,36 +500,55 @@ class TestNetworks:
             assert bridge_ip_address == str(master.public_ip_address)
             assert bridge_ip_address == str(master.private_ip_address)
 
-    def test_same_ip(self, docker_network: Network) -> None:
+    def test_network_partition(
+        self,
+        docker_network: Network,
+        oss_artifact: Path,
+    ) -> None:
         docker_backend = Docker(
             network=docker_network,
             transport=Transport.DOCKER_EXEC,
         )
-
         with Cluster(
             cluster_backend=docker_backend,
             masters=3,
             agents=0,
             public_agents=0,
-        ) as original_cluster:
-            master = next(iter(original_cluster.masters))
-            replaced_master_ip = master.private_ip_address
-            original_cluster.destroy_node(master)
-            with Cluster(
-                cluster_backend=docker_backend,
-                masters=3,
-                agents=0,
-                public_agents=0,
-            ) as temporary_cluster:
-                [temporary_master] = [
-                    master for master in temporary_cluster.masters if
-                    master.private_ip_address == replaced_master_ip
-                ]
-                new_cluster = Cluster.from_nodes(
-                    masters=original_cluster.masters.union(set([temporary_master])),
-                    agents=original_cluster.agents,
-                    public_agents=original_cluster.public_agents,
-                )
+        ) as cluster:
+            master = next(iter(cluster.masters))
+            result = master.run(
+                args=[
+                    'ifconfig',
+                    '|', 'grep', '-B1', str(master.public_ip_address),
+                    '|', 'grep', '-o', '"^\w*"',
+                ],
+                shell=True,
+            )
+            interface = result.stdout.strip().decode()
+            ip_detect_contents = textwrap.dedent(
+                """\
+                #!/bin/bash -e
+                if [ -f /sbin/ip ]; then
+                   IP_CMD=/sbin/ip
+                else
+                   IP_CMD=/bin/ip
+                fi
 
-                for master in new_cluster.masters:
-                    print(str(master.public_ip_address))
+                $IP_CMD -4 -o addr show dev {interface} | awk '{{split($4,a,"/");print a[1]}}'
+                """.format(interface=interface),
+            )
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config={
+                    **cluster.base_config,
+                    **{'ip_detect_contents': yaml.dump(ip_detect_contents)},
+                },
+            )
+            cluster.wait_for_dcos_oss()
+            master = next(iter(cluster.masters))
+            master_container = _get_container_from_node(master)
+            docker_network.disconnect(master_container)
+            import pdb; pdb.set_trace()
+            docker_network.connect(master_container, ipv4_address=str(master.public_ip_address))
+            import pdb; pdb.set_trace()
+            cluster.wait_for_dcos_oss()
