@@ -217,7 +217,9 @@ class DockerExecTransport(NodeTransport):
 
         container = _get_container_from_ip_address(public_ip_address)
         tarstream = io.BytesIO()
-        with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
+        with tarfile.TarFile(
+            fileobj=tarstream, mode='w', dereference=True
+        ) as tar:
             tar.add(name=str(local_path), arcname='/' + remote_path.name)
         tarstream.seek(0)
 
