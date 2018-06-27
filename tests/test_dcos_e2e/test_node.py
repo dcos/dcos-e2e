@@ -199,7 +199,7 @@ class TestSendFile:
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
 
-    def test_send_symlink(self, dcos_node, tmpdir: local):
+    def test_send_symlink(self, dcos_node: Node, tmpdir: local) -> None:
         """
         If sending the path to a symbolic link, the link's target is sent.
         """
