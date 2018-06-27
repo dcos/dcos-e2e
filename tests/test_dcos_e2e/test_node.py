@@ -199,6 +199,28 @@ class TestSendFile:
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
 
+    def test_send_symlink(self, dcos_node, tmpdir: local):
+        """
+        If sending the path to a symbolic link, the link's target is sent.
+        """
+        random = str(uuid.uuid4())
+        dir_containing_real_file = tmpdir.mkdir(uuid.uuid4().hex)
+        dir_containing_symlink = tmpdir.mkdir(uuid.uuid4().hex)
+        local_file = dir_containing_real_file.join('example_file.txt')
+        local_file.write(random)
+        symlink_file = dir_containing_symlink.join('symlink.txt')
+        symlink_file_path = Path(str(symlink_file))
+        symlink_file_path.symlink_to(target=Path(str(local_file)))
+        master_destination_dir = '/etc/{random}'.format(random=random)
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
+        dcos_node.send_file(
+            local_path=symlink_file_path,
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == random
+
 
 class TestPopen:
     """

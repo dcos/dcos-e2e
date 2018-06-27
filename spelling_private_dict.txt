@@ -54,6 +54,7 @@ login
 logout
 macOS
 macos
+makefile
 mesos
 mkstemp
 modprobe
