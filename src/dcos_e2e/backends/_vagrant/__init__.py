@@ -2,6 +2,7 @@
 Vagrant backend.
 """
 
+import os
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple, Type
@@ -64,15 +65,10 @@ class VagrantCluster(ClusterManager):
 
         # Plan:
         # * Create nodes separate from installing DC/OS
+        # * Use environment variables for e.g. number of nodes, cluster ID
         # * Fill in methods like Destroy
-        # * Look at why we have things like m1.dcos - can we just use IP addresses?
-        # * Removing junk from the installation
-        # * Using a custom DC/OS config file
-        # * Customise size of cluster (generate YAML)
         # * Passwordless
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
-        config_file_path = dcos_vagrant_path / 'VagrantConfig-1m-1a-1p.yaml'
-        import os
         run_subprocess(
             args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
             cwd=str(dcos_vagrant_path),
