@@ -124,13 +124,13 @@ class VagrantCluster(ClusterManager):
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         client = vagrant.Vagrant(root=str(dcos_vagrant_path))
 
-    def _nodes(self, container_base_name: str) -> Set[Node]:
+    def _nodes(self, node_base_name: str) -> Set[Node]:
         """
         Args:
-            container_base_name: The start of the container names.
+            node_base_name: The start of node names.
 
-        Returns: ``Node``s corresponding to containers with names starting
-            with ``container_base_name``.
+        Returns: ``Node``s corresponding to VMs with names starting with
+            ``node_base_name``.
         """
         client = vagrant.Vagrant(root=str(dcos_vagrant_path))
         vagrant_nodes = client.status()
@@ -138,16 +138,17 @@ class VagrantCluster(ClusterManager):
         ssh_key_path = 'x'
         # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
         nodes = set([])
-        for container in containers:
+        for node in vagrant_nodes:
             node_ip_address = 'X'
-            nodes.add(
-                Node(
-                    public_ip_address=node_ip_address,
-                    private_ip_address=node_ip_address,
-                    default_user=default_user,
-                    ssh_key_path=ssh_key_path,
-                ),
-            )
+            if node.name.startswith(node_base_name):
+                nodes.add(
+                    Node(
+                        public_ip_address=node_ip_address,
+                        private_ip_address=node_ip_address,
+                        default_user=default_user,
+                        ssh_key_path=ssh_key_path,
+                    ),
+                )
         return nodes
 
     @property
