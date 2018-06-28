@@ -78,11 +78,10 @@ class Node:
         Compare a ``Node`` object against another one based on its attributes,
         namely the ``public_ip_address`` and ``private_ip_address``.
         """
+        return bool(hash(self) == hash(other))
 
-        return bool(
-            self.public_ip_address == other.public_ip_address
-            and self.private_ip_address == other.private_ip_address,
-        )
+    def __hash__(self) -> int:
+        return hash((self.public_ip_address, self.private_ip_address))
 
     def __str__(self) -> str:
         """
