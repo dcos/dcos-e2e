@@ -27,6 +27,7 @@ class AWS(ClusterBackend):
 
     def __init__(
         self,
+        aws_instance_type: str = 'm4.large',
         aws_region: str = 'us-west-2',
         admin_location: str = '0.0.0.0/0',
         linux_distribution: Distribution = Distribution.CENTOS_7,
@@ -39,6 +40,8 @@ class AWS(ClusterBackend):
         Args:
             admin_location: The IP address range from which the AWS nodes can
                 be accessed.
+            aws_instance_type: The AWS instance type to use.
+                See `Instance types`_.
             aws_region: The AWS location to create nodes in. See
                 `Regions and Availability Zones`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
@@ -56,6 +59,8 @@ class AWS(ClusterBackend):
         Attributes:
             admin_location: The IP address range from which the AWS nodes can
                 be accessed.
+            aws_instance_type: The AWS instance type to use.
+                See `Instance types`_.
             aws_region: The AWS location to create nodes in. See
                 `Regions and Availability Zones`_.
             linux_distribution: The Linux distribution to boot DC/OS on.
@@ -73,6 +78,8 @@ class AWS(ClusterBackend):
 
         .. _Regions and Availability Zones:
             https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+        .. _Instance types:
+            https://aws.amazon.com/ec2/instance-types
         """
         supported_distributions = set(
             [
@@ -92,6 +99,7 @@ class AWS(ClusterBackend):
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.linux_distribution = linux_distribution
         self.aws_region = aws_region
+        self.aws_instance_type = aws_instance_type
         self.admin_location = admin_location
         self.aws_key_pair = aws_key_pair
 
@@ -172,7 +180,7 @@ class AWSCluster(ClusterManager):
             # Supply a valid URL to the preliminary config.
             # This is replaced later before the DC/OS installation.
             'installer_url': 'https://example.com',
-            'instance_type': 'm4.large',
+            'instance_type': cluster_backend.aws_instance_type,
             'launch_config_version': 1,
             'num_masters': masters,
             'num_private_agents': agents,
