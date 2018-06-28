@@ -1,31 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-require_relative 'lib/vagrant-dcos'
 require 'vagrant/util/downloader'
 require 'vagrant/ui'
 require 'yaml'
 require 'fileutils'
 require 'digest'
-
-require 'log4r/config'
-UI = Log4r::Logger.new("dcos-vagrant")
-UI.add Log4r::Outputter.stdout
-if ENV['VAGRANT_LOG'] && ENV['VAGRANT_LOG'] != ''
-  Log4r.define_levels(*Log4r::Log4rConfig::LogLevels)
-  level = Log4r.const_get(ENV['VAGRANT_LOG'].upcase)
-  UI.level = level
-end
-
-# path to the provision shell scripts
-def provision_script_path(type)
-  "./provision/bin/#{type}.sh"
-end
-
-UI.info 'Configuring VirtualBox Host-Only Network...'
-# configure vbox host-only network
-system(provision_script_path('vbox-network'))
-
 
 ## VM Creation & Provisioning
 ##############################################
@@ -34,61 +14,35 @@ Vagrant.configure(2) do |config|
 
   # Avoid random ssh key for demo purposes
   config.ssh.insert_key = false
+  config.vbguest.auto_update = true
+  # TODO template this file and get the bridge name
+  config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
 
-  # Vagrant Plugin Configuration: vagrant-vbguest
-  if Vagrant.has_plugin?('vagrant-vbguest')
-    # enable auto update guest additions
-    config.vbguest.auto_update = true
-  end
+  # TODO template this file and get the node
+  config.vm.define "node" do |machine|
+    # custom mount type
+    # machine.vm.synced_folder '.', '/vagrant', type: user_config.vagrant_mount_method
 
-  machine_types.each do |name, machine_type|
-    config.vm.define name do |machine|
-      machine.vm.hostname = "#{name}.dcos"
+    # allow explicit nil values in the machine_type to override the defaults
+    machine.vm.box = 'mesosphere/dcos-centos-virtualbox'
+    machine.vm.box_url = 'https://downloads.dcos.io/dcos-vagrant/metadata.json'
+    machine.vm.box_version = '~> 0.9.2'
 
-      # custom mount type
-      machine.vm.synced_folder '.', '/vagrant', type: user_config.vagrant_mount_method
+    machine.vm.provider 'virtualbox' do |v, override|
+      v.cpus = 2
+      v.memory = 2048
 
-      # allow explicit nil values in the machine_type to override the defaults
-      machine.vm.box = machine_type.fetch('box', user_config.box)
-      machine.vm.box_url = machine_type.fetch('box-url', user_config.box_url)
-      machine.vm.box_version = machine_type.fetch('box-version', user_config.box_version)
+      # Manually configure DNS
+      v.auto_nat_dns_proxy = false
+      # NAT proxy is flakey (times out frequently)
+      v.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
+      # Host DNS resolution required to support host proxies and faster global DNS resolution
+      v.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
+      # Assign unique mac address
+      v.customize ['modifyvm', :id, '--macaddress1', 'auto']
 
-      machine.vm.provider 'virtualbox' do |v, override|
-        v.name = machine.vm.hostname
-        v.cpus = machine_type['cpus'] || 2
-        v.memory = machine_type['memory'] || 2048
-
-        # Manually configure DNS
-        v.auto_nat_dns_proxy = false
-        # NAT proxy is flakey (times out frequently)
-        v.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
-        # Host DNS resolution required to support host proxies and faster global DNS resolution
-        v.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
-        # Assign unique mac address
-        v.customize ['modifyvm', :id, '--macaddress1', 'auto']
-
-        override.vm.network :private_network, ip: machine_type['ip']
-
-        # guest should sync time if more than 10s off host
-        v.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 1000 ]
-      end
-
-      # provision a shared SSH key (required by DC/OS SSH installer)
-      machine.vm.provision :dcos_ssh, name: 'Shared SSH Key'
-
-      machine.vm.provision :shell do |vm|
-        vm.name = 'Certificate Authorities'
-        vm.path = provision_script_path('ca-certificates')
-      end
-
-      script_path = provision_script_path("type-#{machine_type['type']}")
-      if File.exist?(script_path)
-        machine.vm.provision :shell do |vm|
-          vm.name = "DC/OS #{machine_type['type'].capitalize}"
-          vm.path = script_path
-          vm.env = user_config.provision_env(machine_type)
-        end
-      end
+      # guest should sync time if more than 10s off host
+      v.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 1000 ]
     end
   end
 end

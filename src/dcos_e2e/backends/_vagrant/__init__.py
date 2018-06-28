@@ -72,10 +72,6 @@ class VagrantCluster(ClusterManager):
         # * Passwordless
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         config_file_path = dcos_vagrant_path / 'VagrantConfig-1m-1a-1p.yaml'
-        artifact_path = dcos_vagrant_path / 'dcos_generate_config.oss.sh'
-        dcos_config_path = dcos_vagrant_path / 'etc' / 'config-1.11.0.yaml'
-        license_key_path = Path('/tmp/license-key.txt')
-        return
         import os
         run_subprocess(
             args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
@@ -127,77 +123,57 @@ class VagrantCluster(ClusterManager):
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         client = vagrant.Vagrant(root=str(dcos_vagrant_path))
 
+    def _nodes(self, container_base_name: str) -> Set[Node]:
+        """
+        Args:
+            container_base_name: The start of the container names.
+
+        Returns: ``Node``s corresponding to containers with names starting
+            with ``container_base_name``.
+        """
+        client = vagrant.Vagrant(root=str(dcos_vagrant_path))
+        vagrant_nodes = client.status()
+        # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
+        nodes = set([])
+        for container in containers:
+            networks = container.attrs['NetworkSettings']['Networks']
+            network_name = 'bridge'
+            if len(networks) != 1:
+                [network_name] = list(networks.keys() - set(['bridge']))
+            container_ip_address = IPv4Address(
+                networks[network_name]['IPAddress'],
+            )
+            nodes.add(
+                Node(
+                    public_ip_address=container_ip_address,
+                    private_ip_address=container_ip_address,
+                    default_user=self._default_user,
+                    ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
+                    default_transport=self._default_transport,
+                ),
+            )
+        return nodes
+
     @property
     def masters(self) -> Set[Node]:
         """
         Return all DC/OS master :class:`.node.Node` s.
         """
-        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
-        client = vagrant.Vagrant(root=str(dcos_vagrant_path))
-
-        ip_addresses = [IPv4Address('192.168.65.90')]
-
-        nodes = set([])
-        for ip_address in ip_addresses:
-            nodes.add(
-                Node(
-                    public_ip_address=ip_address,
-                    private_ip_address=ip_address,
-                    default_user='vagrant',
-                    ssh_key_path=Path(client.keyfile()),
-                    default_transport=self._default_transport,
-                ),
-            )
-
-        return nodes
+        return self._nodes(node_base_name=self._master_prefix)
 
     @property
     def agents(self) -> Set[Node]:
         """
         Return all DC/OS agent :class:`.node.Node` s.
         """
-        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
-        client = vagrant.Vagrant(root=str(dcos_vagrant_path))
-
-        ip_addresses = [IPv4Address('192.168.65.111')]
-
-        nodes = set([])
-        for ip_address in ip_addresses:
-            nodes.add(
-                Node(
-                    public_ip_address=ip_address,
-                    private_ip_address=ip_address,
-                    default_user='vagrant',
-                    ssh_key_path=Path(client.keyfile()),
-                    default_transport=self._default_transport,
-                ),
-            )
-
-        return nodes
+        return self._nodes(node_base_name=self._agent_prefix)
 
     @property
     def public_agents(self) -> Set[Node]:
         """
         Return all DC/OS public agent :class:`.node.Node` s.
         """
-        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
-        client = vagrant.Vagrant(root=str(dcos_vagrant_path))
-
-        ip_addresses = [IPv4Address('192.168.65.60')]
-
-        nodes = set([])
-        for ip_address in ip_addresses:
-            nodes.add(
-                Node(
-                    public_ip_address=ip_address,
-                    private_ip_address=ip_address,
-                    default_user='vagrant',
-                    ssh_key_path=Path(client.keyfile()),
-                    default_transport=self._default_transport,
-                ),
-            )
-
-        return nodes
+        return self._nodes(node_base_name=self._public_agent_prefix)
 
     @property
     def base_config(self) -> Dict[str, Any]:
