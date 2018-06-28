@@ -73,6 +73,16 @@ class Node:
         self._ssh_key_path = ssh_key_path
         self.default_transport = default_transport
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Compare a ``Node`` object against another one based on its attributes,
+        namely the ``public_ip_address`` and ``private_ip_address``.
+        """
+        return bool(hash(self) == hash(other))
+
+    def __hash__(self) -> int:
+        return hash((self.public_ip_address, self.private_ip_address))
+
     def __str__(self) -> str:
         """
         Convert a `Node` object to string listing only its IP addresses.
@@ -108,9 +118,27 @@ class Node:
         transport: Optional[Transport] = None,
     ) -> None:
         """
-        DC/OS advanced installation procedure carried out
-        remotely without a bootstrap node from a
-        ``build_artifact`` stored on the remote node.
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the artifact.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the artifact is extracted on this node, and then DC/OS is
+        installed.
+
+        Args:
+            remote_build_artifact: The path on the node to a build artifact to
+                be installed on the node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            log_output_live: If ``True``, log output live.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
         """
         tempdir = Path(gettempdir())
 
@@ -135,6 +163,7 @@ class Node:
             remote_path=remote_genconf_path / 'config.yaml',
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         genconf_args = [
@@ -154,6 +183,7 @@ class Node:
             shell=True,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         self.run(
@@ -161,6 +191,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
         setup_args = [
@@ -179,6 +210,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
 
     def install_dcos_from_path(
@@ -202,6 +234,10 @@ class Node:
         Instead, the artifact is sent to this node and then extracted on this
         node, and then DC/OS is installed.
 
+        This creates a folder in ``/dcos-e2e`` on this node which contains the
+        DC/OS installation files that can be removed safely after the DC/OS
+        installation has finished.
+
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
 
@@ -216,13 +252,22 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_artifact_parent = Path('/') / 'dcos-e2e' / uuid.uuid4().hex
+        workspace_dir = Path('/dcos-e2e')
+        node_artifact_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+        )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
             local_path=build_artifact,
             remote_path=node_build_artifact,
             transport=transport,
             user=user,
+            sudo=True,
         )
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
@@ -257,7 +302,7 @@ class Node:
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
 
-        This creates a folder ``/dcos-e2e`` on this node which contains the
+        This creates a folder in ``/dcos-e2e`` on this node which contains the
         DC/OS installation files that can be removed safely after the DC/OS
         installation has finished.
 
@@ -272,7 +317,15 @@ class Node:
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
         """
-        node_artifact_parent = Path('/') / 'dcos-e2e' / uuid.uuid4().hex
+        workspace_dir = Path('/dcos-e2e')
+        node_artifact_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+        )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(
             args=[
@@ -304,6 +357,7 @@ class Node:
         shell: bool = False,
         tty: bool = False,
         transport: Optional[Transport] = None,
+        sudo: bool = False,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -329,6 +383,7 @@ class Node:
                 the returned ``subprocess.CompletedProcess``.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use "sudo" to run commands.
 
         Returns:
             The representation of the finished process.
@@ -342,6 +397,9 @@ class Node:
         env = dict(env or {})
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]
+
+        if sudo:
+            args = ['sudo'] + args
 
         if user is None:
             user = self.default_user
@@ -415,6 +473,7 @@ class Node:
         remote_path: Path,
         user: Optional[str] = None,
         transport: Optional[Transport] = None,
+        sudo: bool = False,
     ) -> None:
         """
         Copy a file to this node.
@@ -426,23 +485,51 @@ class Node:
                 the ``default_user`` is used instead.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            sudo: Whether to use sudo to create the directory which holds the
+                remote file.
         """
         if user is None:
             user = self.default_user
 
         transport = transport or self.default_transport
         node_transport = self._get_node_transport(transport=transport)
+        mkdir_args = ['mkdir', '--parents', str(remote_path.parent)]
         self.run(
-            args=['mkdir', '--parents',
-                  str(remote_path.parent)],
+            args=mkdir_args,
             user=user,
             transport=transport,
+            sudo=sudo,
         )
 
-        return node_transport.send_file(
+        stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
+        stat_result = self.run(
+            args=stat_cmd,
+            shell=True,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
+
+        original_parent = stat_result.stdout.decode().strip()
+
+        chown_args = ['chown', '-R', user, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            transport=transport,
+            sudo=True,
+        )
+
+        node_transport.send_file(
             local_path=local_path,
             remote_path=remote_path,
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
+        )
+
+        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            transport=transport,
+            sudo=True,
         )

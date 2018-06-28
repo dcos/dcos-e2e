@@ -59,7 +59,7 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def install_dcos_from_path(
+    def install_dcos_from_path_with_bootstrap_node(
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
@@ -67,6 +67,10 @@ class ClusterManager(abc.ABC):
     ) -> None:
         """
         Install DC/OS from a build artifact passed as a file system `Path`.
+
+        If a method which implements this abstract method raises a
+        ``NotImplementedError``, users of the backend can still install DC/OS
+        from a path in an inefficient manner.
 
         Args:
             build_artifact: The path to a build artifact to install DC/OS from.

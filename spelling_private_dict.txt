@@ -40,6 +40,7 @@ genconf
 homebrew
 hwclock
 idna
+iff
 init
 invalidversion
 ip
@@ -54,6 +55,7 @@ login
 logout
 macOS
 macos
+makefile
 mesos
 mkstemp
 modprobe
@@ -97,6 +99,7 @@ submodules
 subnet
 subpackages
 subprocess
+sudo
 symlink
 systemctl
 systemd

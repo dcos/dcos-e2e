@@ -61,6 +61,7 @@ htmlhelp_basename = 'DCOSE2Edoc'
 autoclass_content = 'init'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.5', None),
+    'docker': ('http://docker-py.readthedocs.io/en/stable', None),
 }
 nitpicky = True
 warning_is_error = True

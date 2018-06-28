@@ -6,6 +6,25 @@ Changelog
 Next
 ----
 
+2018.06.28.1
+------------
+
+2018.06.28.0
+------------
+
+- Compare ``Node`` objects based on the ``public_ip_address`` and ``private_ip_address``.
+
+2018.06.27.0
+------------
+
+2018.06.26.0
+------------
+
+- Add a ``network`` parameter to the ``Docker`` backend.
+
+2018.06.20.0
+------------
+
 - Add platform-independent DC/OS installation method from ``Path`` and URL on ``Node``.
 
 2018.06.18.0

@@ -6,13 +6,12 @@ import configparser
 import io
 import shlex
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import Dict, List, Optional
 
 import docker
 
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node
 
 
 def _docker_service_file(
@@ -77,7 +76,6 @@ def _docker_service_file(
 
 
 def start_dcos_container(
-    existing_masters: Set[Node],
     container_base_name: str,
     container_number: int,
     mounts: List[docker.types.Mount],
@@ -87,6 +85,7 @@ def start_dcos_container(
     public_key_path: Path,
     docker_storage_driver: DockerStorageDriver,
     docker_version: DockerVersion,
+    network: Optional[docker.models.networks.Network] = None,
 ) -> None:
     """
     Start a master, agent or public agent container.
@@ -96,7 +95,6 @@ def start_dcos_container(
     See https://jira.mesosphere.com/browse/DCOS_OSS-1131.
 
     Args:
-        existing_masters: The existing masters in the cluster.
         container_base_name: The start of the container name.
         container_number: The end of the container name.
         mounts: See `mounts` on
@@ -111,26 +109,20 @@ def start_dcos_container(
         docker_version: The Docker version to use on the node.
         docker_storage_driver: The storage driver to use for Docker on the
             node.
+        network: The network to connect the container to other than the default
+        ``docker0`` bridge network.
     """
-    registry_host = 'registry.local'
-    if existing_masters:
-        first_master = next(iter(existing_masters))
-        extra_host_ip_address = str(first_master.public_ip_address)
-    else:
-        extra_host_ip_address = '127.0.0.1'
     hostname = container_base_name + str(container_number)
     environment = {'container': hostname}
-    extra_hosts = {registry_host: extra_host_ip_address}
 
     client = docker.from_env(version='auto')
-    container = client.containers.run(
+    container = client.containers.create(
         name=hostname,
         privileged=True,
         detach=True,
         tty=True,
         environment=environment,
         hostname=hostname,
-        extra_hosts=extra_hosts,
         image=docker_image,
         mounts=mounts,
         tmpfs=tmpfs,
@@ -138,6 +130,9 @@ def start_dcos_container(
         stop_signal='SIGRTMIN+3',
         command=['/sbin/init'],
     )
+    if network:
+        network.connect(container)
+    container.start()
 
     disable_systemd_support_cmd = (
         "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "

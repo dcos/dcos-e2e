@@ -5,6 +5,7 @@ Tests for managing DC/OS cluster nodes.
 import logging
 import textwrap
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
@@ -46,6 +47,71 @@ def dcos_node(request: SubRequest) -> Iterator[Node]:
         yield master
 
 
+class TestEquality:
+    """
+    Tests for Node.__eq__
+    """
+
+    def test_eq(self, tmpdir: local) -> None:
+        """
+        Two nodes are equal iff their IP addresses are equal.
+        """
+
+        content = str(uuid.uuid4())
+        key1_filename = 'foo.key'
+        key1_file = tmpdir.join(key1_filename)
+        key1_file.write(content)
+        key2_filename = 'bar.key'
+        key2_file = tmpdir.join(key2_filename)
+        key2_file.write(content)
+
+        node_public_ip_address = IPv4Address('172.0.0.1')
+        node_private_ip_address = IPv4Address('172.0.0.3')
+        other_ip_address = IPv4Address('172.0.0.4')
+        node_ssh_key_path = Path(str(key1_file))
+        other_ssh_key_path = Path(str(key2_file))
+        node_user = 'a'
+        other_user = 'b'
+        node_transport = Transport.DOCKER_EXEC
+        other_transport = Transport.SSH
+        node = Node(
+            public_ip_address=node_public_ip_address,
+            private_ip_address=node_private_ip_address,
+            ssh_key_path=node_ssh_key_path,
+            default_user=node_user,
+            default_transport=node_transport,
+        )
+        for transport in (node_transport, other_transport):
+            for public_ip_address in (
+                node_public_ip_address,
+                other_ip_address,
+            ):
+                for private_ip_address in (
+                    node_private_ip_address,
+                    other_ip_address,
+                ):
+                    for ssh_key_path in (
+                        node_ssh_key_path,
+                        other_ssh_key_path,
+                    ):
+                        for user in (node_user, other_user):
+                            other_node = Node(
+                                public_ip_address=public_ip_address,
+                                private_ip_address=private_ip_address,
+                                ssh_key_path=ssh_key_path,
+                                default_user=user,
+                                default_transport=transport,
+                            )
+
+                            should_match = bool(
+                                public_ip_address == node_public_ip_address and
+                                private_ip_address == node_private_ip_address,
+                            )
+
+                            do_match = bool(node == other_node)
+                            assert should_match == do_match
+
+
 class TestStringRepresentation:
     """
     Tests for the string representation of a ``Node``.
@@ -81,7 +147,9 @@ class TestSendFile:
         content = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
         local_file.write(content)
-        master_destination_path = Path('/etc/new_dir/on_master_node.txt')
+        random = uuid.uuid4().hex
+        master_destination_dir = '/etc/{random}'.format(random=random)
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
@@ -112,7 +180,7 @@ class TestSendFile:
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
-    def test_send_file_custom_user(
+    def test_custom_user(
         self,
         dcos_node: Node,
         tmpdir: local,
@@ -127,25 +195,97 @@ class TestSendFile:
             shell=True,
         )
 
-        content = str(uuid.uuid4())
+        random = str(uuid.uuid4())
         local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
-        master_destination = '/home/{user}/on_master_node.txt'.format(
-            user=testuser,
+        local_file.write(random)
+        master_destination_dir = '/home/{testuser}/{random}'.format(
+            testuser=testuser,
+            random=random,
         )
-        master_destination_path = Path(master_destination)
-
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
             local_path=Path(str(local_file)),
             remote_path=master_destination_path,
             user=testuser,
         )
-        args = ['cat', str(master_destination_path)]
-        result = dcos_node.run(args=args, user=testuser)
-        assert result.stdout.decode() == content
+        args = ['stat', '-c', '"%U"', str(master_destination_path)]
+        result = dcos_node.run(args=args, shell=True)
+        assert result.stdout.decode().strip() == testuser
 
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
+
+    def test_sudo(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to use sudo to send a file to a directory which the
+        user does not have access to.
+        """
+        testuser = str(uuid.uuid4().hex)
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        sudoers_line = '{user} ALL=(ALL) NOPASSWD: ALL'.format(user=testuser)
+        dcos_node.run(
+            args=['echo "' + sudoers_line + '">> /etc/sudoers'],
+            shell=True,
+        )
+
+        random = str(uuid.uuid4())
+        local_file = tmpdir.join('example_file.txt')
+        local_file.write(random)
+        master_destination_dir = '/etc/{testuser}/{random}'.format(
+            testuser=testuser,
+            random=random,
+        )
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
+        with pytest.raises(CalledProcessError):
+            dcos_node.send_file(
+                local_path=Path(str(local_file)),
+                remote_path=master_destination_path,
+                user=testuser,
+            )
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+            user=testuser,
+            sudo=True,
+        )
+
+        args = ['stat', '-c', '"%U"', str(master_destination_path)]
+        result = dcos_node.run(args=args, shell=True)
+        assert result.stdout.decode().strip() == 'root'
+
+        # Implicitly asserts SSH connection closed by ``send_file``.
+        dcos_node.run(args=['userdel', '-r', testuser])
+
+    def test_send_symlink(self, dcos_node: Node, tmpdir: local) -> None:
+        """
+        If sending the path to a symbolic link, the link's target is sent.
+        """
+        random = str(uuid.uuid4())
+        dir_containing_real_file = tmpdir.mkdir(uuid.uuid4().hex)
+        dir_containing_symlink = tmpdir.mkdir(uuid.uuid4().hex)
+        local_file = dir_containing_real_file.join('example_file.txt')
+        local_file.write(random)
+        symlink_file = dir_containing_symlink.join('symlink.txt')
+        symlink_file_path = Path(str(symlink_file))
+        symlink_file_path.symlink_to(target=Path(str(local_file)))
+        master_destination_dir = '/etc/{random}'.format(random=random)
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
+        dcos_node.send_file(
+            local_path=symlink_file_path,
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == random
 
 
 class TestPopen:
@@ -300,6 +440,51 @@ class TestRun:
         assert echo_result.returncode == 0
         assert echo_result.stdout.strip() == b'Hello,  && echo World!'
         assert echo_result.stderr == b''
+
+    def test_sudo(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        When sudo is given as ``True``, the given command has sudo prefixed.
+        """
+        testuser = str(uuid.uuid4().hex)
+        dcos_node.run(args=['useradd', testuser])
+        dcos_node.run(
+            args=['cp', '-R', '$HOME/.ssh', '/home/{}/'.format(testuser)],
+            shell=True,
+        )
+
+        sudoers_line = '{user} ALL=(ALL) NOPASSWD: ALL'.format(user=testuser)
+
+        echo_result = dcos_node.run(
+            args=['echo "' + sudoers_line + '">> /etc/sudoers'],
+            shell=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == ''
+        assert echo_result.stderr.strip().decode() == ''
+
+        echo_result = dcos_node.run(
+            args=['echo', '$(whoami)'],
+            user=testuser,
+            shell=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == testuser
+        assert echo_result.stderr.strip().decode() == ''
+
+        echo_result = dcos_node.run(
+            args=['echo', '$(whoami)'],
+            user=testuser,
+            shell=True,
+            sudo=True,
+        )
+        assert echo_result.returncode == 0
+        assert echo_result.stdout.strip().decode() == 'root'
+        assert echo_result.stderr.strip().decode() == ''
+
+        dcos_node.run(args=['userdel', '-r', testuser])
 
     @pytest.mark.parametrize('tty', [True, False])
     def test_tty(

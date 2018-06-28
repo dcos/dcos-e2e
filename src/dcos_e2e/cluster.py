@@ -21,12 +21,12 @@ from .node import Node, Role, Transport
 
 @retry(
     exceptions=(subprocess.CalledProcessError),
-    tries=60,
+    tries=5,
     delay=1,
 )
 def _wait_for_ssh(node: Node) -> None:
     """
-    Retry for up to one minute (arbitrary) until SSH is available on the given
+    Retry up to five times (arbitrary) until SSH is available on the given
     node.
     """
     node.run(args=['systemctl', 'status', 'sshd'])
@@ -393,11 +393,25 @@ class Cluster(ContextDecorator):
                 efficient for the given backend to use the DC/OS advanced
                 installation method that takes build artifacts by URL string.
         """
-        self._cluster.install_dcos_from_path(
-            build_artifact=build_artifact,
-            dcos_config=dcos_config,
-            log_output_live=log_output_live,
-        )
+        try:
+            self._cluster.install_dcos_from_path_with_bootstrap_node(
+                build_artifact=build_artifact,
+                dcos_config=dcos_config,
+                log_output_live=log_output_live,
+            )
+        except NotImplementedError:
+            for nodes, role in (
+                (self.masters, Role.MASTER),
+                (self.agents, Role.AGENT),
+                (self.public_agents, Role.PUBLIC_AGENT),
+            ):
+                for node in nodes:
+                    node.install_dcos_from_path(
+                        build_artifact=build_artifact,
+                        dcos_config=dcos_config,
+                        role=role,
+                        log_output_live=log_output_live,
+                    )
 
     def run_integration_tests(
         self,
