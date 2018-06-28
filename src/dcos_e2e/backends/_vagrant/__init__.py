@@ -75,6 +75,7 @@ class VagrantCluster(ClusterManager):
 
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         run_subprocess(
+            # TODO use the library to get_vagrant_executable
             args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
             cwd=str(dcos_vagrant_path),
             env={
