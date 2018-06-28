@@ -3,6 +3,7 @@ Vagrant backend.
 """
 
 import os
+import shutil
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -85,9 +86,9 @@ class VagrantCluster(ClusterManager):
                 vm_names.append(name)
 
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
+        vagrant_executable = shutil.which('vagrant')
         run_subprocess(
-            # TODO use the library to get_vagrant_executable
-            args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
+            args=[vagrant_executable, 'up', '--provider=virtualbox'],
             cwd=str(dcos_vagrant_path),
             env={
                 'PATH': os.environ['PATH'],
