@@ -128,23 +128,18 @@ class VagrantCluster(ClusterManager):
         """
         client = vagrant.Vagrant(root=str(dcos_vagrant_path))
         vagrant_nodes = client.status()
+        default_user = 'vagrant'
+        ssh_key_path = 'x'
         # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
         nodes = set([])
         for container in containers:
-            networks = container.attrs['NetworkSettings']['Networks']
-            network_name = 'bridge'
-            if len(networks) != 1:
-                [network_name] = list(networks.keys() - set(['bridge']))
-            container_ip_address = IPv4Address(
-                networks[network_name]['IPAddress'],
-            )
+            node_ip_address = 'X'
             nodes.add(
                 Node(
-                    public_ip_address=container_ip_address,
-                    private_ip_address=container_ip_address,
-                    default_user=self._default_user,
-                    ssh_key_path=self._path / 'include' / 'ssh' / 'id_rsa',
-                    default_transport=self._default_transport,
+                    public_ip_address=node_ip_address,
+                    private_ip_address=node_ip_address,
+                    default_user=default_user,
+                    ssh_key_path=ssh_key_path,
                 ),
             )
         return nodes
