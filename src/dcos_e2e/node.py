@@ -73,6 +73,17 @@ class Node:
         self._ssh_key_path = ssh_key_path
         self.default_transport = default_transport
 
+    def __eq__(self, other: Any) -> bool:
+        """
+        Compare a ``Node`` object against another one based on its attributes,
+        namely the ``public_ip_address`` and ``private_ip_address``.
+        """
+
+        return bool(
+            self.public_ip_address == other.public_ip_address
+            and self.private_ip_address == other.private_ip_address,
+        )
+
     def __str__(self) -> str:
         """
         Convert a `Node` object to string listing only its IP addresses.
