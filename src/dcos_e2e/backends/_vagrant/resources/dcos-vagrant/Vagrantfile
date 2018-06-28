@@ -6,8 +6,8 @@ Vagrant.configure(2) do |config|
   config.ssh.insert_key = false
   config.vbguest.auto_update = true
 
-  # TODO template this file and get the node names
-  node_names = ['node']
+  vm_names_string = ENV['VM_NAMES'].to_s
+  node_names = vm_names_string.split(',')
   for node_name in node_names do
     config.vm.define node_name do |machine|
       machine.vm.box = 'mesosphere/dcos-centos-virtualbox'

@@ -74,6 +74,16 @@ class VagrantCluster(ClusterManager):
         self._agent_prefix = cluster_id + '-agent-'
         self._public_agent_prefix = cluster_id + '-public-agent-'
 
+        vm_names = []
+        for nodes, prefix in (
+            (masters, self._master_prefix),
+            (agents, self._agent_prefix),
+            (public_agents, self._public_agent_prefix),
+        ):
+            for vm_number in range(nodes):
+                name = prefix + vm_number
+                vm_names.append(name)
+
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         run_subprocess(
             # TODO use the library to get_vagrant_executable
@@ -81,6 +91,7 @@ class VagrantCluster(ClusterManager):
             cwd=str(dcos_vagrant_path),
             env={
                 'PATH': os.environ['PATH'],
+                'VM_NAMES': ','.join(vm_names),
             },
             log_output_live=True,
         )
