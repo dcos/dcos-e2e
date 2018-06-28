@@ -5,6 +5,7 @@ Tests for managing DC/OS cluster nodes.
 import logging
 import textwrap
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
@@ -44,6 +45,71 @@ def dcos_node(request: SubRequest) -> Iterator[Node]:
     ) as cluster:
         (master, ) = cluster.masters
         yield master
+
+
+class TestEquality:
+    """
+    Tests for Node.__eq__
+    """
+
+    def test_eq(self, tmpdir: local) -> None:
+        """
+        Two nodes are equal iff their IP addresses are equal.
+        """
+
+        content = str(uuid.uuid4())
+        key1_filename = 'foo.key'
+        key1_file = tmpdir.join(key1_filename)
+        key1_file.write(content)
+        key2_filename = 'bar.key'
+        key2_file = tmpdir.join(key2_filename)
+        key2_file.write(content)
+
+        node_public_ip_address = IPv4Address('172.0.0.1')
+        node_private_ip_address = IPv4Address('172.0.0.3')
+        other_ip_address = IPv4Address('172.0.0.4')
+        node_ssh_key_path = Path(str(key1_file))
+        other_ssh_key_path = Path(str(key2_file))
+        node_user = 'a'
+        other_user = 'b'
+        node_transport = Transport.DOCKER_EXEC
+        other_transport = Transport.SSH
+        node = Node(
+            public_ip_address=node_public_ip_address,
+            private_ip_address=node_private_ip_address,
+            ssh_key_path=node_ssh_key_path,
+            default_user=node_user,
+            default_transport=node_transport,
+        )
+        for transport in (node_transport, other_transport):
+            for public_ip_address in (
+                node_public_ip_address,
+                other_ip_address,
+            ):
+                for private_ip_address in (
+                    node_private_ip_address,
+                    other_ip_address,
+                ):
+                    for ssh_key_path in (
+                        node_ssh_key_path,
+                        other_ssh_key_path,
+                    ):
+                        for user in (node_user, other_user):
+                            other_node = Node(
+                                public_ip_address=public_ip_address,
+                                private_ip_address=private_ip_address,
+                                ssh_key_path=ssh_key_path,
+                                default_user=user,
+                                default_transport=transport,
+                            )
+
+                            should_match = bool(
+                                public_ip_address == node_public_ip_address and
+                                private_ip_address == node_private_ip_address,
+                            )
+
+                            do_match = bool(node == other_node)
+                            assert should_match == do_match
 
 
 class TestStringRepresentation:

@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Compare ``Node`` objects based on the ``public_ip_address`` and ``private_ip_address``.
+
 2018.06.27.0
 ------------
 
