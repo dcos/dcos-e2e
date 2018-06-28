@@ -151,6 +151,8 @@ class VagrantCluster(ClusterManager):
             ``node_base_name``.
         """
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
+        # TODO Pass ENV with VM_NAMES
+        # TODO put into helper
         client = vagrant.Vagrant(root=str(dcos_vagrant_path))
         vagrant_nodes = [
             vm for vm in client.status() if vm.name.startswith(node_base_name)
@@ -158,6 +160,7 @@ class VagrantCluster(ClusterManager):
         # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
         hostname_command = "hostname -I | cut -d' ' -f2"
         nodes = set([])
+        import pdb; pdb.set_trace()
         for node in vagrant_nodes:
             default_user = client.user(vm_name=node.name)
             ssh_key_path = Path(client.keyfile(vm_name=node.name))
