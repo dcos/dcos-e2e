@@ -8,9 +8,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple, Type
 
 import vagrant
+import yaml
 
 from .._base_classes import ClusterBackend, ClusterManager
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Node
 from dcos_e2e._common import run_subprocess
 
 
@@ -54,8 +55,6 @@ class VagrantCluster(ClusterManager):
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
         """
-        self._default_transport = Transport.SSH
-
         # Document that we need Virtualbox guest additions
         # Write a configuration file
         #
