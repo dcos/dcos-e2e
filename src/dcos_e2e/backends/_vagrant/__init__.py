@@ -82,7 +82,7 @@ class VagrantCluster(ClusterManager):
             (public_agents, self._public_agent_prefix),
         ):
             for vm_number in range(nodes):
-                name = prefix + vm_number
+                name = prefix + str(vm_number)
                 vm_names.append(name)
 
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
