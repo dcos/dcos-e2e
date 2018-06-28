@@ -100,7 +100,7 @@ class VagrantCluster(ClusterManager):
         """
         raise NotImplementedError
 
-    def install_dcos_from_path(
+    def install_dcos_from_path_with_bootstrap_node(
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
@@ -116,6 +116,9 @@ class VagrantCluster(ClusterManager):
         """
         raise NotImplementedError
 
+
+    def destroy_node(self, node: Node) -> None:
+        raise NotImplementedError
 
     def destroy(self) -> None:
         """
