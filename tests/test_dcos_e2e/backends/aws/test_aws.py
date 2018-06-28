@@ -32,6 +32,12 @@ class TestDefaults:
         """
         assert AWS().admin_location == '0.0.0.0/0'
 
+    def test_aws_instance_type(self) -> None:
+        """
+        The default ``aws_instance_type`` is correct.
+        """
+        assert AWS().aws_instance_type == 'm4.large'
+
     def test_aws_region(self) -> None:
         """
         The default ``aws_region`` is correct.
