@@ -3,6 +3,7 @@ Vagrant backend.
 """
 
 import os
+import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple, Type
@@ -66,7 +67,12 @@ class VagrantCluster(ClusterManager):
         # * Create nodes separate from installing DC/OS
         # * Use environment variables for e.g. number of nodes, cluster ID
         # * Fill in methods like Destroy
-        # * Passwordless
+        # * Copy the file to a workspace dir like Docker
+        cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
+        self._master_prefix = cluster_id + '-master-'
+        self._agent_prefix = cluster_id + '-agent-'
+        self._public_agent_prefix = cluster_id + '-public-agent-'
+
         dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         run_subprocess(
             args=['/usr/local/bin/vagrant', 'up', '--provider=virtualbox'],
