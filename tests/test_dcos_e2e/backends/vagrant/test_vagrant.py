@@ -26,15 +26,12 @@ class TestRunIntegrationTest:
         It is possible to run DC/OS integration tests on Vagrant.
         This test module only requires a single master node.
         """
-        config = {}
-
         with Cluster(
             cluster_backend=Vagrant(),
             masters=1,
             agents=0,
             public_agents=0,
         ) as cluster:
-
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
