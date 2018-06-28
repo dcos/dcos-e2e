@@ -80,7 +80,7 @@ class Node:
         """
         return bool(hash(self) == hash(other))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.public_ip_address, self.private_ip_address))
 
     def __str__(self) -> str:
