@@ -58,6 +58,7 @@ class VagrantCluster(ClusterManager):
         """
         # Document that we need Virtualbox guest additions
         # Write a configuration file
+        # TODO Doctor command with client.plugin_list
         #
         # Works with Virtualbox 5.1.18
         # Does not work with Virtualbox latest version
@@ -136,23 +137,29 @@ class VagrantCluster(ClusterManager):
         Returns: ``Node``s corresponding to VMs with names starting with
             ``node_base_name``.
         """
+        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         client = vagrant.Vagrant(root=str(dcos_vagrant_path))
-        vagrant_nodes = client.status()
-        default_user = 'vagrant'
-        ssh_key_path = 'x'
+        vagrant_nodes = [
+            vm for vm in client.status() if vm.name.startswith(node_base_name)
+        ]
+        default_user = client.user()
+        ssh_key_path = Path(client.keyfile())
         # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
+        hostname_command = "hostname -I | cut -d' ' -f2"
         nodes = set([])
         for node in vagrant_nodes:
-            node_ip_address = 'X'
-            if node.name.startswith(node_base_name):
-                nodes.add(
-                    Node(
-                        public_ip_address=node_ip_address,
-                        private_ip_address=node_ip_address,
-                        default_user=default_user,
-                        ssh_key_path=ssh_key_path,
-                    ),
-                )
+            node_ip_address = client.ssh(
+                vm_name=node.name,
+                command=hostname_command,
+            )
+            nodes.add(
+                Node(
+                    public_ip_address=node_ip_address,
+                    private_ip_address=node_ip_address,
+                    default_user=default_user,
+                    ssh_key_path=ssh_key_path,
+                ),
+            )
         return nodes
 
     @property
