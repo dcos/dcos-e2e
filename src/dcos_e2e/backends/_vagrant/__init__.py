@@ -3,7 +3,7 @@ Vagrant backend.
 """
 
 import os
-import shutil
+import textwrap
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -12,9 +12,9 @@ from typing import Any, Dict, List, Set, Tuple, Type
 import vagrant
 import yaml
 
-from .._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node
-from dcos_e2e._common import run_subprocess
+
+from .._base_classes import ClusterBackend, ClusterManager
 
 
 class Vagrant(ClusterBackend):
@@ -88,17 +88,17 @@ class VagrantCluster(ClusterManager):
         path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         vagrant_env = {
             'PATH': os.environ['PATH'],
+            # TODO Instead maybe just run Vagrant up multiple times
             'VM_NAMES': ','.join(vm_names),
         }
         self._vagrant_client = vagrant.Vagrant(
             root=str(path),
             env=vagrant_env,
+            quiet_stdout=False,
+            quiet_stderr=True,
         )
 
-        self._vagrant_client.up(
-            quiet_stdout=not log_output_live,
-            quiet_stderr=not log_output_live,
-        )
+        self._vagrant_client.up()
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
@@ -133,7 +133,6 @@ class VagrantCluster(ClusterManager):
         """
         raise NotImplementedError
 
-
     def destroy_node(self, node: Node) -> None:
         raise NotImplementedError
 
@@ -158,7 +157,8 @@ class VagrantCluster(ClusterManager):
         # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
         hostname_command = "hostname -I | cut -d' ' -f2"
         nodes = set([])
-        import pdb; pdb.set_trace()
+        import pdb
+        pdb.set_trace()
         for node in vagrant_nodes:
             default_user = client.user(vm_name=node.name)
             ssh_key_path = Path(client.keyfile(vm_name=node.name))
@@ -217,7 +217,7 @@ class VagrantCluster(ClusterManager):
             set -o pipefail
 
             echo $(/usr/sbin/ip route show to match {master_ip} | grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}' | tail -1)
-            """.format(master_ip=master.private_ip_address)
+            """.format(master_ip=master.private_ip_address),
         )
         config = {
             'check_time': 'false',

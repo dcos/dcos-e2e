@@ -2,15 +2,10 @@
 Tests for the Vagrant backend.
 """
 
-import uuid
 from pathlib import Path
-
-import pytest
-from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.distributions import Distribution
 
 
 class TestRunIntegrationTest:
