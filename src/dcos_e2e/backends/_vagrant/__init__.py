@@ -3,6 +3,7 @@ Vagrant backend.
 """
 
 import os
+import shutil
 import textwrap
 import uuid
 from ipaddress import IPv4Address
@@ -88,6 +89,7 @@ class VagrantCluster(ClusterManager):
         # * Ignore coverage on the new Vagrant files
         # * Write documentation
         # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor
+        # * Remove DC/OS Vagrant
 
         # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
@@ -96,6 +98,8 @@ class VagrantCluster(ClusterManager):
         path = Path(workspace_dir) / uuid.uuid4().hex / self._cluster_id
         path.mkdir(exist_ok=True, parents=True)
         path = self._path.resolve()
+        vagrantfile_path = Path(__file__).parent / 'resources' / 'Vagrantfile'
+        shutil.copy(src=str(vagrantfile_path), dst=str(path))
 
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
@@ -112,7 +116,6 @@ class VagrantCluster(ClusterManager):
                 name = prefix + str(vm_number)
                 vm_names.append(name)
 
-        path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         vagrant_env = {
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(vm_names),
