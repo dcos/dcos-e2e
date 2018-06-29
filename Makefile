@@ -85,10 +85,6 @@ spelling:
 shellcheck:
 	shellcheck --exclude SC2164,SC1091 admin/*.sh
 
-# Run various linting tools.
-# We put each one in a different target so that we can run these in parallel with --jobs
-# Not currently doing pip-extra-reqs or pip-missing-reqs because they are
-# incompatible with pip 10.
 .PHONY: lint
 lint: \
     check-manifest \
