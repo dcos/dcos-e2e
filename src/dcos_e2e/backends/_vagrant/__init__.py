@@ -91,8 +91,13 @@ class VagrantCluster(ClusterManager):
             'VM_NAMES': ','.join(vm_names),
         }
         self._vagrant_client = vagrant.Vagrant(
-            root=str(dcos_vagrant_path),
+            root=str(path),
             env=vagrant_env,
+        )
+
+        self._vagrant_client.up(
+            quiet_stdout=not log_output_live,
+            quiet_stderr=not log_output_live,
         )
 
     def install_dcos_from_url_with_bootstrap_node(
@@ -158,10 +163,13 @@ class VagrantCluster(ClusterManager):
             default_user = client.user(vm_name=node.name)
             ssh_key_path = Path(client.keyfile(vm_name=node.name))
 
-            node_ip_address = client.ssh(
+            node_ip_str = client.ssh(
                 vm_name=node.name,
                 command=hostname_command,
-            )
+            ).strip()
+
+            node_ip_address = IPv4Address(node_ip_str)
+
             nodes.add(
                 Node(
                     public_ip_address=node_ip_address,
