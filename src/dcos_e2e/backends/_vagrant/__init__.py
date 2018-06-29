@@ -157,8 +157,6 @@ class VagrantCluster(ClusterManager):
         # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
         hostname_command = "hostname -I | cut -d' ' -f2"
         nodes = set([])
-        import pdb
-        pdb.set_trace()
         for node in vagrant_nodes:
             default_user = client.user(vm_name=node.name)
             ssh_key_path = Path(client.keyfile(vm_name=node.name))
