@@ -87,9 +87,6 @@ class VagrantCluster(ClusterManager):
             )
             raise NotImplementedError(message)
 
-        # Plan:
-        # * Ignore coverage on the new Vagrant files
-
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'

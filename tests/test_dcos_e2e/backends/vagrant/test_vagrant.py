@@ -8,7 +8,8 @@ from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
 
-class TestRunIntegrationTest:
+# We skip these tests because VirtualBox is not available on Travis CI.
+class TestRunIntegrationTest:  # pragma: nocover
     """
     Tests for functionality specific to the Vagrant backend.
     """
