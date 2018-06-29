@@ -75,8 +75,17 @@ class VagrantCluster(ClusterManager):
             files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            cluster_backend: Details of the specific Vagrant backend to use.
+
+        Raises:
+            NotImplementedError: ``files_to_copy_to_installer`` includes files
+                to copy to the installer.
         """
+        if files_to_copy_to_installer:
+            message = (
+                'Copying files to the installer is currently not supported by '
+                'the Vagrant backend.'
+            )
+            raise NotImplementedError(message)
 
         # Plan for dcos-vagrant doctor:
         # * Check we have the VirtualBox guest additions plugin,
