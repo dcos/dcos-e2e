@@ -8,7 +8,8 @@ import textwrap
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple, Type
+from tempfile import gettempdir
+from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
 import vagrant
 import yaml
@@ -91,20 +92,21 @@ class VagrantCluster(ClusterManager):
         # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor
         # * Remove DC/OS Vagrant
 
-        # We work in a new directory.
-        # This helps running tests in parallel without conflicts and it
-        # reduces the chance of side-effects affecting sequential tests.
-        workspace_dir = cluster_backend.workspace_dir
-        path = Path(workspace_dir) / uuid.uuid4().hex / self._cluster_id
-        path.mkdir(exist_ok=True, parents=True)
-        path = self._path.resolve()
-        vagrantfile_path = Path(__file__).parent / 'resources' / 'Vagrantfile'
-        shutil.copy(src=str(vagrantfile_path), dst=str(path))
 
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'
         self._public_agent_prefix = cluster_id + '-public-agent-'
+
+        # We work in a new directory.
+        # This helps running tests in parallel without conflicts and it
+        # reduces the chance of side-effects affecting sequential tests.
+        workspace_dir = cluster_backend.workspace_dir
+        path = Path(workspace_dir) / uuid.uuid4().hex / cluster_id
+        path.mkdir(exist_ok=True, parents=True)
+        path = self._path.resolve()
+        vagrantfile_path = Path(__file__).parent / 'resources' / 'Vagrantfile'
+        shutil.copy(src=str(vagrantfile_path), dst=str(path))
 
         vm_names = []
         for nodes, prefix in (
@@ -186,7 +188,7 @@ class VagrantCluster(ClusterManager):
         for node in {*self.masters, *self.agents, *self.public_agents}:
             self.destroy_node(node=node)
 
-        rmtree(path=client.root, ignore_errors=True)
+        shutil.rmtree(path=client.root, ignore_errors=True)
 
     def _nodes(self, node_base_name: str) -> Set[Node]:
         """
