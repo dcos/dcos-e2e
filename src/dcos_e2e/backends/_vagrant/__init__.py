@@ -87,18 +87,8 @@ class VagrantCluster(ClusterManager):
             )
             raise NotImplementedError(message)
 
-        # Plan for dcos-vagrant doctor:
-        # * Check we have the VirtualBox guest additions plugin,
-        # using client.plugin_list
-        # * Check that have a viable version of VirtualBox - figure this out
-        # from the DC/OS Vagrant documentation. 5.1.18 seems to work. The
-        # latest version of VirtualBox does not work.
-
         # Plan:
         # * Ignore coverage on the new Vagrant files
-        # * Write documentation
-        # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor and a Web UI
-        # * Remove DC/OS Vagrant
 
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
