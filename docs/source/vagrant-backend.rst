@@ -28,6 +28,11 @@ This has been tested with VirtualBox 5.1.18.
 
 `vagrant-vbguest`_ must be installed.
 
+Reference
+---------
+
+.. autoclass:: dcos_e2e.backends.Vagrant
+
 .. _VirtualBox: https://www.virtualbox.org
 .. _Vagrant: https://www.vagrantup.com
 .. _vagrant-vbguest: https://github.com/dotless-de/vagrant-vbguest
