@@ -255,9 +255,9 @@ class VagrantCluster(ClusterManager):
         ip_detect_contents = textwrap.dedent(
             """\
             #!/usr/bin/env bash
-            echo $(/usr/sbin/ip route show to match {master_ip}
-            | grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}'
-            | tail -1)
+            echo $(/usr/sbin/ip route show to match {master_ip} |
+            grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}} |'
+            tail -1)
             """.format(master_ip=master.private_ip_address),
         )
         # pylint: enable=anomalous-backslash-in-string
