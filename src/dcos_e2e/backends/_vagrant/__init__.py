@@ -22,6 +22,25 @@ class Vagrant(ClusterBackend):
     Vagrant cluster backend base class.
     """
 
+    def __init__(
+        self,
+        workspace_dir: Optional[Path] = None,
+    ) -> None:
+        """
+        Create a configuration for a Docker cluster backend.
+
+        Args:
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
+                This is equivalent to `dir` in
+                :py:func:`tempfile.mkstemp`.
+
+        Attributes:
+            workspace_dir: The directory in which large temporary files will be
+                created. These files will be deleted at the end of a test run.
+        """
+        self.workspace_dir = workspace_dir or Path(gettempdir())
+
     @property
     def cluster_cls(self) -> Type['VagrantCluster']:
         """
