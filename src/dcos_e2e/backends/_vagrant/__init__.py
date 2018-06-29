@@ -57,18 +57,19 @@ class VagrantCluster(ClusterManager):
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
         """
-        # Document that we need Virtualbox guest additions
-        # Write a configuration file
-        # TODO Doctor command with client.plugin_list
-        #
-        # Works with Virtualbox 5.1.18
-        # Does not work with Virtualbox latest version
-        # TODO: submit a bug report to DC/OS Vagrant
+
+        # Plan for dcos-vagrant doctor:
+        # * Check we have the VirtualBox guest additions plugin,
+        # using client.plugin_list
+        # * Check that have a viable version of VirtualBox - figure this out
+        # from the DC/OS Vagrant documentation. 5.1.18 seems to work. The
+        # latest version of VirtualBox does not work.
 
         # Plan:
         # * Copy the file to a workspace dir like Docker
+        # * Ignore coverage on the new Vagrant files
         # * Write documentation
-        # * Follow-up - make CLI (JIRA)
+        # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'
@@ -221,12 +222,9 @@ class VagrantCluster(ClusterManager):
         ip_detect_contents = textwrap.dedent(
             """\
             #!/usr/bin/env bash
-
-            set -o errexit
-            set -o nounset
-            set -o pipefail
-
-            echo $(/usr/sbin/ip route show to match {master_ip} | grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}' | tail -1)
+            echo $(/usr/sbin/ip route show to match {master_ip}
+            | grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}'
+            | tail -1)
             """.format(master_ip=master.private_ip_address),
         )
         config = {
