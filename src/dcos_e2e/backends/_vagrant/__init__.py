@@ -100,7 +100,6 @@ class VagrantCluster(ClusterManager):
         # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor and a Web UI
         # * Remove DC/OS Vagrant
 
-
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'
@@ -211,8 +210,8 @@ class VagrantCluster(ClusterManager):
         """
         client = self._vagrant_client
         vagrant_nodes = [
-            vm for vm in client.status() if vm.name.startswith(node_base_name)
-            and vm.state == 'running'
+            vm for vm in client.status()
+            if vm.name.startswith(node_base_name) and vm.state == 'running'
         ]
         hostname_command = "hostname -I | cut -d' ' -f2"
         nodes = set([])

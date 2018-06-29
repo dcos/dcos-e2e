@@ -14,10 +14,20 @@ A minimum of 2 GB of free memory is required per DC/OS node.
 Vagrant
 ~~~~~~~
 
-Vagrant must be installed.
+`Vagrant`_ must be installed.
 This has been tested with Vagrant 2.1.1.
 
 VirtualBox
 ~~~~~~~~~~
 
-VirtualBox must be installed.
+`VirtualBox`_ must be installed.
+This has been tested with VirtualBox 5.1.18.
+
+``vagrant-vbguest``
+~~~~~~~~~~~~~~~~~~~
+
+`vagrant-vbguest`_ must be installed.
+
+.. _VirtualBox: https://www.virtualbox.org
+.. _Vagrant: https://www.vagrantup.com
+.. _vagrant-vbguest: https://github.com/dotless-de/vagrant-vbguest
