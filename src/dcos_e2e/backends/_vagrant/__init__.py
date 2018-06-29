@@ -96,7 +96,6 @@ class VagrantCluster(ClusterManager):
 
         # Plan:
         # * Ignore coverage on the new Vagrant files
-        # * Raise NotImplementedError for files_to_copy_to_installer
         # * Write documentation
         # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor and a Web UI
         # * Remove DC/OS Vagrant

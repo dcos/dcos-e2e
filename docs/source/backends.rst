@@ -8,4 +8,5 @@ DC/OS E2E comes with some backends and it is also possible to create custom back
 
    docker-backend
    aws-backend
+   vagrant-backend
    custom-backend
