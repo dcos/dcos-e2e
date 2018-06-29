@@ -66,10 +66,9 @@ class VagrantCluster(ClusterManager):
         # TODO: submit a bug report to DC/OS Vagrant
 
         # Plan:
-        # * Create nodes separate from installing DC/OS
-        # * Use environment variables for e.g. number of nodes, cluster ID
-        # * Fill in methods like Destroy
         # * Copy the file to a workspace dir like Docker
+        # * Write documentation
+        # * Follow-up - make CLI (JIRA)
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'
@@ -153,7 +152,6 @@ class VagrantCluster(ClusterManager):
         """
         Destroy all nodes in the cluster.
         """
-        client = self._vagrant_client
         for node in {*self.masters, *self.agents, *self.public_agents}:
             self.destroy_node(node=node)
 
