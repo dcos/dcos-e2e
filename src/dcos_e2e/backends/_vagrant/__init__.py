@@ -134,14 +134,28 @@ class VagrantCluster(ClusterManager):
         raise NotImplementedError
 
     def destroy_node(self, node: Node) -> None:
-        raise NotImplementedError
+        """
+        Destroy a node in the cluster.
+        """
+        client = self._vagrant_client
+        hostname_command = "hostname -I | cut -d' ' -f2"
+        for vm in client.status():
+            vm_ip_str = client.ssh(
+                vm_name=vm.name,
+                command=hostname_command,
+            ).strip()
+
+            vm_ip_address = IPv4Address(vm_ip_str)
+            if vm_ip_address == node.private_ip_address:
+                client.destroy(vm_name=vm.name)
 
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
         client = self._vagrant_client
-        client.destroy()
+        for node in {*self.masters, *self.agents, *self.public_agents}:
+            self.destroy_node(node=node)
 
     def _nodes(self, node_base_name: str) -> Set[Node]:
         """
@@ -155,7 +169,6 @@ class VagrantCluster(ClusterManager):
         vagrant_nodes = [
             vm for vm in client.status() if vm.name.startswith(node_base_name)
         ]
-        # TODO get IP with vagrant ssh -c "hostname -I | cut -d' ' -f2" 2>/dev/null
         hostname_command = "hostname -I | cut -d' ' -f2"
         nodes = set([])
         for node in vagrant_nodes:

@@ -24,8 +24,8 @@ class TestRunIntegrationTest:
         with Cluster(
             cluster_backend=Vagrant(),
             masters=1,
-            agents=0,
-            public_agents=0,
+            agents=1,
+            public_agents=1,
         ) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
