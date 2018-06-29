@@ -56,7 +56,11 @@ This allows for extending the cluster lifetime and also for cleaning up the clus
 EC2 instance types
 ------------------
 
-Currently the AWS backend launches ``m4.large`` instances for all DC/OS nodes.
+By default the AWS backend launches ``m4.large`` instances for all DC/OS nodes.
+
+It is possible to choose a different instance type through the :paramref:`~dcos_e2e.backends.AWS.aws_instance_type` parameter.
+
+See the `AWS Instance types`_ for available instance types.
 
 Unsupported DC/OS versions
 --------------------------
@@ -90,4 +94,5 @@ Reference
 
 .. _CCM: ccm.mesosphere.com
 .. _AWS Regions and Availability Zones: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-available-regions
+.. _AWS Instance types: https://aws.amazon.com/ec2/instance-types
 .. _dcos-launch: https://github.com/dcos/dcos-launch

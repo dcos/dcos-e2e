@@ -6,6 +6,11 @@ Changelog
 Next
 ----
 
+2018.06.28.2
+------------
+
+- Add a ``aws_instance_type`` parameter to the ``AWS`` backend.
+
 2018.06.28.1
 ------------
 
