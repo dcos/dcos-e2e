@@ -36,7 +36,7 @@ class VagrantCluster(ClusterManager):
     Vagrant cluster manager.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         masters: int,
         agents: int,
@@ -66,10 +66,18 @@ class VagrantCluster(ClusterManager):
         # latest version of VirtualBox does not work.
 
         # Plan:
-        # * Copy the file to a workspace dir like Docker
         # * Ignore coverage on the new Vagrant files
         # * Write documentation
         # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor
+
+        # We work in a new directory.
+        # This helps running tests in parallel without conflicts and it
+        # reduces the chance of side-effects affecting sequential tests.
+        workspace_dir = cluster_backend.workspace_dir
+        path = Path(workspace_dir) / uuid.uuid4().hex / self._cluster_id
+        path.mkdir(exist_ok=True, parents=True)
+        path = self._path.resolve()
+
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'
@@ -88,7 +96,6 @@ class VagrantCluster(ClusterManager):
         path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
         vagrant_env = {
             'PATH': os.environ['PATH'],
-            # TODO Instead maybe just run Vagrant up multiple times
             'VM_NAMES': ','.join(vm_names),
         }
         self._vagrant_client = vagrant.Vagrant(
@@ -139,22 +146,25 @@ class VagrantCluster(ClusterManager):
         """
         client = self._vagrant_client
         hostname_command = "hostname -I | cut -d' ' -f2"
-        for vm in client.status():
+        for virtual_machine in client.status():
             vm_ip_str = client.ssh(
-                vm_name=vm.name,
+                vm_name=virtual_machine.name,
                 command=hostname_command,
             ).strip()
 
             vm_ip_address = IPv4Address(vm_ip_str)
             if vm_ip_address == node.private_ip_address:
-                client.destroy(vm_name=vm.name)
+                client.destroy(vm_name=virtual_machine.name)
 
     def destroy(self) -> None:
         """
         Destroy all nodes in the cluster.
         """
+        client = self._vagrant_client
         for node in {*self.masters, *self.agents, *self.public_agents}:
             self.destroy_node(node=node)
+
+        rmtree(path=client.root, ignore_errors=True)
 
     def _nodes(self, node_base_name: str) -> Set[Node]:
         """
@@ -219,6 +229,7 @@ class VagrantCluster(ClusterManager):
         """
         master = next(iter(self.masters))
 
+        # pylint: disable=anomalous-backslash-in-string
         ip_detect_contents = textwrap.dedent(
             """\
             #!/usr/bin/env bash
@@ -227,6 +238,8 @@ class VagrantCluster(ClusterManager):
             | tail -1)
             """.format(master_ip=master.private_ip_address),
         )
+        # pylint: enable=anomalous-backslash-in-string
+
         config = {
             'check_time': 'false',
             'cluster_name': 'DCOS',
