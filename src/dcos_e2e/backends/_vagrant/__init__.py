@@ -140,7 +140,8 @@ class VagrantCluster(ClusterManager):
         """
         Destroy all nodes in the cluster.
         """
-        raise NotImplementedError
+        client = self._vagrant_client
+        client.destroy()
 
     def _nodes(self, node_base_name: str) -> Set[Node]:
         """
