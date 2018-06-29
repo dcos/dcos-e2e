@@ -125,8 +125,10 @@ validators
 vendored
 vendoring
 versioning
+virtualbox
 virtualization
 vm
+vms
 vpn
 whitespace
 wildcard
