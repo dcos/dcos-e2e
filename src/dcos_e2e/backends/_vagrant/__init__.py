@@ -85,16 +85,14 @@ class VagrantCluster(ClusterManager):
                 name = prefix + str(vm_number)
                 vm_names.append(name)
 
-        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
-        vagrant_executable = shutil.which('vagrant')
-        run_subprocess(
-            args=[vagrant_executable, 'up', '--provider=virtualbox'],
-            cwd=str(dcos_vagrant_path),
-            env={
-                'PATH': os.environ['PATH'],
-                'VM_NAMES': ','.join(vm_names),
-            },
-            log_output_live=True,
+        path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
+        vagrant_env = {
+            'PATH': os.environ['PATH'],
+            'VM_NAMES': ','.join(vm_names),
+        }
+        self._vagrant_client = vagrant.Vagrant(
+            root=str(dcos_vagrant_path),
+            env=vagrant_env,
         )
 
     def install_dcos_from_url_with_bootstrap_node(
@@ -138,9 +136,7 @@ class VagrantCluster(ClusterManager):
         """
         Destroy all nodes in the cluster.
         """
-        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
-        client = vagrant.Vagrant(root=str(dcos_vagrant_path))
-        # TODO implement this including passing VM_NAMES
+        raise NotImplementedError
 
     def _nodes(self, node_base_name: str) -> Set[Node]:
         """
@@ -150,10 +146,7 @@ class VagrantCluster(ClusterManager):
         Returns: ``Node``s corresponding to VMs with names starting with
             ``node_base_name``.
         """
-        dcos_vagrant_path = Path(__file__).parent / 'resources' / 'dcos-vagrant'
-        # TODO Pass ENV with VM_NAMES
-        # TODO put into helper
-        client = vagrant.Vagrant(root=str(dcos_vagrant_path))
+        client = self._vagrant_client
         vagrant_nodes = [
             vm for vm in client.status() if vm.name.startswith(node_base_name)
         ]

@@ -560,6 +560,7 @@ class DockerCluster(ClusterManager):
             self.destroy_node(node=node)
 
         rmtree(path=str(self._path), ignore_errors=True)
+        # TODO put into helper
 
     def _nodes(self, container_base_name: str) -> Set[Node]:
         """
