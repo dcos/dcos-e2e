@@ -29,7 +29,7 @@ class Vagrant(ClusterBackend):
         workspace_dir: Optional[Path] = None,
     ) -> None:
         """
-        Create a configuration for a Docker cluster backend.
+        Create a configuration for a Vagrant cluster backend.
 
         Args:
             workspace_dir: The directory in which large temporary files will be
@@ -75,8 +75,7 @@ class VagrantCluster(ClusterManager):
             files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            cluster_backend: Details of the specific DC/OS Docker backend to
-                use.
+            cluster_backend: Details of the specific Vagrant backend to use.
         """
 
         # Plan for dcos-vagrant doctor:
@@ -88,6 +87,7 @@ class VagrantCluster(ClusterManager):
 
         # Plan:
         # * Ignore coverage on the new Vagrant files
+        # * Raise NotImplementedError for files_to_copy_to_installer
         # * Write documentation
         # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor
         # * Remove DC/OS Vagrant
@@ -104,7 +104,7 @@ class VagrantCluster(ClusterManager):
         workspace_dir = cluster_backend.workspace_dir
         path = Path(workspace_dir) / uuid.uuid4().hex / cluster_id
         path.mkdir(exist_ok=True, parents=True)
-        path = self._path.resolve()
+        path = path.resolve()
         vagrantfile_path = Path(__file__).parent / 'resources' / 'Vagrantfile'
         shutil.copy(src=str(vagrantfile_path), dst=str(path))
 
