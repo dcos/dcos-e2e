@@ -98,7 +98,7 @@ class VagrantCluster(ClusterManager):
         # * Ignore coverage on the new Vagrant files
         # * Raise NotImplementedError for files_to_copy_to_installer
         # * Write documentation
-        # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor
+        # * Follow-up - make CLI (JIRA) with dcos-vagrant doctor and a Web UI
         # * Remove DC/OS Vagrant
 
 
@@ -179,7 +179,10 @@ class VagrantCluster(ClusterManager):
         """
         client = self._vagrant_client
         hostname_command = "hostname -I | cut -d' ' -f2"
-        for virtual_machine in client.status():
+        virtual_machines = [
+            vm for vm in client.status() if vm.state == 'running'
+        ]
+        for virtual_machine in virtual_machines:
             vm_ip_str = client.ssh(
                 vm_name=virtual_machine.name,
                 command=hostname_command,
@@ -210,6 +213,7 @@ class VagrantCluster(ClusterManager):
         client = self._vagrant_client
         vagrant_nodes = [
             vm for vm in client.status() if vm.name.startswith(node_base_name)
+            and vm.state == 'running'
         ]
         hostname_command = "hostname -I | cut -d' ' -f2"
         nodes = set([])
