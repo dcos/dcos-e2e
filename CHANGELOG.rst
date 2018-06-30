@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.06.30.0
+------------
+
 - Add a ``Vagrant`` backend.
 
 2018.06.28.2
