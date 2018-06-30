@@ -75,6 +75,7 @@ class VagrantCluster(ClusterManager):
             files_to_copy_to_installer: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
+            cluster_backend: Details of the specific Docker backend to use.
 
         Raises:
             NotImplementedError: ``files_to_copy_to_installer`` includes files
@@ -97,8 +98,8 @@ class VagrantCluster(ClusterManager):
         # reduces the chance of side-effects affecting sequential tests.
         workspace_dir = cluster_backend.workspace_dir
         path = Path(workspace_dir) / uuid.uuid4().hex / cluster_id
-        path.mkdir(exist_ok=True, parents=True)
-        path = path.resolve()
+        Path(path).mkdir(exist_ok=True, parents=True)
+        path = Path(path).resolve()
         vagrantfile_path = Path(__file__).parent / 'resources' / 'Vagrantfile'
         shutil.copy(src=str(vagrantfile_path), dst=str(path))
 
@@ -209,7 +210,7 @@ class VagrantCluster(ClusterManager):
             node_ip_str = client.ssh(
                 vm_name=node.name,
                 command=hostname_command,
-            ).strip()
+            ).strip().strip('{}')
 
             node_ip_address = IPv4Address(node_ip_str)
 
