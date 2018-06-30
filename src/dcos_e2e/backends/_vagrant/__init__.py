@@ -257,7 +257,7 @@ class VagrantCluster(ClusterManager):
             """\
             #!/usr/bin/env bash
             echo $(/usr/sbin/ip route show to match {master_ip} |
-            grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}} |
+            grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}} '|
             tail -1)
             """.format(master_ip=master.private_ip_address),
         )
