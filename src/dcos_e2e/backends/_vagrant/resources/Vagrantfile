@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vbguest.auto_update = true
+  config.vm.network "private_network", type: "dhcp"
+
+  vm_names_string = ENV['VM_NAMES'].to_s
+  node_names = vm_names_string.split(',')
+  for node_name in node_names do
+    config.vm.define node_name do |machine|
+      machine.vm.box = 'mesosphere/dcos-centos-virtualbox'
+      machine.vm.box_url = 'https://downloads.dcos.io/dcos-vagrant/metadata.json'
+      machine.vm.box_version = '~> 0.9.2'
+
+      machine.vm.provider 'virtualbox' do |v, override|
+        v.cpus = 2
+        v.memory = 2048
+      end
+    end
+  end
+end

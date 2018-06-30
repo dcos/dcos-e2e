@@ -6,6 +6,7 @@ from ._aws import AWS
 from ._base_classes import ClusterBackend, ClusterManager
 from ._docker import Docker
 from ._existing_cluster import ExistingCluster as _ExistingCluster
+from ._vagrant import Vagrant
 
 __all__ = [
     'ClusterBackend',
@@ -13,4 +14,5 @@ __all__ = [
     'AWS',
     'Docker',
     '_ExistingCluster',
+    'Vagrant',
 ]
