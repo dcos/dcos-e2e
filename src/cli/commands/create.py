@@ -530,7 +530,6 @@ def create(
     )
 
     artifact_path = Path(artifact).resolve()
-    enterprise = bool(variant == 'enterprise')
 
     if variant == 'auto':
         variant = _get_variant(
@@ -538,6 +537,7 @@ def create(
             workspace_dir=workspace_dir,
         )
 
+    enterprise = bool(variant == 'enterprise')
     if enterprise:
         superuser_username = 'admin'
         superuser_password = 'admin'
