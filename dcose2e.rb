@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.07.01.1.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.07.01.2.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -329,7 +329,7 @@ class Dcose2e < Formula
 
 resource "PyYAML" do
   url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
-  sha256 "a204d840220a044ce782b5b5906d150dc053de0c"
+  sha256 "851e17742830a79dacba60b06ad1cc52b67b0a4e78433d442c74756ceebe23b8"
 end
 
 
