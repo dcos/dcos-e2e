@@ -73,7 +73,6 @@ def get_homebrew_formula(version: str) -> str:
     assert py_37_broken_pyyaml_url in recipe
     assert py_37_broken_pyyaml_sha in recipe
 
-
     working_pyyaml_url = 'https://github.com/yaml/pyyaml/archive/4.2b2.tar.gz'
     working_pyyaml_sha = 'a204d840220a044ce782b5b5906d150dc053de0c'
     recipe = recipe.replace(py_37_broken_pyyaml_url, working_pyyaml_url)
