@@ -70,5 +70,6 @@ setup(
     entry_points="""
         [console_scripts]
         dcos-docker=cli.dcos_docker:dcos_docker
+        dcos-vagrant=cli.dcos_vagrant:dcos_vagrant
     """,
 )
