@@ -267,56 +267,56 @@ CLI Reference
 
 .. _dcos-docker-create:
 
-.. click:: cli:create
+.. click:: cli.dcos_docker:create
   :prog: dcos-docker create
 
-.. click:: cli:list_clusters
+.. click:: cli.dcos_docker:list_clusters
   :prog: dcos-docker list
 
 .. _dcos-docker-wait:
 
-.. click:: cli:wait
+.. click:: cli.dcos_docker:wait
   :prog: dcos-docker wait
 
 .. _dcos-docker-run:
 
-.. click:: cli:run
+.. click:: cli.dcos_docker:run
   :prog: dcos-docker run
 
 .. _dcos-docker-inspect:
 
-.. click:: cli:inspect_cluster
+.. click:: cli.dcos_docker:inspect_cluster
   :prog: dcos-docker inspect
 
-.. click:: cli:sync_code
+.. click:: cli.dcos_docker:sync_code
   :prog: dcos-docker sync
 
 .. _dcos-docker-destroy:
 
-.. click:: cli:destroy
+.. click:: cli.dcos_docker:destroy
   :prog: dcos-docker destroy
 
 .. _dcos-docker-destroy-list:
 
-.. click:: cli:destroy_list
+.. click:: cli.dcos_docker:destroy_list
   :prog: dcos-docker destroy-list
 
 .. _dcos-docker-doctor:
 
-.. click:: cli:doctor
+.. click:: cli.dcos_docker:doctor
   :prog: dcos-docker doctor
 
 .. _dcos-docker-web:
 
-.. click:: cli:web
+.. click:: cli.dcos_docker:web
   :prog: dcos-docker web
 
 .. _dcos-docker-setup-mac-network:
 
-.. click:: cli:setup_mac_network
+.. click:: cli.dcos_docker:setup_mac_network
   :prog: dcos-docker setup-mac-network
 
 .. _dcos-docker-destroy-mac-network:
 
-.. click:: cli:destroy_mac_network
+.. click:: cli.dcos_docker:destroy_mac_network
   :prog: dcos-docker destroy-mac-network
