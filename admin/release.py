@@ -33,7 +33,7 @@ def get_homebrew_formula(version: str) -> str:
 
     # The version of PyYAML on PyPI does not work on Python 3.7.
     # We manually add a stanza later.
-    requirements.remove('PyYAML>=3.2')
+    requirements.remove('PyYAML>=3.12')
 
     args = ['poet', first]
     for requirement in requirements[1:]:
