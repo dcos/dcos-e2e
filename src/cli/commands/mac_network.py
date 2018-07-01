@@ -25,7 +25,7 @@ import click
 import click_spinner
 import docker
 
-from cli._common import docker_client
+from ._common import docker_client
 
 # We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
 # with "make clean".

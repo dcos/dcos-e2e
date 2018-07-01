@@ -4,9 +4,10 @@ Tools for opening a cluster's web UI.
 
 import click
 
-from cli._common import ClusterContainers
-from cli._options import existing_cluster_id_option
 from dcos_e2e.node import Transport
+
+from ._common import ClusterContainers
+from ._options import existing_cluster_id_option
 
 
 @click.command('web')

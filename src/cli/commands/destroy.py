@@ -8,9 +8,10 @@ from typing import List
 import click
 import click_spinner
 
-from cli._common import ClusterContainers, existing_cluster_ids
-from cli._options import existing_cluster_id_option, node_transport_option
 from dcos_e2e.node import Transport
+
+from ._common import ClusterContainers, existing_cluster_ids
+from ._options import existing_cluster_id_option, node_transport_option
 
 
 @click.command('destroy-list')

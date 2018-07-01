@@ -6,9 +6,10 @@ import click
 import click_spinner
 import urllib3
 
-from cli._common import ClusterContainers
-from cli._options import existing_cluster_id_option, node_transport_option
 from dcos_e2e.node import Transport
+
+from ._common import ClusterContainers
+from ._options import existing_cluster_id_option, node_transport_option
 
 
 @click.command('wait')

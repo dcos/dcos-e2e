@@ -2,8 +2,9 @@ from typing import Callable, Optional, Union
 
 import click
 
-from cli._common import existing_cluster_ids
 from dcos_e2e.node import Transport
+
+from ._common import existing_cluster_ids
 
 
 def _validate_cluster_exists(

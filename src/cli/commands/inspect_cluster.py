@@ -7,9 +7,10 @@ from typing import Any, Dict  # noqa: F401
 
 import click
 
-from cli._common import ClusterContainers, ContainerInspectView
-from cli._options import existing_cluster_id_option
 from dcos_e2e.node import Transport
+
+from ._common import ClusterContainers, ContainerInspectView
+from ._options import existing_cluster_id_option
 
 
 @click.command('inspect')
