@@ -1,4 +1,4 @@
-class Dcosdocker < Formula
+class Dcose2e < Formula
   include Language::Python::Virtualenv
 
   url "https://github.com/dcos/dcos-e2e/archive/2018.06.30.0.tar.gz"

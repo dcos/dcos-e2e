@@ -41,7 +41,7 @@ def get_homebrew_formula(version: str) -> str:
 
     pattern = dedent(
         """\
-        class Dcosdocker < Formula
+        class Dcose2e < Formula
           include Language::Python::Virtualenv
 
           url "https://github.com/dcos/dcos-e2e/archive/{version}.tar.gz"
@@ -127,7 +127,7 @@ def commit_and_push(version: str) -> None:
     Commit and push all changes.
     """
     repo = Repo('.')
-    paths = ['dcosdocker.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
+    paths = ['dcose2e.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
     _, ignored = add(paths=paths)
     assert not ignored
     message = b'Update for release ' + version.encode('utf-8')
@@ -145,7 +145,7 @@ def update_homebrew(version_str: str) -> None:
     Update the Homebrew file.
     """
     homebrew_formula_contents = get_homebrew_formula(version=version_str)
-    homebrew_file = Path('dcosdocker.rb')
+    homebrew_file = Path('dcose2e.rb')
     homebrew_file.write_text(homebrew_formula_contents)
 
 
