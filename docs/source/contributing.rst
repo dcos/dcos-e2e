@@ -268,7 +268,7 @@ Install `Homebrew`_ or `Linuxbrew`_.
 
 .. code:: sh
 
-   brew install dcosdocker.rb
+   brew install dcose2e.rb
    brew audit dcosdocker
    brew test dcosdocker
 
