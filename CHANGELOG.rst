@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.07.01.0
+------------
+
 - Renamed Homebrew formula.
   To upgrade from a previous version, follow Homebrew's linking instructions after upgrade instructions.
 
