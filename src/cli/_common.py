@@ -61,7 +61,7 @@ def existing_cluster_ids() -> Set[str]:
     filters = {'label': CLUSTER_ID_LABEL_KEY}
     containers = client.containers.list(filters=filters)
     return set(
-        [container.labels[CLUSTER_ID_LABEL_KEY] for container in containers],
+        container.labels[CLUSTER_ID_LABEL_KEY] for container in containers
     )
 
 
