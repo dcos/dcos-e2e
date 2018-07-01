@@ -65,7 +65,20 @@ def get_homebrew_formula(version: str) -> str:
         """,
     )
 
-    return pattern.format(resource_stanzas=resource_stanzas, version=version)
+    recipe = pattern.format(resource_stanzas=resource_stanzas, version=version)
+
+    py_37_broken_pyyaml_url = 'https://files.pythonhosted.org/packages/4a/85/db5a2df477072b2902b0eb892feb37d88ac635d36245a72a6a69b23b383a/PyYAML-3.12.tar.gz'  # noqa: E501
+    py_37_broken_pyyaml_sha = '592766c6303207a20efc445587778322d7f73b161bd994f227adaa341ba212ab'  # noqa: E501
+
+    assert py_37_broken_pyyaml_url in recipe
+    assert py_37_broken_pyyaml_sha in recipe
+
+
+    working_pyyaml_url = 'https://github.com/yaml/pyyaml/archive/4.2b2.tar.gz'
+    working_pyyaml_sha = 'a204d840220a044ce782b5b5906d150dc053de0c'
+    recipe = recipe.replace(py_37_broken_pyyaml_url, working_pyyaml_url)
+    recipe = recipe.replace(py_37_broken_pyyaml_sha, working_pyyaml_sha)
+    return recipe
 
 
 def get_version() -> str:
