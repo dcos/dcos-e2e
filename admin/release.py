@@ -80,6 +80,8 @@ def get_homebrew_formula(version: str) -> str:
         """
     )
 
+    resource_stanzas += pyyaml_resource_stanza
+
     return pattern.format(resource_stanzas=resource_stanzas, version=version)
 
 
