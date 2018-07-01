@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.07.01.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.07.01.1.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -326,6 +326,11 @@ class Dcose2e < Formula
     url "https://files.pythonhosted.org/packages/28/85/df04ec21c622728316b591c2852fd20a0e74324eeb6ca26f351844ba815f/websocket_client-0.48.0.tar.gz"
     sha256 "18f1170e6a1b5463986739d9fd45c4308b0d025c1b2f9b88788d8f69e8a5eb4a"
   end
+
+resource "PyYAML" do
+  url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
+  sha256 "a204d840220a044ce782b5b5906d150dc053de0c"
+end
 
 
   def install
