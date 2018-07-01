@@ -4,7 +4,7 @@ Tools for listing clusters.
 
 import click
 
-from cli._common import existing_cluster_ids
+from ._common import existing_cluster_ids
 
 
 @click.command('list')

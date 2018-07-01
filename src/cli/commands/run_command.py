@@ -9,11 +9,12 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import click
 
-from cli._common import ClusterContainers, ContainerInspectView
-from cli._options import existing_cluster_id_option, node_transport_option
-from cli._validators import validate_path_is_directory
 from cli.commands.sync import sync_code
 from dcos_e2e.node import Node, Transport
+
+from ._common import ClusterContainers, ContainerInspectView
+from ._options import existing_cluster_id_option, node_transport_option
+from ._validators import validate_path_is_directory
 
 
 def _validate_environment_variable(

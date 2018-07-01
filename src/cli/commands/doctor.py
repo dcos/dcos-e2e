@@ -13,10 +13,11 @@ from tempfile import gettempdir, gettempprefix
 import click
 import docker
 
-from cli._common import DOCKER_STORAGE_DRIVERS, docker_client
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
+
+from ._common import DOCKER_STORAGE_DRIVERS, docker_client
 
 
 class _CheckLevels(IntEnum):

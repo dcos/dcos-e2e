@@ -22,7 +22,11 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
-from cli._common import (
+from dcos_e2e.backends import Docker
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Transport
+
+from ._common import (
     CLUSTER_ID_LABEL_KEY,
     DOCKER_STORAGE_DRIVERS,
     DOCKER_VERSIONS,
@@ -31,13 +35,10 @@ from cli._common import (
     WORKSPACE_DIR_LABEL_KEY,
     existing_cluster_ids,
 )
-from cli._options import node_transport_option
-from cli._utils import is_enterprise
-from cli._validators import validate_path_is_directory
-from cli.commands.wait import wait
-from dcos_e2e.backends import Docker
-from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Transport
+from ._options import node_transport_option
+from ._utils import is_enterprise
+from ._validators import validate_path_is_directory
+from .wait import wait
 
 
 def _validate_dcos_configuration(
