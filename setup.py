@@ -69,6 +69,6 @@ setup(
     dependency_links=DEPENDENCY_LINKS,
     entry_points="""
         [console_scripts]
-        dcos-docker=cli:dcos_docker
+        dcos-docker=cli.dcos_docker:dcos_docker
     """,
 )
