@@ -73,6 +73,9 @@ class TestDcosVagrant:
               --version      Show the version and exit.
               -v, --verbose
               --help         Show this message and exit.
+
+            Commands:
+              create  Create a DC/OS cluster.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -105,10 +108,7 @@ class TestCreate:
               Create a DC/OS cluster.
 
             Options:
-              --version      Show the version and exit.
-              -v, --verbose
-              --help         Show this message and exit.
-
+              --help  Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
