@@ -1,7 +1,7 @@
 Installation
 ------------
 
-DC/OS E2E consists of a :doc:`library` and a :doc:`cli`.
+DC/OS E2E consists of a :doc:`library` and a :doc:`dcos-docker-cli`.
 
 The CLI works only with the :doc:`docker-backend`, while the library supports multiple :doc:`backends`.
 The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
