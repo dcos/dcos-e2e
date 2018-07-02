@@ -25,7 +25,6 @@ The CLI can be installed with Homebrew on macOS, and the library and CLI can be 
 Windows is not currently supported, but we provide instructions on using DC/OS E2E on Windows with Vagrant on particular `backends`_\ ' documentation.
 
 .. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html
-.. _CLI: http://dcos-e2e.readthedocs.io/en/latest/cli.html
 .. _Docker backend: http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html
 .. _backends: http://dcos-e2e.readthedocs.io/en/latest/backends.html
 
@@ -145,7 +144,7 @@ A typical CLI workflow may look like this:
    ...
    $ dcos-docker destroy
 
-Each of these commands and more described in detail in the `full CLI documentation <http://dcos-e2e.readthedocs.io/en/latest/cli.html>`_.
+Each of these commands and more described in detail in the `full CLI documentation <CLI>`_.
 
 .. |Build Status| image:: https://travis-ci.org/dcos/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/dcos/dcos-e2e
@@ -156,3 +155,4 @@ Each of these commands and more described in detail in the `full CLI documentati
    :alt: Documentation Status
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
+.. _CLI: http://dcos-e2e.readthedocs.io/en/latest/cli.html
