@@ -73,8 +73,43 @@ class TestDcosVagrant:
               --version      Show the version and exit.
               -v, --verbose
               --help         Show this message and exit.
+
+            Commands:
+              create  Create a DC/OS cluster.
             """,# noqa: E501,E261
         )
         # yapf: enable
         assert result.output == expected_help
 
+
+class TestCreate:
+    """
+    Tests for the `create` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-vagrant create --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_vagrant,
+            ['create', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-vagrant create [OPTIONS] ARTIFACT
+
+              Create a DC/OS cluster.
+
+            Options:
+              --help  Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
