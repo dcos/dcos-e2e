@@ -7,6 +7,8 @@ from typing import Optional, Union
 
 import click
 
+from .commands.create import create
+
 
 def _set_logging(
     ctx: click.core.Context,
@@ -47,3 +49,6 @@ def dcos_vagrant(verbose: None) -> None:
     # We "use" variables to satisfy linting tools.
     for _ in (verbose, ):
         pass
+
+
+dcos_vagrant.add_command(create)
