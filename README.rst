@@ -19,14 +19,10 @@ Installation
 
 DC/OS E2E consists of a `library`_ and a `CLI`_.
 
-The CLI works only with the `Docker backend`_, while the library supports multiple `backends`_.
 The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
 
 Windows is not currently supported, but we provide instructions on using DC/OS E2E on Windows with Vagrant on particular `backends`_\ ' documentation.
 
-.. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html
-.. _Docker backend: http://dcos-e2e.readthedocs.io/en/latest/docker-backend.html
-.. _backends: http://dcos-e2e.readthedocs.io/en/latest/backends.html
 
 CLI on macOS With Homebrew or Linux with Linuxbrew
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -144,7 +140,7 @@ A typical CLI workflow may look like this:
    ...
    $ dcos-docker destroy
 
-Each of these commands and more described in detail in the `full CLI documentation <CLI>`_.
+Each of these commands and more described in detail in the full `CLI`_ documentation.
 
 .. |Build Status| image:: https://travis-ci.org/dcos/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/dcos/dcos-e2e
@@ -156,3 +152,4 @@ Each of these commands and more described in detail in the `full CLI documentati
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
 .. _CLI: http://dcos-e2e.readthedocs.io/en/latest/cli.html
+.. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html
