@@ -13,18 +13,11 @@ to capture what the help text actually is with:
        import pyperclip; pyperclip.copy(result.output)
 """
 
-import os
-import uuid
-from pathlib import Path
-from tempfile import mkstemp
 from textwrap import dedent
 from typing import List
 
 import pytest
 from click.testing import CliRunner
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from cli import dcos_vagrant
 
