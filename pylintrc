@@ -110,7 +110,7 @@ disable=line-too-long,
 
 [REPORTS]
 
-# Set the output format. Available formats are text, parseable, colorized, msvs
+# Set the output format. Available formats are text, parseable, colorFized, msvs
 # (visual studio) and html. You can also give a reporter class, eg
 # mypackage.mymodule.MyReporterClass.
 output-format=text

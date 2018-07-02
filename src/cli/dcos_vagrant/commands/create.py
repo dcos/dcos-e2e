@@ -5,6 +5,7 @@ Tools for creating a DC/OS cluster.
 import sys
 from pathlib import Path
 from subprocess import CalledProcessError
+from typing import Dict  # noqa: F401
 
 import click
 import click_spinner
@@ -23,7 +24,7 @@ def create(artifact: str) -> None:
     masters = 1
     agents = 1
     public_agents = 1
-    extra_config = {}
+    extra_config = {}  # type: Dict
 
     artifact_path = Path(artifact).resolve()
 
