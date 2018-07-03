@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.07.03.5
+------------
+
 - Add a ``--network`` option to the ``dcos-docker`` CLI.
 
 2018.07.03.0
