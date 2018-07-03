@@ -10,20 +10,30 @@ from typing import Dict  # noqa: F401
 import click
 import click_spinner
 
+from cli.common.options import (
+    agents_option,
+    masters_option,
+    public_agents_option,
+)
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
 
 @click.command('create')
 @click.argument('artifact', type=click.Path(exists=True))
-def create(artifact: str) -> None:
+@masters_option
+@agents_option
+@public_agents_option
+def create(
+    agents: int,
+    artifact: str,
+    masters: int,
+    public_agents: int,
+) -> None:
     """
     Create an OSS DC/OS cluster.
     """
     cluster_backend = Vagrant()
-    masters = 1
-    agents = 1
-    public_agents = 1
     extra_config = {}  # type: Dict
 
     artifact_path = Path(artifact).resolve()
