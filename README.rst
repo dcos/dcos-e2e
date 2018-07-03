@@ -17,9 +17,9 @@ See the full documentation on `Read the Docs <http://dcos-e2e.readthedocs.io/>`_
 Installation
 ------------
 
-DC/OS E2E consists of a `library`_ and a `CLI`_.
+DC/OS E2E consists of a `library`_ and various `CLI`_ tools.
 
-The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
+The tools CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
 
 Windows is not currently supported, but we provide instructions on using DC/OS E2E on Windows with Vagrant on particular `backends`_\ ' documentation.
 
@@ -43,7 +43,7 @@ To upgrade from an older version, run the following command:
 
     brew upgrade https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
 
-Run ``dcos-docker doctor`` to make sure that your system is ready to go:
+Run ``dcos-docker doctor`` to make sure that your system is ready to go for the ``dcos-docker`` CLI:
 
 .. code-block:: console
 
@@ -124,10 +124,10 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
 CLI
 ---
 
-There is also a CLI tool.
-This is useful for quickly creating, managing and destroying clusters.
+DC/OS E2E also provides multiple command line interface tools.
+These allow you to create, manage and destroy DC/OS clusters on various backends.
 
-A typical CLI workflow may look like this:
+A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
 
 .. code-block:: console
 
@@ -140,7 +140,10 @@ A typical CLI workflow may look like this:
    ...
    $ dcos-docker destroy
 
-Each of these commands and more described in detail in the full `CLI`_ documentation.
+
+Each of these commands and more are described in detail in the full `dcos-docker CLI`_ documentation.
+
+See the full `CLI`_ documentation for information on other CLI tools provided by DC/OS E2E.
 
 .. |Build Status| image:: https://travis-ci.org/dcos/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/dcos/dcos-e2e
@@ -151,5 +154,6 @@ Each of these commands and more described in detail in the full `CLI`_ documenta
    :alt: Documentation Status
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
+.. _CLI: http://dcos-e2e.readthedocs.io/en/latest/cli.html
 .. _CLI: http://dcos-e2e.readthedocs.io/en/latest/dcos-docker-cli.html
 .. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html

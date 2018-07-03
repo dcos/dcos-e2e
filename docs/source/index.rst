@@ -10,9 +10,9 @@ DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environm
 CLI
 ---
 
-DC/OS E2E also provides a command line interface for the Docker backend.
-It allows you to create, manage and destroy DC/OS clusters.
-See :doc:`dcos-docker-cli` for details.
+DC/OS E2E also provides multiple command line interface tools.
+These allow you to create, manage and destroy DC/OS clusters on various backends.
+See :doc:`cli` for details.
 
 Reference
 ---------
@@ -22,6 +22,7 @@ Reference
 
    installation
    library
+   cli
    dcos-docker-cli
    versioning-and-api-stability
    contributing
