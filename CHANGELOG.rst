@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.07.03.0
+------------
+
 - Add a ``dcos-vagrant`` CLI.
 
 2018.07.01.0
