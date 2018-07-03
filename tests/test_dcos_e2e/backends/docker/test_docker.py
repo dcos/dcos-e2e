@@ -497,3 +497,23 @@ class TestNetworks:
             bridge_ip_address = networks['bridge']['IPAddress']
             assert bridge_ip_address == str(master.public_ip_address)
             assert bridge_ip_address == str(master.private_ip_address)
+
+    def test_pass_bridge(self) -> None:
+        """
+        If the bridge network is given, the only network a container is in
+        is the Docker default bridge network.
+        """
+        client = docker.from_env(version='auto')
+        network = client.networks.get(network_id='bridge')
+        with Cluster(
+            cluster_backend=Docker(network=network),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            container = _get_container_from_node(master)
+            networks = container.attrs['NetworkSettings']['Networks']
+            assert networks.keys() == set(['bridge'])
+            bridge_ip_address = networks['bridge']['IPAddress']
+            assert bridge_ip_address == str(master.public_ip_address)
+            assert bridge_ip_address == str(master.private_ip_address)
