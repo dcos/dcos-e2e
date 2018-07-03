@@ -26,18 +26,7 @@ Each of these and more are described in detail below.
 
 .. _installation:
 
-Installation
-------------
-
-The CLI can be installed with Homebrew on macOS or Linuxbrew on Linux.
-The library and CLI can be installed together with ``pip`` on any Linux and macOS.
-See "Operating System" requirements for instructions on using the CLI on Windows in a Vagrant VM.
-
-.. include:: cli-homebrew.rst
-
-.. include:: cli-linuxbrew.rst
-
-.. include:: install-python.rst
+.. include:: install-cli.rst
 
 
 Creating a Cluster
