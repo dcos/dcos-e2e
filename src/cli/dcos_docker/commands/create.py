@@ -26,6 +26,7 @@ from cli.common.options import (
     extra_config_option,
     masters_option,
     public_agents_option,
+	workspace_dir_option,
 )
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -321,20 +322,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         '/absolute/local/path:/remote/path.'
     ),
 )
-@click.option(
-    '--workspace-dir',
-    type=click.Path(exists=True),
-    callback=validate_path_is_directory,
-    help=(
-        'Creating a cluster can use approximately 2 GB of temporary storage. '
-        'Set this option to use a custom "workspace" for this temporary '
-        'storage. '
-        'See '
-        'https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir '
-        'for details on the temporary directory location if this option is '
-        'not set.'
-    ),
-)
+@workspace_dir_option
 @click.option(
     '--custom-volume',
     type=str,
