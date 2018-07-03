@@ -3,9 +3,11 @@ Tools for creating a DC/OS cluster.
 """
 
 import sys
+import tempfile
+import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 import click_spinner
@@ -15,6 +17,7 @@ from cli.common.options import (
     extra_config_option,
     masters_option,
     public_agents_option,
+    workspace_dir_option,
 )
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
@@ -26,17 +29,21 @@ from dcos_e2e.cluster import Cluster
 @agents_option
 @extra_config_option
 @public_agents_option
+@workspace_dir_option
 def create(
     agents: int,
     artifact: str,
     extra_config: Dict[str, Any],
     masters: int,
     public_agents: int,
+    workspace_dir: Optional[Path],
 ) -> None:
     """
     Create an OSS DC/OS cluster.
     """
-    cluster_backend = Vagrant()
+    base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
+    workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    cluster_backend = Vagrant(workspace_dir=workspace_dir)
 
     artifact_path = Path(artifact).resolve()
 
