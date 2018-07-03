@@ -11,7 +11,6 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
-import vagrant
 import yaml
 
 from dcos_e2e.node import Node
@@ -117,6 +116,13 @@ class VagrantCluster(ClusterManager):
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(vm_names),
         }
+
+        # We import Vagrant here instead of at the top of the file because, if
+        # the Vagrant executable is not found, a warning is logged.
+        #
+        # We want to avoid that warning for users of other backends who do not
+        # have the Vagrant executable.
+        import vagrant
         self._vagrant_client = vagrant.Vagrant(
             root=str(path),
             env=vagrant_env,
