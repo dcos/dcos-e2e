@@ -18,6 +18,7 @@ import docker
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
@@ -46,6 +47,23 @@ from ._options import node_transport_option
 from ._utils import is_enterprise
 from .wait import wait
 
+def _validate_docker_network(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Network:
+    client = docker.from_env(version='auto')
+    try:
+        return client.networks.get(network_id=value)
+    except docker.errors.NotFound:
+        message = (
+            'No such Docker network with the name "{value}".\n'
+            'Docker networks are:\n{networks}'
+        ).format(
+            value=value,
+            networks='\n'.join([network.name for network in client.networks.list()]),
+        )
+        raise click.BadParameter(message=message)
 
 def _validate_path_pair(
     ctx: click.core.Context,
@@ -434,6 +452,7 @@ def create(
     variant: str,
     transport: Transport,
     wait_for_dcos: bool,
+    network: Network,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -532,6 +551,7 @@ def create(
         docker_public_agent_labels={'node_type': 'public_agent'},
         workspace_dir=workspace_dir,
         transport=transport,
+        network=Network,
     )
 
     try:
