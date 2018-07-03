@@ -7,7 +7,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from textwrap import dedent
+from textwrap import dedent, indent
 
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
@@ -70,7 +70,7 @@ def get_homebrew_formula(version: str) -> str:
     )
 
     # The version of PyYAML on PyPI does not work on Python 3.7.
-    pyyaml_resource_stanza = (
+    pyyaml_resource_stanza = dedent(
         """\
         resource "PyYAML" do
           url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
@@ -81,7 +81,8 @@ def get_homebrew_formula(version: str) -> str:
         sha='851e17742830a79dacba60b06ad1cc52b67b0a4e78433d442c74756ceebe23b8',
     )
 
-    resource_stanzas += pyyaml_resource_stanza
+    resource_stanzas += '\n'
+    resource_stanzas += indent(text=pyyaml_resource_stanza, prefix='  ')
 
     return pattern.format(resource_stanzas=resource_stanzas, version=version)
 
