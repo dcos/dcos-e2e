@@ -47,11 +47,18 @@ from ._options import node_transport_option
 from ._utils import is_enterprise
 from .wait import wait
 
+
 def _validate_docker_network(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
 ) -> Network:
+    """
+    Validate that a given network name is an existing Docker network name.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
     client = docker.from_env(version='auto')
     try:
         return client.networks.get(network_id=value)
@@ -61,9 +68,12 @@ def _validate_docker_network(
             'Docker networks are:\n{networks}'
         ).format(
             value=value,
-            networks='\n'.join([network.name for network in client.networks.list()]),
+            networks='\n'.join(
+                [network.name for network in client.networks.list()],
+            ),
         )
         raise click.BadParameter(message=message)
+
 
 def _validate_path_pair(
     ctx: click.core.Context,
@@ -551,7 +561,7 @@ def create(
         docker_public_agent_labels={'node_type': 'public_agent'},
         workspace_dir=workspace_dir,
         transport=transport,
-        network=Network,
+        network=network,
     )
 
     try:
