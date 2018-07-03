@@ -6,6 +6,8 @@ The ``dcos-vagrant`` CLI allows you to create open source DC/OS clusters on Vagr
 .. contents::
    :local:
 
+.. include:: vagrant-backend-requirements.rst
+
 .. include:: install-cli.rst
 
 CLI Reference
