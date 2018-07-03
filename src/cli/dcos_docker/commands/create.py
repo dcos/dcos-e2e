@@ -396,6 +396,19 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         'and so the cluster may not be fully ready.'
     ),
 )
+@click.option(
+    '--network',
+    default='bridge',
+    type=str,
+    callback=_validate_docker_network,
+    help=(
+        'The Docker network containers will be connected to.'
+        'It may not be possible to SSH to containers on a custom network on '
+        'macOS. '
+        'Therefore, it is recommended that you use this in conjunction with '
+        'the "--transport" option.'
+    ),
+)
 @node_transport_option
 @click.pass_context
 def create(
