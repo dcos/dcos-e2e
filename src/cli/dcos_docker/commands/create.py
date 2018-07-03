@@ -26,8 +26,9 @@ from cli.common.options import (
     extra_config_option,
     masters_option,
     public_agents_option,
-	workspace_dir_option,
+    workspace_dir_option,
 )
+from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
@@ -43,7 +44,6 @@ from ._common import (
 )
 from ._options import node_transport_option
 from ._utils import is_enterprise
-from ._validators import validate_path_is_directory
 from .wait import wait
 
 
