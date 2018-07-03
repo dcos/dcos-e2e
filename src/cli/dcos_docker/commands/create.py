@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import click
 import click_spinner
 import docker
-import yaml
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -24,6 +23,7 @@ from passlib.hash import sha512_crypt
 
 from cli.common.options import (
     agents_option,
+    extra_config_option,
     masters_option,
     public_agents_option,
 )
@@ -44,35 +44,6 @@ from ._options import node_transport_option
 from ._utils import is_enterprise
 from ._validators import validate_path_is_directory
 from .wait import wait
-
-
-def _validate_dcos_configuration(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Union[int, bool, str],
-) -> Dict[str, Any]:
-    """
-    Validate that a given value is a file containing a YAML map.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value is None:
-        return {}
-
-    content = Path(str(value)).read_text()
-
-    try:
-        return dict(yaml.load(content) or {})
-    except ValueError:
-        message = '"{content}" is not a valid DC/OS configuration'.format(
-            content=content,
-        )
-    except yaml.YAMLError:
-        message = '"{content}" is not valid YAML'.format(content=content)
-
-    raise click.BadParameter(message=message)
 
 
 def _validate_path_pair(
@@ -297,16 +268,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 @masters_option
 @agents_option
 @public_agents_option
-@click.option(
-    '--extra-config',
-    type=click.Path(exists=True),
-    callback=_validate_dcos_configuration,
-    help=(
-        'The path to a file including DC/OS configuration YAML. '
-        'The contents of this file will be added to add to a default '
-        'configuration.'
-    ),
-)
+@extra_config_option
 @click.option(
     '--security-mode',
     type=click.Choice(['disabled', 'permissive', 'strict']),

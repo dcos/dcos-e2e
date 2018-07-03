@@ -103,6 +103,9 @@ class TestCreate:
             Options:
               --masters INTEGER        The number of master nodes.  [default: 1]
               --agents INTEGER         The number of agent nodes.  [default: 1]
+              --extra-config PATH      The path to a file including DC/OS configuration
+                                       YAML. The contents of this file will be added to add
+                                       to a default configuration.
               --public-agents INTEGER  The number of public agent nodes.  [default: 1]
               --help                   Show this message and exit.
             """,# noqa: E501,E261
