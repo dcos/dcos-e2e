@@ -24,6 +24,7 @@ Reference
    library
    cli
    dcos-docker-cli
+   dcos-vagrant-cli
    versioning-and-api-stability
    contributing
 
