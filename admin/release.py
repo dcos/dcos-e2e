@@ -40,7 +40,7 @@ def get_homebrew_formula(version: str) -> str:
         args.append('--also')
         args.append(requirement)
 
-    result = subprocess.run(args=args, stdout=subprocess.PIPE)
+    result = subprocess.run(args=args, stdout=subprocess.PIPE, check=True)
     resource_stanzas = str(result.stdout.decode())
 
     pattern = dedent(
