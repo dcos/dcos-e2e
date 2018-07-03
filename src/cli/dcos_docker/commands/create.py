@@ -22,7 +22,11 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
-from cli.common.options import masters_option
+from cli.common.options import (
+    agents_option,
+    masters_option,
+    public_agents_option,
+)
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
@@ -291,20 +295,8 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     ),
 )
 @masters_option
-@click.option(
-    '--agents',
-    type=click.INT,
-    default=1,
-    show_default=True,
-    help='The number of agent nodes.',
-)
-@click.option(
-    '--public-agents',
-    type=click.INT,
-    default=1,
-    show_default=True,
-    help='The number of public agent nodes.',
-)
+@agents_option
+@public_agents_option
 @click.option(
     '--extra-config',
     type=click.Path(exists=True),
