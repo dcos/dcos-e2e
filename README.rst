@@ -155,5 +155,6 @@ See the full `CLI`_ documentation for information on other CLI tools provided by
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
 .. _CLI: http://dcos-e2e.readthedocs.io/en/latest/cli.html
-.. _CLI: http://dcos-e2e.readthedocs.io/en/latest/dcos-docker-cli.html
+.. _dcos-docker CLI: http://dcos-e2e.readthedocs.io/en/latest/dcos-docker-cli.html
 .. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html
+.. _backends: http://dcos-e2e.readthedocs.io/en/latest/backends.html
