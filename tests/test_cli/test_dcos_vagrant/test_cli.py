@@ -68,7 +68,7 @@ class TestDcosVagrant:
               --help         Show this message and exit.
 
             Commands:
-              create  Create a DC/OS cluster.
+              create  Create an OSS DC/OS cluster.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -98,7 +98,7 @@ class TestCreate:
             """\
             Usage: dcos-vagrant create [OPTIONS] ARTIFACT
 
-              Create a DC/OS cluster.
+              Create an OSS DC/OS cluster.
 
             Options:
               --help  Show this message and exit.
