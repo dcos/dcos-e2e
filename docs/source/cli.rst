@@ -7,5 +7,6 @@ DC/OS E2E comes with multiple CLI tools.
    :maxdepth: 1
 
    dcos-docker-cli
+   dcos-vagrant-cli
 
 .. include:: install-cli.rst
