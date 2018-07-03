@@ -18,6 +18,7 @@ import docker
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
@@ -45,6 +46,33 @@ from ._common import (
 from ._options import node_transport_option
 from ._utils import is_enterprise
 from .wait import wait
+
+
+def _validate_docker_network(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Network:
+    """
+    Validate that a given network name is an existing Docker network name.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+    client = docker.from_env(version='auto')
+    try:
+        return client.networks.get(network_id=value)
+    except docker.errors.NotFound:
+        message = (
+            'No such Docker network with the name "{value}".\n'
+            'Docker networks are:\n{networks}'
+        ).format(
+            value=value,
+            networks='\n'.join(
+                [network.name for network in client.networks.list()],
+            ),
+        )
+        raise click.BadParameter(message=message)
 
 
 def _validate_path_pair(
@@ -396,6 +424,19 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         'and so the cluster may not be fully ready.'
     ),
 )
+@click.option(
+    '--network',
+    default='bridge',
+    type=str,
+    callback=_validate_docker_network,
+    help=(
+        'The Docker network containers will be connected to.'
+        'It may not be possible to SSH to containers on a custom network on '
+        'macOS. '
+        'Therefore, it is recommended that you use this in conjunction with '
+        'the "--transport" option.'
+    ),
+)
 @node_transport_option
 @click.pass_context
 def create(
@@ -421,6 +462,7 @@ def create(
     variant: str,
     transport: Transport,
     wait_for_dcos: bool,
+    network: Network,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -519,6 +561,7 @@ def create(
         docker_public_agent_labels={'node_type': 'public_agent'},
         workspace_dir=workspace_dir,
         transport=transport,
+        network=network,
     )
 
     try:
