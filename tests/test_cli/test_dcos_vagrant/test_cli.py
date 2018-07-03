@@ -101,7 +101,10 @@ class TestCreate:
               Create an OSS DC/OS cluster.
 
             Options:
-              --help  Show this message and exit.
+              --masters INTEGER        The number of master nodes.  [default: 1]
+              --agents INTEGER         The number of agent nodes.  [default: 1]
+              --public-agents INTEGER  The number of public agent nodes.  [default: 1]
+              --help                   Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
