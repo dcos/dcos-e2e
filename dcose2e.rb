@@ -327,10 +327,10 @@ class Dcose2e < Formula
     sha256 "18f1170e6a1b5463986739d9fd45c4308b0d025c1b2f9b88788d8f69e8a5eb4a"
   end
 
-resource "PyYAML" do
-  url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
-  sha256 "851e17742830a79dacba60b06ad1cc52b67b0a4e78433d442c74756ceebe23b8"
-end
+  resource "PyYAML" do
+    url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
+    sha256 "851e17742830a79dacba60b06ad1cc52b67b0a4e78433d442c74756ceebe23b8"
+  end
 
 
   def install
