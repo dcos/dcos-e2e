@@ -120,6 +120,7 @@ def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     )(command)  # type: Callable[..., None]
     return function
 
+
 def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
     """
     An argument decorator for a DC/OS artifact.
