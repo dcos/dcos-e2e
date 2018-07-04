@@ -14,6 +14,7 @@ import click_spinner
 
 from cli.common.options import (
     agents_option,
+    artifact_argument,
     extra_config_option,
     masters_option,
     public_agents_option,
@@ -24,7 +25,7 @@ from dcos_e2e.cluster import Cluster
 
 
 @click.command('create')
-@click.argument('artifact', type=click.Path(exists=True))
+@artifact_argument
 @masters_option
 @agents_option
 @extra_config_option
