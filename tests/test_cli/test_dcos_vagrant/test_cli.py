@@ -158,5 +158,9 @@ class TestDoctor:
         No exception is raised by the ``doctor`` subcommand.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_vagrant, ['doctor'], catch_exceptions=False)
+        result = runner.invoke(
+            dcos_vagrant,
+            ['doctor'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
