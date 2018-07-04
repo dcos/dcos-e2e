@@ -76,7 +76,7 @@ def get_homebrew_formula(version: str) -> str:
           url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
           sha256 "{sha}"
         end
-        """
+        """,
     ).format(
         sha='851e17742830a79dacba60b06ad1cc52b67b0a4e78433d442c74756ceebe23b8',
     )

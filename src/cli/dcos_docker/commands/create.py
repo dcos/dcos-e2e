@@ -24,6 +24,7 @@ from passlib.hash import sha512_crypt
 
 from cli.common.options import (
     agents_option,
+    artifact_argument,
     extra_config_option,
     masters_option,
     public_agents_option,
@@ -269,7 +270,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
 
 @click.command('create')
-@click.argument('artifact', type=click.Path(exists=True))
+@artifact_argument
 @click.option(
     '--docker-version',
     type=click.Choice(sorted(DOCKER_VERSIONS.keys())),
