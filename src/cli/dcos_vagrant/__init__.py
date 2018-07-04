@@ -8,6 +8,7 @@ from typing import Optional, Union
 import click
 
 from .commands.create import create
+from .commands.doctor import doctor
 
 
 def _set_logging(
@@ -52,3 +53,4 @@ def dcos_vagrant(verbose: None) -> None:
 
 
 dcos_vagrant.add_command(create)
+dcos_vagrant.add_command(doctor)

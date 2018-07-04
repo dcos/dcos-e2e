@@ -69,6 +69,7 @@ class TestDcosVagrant:
 
             Commands:
               create  Create an OSS DC/OS cluster.
+              doctor  Diagnose common issues which stop DC/OS E2E...
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -118,3 +119,44 @@ class TestCreate:
         )
         # yapf: enable
         assert result.output == expected_help
+
+
+class TestDoctor:
+    """
+    Tests for the ``doctor`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-vagrant doctor --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_vagrant,
+            ['doctor', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-vagrant doctor [OPTIONS]
+
+              Diagnose common issues which stop DC/OS E2E from working correctly.
+
+            Options:
+              --help  Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+    def test_doctor(self) -> None:
+        """
+        No exception is raised by the ``doctor`` subcommand.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_vagrant, ['doctor'], catch_exceptions=False)
+        assert result.exit_code == 0
