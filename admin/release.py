@@ -128,7 +128,7 @@ def create_github_release(
     Create a tag and release on GitHub.
     """
     github_client = Github(github_token)
-    org = github_client.get_organization('mesosphere')
+    org = github_client.get_organization('dcos')
     repository = org.get_repo('dcos-e2e')
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
     repository.create_git_tag_and_release(
@@ -154,7 +154,7 @@ def commit_and_push(version: str) -> None:
     branch_name = 'master'
     push(
         repo=repo,
-        remote_location='git@github.com:mesosphere/dcos-e2e.git',
+        remote_location='git@github.com:dcos/dcos-e2e.git',
         refspecs=branch_name.encode('utf-8'),
     )
 
