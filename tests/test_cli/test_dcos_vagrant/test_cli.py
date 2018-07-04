@@ -107,6 +107,12 @@ class TestCreate:
                                        YAML. The contents of this file will be added to add
                                        to a default configuration.
               --public-agents INTEGER  The number of public agent nodes.  [default: 1]
+              --workspace-dir PATH     Creating a cluster can use approximately 2 GB of
+                                       temporary storage. Set this option to use a custom
+                                       "workspace" for this temporary storage. See https://d
+                                       ocs.python.org/3/library/tempfile.html#tempfile.gette
+                                       mpdir for details on the temporary directory location
+                                       if this option is not set.
               --help                   Show this message and exit.
             """,# noqa: E501,E261
         )

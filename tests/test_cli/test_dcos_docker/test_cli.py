@@ -219,6 +219,11 @@ class TestCreate:
                                               transport is "docker-exec", this will skip
                                               HTTP checks and so the cluster may not be
                                               fully ready.
+              --network TEXT                  The Docker network containers will be
+                                              connected to.It may not be possible to SSH to
+                                              containers on a custom network on macOS.
+                                              Therefore, it is recommended that you use this
+                                              in conjunction with the "--transport" option.
               --transport [docker-exec|ssh]   The communication transport to use. On macOS
                                               the SSH transport requires IP routing to be
                                               set up. See "dcos-docker setup-mac-network".It
