@@ -15,7 +15,10 @@ Vagrant
 ~~~~~~~
 
 `Vagrant`_ must be installed.
-This has been tested with Vagrant 2.1.1.
+This has been tested with:
+
+* Vagrant 2.1.1
+* Vagrant 2.1.2
 
 VirtualBox
 ~~~~~~~~~~
