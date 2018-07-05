@@ -5,14 +5,13 @@ Checks for showing up common sources of errors with the Docker backend.
 import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
 import click
 import docker
 
-from cli.common.doctor import CheckLevels, error, info, warn
+from cli.common.doctor import CheckLevels, check_1_9_sed, error, info, warn
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
@@ -300,30 +299,6 @@ def _link_to_troubleshooting() -> None:
     info(message=message)
 
 
-def _check_1_9_sed() -> CheckLevels:
-    """
-    Warn if the system's version of ``sed`` is incompatible with legacy DC/OS
-    installers.
-    """
-    temp = tempfile.NamedTemporaryFile()
-    Path(temp.name).write_text('a\na')
-    sed_args = "sed '0,/a/ s/a/b/' " + temp.name
-    result = subprocess.check_output(args=sed_args, shell=True)
-
-    if result != b'b\na':
-        message = (
-            'The version of ``sed`` is not compatible with installers for '
-            'DC/OS 1.9 and below. '
-            'See '
-            'http://dcos-e2e.readthedocs.io/en/latest/versioning-and-api-stability.html#dc-os-1-9-and-below'  # noqa: E501
-            '.'
-        )
-        warn(message=message)
-        return CheckLevels.WARNING
-
-    return CheckLevels.NONE
-
-
 def _check_selinux() -> CheckLevels:
     """
     Error if SELinux is enabled.
@@ -435,7 +410,7 @@ def doctor() -> None:
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     check_functions = [
-        _check_1_9_sed,
+        check_1_9_sed,
         _check_docker_root_free_space,
         _check_docker_supports_mounts,
         _check_memory,
