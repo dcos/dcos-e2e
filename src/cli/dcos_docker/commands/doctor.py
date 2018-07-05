@@ -5,14 +5,13 @@ Checks for showing up common sources of errors with the Docker backend.
 import shutil
 import subprocess
 import sys
-import tempfile
-from enum import IntEnum
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
 import click
 import docker
 
+from cli.common.doctor import CheckLevels, check_1_9_sed, error, info, warn
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
@@ -20,44 +19,7 @@ from dcos_e2e.docker_versions import DockerVersion
 from ._common import DOCKER_STORAGE_DRIVERS, docker_client
 
 
-class _CheckLevels(IntEnum):
-    """
-    Levels of issues that a check can raise.
-    """
-
-    NONE = 1
-    WARNING = 2
-    ERROR = 3
-
-
-def _info(message: str) -> None:
-    """
-    Show an info message.
-    """
-    click.echo()
-    click.echo(click.style('Note: ', fg='blue'), nl=False)
-    click.echo(message)
-
-
-def _warn(message: str) -> None:
-    """
-    Show a warning message.
-    """
-    click.echo()
-    click.echo(click.style('Warning: ', fg='yellow'), nl=False)
-    click.echo(message)
-
-
-def _error(message: str) -> None:
-    """
-    Show an error message.
-    """
-    click.echo()
-    click.echo(click.style('Error: ', fg='red'), nl=False)
-    click.echo(message)
-
-
-def _check_tmp_free_space() -> _CheckLevels:
+def _check_tmp_free_space() -> CheckLevels:
     """
     Warn if there is not enough free space in the default temporary directory.
     """
@@ -78,13 +40,13 @@ def _check_tmp_free_space() -> _CheckLevels:
     )
 
     if free_space_gb < 5:
-        _warn(message=low_space_message)
-        return _CheckLevels.WARNING
+        warn(message=low_space_message)
+        return CheckLevels.WARNING
 
-    return _CheckLevels.NONE
+    return CheckLevels.NONE
 
 
-def _check_docker_root_free_space() -> _CheckLevels:
+def _check_docker_root_free_space() -> CheckLevels:
     """
     Warn if there is not enough free space in the Docker root directory.
     """
@@ -124,13 +86,13 @@ def _check_docker_root_free_space() -> _CheckLevels:
     # The choice of 5 GB is arbitrary. Let's see how it goes in practice and
     # potentially adjust later.
     if available_gigabytes < 5:
-        _warn(message=low_space_message)
-        return _CheckLevels.WARNING
+        warn(message=low_space_message)
+        return CheckLevels.WARNING
 
-    return _CheckLevels.NONE
+    return CheckLevels.NONE
 
 
-def _check_storage_driver() -> _CheckLevels:
+def _check_storage_driver() -> CheckLevels:
     """
     Warn if the Docker storage driver is not a recommended driver.
     """
@@ -174,8 +136,8 @@ def _check_storage_driver() -> _CheckLevels:
             supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
             help_url=storage_driver_url,
         )
-        _error(message=message)
-        return _CheckLevels.ERROR
+        error(message=message)
+        return CheckLevels.ERROR
 
     if not supported_host_driver:
         message = (
@@ -187,27 +149,27 @@ def _check_storage_driver() -> _CheckLevels:
             supported_drivers=', '.join(sorted(DOCKER_STORAGE_DRIVERS.keys())),
             help_url=storage_driver_url,
         )
-        _warn(message=message)
-        return _CheckLevels.WARNING
+        warn(message=message)
+        return CheckLevels.WARNING
 
-    return _CheckLevels.NONE
+    return CheckLevels.NONE
 
 
-def _check_ssh() -> _CheckLevels:
+def _check_ssh() -> CheckLevels:
     """
     Error if `ssh` is not available on the path.
     """
     if shutil.which('ssh') is None:
-        _error(message='`ssh` must be available on your path.')
-        return _CheckLevels.ERROR
-    return _CheckLevels.NONE
+        error(message='`ssh` must be available on your path.')
+        return CheckLevels.ERROR
+    return CheckLevels.NONE
 
 
-def _check_networking() -> _CheckLevels:
+def _check_networking() -> CheckLevels:
     """
     Error if the Docker network is not set up correctly.
     """
-    highest_level = _CheckLevels.NONE
+    highest_level = CheckLevels.NONE
     # Image for a container which sleeps for a long time.
     tiny_image = 'luca3m/sleep'
     client = docker_client()
@@ -243,19 +205,19 @@ def _check_networking() -> _CheckLevels:
                 'We recommend using "dcos-docker setup-mac-network" to '
                 'resolve this issue.'
             )
-        _error(message=message)
-        highest_level = _CheckLevels.ERROR
+        error(message=message)
+        highest_level = CheckLevels.ERROR
 
     ping_container.stop()
     ping_container.remove(v=True)
     return highest_level
 
 
-def _check_mount_tmp() -> _CheckLevels:
+def _check_mount_tmp() -> CheckLevels:
     """
     Error if it is not possible to mount the temporary directory.
     """
-    highest_level = _CheckLevels.NONE
+    highest_level = CheckLevels.NONE
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
     tiny_image = 'luca3m/sleep'
@@ -286,15 +248,15 @@ def _check_mount_tmp() -> _CheckLevels:
                 'backslashreplace',
             ),
         )
-        _error(message=message)
-        highest_level = _CheckLevels.ERROR
+        error(message=message)
+        highest_level = CheckLevels.ERROR
 
     private_mount_container.stop()
     private_mount_container.remove(v=True)
     return highest_level
 
 
-def _check_memory() -> _CheckLevels:
+def _check_memory() -> CheckLevels:
     """
     Show information about the memory available to Docker.
     """
@@ -319,11 +281,11 @@ def _check_memory() -> _CheckLevels:
     if docker_for_mac:
         message += mac_message
 
-    _info(message=message)
-    return _CheckLevels.NONE
+    info(message=message)
+    return CheckLevels.NONE
 
 
-def _link_to_troubleshooting() -> _CheckLevels:
+def _link_to_troubleshooting() -> None:
     """
     Link to documentation for further troubleshooting.
     """
@@ -334,41 +296,16 @@ def _link_to_troubleshooting() -> _CheckLevels:
         '.'
     )
 
-    _info(message=message)
-    return _CheckLevels.NONE
+    info(message=message)
 
 
-def _check_1_9_sed() -> _CheckLevels:
-    """
-    Warn if the system's version of ``sed`` is incompatible with legacy DC/OS
-    installers.
-    """
-    temp = tempfile.NamedTemporaryFile()
-    Path(temp.name).write_text('a\na')
-    sed_args = "sed '0,/a/ s/a/b/' " + temp.name
-    result = subprocess.check_output(args=sed_args, shell=True)
-
-    if result != b'b\na':
-        message = (
-            'The version of ``sed`` is not compatible with installers for '
-            'DC/OS 1.9 and below. '
-            'See '
-            'http://dcos-e2e.readthedocs.io/en/latest/versioning-and-api-stability.html#dc-os-1-9-and-below'  # noqa: E501
-            '.'
-        )
-        _warn(message=message)
-        return _CheckLevels.WARNING
-
-    return _CheckLevels.NONE
-
-
-def _check_selinux() -> _CheckLevels:
+def _check_selinux() -> CheckLevels:
     """
     Error if SELinux is enabled.
     This can cause problems such as mount problems for the installer.
     """
     if shutil.which('getenforce') is None:
-        return _CheckLevels.NONE
+        return CheckLevels.NONE
 
     result = subprocess.check_output(args=['getenforce'])
     if result == b'Enforcing':
@@ -376,13 +313,13 @@ def _check_selinux() -> _CheckLevels:
             'SELinux is in "Enforcing" mode. '
             'SELinux must be in "Permissive" or "Disabled" mode.'
         )
-        _error(message=message)
-        return _CheckLevels.ERROR
+        error(message=message)
+        return CheckLevels.ERROR
 
-    return _CheckLevels.NONE
+    return CheckLevels.NONE
 
 
-def _check_docker_supports_mounts() -> _CheckLevels:
+def _check_docker_supports_mounts() -> CheckLevels:
     """
     This is to avoid:
 
@@ -407,17 +344,17 @@ def _check_docker_supports_mounts() -> _CheckLevels:
                 'The Docker API version must be >= 1.30. '
                 'This is because DC/OS E2E uses the ``mounts`` parameter.'
             )
-            _error(message=message)
-            return _CheckLevels.ERROR
+            error(message=message)
+            return CheckLevels.ERROR
         raise
 
     container.stop()
     container.remove(v=True)
 
-    return _CheckLevels.NONE
+    return CheckLevels.NONE
 
 
-def _check_can_mount_in_docker() -> _CheckLevels:
+def _check_can_mount_in_docker() -> CheckLevels:
     """
     Check for an incompatibility between some systemd versions and some
     versions of Docker.
@@ -461,10 +398,10 @@ def _check_can_mount_in_docker() -> _CheckLevels:
                 ' To do this in the Python library, pass a '
                 '``docker_version`` parameter to the ``Docker`` backend class.'
             )
-            _warn(message=message)
-            return _CheckLevels.WARNING
+            warn(message=message)
+            return CheckLevels.WARNING
 
-    return _CheckLevels.NONE
+    return CheckLevels.NONE
 
 
 @click.command('doctor')
@@ -473,7 +410,7 @@ def doctor() -> None:
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     check_functions = [
-        _check_1_9_sed,
+        check_1_9_sed,
         _check_docker_root_free_space,
         _check_docker_supports_mounts,
         _check_memory,
@@ -489,5 +426,5 @@ def doctor() -> None:
     highest_level = max(function() for function in check_functions)
 
     _link_to_troubleshooting()
-    if highest_level == _CheckLevels.ERROR:
+    if highest_level == CheckLevels.ERROR:
         sys.exit(1)
