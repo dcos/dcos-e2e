@@ -45,6 +45,7 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     cluster_backend = Vagrant(workspace_dir=workspace_dir)
+    doctor_message = 'Try `dcos-vagrant doctor` for troubleshooting help.'
 
     artifact_path = Path(artifact).resolve()
 
@@ -58,6 +59,7 @@ def create(
         )
     except CalledProcessError as exc:
         click.echo('Error creating cluster.', err=True)
+        click.echo(doctor_message)
         sys.exit(exc.returncode)
 
     try:
@@ -71,5 +73,6 @@ def create(
             )
     except CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)
+        click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
