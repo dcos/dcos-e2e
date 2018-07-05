@@ -7,7 +7,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from textwrap import dedent, indent
+from textwrap import dedent
 
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
@@ -30,10 +30,6 @@ def get_homebrew_formula(version: str) -> str:
     # The 'secretstorage' distribution was not found and is required by keyring
     requirements.append('secretstorage')
     first = requirements[0]
-
-    # The version of PyYAML on PyPI does not work on Python 3.7.
-    # We manually add a stanza later.
-    requirements.remove('PyYAML>=3.12')
 
     args = ['poet', first]
     for requirement in requirements[1:]:
@@ -68,21 +64,6 @@ def get_homebrew_formula(version: str) -> str:
         end
         """,
     )
-
-    # The version of PyYAML on PyPI does not work on Python 3.7.
-    pyyaml_resource_stanza = dedent(
-        """\
-        resource "PyYAML" do
-          url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
-          sha256 "{sha}"
-        end
-        """,
-    ).format(
-        sha='851e17742830a79dacba60b06ad1cc52b67b0a4e78433d442c74756ceebe23b8',
-    )
-
-    resource_stanzas += '\n'
-    resource_stanzas += indent(text=pyyaml_resource_stanza, prefix='  ')
 
     return pattern.format(resource_stanzas=resource_stanzas, version=version)
 
