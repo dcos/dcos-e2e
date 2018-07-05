@@ -11,7 +11,14 @@ from tempfile import gettempdir, gettempprefix
 import click
 import docker
 
-from cli.common.doctor import CheckLevels, check_1_9_sed, error, info, warn
+from cli.common.doctor import (
+    CheckLevels,
+    check_1_9_sed,
+    check_ssh,
+    error,
+    info,
+    warn,
+)
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
@@ -152,16 +159,6 @@ def _check_storage_driver() -> CheckLevels:
         warn(message=message)
         return CheckLevels.WARNING
 
-    return CheckLevels.NONE
-
-
-def _check_ssh() -> CheckLevels:
-    """
-    Error if `ssh` is not available on the path.
-    """
-    if shutil.which('ssh') is None:
-        error(message='`ssh` must be available on your path.')
-        return CheckLevels.ERROR
     return CheckLevels.NONE
 
 
@@ -417,7 +414,7 @@ def doctor() -> None:
         _check_mount_tmp,
         _check_networking,
         _check_selinux,
-        _check_ssh,
+        check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
         _check_can_mount_in_docker,

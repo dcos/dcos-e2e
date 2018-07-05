@@ -6,7 +6,7 @@ import sys
 
 import click
 
-from cli.common.doctor import CheckLevels, check_1_9_sed
+from cli.common.doctor import CheckLevels, check_1_9_sed, check_ssh
 
 
 @click.command('doctor')
@@ -16,6 +16,7 @@ def doctor() -> None:
     """
     check_functions = [
         check_1_9_sed,
+        check_ssh,
     ]
 
     highest_level = max(function() for function in check_functions)
