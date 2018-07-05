@@ -6,6 +6,11 @@ Hardware
 
 A minimum of 2 GB of free memory is required per DC/OS node.
 
+``ssh``
+~~~~~~~
+
+The ``ssh`` command must be available to use the :py:class:`~dcos_e2e.node.Transport.SSH` transport.
+
 Vagrant
 ~~~~~~~
 
