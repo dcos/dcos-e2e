@@ -19,6 +19,7 @@ def check_vagrant() -> CheckLevels:
         return CheckLevels.ERROR
     return CheckLevels.NONE
 
+
 def check_vagrant_plugins() -> CheckLevels:
     """
     Error if `vagrant-vbguest` is not installed.
