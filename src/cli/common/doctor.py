@@ -2,6 +2,7 @@
 Common helpers for doctor commands.
 """
 
+import shutil
 import subprocess
 import tempfile
 from enum import IntEnum
@@ -68,4 +69,14 @@ def check_1_9_sed() -> CheckLevels:
         warn(message=message)
         return CheckLevels.WARNING
 
+    return CheckLevels.NONE
+
+
+def check_ssh() -> CheckLevels:
+    """
+    Error if `ssh` is not available on the path.
+    """
+    if shutil.which('ssh') is None:
+        error(message='`ssh` must be available on the PATH.')
+        return CheckLevels.ERROR
     return CheckLevels.NONE
