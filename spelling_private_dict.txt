@@ -122,6 +122,7 @@ utils
 vagrantfile
 validator
 validators
+vbguest
 vendored
 vendoring
 versioning
