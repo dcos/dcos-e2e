@@ -26,6 +26,7 @@ class Vagrant(ClusterBackend):
     def __init__(
         self,
         workspace_dir: Optional[Path] = None,
+        vm_name_prefix: str = '',
     ) -> None:
         """
         Create a configuration for a Vagrant cluster backend.
@@ -35,12 +36,15 @@ class Vagrant(ClusterBackend):
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
+            vm_name_prefix: The prefix for VirtualBox VMs.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            vm_name_prefix: The prefix for VirtualBox VMs.
         """
         self.workspace_dir = workspace_dir or Path(gettempdir())
+        self.vm_name_prefix = vm_name_prefix
 
     @property
     def cluster_cls(self) -> Type['VagrantCluster']:
@@ -87,7 +91,10 @@ class VagrantCluster(ClusterManager):
             )
             raise NotImplementedError(message)
 
-        cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
+        cluster_id = '{prefix}-dcos-e2e-{random}'.format(
+            prefix=cluster_backend.vm_name_prefix,
+            random=uuid.uuid4(),
+        )
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'
         self._public_agent_prefix = cluster_id + '-public-agent-'
