@@ -4,6 +4,9 @@ Tests for the Vagrant backend.
 
 from pathlib import Path
 
+# TODO check what happens if virtualbox is not installed
+# TODO add doctor check that virtualbox is installed
+import virtualbox
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
@@ -41,3 +44,18 @@ class TestRunIntegrationTest:  # pragma: nocover
                 pytest_command=['pytest', '-vvv', '-s', '-x', 'test_units.py'],
                 log_output_live=True,
             )
+
+# TODO pragma ignore
+class TestVMNameSuffix:
+    # TODO create with a suffix
+    # Assert with Virtualbox API the structure of the VM name
+
+    def test_default(self):
+        with Cluster(
+            cluster_backend=Vagrant(),
+            masters=1,
+        ):
+            pass
+
+    def test_custom(self):
+        pass
