@@ -2,6 +2,7 @@
 Tests for the Vagrant backend.
 """
 
+import uuid
 from pathlib import Path
 
 from dcos_e2e.backends import Vagrant
@@ -45,7 +46,7 @@ class TestRunIntegrationTest:  # pragma: nocover
 # TODO pragma ignore
 class TestVMNameSuffix:
     # TODO create with a suffix
-    # Assert with Virtualbox API the structure of the VM name
+    # Assert with Virtualbox CLI the structure of the VM name
 
     def test_default(self):
         with Cluster(
@@ -55,4 +56,9 @@ class TestVMNameSuffix:
             pass
 
     def test_custom(self):
-        pass
+        suffix = uuid.uuid4().hex
+        with Cluster(
+            cluster_backend=Vagrant(vm_name_suffix=suffix),
+            masters=1,
+        ):
+            pass
