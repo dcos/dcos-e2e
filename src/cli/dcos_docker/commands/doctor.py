@@ -420,8 +420,9 @@ def doctor() -> None:
         _check_can_mount_in_docker,
     ]
 
-    highest_level = max(function() for function in check_functions)
+    for function in check_functions:
+        level = function()
+        if level == CheckLevels.ERROR:
+            sys.exit(1)
 
     _link_to_troubleshooting()
-    if highest_level == CheckLevels.ERROR:
-        sys.exit(1)

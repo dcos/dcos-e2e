@@ -53,7 +53,7 @@ def doctor() -> None:
         check_vagrant_plugins,
     ]
 
-    highest_level = max(function() for function in check_functions)
-
-    if highest_level == CheckLevels.ERROR:
-        sys.exit(1)
+    for function in check_functions:
+        level = function()
+        if level == CheckLevels.ERROR:
+            sys.exit(1)
