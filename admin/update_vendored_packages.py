@@ -8,6 +8,10 @@ from pathlib import Path
 
 import vendorize
 
+class _Requirement:
+    """
+    A requirement to vendor.
+    """
 
 def main() -> None:
     """
