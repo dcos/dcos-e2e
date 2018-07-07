@@ -74,7 +74,7 @@ class TestVMDescription:  # pragma: nocover
             masters=1,
             agents=0,
             public_agents=0,
-        ):
+        ) as master:
             new_vm_name = get_vm_from_node
 
     def test_custom(self):
