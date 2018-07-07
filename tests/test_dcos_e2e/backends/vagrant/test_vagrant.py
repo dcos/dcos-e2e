@@ -52,6 +52,8 @@ class TestVMNameSuffix:
         with Cluster(
             cluster_backend=Vagrant(),
             masters=1,
+            agents=0,
+            public_agents=0,
         ):
             pass
 
@@ -60,5 +62,7 @@ class TestVMNameSuffix:
         with Cluster(
             cluster_backend=Vagrant(vm_name_suffix=suffix),
             masters=1,
+            agents=0,
+            public_agents=0,
         ):
             pass
