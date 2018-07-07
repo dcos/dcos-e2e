@@ -5,6 +5,7 @@ Tests for the Vagrant backend.
 import subprocess
 import uuid
 from pathlib import Path
+from typing import Set
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
@@ -50,36 +51,37 @@ class TestVMDescription:  # pragma: nocover
     XXX
     """
 
-    def test_default(self):
+    def _vm_names(self) -> Set[str]:
         """
         XXX
         """
         args = ['VboxManage', 'list', 'vms']
-        list_result_before = subprocess.run(
+        list_result = subprocess.run(
             args=args,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        list_stdout_before = list_result_before.stdout
+        list_stdout = list_result.stdout
+        return set(list_stdout.decode().strip().split('\n'))
+
+
+    def test_default(self):
+        """
+        XXX
+        """
         with Cluster(
             cluster_backend=Vagrant(),
             masters=1,
             agents=0,
             public_agents=0,
         ):
-            list_result = subprocess.run(
-                args=args,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            list_stdout = list_result.stdout
-            import pdb; pdb.set_trace()
-            pass
+            new_vm_name = get_vm_from_node
 
     def test_custom(self):
         """
         XXX
         """
+        return
         suffix = uuid.uuid4().hex
         with Cluster(
             cluster_backend=Vagrant(vm_name_suffix=suffix),
