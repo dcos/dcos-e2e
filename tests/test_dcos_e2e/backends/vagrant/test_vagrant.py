@@ -45,6 +45,13 @@ class TestRunIntegrationTest:  # pragma: nocover
                 log_output_live=True,
             )
 
+def _get_vm_from_node(node: Node) -> None:
+    """
+    Return the container which represents the given ``node``.
+    """
+    import pdb; pdb.set_trace()
+    pass
+
 # We skip these tests because VirtualBox is not available on Travis CI.
 class TestVMDescription:  # pragma: nocover
     """
@@ -74,8 +81,9 @@ class TestVMDescription:  # pragma: nocover
             masters=1,
             agents=0,
             public_agents=0,
-        ) as master:
-            new_vm_name = get_vm_from_node
+        ) as cluster:
+            (master, ) = cluster.masters
+            new_vm_name = get_vm_from_node(node=master)
 
     def test_custom(self):
         """
