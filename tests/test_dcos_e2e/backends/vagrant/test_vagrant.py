@@ -71,10 +71,11 @@ def _get_vm_from_node(node: Node) -> str:
     Return the container which represents the given ``node``.
     """
     vm_names = _vm_names()
-    for vm_name in vm_names:
-        _ip_from_vm_name =
-        import pdb; pdb.set_trace()
-    pass
+    [node_vm] = [
+        vm_name for vm_name in vm_names if
+        _ip_from_vm_name(vm_name) == node.private_ip_address
+    ]
+    return node_vm
 
 # We skip these tests because VirtualBox is not available on Travis CI.
 class TestVMDescription:  # pragma: nocover
