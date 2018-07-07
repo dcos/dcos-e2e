@@ -4,11 +4,13 @@ Tests for the Vagrant backend.
 
 import subprocess
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Set
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 
 # We skip these tests because VirtualBox is not available on Travis CI.
@@ -45,11 +47,33 @@ class TestRunIntegrationTest:  # pragma: nocover
                 log_output_live=True,
             )
 
-def _get_vm_from_node(node: Node) -> None:
+def _vm_names() -> Set[str]:
+    """
+    XXX
+    """
+    args = ['VboxManage', 'list', 'vms']
+    list_result = subprocess.run(
+        args=args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    list_stdout = list_result.stdout
+    return set(list_stdout.decode().strip().split('\n'))
+
+def _ip_from_vm_name(vm_name: str) - IPv4Address:
+    """
+    XXX
+    """
+    pass
+
+def _get_vm_from_node(node: Node) -> str:
     """
     Return the container which represents the given ``node``.
     """
-    import pdb; pdb.set_trace()
+    vm_names = _vm_names()
+    for vm_name in vm_names:
+        _ip_from_vm_name =
+        import pdb; pdb.set_trace()
     pass
 
 # We skip these tests because VirtualBox is not available on Travis CI.
@@ -57,19 +81,6 @@ class TestVMDescription:  # pragma: nocover
     """
     XXX
     """
-
-    def _vm_names(self) -> Set[str]:
-        """
-        XXX
-        """
-        args = ['VboxManage', 'list', 'vms']
-        list_result = subprocess.run(
-            args=args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        list_stdout = list_result.stdout
-        return set(list_stdout.decode().strip().split('\n'))
 
 
     def test_default(self):
@@ -83,7 +94,7 @@ class TestVMDescription:  # pragma: nocover
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            new_vm_name = get_vm_from_node(node=master)
+            new_vm_name = _get_vm_from_node(node=master)
 
     def test_custom(self):
         """
