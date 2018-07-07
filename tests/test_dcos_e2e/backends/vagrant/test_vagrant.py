@@ -4,9 +4,6 @@ Tests for the Vagrant backend.
 
 from pathlib import Path
 
-# TODO check what happens if virtualbox is not installed
-# TODO add doctor check that virtualbox is installed
-import virtualbox
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
