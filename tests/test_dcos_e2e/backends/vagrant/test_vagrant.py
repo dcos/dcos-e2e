@@ -58,12 +58,22 @@ def _vm_names() -> Set[str]:
         stderr=subprocess.PIPE,
     )
     list_stdout = list_result.stdout
-    return set(list_stdout.decode().strip().split('\n'))
+    lines = set(list_stdout.decode().strip().split('\n'))
+    vm_names = set(line.split('\n')[0] for line in lines)
+    return vm_names
 
 def _ip_from_vm_name(vm_name: str) - IPv4Address:
     """
     XXX
     """
+    args = ['VBoxManage', 'guestproperty', 'enumerate', vm_name]
+    enumarate_result = subprocess.run(
+        args=args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    enumerate_stdout = enumerate_result.stdout.decode()
+
     pass
 
 def _get_vm_from_node(node: Node) -> str:
