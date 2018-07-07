@@ -2,6 +2,7 @@
 Tests for the Vagrant backend.
 """
 
+import subprocess
 import uuid
 from pathlib import Path
 
@@ -43,21 +44,42 @@ class TestRunIntegrationTest:  # pragma: nocover
                 log_output_live=True,
             )
 
-# TODO pragma ignore
-class TestVMNameSuffix:
-    # TODO create with a suffix
-    # Assert with Virtualbox CLI the structure of the VM name
+# We skip these tests because VirtualBox is not available on Travis CI.
+class TestVMDescription:  # pragma: nocover
+    """
+    XXX
+    """
 
     def test_default(self):
+        """
+        XXX
+        """
+        args = ['VboxManage', 'list', 'vms']
+        list_result_before = subprocess.run(
+            args=args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        list_stdout_before = list_result_before.stdout
         with Cluster(
             cluster_backend=Vagrant(),
             masters=1,
             agents=0,
             public_agents=0,
         ):
+            list_result = subprocess.run(
+                args=args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            list_stdout = list_result.stdout
+            import pdb; pdb.set_trace()
             pass
 
     def test_custom(self):
+        """
+        XXX
+        """
         suffix = uuid.uuid4().hex
         with Cluster(
             cluster_backend=Vagrant(vm_name_suffix=suffix),
