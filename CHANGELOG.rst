@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.07.10.0
+------------
+
 - Execute ``node-poststart`` checks in ``Cluster.wait_for_dcos`` and ``Cluster.wait_for_dcos_ee``.
 - Add ``dcos-vagrant doctor`` checks.
 
