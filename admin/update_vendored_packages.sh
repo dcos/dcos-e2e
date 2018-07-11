@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -ex
+
 # Update vendored packages.
 
 # ``python-vendorize`` has problems with pip 10.0.0
