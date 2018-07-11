@@ -65,7 +65,7 @@ def main() -> None:
         target_directory=dcos_e2e_target_directory,
         package_name='vertigo',
         https_address='https://github.com/adamtheturtle/vertigo.git',
-        git_reference='4e6707f9d03ae731fb1ddbd26a1e657ad5db6924',
+        git_reference='617476661d419c8aa9e6d15495a6ea56abfd48a1',
     )
 
     requirements = [dcos_launch, test_utils, sphinx_click, vertigo]
