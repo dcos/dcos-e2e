@@ -8,10 +8,27 @@ from pathlib import Path
 
 import vendorize
 
+
 class _Requirement:
     """
     A requirement to vendor.
     """
+
+    def __init__(
+        self,
+        target_directory: Path,
+        package_name: str,
+        https_address: str,
+        git_reference: str,
+    ):
+        """
+        Details of a requirement to vendor.
+        """
+        self.target_directory = target_directory
+        self.package_name = package_name
+        self.https_address = https_address
+        self.git_reference = git_reference
+
 
 def main() -> None:
     """
@@ -20,48 +37,60 @@ def main() -> None:
     We use our own script as we want the vendored ``dcos_launch`` to use the
     vendored ``dcos_test_utils``.
     """
-    launch = (
-        'dcos_launch',
-        'git+https://github.com/dcos/dcos-launch',
-        '09c1d53652d8e91aad5f1c246ef24646de2eb4c1',
+    dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
+    dcos_launch = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='dcos_launch',
+        https_address='https://github.com/dcos/dcos-launch',
+        git_reference='09c1d53652d8e91aad5f1c246ef24646de2eb4c1',
     )
 
-    test_utils = (
-        'dcos_test_utils',
-        'git+https://github.com/dcos/dcos-test-utils',
-        '00f1a62ef673ebc34e29d9db488dd06b0c1ae4ec',
+    test_utils = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='dcos_test_utils',
+        https_address='https://github.com/dcos/dcos-test-utils',
+        git_reference='00f1a62ef673ebc34e29d9db488dd06b0c1ae4ec',
     )
 
     # We have a fix at https://github.com/click-contrib/sphinx-click/pull/27
     # that we require.
-    sphinx_click = (
-        'sphinx_click',
-        'git+https://github.com/adamtheturtle/sphinx-click',
-        'fix-envvar-duplicates',
+    sphinx_click = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='sphinx_click',
+        https_address='https://github.com/adamtheturtle/sphinx-click',
+        git_reference='fix-envvar-duplicates',
     )
 
-    target_directory = Path('src/dcos_e2e/_vendor')
-    try:
-        target_directory.mkdir(exist_ok=False)
-    except FileExistsError:
-        message = (
-            'Error: {target_directory} exists. '
-            'Run the following commands before running this script again:'
-            '\n\n'
-            'git rm -rf {target_directory}\n'
-            'rm -rf src/dcos_e2e/_vendor'
-        )
+    requirements = [dcos_launch, test_utils, sphinx_click]
+    target_directories = set(
+        requirement.target_directory for requirement in requirements
+    )
+
+    for target_directory in target_directories:
+        try:
+            target_directory.mkdir(exist_ok=False)
+        except FileExistsError:
+            message = (
+                'Error: {target_directory} exists. '
+                'Run the following commands before running this script again:'
+                '\n\n'
+                'git rm -rf {target_directory}\n'
+                'rm -rf {target_directory}'
+            )
 
         print(message.format(target_directory=target_directory))
         sys.exit(1)
 
-    init_file = Path(target_directory) / '__init__.py'
-    Path(init_file).touch()
+        init_file = Path(target_directory) / '__init__.py'
+        Path(init_file).touch()
 
     package_names = set()
-    for requirement in [launch, test_utils, sphinx_click]:
-        package_name, uri, reference = requirement
-        package_names.add(package_name)
+    for requirement in requirements:
+        package_names.add(requirement.package_name)
+        uri = 'git+{https_address}@{reference}'.format(
+            https_address=requirement.https_address,
+            reference=requirement.git_reference,
+        )
 
         subprocess.check_call(
             [
@@ -69,8 +98,8 @@ def main() -> None:
                 'install',
                 '--no-dependencies',
                 '--target',
-                str(target_directory),
-                uri + '@' + reference,
+                str(requirement.target_directory),
+                uri,
             ],
         )
 
