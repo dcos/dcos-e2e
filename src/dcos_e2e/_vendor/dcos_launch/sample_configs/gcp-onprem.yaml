@@ -1,0 +1,24 @@
+---
+launch_config_version: 1
+deployment_name: dcos-onprem-gce
+installer_url: https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+platform: gcp
+provider: onprem
+os_name: coreos
+dcos_config:
+    cluster_name: My Awesome DC/OS
+    resolvers:
+        - 8.8.4.4
+        - 8.8.8.8
+    dns_search: mesos
+    master_discovery: static
+num_masters: 1
+num_private_agents: 2
+num_public_agents: 1
+ssh_user: dcos
+ssh_private_key_filename: foobar
+ssh_public_key: foobar
+gce_zone: us-west1-a
+tags:
+    owner: mesosphere
+    expiration: 3days
