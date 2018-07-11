@@ -78,8 +78,8 @@ def main() -> None:
                 'rm -rf {target_directory}'
             )
 
-        print(message.format(target_directory=target_directory))
-        sys.exit(1)
+            print(message.format(target_directory=target_directory))
+            sys.exit(1)
 
         init_file = Path(target_directory) / '__init__.py'
         Path(init_file).touch()
