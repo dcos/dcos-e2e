@@ -84,9 +84,7 @@ def main() -> None:
         init_file = Path(target_directory) / '__init__.py'
         Path(init_file).touch()
 
-    package_names = set()
     for requirement in requirements:
-        package_names.add(requirement.package_name)
         uri = 'git+{https_address}@{reference}'.format(
             https_address=requirement.https_address,
             reference=requirement.git_reference,
@@ -103,13 +101,18 @@ def main() -> None:
             ],
         )
 
-    # Ideally we would not use a protected function, however, this trade-off
-    # has been considered - we want to use the vendored ``dcos_test_utils``
-    # from the vendored ``dcos_launch``.
-    vendorize._rewrite_imports(  # pylint: disable=protected-access
-        target_directory=target_directory,
-        top_level_names=list(package_names),
-    )
+    for target_directory in target_directories:
+        # Ideally we would not use a protected function, however, this
+        # trade-off has been considered - we want to use the vendored
+        # ``dcos_test_utils`` from the vendored ``dcos_launch``.
+        package_names = [
+            requirement.package_name for requirement in requirements if
+            requirement.target_directory == target_directory
+        ]
+        vendorize._rewrite_imports(  # pylint: disable=protected-access
+            target_directory=target_directory,
+            top_level_names=package_names,
+        )
 
 
 if __name__ == '__main__':
