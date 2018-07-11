@@ -26,10 +26,6 @@ DC/OS 1.9 and below
 Installers for DC/OS 1.9 and below require a version of ``sed`` that is not compatible with the BSD sed that ships with macOS.
 :ref:`dcos-docker-doctor` includes a check for compatible ``sed`` versions.
 
-Some :doc:`backends` support installing DC/OS from a local path (:paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_path`).
-
-Some :doc:`backends` support installing DC/OS from a URL (:paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_url`).
-
 To use these versions of DC/OS with macOS and :paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_path`, we can either modify the installer or modify the local version of ``sed``.
 
 Modify the installer
