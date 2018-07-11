@@ -1,7 +1,7 @@
 """ This module provides a specialized client for interacting with
 the Identity Access and Management (IAM) service endpoints
 """
-from ..dcos_test_utils import helpers
+from dcos_test_utils import helpers
 
 
 class Iam(helpers.ApiClientSession):

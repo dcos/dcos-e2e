@@ -23,8 +23,8 @@ import pkg_resources
 from botocore.exceptions import ClientError, WaiterError
 from retrying import retry
 
-from ... import dcos_launch
-from ...dcos_test_utils.helpers import Host, SshInfo
+import dcos_launch
+from dcos_test_utils.helpers import Host, SshInfo
 
 log = logging.getLogger(__name__)
 

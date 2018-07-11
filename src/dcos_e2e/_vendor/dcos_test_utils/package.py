@@ -3,7 +3,7 @@
 
 import logging
 
-from ..dcos_test_utils import helpers
+from dcos_test_utils import helpers
 
 log = logging.getLogger(__name__)
 

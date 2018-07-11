@@ -3,12 +3,10 @@ import logging
 
 from retrying import retry
 
-from .. import dcos_test_utils
-from ..dcos_test_utils import onprem as ___vendorize__0
-dcos_test_utils.onprem = ___vendorize__0
-from ..dcos_launch import util
-from ..dcos_launch import onprem
-from ..dcos_launch.platforms import aws
+import dcos_test_utils.onprem
+from dcos_launch import util
+from dcos_launch import onprem
+from dcos_launch.platforms import aws
 
 log = logging.getLogger(__name__)
 

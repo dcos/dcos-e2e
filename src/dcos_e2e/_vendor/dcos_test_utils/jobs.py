@@ -5,7 +5,7 @@ import logging
 import retrying
 import requests
 
-from ..dcos_test_utils import helpers
+from dcos_test_utils import helpers
 
 REQUIRED_HEADERS = {'Accept': 'application/json, text/plain, */*'}
 log = logging.getLogger(__name__)

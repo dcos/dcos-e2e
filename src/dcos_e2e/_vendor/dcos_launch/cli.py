@@ -34,12 +34,10 @@ Options:
 import os
 import sys
 
-from .. import dcos_launch
-from .. import dcos_launch
-from ..dcos_launch import config as ___vendorize__0
-dcos_launch.config = ___vendorize__0
-from ..dcos_launch import util
-from ..dcos_test_utils import logger
+import dcos_launch
+import dcos_launch.config
+from dcos_launch import util
+from dcos_test_utils import logger
 from docopt import docopt
 
 

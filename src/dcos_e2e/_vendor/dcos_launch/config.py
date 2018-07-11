@@ -9,8 +9,8 @@ import requests
 
 import cerberus
 import yaml
-from ..dcos_launch import util
-from ..dcos_launch.platforms import aws, gcp
+from dcos_launch import util
+from dcos_launch.platforms import aws, gcp
 
 log = logging.getLogger(__name__)
 

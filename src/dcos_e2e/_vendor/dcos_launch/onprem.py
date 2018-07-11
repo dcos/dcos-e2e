@@ -8,11 +8,11 @@ import typing
 import pkg_resources
 import yaml
 
-from .. import dcos_launch
-from ..dcos_launch import config
-from ..dcos_launch import util
-from ..dcos_launch.platforms import onprem as platforms_onprem
-from ..dcos_test_utils import onprem
+import dcos_launch
+from dcos_launch import config
+from dcos_launch import util
+from dcos_launch.platforms import onprem as platforms_onprem
+from dcos_test_utils import onprem
 
 log = logging.getLogger(__name__)
 

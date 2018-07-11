@@ -20,8 +20,8 @@ from azure.mgmt.resource.resources.v2016_02_01.models import (DeploymentMode,
                                                               DeploymentProperties,
                                                               ResourceGroup)
 from azure.monitor import MonitorClient
-from ...dcos_launch.util import DeploymentError
-from ...dcos_test_utils.helpers import Host
+from dcos_launch.util import DeploymentError
+from dcos_test_utils.helpers import Host
 
 log = logging.getLogger(__name__)
 

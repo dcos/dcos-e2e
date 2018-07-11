@@ -10,12 +10,10 @@ import zipfile
 import requests
 from cryptography.hazmat.primitives import serialization
 
-from .. import dcos_launch
-from ..dcos_launch import config as ___vendorize__0
-dcos_launch.config = ___vendorize__0
+import dcos_launch.config
 import yaml
-from ..dcos_launch import gcp, util
-from ..dcos_launch.platforms import aws
+from dcos_launch import gcp, util
+from dcos_launch.platforms import aws
 
 log = logging.getLogger(__name__)
 IP_REGEX = '(\d{1,3}.){3}\d{1,3}'

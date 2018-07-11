@@ -12,7 +12,7 @@ from contextlib import contextmanager
 
 import retrying
 
-from ..dcos_test_utils import helpers
+from dcos_test_utils import helpers
 
 log = logging.getLogger(__name__)
 

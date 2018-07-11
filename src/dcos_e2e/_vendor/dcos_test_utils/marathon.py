@@ -8,7 +8,7 @@ import typing
 
 import retrying
 
-from ..dcos_test_utils.helpers import (ApiClientSession,
+from dcos_test_utils.helpers import (ApiClientSession,
                                      RetryCommonHttpErrorsMixin, path_join)
 
 REQUIRED_HEADERS = {'Accept': 'application/json, text/plain, */*'}
