@@ -65,10 +65,11 @@ def main() -> None:
         target_directory=dcos_e2e_target_directory,
         package_name='vertigo',
         https_address='https://github.com/adamtheturtle/vertigo',
-        git_reference='40cacde723c738e91466136a51f7417456d53b39',
+        git_reference='0b0680358c33df4fb9bec48e49cd12e15877357d',
     )
 
     requirements = [dcos_launch, test_utils, sphinx_click, vertigo]
+    requirements = [vertigo]
     target_directories = set(
         requirement.target_directory for requirement in requirements
     )
@@ -107,6 +108,7 @@ def main() -> None:
                 uri,
             ],
         )
+        import pdb; pdb.set_trace()
 
     for target_directory in target_directories:
         # Ideally we would not use a protected function, however, this
