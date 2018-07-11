@@ -20,7 +20,7 @@ class _Requirement:
         package_name: str,
         https_address: str,
         git_reference: str,
-    ):
+    ) -> None:
         """
         Details of a requirement to vendor.
         """
