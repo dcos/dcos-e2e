@@ -111,25 +111,34 @@ class Cluster(ContextDecorator):
         tries=500,
         delay=10,
     )
-    def _wait_for_dcos_diagnostics(self) -> None:
+    def _wait_for_node_poststart(self) -> None:
         """
-        Wait until all DC/OS systemd units are healthy.
+        Wait until all DC/OS node-poststart checks are healthy.
+
+        The execution will differ for different version of DC/OS.
+        ``dcos-check-runner`` only exists on DC/OS 1.12+. ``dcos-diagnostics
+        check node-poststart`` only works on DC/OS 1.10 and 1.11. ``3dt`` only
+        exists on DC/OS 1.9. ``node-poststart`` requires ``sudo`` to allow
+        reading the CA certificate used by certain checks.
         """
         for node in self.masters:
             node.run(
                 args=[
+                    'sudo',
+                    '/opt/mesosphere/bin/dcos-check-runner',
+                    'check',
+                    'node-poststart',
+                    '||',
+                    'sudo',
                     '/opt/mesosphere/bin/dcos-diagnostics',
-                    '--diag',
+                    'check',
+                    'node-poststart',
                     '||',
                     '/opt/mesosphere/bin/3dt',
                     '--diag',
                 ],
                 # Keep in mind this must be run as privileged user.
                 log_output_live=True,
-                env={
-                    'LC_ALL': 'en_US.UTF-8',
-                    'LANG': 'en_US.UTF-8',
-                },
                 shell=True,
             )
 
@@ -149,7 +158,7 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
-        self._wait_for_dcos_diagnostics()
+        self._wait_for_node_poststart()
         if not http_checks:
             return
 
@@ -215,7 +224,7 @@ class Cluster(ContextDecorator):
                 healthy in time.
         """
 
-        self._wait_for_dcos_diagnostics()
+        self._wait_for_node_poststart()
         if not http_checks:
             return
 

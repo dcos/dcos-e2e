@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.07.03.8.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.07.10.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -183,8 +183,8 @@ class Dcose2e < Formula
   end
 
   resource "keyring" do
-    url "https://files.pythonhosted.org/packages/79/84/c8b8f4711b40196b6ba44bb98348717122326bb8167dc05293bf74c608a2/keyring-13.1.0.tar.gz"
-    sha256 "971699318f8a882da4193f0c2f87ae974e34c777fdfb59f89b50105cd678f4d9"
+    url "https://files.pythonhosted.org/packages/a0/c9/c08bf10bd057293ff385abaef38e7e548549bbe81e95333157684e75ebc6/keyring-13.2.1.tar.gz"
+    sha256 "6364bb8c233f28538df4928576f4e051229e0451651073ab20b315488da16a58"
   end
 
   resource "more-itertools" do
@@ -193,8 +193,8 @@ class Dcose2e < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/cc/c6/631db25929c963dd0a8c1b01dce3acb3d9ff89fae138fed2ed4710dad6fb/msrest-0.5.1.tar.gz"
-    sha256 "bb509ee6228eba9062024de5396a2e50856b9cd3aba411870468faf24c872b00"
+    url "https://files.pythonhosted.org/packages/5d/47/5450ad198dedfc67f9d15e9003ac98c09eaae214e993492494ae232100ea/msrest-0.5.2.tar.gz"
+    sha256 "ec32adb65a15bc90f03a4dd0f1265eaa6b5dd19859199b96cdaebfd7c7d1de23"
   end
 
   resource "msrestazure" do
@@ -272,6 +272,11 @@ class Dcose2e < Formula
     sha256 "af9a8a9802d382d45dbea96aa3cfbe77c6e6ad65b3fe7b7c799d41ab988179c6"
   end
 
+  resource "PyYAML" do
+    url "https://files.pythonhosted.org/packages/a8/c6/a8d1555e795dbd0375c3c93b576ca13bbf139db51ea604afa19a2c35fc03/PyYAML-4.2b4.tar.gz"
+    sha256 "3c17fb92c8ba2f525e4b5f7941d850e7a48c3a59b32d331e2502a3cdc6648e76"
+  end
+
   resource "requests" do
     url "https://files.pythonhosted.org/packages/54/1f/782a5734931ddf2e1494e4cd615a51ff98e1879cbe9eecbdfeaf09aa75e9/requests-2.19.1.tar.gz"
     sha256 "ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a"
@@ -325,11 +330,6 @@ class Dcose2e < Formula
   resource "websocket-client" do
     url "https://files.pythonhosted.org/packages/28/85/df04ec21c622728316b591c2852fd20a0e74324eeb6ca26f351844ba815f/websocket_client-0.48.0.tar.gz"
     sha256 "18f1170e6a1b5463986739d9fd45c4308b0d025c1b2f9b88788d8f69e8a5eb4a"
-  end
-
-  resource "PyYAML" do
-    url "https://github.com/yaml/pyyaml/archive/4.2b2.zip"
-    sha256 "851e17742830a79dacba60b06ad1cc52b67b0a4e78433d442c74756ceebe23b8"
   end
 
 

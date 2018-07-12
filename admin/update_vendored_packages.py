@@ -9,6 +9,27 @@ from pathlib import Path
 import vendorize
 
 
+class _Requirement:
+    """
+    A requirement to vendor.
+    """
+
+    def __init__(
+        self,
+        target_directory: Path,
+        package_name: str,
+        https_address: str,
+        git_reference: str,
+    ) -> None:
+        """
+        Details of a requirement to vendor.
+        """
+        self.target_directory = target_directory
+        self.package_name = package_name
+        self.https_address = https_address
+        self.git_reference = git_reference
+
+
 def main() -> None:
     """
     We vendor some requirements.
@@ -16,67 +37,89 @@ def main() -> None:
     We use our own script as we want the vendored ``dcos_launch`` to use the
     vendored ``dcos_test_utils``.
     """
-    vendored_launch_sha = '09c1d53652d8e91aad5f1c246ef24646de2eb4c1'
-    vendored_test_utils_sha = '00f1a62ef673ebc34e29d9db488dd06b0c1ae4ec'
-
-    launch = 'git+https://github.com/dcos/dcos-launch@{sha}'.format(
-        sha=vendored_launch_sha,
+    dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
+    dcos_launch = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='dcos_launch',
+        https_address='https://github.com/dcos/dcos-launch',
+        git_reference='09c1d53652d8e91aad5f1c246ef24646de2eb4c1',
     )
 
-    test_utils = 'git+https://github.com/dcos/dcos-test-utils@{sha}'.format(
-        sha=vendored_test_utils_sha,
+    test_utils = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='dcos_test_utils',
+        https_address='https://github.com/dcos/dcos-test-utils',
+        git_reference='00f1a62ef673ebc34e29d9db488dd06b0c1ae4ec',
     )
 
     # We have a fix at https://github.com/click-contrib/sphinx-click/pull/27
     # that we require.
-    sphinx_click = (
-        'git+https://github.com/adamtheturtle/sphinx-click@'
-        'fix-envvar-duplicates'
+    sphinx_click = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='sphinx_click',
+        https_address='https://github.com/adamtheturtle/sphinx-click',
+        git_reference='fix-envvar-duplicates',
     )
 
-    package_name_to_uri = {
-        'dcos_launch': launch,
-        'dcos_test_utils': test_utils,
-        'sphinx_click': sphinx_click,
-    }
+    vertigo = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='vertigo',
+        https_address='https://github.com/adamtheturtle/vertigo',
+        git_reference='b7b94a7bc9facd877a018166f37f3eeb60b073c1',
+    )
 
-    target_directory = Path('src/dcos_e2e/_vendor')
-    try:
-        target_directory.mkdir(exist_ok=False)
-    except FileExistsError:
-        message = (
-            'Error: {target_directory} exists. '
-            'Run the following commands before running this script again:'
-            '\n\n'
-            'git rm -rf {target_directory}\n'
-            'rm -rf src/dcos_e2e/_vendor'
+    requirements = [dcos_launch, test_utils, sphinx_click, vertigo]
+    target_directories = set(
+        requirement.target_directory for requirement in requirements
+    )
+
+    for target_directory in target_directories:
+        try:
+            target_directory.mkdir(exist_ok=False)
+        except FileExistsError:
+            message = (
+                'Error: {target_directory} exists. '
+                'Run the following commands before running this script again:'
+                '\n\n'
+                'git rm -rf {target_directory}\n'
+                'rm -rf {target_directory}'
+            )
+
+            print(message.format(target_directory=target_directory))
+            sys.exit(1)
+
+        init_file = Path(target_directory) / '__init__.py'
+        Path(init_file).touch()
+
+    for requirement in requirements:
+        uri = 'git+{https_address}@{reference}'.format(
+            https_address=requirement.https_address,
+            reference=requirement.git_reference,
         )
 
-        print(message.format(target_directory=target_directory))
-        sys.exit(1)
-
-    init_file = Path(target_directory) / '__init__.py'
-    Path(init_file).touch()
-
-    for _, requirement in package_name_to_uri.items():
         subprocess.check_call(
             [
                 'pip',
                 'install',
                 '--no-dependencies',
                 '--target',
-                str(target_directory),
-                requirement,
+                str(requirement.target_directory),
+                uri,
             ],
         )
 
-    # Ideally we would not use a protected function, however, this trade-off
-    # has been considered - we want to use the vendored ``dcos_test_utils``
-    # from the vendored ``dcos_launch``.
-    vendorize._rewrite_imports(  # pylint: disable=protected-access
-        target_directory=target_directory,
-        top_level_names=list(package_name_to_uri.keys()),
-    )
+    for target_directory in target_directories:
+        # Ideally we would not use a protected function, however, this
+        # trade-off has been considered - we want to use the vendored
+        # ``dcos_test_utils`` from the vendored ``dcos_launch``.
+        package_names = [
+            requirement.package_name for requirement in requirements if
+            requirement.target_directory == target_directory
+        ]
+        vendorize._rewrite_imports(  # pylint: disable=protected-access
+            target_directory=target_directory,
+            top_level_names=package_names,
+        )
 
 
 if __name__ == '__main__':
