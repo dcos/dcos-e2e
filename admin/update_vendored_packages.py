@@ -69,7 +69,6 @@ def main() -> None:
     )
 
     requirements = [dcos_launch, test_utils, sphinx_click, vertigo]
-    requirements = [vertigo]
     target_directories = set(
         requirement.target_directory for requirement in requirements
     )
@@ -108,7 +107,6 @@ def main() -> None:
                 uri,
             ],
         )
-        import pdb; pdb.set_trace()
 
     for target_directory in target_directories:
         # Ideally we would not use a protected function, however, this
