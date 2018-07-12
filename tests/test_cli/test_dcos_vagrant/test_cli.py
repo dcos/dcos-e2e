@@ -158,7 +158,7 @@ class TestDoctor:
         os.environ.get('TRAVIS') == 'true',
         'It is not possible to run VirtualBox on Travis CI',
     )
-    def test_doctor(self) -> None:  # pragma: nocover
+    def test_doctor(self) -> None:  # pragma: no cover
         """
         No exception is raised by the ``doctor`` subcommand.
         """
