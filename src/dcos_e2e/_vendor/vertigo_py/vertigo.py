@@ -2,7 +2,7 @@ import re
 import subprocess
 from . import constants
 
-from .error import *
+from .error import CommandError, NoMediumError, RegistrationError, UnknownOptionError, UnknownVMError, os
 
 # functions that don't fall into the VM class
 
@@ -81,7 +81,7 @@ def registervm(self, filename):
     args = [constants.cmd, "registervm", filename]
 
     try:
-        result = subprocess.check_output(args)
+        subprocess.check_output(args)
     except subprocess.CalledProcessError as e:
         raise RegistrationError(filename, e)
 
@@ -246,7 +246,7 @@ class VM(object):
         if delete:
             args += ["--delete"]
         try:
-            result = subprocess.check_output(args)
+            subprocess.check_output(args)
         except subprocess.CalledProcessError as e:
             raise CommandError(args, e)
 

@@ -113,8 +113,8 @@ def main() -> None:
         # trade-off has been considered - we want to use the vendored
         # ``dcos_test_utils`` from the vendored ``dcos_launch``.
         package_names = [
-            requirement.package_name for requirement in requirements if
-            requirement.target_directory == target_directory
+            requirement.package_name for requirement in requirements
+            if requirement.target_directory == target_directory
         ]
         vendorize._rewrite_imports(  # pylint: disable=protected-access
             target_directory=target_directory,
