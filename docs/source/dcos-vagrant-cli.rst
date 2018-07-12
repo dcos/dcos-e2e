@@ -1,3 +1,5 @@
+.. _dcos-vagrant_cli:
+
 ``dcos-vagrant`` CLI
 ====================
 

@@ -34,8 +34,14 @@ If you are not in a virtualenv, you may have to use ``sudo`` before the followin
 
     pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@master
 
-Run :ref:`dcos-docker-doctor` to make sure that your system is ready to go for the Docker backend:
+Run :ref:`dcos-docker-doctor` to make sure that your system is ready to go for the :ref:`docker_backend` and the :ref:`dcos-docker_cli`:
 
 .. code-block:: console
 
    $ dcos-docker doctor
+
+Run :ref:`dcos-vagrant-doctor` to make sure that your system is ready to go for the :ref:`vagrant_backend` and the :ref:`dcos-vagrant_cli`:
+
+.. code-block:: console
+
+   $ dcos-vagrant doctor
