@@ -61,7 +61,14 @@ def main() -> None:
         git_reference='fix-envvar-duplicates',
     )
 
-    requirements = [dcos_launch, test_utils, sphinx_click]
+    vertigo = _Requirement(
+        target_directory=dcos_e2e_target_directory,
+        package_name='vertigo',
+        https_address='https://github.com/adamtheturtle/vertigo',
+        git_reference='b7b94a7bc9facd877a018166f37f3eeb60b073c1',
+    )
+
+    requirements = [dcos_launch, test_utils, sphinx_click, vertigo]
     target_directories = set(
         requirement.target_directory for requirement in requirements
     )
