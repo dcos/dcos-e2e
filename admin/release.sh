@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -ex
+
 # Perform a release.
 # See the release process documentation for details.
 cd "$(mktemp -d)"
