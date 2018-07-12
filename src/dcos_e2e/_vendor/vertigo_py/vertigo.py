@@ -1,6 +1,6 @@
 import re
 import subprocess
-import constants
+from . import constants
 
 from .error import *
 
