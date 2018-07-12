@@ -13,6 +13,7 @@ to capture what the help text actually is with:
        import pyperclip; pyperclip.copy(result.output)
 """
 
+import os
 from textwrap import dedent
 from typing import List
 
@@ -153,7 +154,11 @@ class TestDoctor:
         # yapf: enable
         assert result.output == expected_help
 
-    def test_doctor(self) -> None:
+    @pytest.mark.skipif(
+        os.environ.get('TRAVIS') == 'true',
+        'It is not possible to run VirtualBox on Travis CI',
+    )
+    def test_doctor(self) -> None:  # pragma: no cover
         """
         No exception is raised by the ``doctor`` subcommand.
         """
