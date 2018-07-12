@@ -440,7 +440,7 @@ class TestNetworks:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            container = _get_container_from_node(master)
+            container = _get_container_from_node(node=master)
             networks = container.attrs['NetworkSettings']['Networks']
             assert networks.keys() == set(['bridge', docker_network.name])
             custom_network_ip = networks[docker_network.name]['IPAddress']
@@ -491,7 +491,7 @@ class TestNetworks:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            container = _get_container_from_node(master)
+            container = _get_container_from_node(node=master)
             networks = container.attrs['NetworkSettings']['Networks']
             assert networks.keys() == set(['bridge'])
             bridge_ip_address = networks['bridge']['IPAddress']
@@ -511,7 +511,7 @@ class TestNetworks:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            container = _get_container_from_node(master)
+            container = _get_container_from_node(node=master)
             networks = container.attrs['NetworkSettings']['Networks']
             assert networks.keys() == set(['bridge'])
             bridge_ip_address = networks['bridge']['IPAddress']
