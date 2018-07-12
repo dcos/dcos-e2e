@@ -1,3 +1,5 @@
+.. _vagrant_backend:
+
 Vagrant Backend
 ===============
 

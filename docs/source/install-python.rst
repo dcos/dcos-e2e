@@ -39,3 +39,9 @@ Run :ref:`dcos-docker-doctor` to make sure that your system is ready to go for t
 .. code-block:: console
 
    $ dcos-docker doctor
+
+Run :ref:`dcos-vagrant-doctor` to make sure that your system is ready to go for the :ref:`vagrant_backend` and the :ref:`dcos-vagrant_cli`:
+
+.. code-block:: console
+
+   $ dcos-vagrant doctor
