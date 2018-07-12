@@ -1,8 +1,8 @@
 import re
 import subprocess
-from vertigo_py import constants
+import constants
 
-from vertigo_py.error import *
+from .error import *
 
 # functions that don't fall into the VM class
 

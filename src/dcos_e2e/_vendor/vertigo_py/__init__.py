@@ -1,1 +1,1 @@
-from vertigo_py.vertigo import VM
+from .vertigo import VM
