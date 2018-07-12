@@ -51,6 +51,7 @@ def _vm_names() -> Set[str]:
     """
     XXX
     """
+    import pdb; pdb.set_trace()
     args = ['VboxManage', 'list', 'vms']
     list_result = subprocess.run(
         args=args,
@@ -62,7 +63,7 @@ def _vm_names() -> Set[str]:
     vm_names = set(line.split('\n')[0] for line in lines)
     return vm_names
 
-def _ip_from_vm_name(vm_name: str) - IPv4Address:
+def _ip_from_vm_name(vm_name: str) -> IPv4Address:
     """
     XXX
     """
