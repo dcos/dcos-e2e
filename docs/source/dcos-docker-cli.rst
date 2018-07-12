@@ -1,3 +1,5 @@
+.. _dcos-docker_cli:
+
 ``dcos-docker`` CLI
 ===================
 
