@@ -65,7 +65,7 @@ def main() -> None:
         target_directory=dcos_e2e_target_directory,
         package_name='vertigo',
         https_address='https://github.com/adamtheturtle/vertigo',
-        git_reference='b7b94a7bc9facd877a018166f37f3eeb60b073c1',
+        git_reference='166c5c19ea61bcb9922e13070ee747f6a0115241',
     )
 
     requirements = [dcos_launch, test_utils, sphinx_click, vertigo]
@@ -113,8 +113,8 @@ def main() -> None:
         # trade-off has been considered - we want to use the vendored
         # ``dcos_test_utils`` from the vendored ``dcos_launch``.
         package_names = [
-            requirement.package_name for requirement in requirements if
-            requirement.target_directory == target_directory
+            requirement.package_name for requirement in requirements
+            if requirement.target_directory == target_directory
         ]
         vendorize._rewrite_imports(  # pylint: disable=protected-access
             target_directory=target_directory,
