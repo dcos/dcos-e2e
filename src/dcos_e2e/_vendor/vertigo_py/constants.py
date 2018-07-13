@@ -1,5 +1,6 @@
 # Constants for use by the rest of the Vertigo system
 
+import re
 # The basic VBoxManage command
 cmd = "VBoxManage"
 
