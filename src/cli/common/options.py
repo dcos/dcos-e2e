@@ -130,3 +130,55 @@ def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
         type=click.Path(exists=True),
     )(command)  # type: Callable[..., None]
     return function
+
+
+def variant_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for a DC/OS variant.
+    """
+    function = click.option(
+        '--variant',
+        type=click.Choice(['auto', 'oss', 'enterprise']),
+        default='auto',
+        help=(
+            'Choose the DC/OS variant. '
+            'If the variant does not match the variant of the given artifact, '
+            'an error will occur. '
+            'Using "auto" finds the variant from the artifact. '
+            'Finding the variant from the artifact takes some time and so '
+            'using another option is a performance optimization.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for passing a license key.
+    """
+    function = click.option(
+        '--license-key',
+        type=click.Path(exists=True),
+        envvar='DCOS_LICENSE_KEY_PATH',
+        help=(
+            'This is ignored if using open source DC/OS. '
+            'If using DC/OS Enterprise, this defaults to the value of the '
+            '`DCOS_LICENSE_KEY_PATH` environment variable.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def security_mode_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for the DC/OS Enterprise security mode.
+    """
+    function = click.option(
+        '--security-mode',
+        type=click.Choice(['disabled', 'permissive', 'strict']),
+        help=(
+            'The security mode to use for a DC/OS Enterprise cluster. '
+            'This overrides any security mode set in ``--extra-config``.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function

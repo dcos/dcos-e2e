@@ -24,8 +24,11 @@ from cli.common.options import (
     agents_option,
     artifact_argument,
     extra_config_option,
+    license_key_option,
     masters_option,
     public_agents_option,
+    security_mode_option,
+    variant_option,
     workspace_dir_option,
 )
 from cli.common.utils import get_variant
@@ -260,14 +263,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 @agents_option
 @public_agents_option
 @extra_config_option
-@click.option(
-    '--security-mode',
-    type=click.Choice(['disabled', 'permissive', 'strict']),
-    help=(
-        'The security mode to use for a DC/OS Enterprise cluster. '
-        'This overrides any security mode set in ``--extra-config``.'
-    ),
-)
+@security_mode_option
 @click.option(
     '-c',
     '--cluster-id',
@@ -280,16 +276,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         'without specifying --cluster-id.'
     ),
 )
-@click.option(
-    '--license-key',
-    type=click.Path(exists=True),
-    envvar='DCOS_LICENSE_KEY_PATH',
-    help=(
-        'This is ignored if using open source DC/OS. '
-        'If using DC/OS Enterprise, this defaults to the value of the '
-        '`DCOS_LICENSE_KEY_PATH` environment variable.'
-    ),
-)
+@license_key_option
 @click.option(
     '--genconf-dir',
     type=click.Path(exists=True),
@@ -361,19 +348,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     ),
     multiple=True,
 )
-@click.option(
-    '--variant',
-    type=click.Choice(['auto', 'oss', 'enterprise']),
-    default='auto',
-    help=(
-        'Choose the DC/OS variant. '
-        'If the variant does not match the variant of the given artifact, '
-        'an error will occur. '
-        'Using "auto" finds the variant from the artifact. '
-        'Finding the variant from the artifact takes some time and so using '
-        'another option is a performance optimization.'
-    ),
-)
+@variant_option
 @click.option(
     '--wait-for-dcos',
     is_flag=True,
