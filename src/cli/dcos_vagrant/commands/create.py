@@ -32,7 +32,7 @@ from dcos_e2e.cluster import Cluster
 @extra_config_option
 @public_agents_option
 @workspace_dir_option
-@variant_option,
+@variant_option
 def create(
     agents: int,
     artifact: str,
@@ -73,13 +73,38 @@ def create(
 
             \b
             If none of these are set, ``license_key_contents`` is not given.
-    """
+    """  # noqa: E501
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     cluster_backend = Vagrant(workspace_dir=workspace_dir)
     doctor_message = 'Try `dcos-vagrant doctor` for troubleshooting help.'
 
     artifact_path = Path(artifact).resolve()
+
+    if variant == 'auto':
+        variant = get_variant(
+            artifact_path=artifact_path,
+            workspace_dir=workspace_dir,
+            doctor_message=doctor_message,
+        )
+
+    enterprise = bool(variant == 'enterprise')
+    if enterprise:
+        superuser_username = 'admin'
+        superuser_password = 'admin'
+
+        enterprise_extra_config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
+        }
+        if license_key is not None:
+            key_contents = Path(license_key).read_text()
+            enterprise_extra_config['license_key_contents'] = key_contents
+
+        extra_config = {**enterprise_extra_config, **extra_config}
+        if security_mode is not None:
+            extra_config['security'] = security_mode
 
     try:
         cluster = Cluster(
