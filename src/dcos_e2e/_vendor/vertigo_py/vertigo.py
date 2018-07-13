@@ -81,7 +81,7 @@ def registervm(self, filename):
     args = [constants.cmd, "registervm", filename]
 
     try:
-        result = subprocess.check_output(args)
+        subprocess.check_output(args)
     except subprocess.CalledProcessError as e:
         raise RegistrationError(filename, e)
 
@@ -246,7 +246,7 @@ class VM(object):
         if delete:
             args += ["--delete"]
         try:
-            result = subprocess.check_output(args)
+            subprocess.check_output(args)
         except subprocess.CalledProcessError as e:
             raise CommandError(args, e)
 
