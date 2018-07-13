@@ -2,11 +2,9 @@
 Tests for the Vagrant backend.
 """
 
-import subprocess
-import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Optional, Set
+from typing import Optional
 
 import yaml
 
@@ -50,6 +48,7 @@ class TestRunIntegrationTest:  # pragma: nocover
                 log_output_live=True,
             )
 
+
 def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
     """
     Given the name of a VirtualBox VM, return its IP address.
@@ -68,6 +67,7 @@ def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
         return
     return IPv4Address(results['Value'])
 
+
 def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
     Given the name of a VirtualBox VM, return its description address.
@@ -84,17 +84,17 @@ def _get_vm_from_node(node: Node) -> str:
     lines = vertigo_py.ls(option='vms').decode().strip().split('\n')
     vm_names = set(line.split(' ')[0][1:-1] for line in lines)
     [node_vm] = [
-        vm_name for vm_name in vm_names if
-        _ip_from_vm_name(vm_name) == node.private_ip_address
+        vm_name for vm_name in vm_names
+        if _ip_from_vm_name(vm_name) == node.private_ip_address
     ]
     return node_vm
+
 
 # We skip these tests because VirtualBox is not available on Travis CI.
 class TestVMDescription:  # pragma: nocover
     """
     Tests for the VirtualBox description of VMs representing nodes.
     """
-
 
     def test_default(self):
         """
