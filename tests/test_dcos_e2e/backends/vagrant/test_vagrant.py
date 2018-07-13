@@ -2,6 +2,7 @@
 Tests for the Vagrant backend.
 """
 
+import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Optional
@@ -110,3 +111,19 @@ class TestVMDescription:  # pragma: nocover
             new_vm_name = _get_vm_from_node(node=master)
             description = _description_from_vm_name(vm_name=new_vm_name)
             assert description is None
+
+    def test_custom(self):
+        """
+        It is possible to set a custom description for VMs.
+        """
+        description = uuid.uuid4().hex
+        with Cluster(
+            cluster_backend=Vagrant(virtualbox_description=description),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            new_vm_name = _get_vm_from_node(node=master)
+            vm_description = _description_from_vm_name(vm_name=new_vm_name)
+            assert vm_description == description

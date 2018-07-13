@@ -25,6 +25,7 @@ class Vagrant(ClusterBackend):
 
     def __init__(
         self,
+        virtualbox_description: str = '',
         workspace_dir: Optional[Path] = None,
     ) -> None:
         """
@@ -35,12 +36,17 @@ class Vagrant(ClusterBackend):
                 created. These files will be deleted at the end of a test run.
                 This is equivalent to `dir` in
                 :py:func:`tempfile.mkstemp`.
+            virtualbox_description: A description string to add to VirtualBox
+                VMs.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
+            virtualbox_description: A description string to add to VirtualBox
+                VMs.
         """
         self.workspace_dir = workspace_dir or Path(gettempdir())
+        self.virtualbox_description = virtualbox_description
 
     @property
     def cluster_cls(self) -> Type['VagrantCluster']:
@@ -115,6 +121,7 @@ class VagrantCluster(ClusterManager):
         vagrant_env = {
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(vm_names),
+            'VM_DESCRIPTION': cluster_backend.virtualbox_description,
         }
 
         # We import Vagrant here instead of at the top of the file because, if

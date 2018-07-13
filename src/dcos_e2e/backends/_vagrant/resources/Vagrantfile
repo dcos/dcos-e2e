@@ -6,6 +6,7 @@ Vagrant.configure(2) do |config|
   config.vbguest.auto_update = true
   config.vm.network "private_network", type: "dhcp"
 
+  vm_description = ENV['VM_DESCRIPTION'].to_s
   vm_names_string = ENV['VM_NAMES'].to_s
   node_names = vm_names_string.split(',')
   for node_name in node_names do
@@ -17,6 +18,7 @@ Vagrant.configure(2) do |config|
       machine.vm.provider 'virtualbox' do |v, override|
         v.cpus = 2
         v.memory = 2048
+        v.customize ["modifyvm", :id, "--description", vm_description]
       end
     end
   end
