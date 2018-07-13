@@ -8,6 +8,9 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Set
 
+import yaml
+
+from dcos_e2e._vendor import vertigo_py
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
@@ -47,41 +50,28 @@ class TestRunIntegrationTest:  # pragma: nocover
                 log_output_live=True,
             )
 
-def _vm_names() -> Set[str]:
-    """
-    XXX
-    """
-    import pdb; pdb.set_trace()
-    args = ['VboxManage', 'list', 'vms']
-    list_result = subprocess.run(
-        args=args,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    list_stdout = list_result.stdout
-    lines = set(list_stdout.decode().strip().split('\n'))
-    vm_names = set(line.split('\n')[0] for line in lines)
-    return vm_names
-
 def _ip_from_vm_name(vm_name: str) -> IPv4Address:
     """
     XXX
     """
-    args = ['VBoxManage', 'guestproperty', 'enumerate', vm_name]
-    enumarate_result = subprocess.run(
-        args=args,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-    enumerate_stdout = enumerate_result.stdout.decode()
-
-    pass
+    property_name = '/VirtualBox/GuestInfo/Net/1/V4/IP'
+    args = [
+        vertigo_py.constants.cmd,
+        'guestproperty',
+        'get',
+        vm_name,
+        property_name,
+    ]
+    property_result = vertigo_py.execute(args=args)
+    results = yaml.load(property_result)
+    return IPv4Address(results['Value'])
 
 def _get_vm_from_node(node: Node) -> str:
     """
     Return the container which represents the given ``node``.
     """
-    vm_names = _vm_names()
+    lines = vertigo_py.ls(option='vms').decode().strip().split('\n')
+    vm_names = set(line.split(' ')[0][1:-1] for line in lines)
     [node_vm] = [
         vm_name for vm_name in vm_names if
         _ip_from_vm_name(vm_name) == node.private_ip_address

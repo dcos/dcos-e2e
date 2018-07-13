@@ -1,1 +1,1 @@
-from .vertigo import VM
+from .vertigo import *
