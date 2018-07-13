@@ -85,6 +85,17 @@ spelling:
 shellcheck:
 	shellcheck --exclude SC2164,SC1091 admin/*.sh
 
+.PHONY: autoflake
+shellcheck:
+	autoflake \
+	    --in-place \
+	    --recursive \
+	    --remove-all-unused-imports \
+	    --remove-unused-variables \
+	    --expand-star-imports \
+	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py,release \
+	    .
+
 .PHONY: lint
 lint: \
     check-manifest \
@@ -113,15 +124,7 @@ clean:
 
 # Fix some linting errors.
 .PHONY: fix-lint
-fix-lint:
-	autoflake \
-	    --in-place \
-	    --recursive \
-	    --remove-all-unused-imports \
-	    --remove-unused-variables \
-	    --expand-star-imports \
-	    --exclude src/dcos_e2e/_vendor,src/dcos_e2e/_version.py,versioneer.py,release \
-	    .
+fix-lint: autoflake
 	yapf \
 	    --in-place \
 	    --recursive \
