@@ -93,7 +93,7 @@ autoflake:
 	    --remove-all-unused-imports \
 	    --remove-unused-variables \
 	    --expand-star-imports \
-	    --exclude *_vendor*,src/dcos_e2e/_version.py,versioneer.py,release \
+	    --exclude _vendor,src/dcos_e2e/_version.py,versioneer.py,release \
 	    .
 
 .PHONY: lint
