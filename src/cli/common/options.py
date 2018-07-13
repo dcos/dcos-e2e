@@ -150,3 +150,35 @@ def variant_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
+
+
+def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for passing a license key.
+    """
+    function = click.option(
+        '--license-key',
+        type=click.Path(exists=True),
+        envvar='DCOS_LICENSE_KEY_PATH',
+        help=(
+            'This is ignored if using open source DC/OS. '
+            'If using DC/OS Enterprise, this defaults to the value of the '
+            '`DCOS_LICENSE_KEY_PATH` environment variable.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def security_mode_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for the DC/OS Enterprise security mode.
+    """
+    function = click.option(
+        '--security-mode',
+        type=click.Choice(['disabled', 'permissive', 'strict']),
+        help=(
+            'The security mode to use for a DC/OS Enterprise cluster. '
+            'This overrides any security mode set in ``--extra-config``.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
