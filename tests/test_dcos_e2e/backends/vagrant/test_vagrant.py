@@ -50,9 +50,9 @@ class TestRunIntegrationTest:  # pragma: nocover
                 log_output_live=True,
             )
 
-def _ip_from_vm_name(vm_name: str) -> IPv4Address:
+def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
     """
-    XXX
+    Given the name of a VirtualBox VM, return its IP address.
     """
     property_name = '/VirtualBox/GuestInfo/Net/1/V4/IP'
     args = [
@@ -64,11 +64,13 @@ def _ip_from_vm_name(vm_name: str) -> IPv4Address:
     ]
     property_result = vertigo_py.execute(args=args)
     results = yaml.load(property_result)
+    if results == 'No value set!':
+        return
     return IPv4Address(results['Value'])
 
 def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
-    XXX
+    Given the name of a VirtualBox VM, return its description address.
     """
     vm = vertigo_py.VM(name=vm_name)
     info = vm.parse_info()
