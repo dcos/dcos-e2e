@@ -203,7 +203,11 @@ def _validate_cluster_id(
     return str(value)
 
 
-def _get_variant(artifact_path: Path, workspace_dir: Path) -> str:
+def _get_variant(
+    artifact_path: Path,
+    doctor_message: str,
+    workspace_dir: Path,
+) -> str:
     """
     Get the variant of a DC/OS artifact.
 
@@ -211,6 +215,7 @@ def _get_variant(artifact_path: Path, workspace_dir: Path) -> str:
         artifact_path: The path to an artifact to get the DC/OS variant of.
         workspace_dir: A directory to work in, given that this function uses
             large files.
+        doctor_message: The message to show if something goes wrong.
 
     Returns:
         "oss" or "enterprise" as appropriate.
@@ -218,8 +223,6 @@ def _get_variant(artifact_path: Path, workspace_dir: Path) -> str:
     Raises:
         CalledProcessError: There was an error unpacking the artifact.
     """
-    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
-
     try:
         with click_spinner.spinner():
             enterprise = is_enterprise(
@@ -516,6 +519,7 @@ def create(
         variant = _get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
+            doctor_message=doctor_message,
         )
 
     enterprise = bool(variant == 'enterprise')
