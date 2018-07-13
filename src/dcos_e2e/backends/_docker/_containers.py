@@ -6,7 +6,7 @@ import configparser
 import io
 import shlex
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import docker
 
@@ -86,6 +86,7 @@ def start_dcos_container(
     docker_storage_driver: DockerStorageDriver,
     docker_version: DockerVersion,
     network: Optional[docker.models.networks.Network] = None,
+    ports: Optional[Dict[str, Any]] = None,
 ) -> None:
     """
     Start a master, agent or public agent container.
@@ -111,6 +112,7 @@ def start_dcos_container(
             node.
         network: The network to connect the container to other than the default
         ``docker0`` bridge network.
+        ports: The ports to expose on the host.
     """
     hostname = container_base_name + str(container_number)
     environment = {'container': hostname}
@@ -129,6 +131,7 @@ def start_dcos_container(
         labels=labels,
         stop_signal='SIGRTMIN+3',
         command=['/sbin/init'],
+        ports=ports or {},
     )
     if network:
         network.connect(container)
