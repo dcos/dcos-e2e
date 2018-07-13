@@ -8,12 +8,12 @@ from pathlib import Path
 
 from _pytest.tmpdir import TempdirFactory
 
-from cli.dcos_docker.commands._utils import is_enterprise
+from cli.dcos_docker.common.utils import _is_enterprise
 
 
 class TestIsEnterprise:
     """
-    Tests for ``is_enterprise``.
+    Tests for ``_is_enterprise``.
     """
 
     def test_oss(
@@ -37,7 +37,7 @@ class TestIsEnterprise:
         for artifact in artifacts:
             random = uuid.uuid4().hex
             workspace_dir = Path(str(tmpdir_factory.mktemp(random)))
-            assert not is_enterprise(
+            assert not _is_enterprise(
                 build_artifact=artifact,
                 workspace_dir=workspace_dir,
             )
@@ -66,7 +66,7 @@ class TestIsEnterprise:
         for artifact in artifacts:
             random = uuid.uuid4().hex
             workspace_dir = Path(str(tmpdir_factory.mktemp(random)))
-            assert is_enterprise(
+            assert _is_enterprise(
                 build_artifact=artifact,
                 workspace_dir=workspace_dir,
             )
