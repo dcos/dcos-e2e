@@ -156,7 +156,7 @@ class TestDoctor:
 
     @pytest.mark.skipif(
         os.environ.get('TRAVIS') == 'true',
-        'It is not possible to run VirtualBox on Travis CI',
+        reason='It is not possible to run VirtualBox on Travis CI',
     )
     def test_doctor(self) -> None:  # pragma: no cover
         """
