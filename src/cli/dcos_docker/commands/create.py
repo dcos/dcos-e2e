@@ -3,12 +3,10 @@ Tools for creating a DC/OS cluster.
 """
 
 import re
-import subprocess
 import sys
 import tempfile
 import uuid
 from pathlib import Path
-from shutil import rmtree
 from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -31,6 +29,7 @@ from cli.common.options import (
     variant_option,
     workspace_dir_option,
 )
+from cli.common.utils import get_variant
 from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -46,7 +45,6 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._options import node_transport_option
-from ._utils import is_enterprise
 from .wait import wait
 
 
@@ -202,43 +200,6 @@ def _validate_cluster_id(
         raise click.BadParameter(message)
 
     return str(value)
-
-
-def _get_variant(artifact_path: Path, workspace_dir: Path) -> str:
-    """
-    Get the variant of a DC/OS artifact.
-
-    Args:
-        artifact_path: The path to an artifact to get the DC/OS variant of.
-        workspace_dir: A directory to work in, given that this function uses
-            large files.
-
-    Returns:
-        "oss" or "enterprise" as appropriate.
-
-    Raises:
-        CalledProcessError: There was an error unpacking the artifact.
-    """
-    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
-
-    try:
-        with click_spinner.spinner():
-            enterprise = is_enterprise(
-                build_artifact=artifact_path,
-                workspace_dir=workspace_dir,
-            )
-    except subprocess.CalledProcessError as exc:
-        rmtree(path=str(workspace_dir), ignore_errors=True)
-        click.echo(doctor_message)
-        click.echo()
-        click.echo('Original error:', err=True)
-        click.echo(exc.stderr, err=True)
-        raise
-    except ValueError as exc:
-        click.echo(str(exc), err=True)
-        sys.exit(1)
-
-    return 'enterprise' if enterprise else 'oss'
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
@@ -502,9 +463,10 @@ def create(
     artifact_path = Path(artifact).resolve()
 
     if variant == 'auto':
-        variant = _get_variant(
+        variant = get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
+            doctor_message=doctor_message,
         )
 
     enterprise = bool(variant == 'enterprise')
