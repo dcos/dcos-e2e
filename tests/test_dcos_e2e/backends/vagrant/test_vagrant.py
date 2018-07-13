@@ -66,15 +66,13 @@ def _ip_from_vm_name(vm_name: str) -> IPv4Address:
     results = yaml.load(property_result)
     return IPv4Address(results['Value'])
 
-def _description_from_vm_name(vm_name: str) -> IPv4Address:
+def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
     XXX
     """
     vm = vertigo_py.VM(name=vm_name)
     info = vm.parse_info()
-    import pdb; pdb.set_trace()
-    pass
-
+    return info.get('description')
 
 
 def _get_vm_from_node(node: Node) -> str:
@@ -109,4 +107,4 @@ class TestVMDescription:  # pragma: nocover
             (master, ) = cluster.masters
             new_vm_name = _get_vm_from_node(node=master)
             description = _description_from_vm_name(vm_name=new_vm_name)
-            assert description == ''
+            assert description is None
