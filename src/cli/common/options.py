@@ -8,7 +8,7 @@ from typing import Any, Callable, Dict, Union
 import click
 import yaml
 
-from .validators import validate_path_is_directory
+from .validators import validate_path_is_directory, validate_path_pair
 
 
 def _validate_dcos_configuration(
@@ -179,6 +179,26 @@ def security_mode_option(command: Callable[..., None]) -> Callable[..., None]:
         help=(
             'The security mode to use for a DC/OS Enterprise cluster. '
             'This overrides any security mode set in ``--extra-config``.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for copying files to master nodes before installing
+    DC/OS.
+    """
+    function = click.option(
+        '--copy-to-master',
+        type=str,
+        callback=validate_path_pair,
+        multiple=True,
+        help=(
+            'Files to copy to master nodes before installing DC/OS. '
+            'This option can be given multiple times. '
+            'Each option should be in the format '
+            '/absolute/local/path:/remote/path.'
         ),
     )(command)  # type: Callable[..., None]
     return function

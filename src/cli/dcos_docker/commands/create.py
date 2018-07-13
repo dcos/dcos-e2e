@@ -23,6 +23,7 @@ from passlib.hash import sha512_crypt
 from cli.common.options import (
     agents_option,
     artifact_argument,
+    copy_to_master_option,
     extra_config_option,
     license_key_option,
     masters_option,
@@ -75,47 +76,6 @@ def _validate_docker_network(
             ),
         )
         raise click.BadParameter(message=message)
-
-
-def _validate_path_pair(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> List[Tuple[Path, Path]]:
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    result = []  # type: List[Tuple[Path, Path]]
-
-    if value is None:
-        return result
-
-    for path_pair in value:
-        try:
-            [local_path, remote_path] = list(map(Path, path_pair.split(':')))
-        except ValueError:
-            message = (
-                '"{path_pair}" is not in the format '
-                '/absolute/local/path:/remote/path.'
-            ).format(path_pair=path_pair)
-            raise click.BadParameter(message=message)
-
-        if not local_path.exists():
-            message = '"{local_path}" does not exist.'.format(
-                local_path=local_path,
-            )
-            raise click.BadParameter(message=message)
-
-        if not remote_path.is_absolute():
-            message = '"{remote_path} is not an absolute path.'.format(
-                remote_path=remote_path,
-            )
-            raise click.BadParameter(message=message)
-
-        result.append((local_path, remote_path))
-
-    return result
 
 
 def _validate_volumes(
@@ -287,18 +247,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         '`genconf` directory before running DC/OS installer.'
     ),
 )
-@click.option(
-    '--copy-to-master',
-    type=str,
-    callback=_validate_path_pair,
-    multiple=True,
-    help=(
-        'Files to copy to master nodes before installing DC/OS. '
-        'This option can be given multiple times. '
-        'Each option should be in the format '
-        '/absolute/local/path:/remote/path.'
-    ),
-)
+@copy_to_master_option
 @workspace_dir_option
 @click.option(
     '--custom-volume',
