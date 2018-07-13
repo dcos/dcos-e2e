@@ -11,6 +11,7 @@ from typing import Any, Dict, Optional
 
 import click
 import click_spinner
+from passlib.hash import sha512_crypt
 
 from cli.common.options import (
     agents_option,
@@ -21,6 +22,7 @@ from cli.common.options import (
     variant_option,
     workspace_dir_option,
 )
+from cli.common.utils import get_variant
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
