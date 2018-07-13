@@ -6,7 +6,7 @@ import subprocess
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
-from typing import Set
+from typing import Optional, Set
 
 import yaml
 
