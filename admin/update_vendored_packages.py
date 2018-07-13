@@ -38,6 +38,8 @@ def main() -> None:
     vendored ``dcos_test_utils``.
     """
     dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
+    dcos_cli_target_directory = Path('src/cli/_vendor')
+
     dcos_launch = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
@@ -61,14 +63,27 @@ def main() -> None:
         git_reference='fix-envvar-duplicates',
     )
 
-    vertigo = _Requirement(
+    vertigo_e2e = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='vertigo',
         https_address='https://github.com/adamtheturtle/vertigo',
         git_reference='77d7aa5d994e2650ece9e8aded6e9bffda21a2ac',
     )
 
-    requirements = [dcos_launch, test_utils, sphinx_click, vertigo]
+    vertigo_cli = _Requirement(
+        target_directory=dcos_cli_target_directory,
+        package_name='vertigo',
+        https_address='https://github.com/adamtheturtle/vertigo',
+        git_reference='77d7aa5d994e2650ece9e8aded6e9bffda21a2ac',
+    )
+
+    requirements = [
+        dcos_launch,
+        test_utils,
+        sphinx_click,
+        vertigo_e2e,
+        vertigo_cli,
+    ]
     target_directories = set(
         requirement.target_directory for requirement in requirements
     )
