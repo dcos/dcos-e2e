@@ -23,9 +23,21 @@ yapf:
 	yapf \
 	    --diff \
 	    --recursive \
+	    --exclude src/cli/_vendor \
 	    --exclude src/dcos_e2e/_vendor \
 	    --exclude src/dcos_e2e/_version.py \
 	    --exclude release/ \
+	    --exclude versioneer.py \
+	    .
+
+.PHONY: fix-yapf
+fix-yapf:
+	yapf \
+	    --in-place \
+	    --recursive \
+	    --exclude src/cli/_vendor \
+	    --exclude src/dcos_e2e/_vendor \
+	    --exclude src/dcos_e2e/_version.py \
 	    --exclude versioneer.py \
 	    .
 
@@ -124,14 +136,7 @@ clean:
 
 # Fix some linting errors.
 .PHONY: fix-lint
-fix-lint: autoflake
-	yapf \
-	    --in-place \
-	    --recursive \
-	    --exclude src/dcos_e2e/_vendor \
-	    --exclude src/dcos_e2e/_version.py \
-	    --exclude versioneer.py \
-	    .
+fix-lint: autoflake fix-yapf
 	isort --recursive --apply
 
 .PHONY: clean-artifacts
