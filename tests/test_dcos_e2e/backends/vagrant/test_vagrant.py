@@ -66,6 +66,17 @@ def _ip_from_vm_name(vm_name: str) -> IPv4Address:
     results = yaml.load(property_result)
     return IPv4Address(results['Value'])
 
+def _description_from_vm_name(vm_name: str) -> IPv4Address:
+    """
+    XXX
+    """
+    vm = vertigo_py.VM(name=vm_name)
+    info = vm.parse_info()
+    import pdb; pdb.set_trace()
+    pass
+
+
+
 def _get_vm_from_node(node: Node) -> str:
     """
     Return the container which represents the given ``node``.
@@ -81,13 +92,13 @@ def _get_vm_from_node(node: Node) -> str:
 # We skip these tests because VirtualBox is not available on Travis CI.
 class TestVMDescription:  # pragma: nocover
     """
-    XXX
+    Tests for the VirtualBox description of VMs representing nodes.
     """
 
 
     def test_default(self):
         """
-        XXX
+        By default, VMs include an empty description.
         """
         with Cluster(
             cluster_backend=Vagrant(),
@@ -97,17 +108,5 @@ class TestVMDescription:  # pragma: nocover
         ) as cluster:
             (master, ) = cluster.masters
             new_vm_name = _get_vm_from_node(node=master)
-
-    def test_custom(self):
-        """
-        XXX
-        """
-        return
-        suffix = uuid.uuid4().hex
-        with Cluster(
-            cluster_backend=Vagrant(vm_name_suffix=suffix),
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ):
-            pass
+            description = _description_from_vm_name(vm_name=new_vm_name)
+            assert description == ''
