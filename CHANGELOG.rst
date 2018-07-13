@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add ``virtualbox_description`` parameter to the ``Vagrant`` backend.
+
 2018.07.10.0
 ------------
 
