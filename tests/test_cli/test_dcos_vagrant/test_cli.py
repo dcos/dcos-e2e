@@ -69,7 +69,7 @@ class TestDcosVagrant:
               --help         Show this message and exit.
 
             Commands:
-              create  Create an OSS DC/OS cluster.
+              create  Create a DC/OS cluster.
               doctor  Diagnose common issues which stop DC/OS E2E...
             """,# noqa: E501,E261
         )
@@ -100,22 +100,64 @@ class TestCreate:
             """\
             Usage: dcos-vagrant create [OPTIONS] ARTIFACT
 
-              Create an OSS DC/OS cluster.
+              Create a DC/OS cluster.
+
+                  DC/OS Enterprise
+
+                              DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
+                              For example, enterprise clusters require the following configuration parameters:
+
+                      ``superuser_username``, ``superuser_password_hash``,
+                      ``fault_domain_enabled``, ``license_key_contents``
+
+                              These can all be set in ``--extra-config``.
+                              However, some defaults are provided for all but the license key.
+
+                              The default superuser username is ``admin``.
+                              The default superuser password is ``admin``.
+                              The default ``fault_domain_enabled`` is ``false``.
+
+                              ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
+                              This is set to one of the following, in order:
+
+                              * The ``license_key_contents`` set in ``--extra-config``.
+                              * The contents of the path given with ``--license-key``.
+                              * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
+
+                              If none of these are set, ``license_key_contents`` is not given.
 
             Options:
-              --masters INTEGER        The number of master nodes.  [default: 1]
-              --agents INTEGER         The number of agent nodes.  [default: 1]
-              --extra-config PATH      The path to a file including DC/OS configuration
-                                       YAML. The contents of this file will be added to add
-                                       to a default configuration.
-              --public-agents INTEGER  The number of public agent nodes.  [default: 1]
-              --workspace-dir PATH     Creating a cluster can use approximately 2 GB of
-                                       temporary storage. Set this option to use a custom
-                                       "workspace" for this temporary storage. See https://d
-                                       ocs.python.org/3/library/tempfile.html#tempfile.gette
-                                       mpdir for details on the temporary directory location
-                                       if this option is not set.
-              --help                   Show this message and exit.
+              --masters INTEGER               The number of master nodes.  [default: 1]
+              --agents INTEGER                The number of agent nodes.  [default: 1]
+              --extra-config PATH             The path to a file including DC/OS
+                                              configuration YAML. The contents of this file
+                                              will be added to add to a default
+                                              configuration.
+              --public-agents INTEGER         The number of public agent nodes.  [default:
+                                              1]
+              --workspace-dir PATH            Creating a cluster can use approximately 2 GB
+                                              of temporary storage. Set this option to use a
+                                              custom "workspace" for this temporary storage.
+                                              See https://docs.python.org/3/library/tempfile
+                                              .html#tempfile.gettempdir for details on the
+                                              temporary directory location if this option is
+                                              not set.
+              --variant [auto|oss|enterprise]
+                                              Choose the DC/OS variant. If the variant does
+                                              not match the variant of the given artifact,
+                                              an error will occur. Using "auto" finds the
+                                              variant from the artifact. Finding the variant
+                                              from the artifact takes some time and so using
+                                              another option is a performance optimization.
+              --license-key PATH              This is ignored if using open source DC/OS. If
+                                              using DC/OS Enterprise, this defaults to the
+                                              value of the `DCOS_LICENSE_KEY_PATH`
+                                              environment variable.
+              --security-mode [disabled|permissive|strict]
+                                              The security mode to use for a DC/OS
+                                              Enterprise cluster. This overrides any
+                                              security mode set in ``--extra-config``.
+              --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
