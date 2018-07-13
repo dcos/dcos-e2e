@@ -8,7 +8,7 @@ from pathlib import Path
 
 from _pytest.tmpdir import TempdirFactory
 
-from cli.dcos_docker.common.utils import _is_enterprise
+from cli.common.utils import _is_enterprise
 
 
 class TestIsEnterprise:
