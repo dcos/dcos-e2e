@@ -7,7 +7,7 @@ import tempfile
 import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import click
 import click_spinner
@@ -16,6 +16,7 @@ from passlib.hash import sha512_crypt
 from cli.common.options import (
     agents_option,
     artifact_argument,
+    copy_to_master_option,
     extra_config_option,
     license_key_option,
     masters_option,
@@ -39,6 +40,7 @@ from dcos_e2e.cluster import Cluster
 @variant_option
 @license_key_option
 @security_mode_option
+@copy_to_master_option
 def create(
     agents: int,
     artifact: str,
@@ -49,6 +51,7 @@ def create(
     workspace_dir: Optional[Path],
     license_key: Optional[str],
     security_mode: Optional[str],
+    copy_to_master: List[Tuple[Path, Path]],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -126,6 +129,14 @@ def create(
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
         sys.exit(exc.returncode)
+
+    for node in cluster.masters:
+        for path_pair in copy_to_master:
+            local_path, remote_path = path_pair
+            node.send_file(
+                local_path=local_path,
+                remote_path=remote_path,
+            )
 
     try:
         with click_spinner.spinner():
