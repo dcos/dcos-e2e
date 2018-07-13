@@ -18,6 +18,7 @@ from cli.common.options import (
     extra_config_option,
     masters_option,
     public_agents_option,
+    variant_option,
     workspace_dir_option,
 )
 from dcos_e2e.backends import Vagrant
@@ -31,16 +32,47 @@ from dcos_e2e.cluster import Cluster
 @extra_config_option
 @public_agents_option
 @workspace_dir_option
+@variant_option,
 def create(
     agents: int,
     artifact: str,
     extra_config: Dict[str, Any],
     masters: int,
     public_agents: int,
+    variant: str,
     workspace_dir: Optional[Path],
 ) -> None:
     """
-    Create an OSS DC/OS cluster.
+    Create a DC/OS cluster.
+
+        DC/OS Enterprise
+
+            \b
+            DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
+            For example, enterprise clusters require the following configuration parameters:
+
+            ``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
+
+            \b
+            These can all be set in ``--extra-config``.
+            However, some defaults are provided for all but the license key.
+
+            \b
+            The default superuser username is ``admin``.
+            The default superuser password is ``admin``.
+            The default ``fault_domain_enabled`` is ``false``.
+
+            \b
+            ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
+            This is set to one of the following, in order:
+
+            \b
+            * The ``license_key_contents`` set in ``--extra-config``.
+            * The contents of the path given with ``--license-key``.
+            * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
+
+            \b
+            If none of these are set, ``license_key_contents`` is not given.
     """
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
