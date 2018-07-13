@@ -157,6 +157,10 @@ class TestCreate:
                                               The security mode to use for a DC/OS
                                               Enterprise cluster. This overrides any
                                               security mode set in ``--extra-config``.
+              --copy-to-master TEXT           Files to copy to master nodes before
+                                              installing DC/OS. This option can be given
+                                              multiple times. Each option should be in the
+                                              format /absolute/local/path:/remote/path.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
