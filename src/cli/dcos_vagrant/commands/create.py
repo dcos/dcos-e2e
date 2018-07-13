@@ -29,6 +29,15 @@ from cli.common.utils import get_variant
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
+def existing_cluster_ids():
+    # Vendor vertigo here
+    # Get all VMs
+    # Filter for those with a description key
+    # Filter for those with a description key which is valid json
+    # Filter for those with the key CLUSTER_ID_DESCRIPTION_KEY
+    # List those values
+    pass
+
 
 @click.command('create')
 @artifact_argument
