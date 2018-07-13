@@ -17,8 +17,10 @@ from cli.common.options import (
     agents_option,
     artifact_argument,
     extra_config_option,
+    license_key_option,
     masters_option,
     public_agents_option,
+    security_mode_option,
     variant_option,
     workspace_dir_option,
 )
@@ -35,6 +37,8 @@ from dcos_e2e.cluster import Cluster
 @public_agents_option
 @workspace_dir_option
 @variant_option
+@license_key_option
+@security_mode_option
 def create(
     agents: int,
     artifact: str,
@@ -43,6 +47,8 @@ def create(
     public_agents: int,
     variant: str,
     workspace_dir: Optional[Path],
+    license_key: Optional[str],
+    security_mode: Optional[str],
 ) -> None:
     """
     Create a DC/OS cluster.
