@@ -130,3 +130,23 @@ def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
         type=click.Path(exists=True),
     )(command)  # type: Callable[..., None]
     return function
+
+
+def variant_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for a DC/OS variant.
+    """
+    function = click.option(
+        '--variant',
+        type=click.Choice(['auto', 'oss', 'enterprise']),
+        default='auto',
+        help=(
+            'Choose the DC/OS variant. '
+            'If the variant does not match the variant of the given artifact, '
+            'an error will occur. '
+            'Using "auto" finds the variant from the artifact. '
+            'Finding the variant from the artifact takes some time and so '
+            'using another option is a performance optimization.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function

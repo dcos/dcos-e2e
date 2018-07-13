@@ -28,6 +28,7 @@ from cli.common.options import (
     extra_config_option,
     masters_option,
     public_agents_option,
+    variant_option,
     workspace_dir_option,
 )
 from cli.common.validators import validate_path_is_directory
@@ -400,19 +401,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     ),
     multiple=True,
 )
-@click.option(
-    '--variant',
-    type=click.Choice(['auto', 'oss', 'enterprise']),
-    default='auto',
-    help=(
-        'Choose the DC/OS variant. '
-        'If the variant does not match the variant of the given artifact, '
-        'an error will occur. '
-        'Using "auto" finds the variant from the artifact. '
-        'Finding the variant from the artifact takes some time and so using '
-        'another option is a performance optimization.'
-    ),
-)
+@variant_option
 @click.option(
     '--wait-for-dcos',
     is_flag=True,
