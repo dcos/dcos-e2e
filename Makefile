@@ -86,7 +86,7 @@ shellcheck:
 	shellcheck --exclude SC2164,SC1091 admin/*.sh
 
 .PHONY: autoflake
-shellcheck:
+autoflake:
 	autoflake \
 	    --in-place \
 	    --recursive \
