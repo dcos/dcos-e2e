@@ -11,16 +11,6 @@ from shutil import rmtree
 import click
 import click_spinner
 
-from cli.common.options import (
-    agents_option,
-    artifact_argument,
-    extra_config_option,
-    masters_option,
-    public_agents_option,
-    workspace_dir_option,
-)
-from cli.common.utils import get_variant
-
 
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
     """
