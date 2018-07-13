@@ -3,7 +3,7 @@
 ``dcos-vagrant`` CLI
 ====================
 
-The ``dcos-vagrant`` CLI allows you to create open source DC/OS clusters on Vagrant nodes.
+The ``dcos-vagrant`` CLI allows you to create DC/OS clusters on Vagrant nodes.
 
 .. contents::
    :local:
