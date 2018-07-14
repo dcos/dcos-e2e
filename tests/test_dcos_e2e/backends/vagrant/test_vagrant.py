@@ -86,7 +86,7 @@ def _get_vm_from_node(node: Node) -> str:
     vm_names = set(line.split(' ')[0][1:-1] for line in lines)
     [node_vm] = [
         vm_name for vm_name in vm_names
-        if _ip_from_vm_name(vm_name) == node.private_ip_address
+        if _ip_from_vm_name(vm_name=vm_name) == node.private_ip_address
     ]
     return node_vm
 

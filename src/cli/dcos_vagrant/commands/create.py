@@ -29,14 +29,37 @@ from cli.common.utils import get_variant
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
+
+def _is_json(value: Optional[str]) -> bool:
+    try:
+        json.loads(value)
+    except ValueError:
+        return False
+    return True
+
+
+def _description_from_vm_name(vm_name: str) -> Optional[str]:
+    """
+    Given the name of a VirtualBox VM, return its description address.
+    """
+    vm = vertigo_py.VM(name=vm_name)
+    info = vm.parse_info()
+    return info.get('description')
+
+
 def existing_cluster_ids():
-    # Vendor vertigo here
+    lines = vertigo_py.ls(option='vms').decode().strip().split('\n')
+    vm_names = set(line.split(' ')[0][1:-1] for line in lines)
+    vm_names = set(
+        vm_name for vm_name in vm_names
+        if _is_json(value=_description_from_vm_name(vm_name=vm_name))
+    )
+    return node_vm
     # Get all VMs
     # Filter for those with a description key
     # Filter for those with a description key which is valid json
     # Filter for those with the key CLUSTER_ID_DESCRIPTION_KEY
     # List those values
-    pass
 
 
 @click.command('create')
