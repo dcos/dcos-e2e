@@ -19,6 +19,7 @@ Vagrant.configure(2) do |config|
       machine.vm.provider 'virtualbox' do |v, override|
         v.cpus = 2
         v.memory = 2048
+        v.name = node_name
         v.customize ["modifyvm", :id, "--description", vm_description]
       end
     end

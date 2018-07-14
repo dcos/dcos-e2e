@@ -220,10 +220,15 @@ class VagrantCluster(ClusterManager):
             default_user = client.user(vm_name=node.name)
             ssh_key_path = Path(client.keyfile(vm_name=node.name))
 
+            not_ip_chars = ['{', '}', '^', '[', ']']
+
             node_ip_str = client.ssh(
                 vm_name=node.name,
                 command=hostname_command,
-            ).strip().strip('{}')
+            ).strip()
+
+            for char in not_ip_chars:
+                node_ip_str = node_ip_str.replace(char, '')
 
             node_ip_address = IPv4Address(node_ip_str)
 
