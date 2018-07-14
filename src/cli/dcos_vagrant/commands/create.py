@@ -14,6 +14,7 @@ import click
 import click_spinner
 from passlib.hash import sha512_crypt
 
+from cli._vendor.vertigo_py import VM
 from cli.common.options import (
     agents_option,
     artifact_argument,
@@ -30,6 +31,8 @@ from cli.common.utils import get_variant
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
+CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
+
 
 def _is_json(value: Optional[str]) -> bool:
     try:
@@ -43,7 +46,7 @@ def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
     Given the name of a VirtualBox VM, return its description address.
     """
-    vm = vertigo_py.VM(name=vm_name)
+    vm = VM(name=vm_name)
     info = vm.parse_info()
     return info.get('description')
 
