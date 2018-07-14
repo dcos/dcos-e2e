@@ -62,6 +62,20 @@ class ClusterVMs:
         """
         self._cluster_id = cluster_id
 
+    def _to_node(self, vm_name: str) -> Node:
+        """
+        Return the ``Node`` that is represented by a given VM name.
+        """
+        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
+        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
+        return Node(
+            public_ip_address=address,
+            private_ip_address=address,
+            default_user='root',
+            ssh_key_path=ssh_key_path,
+            default_transport=self._transport,
+        )
+
     @property
     def _vm_names(self) -> Set[str]:
         """
@@ -84,6 +98,29 @@ class ClusterVMs:
             cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
             if cluster_id == self._cluster_id:
                 vm_names.append(vm_name)
+
+    @property
+    def is_enterprise(self) -> bool:
+        """
+        Return whether the cluster is a DC/OS Enterprise cluster.
+        """
+        vm_names = self._vm_names
+        one_vm_name = next(iter(vm_names))
+        description = _description_from_vm_name(vm_name=one_vm_name)
+        data = json.loads(s=description)
+        variant = data[VARIANT_DESCRIPTION_KEY]
+        return bool(variant == 'ee')
+
+    @property
+    def cluster(self) -> Cluster:
+        """
+        Return a ``Cluster`` constructed from the Vms.
+        """
+        return Cluster.from_nodes(
+            masters=set(map(self._to_node, masters)),
+            agents=set(map(self._to_node, agents)),
+            public_agents=set(map(self._to_node, public_agents)),
+        )
 
     @property
     def workspace_dir(self) -> Path:
