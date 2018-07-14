@@ -63,12 +63,29 @@ class ClusterVMs:
         """
         Destroy this cluster.
         """
-        workspace_dir = 'X'
+        ls_output = vertigo_py.ls()  # type: ignore
+        vm_ls_output = ls_output['vms']
+        lines = vm_ls_output.decode().strip().split('\n')
+        lines = [line for line in lines if line]
         vm_names = []
-        vm_names = ','.join(vm_names)
+        cluster_ids = set()
+        for line in lines:
+            vm_name_in_quotes, _ = line.split(' ')
+            vm_name = vm_name_in_quotes[1:-1]
+            description = _description_from_vm_name(vm_name=vm_name)
+            try:
+                data = json.loads(s=description)
+            except json.decoder.JSONDecodeError:
+                continue
+
+            cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
+            if cluster_id == self._cluster_id:
+                vm_names.append(vm_name)
+                workspace_dir = data[WORKSPACE_DIR_DESCRIPTION_KEY]
+
         vagrant_env = {
             'PATH': os.environ['PATH'],
-            'VM_NAMES': vm_names,
+            'VM_NAMES': ','.join(vm_names),
             'VM_DESCRIPTION': '',
         }
 
