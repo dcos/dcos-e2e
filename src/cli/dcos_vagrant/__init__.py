@@ -7,6 +7,8 @@ from typing import Optional, Union
 
 import click
 
+from cli.common.commands import list_clusters_command_factory
+from .commands._common import existing_cluster_ids
 from .commands.create import create
 from .commands.doctor import doctor
 
@@ -54,3 +56,8 @@ def dcos_vagrant(verbose: None) -> None:
 
 dcos_vagrant.add_command(create)
 dcos_vagrant.add_command(doctor)
+dcos_vagrant.add_command(
+    list_clusters_command_factory(
+        existing_cluster_ids_func=existing_cluster_ids,
+    ),
+)

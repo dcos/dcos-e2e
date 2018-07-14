@@ -71,6 +71,7 @@ class TestDcosVagrant:
             Commands:
               create  Create a DC/OS cluster.
               doctor  Diagnose common issues which stop DC/OS E2E...
+              list    List all clusters.
             """,# noqa: E501,E261
         )
         # yapf: enable
