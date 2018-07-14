@@ -3,6 +3,7 @@ Common code for dcos-docker CLI modules.
 """
 
 import json
+from typing import Dict  # noqa: F401
 from typing import Set
 
 from cli._vendor import vertigo_py
@@ -18,7 +19,7 @@ def _description_from_vm_name(vm_name: str) -> str:
     info = virtualbox_vm.parse_info()  # type: Dict[str, str]
     escaped_description = info.get('description', '')
     description = escaped_description.encode().decode('unicode_escape')
-    return description
+    return str(description)
 
 
 def existing_cluster_ids() -> Set[str]:
