@@ -98,7 +98,13 @@ class ClusterVMs:
         # have the Vagrant executable.
         import vagrant
 
-        [vagrant_root] = list(workspace_dir.iterdir())
+        [vagrant_root_parent] = [
+            item for item in workspace_dir.iterdir() if item.is_dir()
+            and item.name != 'genconf'
+        ]
+
+        [vagrant_root] = list(vagrant_root_parent.iterdir())
+
         vagrant_client = vagrant.Vagrant(
             root=str(vagrant_root),
             env=vagrant_env,
