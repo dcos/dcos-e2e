@@ -62,6 +62,7 @@ class ClusterVMs:
         """
         Destroy this cluster.
         """
+        workspace_dir = 'X'
         vm_names = []
         vm_names = ','.join(vm_names)
         vagrant_env = {
@@ -76,8 +77,10 @@ class ClusterVMs:
         # We want to avoid that warning for users of other backends who do not
         # have the Vagrant executable.
         import vagrant
+
+        [vagrant_root] = list(workspace_dir.iterdir())
         self._vagrant_client = vagrant.Vagrant(
-            root=str(path),
+            root=str(vagrant_root),
             env=vagrant_env,
             quiet_stdout=False,
             quiet_stderr=True,
