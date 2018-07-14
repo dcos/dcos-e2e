@@ -1,5 +1,5 @@
 """
-Common code for CLI modules.
+Common code for dcos-docker CLI modules.
 """
 
 import sys

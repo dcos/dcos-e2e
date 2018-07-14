@@ -8,13 +8,12 @@ import tempfile
 import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import click
 import click_spinner
 from passlib.hash import sha512_crypt
 
-from cli._vendor import vertigo_py
 from cli.common.options import (
     agents_option,
     artifact_argument,
@@ -32,42 +31,7 @@ from cli.common.utils import get_variant
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
-CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
-
-
-def _description_from_vm_name(vm_name: str) -> str:
-    """
-    Given the name of a VirtualBox VM, return its description.
-    """
-    virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
-    info = virtualbox_vm.parse_info()  # type: Dict[str, str]
-    escaped_description = info.get('description', '')
-    description = escaped_description.encode().decode('unicode_escape')
-    return description
-
-
-def existing_cluster_ids() -> Set[str]:
-    """
-    Return the IDs of existing clusters.
-    """
-    ls_output = vertigo_py.ls()  # type: ignore
-    vm_ls_output = ls_output['vms']
-    lines = vm_ls_output.decode().strip().split('\n')
-    lines = [line for line in lines if line]
-    cluster_ids = set()
-    for line in lines:
-        vm_name_in_quotes, _ = line.split(' ')
-        vm_name = vm_name_in_quotes[1:-1]
-        description = _description_from_vm_name(vm_name=vm_name)
-        try:
-            data = json.loads(s=description)
-        except json.decoder.JSONDecodeError:
-            continue
-
-        cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
-        cluster_ids.add(cluster_id)
-
-    return cluster_ids - set([None])
+from ._common import CLUSTER_ID_DESCRIPTION_KEY, existing_cluster_ids
 
 
 @click.command('create')
