@@ -22,6 +22,7 @@ from cli.common.options import (
     copy_to_master_option,
     extra_config_option,
     license_key_option,
+    make_validate_cluster_id,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -65,48 +66,6 @@ def existing_cluster_ids() -> Set[str]:
         cluster_ids.add(cluster_id)
 
     return cluster_ids - set([None])
-
-
-def make_validate_cluster_id(existing_cluster_ids_func: Callable[[], Set[str]]):
-    """
-    Return a Click validator for a new cluster ID.
-
-    Args:
-        existing_cluster_ids_func: A function which returns existing cluster
-            IDs.
-    """
-
-    def _validate_cluster_id(
-        ctx: click.core.Context,
-        param: Union[click.core.Option, click.core.Parameter],
-        value: Optional[Union[int, bool, str]],
-    ) -> str:
-        """
-        Validate that a value is a valid cluster ID.
-        """
-        # We "use" variables to satisfy linting tools.
-        for _ in (ctx, param):
-            pass
-
-        if value in existing_cluster_ids_func():
-            message = 'A cluster with the id "{value}" already exists.'.format(
-                value=value,
-            )
-            raise click.BadParameter(message=message)
-
-        # This matches the Docker ID regular expression.
-        # This regular expression can be seen by running:
-        # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
-        if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
-            message = (
-                'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-                'are allowed and the cluster ID cannot be empty.'
-            ).format(value=value)
-            raise click.BadParameter(message)
-
-        return str(value)
-    return _validate_cluster_id
-
 
 
 @click.command('create')
