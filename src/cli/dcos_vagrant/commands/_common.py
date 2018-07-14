@@ -8,12 +8,11 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from typing import Dict  # noqa: F401
-from typing import Optional, Set
+from typing import Any, Optional, Set
 
 import yaml
 
 from cli._vendor import vertigo_py
-
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 
@@ -94,8 +93,8 @@ class ClusterVMs:
         """
         client = self._vagrant_client
         address = _ip_from_vm_name(vm_name=vm_name)
-        ssh_key_path = Path(client.keyfile(vm_name=node.name))
-        default_user = client.user(vm_name=node.name)
+        ssh_key_path = Path(client.keyfile(vm_name=vm_name))
+        default_user = client.user(vm_name=vm_name)
         return Node(
             public_ip_address=address,
             private_ip_address=address,
@@ -163,8 +162,10 @@ class ClusterVMs:
         workspace_dir = data[WORKSPACE_DIR_DESCRIPTION_KEY]
         return Path(workspace_dir)
 
+    # Use type "Any" so we do not have to import ``vagrant`` because importing
+    # that shows a warning on matchines that do not have Vagrant installed.
     @property
-    def _vagrant_client() -> vagrant.Vagrant:
+    def _vagrant_client(self) -> Any:
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
