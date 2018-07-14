@@ -10,7 +10,6 @@ from cli.common.options import (
     superuser_password_option,
     superuser_username_option,
 )
-from dcos_e2e.node import Transport
 
 from ._common import ClusterVMs
 from ._options import existing_cluster_id_option
