@@ -9,6 +9,7 @@ from typing import Set
 from cli._vendor import vertigo_py
 
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
+WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
 
 
 def _description_from_vm_name(vm_name: str) -> str:
