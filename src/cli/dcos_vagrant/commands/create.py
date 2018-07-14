@@ -87,6 +87,7 @@ def create(
     """  # noqa: E501
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    workspace_dir.mkdir(parents=True)
     cluster_backend = Vagrant(workspace_dir=workspace_dir)
     doctor_message = 'Try `dcos-vagrant doctor` for troubleshooting help.'
 
