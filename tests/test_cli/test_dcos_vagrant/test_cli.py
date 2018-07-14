@@ -71,6 +71,7 @@ class TestDcosVagrant:
             Commands:
               create  Create a DC/OS cluster.
               doctor  Diagnose common issues which stop DC/OS E2E...
+              list    List all clusters.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -218,3 +219,32 @@ class TestDoctor:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
+
+
+class TestList:
+    """
+    Tests for the `list` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-vagrant list --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_vagrant,
+            ['list', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        expected_help = dedent(
+            """\
+            Usage: dcos-vagrant list [OPTIONS]
+
+              List all clusters.
+
+            Options:
+              --help  Show this message and exit.
+            """,
+        )
+        assert result.output == expected_help
