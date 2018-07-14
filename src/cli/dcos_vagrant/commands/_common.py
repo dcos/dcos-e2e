@@ -44,3 +44,40 @@ def existing_cluster_ids() -> Set[str]:
         cluster_ids.add(cluster_id)
 
     return cluster_ids - set([None])
+
+
+class ClusterVMs:
+    """
+    A representation of a cluster constructed from Vagrant VMs.
+    """
+
+    def __init__(self, cluster_id: str) -> None:
+        """
+        Args:
+            cluster_id: The ID of the cluster.
+        """
+        self._cluster_id = cluster_id
+
+    def destroy(self) -> None:
+        """
+        Destroy this cluster.
+        """
+        vagrant_env = {
+            'PATH': os.environ['PATH'],
+            'VM_NAMES': vm_names,
+            'VM_DESCRIPTION': '',
+        }
+
+        # We import Vagrant here instead of at the top of the file because, if
+        # the Vagrant executable is not found, a warning is logged.
+        #
+        # We want to avoid that warning for users of other backends who do not
+        # have the Vagrant executable.
+        import vagrant
+        self._vagrant_client = vagrant.Vagrant(
+            root=str(path),
+            env=vagrant_env,
+            quiet_stdout=False,
+            quiet_stderr=True,
+        )
+        rmtree(path=str(self.workspace_dir), ignore_errors=True)
