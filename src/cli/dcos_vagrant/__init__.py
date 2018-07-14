@@ -13,6 +13,7 @@ from .commands._common import existing_cluster_ids
 from .commands.create import create
 from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
+from .commands.wait import wait
 
 
 def _set_logging(
@@ -64,3 +65,4 @@ dcos_vagrant.add_command(destroy)
 dcos_vagrant.add_command(destroy_list)
 dcos_vagrant.add_command(doctor)
 dcos_vagrant.add_command(LIST_CLUSTERS)
+dcos_vagrant.add_command(wait)

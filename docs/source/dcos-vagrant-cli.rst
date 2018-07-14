@@ -36,3 +36,6 @@ CLI Reference
 
 .. click:: cli.dcos_vagrant:doctor
   :prog: dcos-vagrant doctor
+
+.. click:: cli.dcos_vagrant:wait
+  :prog: dcos-vagrant wait
