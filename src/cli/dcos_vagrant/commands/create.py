@@ -35,13 +35,13 @@ from dcos_e2e.cluster import Cluster
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 
 
-def _description_from_vm_name(vm_name: str) -> Optional[str]:
+def _description_from_vm_name(vm_name: str) -> str:
     """
-    Given the name of a VirtualBox VM, return its description address.
+    Given the name of a VirtualBox VM, return its description.
     """
     virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
     info = virtualbox_vm.parse_info()  # type: Dict[str, str]
-    escaped_description = info.get('description')
+    escaped_description = info.get('description', '')
     description = escaped_description.encode().decode('unicode_escape')
     return description
 
@@ -56,9 +56,6 @@ def existing_cluster_ids() -> Set[str]:
         vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
         description = _description_from_vm_name(vm_name=vm_name)
-        if description is None:
-            continue
-
         try:
             data = json.loads(s=description)
         except json.decoder.JSONDecodeError:
@@ -70,35 +67,46 @@ def existing_cluster_ids() -> Set[str]:
     return cluster_ids - set([None])
 
 
-def _validate_cluster_id(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> str:
+def make_validate_cluster_id(existing_cluster_ids_func: Callable[[], Set[str]]):
     """
-    Validate that a value is a valid cluster ID.
+    Return a Click validator for a new cluster ID.
+
+    Args:
+        existing_cluster_ids_func: A function which returns existing cluster
+            IDs.
     """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
 
-    if value in existing_cluster_ids():
-        message = 'A cluster with the id "{value}" already exists.'.format(
-            value=value,
-        )
-        raise click.BadParameter(message=message)
+    def _validate_cluster_id(
+        ctx: click.core.Context,
+        param: Union[click.core.Option, click.core.Parameter],
+        value: Optional[Union[int, bool, str]],
+    ) -> str:
+        """
+        Validate that a value is a valid cluster ID.
+        """
+        # We "use" variables to satisfy linting tools.
+        for _ in (ctx, param):
+            pass
 
-    # This matches the Docker ID regular expression.
-    # This regular expression can be seen by running:
-    # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
-    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
-        message = (
-            'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-            'are allowed and the cluster ID cannot be empty.'
-        ).format(value=value)
-        raise click.BadParameter(message)
+        if value in existing_cluster_ids_func():
+            message = 'A cluster with the id "{value}" already exists.'.format(
+                value=value,
+            )
+            raise click.BadParameter(message=message)
 
-    return str(value)
+        # This matches the Docker ID regular expression.
+        # This regular expression can be seen by running:
+        # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
+        if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
+            message = (
+                'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
+                'are allowed and the cluster ID cannot be empty.'
+            ).format(value=value)
+            raise click.BadParameter(message)
+
+        return str(value)
+    return _validate_cluster_id
+
 
 
 @click.command('create')
@@ -117,7 +125,9 @@ def _validate_cluster_id(
     '--cluster-id',
     type=str,
     default='default',
-    callback=_validate_cluster_id,
+    callback=make_validate_cluster_id(
+        existing_cluster_ids_func=existing_cluster_ids,
+    ),
     help=(
         'A unique identifier for the cluster. '
         'Use the value "default" to use this cluster for other commands '
