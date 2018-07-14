@@ -14,7 +14,7 @@ import click
 import click_spinner
 from passlib.hash import sha512_crypt
 
-from cli._vendor.vertigo_py import VM
+from cli._vendor import vertigo_py
 from cli.common.options import (
     agents_option,
     artifact_argument,
@@ -34,36 +34,31 @@ from dcos_e2e.cluster import Cluster
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 
 
-def _is_json(value: Optional[str]) -> bool:
-    try:
-        json.loads(value)
-    except ValueError:
-        return False
-    return True
-
-
 def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
     Given the name of a VirtualBox VM, return its description address.
     """
-    vm = VM(name=vm_name)
+    vm = vertigo_py.VM(name=vm_name)
     info = vm.parse_info()
     return info.get('description')
 
 
 def existing_cluster_ids() -> Set[str]:
     lines = vertigo_py.ls(option='vms').decode().strip().split('\n')
-    vm_names = set(line.split(' ')[0][1:-1] for line in lines)
-    vm_names = set(
-        vm_name for vm_name in vm_names
-        if _is_json(value=_description_from_vm_name(vm_name=vm_name))
-    )
+    cluster_ids = set()
+    for line in lines:
+        vm_name_in_quotes, _ = line.split(' ')
+        vm_name = vm_name_in_quotes[1:-1]
+        description = _description_from_vm_name(vm_name=vm_name)
+        try:
+            data = json.loads(s=description)
+        except (TypeError, json.decoder.JSONDecoder):
+            continue
 
-    cluster_ids = set(
-        json.loads(_description_from_vm_name(vm_name=vm_name))
-        .get(CLUSTER_ID_DESCRIPTION_KEY) for vm_name in vm_names
-    ) - set([None])
-    return cluster_ids
+        cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
+        cluster_ids.add(cluster_id)
+
+    return cluster_ids - set([None])
 
 
 @click.command('create')
