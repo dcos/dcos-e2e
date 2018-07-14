@@ -4,10 +4,13 @@ Common code for dcos-docker CLI modules.
 
 import json
 import os
+from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from typing import Dict  # noqa: F401
 from typing import Set
+
+import yaml
 
 from cli._vendor import vertigo_py
 
@@ -25,6 +28,25 @@ def _description_from_vm_name(vm_name: str) -> str:
     escaped_description = info.get('description', '')
     description = escaped_description.encode().decode('unicode_escape')
     return str(description)
+
+
+def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
+    """
+    Given the name of a VirtualBox VM, return its IP address.
+    """
+    property_name = '/VirtualBox/GuestInfo/Net/1/V4/IP'
+    args = [
+        vertigo_py.constants.cmd,
+        'guestproperty',
+        'get',
+        vm_name,
+        property_name,
+    ]
+    property_result = vertigo_py.execute(args=args)
+    results = yaml.load(property_result)
+    if results == 'No value set!':
+        return
+    return IPv4Address(results['Value'])
 
 
 def existing_cluster_ids() -> Set[str]:
@@ -67,7 +89,7 @@ class ClusterVMs:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
-        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
+        address = _ip_from_vm_name(vm_name=vm_name)
         ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
         return Node(
             public_ip_address=address,
@@ -137,10 +159,8 @@ class ClusterVMs:
         workspace_dir = data[WORKSPACE_DIR_DESCRIPTION_KEY]
         return Path(workspace_dir)
 
-    def destroy(self) -> None:
-        """
-        Destroy this cluster.
-        """
+    @property
+    def _vagrant_client() -> vagrant.Vagrant:
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
@@ -171,5 +191,12 @@ class ClusterVMs:
             quiet_stdout=False,
             quiet_stderr=True,
         )
-        vagrant_client.destroy()
-        rmtree(path=str(workspace_dir), ignore_errors=True)
+
+        return vagrant_client
+
+    def destroy(self) -> None:
+        """
+        Destroy this cluster.
+        """
+        self._vagrant_client.destroy()
+        rmtree(path=str(self.workspace_dir), ignore_errors=True)
