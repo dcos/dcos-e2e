@@ -54,18 +54,10 @@ def destroy(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.
     """
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
     with click_spinner.spinner():
-        cluster_containers = ClusterContainers(
-            cluster_id=cluster_id,
-            transport=transport,
-        )
-        containers = {
-            *cluster_containers.masters,
-            *cluster_containers.agents,
-            *cluster_containers.public_agents,
-        }
-        rmtree(path=str(cluster_containers.workspace_dir), ignore_errors=True)
-        for container in containers:
-            container.stop()
-            container.remove(v=True)
+        cluster_containers.destroy()
     click.echo(cluster_id)

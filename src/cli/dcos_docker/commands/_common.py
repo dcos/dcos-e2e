@@ -188,3 +188,17 @@ class ClusterContainers:
         container = next(iter(self.masters))
         workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
         return Path(workspace_dir)
+
+    def destroy():
+        """
+        Destroy this cluster.
+        """
+        containers = {
+            *self.masters,
+            *self.agents,
+            *self.public_agents,
+        }
+        rmtree(path=str(self.workspace_dir), ignore_errors=True)
+        for container in containers:
+            container.stop()
+            container.remove(v=True)
