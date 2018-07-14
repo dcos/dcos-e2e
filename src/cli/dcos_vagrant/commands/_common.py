@@ -106,7 +106,7 @@ class ClusterVMs:
     @property
     def _vm_names(self) -> Set[str]:
         """
-        XXX
+        Return VirtualBox and Vagrant names of VMs in this cluster.
         """
         ls_output = vertigo_py.ls()  # type: ignore
         vm_ls_output = ls_output['vms']
@@ -166,7 +166,7 @@ class ClusterVMs:
         return Path(workspace_dir)
 
     # Use type "Any" so we do not have to import ``vagrant`` because importing
-    # that shows a warning on matchines that do not have Vagrant installed.
+    # that shows a warning on machines that do not have Vagrant installed.
     @property
     def _vagrant_client(self) -> Any:
         vm_names = self._vm_names
