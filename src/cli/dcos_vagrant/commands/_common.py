@@ -44,10 +44,10 @@ def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
         vm_name,
         property_name,
     ]
-    property_result = vertigo_py.execute(args=args)
+    property_result = vertigo_py.execute(args=args)  # type: ignore
     results = yaml.load(property_result)
     if results == 'No value set!':
-        return
+        return None
     return IPv4Address(results['Value'])
 
 
@@ -93,6 +93,7 @@ class ClusterVMs:
         """
         client = self._vagrant_client
         address = _ip_from_vm_name(vm_name=vm_name)
+        assert isinstance(address, IPv4Address)
         ssh_key_path = Path(client.keyfile(vm_name=vm_name))
         default_user = client.user(vm_name=vm_name)
         return Node(
@@ -123,7 +124,9 @@ class ClusterVMs:
 
             cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
             if cluster_id == self._cluster_id:
-                vm_names.append(vm_name)
+                vm_names.add(vm_name)
+
+        return vm_names
 
     @property
     def is_enterprise(self) -> bool:
