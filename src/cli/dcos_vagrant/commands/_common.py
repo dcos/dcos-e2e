@@ -89,14 +89,15 @@ class ClusterVMs:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
+        client = self._vagrant_client
         address = _ip_from_vm_name(vm_name=vm_name)
-        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
+        ssh_key_path = Path(client.keyfile(vm_name=node.name))
+        default_user = client.user(vm_name=node.name)
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_user='root',
+            default_user=default_user,
             ssh_key_path=ssh_key_path,
-            default_transport=self._transport,
         )
 
     @property
