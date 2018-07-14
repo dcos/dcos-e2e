@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 import click
 
-from cli.common import list_clusters_command_factory
+from cli.common.commands import list_clusters_command_factory
 
 from .commands._common import existing_cluster_ids
 from .commands.create import create
@@ -62,17 +62,17 @@ def dcos_docker(verbose: None) -> None:
         pass
 
 
-list_clusters = list_clusters_command_factory(
-    existing_cluster_ids_func=existing_cluster_ids,
-)
-
 dcos_docker.add_command(create)
 dcos_docker.add_command(destroy)
 dcos_docker.add_command(destroy_list)
 dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
 dcos_docker.add_command(inspect_cluster)
-dcos_docker.add_command(list_clusters)
+dcos_docker.add_command(
+    list_clusters_command_factory(
+        existing_cluster_ids_func=existing_cluster_ids,
+    ),
+)
 dcos_docker.add_command(run)
 dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(sync_code)
