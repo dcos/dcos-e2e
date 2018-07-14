@@ -44,7 +44,7 @@ def _description_from_vm_name(vm_name: str) -> Optional[str]:
 
 
 def existing_cluster_ids() -> Set[str]:
-    ls_output = vertigo_py.ls(option='vms')  # type: bytes
+    ls_output = vertigo_py.ls(option='vms')  # type: ignore
     lines = ls_output.decode().strip().split('\n')
     cluster_ids = set()
     for line in lines:
@@ -56,7 +56,7 @@ def existing_cluster_ids() -> Set[str]:
 
         try:
             data = json.loads(s=description)
-        except json.decoder.JSONDecoder:
+        except json.decoder.JSONDecodeError:
             continue
 
         cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
