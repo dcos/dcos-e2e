@@ -3,6 +3,8 @@ Common code for dcos-docker CLI modules.
 """
 
 import json
+import os
+from shutil import rmtree
 from typing import Dict  # noqa: F401
 from typing import Set
 
@@ -68,7 +70,6 @@ class ClusterVMs:
         lines = vm_ls_output.decode().strip().split('\n')
         lines = [line for line in lines if line]
         vm_names = []
-        cluster_ids = set()
         for line in lines:
             vm_name_in_quotes, _ = line.split(' ')
             vm_name = vm_name_in_quotes[1:-1]
@@ -104,4 +105,4 @@ class ClusterVMs:
             quiet_stderr=True,
         )
         vagrant_client.destroy()
-        rmtree(path=str(self.workspace_dir), ignore_errors=True)
+        rmtree(path=str(workspace_dir), ignore_errors=True)
