@@ -39,3 +39,6 @@ CLI Reference
 
 .. click:: cli.dcos_vagrant:wait
   :prog: dcos-vagrant wait
+
+.. click:: cli.dcos_vagrant:web
+  :prog: dcos-vagrant web
