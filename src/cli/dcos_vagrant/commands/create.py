@@ -33,6 +33,7 @@ from dcos_e2e.cluster import Cluster
 
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,
+    VARIANT_DESCRIPTION_KEY,
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )

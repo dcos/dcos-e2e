@@ -8,11 +8,14 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from typing import Dict  # noqa: F401
-from typing import Set
+from typing import Optional, Set
 
 import yaml
 
 from cli._vendor import vertigo_py
+
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
