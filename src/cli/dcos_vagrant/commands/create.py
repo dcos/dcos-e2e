@@ -31,7 +31,11 @@ from cli.common.utils import get_variant
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
-from ._common import CLUSTER_ID_DESCRIPTION_KEY, existing_cluster_ids
+from ._common import (
+    CLUSTER_ID_DESCRIPTION_KEY,
+    WORKSPACE_DIR_DESCRIPTION_KEY,
+    existing_cluster_ids,
+)
 
 
 @click.command('create')
@@ -97,6 +101,7 @@ def create(
 
     description = {
         CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
+        WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
     }
     cluster_backend = Vagrant(
         workspace_dir=workspace_dir,
