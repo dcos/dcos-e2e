@@ -76,6 +76,7 @@ class TestDcosVagrant:
               doctor        Diagnose common issues which stop DC/OS E2E...
               list          List all clusters.
               wait          Wait for DC/OS to start.
+              web           Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
