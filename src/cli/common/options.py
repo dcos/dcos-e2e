@@ -131,6 +131,42 @@ def public_agents_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
+def superuser_username_option(command: Callable[..., None],
+                              ) -> Callable[..., None]:
+    """
+    An option decorator for a superuser username.
+    """
+    function = click.option(
+        '--superuser-username',
+        type=str,
+        default='admin',
+        help=(
+            'The superuser username is needed only on DC/OS Enterprise '
+            'clusters. '
+            'By default, on a DC/OS Enterprise cluster, `admin` is used.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def superuser_password_option(command: Callable[..., None],
+                              ) -> Callable[..., None]:
+    """
+    An option decorator for a superuser password.
+    """
+    function = click.option(
+        '--superuser-password',
+        type=str,
+        default='admin',
+        help=(
+            'The superuser password is needed only on DC/OS Enterprise '
+            'clusters. '
+            'By default, on a DC/OS Enterprise cluster, `admin` is used.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
 def extra_config_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for supplying extra DC/OS configuration options.
