@@ -4,6 +4,7 @@ Common code for dcos-docker CLI modules.
 
 import json
 import os
+from pathlib import Path
 from shutil import rmtree
 from typing import Dict  # noqa: F401
 from typing import Set
@@ -82,7 +83,7 @@ class ClusterVMs:
             cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
             if cluster_id == self._cluster_id:
                 vm_names.append(vm_name)
-                workspace_dir = data[WORKSPACE_DIR_DESCRIPTION_KEY]
+                workspace_dir = Path(data[WORKSPACE_DIR_DESCRIPTION_KEY])
 
         vagrant_env = {
             'PATH': os.environ['PATH'],
