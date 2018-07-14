@@ -79,10 +79,11 @@ class ClusterVMs:
         import vagrant
 
         [vagrant_root] = list(workspace_dir.iterdir())
-        self._vagrant_client = vagrant.Vagrant(
+        vagrant_client = vagrant.Vagrant(
             root=str(vagrant_root),
             env=vagrant_env,
             quiet_stdout=False,
             quiet_stderr=True,
         )
+        vagrant_client.destroy()
         rmtree(path=str(self.workspace_dir), ignore_errors=True)
