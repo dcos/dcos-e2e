@@ -38,21 +38,25 @@ def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
     Given the name of a VirtualBox VM, return its description address.
     """
-    vm = vertigo_py.VM(name=vm_name)
-    info = vm.parse_info()
+    vm = vertigo_py.VM(name=vm_name)  # type: ignore
+    info = vm.parse_info()  # type: Dict[str, str]
     return info.get('description')
 
 
 def existing_cluster_ids() -> Set[str]:
-    lines = vertigo_py.ls(option='vms').decode().strip().split('\n')
+    ls_output = vertigo_py.ls(option='vms')  # type: bytes
+    lines = ls_output.decode().strip().split('\n')
     cluster_ids = set()
     for line in lines:
         vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
         description = _description_from_vm_name(vm_name=vm_name)
+        if description is None:
+            continue
+
         try:
             data = json.loads(s=description)
-        except (TypeError, json.decoder.JSONDecoder):
+        except json.decoder.JSONDecoder:
             continue
 
         cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
