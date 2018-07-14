@@ -84,11 +84,12 @@ class ClusterVMs:
             if cluster_id == self._cluster_id:
                 vm_names.append(vm_name)
                 workspace_dir = Path(data[WORKSPACE_DIR_DESCRIPTION_KEY])
+                vm_description = description
 
         vagrant_env = {
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(vm_names),
-            'VM_DESCRIPTION': '',
+            'VM_DESCRIPTION': vm_description,
         }
 
         # We import Vagrant here instead of at the top of the file because, if
