@@ -161,6 +161,9 @@ class TestCreate:
                                               installing DC/OS. This option can be given
                                               multiple times. Each option should be in the
                                               format /absolute/local/path:/remote/path.
+              -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
+                                              value "default" to use this cluster for other
+                                              commands without specifying --cluster-id.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
