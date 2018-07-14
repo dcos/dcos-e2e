@@ -6,6 +6,10 @@ import click
 import click_spinner
 import urllib3
 
+from cli.common.options import (
+    superuser_password_option,
+    superuser_username_option,
+)
 from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers
@@ -14,24 +18,8 @@ from ._options import existing_cluster_id_option, node_transport_option
 
 @click.command('wait')
 @existing_cluster_id_option
-@click.option(
-    '--superuser-username',
-    type=str,
-    default='admin',
-    help=(
-        'The superuser username is needed only on DC/OS Enterprise clusters. '
-        'By default, on a DC/OS Enterprise cluster, `admin` is used.'
-    ),
-)
-@click.option(
-    '--superuser-password',
-    type=str,
-    default='admin',
-    help=(
-        'The superuser password is needed only on DC/OS Enterprise clusters. '
-        'By default, on a DC/OS Enterprise cluster, `admin` is used.'
-    ),
-)
+@superuser_username_option
+@superuser_password_option
 @click.option(
     '--skip-http-checks',
     is_flag=True,
