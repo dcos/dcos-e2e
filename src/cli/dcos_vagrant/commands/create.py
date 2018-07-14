@@ -3,13 +3,12 @@ Tools for creating a DC/OS cluster.
 """
 
 import json
-import re
 import sys
 import tempfile
 import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import click
 import click_spinner
@@ -22,7 +21,7 @@ from cli.common.options import (
     copy_to_master_option,
     extra_config_option,
     license_key_option,
-    make_validate_cluster_id,
+    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -79,20 +78,7 @@ def existing_cluster_ids() -> Set[str]:
 @license_key_option
 @security_mode_option
 @copy_to_master_option
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    default='default',
-    callback=make_validate_cluster_id(
-        existing_cluster_ids_func=existing_cluster_ids,
-    ),
-    help=(
-        'A unique identifier for the cluster. '
-        'Use the value "default" to use this cluster for other commands '
-        'without specifying --cluster-id.'
-    ),
-)
+@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
 def create(
     agents: int,
     artifact: str,
@@ -138,7 +124,6 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    return
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
@@ -191,8 +176,6 @@ def create(
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
         sys.exit(exc.returncode)
-
-    return
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
