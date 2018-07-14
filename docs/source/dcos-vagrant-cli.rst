@@ -23,6 +23,9 @@ CLI Reference
 .. click:: cli.dcos_vagrant:create
   :prog: dcos-vagrant create
 
+.. click:: cli.dcos_vagrant:LIST_CLUSTERS
+  :prog: dcos-vagrant list
+
 .. _dcos-vagrant-doctor:
 
 .. click:: cli.dcos_vagrant:doctor
