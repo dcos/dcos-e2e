@@ -1,3 +1,7 @@
+"""
+Common options for ``dcos-docker`` commands.
+"""
+
 from typing import Callable
 
 import click
