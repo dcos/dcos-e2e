@@ -7,8 +7,6 @@ from typing import List
 import click
 import click_spinner
 
-from dcos_e2e.node import Transport
-
 from ._common import ClusterVMs, existing_cluster_ids
 from ._options import existing_cluster_id_option
 
@@ -49,9 +47,7 @@ def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
-    cluster_vms = ClusterVMs(
-        cluster_id=cluster_id,
-    )
+    cluster_vms = ClusterVMs(cluster_id=cluster_id)
     with click_spinner.spinner():
         cluster_vms.destroy()
     click.echo(cluster_id)
