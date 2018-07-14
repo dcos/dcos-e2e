@@ -2,7 +2,6 @@
 Tools for creating a DC/OS cluster.
 """
 
-import re
 import sys
 import tempfile
 import uuid
@@ -33,7 +32,10 @@ from cli.common.options import (
     workspace_dir_option,
 )
 from cli.common.utils import get_variant
-from cli.common.validators import validate_path_is_directory
+from cli.common.validators import (
+    make_validate_cluster_id,
+    validate_path_is_directory,
+)
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
@@ -133,37 +135,6 @@ def _validate_volumes(
     return mounts
 
 
-def _validate_cluster_id(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> str:
-    """
-    Validate that a value is a valid cluster ID.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value in existing_cluster_ids():
-        message = 'A cluster with the id "{value}" already exists'.format(
-            value=value,
-        )
-        raise click.BadParameter(message=message)
-
-    # This matches the Docker ID regular expression.
-    # This regular expression can be seen by running:
-    # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
-    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
-        message = (
-            'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-            'are allowed and the cluster ID cannot be empty.'
-        ).format(value=value)
-        raise click.BadParameter(message)
-
-    return str(value)
-
-
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
     Write an RSA key pair for connecting to nodes via SSH.
@@ -229,7 +200,9 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     '--cluster-id',
     type=str,
     default='default',
-    callback=_validate_cluster_id,
+    callback=make_validate_cluster_id(
+        existing_cluster_ids_func=existing_cluster_ids,
+    ),
     help=(
         'A unique identifier for the cluster. '
         'Use the value "default" to use this cluster for other commands '
