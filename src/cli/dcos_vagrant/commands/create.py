@@ -99,14 +99,6 @@ def create(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
-    description = {
-        CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
-        WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
-    }
-    cluster_backend = Vagrant(
-        workspace_dir=workspace_dir,
-        virtualbox_description=json.dumps(obj=description),
-    )
     doctor_message = 'Try `dcos-vagrant doctor` for troubleshooting help.'
 
     artifact_path = Path(artifact).resolve()
@@ -119,6 +111,15 @@ def create(
         )
 
     enterprise = bool(variant == 'enterprise')
+    description = {
+        CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
+        WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
+        VARIANT_DESCRIPTION_KEY: 'ee' if enterprise else '',
+    }
+    cluster_backend = Vagrant(
+        workspace_dir=workspace_dir,
+        virtualbox_description=json.dumps(obj=description),
+    )
     if enterprise:
         superuser_username = 'admin'
         superuser_password = 'admin'
