@@ -146,7 +146,7 @@ def _validate_cluster_id(
         pass
 
     if value in existing_cluster_ids():
-        message = 'A cluster with the id "{value}" already exists'.format(
+        message = 'A cluster with the id "{value}" already exists.'.format(
             value=value,
         )
         raise click.BadParameter(message=message)
