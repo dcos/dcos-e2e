@@ -55,10 +55,9 @@ def dcos_vagrant(verbose: None) -> None:
         pass
 
 
+LIST_CLUSTERS = list_clusters_command_factory(
+    existing_cluster_ids_func=existing_cluster_ids,
+)
 dcos_vagrant.add_command(create)
 dcos_vagrant.add_command(doctor)
-dcos_vagrant.add_command(
-    list_clusters_command_factory(
-        existing_cluster_ids_func=existing_cluster_ids,
-    ),
-)
+dcos_vagrant.add_command(LIST_CLUSTERS)

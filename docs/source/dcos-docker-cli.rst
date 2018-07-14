@@ -261,7 +261,7 @@ CLI Reference
 .. click:: cli.dcos_docker:create
   :prog: dcos-docker create
 
-.. click:: cli.dcos_docker:list_clusters
+.. click:: cli.dcos_docker:LIST_CLUSTERS
   :prog: dcos-docker list
 
 .. _dcos-docker-wait:
