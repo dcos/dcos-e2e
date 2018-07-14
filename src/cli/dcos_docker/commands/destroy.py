@@ -2,7 +2,6 @@
 Tools for destroying clusters.
 """
 
-from shutil import rmtree
 from typing import List
 
 import click

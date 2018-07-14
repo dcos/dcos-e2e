@@ -5,6 +5,7 @@ Common code for dcos-docker CLI modules.
 import sys
 from ipaddress import IPv4Address
 from pathlib import Path
+from shutil import rmtree
 from typing import Dict, Set
 
 import click
@@ -189,7 +190,7 @@ class ClusterContainers:
         workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
         return Path(workspace_dir)
 
-    def destroy():
+    def destroy(self) -> None:
         """
         Destroy this cluster.
         """
