@@ -2,7 +2,6 @@
 Tools for creating a DC/OS cluster.
 """
 
-import re
 import sys
 import tempfile
 import uuid
@@ -26,6 +25,7 @@ from cli.common.options import (
     copy_to_master_option,
     extra_config_option,
     license_key_option,
+    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -133,37 +133,6 @@ def _validate_volumes(
     return mounts
 
 
-def _validate_cluster_id(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> str:
-    """
-    Validate that a value is a valid cluster ID.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value in existing_cluster_ids():
-        message = 'A cluster with the id "{value}" already exists.'.format(
-            value=value,
-        )
-        raise click.BadParameter(message=message)
-
-    # This matches the Docker ID regular expression.
-    # This regular expression can be seen by running:
-    # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
-    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
-        message = (
-            'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-            'are allowed and the cluster ID cannot be empty.'
-        ).format(value=value)
-        raise click.BadParameter(message)
-
-    return str(value)
-
-
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     """
     Write an RSA key pair for connecting to nodes via SSH.
@@ -224,18 +193,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 @public_agents_option
 @extra_config_option
 @security_mode_option
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    default='default',
-    callback=_validate_cluster_id,
-    help=(
-        'A unique identifier for the cluster. '
-        'Use the value "default" to use this cluster for other commands '
-        'without specifying --cluster-id.'
-    ),
-)
+@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
 @license_key_option
 @click.option(
     '--genconf-dir',
@@ -384,7 +342,6 @@ def create(
     """  # noqa: E501
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
-    workspace_dir.mkdir(parents=True)
 
     doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
     ssh_keypair_dir = workspace_dir / 'ssh'
