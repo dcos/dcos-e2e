@@ -384,6 +384,7 @@ def create(
     """  # noqa: E501
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    workspace_dir.mkdir(parents=True)
 
     doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
     ssh_keypair_dir = workspace_dir / 'ssh'

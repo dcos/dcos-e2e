@@ -3,12 +3,13 @@ Tools for creating a DC/OS cluster.
 """
 
 import json
+import re
 import sys
 import tempfile
 import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import click
 import click_spinner
@@ -47,9 +48,15 @@ def existing_cluster_ids() -> Set[str]:
     ls_output = vertigo_py.ls()  # type: ignore
     vm_ls_output = ls_output['vms']
     lines = vm_ls_output.decode().strip().split('\n')
+    lines = filter(len, lines)
     cluster_ids = set()
     for line in lines:
-        vm_name_in_quotes, _ = line.split(' ')
+        try:
+            vm_name_in_quotes, _ = line.split(' ')
+        except:
+
+            import pdb; pdb.set_trace()
+            pass
         vm_name = vm_name_in_quotes[1:-1]
         description = _description_from_vm_name(vm_name=vm_name)
         if description is None:
@@ -66,6 +73,37 @@ def existing_cluster_ids() -> Set[str]:
     return cluster_ids - set([None])
 
 
+def _validate_cluster_id(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> str:
+    """
+    Validate that a value is a valid cluster ID.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    if value in existing_cluster_ids():
+        message = 'A cluster with the id "{value}" already exists.'.format(
+            value=value,
+        )
+        raise click.BadParameter(message=message)
+
+    # This matches the Docker ID regular expression.
+    # This regular expression can be seen by running:
+    # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
+    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
+        message = (
+            'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
+            'are allowed and the cluster ID cannot be empty.'
+        ).format(value=value)
+        raise click.BadParameter(message)
+
+    return str(value)
+
+
 @click.command('create')
 @artifact_argument
 @masters_option
@@ -77,6 +115,18 @@ def existing_cluster_ids() -> Set[str]:
 @license_key_option
 @security_mode_option
 @copy_to_master_option
+@click.option(
+    '-c',
+    '--cluster-id',
+    type=str,
+    default='default',
+    callback=_validate_cluster_id,
+    help=(
+        'A unique identifier for the cluster. '
+        'Use the value "default" to use this cluster for other commands '
+        'without specifying --cluster-id.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -88,6 +138,7 @@ def create(
     license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
+    cluster_id: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -123,7 +174,15 @@ def create(
     """  # noqa: E501
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
-    cluster_backend = Vagrant(workspace_dir=workspace_dir)
+    workspace_dir.mkdir(parents=True)
+
+    description = {
+        CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
+    }
+    cluster_backend = Vagrant(
+        workspace_dir=workspace_dir,
+        virtualbox_description=json.dumps(obj=description),
+    )
     doctor_message = 'Try `dcos-vagrant doctor` for troubleshooting help.'
 
     artifact_path = Path(artifact).resolve()
@@ -165,6 +224,8 @@ def create(
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
         sys.exit(exc.returncode)
+
+    return
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
