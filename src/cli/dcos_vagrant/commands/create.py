@@ -2,6 +2,7 @@
 Tools for creating a DC/OS cluster.
 """
 
+import json
 import sys
 import tempfile
 import uuid
@@ -19,6 +20,7 @@ from cli.common.options import (
     copy_to_master_option,
     extra_config_option,
     license_key_option,
+    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -28,6 +30,8 @@ from cli.common.options import (
 from cli.common.utils import get_variant
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
+
+from ._common import CLUSTER_ID_DESCRIPTION_KEY, existing_cluster_ids
 
 
 @click.command('create')
@@ -41,6 +45,7 @@ from dcos_e2e.cluster import Cluster
 @license_key_option
 @security_mode_option
 @copy_to_master_option
+@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
 def create(
     agents: int,
     artifact: str,
@@ -52,6 +57,7 @@ def create(
     license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
+    cluster_id: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -88,7 +94,14 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
-    cluster_backend = Vagrant(workspace_dir=workspace_dir)
+
+    description = {
+        CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
+    }
+    cluster_backend = Vagrant(
+        workspace_dir=workspace_dir,
+        virtualbox_description=json.dumps(obj=description),
+    )
     doctor_message = 'Try `dcos-vagrant doctor` for troubleshooting help.'
 
     artifact_path = Path(artifact).resolve()
