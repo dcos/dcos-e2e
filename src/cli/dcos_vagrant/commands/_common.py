@@ -62,6 +62,8 @@ class ClusterVMs:
         """
         Destroy this cluster.
         """
+        vm_names = []
+        vm_names = ','.join(vm_names)
         vagrant_env = {
             'PATH': os.environ['PATH'],
             'VM_NAMES': vm_names,
