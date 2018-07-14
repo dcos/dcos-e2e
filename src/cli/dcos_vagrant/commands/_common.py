@@ -117,6 +117,11 @@ class ClusterVMs:
         """
         Return a ``Cluster`` constructed from the Vms.
         """
+        vm_names = self._vm_names
+        masters = [name for name in vm_names if '-master-' in name]
+        agents = [name for name in vm_names if '-agent-' in name]
+        public_agents = [name for name in vm_names if '-public-agent-' in name]
+
         return Cluster.from_nodes(
             masters=set(map(self._to_node, masters)),
             agents=set(map(self._to_node, agents)),
