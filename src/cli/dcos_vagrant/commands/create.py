@@ -47,6 +47,9 @@ def _description_from_vm_name(vm_name: str) -> str:
 
 
 def existing_cluster_ids() -> Set[str]:
+    """
+    Return the IDs of existing clusters.
+    """
     ls_output = vertigo_py.ls()  # type: ignore
     vm_ls_output = ls_output['vms']
     lines = vm_ls_output.decode().strip().split('\n')
