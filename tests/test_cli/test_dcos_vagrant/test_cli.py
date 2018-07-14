@@ -75,6 +75,7 @@ class TestDcosVagrant:
               destroy-list  Destroy clusters.
               doctor        Diagnose common issues which stop DC/OS E2E...
               list          List all clusters.
+              wait          Wait for DC/OS to start.
             """,# noqa: E501,E261
         )
         # yapf: enable
