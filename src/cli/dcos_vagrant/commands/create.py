@@ -43,6 +43,7 @@ def _description_from_vm_name(vm_name: str) -> Optional[str]:
     info = virtualbox_vm.parse_info()  # type: Dict[str, str]
     escaped_description = info.get('description')
     description = escaped_description.encode().decode('unicode_escape')
+    return description
 
 
 def existing_cluster_ids() -> Set[str]:
