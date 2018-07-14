@@ -13,6 +13,7 @@ from cli._vendor import vertigo_py
 
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
+VARIANT_DESCRIPTION_KEY = 'dcos_e2e.variant'
 
 
 def _description_from_vm_name(vm_name: str) -> str:
