@@ -11,6 +11,7 @@ from cli.common.commands import list_clusters_command_factory
 
 from .commands._common import existing_cluster_ids
 from .commands.create import create
+from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
 
 
@@ -59,5 +60,7 @@ LIST_CLUSTERS = list_clusters_command_factory(
     existing_cluster_ids_func=existing_cluster_ids,
 )
 dcos_vagrant.add_command(create)
+dcos_vagrant.add_command(destroy)
+dcos_vagrant.add_command(destroy_list)
 dcos_vagrant.add_command(doctor)
 dcos_vagrant.add_command(LIST_CLUSTERS)
