@@ -41,22 +41,18 @@ def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
     virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
     info = virtualbox_vm.parse_info()  # type: Dict[str, str]
-    return info.get('description')
+    escaped_description = info.get('description')
+    description = escaped_description.encode().decode('unicode_escape')
 
 
 def existing_cluster_ids() -> Set[str]:
     ls_output = vertigo_py.ls()  # type: ignore
     vm_ls_output = ls_output['vms']
     lines = vm_ls_output.decode().strip().split('\n')
-    lines = filter(len, lines)
+    lines = [line for line in lines if line]
     cluster_ids = set()
     for line in lines:
-        try:
-            vm_name_in_quotes, _ = line.split(' ')
-        except:
-
-            import pdb; pdb.set_trace()
-            pass
+        vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
         description = _description_from_vm_name(vm_name=vm_name)
         if description is None:
@@ -172,6 +168,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
+    return
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
