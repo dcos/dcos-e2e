@@ -100,8 +100,8 @@ class ClusterVMs:
         import vagrant
 
         [vagrant_root_parent] = [
-            item for item in workspace_dir.iterdir() if item.is_dir()
-            and item.name != 'genconf'
+            item for item in workspace_dir.iterdir()
+            if item.is_dir() and item.name != 'genconf'
         ]
 
         [vagrant_root] = list(vagrant_root_parent.iterdir())
