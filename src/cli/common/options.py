@@ -2,13 +2,62 @@
 Click options which are common across CLI tools.
 """
 
+import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Dict, Optional, Set, Union
 
 import click
 import yaml
 
 from .validators import validate_path_is_directory, validate_path_pair
+
+
+def _make_validate_cluster_id(
+    existing_cluster_ids_func: Callable[[], Set[str]],
+) -> Callable[[
+    click.core.Context,
+    Union[click.core.Option, click.core.Parameter],
+    Optional[Union[int, bool, str]],
+], str]:
+    """
+    Return a Click validator for a new cluster ID.
+
+    Args:
+        existing_cluster_ids_func: A function which returns existing cluster
+            IDs.
+    """
+
+    def _validate_cluster_id(
+        ctx: click.core.Context,
+        param: Union[click.core.Option, click.core.Parameter],
+        value: Optional[Union[int, bool, str]],
+    ) -> str:
+        """
+        Validate that a value is a valid cluster ID.
+        """
+        # We "use" variables to satisfy linting tools.
+        for _ in (ctx, param):
+            pass
+
+        if value in existing_cluster_ids_func():
+            message = 'A cluster with the id "{value}" already exists.'.format(
+                value=value,
+            )
+            raise click.BadParameter(message=message)
+
+        # This matches the Docker ID regular expression.
+        # This regular expression can be seen by running:
+        # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
+        if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
+            message = (
+                'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
+                'are allowed and the cluster ID cannot be empty.'
+            ).format(value=value)
+            raise click.BadParameter(message)
+
+        return str(value)
+
+    return _validate_cluster_id
 
 
 def _validate_dcos_configuration(
@@ -186,7 +235,7 @@ def security_mode_option(command: Callable[..., None]) -> Callable[..., None]:
 
 def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for copying files to master nodes before installing
+    A decorator for setting files to copy to master nodes before installing
     DC/OS.
     """
     function = click.option(
@@ -202,3 +251,34 @@ def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
+
+
+def make_cluster_id_option(
+    existing_cluster_ids_func: Callable[[], Set[str]],
+) -> Callable[[Callable[..., None]], Callable[..., None]]:
+    """
+    Return a Click option for choosing a new cluster ID.
+
+    Args:
+        existing_cluster_ids_func: A function which returns existing cluster
+            IDs.
+    """
+
+    def cluster_id_option(command: Callable[..., None]) -> Callable[..., None]:
+        function = click.option(
+            '-c',
+            '--cluster-id',
+            type=str,
+            default='default',
+            callback=_make_validate_cluster_id(
+                existing_cluster_ids_func=existing_cluster_ids_func,
+            ),
+            help=(
+                'A unique identifier for the cluster. '
+                'Use the value "default" to use this cluster for other '
+                'commands without specifying --cluster-id.'
+            ),
+        )(command)  # type: Callable[..., None]
+        return function
+
+    return cluster_id_option

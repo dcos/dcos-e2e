@@ -25,6 +25,7 @@ from cli.common.options import (
     copy_to_master_option,
     extra_config_option,
     license_key_option,
+    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -32,10 +33,7 @@ from cli.common.options import (
     workspace_dir_option,
 )
 from cli.common.utils import get_variant
-from cli.common.validators import (
-    make_validate_cluster_id,
-    validate_path_is_directory,
-)
+from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
@@ -195,20 +193,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 @public_agents_option
 @extra_config_option
 @security_mode_option
-@click.option(
-    '-c',
-    '--cluster-id',
-    type=str,
-    default='default',
-    callback=make_validate_cluster_id(
-        existing_cluster_ids_func=existing_cluster_ids,
-    ),
-    help=(
-        'A unique identifier for the cluster. '
-        'Use the value "default" to use this cluster for other commands '
-        'without specifying --cluster-id.'
-    ),
-)
+@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
 @license_key_option
 @click.option(
     '--genconf-dir',
