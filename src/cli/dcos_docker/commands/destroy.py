@@ -10,7 +10,7 @@ import click_spinner
 from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers, existing_cluster_ids
-from ._options import existing_cluster_id_option
+from ._options import existing_cluster_id_option, node_transport_option
 
 
 @click.command('destroy-list')
@@ -19,6 +19,7 @@ from ._options import existing_cluster_id_option
     nargs=-1,
     type=str,
 )
+@node_transport_option
 @click.pass_context
 def destroy_list(
     ctx: click.core.Context,
@@ -47,6 +48,7 @@ def destroy_list(
 
 @click.command('destroy')
 @existing_cluster_id_option
+@node_transport_option
 def destroy(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.
