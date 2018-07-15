@@ -3,11 +3,15 @@ Tools for running arbitrary commands on cluster nodes.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple
 
 import click
 
-from cli.common.options import dcos_login_pw_option, dcos_login_uname_option
+from cli.common.options import (
+    dcos_login_pw_option,
+    dcos_login_uname_option,
+    environment_variables_option,
+)
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
 from cli.common.validators import validate_path_is_directory
@@ -15,31 +19,6 @@ from dcos_e2e.node import Node, Transport
 
 from ._common import ClusterContainers, ContainerInspectView
 from ._options import existing_cluster_id_option, node_transport_option
-
-
-def _validate_environment_variable(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> Dict[str, str]:
-    """
-    Validate that environment variables are set as expected.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (param, ctx):
-        pass
-
-    env = {}
-    for definition in value:
-        try:
-            key, val = definition.split(sep='=', maxsplit=1)
-        except ValueError:
-            message = (
-                '"{definition}" does not match the format "<KEY>=<VALUE>".'
-            ).format(definition=definition)
-            raise click.BadParameter(message=message)
-        env[key] = val
-    return env
 
 
 def _get_node(cluster_id: str, node_reference: str) -> Node:
@@ -135,13 +114,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         'These details be seen with ``dcos_docker inspect``.'
     ),
 )
-@click.option(
-    '--env',
-    type=str,
-    callback=_validate_environment_variable,
-    multiple=True,
-    help='Set environment variables in the format "<KEY>=<VALUE>"',
-)
+@environment_variables_option
 @node_transport_option
 def run(
     cluster_id: str,

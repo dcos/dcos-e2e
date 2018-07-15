@@ -60,6 +60,31 @@ def _make_validate_cluster_id(
     return _validate_cluster_id
 
 
+def _validate_environment_variable(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Dict[str, str]:
+    """
+    Validate that environment variables are set as expected.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (param, ctx):
+        pass
+
+    env = {}
+    for definition in value:
+        try:
+            key, val = definition.split(sep='=', maxsplit=1)
+        except ValueError:
+            message = (
+                '"{definition}" does not match the format "<KEY>=<VALUE>".'
+            ).format(definition=definition)
+            raise click.BadParameter(message=message)
+        env[key] = val
+    return env
+
+
 def _validate_dcos_configuration(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
@@ -127,6 +152,21 @@ def public_agents_option(command: Callable[..., None]) -> Callable[..., None]:
         default=1,
         show_default=True,
         help='The number of public agent nodes.',
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def environment_variables_option(command: Callable[..., None],
+                                 ) -> Callable[..., None]:
+    """
+    An option decorator for setting environment variables.
+    """
+    function = click.option(
+        '--env',
+        type=str,
+        callback=_validate_environment_variable,
+        multiple=True,
+        help='Set environment variables in the format "<KEY>=<VALUE>"',
     )(command)  # type: Callable[..., None]
     return function
 
@@ -309,7 +349,7 @@ def dcos_login_uname_option(command: Callable[..., None],
 
 def dcos_login_pw_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    A decorator for choosing the username to set the ``DCOS_LOGIN_PW``
+    A decorator for choosing the password to set the ``DCOS_LOGIN_PW``
     environment variable to.
     """
     function = click.option(
@@ -317,7 +357,7 @@ def dcos_login_pw_option(command: Callable[..., None]) -> Callable[..., None]:
         type=str,
         default='admin',
         help=(
-            'The username to set the ``DCOS_LOGIN_PW`` environment variable '
+            'The password to set the ``DCOS_LOGIN_PW`` environment variable '
             'to.'
         ),
     )(command)  # type: Callable[..., None]
