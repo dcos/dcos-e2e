@@ -201,7 +201,7 @@ def _check_networking() -> CheckLevels:
                 'We recommend using "dcos-docker setup-mac-network" to '
                 'resolve this issue.'
             )
-        error(message=message)
+        warn(message=message)
         highest_level = CheckLevels.WARNING
 
     ping_container.stop()
