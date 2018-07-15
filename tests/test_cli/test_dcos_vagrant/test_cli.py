@@ -76,6 +76,7 @@ class TestDcosVagrant:
               doctor        Diagnose common issues which stop DC/OS E2E...
               list          List all clusters.
               wait          Wait for DC/OS to start.
+              web           Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -419,3 +420,40 @@ class TestWait:
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
         assert expected_error in result.output
+
+
+class TestWeb:
+    """
+    Tests for the ``web`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-vagrant web --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_vagrant,
+            ['web', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-vagrant web [OPTIONS]
+
+              Open the browser at the web UI.
+
+              Note that the web UI may not be available at first. Consider using ``dcos-
+              vagrant wait`` before running this command.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
