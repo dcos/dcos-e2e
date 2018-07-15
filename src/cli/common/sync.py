@@ -72,6 +72,11 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
       - `dcos-docker run systemctl restart dcos-mesos-master`
       - `dcos-docker run journalctl -f -u dcos-mesos-master`
       - We expect to see the assertion error.
+
+    Args:
+        cluster: The cluster to sync code to.
+        dcos_checkout_dir: The path to a DC/OS (Enterprise) checkout to sync
+            code from.
     """
     local_packages = dcos_checkout_dir / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
