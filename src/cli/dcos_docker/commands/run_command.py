@@ -9,12 +9,12 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import click
 
+from cli.common.sync import sync_code_to_masters
 from cli.common.validators import validate_path_is_directory
 from dcos_e2e.node import Node, Transport
 
 from ._common import ClusterContainers, ContainerInspectView
 from ._options import existing_cluster_id_option, node_transport_option
-from .sync import sync_code
 
 
 def _validate_environment_variable(
@@ -157,9 +157,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     help='Set environment variables in the format "<KEY>=<VALUE>"',
 )
 @node_transport_option
-@click.pass_context
 def run(
-    ctx: click.core.Context,
     cluster_id: str,
     node_args: Tuple[str],
     sync_dir: Optional[Path],
@@ -186,22 +184,28 @@ def run(
     """  # noqa: E501
     host = _get_node(cluster_id=cluster_id, node_reference=node)
 
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
+    cluster = cluster_containers.cluster
+
     if sync_dir is not None:
-        ctx.invoke(
-            sync_code,
-            cluster_id=cluster_id,
-            dcos_checkout_dir=str(sync_dir),
-            transport=transport,
+        sync_code_to_masters(
+            cluster=cluster,
+            dcos_checkout_dir=sync_dir,
         )
 
-    if transport == Transport.DOCKER_EXEC:
-        columns, rows = click.get_terminal_size()
+    columns, rows = click.get_terminal_size()
+    env = {
+        # LINES and COLUMNS are needed if using the ``DOCKER_EXEC`` transport.
         # See https://github.com/moby/moby/issues/35407.
-        env = {
-            'COLUMNS': str(columns),
-            'LINES': str(rows),
-            **env,
-        }
+        'COLUMNS': str(columns),
+        'LINES': str(rows),
+        'DCOS_LOGIN_UNAME': dcos_login_uname,
+        'DCOS_LOGIN_PW': dcos_login_pw,
+        **env,
+    }
 
     if no_test_env:
         try:
@@ -217,18 +221,6 @@ def run(
             sys.exit(exc.returncode)
 
         return
-
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        transport=transport,
-    )
-    cluster = cluster_containers.cluster
-
-    env = {
-        'DCOS_LOGIN_UNAME': dcos_login_uname,
-        'DCOS_LOGIN_PW': dcos_login_pw,
-        **env,
-    }
 
     try:
         cluster.run_integration_tests(
