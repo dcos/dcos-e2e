@@ -206,6 +206,6 @@ class ClusterVMs:
         """
         Destroy this cluster.
         """
-        workspace_dir = self._vagrant_client.workspace_dir
+        workspace_dir = self.workspace_dir
         self._vagrant_client.destroy()
         rmtree(path=str(workspace_dir), ignore_errors=True)
