@@ -139,6 +139,13 @@ def start_dcos_container(
         '/var/lib/dcos/mesos-slave-common'
     )
 
+    setup_mesos_cgroup_root = (
+        'MESOS_CGROUPS_ROOT=`grep memory /proc/1/cgroup | cut -d: -f3`/mesos; '
+        'MESOS_CGROUPS_ROOT=${MESOS_CGROUPS_ROOT:1}; '
+        'echo "MESOS_CGROUPS_ROOT=$MESOS_CGROUPS_ROOT" >> '
+        '/var/lib/dcos/mesos-slave-common'
+    )
+
     docker_service_name = 'docker.service'
     docker_service_text = _docker_service_file(
         storage_driver=docker_storage_driver,
@@ -163,6 +170,7 @@ def start_dcos_container(
         ['systemctl', 'enable', docker_service_name],
         ['systemctl', 'start', docker_service_name],
         ['/bin/bash', '-c', disable_systemd_support_cmd],
+        ['/bin/bash', '-c', setup_mesos_cgroup_root],
         ['mkdir', '--parents', '/root/.ssh'],
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ['rm', '-f', '/run/nologin', '||', 'true'],
