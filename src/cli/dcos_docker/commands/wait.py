@@ -13,7 +13,7 @@ from cli.common.options import (
 from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers
-from ._options import existing_cluster_id_option, node_transport_option
+from ._options import existing_cluster_id_option
 
 
 @click.command('wait')
@@ -33,7 +33,6 @@ from ._options import existing_cluster_id_option, node_transport_option
         'For example this is useful on macOS without a VPN set up.'
     ),
 )
-@node_transport_option
 def wait(
     cluster_id: str,
     superuser_username: str,

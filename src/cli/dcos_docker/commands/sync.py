@@ -13,7 +13,7 @@ import click
 from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers
-from ._options import existing_cluster_id_option, node_transport_option
+from ._options import existing_cluster_id_option
 
 
 def _tar_with_filter(
@@ -52,7 +52,6 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
     envvar='DCOS_CHECKOUT_DIR',
     default='.',
 )
-@node_transport_option
 def sync_code(
     cluster_id: str,
     dcos_checkout_dir: str,

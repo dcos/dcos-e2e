@@ -13,7 +13,7 @@ from cli.common.validators import validate_path_is_directory
 from dcos_e2e.node import Node, Transport
 
 from ._common import ClusterContainers, ContainerInspectView
-from ._options import existing_cluster_id_option, node_transport_option
+from ._options import existing_cluster_id_option
 from .sync import sync_code
 
 
@@ -156,7 +156,6 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     multiple=True,
     help='Set environment variables in the format "<KEY>=<VALUE>"',
 )
-@node_transport_option
 @click.pass_context
 def run(
     ctx: click.core.Context,
