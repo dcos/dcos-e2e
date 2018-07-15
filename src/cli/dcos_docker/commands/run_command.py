@@ -12,6 +12,7 @@ from cli.common.options import (
     dcos_login_pw_option,
     dcos_login_uname_option,
     environment_variables_option,
+    sync_dir_run_option,
 )
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
@@ -83,16 +84,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 @node_args_argument
 @dcos_login_uname_option
 @dcos_login_pw_option
-@click.option(
-    '--sync-dir',
-    type=click.Path(exists=True),
-    help=(
-        'The path to a DC/OS checkout. '
-        'Part of this checkout will be synced to all master nodes before the '
-        'command is run.'
-    ),
-    callback=validate_path_is_directory,
-)
+@sync_dir_run_option
 @click.option(
     '--no-test-env',
     is_flag=True,
