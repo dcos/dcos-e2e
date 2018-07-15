@@ -37,8 +37,8 @@ CLI Reference
 .. click:: cli.dcos_vagrant:doctor
   :prog: dcos-vagrant doctor
 
-.. click:: cli.dcos_docker:run
-  :prog: dcos-docker run
+.. click:: cli.dcos_vagrant:run
+  :prog: dcos-vagrant run
 
 .. click:: cli.dcos_vagrant:sync_code
   :prog: dcos-vagrant sync
