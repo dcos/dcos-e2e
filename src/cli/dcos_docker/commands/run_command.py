@@ -7,14 +7,16 @@ from typing import Dict, Optional, Tuple
 
 import click
 
+from cli.common.arguments import node_args_argument
 from cli.common.options import (
     dcos_login_pw_option,
     dcos_login_uname_option,
     environment_variables_option,
+    no_test_env_run_option,
+    sync_dir_run_option,
 )
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
-from cli.common.validators import validate_path_is_directory
 from dcos_e2e.node import Node, Transport
 
 from ._common import ClusterContainers, ContainerInspectView
@@ -79,27 +81,11 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
 @existing_cluster_id_option
-@click.argument('node_args', type=str, nargs=-1, required=True)
+@node_args_argument
 @dcos_login_uname_option
 @dcos_login_pw_option
-@click.option(
-    '--sync-dir',
-    type=click.Path(exists=True),
-    help=(
-        'The path to a DC/OS checkout. '
-        'Part of this checkout will be synced to all master nodes before the '
-        'command is run.'
-    ),
-    callback=validate_path_is_directory,
-)
-@click.option(
-    '--no-test-env',
-    is_flag=True,
-    help=(
-        'With this flag set, no environment variables are set and the command '
-        'is run in the home directory. '
-    ),
-)
+@sync_dir_run_option
+@no_test_env_run_option
 @click.option(
     '--node',
     type=str,

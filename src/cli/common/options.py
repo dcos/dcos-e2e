@@ -364,6 +364,39 @@ def dcos_login_pw_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
+def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    A decorator for choosing a DC/OS checkout to sync before running commands.
+    """
+    function = click.option(
+        '--sync-dir',
+        type=click.Path(exists=True),
+        help=(
+            'The path to a DC/OS checkout. '
+            'Part of this checkout will be synced to all master nodes before '
+            'the command is run.'
+        ),
+        callback=validate_path_is_directory,
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def no_test_env_run_option(command: Callable[..., None],
+                           ) -> Callable[..., None]:
+    """
+    A decorator for choosing whether to run commands in a test environment.
+    """
+    function = click.option(
+        '--no-test-env',
+        is_flag=True,
+        help=(
+            'With this flag set, no environment variables are set and the '
+            'command is run in the home directory. '
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
 def make_cluster_id_option(
     existing_cluster_ids_func: Callable[[], Set[str]],
 ) -> Callable[[Callable[..., None]], Callable[..., None]]:
