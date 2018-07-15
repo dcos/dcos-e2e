@@ -7,6 +7,7 @@ Next
 ----
 
 - Add ``virtualbox_description`` parameter to the ``Vagrant`` backend.
+- Change the default tranport for the Docker backend to ``DOCKER_EXEC``.
 
 2018.07.10.0
 ------------
