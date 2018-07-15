@@ -12,11 +12,11 @@ from cli.common.options import (
     dcos_login_pw_option,
     dcos_login_uname_option,
     environment_variables_option,
+    no_test_env_run_option,
     sync_dir_run_option,
 )
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
-from cli.common.validators import validate_path_is_directory
 from dcos_e2e.node import Node, Transport
 
 from ._common import ClusterContainers, ContainerInspectView
@@ -85,14 +85,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 @dcos_login_uname_option
 @dcos_login_pw_option
 @sync_dir_run_option
-@click.option(
-    '--no-test-env',
-    is_flag=True,
-    help=(
-        'With this flag set, no environment variables are set and the command '
-        'is run in the home directory. '
-    ),
-)
+@no_test_env_run_option
 @click.option(
     '--node',
     type=str,
