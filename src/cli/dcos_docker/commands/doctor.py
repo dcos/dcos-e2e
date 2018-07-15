@@ -192,9 +192,8 @@ def _check_networking() -> CheckLevels:
             'Cannot connect to a Docker container by its IP address. '
             'This is needed for features such as connecting to the web UI and '
             'using the DC/OS CLI. '
-            'To use some parts of this CLI without resolving this issue, use '
-            'the "--transport docker-exec" option on many of the available '
-            'commands, and the --skip-http-checks flag on the "wait" command.'
+            'To use the "wait" command without resolving this issue, use the '
+            '"--skip-http-checks" flag on the "wait" command.'
         )
         if docker_for_mac:
             message += (
@@ -203,7 +202,7 @@ def _check_networking() -> CheckLevels:
                 'resolve this issue.'
             )
         error(message=message)
-        highest_level = CheckLevels.ERROR
+        highest_level = CheckLevels.WARNING
 
     ping_container.stop()
     ping_container.remove(v=True)
