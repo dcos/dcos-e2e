@@ -277,8 +277,6 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
         'The Docker network containers will be connected to.'
         'It may not be possible to SSH to containers on a custom network on '
         'macOS. '
-        'Therefore, it is recommended that you use this in conjunction with '
-        'the "--transport" option.'
     ),
 )
 @node_transport_option

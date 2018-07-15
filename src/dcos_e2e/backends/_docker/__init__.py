@@ -115,7 +115,7 @@ class Docker(ClusterBackend):
         docker_master_labels: Optional[Dict[str, str]] = None,
         docker_agent_labels: Optional[Dict[str, str]] = None,
         docker_public_agent_labels: Optional[Dict[str, str]] = None,
-        transport: Transport = Transport.SSH,
+        transport: Transport = Transport.DOCKER_EXEC,
         network: Optional[docker.models.networks.Network] = None,
     ) -> None:
         """
@@ -155,8 +155,6 @@ class Docker(ClusterBackend):
                 network is specified the ``docker0`` bridge network is used.
                 It may not be possible to SSH to containers on a
                 custom network on macOS.
-                Therefore, it is recommended that you use this in conjunction
-                with the ``transport`` parameter.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -188,9 +186,6 @@ class Docker(ClusterBackend):
                 network is specified the ``docker0`` bridge network is used.
                 It may not be possible to SSH to containers on a
                 custom network on macOS.
-                Therefore, it is recommended that you use this in conjunction
-                with the ``transport`` parameter.
-
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run

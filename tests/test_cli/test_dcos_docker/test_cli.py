@@ -222,15 +222,13 @@ class TestCreate:
               --network TEXT                  The Docker network containers will be
                                               connected to.It may not be possible to SSH to
                                               containers on a custom network on macOS.
-                                              Therefore, it is recommended that you use this
-                                              in conjunction with the "--transport" option.
               --transport [docker-exec|ssh]   The communication transport to use. On macOS
                                               the SSH transport requires IP routing to be
                                               set up. See "dcos-docker setup-mac-network".It
                                               also requires the "ssh" command to be
                                               available. This can be provided by setting the
                                               `DCOS_DOCKER_TRANSPORT` environment variable.
-                                              [default: ssh]
+                                              [default: docker-exec]
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -702,7 +700,7 @@ class TestDestroy:
                                              requires the "ssh" command to be available.
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: ssh]
+                                             [default: docker-exec]
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -759,7 +757,7 @@ class TestDestroyList:
                                              requires the "ssh" command to be available.
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: ssh]
+                                             [default: docker-exec]
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -930,7 +928,7 @@ class TestWait:
                                              requires the "ssh" command to be available.
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: ssh]
+                                             [default: docker-exec]
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -990,7 +988,7 @@ class TestSync:
                                              requires the "ssh" command to be available.
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: ssh]
+                                             [default: docker-exec]
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -1283,7 +1281,7 @@ class TestRun:
                                              requires the "ssh" command to be available.
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: ssh]
+                                             [default: docker-exec]
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
