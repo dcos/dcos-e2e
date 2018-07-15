@@ -42,16 +42,10 @@ Next
 
 - Add a ``aws_instance_type`` parameter to the ``AWS`` backend.
 
-2018.06.28.1
-------------
-
 2018.06.28.0
 ------------
 
 - Compare ``Node`` objects based on the ``public_ip_address`` and ``private_ip_address``.
-
-2018.06.27.0
-------------
 
 2018.06.26.0
 ------------
