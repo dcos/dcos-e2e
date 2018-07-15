@@ -13,7 +13,7 @@ from ._options import existing_cluster_id_option
 
 @click.command('inspect')
 @existing_cluster_id_option
-def inspect_cluster(cluster_id: str, env: bool) -> None:
+def inspect_cluster(cluster_id: str) -> None:
     """
     Show cluster details.
     """
