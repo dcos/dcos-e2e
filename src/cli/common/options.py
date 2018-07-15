@@ -289,6 +289,41 @@ def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
+def dcos_login_uname_option(command: Callable[..., None],
+                            ) -> Callable[..., None]:
+    """
+    A decorator for choosing the username to set the ``DCOS_LOGIN_UNAME``
+    environment variable to.
+    """
+    function = click.option(
+        '--dcos-login-uname',
+        type=str,
+        default='admin',
+        help=(
+            'The username to set the ``DCOS_LOGIN_UNAME`` environment '
+            'variable to.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def dcos_login_pw_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    A decorator for choosing the username to set the ``DCOS_LOGIN_PW``
+    environment variable to.
+    """
+    function = click.option(
+        '--dcos-login-pw',
+        type=str,
+        default='admin',
+        help=(
+            'The username to set the ``DCOS_LOGIN_PW`` environment variable '
+            'to.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
+
+
 def make_cluster_id_option(
     existing_cluster_ids_func: Callable[[], Set[str]],
 ) -> Callable[[Callable[..., None]], Callable[..., None]]:
