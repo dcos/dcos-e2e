@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 import click
 
+from cli.common.options import dcos_login_pw_option, dcos_login_uname_option
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
 from cli.common.validators import validate_path_is_directory
@@ -99,23 +100,9 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
 @existing_cluster_id_option
-@click.option(
-    '--dcos-login-uname',
-    type=str,
-    default='admin',
-    help=(
-        'The username to set the ``DCOS_LOGIN_UNAME`` environment variable to.'
-    ),
-)
-@click.option(
-    '--dcos-login-pw',
-    type=str,
-    default='admin',
-    help=(
-        'The password to set the ``DCOS_LOGIN_PW`` environment variable to.'
-    ),
-)
 @click.argument('node_args', type=str, nargs=-1, required=True)
+@dcos_login_uname_option
+@dcos_login_pw_option
 @click.option(
     '--sync-dir',
     type=click.Path(exists=True),
