@@ -7,6 +7,7 @@ from typing import Dict, Optional, Tuple
 
 import click
 
+from cli.common.arguments import node_args_argument
 from cli.common.options import (
     dcos_login_pw_option,
     dcos_login_uname_option,
@@ -79,7 +80,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
 @existing_cluster_id_option
-@click.argument('node_args', type=str, nargs=-1, required=True)
+@node_args_argument
 @dcos_login_uname_option
 @dcos_login_pw_option
 @click.option(

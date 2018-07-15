@@ -19,3 +19,16 @@ def dcos_checkout_dir_argument(command: Callable[..., None],
         default='.',
     )(command)  # type: Callable[..., None]
     return function
+
+
+def node_args_argument(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for choosing arguments to run on a node.
+    """
+    function = click.argument(
+        'node_args',
+        type=str,
+        nargs=-1,
+        required=True,
+    )(command)  # type: Callable[..., None]
+    return function
