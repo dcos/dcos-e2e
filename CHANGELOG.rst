@@ -8,6 +8,7 @@ Next
 
 - Add ``virtualbox_description`` parameter to the ``Vagrant`` backend.
 - Change the default tranport for the Docker backend to ``DOCKER_EXEC``.
+- Remove the option to use SSH to communicated with nodes on the ``dcos-docker`` CLI.
 
 2018.07.10.0
 ------------
