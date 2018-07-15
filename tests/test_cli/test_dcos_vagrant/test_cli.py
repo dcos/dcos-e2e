@@ -74,6 +74,7 @@ class TestDcosVagrant:
               destroy-list  Destroy clusters.
               doctor        Diagnose common issues which stop DC/OS E2E...
               list          List all clusters.
+              run           Run an arbitrary command on a node.
               sync          Sync files from a DC/OS checkout to master...
               wait          Wait for DC/OS to start.
               web           Open the browser at the web UI.
@@ -321,6 +322,62 @@ class TestList:
               --help  Show this message and exit.
             """,
         )
+        assert result.output == expected_help
+
+
+class TestRun:
+    """
+    Tests for the ``run`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-vagrant run --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_vagrant,
+            ['run', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-vagrant run [OPTIONS] NODE_ARGS...
+
+              Run an arbitrary command on a node.
+
+              This command sets up the environment so that ``pytest`` can be run.
+
+              For example, run ``dcos-vagrant run --cluster-id 1231599 pytest -k
+              test_tls.py``.
+
+              Or, with sync: ``dcos-vagrant run --sync-dir . --cluster-id 1231599 pytest
+              -k test_tls.py``.
+
+              To use special characters such as single quotes in your command, wrap the
+              whole command in double quotes.
+
+            Options:
+              -c, --cluster-id TEXT    The ID of the cluster to use.  [default: default]
+              --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
+                                       environment variable to.
+              --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` environment
+                                       variable to.
+              --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
+                                       will be synced to all master nodes before the command
+                                       is run.
+              --no-test-env            With this flag set, no environment variables are set
+                                       and the command is run in the home directory.
+              --env TEXT               Set environment variables in the format
+                                       "<KEY>=<VALUE>"
+              --help                   Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
         assert result.output == expected_help
 
 
