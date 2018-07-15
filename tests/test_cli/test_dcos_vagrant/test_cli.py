@@ -14,7 +14,6 @@ to capture what the help text actually is with:
 """
 
 import os
-import uuid
 from textwrap import dedent
 from typing import List
 
@@ -210,21 +209,6 @@ class TestDestroy:
         # yapf: enable
         assert result.output == expected_help
 
-    def test_cluster_does_not_exist(self) -> None:
-        """
-        An error is shown if the given cluster does not exist.
-        """
-        unique = uuid.uuid4().hex
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_vagrant,
-            ['destroy', '--cluster-id', unique],
-        )
-        assert result.exit_code == 2
-        expected_error = 'Cluster "{unique}" does not exist'
-        expected_error = expected_error.format(unique=unique)
-        assert expected_error in result.output
-
 
 class TestDestroyList:
     """
@@ -259,41 +243,6 @@ class TestDestroyList:
         )
         # yapf: enable
         assert result.output == expected_help
-
-    def test_cluster_does_not_exist(self) -> None:
-        """
-        An error is shown if the given cluster does not exist.
-        """
-        unique = uuid.uuid4().hex
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_vagrant,
-            ['destroy-list', unique],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        expected_error = 'Cluster "{unique}" does not exist'
-        expected_error = expected_error.format(unique=unique)
-        assert expected_error in result.output
-
-    def test_multiple_clusters(self) -> None:
-        """
-        It is possible to give multiple cluster IDs.
-        """
-        unique = uuid.uuid4().hex
-        unique_2 = uuid.uuid4().hex
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_vagrant,
-            ['destroy-list', unique, unique_2],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        expected_error = 'Cluster "{unique}" does not exist'
-        expected_error = expected_error.format(unique=unique)
-        assert expected_error in result.output
-        expected_error = expected_error.format(unique=unique_2)
-        assert expected_error in result.output
 
 
 class TestDoctor:
@@ -408,18 +357,6 @@ class TestWait:
         )
         # yapf: enable
         assert result.output == expected_help
-
-    def test_cluster_does_not_exist(self) -> None:
-        """
-        An error is shown if the given cluster does not exist.
-        """
-        unique = uuid.uuid4().hex
-        runner = CliRunner()
-        result = runner.invoke(dcos_vagrant, ['wait', '--cluster-id', unique])
-        assert result.exit_code == 2
-        expected_error = 'Cluster "{unique}" does not exist'
-        expected_error = expected_error.format(unique=unique)
-        assert expected_error in result.output
 
 
 class TestWeb:
