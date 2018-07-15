@@ -38,7 +38,7 @@ def node_transport_option(command: Callable[..., None],
         '--transport',
         type=click.Choice(sorted(transports.keys())),
         callback=lambda ctx, param, value: transports[str(value)],
-        default='ssh',
+        default='docker-exec',
         show_default=True,
         envvar='DCOS_DOCKER_TRANSPORT',
         help=(
