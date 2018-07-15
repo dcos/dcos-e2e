@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 
+from cli.common.arguments import dcos_checkout_dir_argument
 from cli.common.sync import sync_code_to_masters
 from dcos_e2e.node import Transport
 
@@ -15,12 +16,7 @@ from ._options import existing_cluster_id_option, node_transport_option
 
 @click.command('sync')
 @existing_cluster_id_option
-@click.argument(
-    'dcos_checkout_dir',
-    type=click.Path(exists=True),
-    envvar='DCOS_CHECKOUT_DIR',
-    default='.',
-)
+@dcos_checkout_dir_argument
 @node_transport_option
 def sync_code(
     cluster_id: str,
