@@ -12,6 +12,11 @@ Next
 - Add ``virtualbox_description`` parameter to the ``Vagrant`` backend.
 - Change the default transport for the Docker backend to ``DOCKER_EXEC``.
 
+2018.07.15.0
+------------
+
+- Add a ``--one-master-host-port-map`` option to ``dcos-docker create``.
+
 2018.07.10.0
 ------------
 
