@@ -41,7 +41,8 @@ def _docker_service_file(
         '{daemon} '
         '-D '
         '-s {storage_driver_name} '
-        '--exec-opt=native.cgroupdriver=cgroupfs'
+        '--exec-opt=native.cgroupdriver=cgroupfs '
+        '--cgroup-parent=${{CGROUP_PARENT}}'
     ).format(
         storage_driver_name=storage_driver_name,
         daemon=daemon,
@@ -54,6 +55,7 @@ def _docker_service_file(
             'After': 'dbus.service',
         },
         'Service': {
+            'EnvironmentFile': '/etc/docker/env',
             'ExecStart': docker_cmd,
             'LimitNOFILE': '1048576',
             'LimitNPROC': '1048576',
@@ -159,12 +161,18 @@ def start_dcos_container(
         '>',
         docker_service_dst,
     ]
+    docker_env_setup = (
+        'CGROUP=`grep memory /proc/1/cgroup | cut -d: -f3`; '
+        'echo "CGROUP_PARENT=$CGROUP/docker" >> '
+        '/etc/docker/env'
+    )
 
     public_key = public_key_path.read_text()
     echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
 
     for cmd in [
         ['mkdir', '-p', '/var/lib/dcos'],
+        ['/bin/bash', '-c', docker_env_setup],
         ['mkdir', '-p', '/lib/systemd/system'],
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
         ['systemctl', 'enable', docker_service_name],
