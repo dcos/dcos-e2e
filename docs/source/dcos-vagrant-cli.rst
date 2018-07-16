@@ -76,6 +76,41 @@ It can become tedious repeatedly typing the cluster ID, particularly if you only
 Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
 This means that you can use ``dcos-vagrant wait`` with no arguments to wait for the ``default`` cluster.
 
+Running commands on Cluster Nodes
+---------------------------------
+
+It is possible to run commands on a cluster node in multiple ways.
+These include using :ref:`dcos-vagrant-run` and ``ssh``.
+
+Running commands on a cluster node using :ref:`dcos-vagrant-run`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is possible to run the following to run a command on an arbitrary master node.
+
+.. code-block:: console
+
+   $ dcos-vagrant run --cluster-id example systemctl list-units
+
+See :ref:`the dcos-vagrant run reference <dcos-vagrant-run>` for more information on this command.
+
+Running commands on a cluster node using ``ssh``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One SSH key allows access to all nodes in the cluster.
+See this SSH key's path and the IP addresses of nodes using :ref:`dcos-vagrant-inspect`.
+
+Getting on to a Cluster Node
+----------------------------
+
+Sometimes it is useful to get onto a cluster node.
+To do this, you can use any of the ways of :ref:`running-commands`.
+
+For example, to use :ref:`dcos-vagrant-run` to run ``bash`` to get on to an arbitrary master node:
+
+.. code-block:: console
+
+   $ dcos-vagrant run --cluster-id example bash
+
 CLI Reference
 -------------
 
