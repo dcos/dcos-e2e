@@ -73,6 +73,7 @@ class TestDcosVagrant:
               destroy       Destroy a cluster.
               destroy-list  Destroy clusters.
               doctor        Diagnose common issues which stop DC/OS E2E...
+              inspect       Show cluster details.
               list          List all clusters.
               run           Run an arbitrary command on a node.
               sync          Sync files from a DC/OS checkout to master...
@@ -294,6 +295,40 @@ class TestDoctor:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
+
+
+class TestInspect:
+    """
+    Tests for the `inspect` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-vagrant inspect --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_vagrant,
+            ['inspect', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-vagrant inspect [OPTIONS]
+
+              Show cluster details.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
 
 
 class TestList:
