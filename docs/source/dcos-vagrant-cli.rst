@@ -83,7 +83,7 @@ It is possible to run commands on a cluster node in multiple ways.
 These include using :ref:`dcos-vagrant-run` and ``ssh``.
 
 Running commands on a cluster node using :ref:`dcos-vagrant-run`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is possible to run the following to run a command on an arbitrary master node.
 
@@ -111,6 +111,67 @@ For example, to use :ref:`dcos-vagrant-run` to run ``bash`` to get on to an arbi
 
    $ dcos-vagrant run --cluster-id example bash
 
+Destroying Clusters
+-------------------
+
+There are two commands which can be used to destroy clusters.
+These are :ref:`dcos-vagrant-destroy` and :ref:`dcos-vagrant-destroy-list`.
+
+Either destroy a cluster with :ref:`dcos-vagrant-destroy`:
+
+.. code-block:: console
+
+   $ dcos-vagrant destroy
+   default
+   $ dcos-vagrant destroy --cluster-id pr_4033_strict
+   pr_4033_strict
+
+or use :ref:`dcos-vagrant-destroy-list` to destroy multiple clusters:
+
+.. code-block:: console
+
+   $ dcos-vagrant destroy-list pr_4033_strict pr_4019_permissive
+   pr_4033_strict
+   pr_4019_permissive
+
+To destroy all clusters, run the following command:
+
+.. code-block:: console
+
+   $ dcos-vagrant destroy-list $(dcos-vagrant list)
+   pr_4033_strict
+   pr_4019_permissive
+
+Viewing Debug Information
+-------------------------
+
+The CLI is quiet by default.
+To see more information, use ``-v`` or ``-vv`` after ``dcos-docker``.
+
+Running Integration Tests
+-------------------------
+
+The :ref:`dcos-vagrant-run` command is useful for running integration tests.
+
+To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
+
+.. code-block:: console
+
+   $ dcos-vagrant create /tmp/dcos_generate_config.ee.sh
+   $ dcos-vagrant wait
+   $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+
+There are multiple options and shortcuts for using these commands.
+See :ref:`the dcos-vagrant run reference <dcos-vagrant-run>` for more information on this command.
+
+Viewing the Web UI
+------------------
+
+To view the web UI of your cluster, use the :ref:`dcos-vagrant-web` command.
+If you instead want to view the web UI URL of your cluster, use the :ref:`dcos-vagrant-inspect` command.
+
+Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
+
 CLI Reference
 -------------
 
@@ -125,8 +186,30 @@ CLI Reference
 .. click:: cli.dcos_vagrant:LIST_CLUSTERS
   :prog: dcos-vagrant list
 
+.. _dcos-vagrant-wait:
+
+.. click:: cli.dcos_vagrant:wait
+  :prog: dcos-vagrant wait
+
+.. _dcos-vagrant-run:
+
+.. click:: cli.dcos_vagrant:run
+  :prog: dcos-vagrant run
+
+.. _dcos-vagrant-inspect:
+
+.. click:: cli.dcos_vagrant:inspect_cluster
+  :prog: dcos-vagrant inspect
+
+.. click:: cli.dcos_vagrant:sync_code
+  :prog: dcos-vagrant sync
+
+.. _dcos-vagrant-destroy:
+
 .. click:: cli.dcos_vagrant:destroy
   :prog: dcos-vagrant destroy
+
+.. _dcos-vagrant-destroy-list:
 
 .. click:: cli.dcos_vagrant:destroy_list
   :prog: dcos-vagrant destroy-list
@@ -136,17 +219,7 @@ CLI Reference
 .. click:: cli.dcos_vagrant:doctor
   :prog: dcos-vagrant doctor
 
-.. click:: cli.dcos_vagrant:run
-  :prog: dcos-vagrant run
-
-.. click:: cli.dcos_vagrant:inspect_cluster
-  :prog: dcos-vagrant inspect
-
-.. click:: cli.dcos_vagrant:sync_code
-  :prog: dcos-vagrant sync
-
-.. click:: cli.dcos_vagrant:wait
-  :prog: dcos-vagrant wait
+.. _dcos-vagrant-web:
 
 .. click:: cli.dcos_vagrant:web
   :prog: dcos-vagrant web
