@@ -11,7 +11,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Tuple, Type
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type
 
 import docker
 import yaml
@@ -225,7 +225,6 @@ class DockerCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: Docker,
     ) -> None:
         """
@@ -235,11 +234,6 @@ class DockerCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-                Currently on DC/OS Docker the only supported paths on the
-                installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
         self._default_user = 'root'
@@ -282,15 +276,6 @@ class DockerCluster(ClusterManager):
             public_key_path=public_key_path,
             private_key_path=ssh_dir / 'id_rsa',
         )
-
-        for host_path, installer_path in files_to_copy_to_installer:
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = self._genconf_dir / relative_installer_path
-            if host_path.is_dir():
-                destination_path = destination_path / host_path.stem
-                copytree(src=str(host_path), dst=str(destination_path))
-            else:
-                copyfile(src=str(host_path), dst=str(destination_path))
 
         self._master_prefix = self._cluster_id + '-master-'
         self._agent_prefix = self._cluster_id + '-agent-'
@@ -474,6 +459,7 @@ class DockerCluster(ClusterManager):
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Install DC/OS from a given build artifact.
@@ -483,10 +469,24 @@ class DockerCluster(ClusterManager):
                 from.
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+                Currently on DC/OS Docker the only supported paths on the
+                installer are in the ``/genconf`` directory.
 
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.
         """
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = self._genconf_dir / relative_installer_path
+            if host_path.is_dir():
+                destination_path = destination_path / host_path.stem
+                copytree(src=str(host_path), dst=str(destination_path))
+            else:
+                copyfile(src=str(host_path), dst=str(destination_path))
+
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)

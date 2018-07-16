@@ -378,13 +378,13 @@ def create(
         if security_mode is not None:
             extra_config['security'] = security_mode
 
-    files_to_copy_to_installer = []
+    files_to_copy_to_genconf_dir = []
     if genconf_dir is not None:
         container_genconf_path = Path('/genconf')
         for genconf_file in genconf_dir.glob('*'):
             genconf_relative = genconf_file.relative_to(genconf_dir)
             relative_path = container_genconf_path / genconf_relative
-            files_to_copy_to_installer.append((genconf_file, relative_path))
+            files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
     cluster_backend = Docker(
         custom_container_mounts=custom_volume,
@@ -413,7 +413,6 @@ def create(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=files_to_copy_to_installer,
         )
     except CalledProcessError as exc:
         click.echo('Error creating cluster.', err=True)
@@ -453,6 +452,7 @@ def create(
         with click_spinner.spinner():
             cluster.install_dcos_from_path(
                 build_artifact=artifact_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
                 dcos_config={
                     **cluster.base_config,
                     **extra_config,

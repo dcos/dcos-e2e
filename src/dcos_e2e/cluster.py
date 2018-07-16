@@ -45,7 +45,6 @@ class Cluster(ContextDecorator):
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        files_to_copy_to_installer: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -55,15 +54,11 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-        """
+                    """
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=list(files_to_copy_to_installer),
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
@@ -102,7 +97,6 @@ class Cluster(ContextDecorator):
             masters=len(masters),
             agents=len(agents),
             public_agents=len(public_agents),
-            files_to_copy_to_installer=(),
             cluster_backend=backend,
         )
 
@@ -387,6 +381,8 @@ class Cluster(ContextDecorator):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        files_to_copy_to_genconf_dir: Optional[Iterable[Tuple[Path, Path]]
+                                               ] = (),
         log_output_live: bool = False,
     ) -> None:
         """
@@ -394,6 +390,9 @@ class Cluster(ContextDecorator):
             build_artifact: The `Path` to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 
@@ -406,6 +405,9 @@ class Cluster(ContextDecorator):
             self._cluster.install_dcos_from_path_with_bootstrap_node(
                 build_artifact=build_artifact,
                 dcos_config=dcos_config,
+                files_to_copy_to_genconf_dir=list(
+                    files_to_copy_to_genconf_dir or (),
+                ),
                 log_output_live=log_output_live,
             )
         except NotImplementedError:

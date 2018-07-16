@@ -1,4 +1,5 @@
 from pathlib import Path
+from textwrap import dedent
 
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
@@ -30,9 +31,11 @@ class TestCustomIPDetect:
 
             (master, ) = cluster.masters
             ip_detect_file = tmpdir.join('ip-detect')
-            ip_detect_contents = (
-                '#!/bin/bash\n'
-                'echo {ip_address}'
+            ip_detect_contents = dedent(
+                """\
+                #!/bin/bash
+                echo {ip_address}
+                """,
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write(ip_detect_contents)
 
@@ -68,9 +71,11 @@ class TestCustomIPDetect:
 
             (master, ) = cluster.masters
             ip_detect_file = tmpdir.join('ip-detect')
-            ip_detect_contents = (
-                '#!/bin/bash\n'
-                'echo {ip_address}'
+            ip_detect_contents = dedent(
+                """\
+                #!/bin/bash
+                echo {ip_address}
+                """,
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write(ip_detect_contents)
 

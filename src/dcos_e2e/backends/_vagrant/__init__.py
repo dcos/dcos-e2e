@@ -9,7 +9,7 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Tuple, Type
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type
 
 import yaml
 
@@ -161,6 +161,7 @@ class VagrantCluster(ClusterManager):
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a build artifact passed as a file system `Path`.
@@ -169,6 +170,9 @@ class VagrantCluster(ClusterManager):
             build_artifact: The path to a build artifact to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+                installer node. This must be empty as it is not currently
+                supported.
         """
         raise NotImplementedError
 
