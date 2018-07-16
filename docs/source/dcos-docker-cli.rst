@@ -156,7 +156,7 @@ Either destroy a cluster with :ref:`dcos-docker-destroy`:
 
    $ dcos-docker destroy
    default
-   $ dcos-docker destroy pr_4033_strict
+   $ dcos-docker destroy --cluster-id pr_4033_strict
    pr_4033_strict
 
 or use :ref:`dcos-docker-destroy-list` to destroy multiple clusters:
