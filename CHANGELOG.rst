@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.07.16.0
+------------
+
 - Add ``virtualbox_description`` parameter to the ``Vagrant`` backend.
 - Change the default transport for the Docker backend to ``DOCKER_EXEC``.
 
