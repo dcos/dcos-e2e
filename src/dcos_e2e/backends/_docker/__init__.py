@@ -425,11 +425,6 @@ class DockerCluster(ClusterManager):
         """
         ssh_user = self._default_user
 
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_contents = Path(ip_detect_src).read_text()
-
         config = {
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
@@ -446,10 +441,6 @@ class DockerCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
-            # This is not a documented option.
-            # Users are instructed to instead provide a filename with
-            # 'ip_detect_contents_filename'.
-            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
         return config
@@ -478,6 +469,12 @@ class DockerCluster(ClusterManager):
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.
         """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        ip_detect_src = current_parent / 'resources' / 'ip-detect'
+        ip_detect_dst = Path(self._genconf_dir / 'ip-detect')
+        copyfile(src=(str(ip_detect_src)), dst=str(ip_detect_dst))
+
         for host_path, installer_path in files_to_copy_to_genconf_dir:
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = self._genconf_dir / relative_installer_path

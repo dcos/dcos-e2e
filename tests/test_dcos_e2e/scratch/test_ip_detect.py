@@ -44,12 +44,12 @@ class TestCustomIPDetect:
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
                 files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('genconf/ip-detect')),
+                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
                 ],
             )
             cluster.wait_for_dcos_oss()
             cat_result = master.run(
-                args=['cat', '/opt/mesosphere/bin/ip_detect'],
+                args=['cat', '/opt/mesosphere/bin/detect_ip'],
             )
             assert cat_result.stdout.decode() == ip_detect_contents
 
@@ -83,11 +83,11 @@ class TestCustomIPDetect:
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
                 files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('genconf/ip-detect')),
+                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
                 ],
             )
-            master.wait_for_dcos()
+            cluster.wait_for_dcos_oss()
             cat_result = master.run(
-                args=['cat', '/opt/mesosphere/bin/ip_detect'],
+                args=['cat', '/opt/mesosphere/bin/detect_ip'],
             )
             assert cat_result.stdout.decode() == ip_detect_contents
