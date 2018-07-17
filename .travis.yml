@@ -31,7 +31,7 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestDestroyNode
-  - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
+  - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyDirectory
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS
