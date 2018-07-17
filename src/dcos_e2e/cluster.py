@@ -54,7 +54,7 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-                    """
+        """
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,

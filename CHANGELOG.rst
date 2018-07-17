@@ -6,6 +6,7 @@ Changelog
 Next
 ----
 
+- Remove the ``files_to_copy_to_installer`` argument from ``Cluster.__init__`` and add ``files_to_copy_to_genconf_dir`` to ``Cluster.install_dcos_from_path`` instead.
 - Add ``virtualbox_description`` parameter to the ``Vagrant`` backend.
 - Change the default transport for the Docker backend to ``DOCKER_EXEC``.
 
