@@ -84,24 +84,7 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
-    def test_copy_to_installer_not_supported(self) -> None:
-        """
-        The AWS backend does not support copying files to the installer.
-        """
-        with pytest.raises(NotImplementedError) as excinfo:
-            Cluster(
-                cluster_backend=AWS(),
-                files_to_copy_to_installer={Path('/'): Path('/')},
-            )
-
-        expected_error = (
-            'Copying files to the installer is currently not supported by the '
-            'AWS backend.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
-    def test_destroy_node(self):
+    def test_destroy_node(self) -> None:
         """
         Destroying a particular node is not supported on the AWS backend.
         """

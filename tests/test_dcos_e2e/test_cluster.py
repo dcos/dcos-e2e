@@ -138,7 +138,7 @@ class TestClusterSize:
             assert len(cluster.public_agents) == public_agents
 
 
-class TestInstallDcosCustomGenconf:
+class TestCopyFiles:
 
     def test_install_cluster_from_path(
         self,
