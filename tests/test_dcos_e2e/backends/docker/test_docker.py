@@ -549,3 +549,61 @@ class TestOneMasterHostPortMap:
                     if host_ports[0]['HostPort'] == '8000':
                         port_map_found = True
             assert port_map_found
+
+
+class TestDevices:
+    """
+    Tests for setting device mapping on master or agent Docker containers.
+    """
+
+    def test_default(self) -> None:
+        with Cluster(
+            cluster_backend=Docker(),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            container = _get_container_from_node(node=master)
+            devices = container.attrs['HostConfig']['Devices']
+            assert devices is None
+
+    def test_master_devices(self) -> None:
+        with Cluster(
+            cluster_backend=Docker(
+                master_devices=['/dev/zero:/dev/foo']),
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            container = _get_container_from_node(node=master)
+            devices = container.attrs['HostConfig']['Devices']
+            expected_devices = [
+                {
+                    'PathOnHost': '/dev/zero',
+                    'PathInContainer': '/dev/foo',
+                    'CgroupPermissions': 'rwm',
+                },
+            ]
+            assert devices == expected_devices
+
+    def test_agent_devices(self) -> None:
+        with Cluster(
+            cluster_backend=Docker(
+                agent_devices=['/dev/zero:/dev/foo']),
+            masters=0,
+            agents=1,
+            public_agents=0,
+        ) as cluster:
+            (agent, ) = cluster.agents
+            container = _get_container_from_node(node=agent)
+            devices = container.attrs['HostConfig']['Devices']
+            expected_devices = [
+                {
+                    'PathOnHost': '/dev/zero',
+                    'PathInContainer': '/dev/foo',
+                    'CgroupPermissions': 'rwm',
+                },
+            ]
+            assert devices == expected_devices
