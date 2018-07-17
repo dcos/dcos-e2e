@@ -89,6 +89,7 @@ def start_dcos_container(
     docker_version: DockerVersion,
     network: Optional[docker.models.networks.Network] = None,
     ports: Optional[Dict[str, Any]] = None,
+    devices: Optional[List[str]] = None,
 ) -> None:
     """
     Start a master, agent or public agent container.
@@ -134,6 +135,7 @@ def start_dcos_container(
         stop_signal='SIGRTMIN+3',
         command=['/sbin/init'],
         ports=ports or {},
+        devices=devices or [],
     )
     if network:
         network.connect(container)
