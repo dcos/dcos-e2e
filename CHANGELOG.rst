@@ -6,6 +6,11 @@ Changelog
 Next
 ----
 
+2018.07.17.0
+------------
+
+- Add ``master_devices`` and ``agent_devices`` parameters to the ``Docker`` backend.
+
 2018.07.16.0
 ------------
 

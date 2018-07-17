@@ -118,6 +118,8 @@ class Docker(ClusterBackend):
         transport: Transport = Transport.DOCKER_EXEC,
         network: Optional[docker.models.networks.Network] = None,
         one_master_host_port_map: Optional[Dict[str, int]] = None,
+        master_devices: Optional[List[str]] = None,
+        agent_devices: Optional[List[str]] = None,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -164,6 +166,10 @@ class Docker(ClusterBackend):
                 master only if there are multiple master nodes. See `ports` in
                 `Containers.run`_. Currently, only Transmission Control
                 Protocol is supported.
+            master_devices: Device mappings for master containers. See
+                `devices` in `Containers.run`_.
+            agent_devices: Device mappings for agent containers. See `devices`
+                in `Containers.run`_.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -203,6 +209,10 @@ class Docker(ClusterBackend):
                 master only if there are multiple master nodes. See `ports` in
                 `Containers.run`_. Currently, only Transmission Control
                 Protocol is supported.
+            master_devices: Device mappings for master containers. See
+                `devices` in `Containers.run`_.
+            agent_devices: Device mappings for agent containers. See `devices`
+                in `Containers.run`_.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
@@ -223,6 +233,8 @@ class Docker(ClusterBackend):
         self.transport = transport
         self.network = network
         self.one_master_host_port_map = one_master_host_port_map or {}
+        self.master_devices = master_devices or []
+        self.agent_devices = agent_devices or []
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -407,6 +419,7 @@ class DockerCluster(ClusterManager):
                 docker_version=cluster_backend.docker_version,
                 network=cluster_backend.network,
                 ports=ports,
+                devices=cluster_backend.master_devices,
             )
 
         for nodes, prefix, labels, mounts in (
@@ -440,6 +453,7 @@ class DockerCluster(ClusterManager):
                     ),
                     docker_version=cluster_backend.docker_version,
                     network=cluster_backend.network,
+                    devices=cluster_backend.agent_devices,
                 )
 
     def install_dcos_from_url_with_bootstrap_node(
