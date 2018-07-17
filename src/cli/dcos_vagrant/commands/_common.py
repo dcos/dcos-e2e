@@ -91,7 +91,7 @@ class ClusterVMs:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
-        client = self._vagrant_client
+        client = self.vagrant_client
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
         ssh_key_path = Path(client.keyfile(vm_name=vm_name))
@@ -168,7 +168,7 @@ class ClusterVMs:
     # Use type "Any" so we do not have to import ``vagrant`` because importing
     # that shows a warning on machines that do not have Vagrant installed.
     @property
-    def _vagrant_client(self) -> Any:
+    def vagrant_client(self) -> Any:
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
@@ -207,5 +207,5 @@ class ClusterVMs:
         Destroy this cluster.
         """
         workspace_dir = self.workspace_dir
-        self._vagrant_client.destroy()
+        self.vagrant_client.destroy()
         rmtree(path=str(workspace_dir), ignore_errors=True)
