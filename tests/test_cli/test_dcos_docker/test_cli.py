@@ -229,6 +229,11 @@ class TestCreate:
                                               available. This can be provided by setting the
                                               `DCOS_DOCKER_TRANSPORT` environment variable.
                                               [default: docker-exec]
+              --one-master-host-port-map TEXT
+                                              Publish a container port of one master node to
+                                              the host. Only Transmission Control Protocol
+                                              is supported currently. The syntax is
+                                              <HOST_PORT>:<CONTAINER_PORT>
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )

@@ -517,3 +517,35 @@ class TestNetworks:
             bridge_ip_address = networks['bridge']['IPAddress']
             assert bridge_ip_address == str(master.public_ip_address)
             assert bridge_ip_address == str(master.private_ip_address)
+
+
+class TestOneMasterHostPortMap:
+    """
+    Tests for setting host port map on a master Docker container.
+    """
+
+    def test_one_master_host_port_map(self) -> None:
+        """
+        It is possible to expose admin router to a host port.
+        """
+
+        with Cluster(
+            cluster_backend=Docker(
+                one_master_host_port_map={'80/tcp': 8000},
+                transport=Transport.DOCKER_EXEC,
+            ),
+            masters=3,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            port_map_found = False
+            for node in cluster.masters:
+                container = _get_container_from_node(node=node)
+                ports = container.attrs['HostConfig']['PortBindings']
+                if ports is None:
+                    continue
+                if '80/tcp' in ports:
+                    host_ports = ports['80/tcp']
+                    if host_ports[0]['HostPort'] == '8000':
+                        port_map_found = True
+            assert port_map_found

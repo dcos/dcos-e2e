@@ -6,7 +6,7 @@ import configparser
 import io
 import shlex
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import docker
 
@@ -41,7 +41,8 @@ def _docker_service_file(
         '{daemon} '
         '-D '
         '-s {storage_driver_name} '
-        '--exec-opt=native.cgroupdriver=cgroupfs'
+        '--exec-opt=native.cgroupdriver=cgroupfs '
+        '--cgroup-parent=${{CGROUP_PARENT}}'
     ).format(
         storage_driver_name=storage_driver_name,
         daemon=daemon,
@@ -54,6 +55,7 @@ def _docker_service_file(
             'After': 'dbus.service',
         },
         'Service': {
+            'EnvironmentFile': '/etc/docker/env',
             'ExecStart': docker_cmd,
             'LimitNOFILE': '1048576',
             'LimitNPROC': '1048576',
@@ -86,6 +88,7 @@ def start_dcos_container(
     docker_storage_driver: DockerStorageDriver,
     docker_version: DockerVersion,
     network: Optional[docker.models.networks.Network] = None,
+    ports: Optional[Dict[str, Any]] = None,
 ) -> None:
     """
     Start a master, agent or public agent container.
@@ -111,6 +114,7 @@ def start_dcos_container(
             node.
         network: The network to connect the container to other than the default
         ``docker0`` bridge network.
+        ports: The ports to expose on the host.
     """
     hostname = container_base_name + str(container_number)
     environment = {'container': hostname}
@@ -129,6 +133,7 @@ def start_dcos_container(
         labels=labels,
         stop_signal='SIGRTMIN+3',
         command=['/sbin/init'],
+        ports=ports or {},
     )
     if network:
         network.connect(container)
@@ -136,6 +141,13 @@ def start_dcos_container(
 
     disable_systemd_support_cmd = (
         "echo 'MESOS_SYSTEMD_ENABLE_SUPPORT=false' >> "
+        '/var/lib/dcos/mesos-slave-common'
+    )
+
+    setup_mesos_cgroup_root = (
+        'MESOS_CGROUPS_ROOT=`grep memory /proc/1/cgroup | cut -d: -f3`/mesos; '
+        'MESOS_CGROUPS_ROOT=${MESOS_CGROUPS_ROOT:1}; '
+        'echo "MESOS_CGROUPS_ROOT=$MESOS_CGROUPS_ROOT" >> '
         '/var/lib/dcos/mesos-slave-common'
     )
 
@@ -152,17 +164,24 @@ def start_dcos_container(
         '>',
         docker_service_dst,
     ]
+    docker_env_setup = (
+        'CGROUP=`grep memory /proc/1/cgroup | cut -d: -f3`; '
+        'echo "CGROUP_PARENT=$CGROUP/docker" >> '
+        '/etc/docker/env'
+    )
 
     public_key = public_key_path.read_text()
     echo_key = ['echo', public_key, '>>', '/root/.ssh/authorized_keys']
 
     for cmd in [
         ['mkdir', '-p', '/var/lib/dcos'],
+        ['/bin/bash', '-c', docker_env_setup],
         ['mkdir', '-p', '/lib/systemd/system'],
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_docker)),
         ['systemctl', 'enable', docker_service_name],
         ['systemctl', 'start', docker_service_name],
         ['/bin/bash', '-c', disable_systemd_support_cmd],
+        ['/bin/bash', '-c', setup_mesos_cgroup_root],
         ['mkdir', '--parents', '/root/.ssh'],
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ['rm', '-f', '/run/nologin', '||', 'true'],

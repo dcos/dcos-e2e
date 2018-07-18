@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.07.10.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.07.16.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -28,8 +28,8 @@ class Dcose2e < Formula
   end
 
   resource "azure-common" do
-    url "https://files.pythonhosted.org/packages/b0/e1/d8e553832dce1056e094f2d88f895376955534b9206e51f00ab3d52db034/azure-common-1.1.12.zip"
-    sha256 "3f2b0a0325b22df43ae840399a0b23c0256cb4f7deadb506a335bad516034b54"
+    url "https://files.pythonhosted.org/packages/e0/c8/49ccf6e2f0edf3add1f915afa21d9a75947fb57c028d6792b5ed09b79159/azure-common-1.1.13.zip"
+    sha256 "b087e80e8f0adc858f0a2b9ba596bb791383f74834b4acc4b47b64ddfa1362e3"
   end
 
   resource "azure-mgmt-network" do
@@ -63,13 +63,13 @@ class Dcose2e < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/75/43/700260807978c5abfe4d687b6c0cca2b085a7542eb438aeacb2f73bb10e7/boto3-1.7.48.tar.gz"
-    sha256 "c5a52cb93f7ae28e960810cb69d1fc8a9d00c1f122a681d7454a4d70e42dd5de"
+    url "https://files.pythonhosted.org/packages/4f/28/1642a25573c8ffbdcec0ceb09cf5d941f5bc2a0be71179a5d2220e1df3e0/boto3-1.7.58.tar.gz"
+    sha256 "ce462e7505c03c3e6708ce6f264ac43d478886082af703ff69c502592df5d4f3"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/b9/c3/ec611f82950ebb58b8bbf891d1e43d5662ae67af6d9ba6a256f3e3f590b4/botocore-1.10.48.tar.gz"
-    sha256 "1218517172be766acb9f5de7f4044f9f0f9d9589614e7e6fe6562072586e6290"
+    url "https://files.pythonhosted.org/packages/e5/7b/4f0d1613f33b32a8ad8f65c7973a389244e0aecd209db761f5d51291ebc4/botocore-1.10.58.tar.gz"
+    sha256 "e0e6b6d1fdbce81c28151136ee919d2cdeee13041559710cd5c93d7e4035a455"
   end
 
   resource "cachetools" do
@@ -143,8 +143,8 @@ class Dcose2e < Formula
   end
 
   resource "google-api-python-client" do
-    url "https://files.pythonhosted.org/packages/5e/48/68c64f848b7beaa49bfaa98c3436f34b40a244ab96e8afec3926ac024a19/google-api-python-client-1.7.3.tar.gz"
-    sha256 "e32d30563b90c4f88ff042d4d891b5e8ed1f6cdca0adab95e9c2ce2603087436"
+    url "https://files.pythonhosted.org/packages/4e/92/e4746e646585c8c359781c19984fe8b6b8794a6cfe382cd481329d5252ac/google-api-python-client-1.7.4.tar.gz"
+    sha256 "5d5cb02c6f3112c68eed51b74891a49c0e35263380672d662f8bfe85b8114d7c"
   end
 
   resource "google-auth" do
@@ -193,8 +193,8 @@ class Dcose2e < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/5d/47/5450ad198dedfc67f9d15e9003ac98c09eaae214e993492494ae232100ea/msrest-0.5.2.tar.gz"
-    sha256 "ec32adb65a15bc90f03a4dd0f1265eaa6b5dd19859199b96cdaebfd7c7d1de23"
+    url "https://files.pythonhosted.org/packages/d9/48/e636320da2f5ebf2a0786af61f9656ede1448f57b5b8d1a232e313fc5081/msrest-0.5.4.tar.gz"
+    sha256 "d609c2997ab66aa8985a6ced972e895cd7aa0a415d715af042a554c5c791934a"
   end
 
   resource "msrestazure" do
@@ -258,8 +258,8 @@ class Dcose2e < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/a2/ec/415d0cccc1ed41cd7fdf69ad989da16a8d13057996371004cab4bafc48f3/pytest-3.6.2.tar.gz"
-    sha256 "8ea01fc4fcc8e1b1e305252b4bc80a1528019ab99fd3b88666c9dc38d754406c"
+    url "https://files.pythonhosted.org/packages/55/50/399419c03c39bf41faa7cbd5a8976c076037b2d76adf2535610919806d67/pytest-3.6.3.tar.gz"
+    sha256 "0453c8676c2bee6feb0434748b068d5510273a916295fd61d306c4f22fbfd752"
   end
 
   resource "python-dateutil" do
