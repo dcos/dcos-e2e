@@ -17,7 +17,6 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Role
 
 
 class TestIntegrationTests:
@@ -139,7 +138,6 @@ class TestClusterSize:
 
 
 class TestCopyFiles:
-
     def test_install_cluster_from_path(
         self,
         cluster_backend: ClusterBackend,

@@ -73,6 +73,7 @@ class ExistingClusterManager(ClusterManager):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Raises:

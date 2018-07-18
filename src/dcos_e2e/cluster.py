@@ -333,6 +333,8 @@ class Cluster(ContextDecorator):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool = False,
+        files_to_copy_to_genconf_dir: Optional[Iterable[Tuple[Path, Path]]
+                                               ] = (),
     ) -> None:
         """
         Installs DC/OS using the DC/OS advanced installation method.
@@ -354,6 +356,9 @@ class Cluster(ContextDecorator):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
         """
@@ -361,6 +366,9 @@ class Cluster(ContextDecorator):
             self._cluster.install_dcos_from_url_with_bootstrap_node(
                 build_artifact=build_artifact,
                 dcos_config=dcos_config,
+                files_to_copy_to_genconf_dir=list(
+                    files_to_copy_to_genconf_dir or (),
+                ),
                 log_output_live=log_output_live,
             )
         except NotImplementedError:
@@ -373,6 +381,9 @@ class Cluster(ContextDecorator):
                     node.install_dcos_from_url(
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
+                        files_to_copy_to_genconf_dir=list(
+                            files_to_copy_to_genconf_dir or (),
+                        ),
                         role=role,
                         log_output_live=log_output_live,
                     )
@@ -421,6 +432,9 @@ class Cluster(ContextDecorator):
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
                         role=role,
+                        files_to_copy_to_genconf_dir=list(
+                            files_to_copy_to_genconf_dir or (),
+                        ),
                         log_output_live=log_output_live,
                     )
 

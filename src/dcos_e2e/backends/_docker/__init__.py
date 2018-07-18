@@ -399,6 +399,7 @@ class DockerCluster(ClusterManager):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a URL with a bootstrap node.
@@ -409,6 +410,9 @@ class DockerCluster(ClusterManager):
                 from.
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
 
         Raises:
             NotImplementedError: ``NotImplementedError`` because the Docker
@@ -450,7 +454,7 @@ class DockerCluster(ClusterManager):
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a given build artifact.
@@ -463,8 +467,6 @@ class DockerCluster(ClusterManager):
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-                Currently on DC/OS Docker the only supported paths on the
-                installer are in the ``/genconf`` directory.
 
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.

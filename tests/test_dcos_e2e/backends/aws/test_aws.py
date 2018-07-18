@@ -93,6 +93,28 @@ class TestUnsupported:
             with pytest.raises(NotImplementedError):
                 cluster.destroy_node(node=agent)
 
+    def test_install_with_custom_genconf(
+        self,
+        oss_artifact_url: str,
+    ) -> None:
+        """
+        Copying files to the ``genconf`` directory is not supported on the AWS
+        backend.
+        """
+        with Cluster(
+            cluster_backend=AWS(),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            with pytest.raises(NotImplementedError):
+                cluster.install_dcos_from_url(
+                    build_artifact=oss_artifact_url,
+                    dcos_config=cluster.base_config,
+                    files_to_copy_to_genconf_dir=[
+                        (Path('/foo'), Path('/genconf/bar')),
+                    ],
+                )
+
 
 class TestRunIntegrationTest:
     """

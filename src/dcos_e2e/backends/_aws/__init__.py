@@ -269,6 +269,7 @@ class AWSCluster(ClusterManager):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a URL.
@@ -278,7 +279,18 @@ class AWSCluster(ClusterManager):
                 from.
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
+        Raises:
+            NotImplementedError: ``NotImplementedError`` because the underlying
+                ``dcos-launch`` onprem installation does not support copying
+                files to the bootstrap node before the config generation step.
         """
+        if files_to_copy_to_genconf_dir:
+            raise NotImplementedError
+
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact

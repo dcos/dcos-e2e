@@ -144,6 +144,7 @@ class VagrantCluster(ClusterManager):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a build artifact passed as an URL string.
@@ -153,6 +154,9 @@ class VagrantCluster(ClusterManager):
                 from.
             dcos_config: The DC/OS configuration to use.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+                installer node. This must be empty as it is not currently
+                supported.
         """
         raise NotImplementedError
 
