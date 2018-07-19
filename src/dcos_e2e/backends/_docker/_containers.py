@@ -6,7 +6,7 @@ import configparser
 import io
 import shlex
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 import docker
 
@@ -88,7 +88,7 @@ def start_dcos_container(
     docker_storage_driver: DockerStorageDriver,
     docker_version: DockerVersion,
     network: Optional[docker.models.networks.Network] = None,
-    ports: Optional[Dict[str, Any]] = None,
+    ports: Optional[Dict[str, int]] = None,
 ) -> None:
     """
     Start a master, agent or public agent container.
