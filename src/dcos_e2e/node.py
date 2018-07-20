@@ -150,28 +150,6 @@ class Node:
         remote_genconf_dir = 'genconf'
         remote_genconf_path = remote_build_artifact.parent / remote_genconf_dir
 
-        serve_dir_path = remote_genconf_path / 'serve'
-        dcos_config = {
-            **dcos_config,
-            **{
-                'bootstrap_url':
-                'file://{serve_dir_path}'.format(
-                    serve_dir_path=serve_dir_path,
-                ),
-            },
-        }
-        config_yaml = yaml.dump(data=dcos_config)
-        config_file_path = tempdir / 'config.yaml'
-        Path(config_file_path).write_text(data=config_yaml)
-
-        self.send_file(
-            local_path=config_file_path,
-            remote_path=remote_genconf_path / 'config.yaml',
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
         for host_path, installer_path in files_to_copy_to_genconf_dir:
             # This is a hack that only works because backends are abusing
             # the bug of being able to supply ``ip_detect_contents`` in the
@@ -202,7 +180,27 @@ class Node:
                 sudo=True,
             )
 
-        import pdb; pdb.set_trace()
+        serve_dir_path = remote_genconf_path / 'serve'
+        dcos_config = {
+            **dcos_config,
+            **{
+                'bootstrap_url':
+                'file://{serve_dir_path}'.format(
+                    serve_dir_path=serve_dir_path,
+                ),
+            },
+        }
+        config_yaml = yaml.dump(data=dcos_config)
+        config_file_path = tempdir / 'config.yaml'
+        Path(config_file_path).write_text(data=config_yaml)
+
+        self.send_file(
+            local_path=config_file_path,
+            remote_path=remote_genconf_path / 'config.yaml',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
 
         genconf_args = [
             'cd',
