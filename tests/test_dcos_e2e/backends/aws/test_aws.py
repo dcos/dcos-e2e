@@ -19,7 +19,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node, Role
+from dcos_e2e.node import Node
 
 
 class TestDefaults:
