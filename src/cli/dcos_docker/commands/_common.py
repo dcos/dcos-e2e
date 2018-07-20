@@ -49,7 +49,11 @@ def docker_client() -> DockerClient:
     try:
         return docker.from_env(version='auto')
     except docker.errors.DockerException:
-        message = 'Error: Cannot connect to Docker.'
+        message = (
+            'Error: Cannot connect to Docker.\n'
+            'Make sure that Docker is installed and running, '
+            'and that you can run "docker ps".'
+        )
         click.echo(message, err=True)
         sys.exit(1)
 
