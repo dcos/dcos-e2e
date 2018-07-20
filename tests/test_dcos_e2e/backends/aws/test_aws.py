@@ -18,7 +18,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Role
 
 
 class TestDefaults:
@@ -254,4 +254,25 @@ class TestDCOSInstallation:
                 dcos_config=cluster.base_config,
             )
 
+            cluster.wait_for_dcos_oss()
+
+    def test_install_dcos_from_node(
+        self,
+        oss_artifact_url: str,
+    ) -> None:
+        """
+        It is possible to install DC/OS on an AWS cluster node by node.
+        """
+        with Cluster(
+            cluster_backend=AWS(),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            master.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=cluster.base_config,
+                role=Role.MASTER,
+                log_output_live=True,
+            )
             cluster.wait_for_dcos_oss()
