@@ -91,7 +91,7 @@ class TestUnsupported:
         with pytest.raises(NotImplementedError) as excinfo:
             Cluster(
                 cluster_backend=AWS(),
-                files_to_copy_to_installer={Path('/'): Path('/')},
+                files_to_copy_to_installer=[(Path('/'), Path('/'))],
             )
 
         expected_error = (
@@ -101,7 +101,7 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
-    def test_destroy_node(self):
+    def test_destroy_node(self) -> None:
         """
         Destroying a particular node is not supported on the AWS backend.
         """
@@ -201,7 +201,7 @@ class TestCustomKeyPair:
     Tests for passing a custom key pair to the AWS backend.
     """
 
-    def test_custom_key_pair(self, tmpdir: local):
+    def test_custom_key_pair(self, tmpdir: local) -> None:
         """
         It is possible to pass a custom key pair to the AWS backend.
         """
