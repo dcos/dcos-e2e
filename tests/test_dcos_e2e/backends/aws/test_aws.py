@@ -4,6 +4,7 @@ Tests for the AWS backend.
 
 import uuid
 from pathlib import Path
+from textwrap import dedent
 
 import boto3
 import pytest
@@ -18,7 +19,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Role
 
 
 class TestDefaults:
@@ -92,28 +93,6 @@ class TestUnsupported:
             (agent, ) = cluster.agents
             with pytest.raises(NotImplementedError):
                 cluster.destroy_node(node=agent)
-
-    def test_install_with_custom_genconf(
-        self,
-        oss_artifact_url: str,
-    ) -> None:
-        """
-        Copying files to the ``genconf`` directory is not supported on the AWS
-        backend.
-        """
-        with Cluster(
-            cluster_backend=AWS(),
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            with pytest.raises(NotImplementedError):
-                cluster.install_dcos_from_url(
-                    build_artifact=oss_artifact_url,
-                    dcos_config=cluster.base_config,
-                    files_to_copy_to_genconf_dir=[
-                        (Path('/foo'), Path('/genconf/bar')),
-                    ],
-                )
 
 
 class TestRunIntegrationTest:
@@ -206,7 +185,7 @@ class TestCustomKeyPair:
     Tests for passing a custom key pair to the AWS backend.
     """
 
-    def test_custom_key_pair(self, tmpdir: local):
+    def test_custom_key_pair(self, tmpdir: local) -> None:
         """
         It is possible to pass a custom key pair to the AWS backend.
         """
@@ -260,3 +239,42 @@ class TestDCOSInstallation:
             )
 
             cluster.wait_for_dcos_oss()
+
+    def test_install_dcos_custom_genconf(
+        self,
+        oss_artifact_url: str,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to install DC/OS on an AWS cluster node by node.
+        """
+        with Cluster(
+            cluster_backend=AWS(),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_contents = dedent(
+                """\
+                #!/bin/bash
+                echo {ip_address}
+                """,
+            ).format(ip_address=master.private_ip_address)
+            ip_detect_file.write(ip_detect_contents)
+
+            # This triggers an ``NotImplementedError`` leading to
+            # ``Node.install_dcos_from_url`` being called instead.
+            cluster.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=cluster.base_config,
+                log_output_live=True,
+                files_to_copy_to_genconf_dir=[
+                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                ],
+            )
+            cluster.wait_for_dcos_oss()
+            cat_result = master.run(
+                args=['cat', '/opt/mesosphere/bin/detect_ip'],
+            )
+            assert cat_result.stdout.decode() == ip_detect_contents

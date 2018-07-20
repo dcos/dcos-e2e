@@ -176,11 +176,16 @@ class Node:
             # This is a hack that only works because backends are abusing
             # the bug of being able to supply ``ip_detect_contents`` in the
             # DC/OS configuration file ``config.yaml``.
+            # As long as a ``Node`` is not aware of its backend this is the
+            # only way to select the backend-specific ``ip-detect`` script.
             if installer_path == Path('/genconf/ip-detect'):
                 try:
                     del dcos_config['ip_detect_contents']
                 except KeyError:
                     pass
+            # This part only exists because of the AWS backend workaround
+            # for ip-detect-public-filename in 1.9. It can be removed in a
+            # follow-up after changing the backend to respect that parameter.
             if installer_path == Path('/genconf/ip-detect-public'):
                 try:
                     del dcos_config['ip_detect_public_contents']
@@ -196,6 +201,8 @@ class Node:
                 user=user,
                 sudo=True,
             )
+
+        import pdb; pdb.set_trace()
 
         genconf_args = [
             'cd',
@@ -383,6 +390,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
