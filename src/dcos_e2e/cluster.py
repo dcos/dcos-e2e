@@ -198,8 +198,20 @@ class Cluster(ContextDecorator):
             ],
             auth_user=DcosUser(credentials=CI_CREDENTIALS),
         )
+        import pdb; pdb.set_trace()
+
+        # In order to create an API session, we create a user with the
+        # hardcoded credentials "CI_CREDENTIALS".
+        # These credentials match a user with the UID "albert@bekstil.net".
 
         api_session.wait_for_dcos()  # type: ignore
+        from kazoo.client import KazooClient
+        zk_client_port = '2181'
+        zk_host = str(any_master.public_ip_address)
+        zk = KazooClient(hosts=zk_host + ':'  + zk_client_port)
+        zk.start()
+        zk.delete('/dcos/users/albert@bekstil.net')
+        zk.stop()
 
     def wait_for_dcos_ee(
         self,
