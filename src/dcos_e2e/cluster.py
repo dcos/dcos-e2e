@@ -147,6 +147,9 @@ class Cluster(ContextDecorator):
         """
         Wait until the DC/OS OSS boot process has completed.
 
+        This does not work if a user has logged in previously, apart from with
+        the hard coded "CI_CREDENTIALS".
+
         Args:
             http_checks: Whether or not to wait for checks which involve HTTP.
                 If this is `False`, this function may return before DC/OS is
