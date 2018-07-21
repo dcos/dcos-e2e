@@ -203,7 +203,7 @@ class Cluster(ContextDecorator):
         api_session.wait_for_dcos()  # type: ignore
 
         # In order to create an API session, we create a user with the
-        # hardcoded credentials "CI_CREDENTIALS".
+        # hard coded credentials "CI_CREDENTIALS".
         # These credentials match a user with the email address
         # "albert@bekstil.net".
         #
@@ -213,7 +213,7 @@ class Cluster(ContextDecorator):
 
         zk_client_port = '2181'
         zk_host = str(any_master.public_ip_address)
-        zk_client = KazooClient(hosts=zk_host + ':'  + zk_client_port)
+        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
         zk_client.start()
         zk_client.delete('/dcos/users/albert@bekstil.net')
         zk_client.stop()
