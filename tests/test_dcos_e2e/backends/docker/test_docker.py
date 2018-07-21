@@ -530,22 +530,28 @@ class TestOneMasterHostPortMap:
         """
 
         with Cluster(
-            cluster_backend=Docker(
-                one_master_host_port_map={'80/tcp': 8000},
-                transport=Transport.DOCKER_EXEC,
-            ),
+            cluster_backend=Docker(one_master_host_port_map={'80/tcp': 8000}),
             masters=3,
             agents=0,
             public_agents=0,
         ) as cluster:
-            port_map_found = False
-            for node in cluster.masters:
-                container = _get_container_from_node(node=node)
-                ports = container.attrs['HostConfig']['PortBindings']
-                if ports is None:
-                    continue
-                if '80/tcp' in ports:
-                    host_ports = ports['80/tcp']
-                    if host_ports[0]['HostPort'] == '8000':
-                        port_map_found = True
-            assert port_map_found
+            masters_containers = [
+                _get_container_from_node(node=node) for node in cluster.masters
+            ]
+
+            masters_ports_settings = [
+                container.attrs['HostConfig']['PortBindings']
+                for container in masters_containers
+            ]
+
+            masters_ports_settings.remove(None)
+            masters_ports_settings.remove(None)
+
+            [master_port_settings] = masters_ports_settings
+            expected_master_port_settings = {
+                '80/tcp': [{
+                    'HostIp': '',
+                    'HostPort': '8000',
+                }],
+            }
+            assert master_port_settings == expected_master_port_settings
