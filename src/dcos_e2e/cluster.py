@@ -213,10 +213,10 @@ class Cluster(ContextDecorator):
 
         zk_client_port = '2181'
         zk_host = str(any_master.public_ip_address)
-        zk = KazooClient(hosts=zk_host + ':'  + zk_client_port)
-        zk.start()
-        zk.delete('/dcos/users/albert@bekstil.net')
-        zk.stop()
+        zk_client = KazooClient(hosts=zk_host + ':'  + zk_client_port)
+        zk_client.start()
+        zk_client.delete('/dcos/users/albert@bekstil.net')
+        zk_client.stop()
 
     def wait_for_dcos_ee(
         self,
