@@ -11,6 +11,7 @@ from subprocess import CalledProcessError
 from typing import Iterator, List
 
 import pytest
+from kazoo.client import KazooClient
 from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import ClusterBackend
@@ -45,6 +46,22 @@ class TestIntegrationTests:
             # more thorough dcos-checks.
             dcos_cluster.wait_for_dcos_oss(http_checks=False)
             dcos_cluster.wait_for_dcos_oss()
+            # We exercise the code that ignores the hard-coded user
+            # "albert@bekstil.net".
+            # We check that the user does get created by "wait_for_dcos_oss"
+            # but also that it does not get deleted if it already exists.
+            any_master = next(iter(dcos_cluster.masters))
+            zk_client_port = '2181'
+            zk_host = str(any_master.public_ip_address)
+            zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
+            zk_client.start()
+            email = 'albert@bekstil.net'
+            path = '/dcos/users/{email}'.format(email=email)
+            assert not zk_client.exists(path=path)
+            zk_client.create(path=path, value=email.encode())
+            zk_client.stop()
+            dcos_cluster.wait_for_dcos_oss()
+            assert not zk_client.exists(path=path)
             yield dcos_cluster
 
     def test_run_pytest(self, cluster: Cluster) -> None:

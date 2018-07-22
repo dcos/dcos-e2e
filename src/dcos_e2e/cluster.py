@@ -205,10 +205,9 @@ class Cluster(ContextDecorator):
         path = '/dcos/users/{email}'.format(email=email)
         zk_client.start()
 
-        try:
+        path_existed = zk_client.exists(path=path)
+        if not path_existed:
             zk_client.create(path=path, value=email.encode())
-        except NodeExistsError:
-            pass
 
         api_session = DcosApiSession(
             dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
@@ -226,7 +225,8 @@ class Cluster(ContextDecorator):
         # access.
         # Therefore, we delete the user who was created to wait for DC/OS.
 
-        zk_client.delete(path)
+        if not path_existed:
+            zk_client.delete(path=path)
         zk_client.stop()
 
     def wait_for_dcos_ee(
