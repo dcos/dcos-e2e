@@ -1045,6 +1045,50 @@ class TestDoctor:
         assert result.exit_code == 0
 
 
+class TestDownloadArtifact:
+    """
+    Tests for the ``download-artifact`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker download-artifact --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['download-artifact', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker download-artifact [OPTIONS]
+
+              Download a DC/OS Open Source artifact.
+
+              For DC/OS Enterprise release artifacts, contact your sales representative.
+
+            Options:
+              --dcos-version TEXT   The DC/OS Open Source artifact version to download. This
+                                    can be in one of the following formats: "stable",
+                                    testing/master", "testing/<DC/OS MAJOR RELEASE>",
+                                    "stable/<DC/OS MINOR RELEASE>", "testing/pull/<GITHUB-
+                                    PR-NUMBER>".
+                                    See https://dcos.io/releases/ for available
+                                    releases.  [default: stable]
+              --download-path TEXT  The path to download a release artifact to.  [default:
+                                    /tmp/dcos_generate_config.sh]
+              --help                Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
 class TestWeb:
     """
     Tests for the ``web`` subcommand.
