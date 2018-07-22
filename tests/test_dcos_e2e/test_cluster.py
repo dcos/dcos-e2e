@@ -60,7 +60,7 @@ class TestIntegrationTests:
             assert not zk_client.exists(path=path)
             zk_client.create(path=path, value=email.encode())
             dcos_cluster.wait_for_dcos_oss()
-            assert not zk_client.exists(path=path)
+            assert zk_client.exists(path=path)
             zk_client.stop()
             yield dcos_cluster
 
