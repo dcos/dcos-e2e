@@ -8,6 +8,7 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
+from kazoo.client import KazooClient
 from retry import retry
 
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
@@ -171,7 +172,7 @@ class Cluster(ContextDecorator):
         # outside the cluster for the login and Admin Router only rewrites
         # requests to them, the login endpoint does not provide anything.
 
-        # Current solution to guarantee the security CLI login:
+        # Current solution to guarantee the CLI login:
 
         # Try until one can login successfully with a long lived token
         # (dirty hack in dcos-test-utils wait_for_dcos). This is to avoid
@@ -200,6 +201,23 @@ class Cluster(ContextDecorator):
         )
 
         api_session.wait_for_dcos()  # type: ignore
+
+        # Only the first user can log in with SSO, before granting others
+        # access.
+        # Therefore, we delete the user who was created to wait for DC/OS.
+        #
+        # In order to create an API session, we create a user with the
+        # hard coded credentials "CI_CREDENTIALS".
+        # These credentials match a user with the email address
+        # "albert@bekstil.net".
+        email = 'albert@bekstil.net'
+        path = '/dcos/users/{email}'.format(email=email)
+        zk_client_port = '2181'
+        zk_host = str(any_master.public_ip_address)
+        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
+        zk_client.start()
+        zk_client.delete(path=path)
+        zk_client.stop()
 
     def wait_for_dcos_ee(
         self,

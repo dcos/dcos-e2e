@@ -12,6 +12,7 @@ from typing import Iterator, List
 
 import pytest
 from _pytest.logging import LogCaptureFixture
+from kazoo.client import KazooClient
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -40,12 +41,44 @@ class TestIntegrationTests:
                 build_artifact=oss_artifact,
                 log_output_live=True,
             )
-            # We exercise the "http_checks=False" code here but we do not test
-            # its functionality. It is a temporary measure while we wait for
-            # more thorough dcos-checks.
-            dcos_cluster.wait_for_dcos_oss(http_checks=False)
             dcos_cluster.wait_for_dcos_oss()
             yield dcos_cluster
+
+    @pytest.fixture(scope='class')
+    def zk_client(self, cluster: Cluster) -> Iterator[KazooClient]:
+        """
+        Return a ZooKeeper client connected to ``cluster``.
+        """
+        (master, ) = cluster.masters
+        zk_client_port = '2181'
+        zk_host = str(master.public_ip_address)
+        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
+        zk_client.start()
+        try:
+            yield zk_client
+        finally:
+            zk_client.stop()
+
+    def test_wait_for_dcos_oss(
+        self,
+        cluster: Cluster,
+        zk_client: KazooClient,
+    ) -> None:
+        """
+        Exercise ``wait_for_dcos_oss`` code.
+        """
+        # We exercise the "http_checks=False" code here but we do not test
+        # its functionality. It is a temporary measure while we wait for
+        # more thorough dcos-checks.
+        cluster.wait_for_dcos_oss(http_checks=False)
+
+        # We exercise the code that ignores the hard-coded user
+        # "albert@bekstil.net".
+        # We check that the user does get created by "wait_for_dcos_oss"
+        # but also that it does not get deleted if it already exists.
+        email = 'albert@bekstil.net'
+        path = '/dcos/users/{email}'.format(email=email)
+        assert not zk_client.exists(path=path)
 
     def test_run_pytest(self, cluster: Cluster) -> None:
         """
