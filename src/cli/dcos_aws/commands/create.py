@@ -155,3 +155,6 @@ def create(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+    # TODO Use boto to list all EC2 instances with the IP of the node
+    # Add a tag to the instance
