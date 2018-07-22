@@ -5,6 +5,7 @@ Common commands and command factories.
 from typing import Callable, Set
 
 import click
+import requests
 
 
 def list_clusters_command_factory(
@@ -33,7 +34,7 @@ def list_clusters_command_factory(
 @click.command('download-artifact')
 def download_artifact() -> None:
     """
-    List all clusters.
+    Download a DC/OS artifact.
     """
     label = 'Downloading to ' + str(path)
     stream = requests.get(url, stream=True)
