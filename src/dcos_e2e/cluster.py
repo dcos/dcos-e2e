@@ -197,22 +197,23 @@ class Cluster(ContextDecorator):
         # "albert@bekstil.net".
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
+        zk_timeout = 60 * 60
         retry_policy = KazooRetry(
             max_tries=-1,
             delay=0.5,
             backoff=1,
             max_jitter=0.1,
-            max_delay=60 * 60,
+            max_delay=zk_timeout,
         )
         zk_client_port = '2181'
         zk_host = str(any_master.public_ip_address)
         zk_client = KazooClient(
             hosts=zk_host + ':' + zk_client_port,
-            timeout=60 * 60,
+            timeout=zk_timeout,
             connection_retry=retry_policy,
             command_retry=retry_policy,
         )
-        zk_client.start()
+        zk_client.start(timeout=zk_timeout)
 
         path_existed = zk_client.exists(path=path)
         if not path_existed:
