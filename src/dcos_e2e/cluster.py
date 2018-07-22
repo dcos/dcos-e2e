@@ -192,6 +192,31 @@ class Cluster(ContextDecorator):
         # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
         any_master = next(iter(self.masters))
+        zk_client_port = '2181'
+        zk_host = str(any_master.public_ip_address)
+        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
+
+        email = 'albert@bekstil.net'
+
+        # TODO Test: Log in as a user and then wait
+        # Without this there's a timeout
+        create_user_args = [
+            'source',
+            '/opt/mesosphere/environment.export',
+            '&&',
+            'python',
+            '/opt/mesosphere/active/dcos-oauth/bin/dcos_add_user.py',
+            email,
+        ]
+        try:
+            any_master.run(args=create_user_args, shell=True)
+        except subprocess.CalledProcessError as exc:
+            expected_error = 'User {email} already exists'.format(email=email)
+            assert exc.stderr.decode().strip() == expected_error
+        # zk_client.create(
+        #     '/dcos/users/{email}'.format(email=email),
+        #     email.encode(),
+        # )
 
         api_session = DcosApiSession(
             dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
@@ -214,11 +239,8 @@ class Cluster(ContextDecorator):
         # access.
         # Therefore, we delete the user who was created to wait for DC/OS.
 
-        zk_client_port = '2181'
-        zk_host = str(any_master.public_ip_address)
-        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
         zk_client.start()
-        zk_client.delete('/dcos/users/albert@bekstil.net')
+        zk_client.delete('/dcos/users/{email}'.format(email=email))
         zk_client.stop()
 
     def wait_for_dcos_ee(
