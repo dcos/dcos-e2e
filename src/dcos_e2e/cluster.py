@@ -175,7 +175,7 @@ class Cluster(ContextDecorator):
         # outside the cluster for the login and Admin Router only rewrites
         # requests to them, the login endpoint does not provide anything.
 
-        # Current solution to guarantee the security CLI login:
+        # Current solution to guarantee the CLI login:
 
         # Try until one can login successfully with a long lived token
         # (dirty hack in dcos-test-utils wait_for_dcos). This is to avoid
