@@ -201,12 +201,23 @@ Viewing the Web UI
 To view the web UI of your cluster, use the :ref:`dcos-docker-web` command.
 To see the web UI URL of your cluster, use the :ref:`dcos-docker-inspect` command.
 
-If using macOS, by default, viewing the web UI requires IP routing to be set up.
+Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
+
+macOS
+~~~~~
+
+On macOS, by default, viewing the web UI requires IP routing to be set up.
 Use :ref:`dcos-docker-setup-mac-network` to set up IP routing.
 
-Instead
+The web UI is served by master nodes on port ``80``.
+To view the web UI on macOS without setting up IP routing, use the ``--one-master-host-port-map`` option on the :ref:`dcos-docker-create` command to forward port ``80`` to your host.
+For example:
 
-Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
+.. code-block:: console
+
+   $ dcos-docker create /tmp/dcos_generate_config.ee.sh --one-master-host-port-map 70:80
+   $ dcos-docker wait
+   $ open localhost:70
 
 Using a Custom CA Certificate
 -----------------------------
