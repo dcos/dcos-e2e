@@ -49,9 +49,9 @@ class TestIntegrationTests:
         """
         Return a ZooKeeper client connected to ``cluster``.
         """
-        any_master = next(iter(cluster.masters))
+        (master, ) = cluster.masters
         zk_client_port = '2181'
-        zk_host = str(any_master.public_ip_address)
+        zk_host = str(master.public_ip_address)
         zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
         zk_client.start()
         try:
