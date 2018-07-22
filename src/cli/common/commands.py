@@ -41,8 +41,11 @@ def list_clusters_command_factory(
     help=(
         'The DC/OS Open Source artifact version to download. '
         'This can be in one of the following formats: '
-        '"stable", testing/master", "testing/<DC/OS MAJOR RELEASE>", '
-        '"stable/<DC/OS MINOR RELEASE>", "testing/pull/<GITHUB-PR-NUMBER>".\n'
+        '``stable``, '
+        '``testing/master``, '
+        '``testing/<DC/OS MAJOR RELEASE>``, '
+        '``stable/<DC/OS MINOR RELEASE>``, '
+        '``testing/pull/<GITHUB-PR-NUMBER>``.\n'
         'See https://dcos.io/releases/ for available releases.'
     ),
 )
