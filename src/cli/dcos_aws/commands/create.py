@@ -9,6 +9,7 @@ from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple
 
+import boto3
 import click
 import click_spinner
 from passlib.hash import sha512_crypt
@@ -30,6 +31,10 @@ from dcos_e2e.cluster import Cluster
 
 
 @click.command('create')
+@click.argument(
+    'artifact_url',
+    type=str,
+)
 @click.option(
     '--variant',
     type=click.Choice(['oss', 'enterprise']),
@@ -133,6 +138,11 @@ def create(
         click.echo(doctor_message)
         sys.exit(exc.returncode)
 
+    ec2 = boto3.resource('ec2')
+    import pdb; pdb.set_trace()
+    # TODO Use boto to list all EC2 instances with the IP of the node
+    # Add a tag to the instance
+
     for node in cluster.masters:
         for path_pair in copy_to_master:
             local_path, remote_path = path_pair
@@ -156,5 +166,3 @@ def create(
         cluster.destroy()
         sys.exit(exc.returncode)
 
-    # TODO Use boto to list all EC2 instances with the IP of the node
-    # Add a tag to the instance
