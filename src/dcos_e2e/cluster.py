@@ -197,14 +197,12 @@ class Cluster(ContextDecorator):
         # "albert@bekstil.net".
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
-        # Retry every 0.3 seconds for up to 1 second.
-        # This is taken from ``dcos_add_user.py`` in DC/OS Open Source.
         retry_policy = KazooRetry(
-            max_tries=3,
-            delay=0.3,
+            max_tries=5,
+            delay=0.5,
             backoff=1,
             max_jitter=0.1,
-            max_delay=1,
+            max_delay=5,
         )
         zk_client_port = '2181'
         zk_host = str(any_master.public_ip_address)
