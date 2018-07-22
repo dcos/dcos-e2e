@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from kazoo.client import KazooClient
+from kazoo.retry import KazooRetry
 from retry import retry
 
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
@@ -189,9 +190,6 @@ class Cluster(ContextDecorator):
         # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
         any_master = next(iter(self.masters))
-        zk_client_port = '2181'
-        zk_host = str(any_master.public_ip_address)
-        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
 
         # In order to create an API session, we create a user with the
         # hard coded credentials "CI_CREDENTIALS".
@@ -199,6 +197,23 @@ class Cluster(ContextDecorator):
         # "albert@bekstil.net".
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
+        # Retry every 0.3 seconds for up to 1 second.
+        # This is taken from ``dcos_add_user.py`` in DC/OS Open Source.
+        retry_policy = KazooRetry(
+            max_tries=3,
+            delay=0.3,
+            backoff=1,
+            max_jitter=0.1,
+            max_delay=1,
+        )
+        zk_client_port = '2181'
+        zk_host = str(any_master.public_ip_address)
+        zk_client = KazooClient(
+            hosts=zk_host + ':' + zk_client_port,
+            timeout=1.0,
+            connection_retry=retry_policy,
+            command_retry=retry_policy,
+        )
         zk_client.start()
 
         path_existed = zk_client.exists(path=path)
