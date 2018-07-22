@@ -4,6 +4,7 @@ Common commands and command factories.
 
 from pathlib import Path
 from typing import Callable, Set
+from urllib.parse import urljoin
 
 import click
 import requests
@@ -33,12 +34,28 @@ def list_clusters_command_factory(
 
 
 @click.command('download-artifact')
-def download_artifact() -> None:
+@click.option(
+    '--dcos-version',
+    type=str,
+    default='stable',
+    show_default=True,
+    help=(
+        'The DC/OS Open Source artifact version to download. '
+        'This can be in one of the following formats: '
+        '"stable", testing/master", "testing/<DC/OS MAJOR RELEASE>", '
+        '"stable/<DC/OS MINOR RELEASE>".\n'
+        'See https://dcos.io/releases/ for available releases.\n'
+        'For DC/OS Enterprise release artifacts, '
+
+    ),
+)
+def download_artifact(dcos_version: str) -> None:
     """
-    Download a DC/OS artifact.
+    Download a DC/OS Open Source artifact.
     """
-    path = Path('/tmp')
-    url = 'X'
+    path = Path('/tmp/dcos_generate_config.sh')
+    base_url = 'https://downloads.dcos.io/dcos'
+    url = urljoin(base_url, dcos_version)
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
     chunk_size = 100 * 1024
