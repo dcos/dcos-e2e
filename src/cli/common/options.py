@@ -388,6 +388,10 @@ def verbosity_option(command: Callable[..., None]) -> Callable[..., None]:
     function = click.option(
         '-v',
         '--verbose',
+        help=(
+            'Use verbose output. '
+            'Use this option multiple times for more verbose output.'
+        ),
         count=True,
     )(command)  # type: Callable[..., None]
     return function
