@@ -313,3 +313,8 @@ CLI Reference
 
 .. click:: cli.dcos_docker:destroy_mac_network
   :prog: dcos-docker destroy-mac-network
+
+.. _dcos-docker-download-artifact:
+
+.. click:: cli.dcos_docker:download_artifact
+  :prog: dcos-docker download-artifact

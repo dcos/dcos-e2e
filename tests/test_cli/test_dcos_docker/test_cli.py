@@ -79,6 +79,7 @@ class TestDcosDocker:
               destroy-list         Destroy clusters.
               destroy-mac-network  Destroy containers created by "dcos-docker...
               doctor               Diagnose common issues which stop DC/OS E2E...
+              download-artifact    Download a DC/OS Open Source artifact.
               inspect              Show cluster details.
               list                 List all clusters.
               run                  Run an arbitrary command on a node.
