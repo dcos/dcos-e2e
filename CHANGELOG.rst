@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.07.22.1
+------------
+
 - Add ``dcos-docker download-artifact`` and ``dcos-vagrant download-artifact``.
 
 2018.07.22.0
