@@ -47,13 +47,21 @@ def list_clusters_command_factory(
         'See https://dcos.io/releases/ for available releases.'
     ),
 )
-def download_artifact(dcos_version: str) -> None:
+@click.option(
+    '--download-path',
+    type=str,
+    default='/tmp/dcos_generate_config.sh',
+    show_default=True,
+    help='The path to download a release artifact to.',
+)
+def download_artifact(dcos_version: str, download_path: str) -> None:
     """
     Download a DC/OS Open Source artifact.
 
     For DC/OS Enterprise release artifacts, contact your sales representative.
     """
-    path = Path('/tmp/dcos_generate_config.sh')
+    path = Path(download_path)
+    label = 'Downloading to ' + str(path)
     base_url = 'https://downloads.dcos.io/dcos'
     url = urljoin(base_url, dcos_version)
     stream = requests.get(url, stream=True)
