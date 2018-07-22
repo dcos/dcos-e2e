@@ -59,9 +59,9 @@ class TestIntegrationTests:
             path = '/dcos/users/{email}'.format(email=email)
             assert not zk_client.exists(path=path)
             zk_client.create(path=path, value=email.encode())
-            zk_client.stop()
             dcos_cluster.wait_for_dcos_oss()
             assert not zk_client.exists(path=path)
+            zk_client.stop()
             yield dcos_cluster
 
     def test_run_pytest(self, cluster: Cluster) -> None:
