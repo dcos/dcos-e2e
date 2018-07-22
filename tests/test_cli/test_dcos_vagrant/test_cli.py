@@ -487,12 +487,13 @@ class TestDownloadArtifact:
 
             Options:
               --dcos-version TEXT   The DC/OS Open Source artifact version to download. This
-                                    can be in one of the following formats: "stable",
-                                    testing/master", "testing/<DC/OS MAJOR RELEASE>",
-                                    "stable/<DC/OS MINOR RELEASE>", "testing/pull/<GITHUB-
-                                    PR-NUMBER>".
-                                    See https://dcos.io/releases/ for available
-                                    releases.  [default: stable]
+                                    can be in one of the following formats: ``stable``,
+                                    ``testing/master``, ``testing/<DC/OS MAJOR RELEASE>``,
+                                    ``stable/<DC/OS MINOR RELEASE>``,
+                                    ``testing/pull/<GITHUB-PR-NUMBER>``.
+                                    See
+                                    https://dcos.io/releases/ for available releases.
+                                    [default: stable]
               --download-path TEXT  The path to download a release artifact to.  [default:
                                     /tmp/dcos_generate_config.sh]
               --help                Show this message and exit.
