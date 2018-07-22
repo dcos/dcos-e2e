@@ -11,3 +11,6 @@ CLI Reference
 
 .. click:: cli:dcos_aws
   :prog: dcos-aws
+
+.. click:: cli.dcos_aws:create
+  :prog: dcos-aws create

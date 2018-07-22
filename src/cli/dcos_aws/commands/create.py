@@ -18,7 +18,6 @@ from cli.common.options import (
     copy_to_master_option,
     extra_config_option,
     license_key_option,
-    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -47,11 +46,9 @@ from dcos_e2e.cluster import Cluster
 @extra_config_option
 @public_agents_option
 @workspace_dir_option
-@variant_option
 @license_key_option
 @security_mode_option
 @copy_to_master_option
-@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
 @verbosity_option
 def create(
     agents: int,
@@ -64,7 +61,6 @@ def create(
     license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    cluster_id: str,
     verbose: int,
 ) -> None:
     """
