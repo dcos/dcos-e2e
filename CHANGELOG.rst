@@ -6,11 +6,7 @@ Changelog
 Next
 ----
 
-2018.07.20.0
-------------
-
-2018.07.19.0
-------------
+- Fix bug which meant that a user could not log in after ``dcos-docker wait`` on DC/OS Open Source clusters.
 
 2018.07.16.0
 ------------
