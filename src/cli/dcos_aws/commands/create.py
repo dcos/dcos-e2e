@@ -21,7 +21,6 @@ from cli.common.options import (
     masters_option,
     public_agents_option,
     security_mode_option,
-    variant_option,
     verbosity_option,
     workspace_dir_option,
 )
@@ -101,13 +100,9 @@ def create(
     workspace_dir.mkdir(parents=True)
 
     doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
-
-    if variant == 'auto':
-        # TODO Better exception
-        raise Exception()
-
     enterprise = bool(variant == 'enterprise')
-    cluster_backend = AWS(workspace_dir=workspace_dir, )
+    cluster_backend = AWS(workspace_dir=workspace_dir)
+
     if enterprise:
         superuser_username = 'admin'
         superuser_password = 'admin'
