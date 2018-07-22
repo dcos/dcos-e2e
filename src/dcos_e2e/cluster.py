@@ -198,17 +198,17 @@ class Cluster(ContextDecorator):
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
         retry_policy = KazooRetry(
-            max_tries=5,
+            max_tries=-1,
             delay=0.5,
             backoff=1,
             max_jitter=0.1,
-            max_delay=5,
+            max_delay=60 * 60,
         )
         zk_client_port = '2181'
         zk_host = str(any_master.public_ip_address)
         zk_client = KazooClient(
             hosts=zk_host + ':' + zk_client_port,
-            timeout=1.0,
+            timeout=60 * 60,
             connection_retry=retry_policy,
             command_retry=retry_policy,
         )
