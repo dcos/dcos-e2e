@@ -30,9 +30,10 @@ from cli.common.options import (
     public_agents_option,
     security_mode_option,
     variant_option,
+    verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import get_variant
+from cli.common.utils import get_variant, set_logging
 from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -346,6 +347,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     ),
     multiple=True,
 )
+@verbosity_option
 @click.pass_context
 def create(
     ctx: click.core.Context,
@@ -372,6 +374,7 @@ def create(
     wait_for_dcos: bool,
     network: Network,
     one_master_host_port_map: Dict[str, int],
+    verbose: int,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -405,6 +408,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
+    set_logging(verbosity_level=verbose)
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 

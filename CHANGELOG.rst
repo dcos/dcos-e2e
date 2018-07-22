@@ -7,6 +7,7 @@ Next
 ----
 
 - Fix bug which meant that a user could not log in after ``dcos-docker wait`` on DC/OS Open Source clusters.
+- Add ``verbose`` option to multiple commands.
 
 2018.07.16.0
 ------------
