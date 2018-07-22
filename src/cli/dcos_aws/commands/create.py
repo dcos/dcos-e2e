@@ -3,6 +3,7 @@ Tools for creating a DC/OS cluster.
 """
 
 import sys
+from ipaddress import IPv4Address
 import tempfile
 import uuid
 from pathlib import Path
@@ -138,10 +139,20 @@ def create(
         click.echo(doctor_message)
         sys.exit(exc.returncode)
 
-    ec2 = boto3.resource('ec2')
-    import pdb; pdb.set_trace()
-    # TODO Use boto to list all EC2 instances with the IP of the node
-    # Add a tag to the instance
+    ec2 = boto3.resource('ec2', region_name=cluster_backend.aws_region)
+    ec2_instances = ec2.instances.all()
+
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+    node_public_ips = set([node.public_ip_address for node in nodes])
+    node_ec2_instances = [
+        instance for instance in ec2_instances
+        if IPv4Address(instance.public_ip_address) in node_public_ips
+    ]
+
+    cluster_id_tag = [
+        'Key': CLUSTER_ID_TAG_KEY,
+        'Value': cluster_id,
+    ]
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
@@ -165,4 +176,3 @@ def create(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
-
