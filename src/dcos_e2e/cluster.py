@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from kazoo.client import KazooClient
+from kazoo.exceptions import NodeExistsError
 from retry import retry
 
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
@@ -196,11 +197,18 @@ class Cluster(ContextDecorator):
         zk_host = str(any_master.public_ip_address)
         zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
 
+        # In order to create an API session, we create a user with the
+        # hard coded credentials "CI_CREDENTIALS".
+        # These credentials match a user with the email address
+        # "albert@bekstil.net".
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
         zk_client.start()
 
-        zk_client.exists(path) or zk_client.create(path, email.encode())
+        try:
+            zk_client.create(path=path, value=email.encode())
+        except NodeExistsError:
+            pass
 
         api_session = DcosApiSession(
             dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
@@ -214,11 +222,6 @@ class Cluster(ContextDecorator):
 
         api_session.wait_for_dcos()  # type: ignore
 
-        # In order to create an API session, we create a user with the
-        # hard coded credentials "CI_CREDENTIALS".
-        # These credentials match a user with the email address
-        # "albert@bekstil.net".
-        #
         # Only the first user can log in with SSO, before granting others
         # access.
         # Therefore, we delete the user who was created to wait for DC/OS.
