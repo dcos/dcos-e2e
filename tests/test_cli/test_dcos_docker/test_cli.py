@@ -233,6 +233,7 @@ class TestCreate:
                                               the host. Only Transmission Control Protocol
                                               is supported currently. The syntax is
                                               <HOST_PORT>:<CONTAINER_PORT>
+              -v, --verbose
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
