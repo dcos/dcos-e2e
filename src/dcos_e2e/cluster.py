@@ -197,6 +197,7 @@ class Cluster(ContextDecorator):
         zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
 
         email = 'albert@bekstil.net'
+        path = '/dcos/users/{email}'.format(email=email)
 
         # TODO Test: Log in as a user and then wait
         # Without this there's a timeout
@@ -208,6 +209,7 @@ class Cluster(ContextDecorator):
             '/opt/mesosphere/active/dcos-oauth/bin/dcos_add_user.py',
             email,
         ]
+
         try:
             any_master.run(args=create_user_args, shell=True)
         except subprocess.CalledProcessError as exc:
@@ -240,7 +242,7 @@ class Cluster(ContextDecorator):
         # Therefore, we delete the user who was created to wait for DC/OS.
 
         zk_client.start()
-        zk_client.delete('/dcos/users/{email}'.format(email=email))
+        zk_client.delete(path)
         zk_client.stop()
 
     def wait_for_dcos_ee(
