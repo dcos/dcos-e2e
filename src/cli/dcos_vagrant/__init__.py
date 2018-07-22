@@ -4,7 +4,10 @@ A CLI for controlling DC/OS clusters on Vagrant.
 
 import click
 
-from cli.common.commands import list_clusters_command_factory
+from cli.common.commands import (
+    download_artifact,
+    list_clusters_command_factory,
+)
 
 from .commands._common import existing_cluster_ids
 from .commands.create import create
@@ -32,6 +35,7 @@ dcos_vagrant.add_command(create)
 dcos_vagrant.add_command(destroy)
 dcos_vagrant.add_command(destroy_list)
 dcos_vagrant.add_command(doctor)
+dcos_vagrant.add_command(download_artifact)
 dcos_vagrant.add_command(inspect_cluster)
 dcos_vagrant.add_command(LIST_CLUSTERS)
 dcos_vagrant.add_command(run)

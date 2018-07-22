@@ -8,6 +8,11 @@ Next
 
 - Fix bug which meant that a user could not log in after ``dcos-docker wait`` on DC/OS Open Source clusters.
 
+2018.07.22.1
+------------
+
+- Add ``dcos-docker download-artifact`` and ``dcos-vagrant download-artifact``.
+
 2018.07.22.0
 ------------
 
