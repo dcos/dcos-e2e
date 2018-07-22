@@ -9,7 +9,9 @@ import urllib3
 from cli.common.options import (
     superuser_password_option,
     superuser_username_option,
+    verbosity_option,
 )
+from cli.common.utils import set_logging
 from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers
@@ -34,16 +36,19 @@ from ._options import existing_cluster_id_option, node_transport_option
     ),
 )
 @node_transport_option
+@verbosity_option
 def wait(
     cluster_id: str,
     superuser_username: str,
     superuser_password: str,
     transport: Transport,
     skip_http_checks: bool,
+    verbose: int,
 ) -> None:
     """
     Wait for DC/OS to start.
     """
+    set_logging(verbosity_level=verbose)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     message = (
         'A cluster may take some time to be ready.\n'
