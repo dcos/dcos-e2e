@@ -59,13 +59,13 @@ class TestIntegrationTests:
         finally:
             zk_client.stop()
 
-    def test_wait_for_dcos(
+    def test_wait_for_dcos_oss(
         self,
         cluster: Cluster,
         zk_client: KazooClient,
     ) -> None:
         """
-        Exercise ``wait_for_dcos`` code.
+        Exercise ``wait_for_dcos_oss`` code.
         """
         # We exercise the "http_checks=False" code here but we do not test
         # its functionality. It is a temporary measure while we wait for
