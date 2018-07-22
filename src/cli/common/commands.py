@@ -36,7 +36,8 @@ def download_artifact() -> None:
     """
     Download a DC/OS artifact.
     """
-    label = 'Downloading to ' + str(path)
+    path = Path('/tmp')
+    url = 'X'
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
     chunk_size = 100 * 1024
