@@ -25,9 +25,10 @@ from cli.common.options import (
     public_agents_option,
     security_mode_option,
     variant_option,
+    verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import get_variant
+from cli.common.utils import get_variant, set_logging
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
@@ -51,6 +52,7 @@ from ._common import (
 @security_mode_option
 @copy_to_master_option
 @make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
+@verbosity_option
 def create(
     agents: int,
     artifact: str,
@@ -97,6 +99,7 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
+    set_logging(verbosity_level=verbose)
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
