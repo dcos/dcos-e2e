@@ -64,9 +64,8 @@ class TestDcosVagrant:
               Manage DC/OS clusters on Vagrant.
 
             Options:
-              --version      Show the version and exit.
-              -v, --verbose
-              --help         Show this message and exit.
+              --version  Show the version and exit.
+              --help     Show this message and exit.
 
             Commands:
               create        Create a DC/OS cluster.
@@ -172,6 +171,8 @@ class TestCreate:
               -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
                                               value "default" to use this cluster for other
                                               commands without specifying --cluster-id.
+              -v, --verbose                   Use verbose output. Use this option multiple
+                                              times for more verbose output.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -485,6 +486,8 @@ class TestWait:
               --superuser-password TEXT  The superuser password is needed only on DC/OS
                                          Enterprise clusters. By default, on a DC/OS
                                          Enterprise cluster, `admin` is used.
+              -v, --verbose              Use verbose output. Use this option multiple times
+                                         for more verbose output.
               --help                     Show this message and exit.
             """,# noqa: E501,E261
         )
