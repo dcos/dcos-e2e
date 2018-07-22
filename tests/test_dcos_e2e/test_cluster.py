@@ -72,10 +72,7 @@ class TestIntegrationTests:
         # more thorough dcos-checks.
         cluster.wait_for_dcos_oss(http_checks=False)
 
-        # We exercise the code that ignores the hard-coded user
-        # "albert@bekstil.net".
-        # We check that the user does get created by "wait_for_dcos_oss"
-        # but also that it does not get deleted if it already exists.
+        cluster.wait_for_dcos_oss()
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
         assert not zk_client.exists(path=path)
