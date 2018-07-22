@@ -70,9 +70,8 @@ class TestDcosDocker:
               Manage DC/OS clusters on Docker.
 
             Options:
-              --version      Show the version and exit.
-              -v, --verbose
-              --help         Show this message and exit.
+              --version  Show the version and exit.
+              --help     Show this message and exit.
 
             Commands:
               create               Create a DC/OS cluster.
