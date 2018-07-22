@@ -7,7 +7,6 @@ import subprocess
 import sys
 from pathlib import Path
 from shutil import rmtree
-from typing import Optional, Union
 
 import click
 import click_spinner
