@@ -83,20 +83,12 @@ def get_variant(
     return 'enterprise' if enterprise else 'oss'
 
 
-def set_logging(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> None:
+def set_logging(verbosity_level: int) -> None:
     """
     Set logging level depending on the chosen verbosity.
     """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    value = min(value, 3)
-    value = max(value, 0)
+    verbosity_level = min(verbosity_level, 3)
+    verbosity_level = max(verbosity_level, 0)
     verbosity_map = {
         0: logging.WARNING,
         1: logging.INFO,
@@ -104,4 +96,4 @@ def set_logging(
         3: logging.NOTSET,
     }
     # Disable logging calls of the given severity level or below.
-    logging.disable(verbosity_map[int(value or 0)])
+    logging.disable(verbosity_map[int(verbosity_level or 0)])
