@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add an initial ``dcos-aws`` CLI.
+
 2018.07.22.1
 ------------
 
