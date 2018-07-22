@@ -32,6 +32,16 @@ from dcos_e2e.cluster import Cluster
 
 
 @click.command('create')
+@click.option(
+    '--variant',
+    type=click.Choice(['oss', 'enterprise']),
+    default='oss',
+    help=(
+        'Choose the DC/OS variant. '
+        'If the variant does not match the variant of the given artifact URL, '
+        'an error will occur. '
+    ),
+)
 @masters_option
 @agents_option
 @extra_config_option
