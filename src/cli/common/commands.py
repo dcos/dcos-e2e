@@ -73,8 +73,12 @@ def download_artifact(
         message = 'Cannot download artifact from {url}.'.format(url=url)
         ctx.fail(message=message)
 
-    # TODO error if parent dir does not exist
-    # TODO error if is directory
+    if path.is_dir():
+        path = path / 'dcos_generate_config.sh'
+
+    if not path.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
     chunk_size = 100 * 1024
