@@ -44,14 +44,14 @@ def list_clusters_command_factory(
         'This can be in one of the following formats: '
         '"stable", testing/master", "testing/<DC/OS MAJOR RELEASE>", '
         '"stable/<DC/OS MINOR RELEASE>".\n'
-        'See https://dcos.io/releases/ for available releases.\n'
-        'For DC/OS Enterprise release artifacts, '
-
+        'See https://dcos.io/releases/ for available releases.'
     ),
 )
 def download_artifact(dcos_version: str) -> None:
     """
     Download a DC/OS Open Source artifact.
+
+    For DC/OS Enterprise release artifacts, contact your sales representative.
     """
     path = Path('/tmp/dcos_generate_config.sh')
     base_url = 'https://downloads.dcos.io/dcos'
