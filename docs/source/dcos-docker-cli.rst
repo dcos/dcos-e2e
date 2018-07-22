@@ -34,7 +34,9 @@ Each of these and more are described in detail below.
 Creating a Cluster
 ------------------
 
-To create a cluster you first need to download `a DC/OS release <https://dcos.io/releases/>`__.
+To create a cluster you first need to download a DC/OS release artifact.
+
+This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-docker-download-artifact` command.
 
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
@@ -175,12 +177,6 @@ To destroy all clusters, run the following command:
    pr_4033_strict
    pr_4019_permissive
 
-Viewing Debug Information
--------------------------
-
-The CLI is quiet by default.
-To see more information, use ``-v`` or ``-vv`` after ``dcos-docker``.
-
 .. _running-integration-tests:
 
 Running Integration Tests
@@ -311,3 +307,8 @@ CLI Reference
 
 .. click:: cli.dcos_docker:destroy_mac_network
   :prog: dcos-docker destroy-mac-network
+
+.. _dcos-docker-download-artifact:
+
+.. click:: cli.dcos_docker:download_artifact
+  :prog: dcos-docker download-artifact
