@@ -1,8 +1,8 @@
 """
 Common utilities for making DC/OS E2E CLIs.
 """
-
 import json
+import logging
 import subprocess
 import sys
 from pathlib import Path
@@ -80,3 +80,19 @@ def get_variant(
         sys.exit(1)
 
     return 'enterprise' if enterprise else 'oss'
+
+
+def set_logging(verbosity_level: int) -> None:
+    """
+    Set logging level depending on the chosen verbosity.
+    """
+    verbosity_level = min(verbosity_level, 3)
+    verbosity_level = max(verbosity_level, 0)
+    verbosity_map = {
+        0: logging.WARNING,
+        1: logging.INFO,
+        2: logging.DEBUG,
+        3: logging.NOTSET,
+    }
+    # Disable logging calls of the given severity level or below.
+    logging.disable(verbosity_map[int(verbosity_level or 0)])

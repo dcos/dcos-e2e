@@ -70,9 +70,8 @@ class TestDcosDocker:
               Manage DC/OS clusters on Docker.
 
             Options:
-              --version      Show the version and exit.
-              -v, --verbose
-              --help         Show this message and exit.
+              --version  Show the version and exit.
+              --help     Show this message and exit.
 
             Commands:
               create               Create a DC/OS cluster.
@@ -234,6 +233,8 @@ class TestCreate:
                                               the host. Only Transmission Control Protocol
                                               is supported currently. The syntax is
                                               <HOST_PORT>:<CONTAINER_PORT>
+              -v, --verbose                   Use verbose output. Use this option multiple
+                                              times for more verbose output.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -934,6 +935,8 @@ class TestWait:
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
                                              [default: docker-exec]
+              -v, --verbose                  Use verbose output. Use this option multiple
+                                             times for more verbose output.
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )

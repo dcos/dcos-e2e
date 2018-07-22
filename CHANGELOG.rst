@@ -6,11 +6,7 @@ Changelog
 Next
 ----
 
-2018.07.20.0
-------------
-
-2018.07.19.0
-------------
+- Add ``verbose`` option to multiple commands.
 
 2018.07.16.0
 ------------
