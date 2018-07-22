@@ -53,7 +53,12 @@ def list_clusters_command_factory(
     show_default=True,
     help='The path to download a release artifact to.',
 )
-def download_artifact(dcos_version: str, download_path: str) -> None:
+@click.pass_context
+def download_artifact(
+    ctx: click.core.Context,
+    dcos_version: str,
+    download_path: str,
+) -> None:
     """
     Download a DC/OS Open Source artifact.
 
@@ -63,7 +68,10 @@ def download_artifact(dcos_version: str, download_path: str) -> None:
     label = 'Downloading to ' + str(path)
     base_url = 'https://downloads.dcos.io/dcos/'
     url = base_url + dcos_version + '/dcos_generate_config.sh'
-    # TODO Error if URL not found
+    head_resp = requests.head(url)
+    if not head_resp.ok:
+        message = 'Cannot download artifact from {url}.'.format(url=url)
+        ctx.fail(message=message)
 
     # TODO make parents
     # TODO if directory given, add filename to end
