@@ -4,7 +4,6 @@ Common commands and command factories.
 
 from pathlib import Path
 from typing import Callable, Set
-from urllib.parse import urljoin
 
 import click
 import requests
@@ -62,8 +61,13 @@ def download_artifact(dcos_version: str, download_path: str) -> None:
     """
     path = Path(download_path)
     label = 'Downloading to ' + str(path)
-    base_url = 'https://downloads.dcos.io/dcos'
-    url = urljoin(base_url, dcos_version)
+    base_url = 'https://downloads.dcos.io/dcos/'
+    url = base_url + dcos_version + '/dcos_generate_config.sh'
+    # TODO Error if URL not found
+
+    # TODO make parents
+    # TODO if directory given, add filename to end
+    import pdb; pdb.set_trace()
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
     chunk_size = 100 * 1024
