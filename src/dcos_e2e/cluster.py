@@ -198,27 +198,9 @@ class Cluster(ContextDecorator):
 
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
+        zk_client.start()
 
-        # TODO Test: Log in as a user and then wait
-        # Without this there's a timeout
-        create_user_args = [
-            'source',
-            '/opt/mesosphere/environment.export',
-            '&&',
-            'python',
-            '/opt/mesosphere/active/dcos-oauth/bin/dcos_add_user.py',
-            email,
-        ]
-
-        try:
-            any_master.run(args=create_user_args, shell=True)
-        except subprocess.CalledProcessError as exc:
-            expected_error = 'User {email} already exists'.format(email=email)
-            assert exc.stderr.decode().strip() == expected_error
-        # zk_client.create(
-        #     '/dcos/users/{email}'.format(email=email),
-        #     email.encode(),
-        # )
+        zk_client.exists(path) or zk_client.create(path, email.encode())
 
         api_session = DcosApiSession(
             dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
@@ -241,7 +223,6 @@ class Cluster(ContextDecorator):
         # access.
         # Therefore, we delete the user who was created to wait for DC/OS.
 
-        zk_client.start()
         zk_client.delete(path)
         zk_client.stop()
 
