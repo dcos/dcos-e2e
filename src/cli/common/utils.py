@@ -1,12 +1,13 @@
 """
 Common utilities for making DC/OS E2E CLIs.
 """
-
 import json
+import logging
 import subprocess
 import sys
 from pathlib import Path
 from shutil import rmtree
+from typing import Optional, Union
 
 import click
 import click_spinner
@@ -80,3 +81,27 @@ def get_variant(
         sys.exit(1)
 
     return 'enterprise' if enterprise else 'oss'
+
+
+def set_logging(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> None:
+    """
+    Set logging level depending on the chosen verbosity.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    value = min(value, 3)
+    value = max(value, 0)
+    verbosity_map = {
+        0: logging.WARNING,
+        1: logging.INFO,
+        2: logging.DEBUG,
+        3: logging.NOTSET,
+    }
+    # Disable logging calls of the given severity level or below.
+    logging.disable(verbosity_map[int(value or 0)])

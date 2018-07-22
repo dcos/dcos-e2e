@@ -381,6 +381,18 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
+def verbosity_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    A decorator for setting the verbosity of logging.
+    """
+    function = click.option(
+        '-v',
+        '--verbose',
+        count=True,
+    )(command)  # type: Callable[..., None]
+    return function
+
+
 def no_test_env_run_option(command: Callable[..., None],
                            ) -> Callable[..., None]:
     """
