@@ -100,8 +100,8 @@ PATTERNS = {
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests':
     (EE_MASTER, ),
-    'tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled':
-    (EE_MASTER, ),
+    'tests/test_dcos_e2e/test_enterprise.py::TestSSLDisabled':
+    (EE_1_11, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS':
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise':

@@ -2,6 +2,7 @@
 Tests for using the test harness with a DC/OS Enterprise cluster.
 """
 
+import json
 import subprocess
 import uuid
 from pathlib import Path
@@ -230,19 +231,19 @@ class TestCopyFiles:
             response.raise_for_status()
 
 
-class TestSecurityDisabled:
+class TestSSLDisabled:
     """
-    Tests for clusters in security disabled mode.
+    Tests for clusters with SSL disabled.
     """
 
     def test_wait_for_dcos_ee(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_1_11_artifact: Path,
         license_key_contents: str,
     ) -> None:
         """
-        A cluster can start up in security disabled mode.
+        A cluster can start up with SSL disabled.
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
@@ -260,7 +261,7 @@ class TestSecurityDisabled:
             public_agents=0,
         ) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                build_artifact=enterprise_1_11_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -271,6 +272,15 @@ class TestSecurityDisabled:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+
+            # On 1.11 with security mode disabled, SSL is disabled.
+            any_master = next(iter(cluster.masters))
+            config_result = any_master.run(
+                args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
+            )
+            config = json.loads(config_result.stdout.decode())
+            ssl_enabled = config['ssl_enabled']
+            assert not ssl_enabled
 
 
 class TestWaitForDCOS:
