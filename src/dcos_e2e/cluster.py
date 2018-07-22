@@ -12,6 +12,7 @@ from kazoo.client import KazooClient
 from kazoo.handlers.threading import KazooTimeoutError
 from retry import retry
 
+from ._common import get_logger
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
@@ -19,6 +20,8 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
 from .node import Node, Role, Transport
+
+LOGGER = get_logger(__name__)
 
 
 @retry(
@@ -157,6 +160,7 @@ class Cluster(ContextDecorator):
         any_master = next(iter(self.masters))
         zk_host = str(any_master.public_ip_address)
         zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
+        LOGGER.info('Trying to connect to ZooKeeper.')
         zk_client.start()
         zk_client.stop()
 
