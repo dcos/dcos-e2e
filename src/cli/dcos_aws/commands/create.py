@@ -17,6 +17,7 @@ from passlib.hash import sha512_crypt
 
 from cli.common.options import (
     agents_option,
+    cluster_id_option,
     copy_to_master_option,
     extra_config_option,
     license_key_option,
@@ -26,7 +27,7 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import set_logging
+from cli.common.utils import check_cluster_id_unique, set_logging
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 
@@ -58,6 +59,7 @@ from ._options import aws_region_option
 @security_mode_option
 @copy_to_master_option
 @verbosity_option
+@cluster_id_option
 def create(
     agents: int,
     artifact_url: str,
@@ -71,6 +73,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     verbose: int,
     aws_region: str,
+    cluster_id: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -153,7 +156,6 @@ def create(
         if IPv4Address(instance.public_ip_address) in node_public_ips
     ]
 
-    cluster_id = 'a'
     CLUSTER_ID_TAG_KEY = 'a'
     cluster_id_tag = {
         'Key': CLUSTER_ID_TAG_KEY,
