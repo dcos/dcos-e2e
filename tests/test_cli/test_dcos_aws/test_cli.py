@@ -68,6 +68,7 @@ class TestDcosAWS:
 
             Commands:
               create  Create a DC/OS cluster.
+              doctor  Diagnose common issues which stop DC/OS E2E...
               list    List all clusters.
             """,# noqa: E501,E261
         )
@@ -196,3 +197,48 @@ class TestList:
             """,
         )
         assert result.output == expected_help
+
+
+class TestDoctor:
+    """
+    Tests for the ``doctor`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws doctor --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_aws,
+            ['doctor', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws doctor [OPTIONS]
+
+              Diagnose common issues which stop DC/OS E2E from working correctly.
+
+            Options:
+              --help  Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+    def test_doctor(self) -> None:
+        """
+        No exception is raised by the ``doctor`` subcommand.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_aws,
+            ['doctor'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
