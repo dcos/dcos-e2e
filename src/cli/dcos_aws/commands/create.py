@@ -5,16 +5,19 @@ Tools for creating a DC/OS cluster.
 import sys
 import tempfile
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple
 
+import boto3
 import click
 import click_spinner
 from passlib.hash import sha512_crypt
 
 from cli.common.options import (
     agents_option,
+    cluster_id_option,
     copy_to_master_option,
     extra_config_option,
     license_key_option,
@@ -24,10 +27,11 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import set_logging
+from cli.common.utils import check_cluster_id_unique, set_logging
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 
+from ._common import CLUSTER_ID_TAG_KEY, existing_cluster_ids
 from ._options import aws_region_option
 
 
@@ -56,6 +60,7 @@ from ._options import aws_region_option
 @security_mode_option
 @copy_to_master_option
 @verbosity_option
+@cluster_id_option
 def create(
     agents: int,
     artifact_url: str,
@@ -69,6 +74,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     verbose: int,
     aws_region: str,
+    cluster_id: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -103,6 +109,10 @@ def create(
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
     set_logging(verbosity_level=verbose)
+    check_cluster_id_unique(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
+    )
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
@@ -140,6 +150,26 @@ def create(
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
         sys.exit(exc.returncode)
+
+    ec2 = boto3.resource('ec2', region_name=cluster_backend.aws_region)
+    ec2_instances = ec2.instances.all()
+
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+    node_public_ips = set(node.public_ip_address for node in nodes)
+    node_ec2_instance_ids = [
+        instance.id for instance in ec2_instances
+        if IPv4Address(instance.public_ip_address) in node_public_ips
+    ]
+
+    cluster_id_tag = {
+        'Key': CLUSTER_ID_TAG_KEY,
+        'Value': cluster_id,
+    }
+
+    ec2.create_tags(
+        Resources=node_ec2_instance_ids,
+        Tags=[cluster_id_tag],
+    )
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
