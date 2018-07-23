@@ -284,16 +284,9 @@ class VagrantCluster(ClusterManager):
 
     @property
     def ip_detect_path(self) -> Path:
-        master = next(iter(self.masters))
-        # pylint: disable=anomalous-backslash-in-string
-        ip_detect_contents = textwrap.dedent(
-            """\
-            #!/usr/bin/env bash
-            echo $(/usr/sbin/ip route show to match {master_ip} |
-            grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}} '|
-            tail -1)
-            """.format(master_ip=master.private_ip_address),
-        )
-        # pylint: enable=anomalous-backslash-in-string
-
-        return ip_detect_path
+        """
+        Return the path to the Vagrant specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'

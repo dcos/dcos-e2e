@@ -472,13 +472,9 @@ class DockerCluster(ClusterManager):
         list of nodes.
         """
         ssh_user = self._default_user
+        ip_detect_contents = Path(self.ip_detect_path).read_text()
 
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_contents = Path(ip_detect_src).read_text()
-
-        config = {
+        return {
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
             # "Time is not synchronized / marked as bad by the kernel.".
@@ -495,12 +491,17 @@ class DockerCluster(ClusterManager):
             'ssh_port': 22,
             'ssh_user': ssh_user,
             # This is not a documented option.
-            # Users are instructed to instead provide a filename with
-            # 'ip_detect_contents_filename'.
             'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
-        return config
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the Docker specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
 
     def install_dcos_from_path_with_bootstrap_node(
         self,

@@ -254,17 +254,22 @@ class AWSCluster(ClusterManager):
         """
         # We include ``ip_detect_contents`` so that we can install DC/OS
         # without putting an IP detect script on nodes.
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_contents = Path(ip_detect_src).read_text()
-        ip_detect_contents = yaml.dump(ip_detect_contents)
+        ip_detect_contents = Path(self.ip_detect_path).read_text()
         return {
             **dict(self.launcher.config['dcos_config']),
             **{
-                'ip_detect_contents': ip_detect_contents,
+                'ip_detect_contents': yaml.dump(ip_detect_contents),
             },
         }
+
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the AWS specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
 
     def install_dcos_from_url_with_bootstrap_node(
         self,

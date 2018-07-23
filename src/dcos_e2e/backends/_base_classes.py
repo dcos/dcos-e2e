@@ -126,6 +126,9 @@ class ClusterManager(abc.ABC):
     def ip_detect_path(self) -> Path:
         """
         Return the file system path to a valid ``ip-detect`` script.
+
+        If executed on a node, the script that this path points to returns
+        the current private IP address of this node.
         """
 
 
