@@ -3,9 +3,9 @@ Tools for creating a DC/OS cluster.
 """
 
 import sys
-from ipaddress import IPv4Address
 import tempfile
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple
