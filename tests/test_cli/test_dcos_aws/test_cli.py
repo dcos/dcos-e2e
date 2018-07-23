@@ -95,7 +95,7 @@ class TestCreate:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos-aws create [OPTIONS]
+            Usage: dcos-aws create [OPTIONS] ARTIFACT_URL
 
               Create a DC/OS cluster.
 
