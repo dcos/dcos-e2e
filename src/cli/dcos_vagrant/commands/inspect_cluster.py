@@ -24,13 +24,23 @@ def inspect_cluster(cluster_id: str) -> None:
         existing_cluster_ids=existing_cluster_ids(),
     )
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
+    keys = {
+        'masters': cluster_vms.masters,
+        'agents': cluster_vms.agents,
+        'public_agents': cluster_vms.public_agents,
+    }
     master = next(iter(cluster_vms.cluster.masters))
     web_ui = 'http://' + str(master.private_ip_address)
     vagrant_client = cluster_vms.vagrant_client
+    nodes = {
+        key: [VMInspectView(vm).to_dict() for vm in vms]
+        for key, vms in keys.items()
+    }
 
     data = {
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
+        'Nodes': nodes,
         'Vagrant root': vagrant_client.root,
         'SSH key': vagrant_client.keyfile(),
         'SSH user': vagrant_client.user(),
