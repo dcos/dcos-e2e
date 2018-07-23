@@ -149,10 +149,12 @@ def create(
         if IPv4Address(instance.public_ip_address) in node_public_ips
     ]
 
-    cluster_id_tag = [
+    cluster_id = 'a'
+    CLUSTER_ID_TAG_KEY = 'a'
+    cluster_id_tag = {
         'Key': CLUSTER_ID_TAG_KEY,
         'Value': cluster_id,
-    ]
+    }
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
