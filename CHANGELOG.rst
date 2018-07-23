@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add ``ip_detect_path`` to the ``Cluster.from_nodes`` function.
+
 2018.07.23.1
 ------------
 

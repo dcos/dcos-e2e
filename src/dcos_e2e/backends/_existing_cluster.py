@@ -20,6 +20,7 @@ class ExistingCluster(ClusterBackend):
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
+        ip_detect_path: Path,
     ) -> None:
         """
         Create a record of an existing cluster backend for use by a cluster
@@ -28,6 +29,7 @@ class ExistingCluster(ClusterBackend):
         self.masters = masters
         self.agents = agents
         self.public_agents = public_agents
+        self.ip_detect_path = ip_detect_path
 
     @property
     def cluster_cls(self) -> Type['ExistingClusterManager']:
@@ -70,6 +72,7 @@ class ExistingClusterManager(ClusterManager):
         self._masters = cluster_backend.masters
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
+        self._ip_detect_path = cluster_backend.ip_detect_path
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
@@ -109,13 +112,10 @@ class ExistingClusterManager(ClusterManager):
     @property
     def ip_detect_path(self) -> Path:
         """
-        Raises:
-            NotImplementedError: It is assumed that clusters created with the
-                :class:`ExistingCluster` backend already have an installed
-                instance of DC/OS running on them including a dedicated
-                ``ip-detect`` script that returns the private IP address.
+        Return the ``ip-detect`` script specified when creating the
+        :class:`ExistingCluster` backend that this cluster was created from.
         """
-        raise NotImplementedError
+        return self._ip_detect_path
 
     @property
     def masters(self) -> Set[Node]:
