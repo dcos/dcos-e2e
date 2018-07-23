@@ -90,7 +90,6 @@ class ContainerInspectView:
         """
         Return dictionary with information to be shown to users.
         """
-        # THIS IS A HACK
         container = self._container
         role = container.labels[NODE_TYPE_LABEL_KEY]
         index = container.name.split('-')[-1]
