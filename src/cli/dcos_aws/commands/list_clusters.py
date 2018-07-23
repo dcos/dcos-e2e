@@ -14,6 +14,5 @@ def list_clusters(aws_region: str) -> None:
     """
     List all clusters.
     """
-    # TODO add a test for this
     for cluster_id in existing_cluster_ids(aws_region=aws_region):
         click.echo(cluster_id)

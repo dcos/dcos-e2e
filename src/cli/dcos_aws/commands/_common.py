@@ -25,5 +25,4 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
             if tag['Key'] == CLUSTER_ID_TAG_KEY:
                 cluster_ids.add(tag['Value'])
 
-    # TODO fill this out
     return cluster_ids
