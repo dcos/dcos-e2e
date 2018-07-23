@@ -120,7 +120,7 @@ class ContainerInspectView:
             'e2e_reference': '{role}_{index}'.format(role=role, index=index),
             'docker_container_name': container.name,
             'docker_container_id': container.id,
-            'ip_address': container.attrs['NetworkSettings']['IPAddress'],
+            'ip_address': container_ip,
         }
 
 
