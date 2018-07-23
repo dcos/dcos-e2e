@@ -174,6 +174,9 @@ class TestCreate:
                                               commands without specifying --cluster-id.
               -v, --verbose                   Use verbose output. Use this option multiple
                                               times for more verbose output.
+              --enable-selinux-enforcing      With this flag set, SELinux is set to
+                                              enforcing before DC/OS is installed on the
+                                              cluster.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
