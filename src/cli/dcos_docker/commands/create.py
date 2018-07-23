@@ -479,7 +479,7 @@ def create(
             VARIANT_LABEL_KEY: 'ee' if enterprise else '',
         },
         docker_master_labels={
-            NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE
+            NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE,
         },
         docker_agent_labels={NODE_TYPE_LABEL_KEY: NODE_TYPE_AGENT_LABEL_VALUE},
         docker_public_agent_labels={
