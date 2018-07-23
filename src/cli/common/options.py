@@ -24,12 +24,6 @@ def _validate_cluster_id(
     for _ in (ctx, param):
         pass
 
-    # if value in existing_cluster_ids_func():
-    #     message = 'A cluster with the id "{value}" already exists.'.format(
-    #         value=value,
-    #     )
-    #     raise click.BadParameter(message=message)
-
     # This matches the Docker ID regular expression.
     # This regular expression can be seen by running:
     # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
