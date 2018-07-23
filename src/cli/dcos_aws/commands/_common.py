@@ -8,13 +8,14 @@ import boto3
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 
-def existing_cluster_ids() -> Set[str]:
+
+def existing_cluster_ids(aws_region: str) -> Set[str]:
     """
     Return the IDs of existing clusters.
-    """
-    ec2 = boto3.client('ec2')
 
-    # Retrieves all regions/endpoints that work with EC2
-    response = ec2.describe_regions()
-    print('Regions:', response['Regions'])
+    Args:
+        aws_region: The region to get clusters from.
+    """
+    ec2 = boto3.client('ec2', region_name=aws_region)
     # TODO fill this out
+    return set()

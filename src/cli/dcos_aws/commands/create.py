@@ -111,7 +111,7 @@ def create(
     set_logging(verbosity_level=verbose)
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
-        existing_cluster_ids=existing_cluster_ids(),
+        existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
