@@ -92,14 +92,8 @@ class ContainerInspectView:
         """
         # THIS IS A HACK
         container = self._container
+        role = container.labels[NODE_TYPE_LABEL_KEY]
         index = container.name.split('-')[-1]
-        name_without_index = container.name[:-len('-' + index)]
-        if name_without_index.endswith('public-agent'):
-            role = 'public_agent'
-        elif name_without_index.endswith('agent'):
-            role = 'agent'
-        elif name_without_index.endswith('master'):
-            role = 'master'
 
         return {
             'e2e_reference': '{role}_{index}'.format(role=role, index=index),
