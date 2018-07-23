@@ -162,6 +162,8 @@ class ClusterVMs:
             masters=set(map(self._to_node, masters)),
             agents=set(map(self._to_node, agents)),
             public_agents=set(map(self._to_node, public_agents)),
+            # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
+            ip_detect_path=Path('/foo'),
         )
 
     @property
