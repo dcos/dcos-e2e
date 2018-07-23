@@ -272,6 +272,7 @@ class TestDCOSInstallation:
             master.install_dcos_from_url(
                 build_artifact=oss_artifact_url,
                 dcos_config=cluster.base_config,
+                ip_detect_path=cluster.ip_detect_path,
                 role=Role.MASTER,
                 log_output_live=True,
             )

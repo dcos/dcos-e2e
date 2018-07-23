@@ -676,6 +676,7 @@ class TestAdvancedInstallationMethod:
                     node.install_dcos_from_url(
                         build_artifact=oss_artifact_url,
                         dcos_config=cluster.base_config,
+                        ip_detect_path=cluster.ip_detect_path,
                         role=role,
                     )
             cluster.wait_for_dcos_oss()
@@ -697,6 +698,7 @@ class TestAdvancedInstallationMethod:
                     node.install_dcos_from_path(
                         build_artifact=oss_artifact,
                         dcos_config=cluster.base_config,
+                        ip_detect_path=cluster.ip_detect_path,
                         role=role,
                     )
             cluster.wait_for_dcos_oss()

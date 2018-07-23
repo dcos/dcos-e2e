@@ -471,9 +471,6 @@ class DockerCluster(ClusterManager):
         Return a base configuration for installing DC/OS OSS, not including the
         list of nodes.
         """
-        ssh_user = self._default_user
-        ip_detect_contents = Path(self.ip_detect_path).read_text()
-
         return {
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
@@ -489,9 +486,7 @@ class DockerCluster(ClusterManager):
             'process_timeout': 10000,
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
-            'ssh_user': ssh_user,
-            # This is not a documented option.
-            'ip_detect_contents': yaml.dump(ip_detect_contents),
+            'ssh_user': self._default_user,
         }
 
     @property
@@ -521,6 +516,11 @@ class DockerCluster(ClusterManager):
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.
         """
+        copyfile(
+            src=str(self.ip_detect_path),
+            dst=str(self._genconf_dir / 'ip-detect'),
+        )
+
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)

@@ -386,6 +386,7 @@ class Cluster(ContextDecorator):
                     node.install_dcos_from_url(
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
+                        ip_detect_path=self._cluster.ip_detect_path,
                         role=role,
                         log_output_live=log_output_live,
                     )
@@ -425,6 +426,7 @@ class Cluster(ContextDecorator):
                     node.install_dcos_from_path(
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
+                        ip_detect_path=self._cluster.ip_detect_path,
                         role=role,
                         log_output_live=log_output_live,
                     )
