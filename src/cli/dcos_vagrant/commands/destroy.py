@@ -7,8 +7,10 @@ from typing import List
 import click
 import click_spinner
 
+from cli.common.options import existing_cluster_id_option
+from cli.common.utils import check_cluster_id_exists
+
 from ._common import ClusterVMs, existing_cluster_ids
-from ._options import existing_cluster_id_option
 
 
 @click.command('destroy-list')
@@ -47,6 +49,10 @@ def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
     with click_spinner.spinner():
         cluster_vms.destroy()
