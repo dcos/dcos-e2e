@@ -179,7 +179,7 @@ CLI Reference
 .. click:: cli.dcos_vagrant:create
   :prog: dcos-vagrant create
 
-.. click:: cli.dcos_vagrant:LIST_CLUSTERS
+.. click:: cli.dcos_vagrant:list_clusters
   :prog: dcos-vagrant list
 
 .. _dcos-vagrant-wait:
