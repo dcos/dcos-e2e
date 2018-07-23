@@ -334,6 +334,13 @@ class Cluster(ContextDecorator):
             **self._cluster.base_config,
         }
 
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return a base IP detect script for DC/OS nodes.
+        """
+        return self._cluster.ip_detect_path
+
     def install_dcos_from_url(
         self,
         build_artifact: str,

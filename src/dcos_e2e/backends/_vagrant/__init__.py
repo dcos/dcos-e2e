@@ -2,9 +2,9 @@
 Vagrant backend.
 """
 
+import inspect
 import os
 import shutil
-import textwrap
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -268,20 +268,8 @@ class VagrantCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        master = next(iter(self.masters))
-
-        # pylint: disable=anomalous-backslash-in-string
-        ip_detect_contents = textwrap.dedent(
-            """\
-            #!/usr/bin/env bash
-            echo $(/usr/sbin/ip route show to match {master_ip} |
-            grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}} '|
-            tail -1)
-            """.format(master_ip=master.private_ip_address),
-        )
-        # pylint: enable=anomalous-backslash-in-string
-
-        config = {
+        ip_detect_contents = Path(self.ip_detect_path).read_text()
+        return {
             'check_time': 'false',
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
@@ -290,9 +278,14 @@ class VagrantCluster(ClusterManager):
             'ssh_port': 22,
             'ssh_user': 'vagrant',
             # This is not a documented option.
-            # Users are instructed to instead provide a filename with
-            # 'ip_detect_contents_filename'.
             'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
-        return config
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the Vagrant specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
