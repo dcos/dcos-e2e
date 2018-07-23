@@ -5,7 +5,6 @@ Vagrant backend.
 import inspect
 import os
 import shutil
-import textwrap
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
