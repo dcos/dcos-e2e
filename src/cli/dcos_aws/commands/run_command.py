@@ -22,6 +22,7 @@ from cli.common.utils import check_cluster_id_exists
 from dcos_e2e.node import Transport
 
 from ._common import ClusterInstances, existing_cluster_ids
+from ._options import aws_region_option
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
@@ -32,6 +33,7 @@ from ._common import ClusterInstances, existing_cluster_ids
 @sync_dir_run_option
 @no_test_env_run_option
 @environment_variables_option
+@aws_region_option
 def run(
     cluster_id: str,
     node_args: Tuple[str],
@@ -40,6 +42,7 @@ def run(
     dcos_login_pw: str,
     no_test_env: bool,
     env: Dict[str, str],
+    aws_region: str,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -57,7 +60,7 @@ def run(
     """  # noqa: E501
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
-        existing_cluster_ids=existing_cluster_ids(),
+        existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
     cluster_instances = ClusterInstances(cluster_id=cluster_id)
     cluster = cluster_instances.cluster
