@@ -158,7 +158,7 @@ def create(
 
     ec2.create_tags(
         Resources=node_ec2_instance_ids,
-        Tags=[cluster_id_tag]
+        Tags=[cluster_id_tag],
     )
 
     for node in cluster.masters:
