@@ -37,6 +37,7 @@ class TestIntegrationTests:
         with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
                 dcos_config=dcos_cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
                 build_artifact=oss_artifact,
                 log_output_live=True,
             )
@@ -187,6 +188,7 @@ class TestInstallDcosFromPathLogging:
             ) as cluster:
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
+                    ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,
                     log_output_live=True,
                 )
@@ -211,6 +213,7 @@ class TestInstallDcosFromPathLogging:
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
                     dcos_config=cluster.base_config,
+                    ip_detect_path=cluster_backend.ip_detect_path,
                 )
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
@@ -233,11 +236,13 @@ class TestMultipleClusters:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             with Cluster(cluster_backend=cluster_backend) as cluster:
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
                     dcos_config=cluster.base_config,
+                    ip_detect_path=cluster_backend.ip_detect_path,
                 )
 
 
@@ -323,6 +328,7 @@ class TestClusterFromNodes:
             cluster.install_dcos_from_url(
                 build_artifact=oss_artifact_url,
                 dcos_config=original_cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_oss()
@@ -345,12 +351,12 @@ class TestClusterFromNodes:
                 masters=original_cluster.masters,
                 agents=original_cluster.agents,
                 public_agents=original_cluster.public_agents,
-                ip_detect_path=Path('foo'),
             )
 
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=original_cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_oss()

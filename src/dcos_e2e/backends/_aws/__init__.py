@@ -112,6 +112,15 @@ class AWS(ClusterBackend):
         """
         return AWSCluster
 
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the AWS specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
+
 
 class AWSCluster(ClusterManager):
     # pylint: disable=super-init-not-called
@@ -158,6 +167,7 @@ class AWSCluster(ClusterManager):
         self._path.mkdir(exist_ok=True)
         self._path = self._path.resolve() / unique
         self._path.mkdir(exist_ok=True)
+        self._ip_detect_path = cluster_backend.ip_detect_path
 
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
@@ -251,29 +261,14 @@ class AWSCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        # We include ``ip_detect_contents`` so that we can install DC/OS
-        # without putting an IP detect script on nodes.
-        ip_detect_contents = Path(self.ip_detect_path).read_text()
-        return {
-            **dict(self.launcher.config['dcos_config']),
-            **{
-                'ip_detect_contents': yaml.dump(ip_detect_contents),
-            },
-        }
-
-    @property
-    def ip_detect_path(self) -> Path:
-        """
-        Return the path to the AWS specific ``ip-detect`` script.
-        """
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        return current_parent / 'resources' / 'ip-detect'
+        conf = self.launcher.config['dcos_config']  # type: Dict[str, Any]
+        return conf
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -283,8 +278,18 @@ class AWSCluster(ClusterManager):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to an ``ip-detect`` script to be used
+                during the DC/OS installation.
             log_output_live: If ``True``, log output of the installation live.
+
+        Raises:
+            NotImplementedError: ``NotImplementedError`` because this function
+                backend by ``dcos-launch`` does not support a custom
+                ``ip-detect`` script.
         """
+        if ip_detect_path != self._ip_detect_path:
+            raise NotImplementedError
+
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
@@ -306,6 +311,8 @@ class AWSCluster(ClusterManager):
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to an ``ip-detect`` script to be used
+                during the DC/OS installation.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:

@@ -45,6 +45,7 @@ class TestEnterpriseIntegrationTests:
                     **cluster.base_config,
                     **config,
                 },
+                ip_detect_path=cluster_backend.ip_detect_path,
                 log_output_live=True,
             )
             cluster.wait_for_dcos_ee(
@@ -136,6 +137,7 @@ class TestCopyFiles:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             # We exercise the "http_checks=False" code here but we do not test
@@ -220,6 +222,7 @@ class TestCopyFiles:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_ee(
@@ -267,6 +270,7 @@ class TestSSLDisabled:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
@@ -315,6 +319,7 @@ class TestWaitForDCOS:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             (master, ) = cluster.masters
             cluster.wait_for_dcos_ee(

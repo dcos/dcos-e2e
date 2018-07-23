@@ -232,6 +232,15 @@ class Docker(ClusterBackend):
         """
         return DockerCluster
 
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the Docker specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
+
 
 class DockerCluster(ClusterManager):
     """
@@ -472,8 +481,6 @@ class DockerCluster(ClusterManager):
         list of nodes.
         """
         ssh_user = self._default_user
-        ip_detect_contents = Path(self.ip_detect_path).read_text()
-
         return {
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
@@ -490,18 +497,7 @@ class DockerCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
-            # This is not a documented option.
-            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
-
-    @property
-    def ip_detect_path(self) -> Path:
-        """
-        Return the path to the Docker specific ``ip-detect`` script.
-        """
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        return current_parent / 'resources' / 'ip-detect'
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
