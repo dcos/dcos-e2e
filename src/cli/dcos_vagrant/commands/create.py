@@ -53,6 +53,14 @@ from ._common import (
 @copy_to_master_option
 @cluster_id_option
 @verbosity_option
+@click.option(
+    '--enable-selinux-enforcing',
+    is_flag=True,
+    help=(
+        'With this flag set, SELinux is set to enforcing before DC/OS is '
+        'installed on the cluster.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -158,6 +166,10 @@ def create(
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
         sys.exit(exc.returncode)
+
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+    for node in nodes:
+        node.run(args=['setenforce', '1'], sudo=True)
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
