@@ -144,8 +144,8 @@ def create(
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
     node_public_ips = set([node.public_ip_address for node in nodes])
-    node_ec2_instances = [
-        instance for instance in ec2_instances
+    node_ec2_instance_ids = [
+        instance.id for instance in ec2_instances
         if IPv4Address(instance.public_ip_address) in node_public_ips
     ]
 
@@ -155,6 +155,11 @@ def create(
         'Key': CLUSTER_ID_TAG_KEY,
         'Value': cluster_id,
     }
+
+    ec2.create_tags(
+        Resources=node_ec2_instance_ids,
+        Tags=[cluster_id_tag]
+    )
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
