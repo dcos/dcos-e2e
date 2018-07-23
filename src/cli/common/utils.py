@@ -111,3 +111,17 @@ def check_cluster_id_unique(
             value=new_cluster_id,
         )
         raise click.BadParameter(message=message)
+
+
+def check_cluster_id_exists(
+    new_cluster_id: str,
+    existing_cluster_ids: Set[str],
+) -> None:
+    """
+    Raise an exception if a given Cluster ID does not already exist.
+    """
+    if new_cluster_id not in existing_cluster_ids:
+        message = 'Cluster "{value}" does not exist.'.format(
+            value=new_cluster_id,
+        )
+        raise click.BadParameter(message)
