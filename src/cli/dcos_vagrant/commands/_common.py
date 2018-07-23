@@ -143,11 +143,19 @@ class ClusterVMs:
     @property
     def cluster(self) -> Cluster:
         """
-        Return a ``Cluster`` constructed from the Vms.
+        Return a ``Cluster`` constructed from the VMs.
         """
         vm_names = self._vm_names
+        # This is a hack as it depends on an internal implementation detail of
+        # the library.
+        # Instead, we should set different Virtualbox descriptions for
+        # different node types.
+        # see https://jira.mesosphere.com/browse/DCOS_OSS-3851.
         masters = [name for name in vm_names if '-master-' in name]
-        agents = [name for name in vm_names if '-agent-' in name]
+        agents = [
+            name for name in vm_names
+            if '-agent-' in name and '-public-agent-' not in name
+        ]
         public_agents = [name for name in vm_names if '-public-agent-' in name]
 
         return Cluster.from_nodes(
