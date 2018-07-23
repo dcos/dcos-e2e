@@ -95,7 +95,7 @@ class VMInspectView:
 
         return {
             'vm_name': self._vm_name,
-            'ip_address': ip_address,
+            'ip_address': str(ip_address),
         }
 
 
