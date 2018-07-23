@@ -92,7 +92,29 @@ class ContainerInspectView:
         """
         container = self._container
         role = container.labels[NODE_TYPE_LABEL_KEY]
-        index = container.name.split('-')[-1]
+        container_ip = container.attrs['NetworkSettings']['IPAddress']
+        cluster_containers = ClusterContainers(
+            cluster_id=container.labels[CLUSTER_ID_LABEL_KEY],
+            transport=Transport.DOCKER_EXEC,
+        )
+
+        containers = {
+            NODE_TYPE_MASTER_LABEL_VALUE: cluster_containers.masters,
+            NODE_TYPE_AGENT_LABEL_VALUE: cluster_containers.agents,
+            NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE:
+            cluster_containers.public_agents,
+        }[role]
+
+        sorted_ips = list(
+            sorted(
+                [
+                    ctr.attrs['NetworkSettings']['IPAddress']
+                    for ctr in containers
+                ],
+            ),
+        )
+
+        index = sorted_ips.index(container_ip)
 
         return {
             'e2e_reference': '{role}_{index}'.format(role=role, index=index),
