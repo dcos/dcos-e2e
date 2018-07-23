@@ -30,6 +30,10 @@ from dcos_e2e.cluster import Cluster
 
 
 @click.command('create')
+@click.argument(
+    'artifact_url',
+    type=str,
+)
 @click.option(
     '--variant',
     type=click.Choice(['oss', 'enterprise']),
