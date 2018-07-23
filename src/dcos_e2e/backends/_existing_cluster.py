@@ -107,6 +107,17 @@ class ExistingClusterManager(ClusterManager):
         return {}
 
     @property
+    def ip_detect_path(self) -> Path:
+        """
+        Raises:
+            NotImplementedError: It is assumed that clusters created with the
+                :class:`ExistingCluster` backend already have an installed
+                instance of DC/OS running on them including a dedicated
+                ``ip-detect`` script that returns the private IP address.
+        """
+        raise NotImplementedError
+
+    @property
     def masters(self) -> Set[Node]:
         """
         Return all DC/OS master :class:`dcos_e2e.node.Node` s.

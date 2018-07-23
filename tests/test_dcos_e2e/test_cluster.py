@@ -285,6 +285,9 @@ class TestClusterFromNodes:
             public_agent.run(args=['test', '-f', 'example_public_agent_file'])
 
         with pytest.raises(NotImplementedError):
+            assert duplicate_cluster.ip_detect_path
+
+        with pytest.raises(NotImplementedError):
             duplicate_cluster.destroy()
 
         with pytest.raises(NotImplementedError):
