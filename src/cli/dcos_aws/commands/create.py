@@ -31,6 +31,7 @@ from cli.common.utils import check_cluster_id_unique, set_logging
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 
+from ._common import CLUSTER_ID_TAG_KEY, existing_cluster_ids
 from ._options import aws_region_option
 
 
@@ -108,6 +109,10 @@ def create(
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
     set_logging(verbosity_level=verbose)
+    check_cluster_id_unique(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
@@ -156,7 +161,6 @@ def create(
         if IPv4Address(instance.public_ip_address) in node_public_ips
     ]
 
-    CLUSTER_ID_TAG_KEY = 'a'
     cluster_id_tag = {
         'Key': CLUSTER_ID_TAG_KEY,
         'Value': cluster_id,
