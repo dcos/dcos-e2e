@@ -2,6 +2,8 @@
 Helpers for creating and interacting with clusters on AWS.
 """
 
+import inspect
+import os
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -252,26 +254,10 @@ class AWSCluster(ClusterManager):
         """
         # We include ``ip_detect_contents`` so that we can install DC/OS
         # without putting an IP detect script on nodes.
-        ip_detect_contents = dedent(
-            """\
-            #!/bin/sh
-            set -o nounset -o errexit
-
-            if [ -e /etc/environment ]
-            then
-              set -o allexport
-              source /etc/environment
-              set +o allexport
-            fi
-
-            get_private_ip_from_metaserver()
-            {
-                curl -fsSL http://169.254.169.254/latest/meta-data/local-ipv4
-            }
-
-            echo ${COREOS_PRIVATE_IPV4:-$(get_private_ip_from_metaserver)}
-            """,
-        )
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        ip_detect_src = current_parent / 'resources' / 'ip-detect'
+        ip_detect_contents = Path(ip_detect_src).read_text()
         ip_detect_contents = yaml.dump(ip_detect_contents)
         return {
             **dict(self.launcher.config['dcos_config']),

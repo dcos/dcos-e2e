@@ -121,6 +121,13 @@ class ClusterManager(abc.ABC):
         type.
         """
 
+    @property
+    @abc.abstractmethod
+    def ip_detect_path(self) -> Path:
+        """
+        Return the file system path to a valid ``ip-detect`` script.
+        """
+
 
 class ClusterBackend(abc.ABC):
     """

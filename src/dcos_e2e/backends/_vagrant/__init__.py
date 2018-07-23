@@ -2,6 +2,7 @@
 Vagrant backend.
 """
 
+import inspect
 import os
 import shutil
 import textwrap
@@ -268,8 +269,22 @@ class VagrantCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        master = next(iter(self.masters))
+        ip_detect_contents = Path(self.ip_detect_path).read_text()
+        return {
+            'check_time': 'false',
+            'cluster_name': 'DCOS',
+            'exhibitor_storage_backend': 'static',
+            'master_discovery': 'static',
+            'resolvers': ['8.8.8.8'],
+            'ssh_port': 22,
+            'ssh_user': 'vagrant',
+            # This is not a documented option.
+            'ip_detect_contents': yaml.dump(ip_detect_contents),
+        }
 
+    @property
+    def ip_detect_path(self) -> Path:
+        master = next(iter(self.masters))
         # pylint: disable=anomalous-backslash-in-string
         ip_detect_contents = textwrap.dedent(
             """\
@@ -281,18 +296,4 @@ class VagrantCluster(ClusterManager):
         )
         # pylint: enable=anomalous-backslash-in-string
 
-        config = {
-            'check_time': 'false',
-            'cluster_name': 'DCOS',
-            'exhibitor_storage_backend': 'static',
-            'master_discovery': 'static',
-            'resolvers': ['8.8.8.8'],
-            'ssh_port': 22,
-            'ssh_user': 'vagrant',
-            # This is not a documented option.
-            # Users are instructed to instead provide a filename with
-            # 'ip_detect_contents_filename'.
-            'ip_detect_contents': yaml.dump(ip_detect_contents),
-        }
-
-        return config
+        return ip_detect_path
