@@ -5,12 +5,15 @@ Tools for listing clusters.
 import click
 
 from ._common import existing_cluster_ids
+from ._options import aws_region_option
 
 
 @click.command('list')
-def list_clusters() -> None:
+@aws_region_option
+def list_clusters(aws_region: str) -> None:
     """
     List all clusters.
     """
+    # TODO add a test for this
     for cluster_id in existing_cluster_ids():
         click.echo(cluster_id)
