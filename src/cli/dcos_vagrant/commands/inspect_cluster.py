@@ -7,8 +7,10 @@ from typing import Any, Dict  # noqa: F401
 
 import click
 
-from ._common import ClusterVMs
-from ._options import existing_cluster_id_option
+from cli.common.options import existing_cluster_id_option
+from cli.common.utils import check_cluster_id_exists
+
+from ._common import ClusterVMs, existing_cluster_ids
 
 
 @click.command('inspect')
@@ -17,6 +19,10 @@ def inspect_cluster(cluster_id: str) -> None:
     """
     Show cluster details.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
     master = next(iter(cluster_vms.cluster.masters))
     web_ui = 'http://' + str(master.private_ip_address)
