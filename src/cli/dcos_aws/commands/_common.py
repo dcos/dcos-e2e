@@ -16,6 +16,14 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
     Args:
         aws_region: The region to get clusters from.
     """
-    ec2 = boto3.client('ec2', region_name=aws_region)
+    ec2 = boto3.resource('ec2', region_name=aws_region)
+    ec2_instances = ec2.instances.all()
+
+    cluster_ids = set()  # type: Set[str]
+    for instance in ec2_instances:
+        for tag in instance.tags:
+            if tag['Key'] == CLUSTER_ID_TAG_KEY:
+                cluster_ids.add(tag['Value'])
+
     # TODO fill this out
-    return set()
+    return cluster_ids
