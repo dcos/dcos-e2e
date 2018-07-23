@@ -44,6 +44,10 @@ from ._common import (
     DOCKER_STORAGE_DRIVERS,
     DOCKER_VERSIONS,
     LINUX_DISTRIBUTIONS,
+    NODE_TYPE_AGENT_LABEL_VALUE,
+    NODE_TYPE_LABEL_KEY,
+    NODE_TYPE_MASTER_LABEL_VALUE,
+    NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     existing_cluster_ids,
@@ -474,9 +478,13 @@ def create(
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
             VARIANT_LABEL_KEY: 'ee' if enterprise else '',
         },
-        docker_master_labels={'node_type': 'master'},
-        docker_agent_labels={'node_type': 'agent'},
-        docker_public_agent_labels={'node_type': 'public_agent'},
+        docker_master_labels={
+            NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE
+        },
+        docker_agent_labels={NODE_TYPE_LABEL_KEY: NODE_TYPE_AGENT_LABEL_VALUE},
+        docker_public_agent_labels={
+            NODE_TYPE_LABEL_KEY: NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
+        },
         workspace_dir=workspace_dir,
         transport=transport,
         network=network,
