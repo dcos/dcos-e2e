@@ -10,7 +10,7 @@ import click
 from cli.common.options import existing_cluster_id_option
 from cli.common.utils import check_cluster_id_exists
 
-from ._common import ClusterVMs, existing_cluster_ids
+from ._common import ClusterVMs, VMInspectView, existing_cluster_ids
 
 
 @click.command('inspect')

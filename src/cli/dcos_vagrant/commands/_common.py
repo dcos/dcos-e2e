@@ -75,6 +75,30 @@ def existing_cluster_ids() -> Set[str]:
     return cluster_ids - set([None])
 
 
+class VMInspectView:
+    """
+    Details of a node from a VM.
+    """
+
+    def __init__(self, vm_name: str) -> None:
+        """
+        Args:
+            vm_name: The name of the VM which represents the node.
+        """
+        self._vm_name = vm_name
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        ip_address = _ip_from_vm_name(vm_name=self._vm_name)
+
+        return {
+            'vm_name': self._vm_name,
+            'ip_address': ip_address,
+        }
+
+
 class ClusterVMs:
     """
     A representation of a cluster constructed from Vagrant VMs.
