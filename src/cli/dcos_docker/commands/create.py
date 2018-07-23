@@ -19,9 +19,9 @@ from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
+from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
-    artifact_argument,
     copy_to_master_option,
     extra_config_option,
     license_key_option,
