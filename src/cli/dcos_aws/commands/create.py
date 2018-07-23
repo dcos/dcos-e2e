@@ -147,7 +147,7 @@ def create(
     ec2_instances = ec2.instances.all()
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
-    node_public_ips = set([node.public_ip_address for node in nodes])
+    node_public_ips = set(node.public_ip_address for node in nodes)
     node_ec2_instance_ids = [
         instance.id for instance in ec2_instances
         if IPv4Address(instance.public_ip_address) in node_public_ips
