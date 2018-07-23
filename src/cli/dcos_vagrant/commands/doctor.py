@@ -6,8 +6,34 @@ import shutil
 import sys
 
 import click
+import docker
 
-from cli.common.doctor import CheckLevels, check_1_9_sed, check_ssh, error
+from cli.common.doctor import (
+    CheckLevels,
+    check_1_9_sed,
+    check_ssh,
+    error,
+    warn,
+)
+
+
+def check_docker() -> CheckLevels:
+    """
+    Error if Docker is not running.
+    """
+    try:
+        docker.from_env(version='auto')
+    except docker.errors.DockerException:
+        message = (
+            'Docker is not running. '
+            'Docker is required for the "create" command to determine the '
+            'DC/OS variant of the given DC/OS artifact. '
+            'Use the "--variant" option when using the "create" command or '
+            'install and run Docker.'
+        )
+        warn(message=message)
+        return CheckLevels.WARNING
+    return CheckLevels.NONE
 
 
 def check_vagrant() -> CheckLevels:
@@ -47,6 +73,7 @@ def doctor() -> None:
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
     check_functions = [
+        check_docker,
         check_1_9_sed,
         check_ssh,
         check_vagrant,

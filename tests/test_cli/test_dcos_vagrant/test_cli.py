@@ -64,21 +64,21 @@ class TestDcosVagrant:
               Manage DC/OS clusters on Vagrant.
 
             Options:
-              --version      Show the version and exit.
-              -v, --verbose
-              --help         Show this message and exit.
+              --version  Show the version and exit.
+              --help     Show this message and exit.
 
             Commands:
-              create        Create a DC/OS cluster.
-              destroy       Destroy a cluster.
-              destroy-list  Destroy clusters.
-              doctor        Diagnose common issues which stop DC/OS E2E...
-              inspect       Show cluster details.
-              list          List all clusters.
-              run           Run an arbitrary command on a node.
-              sync          Sync files from a DC/OS checkout to master...
-              wait          Wait for DC/OS to start.
-              web           Open the browser at the web UI.
+              create             Create a DC/OS cluster.
+              destroy            Destroy a cluster.
+              destroy-list       Destroy clusters.
+              doctor             Diagnose common issues which stop DC/OS E2E...
+              download-artifact  Download a DC/OS Open Source artifact.
+              inspect            Show cluster details.
+              list               List all clusters.
+              run                Run an arbitrary command on a node.
+              sync               Sync files from a DC/OS checkout to master...
+              wait               Wait for DC/OS to start.
+              web                Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -172,6 +172,8 @@ class TestCreate:
               -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
                                               value "default" to use this cluster for other
                                               commands without specifying --cluster-id.
+              -v, --verbose                   Use verbose output. Use this option multiple
+                                              times for more verbose output.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -456,6 +458,51 @@ class TestSync:
         assert result.output == expected_help
 
 
+class TestDownloadArtifact:
+    """
+    Tests for the ``download-artifact`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-vagrant download-artifact --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_vagrant,
+            ['download-artifact', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-vagrant download-artifact [OPTIONS]
+
+              Download a DC/OS Open Source artifact.
+
+              For DC/OS Enterprise release artifacts, contact your sales representative.
+
+            Options:
+              --dcos-version TEXT   The DC/OS Open Source artifact version to download. This
+                                    can be in one of the following formats: ``stable``,
+                                    ``testing/master``, ``testing/<DC/OS MAJOR RELEASE>``,
+                                    ``stable/<DC/OS MINOR RELEASE>``,
+                                    ``testing/pull/<GITHUB-PR-NUMBER>``.
+                                    See
+                                    https://dcos.io/releases/ for available releases.
+                                    [default: stable]
+              --download-path TEXT  The path to download a release artifact to.  [default:
+                                    /tmp/dcos_generate_config.sh]
+              --help                Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
 class TestWait:
     """
     Tests for the ``wait`` subcommand.
@@ -485,6 +532,8 @@ class TestWait:
               --superuser-password TEXT  The superuser password is needed only on DC/OS
                                          Enterprise clusters. By default, on a DC/OS
                                          Enterprise cluster, `admin` is used.
+              -v, --verbose              Use verbose output. Use this option multiple times
+                                         for more verbose output.
               --help                     Show this message and exit.
             """,# noqa: E501,E261
         )

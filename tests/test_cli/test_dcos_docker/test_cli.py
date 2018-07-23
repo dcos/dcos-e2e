@@ -70,9 +70,8 @@ class TestDcosDocker:
               Manage DC/OS clusters on Docker.
 
             Options:
-              --version      Show the version and exit.
-              -v, --verbose
-              --help         Show this message and exit.
+              --version  Show the version and exit.
+              --help     Show this message and exit.
 
             Commands:
               create               Create a DC/OS cluster.
@@ -80,6 +79,7 @@ class TestDcosDocker:
               destroy-list         Destroy clusters.
               destroy-mac-network  Destroy containers created by "dcos-docker...
               doctor               Diagnose common issues which stop DC/OS E2E...
+              download-artifact    Download a DC/OS Open Source artifact.
               inspect              Show cluster details.
               list                 List all clusters.
               run                  Run an arbitrary command on a node.
@@ -234,6 +234,8 @@ class TestCreate:
                                               the host. Only Transmission Control Protocol
                                               is supported currently. The syntax is
                                               <HOST_PORT>:<CONTAINER_PORT>
+              -v, --verbose                   Use verbose output. Use this option multiple
+                                              times for more verbose output.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -934,6 +936,8 @@ class TestWait:
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
                                              [default: docker-exec]
+              -v, --verbose                  Use verbose output. Use this option multiple
+                                             times for more verbose output.
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -1040,6 +1044,51 @@ class TestDoctor:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, ['doctor'], catch_exceptions=False)
         assert result.exit_code == 0
+
+
+class TestDownloadArtifact:
+    """
+    Tests for the ``download-artifact`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-docker download-artifact --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['download-artifact', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker download-artifact [OPTIONS]
+
+              Download a DC/OS Open Source artifact.
+
+              For DC/OS Enterprise release artifacts, contact your sales representative.
+
+            Options:
+              --dcos-version TEXT   The DC/OS Open Source artifact version to download. This
+                                    can be in one of the following formats: ``stable``,
+                                    ``testing/master``, ``testing/<DC/OS MAJOR RELEASE>``,
+                                    ``stable/<DC/OS MINOR RELEASE>``,
+                                    ``testing/pull/<GITHUB-PR-NUMBER>``.
+                                    See
+                                    https://dcos.io/releases/ for available releases.
+                                    [default: stable]
+              --download-path TEXT  The path to download a release artifact to.  [default:
+                                    /tmp/dcos_generate_config.sh]
+              --help                Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
 
 
 class TestWeb:

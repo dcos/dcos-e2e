@@ -8,5 +8,6 @@ DC/OS E2E comes with multiple CLI tools.
 
    dcos-docker-cli
    dcos-vagrant-cli
+   dcos-aws-cli
 
 .. include:: install-cli.rst

@@ -2,7 +2,6 @@
 Tools for creating a DC/OS cluster.
 """
 
-import json
 import sys
 import tempfile
 import uuid
@@ -16,46 +15,43 @@ from passlib.hash import sha512_crypt
 
 from cli.common.options import (
     agents_option,
-    artifact_argument,
     copy_to_master_option,
     extra_config_option,
     license_key_option,
-    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
-    variant_option,
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import get_variant, set_logging
-from dcos_e2e.backends import Vagrant
+from cli.common.utils import set_logging
+from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
-
-from ._common import (
-    CLUSTER_ID_DESCRIPTION_KEY,
-    VARIANT_DESCRIPTION_KEY,
-    WORKSPACE_DIR_DESCRIPTION_KEY,
-    existing_cluster_ids,
-)
 
 
 @click.command('create')
-@artifact_argument
+@click.option(
+    '--variant',
+    type=click.Choice(['oss', 'enterprise']),
+    default='oss',
+    help=(
+        'Choose the DC/OS variant. '
+        'If the variant does not match the variant of the given artifact URL, '
+        'an error will occur. '
+    ),
+)
 @masters_option
 @agents_option
 @extra_config_option
 @public_agents_option
 @workspace_dir_option
-@variant_option
 @license_key_option
 @security_mode_option
 @copy_to_master_option
-@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
 @verbosity_option
 def create(
     agents: int,
-    artifact: str,
+    artifact_url: str,
     extra_config: Dict[str, Any],
     masters: int,
     public_agents: int,
@@ -64,7 +60,6 @@ def create(
     license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    cluster_id: str,
     verbose: int,
 ) -> None:
     """
@@ -104,27 +99,10 @@ def create(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
-    doctor_message = 'Try `dcos-vagrant doctor` for troubleshooting help.'
-
-    artifact_path = Path(artifact).resolve()
-
-    if variant == 'auto':
-        variant = get_variant(
-            artifact_path=artifact_path,
-            workspace_dir=workspace_dir,
-            doctor_message=doctor_message,
-        )
-
+    doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
-    description = {
-        CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
-        WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
-        VARIANT_DESCRIPTION_KEY: 'ee' if enterprise else '',
-    }
-    cluster_backend = Vagrant(
-        workspace_dir=workspace_dir,
-        virtualbox_description=json.dumps(obj=description),
-    )
+    cluster_backend = AWS(workspace_dir=workspace_dir)
+
     if enterprise:
         superuser_username = 'admin'
         superuser_password = 'admin'
@@ -165,8 +143,8 @@ def create(
 
     try:
         with click_spinner.spinner():
-            cluster.install_dcos_from_path(
-                build_artifact=artifact_path,
+            cluster.install_dcos_from_url(
+                build_artifact=artifact_url,
                 dcos_config={
                     **cluster.base_config,
                     **extra_config,

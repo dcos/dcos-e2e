@@ -18,7 +18,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Role
 
 
 class TestDefaults:
@@ -91,7 +91,7 @@ class TestUnsupported:
         with pytest.raises(NotImplementedError) as excinfo:
             Cluster(
                 cluster_backend=AWS(),
-                files_to_copy_to_installer={Path('/'): Path('/')},
+                files_to_copy_to_installer=[(Path('/'), Path('/'))],
             )
 
         expected_error = (
@@ -101,7 +101,7 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
-    def test_destroy_node(self):
+    def test_destroy_node(self) -> None:
         """
         Destroying a particular node is not supported on the AWS backend.
         """
@@ -201,7 +201,7 @@ class TestCustomKeyPair:
     Tests for passing a custom key pair to the AWS backend.
     """
 
-    def test_custom_key_pair(self, tmpdir: local):
+    def test_custom_key_pair(self, tmpdir: local) -> None:
         """
         It is possible to pass a custom key pair to the AWS backend.
         """
@@ -254,4 +254,25 @@ class TestDCOSInstallation:
                 dcos_config=cluster.base_config,
             )
 
+            cluster.wait_for_dcos_oss()
+
+    def test_install_dcos_from_node(
+        self,
+        oss_artifact_url: str,
+    ) -> None:
+        """
+        It is possible to install DC/OS on an AWS cluster node by node.
+        """
+        with Cluster(
+            cluster_backend=AWS(),
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            master.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=cluster.base_config,
+                role=Role.MASTER,
+                log_output_live=True,
+            )
             cluster.wait_for_dcos_oss()

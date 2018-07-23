@@ -31,7 +31,9 @@ Each of these and more are described in detail below.
 Creating a Cluster
 ------------------
 
-To create a cluster you first need to download `a DC/OS release <https://dcos.io/releases/>`__.
+To create a cluster you first need to download a DC/OS release artifact.
+
+This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-vagrant-download-artifact` command.
 
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
@@ -142,12 +144,6 @@ To destroy all clusters, run the following command:
    pr_4033_strict
    pr_4019_permissive
 
-Viewing Debug Information
--------------------------
-
-The CLI is quiet by default.
-To see more information, use ``-v`` or ``-vv`` after ``dcos-docker``.
-
 Running Integration Tests
 -------------------------
 
@@ -168,7 +164,7 @@ Viewing the Web UI
 ------------------
 
 To view the web UI of your cluster, use the :ref:`dcos-vagrant-web` command.
-If you instead want to view the web UI URL of your cluster, use the :ref:`dcos-vagrant-inspect` command.
+To see the web UI URL of your cluster, use the :ref:`dcos-vagrant-inspect` command.
 
 Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
 
@@ -223,3 +219,8 @@ CLI Reference
 
 .. click:: cli.dcos_vagrant:web
   :prog: dcos-vagrant web
+
+.. _dcos-vagrant-download-artifact:
+
+.. click:: cli.dcos_vagrant:download_artifact
+  :prog: dcos-vagrant download-artifact

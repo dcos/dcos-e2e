@@ -66,8 +66,10 @@ PATTERNS = {
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestCustomKeyPair':
     (),
-    'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation':
+    'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_path':  # noqa: E501
     (OSS_MASTER, ),
+    'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_node':  # noqa: E501
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
@@ -98,8 +100,8 @@ PATTERNS = {
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests':
     (EE_MASTER, ),
-    'tests/test_dcos_e2e/test_enterprise.py::TestSecurityDisabled':
-    (EE_MASTER, ),
+    'tests/test_dcos_e2e/test_enterprise.py::TestSSLDisabled':
+    (EE_1_11, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS':
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise':

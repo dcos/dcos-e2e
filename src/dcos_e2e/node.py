@@ -338,6 +338,7 @@ class Node:
             log_output_live=log_output_live,
             transport=transport,
             user=user,
+            sudo=True,
         )
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,

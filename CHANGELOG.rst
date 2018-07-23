@@ -6,8 +6,17 @@ Changelog
 Next
 ----
 
-2018.07.19.0
+- Add an initial ``dcos-aws`` CLI.
+
+2018.07.22.1
 ------------
+
+- Add ``dcos-docker download-artifact`` and ``dcos-vagrant download-artifact``.
+
+2018.07.22.0
+------------
+
+- Add ``verbose`` option to multiple commands.
 
 2018.07.16.0
 ------------
