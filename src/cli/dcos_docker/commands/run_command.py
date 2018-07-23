@@ -12,15 +12,21 @@ from cli.common.options import (
     dcos_login_pw_option,
     dcos_login_uname_option,
     environment_variables_option,
+    existing_cluster_id_option,
     no_test_env_run_option,
     sync_dir_run_option,
 )
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
+from cli.common.utils import check_cluster_id_exists
 from dcos_e2e.node import Node, Transport
 
-from ._common import ClusterContainers, ContainerInspectView
-from ._options import existing_cluster_id_option, node_transport_option
+from ._common import (
+    ClusterContainers,
+    ContainerInspectView,
+    existing_cluster_ids,
+)
+from ._options import node_transport_option
 
 
 def _get_node(cluster_id: str, node_reference: str) -> Node:
@@ -127,6 +133,10 @@ def run(
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
     """  # noqa: E501
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     host = _get_node(cluster_id=cluster_id, node_reference=node)
 
     cluster_containers = ClusterContainers(

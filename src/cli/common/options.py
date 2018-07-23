@@ -4,7 +4,7 @@ Click options which are common across CLI tools.
 
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Set, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import click
 import yaml
