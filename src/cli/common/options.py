@@ -246,20 +246,9 @@ def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An argument decorator for a DC/OS artifact.
-    """
-    function = click.argument(
-        'artifact',
-        type=click.Path(exists=True),
-    )(command)  # type: Callable[..., None]
-    return function
-
-
 def variant_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for a DC/OS variant.
+    An option decorator for a DC/OS variant.
     """
     function = click.option(
         '--variant',
@@ -279,7 +268,7 @@ def variant_option(command: Callable[..., None]) -> Callable[..., None]:
 
 def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for passing a license key.
+    An option decorator for passing a license key.
     """
     function = click.option(
         '--license-key',
@@ -296,7 +285,7 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
 
 def security_mode_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for the DC/OS Enterprise security mode.
+    An option decorator for the DC/OS Enterprise security mode.
     """
     function = click.option(
         '--security-mode',
