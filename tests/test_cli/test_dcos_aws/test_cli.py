@@ -95,7 +95,7 @@ class TestCreate:
         # yapf: disable
         expected_help = dedent(
             """\
-            Usage: dcos-aws create [OPTIONS]
+            Usage: dcos-aws create [OPTIONS] ARTIFACT_URL
 
               Create a DC/OS cluster.
 
@@ -135,6 +135,7 @@ class TestCreate:
                                               configuration.
               --public-agents INTEGER         The number of public agent nodes.  [default:
                                               1]
+              --aws-region TEXT               The AWS region to use.  [default: us-west-2]
               --workspace-dir PATH            Creating a cluster can use approximately 2 GB
                                               of temporary storage. Set this option to use a
                                               custom "workspace" for this temporary storage.
