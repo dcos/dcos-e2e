@@ -32,3 +32,14 @@ def node_args_argument(command: Callable[..., None]) -> Callable[..., None]:
         required=True,
     )(command)  # type: Callable[..., None]
     return function
+
+
+def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An argument decorator for a DC/OS artifact.
+    """
+    function = click.argument(
+        'artifact',
+        type=click.Path(exists=True),
+    )(command)  # type: Callable[..., None]
+    return function

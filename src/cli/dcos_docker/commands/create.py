@@ -19,13 +19,13 @@ from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
+from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
-    artifact_argument,
+    cluster_id_option,
     copy_to_master_option,
     extra_config_option,
     license_key_option,
-    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -33,7 +33,7 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import get_variant, set_logging
+from cli.common.utils import check_cluster_id_unique, get_variant, set_logging
 from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -249,7 +249,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 @public_agents_option
 @extra_config_option
 @security_mode_option
-@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
+@cluster_id_option
 @license_key_option
 @click.option(
     '--genconf-dir',
@@ -409,6 +409,10 @@ def create(
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
     set_logging(verbosity_level=verbose)
+    check_cluster_id_unique(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 

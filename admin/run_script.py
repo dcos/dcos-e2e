@@ -128,7 +128,7 @@ def _download_file(url: str, path: Path) -> None:
     label = 'Downloading to ' + str(path)
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
-    chunk_size = 100 * 1024
+    chunk_size = 1024
     with click.open_file(str(path), 'wb') as file_descriptor:
         content_iter = stream.iter_content(chunk_size=chunk_size)
         with click.progressbar(  # type: ignore

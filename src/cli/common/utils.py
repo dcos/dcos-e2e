@@ -7,6 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 from shutil import rmtree
+from typing import Set
 
 import click
 import click_spinner
@@ -96,3 +97,17 @@ def set_logging(verbosity_level: int) -> None:
     }
     # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(verbosity_level or 0)])
+
+
+def check_cluster_id_unique(
+    new_cluster_id: str,
+    existing_cluster_ids: Set[str],
+) -> None:
+    """
+    Raise an exception if a given Cluster ID already exists.
+    """
+    if new_cluster_id in existing_cluster_ids:
+        message = 'A cluster with the id "{value}" already exists.'.format(
+            value=new_cluster_id,
+        )
+        raise click.BadParameter(message=message)

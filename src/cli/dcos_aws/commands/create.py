@@ -28,8 +28,14 @@ from cli.common.utils import set_logging
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 
+from ._options import aws_region_option
+
 
 @click.command('create')
+@click.argument(
+    'artifact_url',
+    type=str,
+)
 @click.option(
     '--variant',
     type=click.Choice(['oss', 'enterprise']),
@@ -44,6 +50,7 @@ from dcos_e2e.cluster import Cluster
 @agents_option
 @extra_config_option
 @public_agents_option
+@aws_region_option
 @workspace_dir_option
 @license_key_option
 @security_mode_option
@@ -61,6 +68,7 @@ def create(
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     verbose: int,
+    aws_region: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -101,7 +109,7 @@ def create(
 
     doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
-    cluster_backend = AWS(workspace_dir=workspace_dir)
+    cluster_backend = AWS(workspace_dir=workspace_dir, aws_region=aws_region)
 
     if enterprise:
         superuser_username = 'admin'
