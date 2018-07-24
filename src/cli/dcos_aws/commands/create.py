@@ -26,7 +26,11 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import check_cluster_id_unique, set_logging
+from cli.common.utils import (
+    check_cluster_id_unique,
+    set_logging,
+    write_key_pair,
+)
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 
@@ -115,6 +119,14 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
+    ssh_keypair_dir = workspace_dir / 'ssh'
+    ssh_keypair_dir.mkdir(parents=True)
+    public_key_path = ssh_keypair_dir / 'id_rsa.pub'
+    private_key_path = ssh_keypair_dir / 'id_rsa'
+    write_key_pair(
+        public_key_path=public_key_path,
+        private_key_path=private_key_path,
+    )
 
     doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
@@ -169,6 +181,21 @@ def create(
         Resources=node_ec2_instance_ids,
         Tags=[cluster_id_tag],
     )
+
+    for node in nodes:
+        node.run(
+            args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
+            shell=True,
+        )
+        node.run(
+            args=[
+                'echo',
+                public_key_path.read_text(),
+                '>>',
+                '/root/.ssh/authorized_keys',
+            ],
+            shell=True,
+        )
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
