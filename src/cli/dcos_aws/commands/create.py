@@ -217,6 +217,7 @@ def create(
         node.run(
             args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
             shell=True,
+            sudo=True,
         )
         node.run(
             args=[
@@ -226,6 +227,7 @@ def create(
                 '/root/.ssh/authorized_keys',
             ],
             shell=True,
+            sudo=True,
         )
 
     for node in cluster.masters:

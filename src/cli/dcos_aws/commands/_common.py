@@ -82,16 +82,17 @@ class ClusterInstances:
         Return the ``Node`` that is represented by a given ``container``.
         """
         public_ip_address = instance.public_ip_address
-        private_ip_address = instance.public_ip_address
+        private_ip_address = instance.private_ip_address
         ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
+        for tag in instance.tags:
+            if tag['Key'] == SSH_USER_TAG_KEY:
+                default_user = tag['Value']
+
         return Node(
             public_ip_address=public_ip_address,
             private_ip_address=private_ip_address,
-            # TODO this does depend on distribution... not root!
-            # store this.
-            default_user='root',
+            default_user=default_user,
             ssh_key_path=ssh_key_path,
-            default_transport=self._transport,
         )
 
     @property
