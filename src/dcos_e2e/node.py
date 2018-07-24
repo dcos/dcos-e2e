@@ -551,7 +551,8 @@ class Node:
             tar.add(str(local_path), arcname=str(arcname), recursive=True)
 
         # `remote_path` may be a tmpfs mount.
-        # At the time of writing, for example, `/tmp` is a tmpfs mount.
+        # At the time of writing, for example, `/tmp` is a tmpfs mount
+        # on the Docker backend.
         # Copying files to tmpfs mounts fails silently.
         # See https://github.com/moby/moby/issues/22020.
         home_path = self.run(
@@ -560,6 +561,8 @@ class Node:
             transport=transport,
             sudo=True,
         ).stdout.strip().decode()
+        # Therefore, we create a temporary file within our home directory,
+        # We then remove the temporary file at the end of this function.
 
         remote_tar_path = Path(home_path) / tar_name
 
