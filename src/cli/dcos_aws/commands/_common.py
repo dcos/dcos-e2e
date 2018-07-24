@@ -12,6 +12,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node, Role
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
+KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
 NODE_TYPE_TAG_KEY = 'dcos_e2e.node_type'
 NODE_TYPE_MASTER_TAG_VALUE = 'master'
 NODE_TYPE_AGENT_TAG_VALUE = 'agent'
