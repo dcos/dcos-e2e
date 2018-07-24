@@ -15,10 +15,11 @@ from cli.common.options import (
     existing_cluster_id_option,
     no_test_env_run_option,
     sync_dir_run_option,
+    verbosity_option,
 )
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
-from cli.common.utils import check_cluster_id_exists
+from cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e.node import Transport
 
 from ._common import ClusterInstances, existing_cluster_ids
@@ -34,6 +35,7 @@ from ._options import aws_region_option
 @no_test_env_run_option
 @environment_variables_option
 @aws_region_option
+@verbosity_option
 def run(
     cluster_id: str,
     node_args: Tuple[str],
@@ -43,6 +45,7 @@ def run(
     no_test_env: bool,
     env: Dict[str, str],
     aws_region: str,
+    verbose: int,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -58,6 +61,7 @@ def run(
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
     """  # noqa: E501
+    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
