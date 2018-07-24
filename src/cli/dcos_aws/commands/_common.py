@@ -11,6 +11,7 @@ NODE_TYPE_TAG_KEY = 'dcos_e2e.node_type'
 NODE_TYPE_MASTER_TAG_VALUE = 'master'
 NODE_TYPE_AGENT_TAG_VALUE = 'agent'
 NODE_TYPE_PUBLIC_AGENT_TAG_VALUE = 'public_agent'
+SSH_USER_TAG_KEY = 'dcos_e2e.ssh_user'
 
 
 def existing_cluster_ids(aws_region: str) -> Set[str]:
