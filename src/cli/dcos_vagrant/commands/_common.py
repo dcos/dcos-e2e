@@ -92,10 +92,18 @@ class VMInspectView:
         Return dictionary with information to be shown to users.
         """
         ip_address = _ip_from_vm_name(vm_name=self._vm_name)
+        description = _description_from_vm_name(vm_name=self._vm_name)
+        data = json.loads(s=description)
+        cluster_id = data[CLUSTER_ID_DESCRIPTION_KEY]
+        cluster_vms = ClusterVMs(cluster_id=cluster_id)
+        vagrant_client = cluster_vms.vagrant_client
 
         return {
-            'vm_name': self._vm_name,
-            'ip_address': str(ip_address),
+            'VM Name': self._vm_name,
+            'IP Address': str(ip_address),
+            'SSH key': vagrant_client.keyfile(vm_name=self._vm_name),
+            'SSH user': vagrant_client.user(vm_name=self._vm_name),
+            'Vagrant root': vagrant_client.root,
         }
 
 
