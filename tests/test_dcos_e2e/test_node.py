@@ -158,6 +158,33 @@ class TestSendFile:
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
+    def test_send_directory(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a directory to a cluster node as the default
+        user.
+        """
+        content = str(uuid.uuid4())
+        dir_name = 'example_dir'
+        local_dir = Path(str(tmpdir.join(dir_name)))
+        local_dir.mkdir(parents=True, exist_ok=True)
+        file_name = 'example_file.txt'
+        local_file = Path(local_dir) / file_name
+        Path(local_file).write_text(content)
+        random = uuid.uuid4().hex
+        master_base_dir = '/etc/{random}'.format(random=random)
+        master_destination_dir = Path(master_base_dir) / dir_name
+        dcos_node.send_file(
+            local_path=local_dir,
+            remote_path=master_destination_dir,
+        )
+        args = ['cat', str(master_destination_dir / file_name)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == content
+
     def test_send_file_to_tmp_directory(
         self,
         dcos_node: Node,
