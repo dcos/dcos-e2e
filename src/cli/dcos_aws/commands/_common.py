@@ -41,67 +41,74 @@ class ClusterInstances:
         Args:
             cluster_id: The ID of the cluster.
         """
+        self.cluster_id = cluster_id
 
-    # def _containers_by_node_type(
-    #     self,
-    #     node_type: str,
-    # ) -> Set[Container]:
-    #     """
-    #     Return all containers in this cluster of a particular node type.
-    #     """
-    #     client = docker_client()
-    #     filters = {
-    #         'label': [
-    #             self._cluster_id_label,
-    #             'node_type={node_type}'.format(node_type=node_type),
-    #         ],
-    #     }
-    #     return set(client.containers.list(filters=filters))
-    #
-    # def to_node(self, container: Container) -> Node:
-    #     """
-    #     Return the ``Node`` that is represented by a given ``container``.
-    #     """
-    #     address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
-    #     ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
-    #     return Node(
-    #         public_ip_address=address,
-    #         private_ip_address=address,
-    #         default_user='root',
-    #         ssh_key_path=ssh_key_path,
-    #         default_transport=self._transport,
-    #     )
-    #
-    # @property
-    # def masters(self) -> Set[Container]:
-    #     """
-    #     EC2 instances which represent master nodes.
-    #     """
-    #     return self._containers_by_node_type(node_type='master')
-    #
-    # @property
-    # def agents(self) -> Set[Container]:
-    #     """
-    #     EC2 instances which represent agent nodes.
-    #     """
-    #     return self._containers_by_node_type(node_type='agent')
-    #
-    # @property
-    # def public_agents(self) -> Set[Container]:
-    #     """
-    #     EC2 instances which represent public agent nodes.
-    #     """
-    #     return self._containers_by_node_type(node_type='public_agent')
-    #
-    # @property
-    # def cluster(self) -> Cluster:
-    #     """
-    #     Return a ``Cluster`` constructed from the containers.
-    #     """
-    #     return Cluster.from_nodes(
-    #         masters=set(map(self.to_node, self.masters)),
-    #         agents=set(map(self.to_node, self.agents)),
-    #         public_agents=set(map(self.to_node, self.public_agents)),
-    #         # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
-    #         ip_detect_path=Path('/foo'),
-    #     )
+    def _containers_by_role(
+        self,
+        role: Role,
+    ) -> Set[Container]:
+        """
+        Return all containers in this cluster of a particular node type.
+        """
+        node_types = {
+            Role.MASTER: NODE_TYPE_MASTER_LABEL_VALUE,
+            Role.AGENT: NODE_TYPE_AGENT_LABEL_VALUE,
+            Role.PUBLIC_AGENT: NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
+        }
+        client = docker_client()
+        filters = {
+            'label': [
+                self._cluster_id_label,
+                '{key}={value}'.format(
+                    key=NODE_TYPE_LABEL_KEY,
+                    value=node_types[role],
+                ),
+            ],
+        }
+        return set(client.containers.list(filters=filters))
+
+    def to_node(self, container: Container) -> Node:
+        """
+        Return the ``Node`` that is represented by a given ``container``.
+        """
+        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
+        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
+        return Node(
+            public_ip_address=address,
+            private_ip_address=address,
+            default_user='root',
+            ssh_key_path=ssh_key_path,
+            default_transport=self._transport,
+        )
+
+    @property
+    def masters(self) -> Set[Container]:
+        """
+        Docker containers which represent master nodes.
+        """
+        return self._containers_by_role(role=Role.MASTER)
+
+    @property
+    def agents(self) -> Set[Container]:
+        """
+        Docker containers which represent agent nodes.
+        """
+        return self._containers_by_role(role=Role.AGENT)
+
+    @property
+    def public_agents(self) -> Set[Container]:
+        """
+        Docker containers which represent public agent nodes.
+        """
+        return self._containers_by_role(role=Role.PUBLIC_AGENT)
+
+    @property
+    def cluster(self) -> Cluster:
+        """
+        Return a ``Cluster`` constructed from the containers.
+        """
+        return Cluster.from_nodes(
+            masters=set(map(self.to_node, self.masters)),
+            agents=set(map(self.to_node, self.agents)),
+            public_agents=set(map(self.to_node, self.public_agents)),
+        )
