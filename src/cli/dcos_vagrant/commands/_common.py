@@ -140,7 +140,7 @@ class ClusterVMs:
         """
         self._cluster_id = cluster_id
 
-    def _to_node(self, vm_name: str) -> Node:
+    def to_node(self, vm_name: str) -> Node:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
@@ -199,9 +199,9 @@ class ClusterVMs:
         Return a ``Cluster`` constructed from the VMs.
         """
         return Cluster.from_nodes(
-            masters=set(map(self._to_node, self.masters)),
-            agents=set(map(self._to_node, self.agents)),
-            public_agents=set(map(self._to_node, self.public_agents)),
+            masters=set(map(self.to_node, self.masters)),
+            agents=set(map(self.to_node, self.agents)),
+            public_agents=set(map(self.to_node, self.public_agents)),
             # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
             ip_detect_path=Path('/foo'),
         )
