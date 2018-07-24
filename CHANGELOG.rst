@@ -6,6 +6,7 @@ Changelog
 Next
 ----
 
+- Add the capability of sending directories to ``Nodes`` via ``Node.send_file``.
 - Add ``ip_detect_path`` to the each ``ClusterBackend`` as a property and to each install DC/OS function as a parameter.
 
 2018.07.23.1
