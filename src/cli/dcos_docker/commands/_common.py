@@ -105,13 +105,8 @@ class ContainerInspectView:
             cluster_containers.public_agents,
         }[role]
 
-        sorted_ips = list(
-            sorted(
-                [
-                    ctr.attrs['NetworkSettings']['IPAddress']
-                    for ctr in containers
-                ],
-            ),
+        sorted_ips = sorted(
+            [ctr.attrs['NetworkSettings']['IPAddress'] for ctr in containers],
         )
 
         index = sorted_ips.index(container_ip)

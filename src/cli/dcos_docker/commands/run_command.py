@@ -37,7 +37,8 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's IP address
-            * A node's Docker container
+            * A node's Docker container name
+            * A node's Docker container ID
             * A reference in the format "<role>_<number>"
 
     Returns:
@@ -77,7 +78,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     message = (
         'No such node in cluster "{cluster_id}" with IP address, Docker '
         'container ID or node reference "{node_reference}". '
-        'Node references can be seen with ``dcos_docker inspect``.'
+        'Node references can be seen with ``dcos-docker inspect``.'
     ).format(
         cluster_id=cluster_id,
         node_reference=node_reference,
