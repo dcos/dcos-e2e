@@ -6,7 +6,7 @@ from typing import Set
 
 import boto3
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Role
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 NODE_TYPE_TAG_KEY = 'dcos_e2e.node_type'
@@ -36,12 +36,14 @@ class ClusterInstances:
     A representation of a cluster constructed from EC2 instances.
     """
 
-    def __init__(self, cluster_id: str) -> None:
+    def __init__(self, cluster_id: str, aws_region: str) -> None:
         """
         Args:
             cluster_id: The ID of the cluster.
+            aws_region: The AWS region the cluster is in.
         """
         self.cluster_id = cluster_id
+        self.aws_region = aws_region
 
     def _containers_by_role(
         self,
