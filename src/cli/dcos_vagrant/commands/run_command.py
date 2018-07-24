@@ -19,9 +19,59 @@ from cli.common.options import (
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
 from cli.common.utils import check_cluster_id_exists
-from dcos_e2e.node import Transport
+from dcos_e2e.node import Node, Transport
 
-from ._common import ClusterVMs, existing_cluster_ids
+from ._common import ClusterVMs, VMInspectView, existing_cluster_ids
+
+
+def _get_node(cluster_id: str, node_reference: str) -> Node:
+    """
+    Get a node from a "reference".
+
+    Args:
+        cluster_id: The ID of a cluster.
+        node_reference: One of:
+            * A node's IP address
+            * A node's VM name
+            * A reference in the format "<role>_<number>"
+
+    Returns:
+        The ``Node`` from the given cluster with the given ID.
+
+    Raises:
+        click.BadParameter: There is no such node.
+    """
+    cluster_vms = ClusterVMs(cluster_id=cluster_id)
+
+    vm_names = {
+        *cluster_vms.masters,
+        *cluster_vms.agents,
+        *cluster_vms.public_agents,
+    }
+
+    for vm_name in vm_names:
+        inspect_data = VMInspectView(vm_name=vm_name).to_dict()
+        reference = inspect_data['e2e_reference']
+        ip_address = inspect_data['ip_address']
+        accepted = (
+            reference,
+            reference.upper(),
+            ip_address,
+            vm_name,
+        )
+
+        if node_reference in accepted:
+            return cluster_vms.to_node(vm_name=vm_name)
+
+    message = (
+        'No such node in cluster "{cluster_id}" with IP address, VM name or '
+        'node reference "{node_reference}". '
+        'Node references can be seen with ``dcos-vagrant inspect``.'
+    ).format(
+        cluster_id=cluster_id,
+        node_reference=node_reference,
+    )
+    raise click.BadParameter(message=message)
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
@@ -32,6 +82,19 @@ from ._common import ClusterVMs, existing_cluster_ids
 @sync_dir_run_option
 @no_test_env_run_option
 @environment_variables_option
+@click.option(
+    '--node',
+    type=str,
+    default='master_0',
+    help=(
+        'A reference to a particular node to run the command on. '
+        'This can be one of: '
+        'The node\'s IP address, '
+        'the node\'s VM name, '
+        'a reference in the format "<role>_<number>". '
+        'These details be seen with ``dcos-vagrant inspect``.'
+    ),
+)
 def run(
     cluster_id: str,
     node_args: Tuple[str],
@@ -39,6 +102,7 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     no_test_env: bool,
+    node: str,
     env: Dict[str, str],
 ) -> None:
     """
@@ -59,9 +123,9 @@ def run(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
+    host = _get_node(cluster_id=cluster_id, node_reference=node)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
     cluster = cluster_vms.cluster
-    host = next(iter(cluster.masters))
 
     if sync_dir is not None:
         sync_code_to_masters(
