@@ -33,6 +33,7 @@ from cli.common.utils import (
 )
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
 
 from ._common import (
     CLUSTER_ID_TAG_KEY,
@@ -138,6 +139,11 @@ def create(
     doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
     cluster_backend = AWS(workspace_dir=workspace_dir, aws_region=aws_region)
+    ssh_user = {
+        Distribution.CENTOS_7: 'centos',
+        Distribution.COREOS: 'core',
+    }
+    default_user = ssh_user[cluster_backend.linux_distribution]
 
     if enterprise:
         superuser_username = 'admin'
@@ -177,6 +183,11 @@ def create(
         'Value': cluster_id,
     }
 
+    ssh_user_tag = {
+        'Key': CLUSTER_ID_TAG_KEY,
+        'Value': cluster_id,
+    }
+
     for nodes, tag_value in (
         (cluster.masters, NODE_TYPE_MASTER_TAG_VALUE),
         (cluster.agents, NODE_TYPE_AGENT_TAG_VALUE),
@@ -200,6 +211,7 @@ def create(
             Tags=[cluster_id_tag, role_tag],
         )
 
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
     for node in nodes:
         node.run(
             args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
