@@ -108,13 +108,8 @@ class VMInspectView:
             role = 'public_agent'
             role_names = cluster_vms.public_agents
 
-        sorted_ips = list(
-            sorted(
-                [
-                    _ip_from_vm_name(vm_name=name)
-                    for name in role_names
-                ],
-            ),
+        sorted_ips = sorted(
+            [_ip_from_vm_name(vm_name=name) for name in role_names],
         )
         index = sorted_ips.index(ip_address)
 
