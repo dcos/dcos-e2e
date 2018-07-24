@@ -5,7 +5,6 @@ Tools for creating a DC/OS cluster.
 import sys
 import tempfile
 import uuid
-from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple
@@ -155,10 +154,10 @@ def create(
     ec2_instances = ec2.instances.all()
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
-    node_public_ips = set(node.public_ip_address for node in nodes)
+    node_public_ips = set(str(node.public_ip_address) for node in nodes)
     node_ec2_instance_ids = [
         instance.id for instance in ec2_instances
-        if IPv4Address(instance.public_ip_address) in node_public_ips
+        if instance.public_ip_address in node_public_ips
     ]
 
     cluster_id_tag = {
