@@ -12,8 +12,6 @@ from tempfile import gettempdir
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Set, Tuple, Type
 
-import yaml
-
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -300,6 +298,7 @@ class AWSCluster(ClusterManager):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """

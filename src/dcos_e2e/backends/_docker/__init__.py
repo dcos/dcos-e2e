@@ -455,6 +455,7 @@ class DockerCluster(ClusterManager):
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -465,6 +466,8 @@ class DockerCluster(ClusterManager):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script that is used for
+                installing DC/OS.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
@@ -503,6 +506,7 @@ class DockerCluster(ClusterManager):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -512,11 +516,18 @@ class DockerCluster(ClusterManager):
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script that is used for
+                installing DC/OS.
             log_output_live: If ``True``, log output of the installation live.
 
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.
         """
+        copyfile(
+            src=str(ip_detect_path),
+            dst=str(self._genconf_dir / 'ip-detect'),
+        )
+
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)

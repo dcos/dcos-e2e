@@ -80,7 +80,6 @@ class Cluster(ContextDecorator):
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
-        ip_detect_path: Path,
     ) -> 'Cluster':
         """
         Create a cluster from existing nodes.
@@ -89,8 +88,6 @@ class Cluster(ContextDecorator):
             masters: The master nodes in an existing cluster.
             agents: The agent nodes in an existing cluster.
             public_agents: The public agent nodes in an existing cluster.
-            ip_detect_path: The path to an ``ip-detect`` script to use when
-                installing DC/OS.
 
         Returns:
             A cluster object with the nodes of an existing cluster.
@@ -99,7 +96,6 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            ip_detect_path=ip_detect_path,
         )
 
         return cls(
@@ -337,13 +333,6 @@ class Cluster(ContextDecorator):
             **config,
             **self._cluster.base_config,
         }
-
-    @property
-    def ip_detect_path(self) -> Path:
-        """
-        Return a base IP detect script for DC/OS nodes.
-        """
-        return self._cluster.ip_detect_path
 
     def install_dcos_from_url(
         self,

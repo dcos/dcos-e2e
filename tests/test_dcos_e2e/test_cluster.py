@@ -271,11 +271,7 @@ class TestClusterFromNodes:
             masters=cluster.masters,
             agents=cluster.agents,
             public_agents=cluster.public_agents,
-            ip_detect_path=Path('/foo'),
         ) as duplicate_cluster:
-
-            assert duplicate_cluster.ip_detect_path == Path('/foo')
-
             (duplicate_master, ) = duplicate_cluster.masters
             (duplicate_agent, ) = duplicate_cluster.agents
             (duplicate_public_agent, ) = duplicate_cluster.public_agents
@@ -319,7 +315,6 @@ class TestClusterFromNodes:
                 masters=original_cluster.masters,
                 agents=original_cluster.agents,
                 public_agents=original_cluster.public_agents,
-                ip_detect_path=Path('/foo'),
             )
 
             cluster.install_dcos_from_url(

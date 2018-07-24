@@ -112,6 +112,7 @@ class Node:
         self,
         remote_build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         role: Role,
         user: Optional[str] = None,
         log_output_live: bool = False,
@@ -133,6 +134,8 @@ class Node:
             remote_build_artifact: The path on the node to a build artifact to
                 be installed on the node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
@@ -144,6 +147,15 @@ class Node:
 
         remote_genconf_dir = 'genconf'
         remote_genconf_path = remote_build_artifact.parent / remote_genconf_dir
+
+        self.send_file(
+            local_path=ip_detect_path,
+            remote_path=remote_genconf_path / 'ip-detect',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
         serve_dir_path = remote_genconf_path / 'serve'
         dcos_config = {
             **dcos_config,
@@ -217,6 +229,7 @@ class Node:
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         role: Role,
         user: Optional[str] = None,
         log_output_live: bool = False,
@@ -245,6 +258,8 @@ class Node:
             build_artifact: The path to a build artifact to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
@@ -272,6 +287,7 @@ class Node:
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
             user=user,
             role=role,
             log_output_live=log_output_live,
@@ -282,6 +298,7 @@ class Node:
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         role: Role,
         user: Optional[str] = None,
         log_output_live: bool = False,
@@ -310,6 +327,8 @@ class Node:
             build_artifact: The URL to a build artifact to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
@@ -343,6 +362,7 @@ class Node:
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
             user=user,
             role=role,
             log_output_live=log_output_live,
