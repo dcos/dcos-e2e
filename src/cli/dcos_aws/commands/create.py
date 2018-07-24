@@ -41,6 +41,7 @@ from ._common import (
     NODE_TYPE_MASTER_TAG_VALUE,
     NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
     NODE_TYPE_TAG_KEY,
+    SSH_USER_TAG_KEY,
     existing_cluster_ids,
 )
 from ._options import aws_region_option
@@ -179,8 +180,8 @@ def create(
     ec2_instances = ec2.instances.all()
 
     cluster_id_tag = {
-        'Key': CLUSTER_ID_TAG_KEY,
-        'Value': cluster_id,
+        'Key': SSH_USER_TAG_KEY,
+        'Value': default_user,
     }
 
     ssh_user_tag = {
@@ -208,7 +209,7 @@ def create(
 
         ec2.create_tags(
             Resources=instance_ids,
-            Tags=[cluster_id_tag, role_tag],
+            Tags=[cluster_id_tag, role_tag, ssh_user_tag],
         )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
