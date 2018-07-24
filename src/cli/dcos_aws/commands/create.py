@@ -186,6 +186,7 @@ def create(
                     **cluster.base_config,
                     **extra_config,
                 },
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
     except CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)

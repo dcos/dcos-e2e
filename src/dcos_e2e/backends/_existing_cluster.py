@@ -20,7 +20,6 @@ class ExistingCluster(ClusterBackend):
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
-        ip_detect_path: Path,
     ) -> None:
         """
         Create a record of an existing cluster backend for use by a cluster
@@ -29,7 +28,6 @@ class ExistingCluster(ClusterBackend):
         self.masters = masters
         self.agents = agents
         self.public_agents = public_agents
-        self.ip_detect_path = ip_detect_path
 
     @property
     def cluster_cls(self) -> Type['ExistingClusterManager']:
@@ -38,6 +36,17 @@ class ExistingCluster(ClusterBackend):
         create and manage a cluster.
         """
         return ExistingClusterManager
+
+    @property
+    def ip_detect_path(self) -> Path:  # pragma: no cover
+        """
+        Return the path to a ``ip-detect`` script.
+
+        Raises:
+            NotImplementedError: The ``ExistingCluster`` backend cannot
+                be associated with a specific ``ip-detect`` script.
+        """
+        raise NotImplementedError
 
 
 class ExistingClusterManager(ClusterManager):
@@ -72,12 +81,12 @@ class ExistingClusterManager(ClusterManager):
         self._masters = cluster_backend.masters
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
-        self._ip_detect_path = cluster_backend.ip_detect_path
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -92,6 +101,7 @@ class ExistingClusterManager(ClusterManager):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -108,14 +118,6 @@ class ExistingClusterManager(ClusterManager):
         Return a base configuration for installing DC/OS OSS.
         """
         return {}
-
-    @property
-    def ip_detect_path(self) -> Path:
-        """
-        Return the ``ip-detect`` script specified when creating the
-        :class:`ExistingCluster` backend that this cluster was created from.
-        """
-        return self._ip_detect_path
 
     @property
     def masters(self) -> Set[Node]:
