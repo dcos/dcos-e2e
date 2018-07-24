@@ -295,6 +295,8 @@ class TestRun:
               --env TEXT               Set environment variables in the format
                                        "<KEY>=<VALUE>"
               --aws-region TEXT        The AWS region to use.  [default: us-west-2]
+              -v, --verbose            Use verbose output. Use this option multiple times
+                                       for more verbose output.
               --help                   Show this message and exit.
             """,# noqa: E501,E261
         )
