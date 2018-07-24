@@ -34,7 +34,14 @@ from cli.common.utils import (
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 
-from ._common import CLUSTER_ID_TAG_KEY, existing_cluster_ids
+from ._common import (
+    CLUSTER_ID_TAG_KEY,
+    NODE_TYPE_AGENT_TAG_VALUE,
+    NODE_TYPE_MASTER_TAG_VALUE,
+    NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
+    NODE_TYPE_TAG_KEY,
+    existing_cluster_ids,
+)
 from ._options import aws_region_option
 
 
@@ -165,22 +172,30 @@ def create(
     ec2 = boto3.resource('ec2', region_name=cluster_backend.aws_region)
     ec2_instances = ec2.instances.all()
 
-    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
-    node_public_ips = set(str(node.public_ip_address) for node in nodes)
-    node_ec2_instance_ids = [
-        instance.id for instance in ec2_instances
-        if instance.public_ip_address in node_public_ips
-    ]
-
     cluster_id_tag = {
         'Key': CLUSTER_ID_TAG_KEY,
         'Value': cluster_id,
     }
 
-    ec2.create_tags(
-        Resources=node_ec2_instance_ids,
-        Tags=[cluster_id_tag],
-    )
+    for nodes, tag_value in (
+        (cluster.masters, NODE_TYPE_MASTER_TAG_VALUE),
+        (cluster.agents, NODE_TYPE_AGENT_TAG_VALUE),
+        (cluster.public_agents, NODE_TYPE_PUBLIC_AGENT_TAG_VALUE),
+    ):
+        node_public_ips = set(str(node.public_ip_address) for node in nodes)
+        instance_ids = [
+            instance.id for instance in ec2_instances
+            if instance.public_ip_address in node_public_ips
+        ]
+        role_tag = {
+            'Key': NODE_TYPE_TAG_KEY,
+            'Value': tag_value,
+        }
+
+        ec2.create_tags(
+            Resources=instance_ids,
+            Tags=[cluster_id_tag, role_tag],
+        )
 
     for node in nodes:
         node.run(
