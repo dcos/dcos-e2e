@@ -37,7 +37,8 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's IP address
-            * A node's Docker container
+            * A node's Docker container name
+            * A node's Docker container ID
             * A reference in the format "<role>_<number>"
 
     Returns:
