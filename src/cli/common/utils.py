@@ -11,6 +11,9 @@ from typing import Set
 
 import click
 import click_spinner
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 
 def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
@@ -125,3 +128,32 @@ def check_cluster_id_exists(
             value=new_cluster_id,
         )
         raise click.BadParameter(message)
+
+
+def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
+    """
+    Write an RSA key pair for connecting to nodes via SSH.
+
+    Args:
+        public_key_path: Path to write public key to.
+        private_key_path: Path to a private key file to write.
+    """
+    rsa_key_pair = rsa.generate_private_key(
+        backend=default_backend(),
+        public_exponent=65537,
+        key_size=2048,
+    )
+
+    public_key = rsa_key_pair.public_key().public_bytes(
+        serialization.Encoding.OpenSSH,
+        serialization.PublicFormat.OpenSSH,
+    )
+
+    private_key = rsa_key_pair.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+
+    public_key_path.write_bytes(data=public_key)
+    private_key_path.write_bytes(data=private_key)

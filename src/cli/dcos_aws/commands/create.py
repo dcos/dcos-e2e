@@ -26,11 +26,24 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import check_cluster_id_unique, set_logging
+from cli.common.utils import (
+    check_cluster_id_unique,
+    set_logging,
+    write_key_pair,
+)
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
 
-from ._common import CLUSTER_ID_TAG_KEY, existing_cluster_ids
+from ._common import (
+    CLUSTER_ID_TAG_KEY,
+    NODE_TYPE_AGENT_TAG_VALUE,
+    NODE_TYPE_MASTER_TAG_VALUE,
+    NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
+    NODE_TYPE_TAG_KEY,
+    SSH_USER_TAG_KEY,
+    existing_cluster_ids,
+)
 from ._options import aws_region_option
 
 
@@ -115,10 +128,23 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
+    ssh_keypair_dir = workspace_dir / 'ssh'
+    ssh_keypair_dir.mkdir(parents=True)
+    public_key_path = ssh_keypair_dir / 'id_rsa.pub'
+    private_key_path = ssh_keypair_dir / 'id_rsa'
+    write_key_pair(
+        public_key_path=public_key_path,
+        private_key_path=private_key_path,
+    )
 
     doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
     cluster_backend = AWS(workspace_dir=workspace_dir, aws_region=aws_region)
+    ssh_user = {
+        Distribution.CENTOS_7: 'centos',
+        Distribution.COREOS: 'core',
+    }
+    default_user = ssh_user[cluster_backend.linux_distribution]
 
     if enterprise:
         superuser_username = 'admin'
@@ -153,22 +179,54 @@ def create(
     ec2 = boto3.resource('ec2', region_name=cluster_backend.aws_region)
     ec2_instances = ec2.instances.all()
 
-    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
-    node_public_ips = set(str(node.public_ip_address) for node in nodes)
-    node_ec2_instance_ids = [
-        instance.id for instance in ec2_instances
-        if instance.public_ip_address in node_public_ips
-    ]
-
     cluster_id_tag = {
+        'Key': SSH_USER_TAG_KEY,
+        'Value': default_user,
+    }
+
+    ssh_user_tag = {
         'Key': CLUSTER_ID_TAG_KEY,
         'Value': cluster_id,
     }
 
-    ec2.create_tags(
-        Resources=node_ec2_instance_ids,
-        Tags=[cluster_id_tag],
-    )
+    for nodes, tag_value in (
+        (cluster.masters, NODE_TYPE_MASTER_TAG_VALUE),
+        (cluster.agents, NODE_TYPE_AGENT_TAG_VALUE),
+        (cluster.public_agents, NODE_TYPE_PUBLIC_AGENT_TAG_VALUE),
+    ):
+        if not nodes:
+            continue
+
+        node_public_ips = set(str(node.public_ip_address) for node in nodes)
+        instance_ids = [
+            instance.id for instance in ec2_instances
+            if instance.public_ip_address in node_public_ips
+        ]
+        role_tag = {
+            'Key': NODE_TYPE_TAG_KEY,
+            'Value': tag_value,
+        }
+
+        ec2.create_tags(
+            Resources=instance_ids,
+            Tags=[cluster_id_tag, role_tag, ssh_user_tag],
+        )
+
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+    for node in nodes:
+        node.run(
+            args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
+            shell=True,
+        )
+        node.run(
+            args=[
+                'echo',
+                public_key_path.read_text(),
+                '>>',
+                '/root/.ssh/authorized_keys',
+            ],
+            shell=True,
+        )
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
