@@ -119,20 +119,10 @@ class ClusterInstances:
     @property
     def workspace_dir(self) -> Path:
         instance = next(iter(self.masters))
-        # TODO Upload SSH key to instance
-        # TODO make get SSH key common
         for tag in instance.tags:
-            if tag['Key'] == CLUSTER_ID_TAG_KEY:
-                if tag['Value'] == self._cluster_id:
-                    cluster_instances.add(instance)
-        workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
-        return Path(workspace_dir)
-
-    @property
-    def ssh_user(self) -> str:
-        container = next(iter(self.masters))
-        workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
-        return Path(workspace_dir)
+            if tag['Key'] == WORKSPACE_TAG_KEY:
+                workspace = Path(tag['Value'])
+        return workspace
 
     @property
     def cluster(self) -> Cluster:
