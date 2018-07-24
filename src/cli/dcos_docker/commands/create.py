@@ -12,9 +12,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import click
 import click_spinner
 import docker
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
@@ -33,7 +30,12 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import check_cluster_id_unique, get_variant, set_logging
+from cli.common.utils import (
+    check_cluster_id_unique,
+    get_variant,
+    set_logging,
+    write_key_pair,
+)
 from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -191,35 +193,6 @@ def _validate_volumes(
         )
         mounts.append(mount)
     return mounts
-
-
-def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
-    """
-    Write an RSA key pair for connecting to nodes via SSH.
-
-    Args:
-        public_key_path: Path to write public key to.
-        private_key_path: Path to a private key file to write.
-    """
-    rsa_key_pair = rsa.generate_private_key(
-        backend=default_backend(),
-        public_exponent=65537,
-        key_size=2048,
-    )
-
-    public_key = rsa_key_pair.public_key().public_bytes(
-        serialization.Encoding.OpenSSH,
-        serialization.PublicFormat.OpenSSH,
-    )
-
-    private_key = rsa_key_pair.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm=serialization.NoEncryption(),
-    )
-
-    public_key_path.write_bytes(data=public_key)
-    private_key_path.write_bytes(data=private_key)
 
 
 @click.command('create')
@@ -425,7 +398,7 @@ def create(
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
     private_key_path = ssh_keypair_dir / 'id_rsa'
-    _write_key_pair(
+    write_key_pair(
         public_key_path=public_key_path,
         private_key_path=private_key_path,
     )
