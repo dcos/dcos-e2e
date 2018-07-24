@@ -7,6 +7,7 @@ import click
 from .commands.create import create
 from .commands.doctor import doctor
 from .commands.list_clusters import list_clusters
+from .commands.run_command import run
 
 
 @click.group(name='dcos-aws')
@@ -20,3 +21,4 @@ def dcos_aws() -> None:
 dcos_aws.add_command(create)
 dcos_aws.add_command(doctor)
 dcos_aws.add_command(list_clusters)
+dcos_aws.add_command(run)
