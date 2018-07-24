@@ -80,7 +80,6 @@ class Cluster(ContextDecorator):
         masters: Set[Node],
         agents: Set[Node],
         public_agents: Set[Node],
-        ip_detect_path: Path,
     ) -> 'Cluster':
         """
         Create a cluster from existing nodes.
@@ -89,8 +88,6 @@ class Cluster(ContextDecorator):
             masters: The master nodes in an existing cluster.
             agents: The agent nodes in an existing cluster.
             public_agents: The public agent nodes in an existing cluster.
-            ip_detect_path: The path to an ``ip-detect`` script to use when
-                installing DC/OS.
 
         Returns:
             A cluster object with the nodes of an existing cluster.
@@ -99,7 +96,6 @@ class Cluster(ContextDecorator):
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            ip_detect_path=ip_detect_path,
         )
 
         return cls(
@@ -338,17 +334,11 @@ class Cluster(ContextDecorator):
             **self._cluster.base_config,
         }
 
-    @property
-    def ip_detect_path(self) -> Path:
-        """
-        Return a base IP detect script for DC/OS nodes.
-        """
-        return self._cluster.ip_detect_path
-
     def install_dcos_from_url(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool = False,
     ) -> None:
         """
@@ -371,6 +361,8 @@ class Cluster(ContextDecorator):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
         """
@@ -378,6 +370,7 @@ class Cluster(ContextDecorator):
             self._cluster.install_dcos_from_url_with_bootstrap_node(
                 build_artifact=build_artifact,
                 dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
                 log_output_live=log_output_live,
             )
         except NotImplementedError:
@@ -390,6 +383,7 @@ class Cluster(ContextDecorator):
                     node.install_dcos_from_url(
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
+                        ip_detect_path=ip_detect_path,
                         role=role,
                         log_output_live=log_output_live,
                     )
@@ -398,6 +392,7 @@ class Cluster(ContextDecorator):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool = False,
     ) -> None:
         """
@@ -405,6 +400,8 @@ class Cluster(ContextDecorator):
             build_artifact: The `Path` to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 
@@ -417,6 +414,7 @@ class Cluster(ContextDecorator):
             self._cluster.install_dcos_from_path_with_bootstrap_node(
                 build_artifact=build_artifact,
                 dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
                 log_output_live=log_output_live,
             )
         except NotImplementedError:
@@ -429,6 +427,7 @@ class Cluster(ContextDecorator):
                     node.install_dcos_from_path(
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
+                        ip_detect_path=ip_detect_path,
                         role=role,
                         log_output_live=log_output_live,
                     )

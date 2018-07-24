@@ -209,8 +209,6 @@ class ClusterContainers:
             masters=set(map(self.to_node, self.masters)),
             agents=set(map(self.to_node, self.agents)),
             public_agents=set(map(self.to_node, self.public_agents)),
-            # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
-            ip_detect_path=Path('/foo'),
         )
 
     @property

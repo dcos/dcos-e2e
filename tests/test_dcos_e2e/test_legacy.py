@@ -32,6 +32,7 @@ class Test19:
                 build_artifact=oss_1_9_artifact,
                 dcos_config=cluster.base_config,
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
 
@@ -58,6 +59,7 @@ class Test19:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
@@ -83,6 +85,7 @@ class Test110:
                 build_artifact=oss_1_10_artifact,
                 dcos_config=cluster.base_config,
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
 
@@ -112,6 +115,7 @@ class Test110:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
@@ -137,6 +141,7 @@ class Test111:
                 build_artifact=oss_1_11_artifact,
                 dcos_config=cluster.base_config,
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
 
@@ -166,6 +171,7 @@ class Test111:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
