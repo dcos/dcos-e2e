@@ -4,7 +4,7 @@ Click options which are common across CLI tools.
 
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Set, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import click
 import yaml
@@ -398,50 +398,17 @@ def cluster_id_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def make_existing_cluster_id_option(
-    existing_cluster_ids_func: Callable[[], Set[str]],
-) -> Callable[[Callable[..., None]], Callable[..., None]]:
+def existing_cluster_id_option(command: Callable[..., None],
+                               ) -> Callable[..., None]:
     """
-    Return a Click option for choosing an existing cluster ID.
-
-    Args:
-        existing_cluster_ids_func: A function which returns existing cluster
-            IDs.
+    An option decorator for an existing Cluster ID.
     """
-
-    def _validate_cluster_exists(
-        ctx: click.core.Context,
-        param: Union[click.core.Option, click.core.Parameter],
-        value: Optional[Union[int, bool, str]],
-    ) -> str:
-        """
-        Validate that a cluster exists with the given name.
-        """
-        # We "use" variables to satisfy linting tools.
-        for _ in (ctx, param):
-            pass
-
-        cluster_id = str(value)
-        if cluster_id not in existing_cluster_ids_func():
-            message = 'Cluster "{value}" does not exist'.format(value=value)
-            raise click.BadParameter(message)
-
-        return cluster_id
-
-    def existing_cluster_id_option(command: Callable[..., None],
-                                   ) -> Callable[..., None]:
-        """
-        An option decorator for one Cluster ID.
-        """
-        function = click.option(
-            '-c',
-            '--cluster-id',
-            type=str,
-            callback=_validate_cluster_exists,
-            default='default',
-            show_default=True,
-            help='The ID of the cluster to use.',
-        )(command)  # type: Callable[..., None]
-        return function
-
-    return existing_cluster_id_option
+    function = click.option(
+        '-c',
+        '--cluster-id',
+        type=str,
+        default='default',
+        show_default=True,
+        help='The ID of the cluster to use.',
+    )(command)  # type: Callable[..., None]
+    return function

@@ -75,6 +75,59 @@ def existing_cluster_ids() -> Set[str]:
     return cluster_ids - set([None])
 
 
+class VMInspectView:
+    """
+    Details of a node from a VM.
+    """
+
+    def __init__(self, vm_name: str) -> None:
+        """
+        Args:
+            vm_name: The name of the VM which represents the node.
+        """
+        self._vm_name = vm_name
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        ip_address = _ip_from_vm_name(vm_name=self._vm_name)
+        description = _description_from_vm_name(vm_name=self._vm_name)
+        data = json.loads(s=description)
+        cluster_id = data[CLUSTER_ID_DESCRIPTION_KEY]
+        cluster_vms = ClusterVMs(cluster_id=cluster_id)
+        vagrant_client = cluster_vms.vagrant_client
+
+        if self._vm_name in cluster_vms.masters:
+            role = 'master'
+            role_names = cluster_vms.masters
+        elif self._vm_name in cluster_vms.agents:
+            role = 'agent'
+            role_names = cluster_vms.agents
+        elif self._vm_name in cluster_vms.public_agents:
+            role = 'public_agent'
+            role_names = cluster_vms.public_agents
+
+        sorted_ips = list(
+            sorted(
+                [
+                    _ip_from_vm_name(vm_name=name)
+                    for name in role_names
+                ],
+            ),
+        )
+        index = sorted_ips.index(ip_address)
+
+        return {
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
+            'vm_name': self._vm_name,
+            'ip_address': str(ip_address),
+            'ssh_key': vagrant_client.keyfile(vm_name=self._vm_name),
+            'ssh_user': vagrant_client.user(vm_name=self._vm_name),
+            'vagrant_root': vagrant_client.root,
+        }
+
+
 class ClusterVMs:
     """
     A representation of a cluster constructed from Vagrant VMs.
@@ -145,26 +198,42 @@ class ClusterVMs:
         """
         Return a ``Cluster`` constructed from the VMs.
         """
-        vm_names = self._vm_names
+        return Cluster.from_nodes(
+            masters=set(map(self._to_node, self.masters)),
+            agents=set(map(self._to_node, self.agents)),
+            public_agents=set(map(self._to_node, self.public_agents)),
+            # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
+            ip_detect_path=Path('/foo'),
+        )
+
+    @property
+    def masters(self) -> Set[str]:
+        """
+        VM names which represent master nodes.
+        """
         # This is a hack as it depends on an internal implementation detail of
         # the library.
         # Instead, we should set different Virtualbox descriptions for
         # different node types.
         # see https://jira.mesosphere.com/browse/DCOS_OSS-3851.
-        masters = [name for name in vm_names if '-master-' in name]
-        agents = [
-            name for name in vm_names
-            if '-agent-' in name and '-public-agent-' not in name
-        ]
-        public_agents = [name for name in vm_names if '-public-agent-' in name]
+        return set(name for name in self._vm_names if '-master-' in name)
 
-        return Cluster.from_nodes(
-            masters=set(map(self._to_node, masters)),
-            agents=set(map(self._to_node, agents)),
-            public_agents=set(map(self._to_node, public_agents)),
-            # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
-            ip_detect_path=Path('/foo'),
+    @property
+    def agents(self) -> Set[str]:
+        """
+        VM names which represent agent nodes.
+        """
+        return set(
+            name for name in self._vm_names
+            if '-agent-' in name and '-public-agent-' not in name
         )
+
+    @property
+    def public_agents(self) -> Set[str]:
+        """
+        VM names which represent public agent nodes.
+        """
+        return set(name for name in self._vm_names if '-public-agent-' in name)
 
     @property
     def workspace_dir(self) -> Path:

@@ -14,3 +14,11 @@ CLI Reference
 
 .. click:: cli.dcos_aws:create
   :prog: dcos-aws create
+
+.. _dcos-aws-doctor:
+
+.. click:: cli.dcos_aws:doctor
+  :prog: dcos-aws doctor
+
+.. click:: cli.dcos_aws:list_clusters
+  :prog: dcos-aws list_clusters

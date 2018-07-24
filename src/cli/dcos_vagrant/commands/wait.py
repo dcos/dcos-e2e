@@ -7,14 +7,14 @@ import click_spinner
 import urllib3
 
 from cli.common.options import (
+    existing_cluster_id_option,
     superuser_password_option,
     superuser_username_option,
     verbosity_option,
 )
-from cli.common.utils import set_logging
+from cli.common.utils import check_cluster_id_exists, set_logging
 
-from ._common import ClusterVMs
-from ._options import existing_cluster_id_option
+from ._common import ClusterVMs, existing_cluster_ids
 
 
 @click.command('wait')
@@ -31,6 +31,10 @@ def wait(
     """
     Wait for DC/OS to start.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     set_logging(verbosity_level=verbose)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     message = (
