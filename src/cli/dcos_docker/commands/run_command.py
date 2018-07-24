@@ -103,7 +103,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         'the node\'s Docker container name, '
         'the node\'s Docker container ID, '
         'a reference in the format "<role>_<number>". '
-        'These details be seen with ``dcos_docker inspect``.'
+        'These details be seen with ``dcos-docker inspect``.'
     ),
 )
 @environment_variables_option
