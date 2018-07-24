@@ -5,6 +5,7 @@ Common code for dcos-docker CLI modules.
 from typing import Set
 
 import boto3
+from boto3.resources.base import ServiceResource
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node, Role
 
@@ -48,28 +49,13 @@ class ClusterInstances:
     def _instances_by_role(
         self,
         role: Role,
-    ) -> Set[Container]:
+    ) -> Set[ServiceResource]:
         """
         Return all containers in this cluster of a particular node type.
         """
-        node_types = {
-            Role.MASTER: NODE_TYPE_MASTER_LABEL_VALUE,
-            Role.AGENT: NODE_TYPE_AGENT_LABEL_VALUE,
-            Role.PUBLIC_AGENT: NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
-        }
-        client = docker_client()
-        filters = {
-            'label': [
-                self._cluster_id_label,
-                '{key}={value}'.format(
-                    key=NODE_TYPE_LABEL_KEY,
-                    value=node_types[role],
-                ),
-            ],
-        }
-        return set(client.containers.list(filters=filters))
+        return set([])
 
-    def to_node(self, instance: Container) -> Node:
+    def to_node(self, instance: ServiceResource) -> Node:
         """
         Return the ``Node`` that is represented by a given ``container``.
         """
@@ -87,21 +73,21 @@ class ClusterInstances:
         )
 
     @property
-    def masters(self) -> Set[Container]:
+    def masters(self) -> Set[ServiceResource]:
         """
         Docker containers which represent master nodes.
         """
         return self._instances_by_role(role=Role.MASTER)
 
     @property
-    def agents(self) -> Set[Container]:
+    def agents(self) -> Set[ServiceResource]:
         """
         Docker containers which represent agent nodes.
         """
         return self._instances_by_role(role=Role.AGENT)
 
     @property
-    def public_agents(self) -> Set[Container]:
+    def public_agents(self) -> Set[ServiceResource]:
         """
         Docker containers which represent public agent nodes.
         """
