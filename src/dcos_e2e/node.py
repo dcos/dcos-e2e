@@ -4,6 +4,7 @@ Tools for managing DC/OS cluster nodes.
 
 import stat
 import subprocess
+import tarfile
 import uuid
 from enum import Enum
 from ipaddress import IPv4Address
@@ -536,21 +537,65 @@ class Node:
         chown_args = ['chown', '-R', user, str(remote_path.parent)]
         self.run(
             args=chown_args,
+            user=user,
             transport=transport,
             sudo=True,
         )
 
+        tempdir = Path(gettempdir())
+        tar_name = '{unique}.tar'.format(
+            unique=uuid.uuid4().hex,
+        )
+        local_tar_path = tempdir / tar_name
+
+        with tarfile.open(str(local_tar_path), 'w') as tar:
+            arcname = remote_path.relative_to(remote_path.parent)
+            tar.add(str(local_path), arcname=str(arcname), recursive=True)
+
+        # `remote_path` may be a tmpfs mount.
+        # At the time of writing, for example, `/tmp` is a tmpfs mount.
+        # Copying files to tmpfs mounts fails silently.
+        # See https://github.com/moby/moby/issues/22020.
+        home_path = self.run(
+            args=['bash', '-c', 'echo $HOME'],
+            user=user,
+            transport=transport,
+            sudo=True,
+        ).stdout.strip().decode()
+
+        remote_tar_path = Path(home_path) / tar_name
+
         node_transport.send_file(
-            local_path=local_path,
-            remote_path=remote_path,
+            local_path=local_tar_path,
+            remote_path=remote_tar_path,
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
         )
 
+        Path(local_tar_path).unlink()
+
         chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
         self.run(
             args=chown_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+        )
+
+        tar_args = [
+            'tar', '-C', str(remote_path.parent), '-xvf', str(remote_tar_path),
+        ]
+        self.run(
+            args=tar_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+        )
+
+        self.run(
+            args=['rm', str(remote_tar_path)],
+            user=user,
             transport=transport,
             sudo=True,
         )
