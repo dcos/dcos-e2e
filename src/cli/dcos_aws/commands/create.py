@@ -182,6 +182,9 @@ def create(
         (cluster.agents, NODE_TYPE_AGENT_TAG_VALUE),
         (cluster.public_agents, NODE_TYPE_PUBLIC_AGENT_TAG_VALUE),
     ):
+        if not nodes:
+            continue
+
         node_public_ips = set(str(node.public_ip_address) for node in nodes)
         instance_ids = [
             instance.id for instance in ec2_instances
