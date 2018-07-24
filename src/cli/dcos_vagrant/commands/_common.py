@@ -98,12 +98,33 @@ class VMInspectView:
         cluster_vms = ClusterVMs(cluster_id=cluster_id)
         vagrant_client = cluster_vms.vagrant_client
 
+        if self._vm_name in cluster_vms.masters:
+            role = 'master'
+            role_names = cluster_vms.masters
+        elif self._vm_name in cluster_vms.agents:
+            role = 'agent'
+            role_names = cluster_vms.agents
+        elif self._vm_name in cluster_vms.public_agents:
+            role = 'public_agent'
+            role_names = cluster_vms.public_agents
+
+        sorted_ips = list(
+            sorted(
+                [
+                    _ip_from_vm_name(vm_name=name)
+                    for name in role_names
+                ],
+            ),
+        )
+        index = sorted_ips.index(ip_address)
+
         return {
-            'VM Name': self._vm_name,
-            'IP Address': str(ip_address),
-            'SSH key': vagrant_client.keyfile(vm_name=self._vm_name),
-            'SSH user': vagrant_client.user(vm_name=self._vm_name),
-            'Vagrant root': vagrant_client.root,
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
+            'vm_name': self._vm_name,
+            'ip_address': str(ip_address),
+            'ssh_key': vagrant_client.keyfile(vm_name=self._vm_name),
+            'ssh_user': vagrant_client.user(vm_name=self._vm_name),
+            'vagrant_root': vagrant_client.root,
         }
 
 
