@@ -69,11 +69,16 @@ class ClusterInstances:
                     if tag['Value'] == self._cluster_id:
                         cluster_instances.add(instance)
 
+        node_types = {
+            Role.MASTER: NODE_TYPE_MASTER_TAG_VALUE,
+            Role.AGENT: NODE_TYPE_AGENT_TAG_VALUE,
+            Role.PUBLIC_AGENT: NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
+        }
         role_instances = set([])
         for instance in cluster_instances:
             for tag in instance.tags:
                 if tag['Key'] == NODE_TYPE_TAG_KEY:
-                    if tag['Value'] == role:
+                    if tag['Value'] == node_types[role]:
                         role_instances.add(instance)
 
         return role_instances
@@ -121,7 +126,7 @@ class ClusterInstances:
     def workspace_dir(self) -> Path:
         instance = next(iter(self.masters))
         for tag in instance.tags:
-            if tag['Key'] == WORKSPACE_TAG_KEY:
+            if tag['Key'] == WORKSPACE_DIR_TAG_KEY:
                 workspace = Path(tag['Value'])
         return workspace
 
