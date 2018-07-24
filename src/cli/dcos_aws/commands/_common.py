@@ -1,7 +1,8 @@
 """
-Common code for dcos-docker CLI modules.
+Common code for dcos-aws CLI modules.
 """
 
+from pathlib import Path
 from typing import Set
 
 import boto3
@@ -113,6 +114,12 @@ class ClusterInstances:
         Docker containers which represent public agent nodes.
         """
         return self._instances_by_role(role=Role.PUBLIC_AGENT)
+
+    @property
+    def workspace_dir(self) -> Path:
+        container = next(iter(self.masters))
+        workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
+        return Path(workspace_dir)
 
     @property
     def cluster(self) -> Cluster:
