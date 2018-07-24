@@ -24,6 +24,7 @@ def inspect_cluster(cluster_id: str) -> None:
         existing_cluster_ids=existing_cluster_ids(),
     )
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
+    ssh_key = cluster_vms.workspace_dir / 'ssh' / 'id_rsa'
     keys = {
         'masters': cluster_vms.masters,
         'agents': cluster_vms.agents,
@@ -42,7 +43,7 @@ def inspect_cluster(cluster_id: str) -> None:
         'Web UI': web_ui,
         'Nodes': nodes,
         'Vagrant root': vagrant_client.root,
-        'SSH key': vagrant_client.keyfile(),
+        'SSH key': ssh_key,
         'SSH user': vagrant_client.user(),
     }  # type: Dict[Any, Any]
     click.echo(
