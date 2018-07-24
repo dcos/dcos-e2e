@@ -9,7 +9,7 @@ from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
 
@@ -114,6 +114,7 @@ class Node:
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
@@ -137,6 +138,9 @@ class Node:
             ip_detect_path: The path to the ``ip-detect`` script to use for
                 installing DC/OS.
             role: The desired DC/OS role for the installation.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installing node. These are files to copy from the host to
+                the installing node before installing DC/OS.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
@@ -178,6 +182,17 @@ class Node:
             sudo=True,
         )
 
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            relative_installer_path = installer_path.relative_to('/genconf')
+            self.send_file(
+                local_path=host_path,
+                remote_path=remote_genconf_path / relative_installer_path,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
+
+        genconf_args = [
         genconf_args = [
             'cd',
             str(remote_build_artifact.parent),
