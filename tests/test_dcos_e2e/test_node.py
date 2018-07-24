@@ -168,14 +168,15 @@ class TestSendFile:
         user.
         """
         content = str(uuid.uuid4())
-        dir_name = 'example_dir'
+        local_dir_name = 'local_dir'
+        remote_dir_name = 'remote_dir'
         file_name = 'example_file.txt'
-        local_dir = tmpdir.mkdir(dir_name)
+        local_dir = tmpdir.mkdir(local_dir_name)
         local_file = local_dir.join(file_name)
         local_file.write(content)
         random = uuid.uuid4().hex
         master_base_dir = '/etc/{random}'.format(random=random)
-        master_destination_dir = Path(master_base_dir) / dir_name
+        master_destination_dir = Path(master_base_dir) / remote_dir_name
         dcos_node.send_file(
             local_path=Path(local_dir),
             remote_path=master_destination_dir,

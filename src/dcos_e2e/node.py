@@ -543,9 +543,7 @@ class Node:
         )
 
         tempdir = Path(gettempdir())
-        tar_name = '{unique}.tar'.format(
-            unique=uuid.uuid4().hex,
-        )
+        tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
         local_tar_path = tempdir / tar_name
 
         with tarfile.open(str(local_tar_path), 'w') as tar:
@@ -584,7 +582,11 @@ class Node:
         )
 
         tar_args = [
-            'tar', '-C', str(remote_path.parent), '-xvf', str(remote_tar_path),
+            'tar',
+            '-C',
+            str(remote_path.parent),
+            '-xvf',
+            str(remote_tar_path),
         ]
         self.run(
             args=tar_args,
