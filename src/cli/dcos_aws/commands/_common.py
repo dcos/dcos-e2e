@@ -11,6 +11,10 @@ from dcos_e2e.node import Node, Role
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 NODE_TYPE_TAG_KEY = 'dcos_e2e.node_type'
+NODE_TYPE_TAG_KEY = 'dcos_e2e.node_type'
+NODE_TYPE_MASTER_TAG_VALUE = 'master'
+NODE_TYPE_AGENT_TAG_VALUE = 'agent'
+NODE_TYPE_PUBLIC_AGENT_TAG_VALUE = 'public_agent'
 
 
 def existing_cluster_ids(aws_region: str) -> Set[str]:
@@ -43,8 +47,8 @@ class ClusterInstances:
             cluster_id: The ID of the cluster.
             aws_region: The AWS region the cluster is in.
         """
-        self.cluster_id = cluster_id
-        self.aws_region = aws_region
+        self._cluster_id = cluster_id
+        self._aws_region = aws_region
 
     def _instances_by_role(
         self,
@@ -53,7 +57,24 @@ class ClusterInstances:
         """
         Return all containers in this cluster of a particular node type.
         """
-        return set([])
+        ec2 = boto3.resource('ec2', region_name=self._aws_region)
+        ec2_instances = ec2.instances.all()
+
+        cluster_instances = set([])
+        for instance in ec2_instances:
+            for tag in instance.tags:
+                if tag['Key'] == CLUSTER_ID_TAG_KEY:
+                    if tag['Value'] == self._cluster_id:
+                        cluster_instances.add(instance)
+
+        role_instances = set([])
+        for instance in cluster_instances:
+            for tag in instance.tags:
+                if tag['Key'] == NODE_TYPE_TAG_KEY:
+                    if tag['Value'] == role:
+                        role_instances.add(instance)
+
+        return role_instances
 
     def to_node(self, instance: ServiceResource) -> Node:
         """
