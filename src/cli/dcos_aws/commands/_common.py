@@ -69,15 +69,18 @@ class ClusterInstances:
         }
         return set(client.containers.list(filters=filters))
 
-    def to_node(self, container: Container) -> Node:
+    def to_node(self, instance: Container) -> Node:
         """
         Return the ``Node`` that is represented by a given ``container``.
         """
-        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
+        public_ip_address = instance.public_ip_address
+        private_ip_address = instance.public_ip_address
         ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
         return Node(
-            public_ip_address=address,
-            private_ip_address=address,
+            public_ip_address=public_ip_address,
+            private_ip_address=private_ip_address,
+            # TODO this does depend on distro... not root!
+            # store this.
             default_user='root',
             ssh_key_path=ssh_key_path,
             default_transport=self._transport,
