@@ -37,6 +37,7 @@ from dcos_e2e.distributions import Distribution
 
 from ._common import (
     CLUSTER_ID_TAG_KEY,
+    KEY_NAME_TAG_KEY,
     NODE_TYPE_AGENT_TAG_VALUE,
     NODE_TYPE_MASTER_TAG_VALUE,
     NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
@@ -131,6 +132,7 @@ def create(
     workspace_dir.mkdir(parents=True)
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
+    key_name = 'dcos-e2e-{random}'.format(random=uuid.uuid4().hex)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
     private_key_path = ssh_keypair_dir / 'id_rsa'
     write_key_pair(
@@ -138,9 +140,19 @@ def create(
         private_key_path=private_key_path,
     )
 
+    ec2 = boto3.resource('ec2', region_name=aws_region)
+    ec2.import_key_pair(
+        KeyName=key_name,
+        PublicKeyMaterial=public_key_path.read_bytes(),
+    )
+
     doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
-    cluster_backend = AWS(workspace_dir=workspace_dir, aws_region=aws_region)
+    cluster_backend = AWS(
+        aws_key_pair=(key_name, private_key_path),
+        workspace_dir=workspace_dir,
+        aws_region=aws_region,
+    )
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
         Distribution.COREOS: 'core',
@@ -177,7 +189,6 @@ def create(
         click.echo(doctor_message)
         sys.exit(exc.returncode)
 
-    ec2 = boto3.resource('ec2', region_name=cluster_backend.aws_region)
     ec2_instances = ec2.instances.all()
 
     cluster_id_tag = {
@@ -193,6 +204,11 @@ def create(
     workspace_tag = {
         'Key': WORKSPACE_DIR_TAG_KEY,
         'Value': str(workspace_dir),
+    }
+
+    key_name_tag = {
+        'Key': KEY_NAME_TAG_KEY,
+        'Value': key_name,
     }
 
     for nodes, tag_value in (
@@ -215,23 +231,13 @@ def create(
 
         ec2.create_tags(
             Resources=instance_ids,
-            Tags=[cluster_id_tag, role_tag, ssh_user_tag, workspace_tag],
-        )
-
-    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
-    for node in nodes:
-        node.run(
-            args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
-            shell=True,
-        )
-        node.run(
-            args=[
-                'echo',
-                public_key_path.read_text(),
-                '>>',
-                '/root/.ssh/authorized_keys',
+            Tags=[
+                cluster_id_tag,
+                key_name_tag,
+                role_tag,
+                ssh_user_tag,
+                workspace_tag,
             ],
-            shell=True,
         )
 
     for node in cluster.masters:
