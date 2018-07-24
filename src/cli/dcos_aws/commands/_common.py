@@ -45,7 +45,7 @@ class ClusterInstances:
         self.cluster_id = cluster_id
         self.aws_region = aws_region
 
-    def _containers_by_role(
+    def _instances_by_role(
         self,
         role: Role,
     ) -> Set[Container]:
@@ -88,21 +88,21 @@ class ClusterInstances:
         """
         Docker containers which represent master nodes.
         """
-        return self._containers_by_role(role=Role.MASTER)
+        return self._instances_by_role(role=Role.MASTER)
 
     @property
     def agents(self) -> Set[Container]:
         """
         Docker containers which represent agent nodes.
         """
-        return self._containers_by_role(role=Role.AGENT)
+        return self._instances_by_role(role=Role.AGENT)
 
     @property
     def public_agents(self) -> Set[Container]:
         """
         Docker containers which represent public agent nodes.
         """
-        return self._containers_by_role(role=Role.PUBLIC_AGENT)
+        return self._instances_by_role(role=Role.PUBLIC_AGENT)
 
     @property
     def cluster(self) -> Cluster:

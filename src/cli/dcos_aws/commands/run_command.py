@@ -62,7 +62,10 @@ def run(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
-    cluster_instances = ClusterInstances(cluster_id=cluster_id)
+    cluster_instances = ClusterInstances(
+        cluster_id=cluster_id,
+        aws_region=aws_region,
+    )
     cluster = cluster_instances.cluster
     host = next(iter(cluster.masters))
 
