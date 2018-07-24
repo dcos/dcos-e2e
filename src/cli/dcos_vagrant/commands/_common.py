@@ -75,6 +75,38 @@ def existing_cluster_ids() -> Set[str]:
     return cluster_ids - set([None])
 
 
+class VMInspectView:
+    """
+    Details of a node from a VM.
+    """
+
+    def __init__(self, vm_name: str) -> None:
+        """
+        Args:
+            vm_name: The name of the VM which represents the node.
+        """
+        self._vm_name = vm_name
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        ip_address = _ip_from_vm_name(vm_name=self._vm_name)
+        description = _description_from_vm_name(vm_name=self._vm_name)
+        data = json.loads(s=description)
+        cluster_id = data[CLUSTER_ID_DESCRIPTION_KEY]
+        cluster_vms = ClusterVMs(cluster_id=cluster_id)
+        vagrant_client = cluster_vms.vagrant_client
+
+        return {
+            'VM Name': self._vm_name,
+            'IP Address': str(ip_address),
+            'SSH key': vagrant_client.keyfile(vm_name=self._vm_name),
+            'SSH user': vagrant_client.user(vm_name=self._vm_name),
+            'Vagrant root': vagrant_client.root,
+        }
+
+
 class ClusterVMs:
     """
     A representation of a cluster constructed from Vagrant VMs.
@@ -145,26 +177,42 @@ class ClusterVMs:
         """
         Return a ``Cluster`` constructed from the VMs.
         """
-        vm_names = self._vm_names
+        return Cluster.from_nodes(
+            masters=set(map(self._to_node, self.masters)),
+            agents=set(map(self._to_node, self.agents)),
+            public_agents=set(map(self._to_node, self.public_agents)),
+            # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
+            ip_detect_path=Path('/foo'),
+        )
+
+    @property
+    def masters(self) -> Set[str]:
+        """
+        VM names which represent master nodes.
+        """
         # This is a hack as it depends on an internal implementation detail of
         # the library.
         # Instead, we should set different Virtualbox descriptions for
         # different node types.
         # see https://jira.mesosphere.com/browse/DCOS_OSS-3851.
-        masters = [name for name in vm_names if '-master-' in name]
-        agents = [
-            name for name in vm_names
-            if '-agent-' in name and '-public-agent-' not in name
-        ]
-        public_agents = [name for name in vm_names if '-public-agent-' in name]
+        return set(name for name in self._vm_names if '-master-' in name)
 
-        return Cluster.from_nodes(
-            masters=set(map(self._to_node, masters)),
-            agents=set(map(self._to_node, agents)),
-            public_agents=set(map(self._to_node, public_agents)),
-            # Use a nonsense ``ip_detect_path`` since we never install DC/OS.
-            ip_detect_path=Path('/foo'),
+    @property
+    def agents(self) -> Set[str]:
+        """
+        VM names which represent agent nodes.
+        """
+        return set(
+            name for name in self._vm_names
+            if '-agent-' in name and '-public-agent-' not in name
         )
+
+    @property
+    def public_agents(self) -> Set[str]:
+        """
+        VM names which represent public agent nodes.
+        """
+        return set(name for name in self._vm_names if '-public-agent-' in name)
 
     @property
     def workspace_dir(self) -> Path:
