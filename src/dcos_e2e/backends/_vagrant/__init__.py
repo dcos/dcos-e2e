@@ -11,8 +11,6 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
-import yaml
-
 from dcos_e2e.node import Node
 
 from .._base_classes import ClusterBackend, ClusterManager
@@ -268,7 +266,6 @@ class VagrantCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        ip_detect_contents = Path(self.ip_detect_path).read_text()
         return {
             'check_time': 'false',
             'cluster_name': 'DCOS',
@@ -277,8 +274,6 @@ class VagrantCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': 'vagrant',
-            # This is not a documented option.
-            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
 
     @property
