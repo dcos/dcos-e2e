@@ -63,12 +63,18 @@ class InstanceInspectView:
     Details of a node from an instance.
     """
 
-    def __init__(self, instance: ServiceResource) -> None:
+    def __init__(
+        self,
+        instance: ServiceResource,
+        aws_region: str,
+    ) -> None:
         """
         Args:
-            EC2 instance: The EC2 instance which represents the node.
+            instance: The EC2 instance which represents the node.
+            aws_region: The AWS region the instance is on.
         """
         self._instance = instance
+        self._aws_region = aws_region
 
     def to_dict(self) -> Dict[str, str]:
         """
@@ -82,7 +88,7 @@ class InstanceInspectView:
         private_ip_address = instance.private_ip_address
         cluster_instances = ClusterInstances(
             cluster_id=cluster_id,
-            aws_region=instance.region_name,
+            aws_region=self._aws_region,
         )
 
         instances = {

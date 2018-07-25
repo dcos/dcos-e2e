@@ -41,8 +41,12 @@ def inspect_cluster(cluster_id: str, aws_region: str) -> None:
     master = next(iter(cluster_instances.cluster.masters))
     web_ui = 'http://' + str(master.public_ip_address)
     nodes = {
-        key:
-        [InstanceInspectView(instance).to_dict() for instance in instances]
+        key: [
+            InstanceInspectView(
+                instance=instance,
+                aws_region=aws_region,
+            ).to_dict() for instance in instances
+        ]
         for key, instances in keys.items()
     }
 
