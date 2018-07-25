@@ -21,4 +21,16 @@ CLI Reference
   :prog: dcos-aws doctor
 
 .. click:: cli.dcos_aws:list_clusters
-  :prog: dcos-aws list_clusters
+  :prog: dcos-aws list
+
+.. click:: cli.dcos_aws:run
+  :prog: dcos-aws run
+
+.. click:: cli.dcos_aws:sync_code
+  :prog: dcos-aws sync
+
+.. click:: cli.dcos_aws:wait
+  :prog: dcos-aws wait
+
+.. click:: cli.dcos_aws:web
+  :prog: dcos-aws web
