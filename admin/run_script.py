@@ -98,6 +98,8 @@ PATTERNS = {
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
     (EE_MASTER, ),
+    'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_node_installer_genconf_dir':  # noqa: E501
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests':
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestSSLDisabled':
@@ -121,6 +123,8 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_url':  # noqa: E501
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_install.py::TestCopyFiles:test_install_node::test_install_from_path_with_genconf_files':  # noqa: E501
     (OSS_MASTER, ),
 }  # type: Dict[str, Tuple]
 

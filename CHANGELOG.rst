@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add ``files_to_copy_to_genconf_dir`` as an argument to ``Node.install_dcos_from_path`` and ``Node.install_dcos_from_url``.
+
 2018.07.25.0
 ------------
 

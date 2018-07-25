@@ -10,7 +10,7 @@ from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
 
@@ -115,6 +115,7 @@ class Node:
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
@@ -143,6 +144,10 @@ class Node:
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
         """
         tempdir = Path(gettempdir())
 
@@ -178,6 +183,17 @@ class Node:
             user=user,
             sudo=True,
         )
+
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = remote_genconf_path / relative_installer_path
+            self.send_file(
+                local_path=host_path,
+                remote_path=destination_path,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
 
         genconf_args = [
             'cd',
@@ -232,6 +248,7 @@ class Node:
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
@@ -267,6 +284,9 @@ class Node:
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
@@ -293,6 +313,7 @@ class Node:
             role=role,
             log_output_live=log_output_live,
             transport=transport,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
 
     def install_dcos_from_url(
@@ -301,6 +322,7 @@ class Node:
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
@@ -336,6 +358,10 @@ class Node:
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
@@ -364,6 +390,7 @@ class Node:
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             user=user,
             role=role,
             log_output_live=log_output_live,
