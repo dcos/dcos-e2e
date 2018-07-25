@@ -72,6 +72,7 @@ class TestDcosAWS:
               list    List all clusters.
               run     Run an arbitrary command on a node.
               sync    Sync files from a DC/OS checkout to master...
+              wait    Wait for DC/OS to start.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -340,6 +341,45 @@ class TestSync:
               -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
               --aws-region TEXT      The AWS region to use.  [default: us-west-2]
               --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestWait:
+    """
+    Tests for the ``wait`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws wait --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_aws, ['wait', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws wait [OPTIONS]
+
+              Wait for DC/OS to start.
+
+            Options:
+              -c, --cluster-id TEXT      The ID of the cluster to use.  [default: default]
+              --superuser-username TEXT  The superuser username is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
+              --superuser-password TEXT  The superuser password is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
+              -v, --verbose              Use verbose output. Use this option multiple times
+                                         for more verbose output.
+              --aws-region TEXT          The AWS region to use.  [default: us-west-2]
+              --help                     Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable

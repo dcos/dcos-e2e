@@ -18,6 +18,7 @@ NODE_TYPE_MASTER_TAG_VALUE = 'master'
 NODE_TYPE_AGENT_TAG_VALUE = 'agent'
 NODE_TYPE_PUBLIC_AGENT_TAG_VALUE = 'public_agent'
 SSH_USER_TAG_KEY = 'dcos_e2e.ssh_user'
+VARIANT_TAG_KEY = 'dcos_e2e.variant'
 WORKSPACE_DIR_TAG_KEY = 'dcos_e2e.workspace_dir'
 
 
@@ -59,7 +60,7 @@ class ClusterInstances:
         role: Role,
     ) -> Set[ServiceResource]:
         """
-        Return all containers in this cluster of a particular node type.
+        Return all EC2 instances in this cluster of a particular node type.
         """
         ec2 = boto3.resource('ec2', region_name=self._aws_region)
         ec2_instances = ec2.instances.all()
@@ -87,7 +88,7 @@ class ClusterInstances:
 
     def to_node(self, instance: ServiceResource) -> Node:
         """
-        Return the ``Node`` that is represented by a given ``container``.
+        Return the ``Node`` that is represented by a given EC2 instance.
         """
         public_ip_address = instance.public_ip_address
         private_ip_address = instance.private_ip_address
@@ -106,21 +107,21 @@ class ClusterInstances:
     @property
     def masters(self) -> Set[ServiceResource]:
         """
-        Docker containers which represent master nodes.
+        EC2 instances which represent master nodes.
         """
         return self._instances_by_role(role=Role.MASTER)
 
     @property
     def agents(self) -> Set[ServiceResource]:
         """
-        Docker containers which represent agent nodes.
+        EC2 instances which represent agent nodes.
         """
         return self._instances_by_role(role=Role.AGENT)
 
     @property
     def public_agents(self) -> Set[ServiceResource]:
         """
-        Docker containers which represent public agent nodes.
+        EC2 instances which represent public agent nodes.
         """
         return self._instances_by_role(role=Role.PUBLIC_AGENT)
 
@@ -133,9 +134,20 @@ class ClusterInstances:
         return workspace
 
     @property
+    def is_enterprise(self) -> bool:
+        """
+        Return whether the cluster is a DC/OS Enterprise cluster.
+        """
+        instance = next(iter(self.masters))
+        for tag in instance.tags:
+            if tag['Key'] == VARIANT_TAG_KEY:
+                variant = Path(tag['Value'])
+        return bool(variant == 'ee')
+
+    @property
     def cluster(self) -> Cluster:
         """
-        Return a ``Cluster`` constructed from the containers.
+        Return a ``Cluster`` constructed from the EC2 instances.
         """
         return Cluster.from_nodes(
             masters=set(map(self.to_node, self.masters)),

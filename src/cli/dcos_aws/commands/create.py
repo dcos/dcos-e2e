@@ -43,6 +43,7 @@ from ._common import (
     NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
     NODE_TYPE_TAG_KEY,
     SSH_USER_TAG_KEY,
+    VARIANT_TAG_KEY,
     WORKSPACE_DIR_TAG_KEY,
     existing_cluster_ids,
 )
@@ -211,6 +212,11 @@ def create(
         'Value': key_name,
     }
 
+    variant_tag = {
+        'Key': VARIANT_TAG_KEY,
+        'Value': 'ee' if enterprise else '',
+    }
+
     for nodes, tag_value in (
         (cluster.masters, NODE_TYPE_MASTER_TAG_VALUE),
         (cluster.agents, NODE_TYPE_AGENT_TAG_VALUE),
@@ -236,6 +242,7 @@ def create(
                 key_name_tag,
                 role_tag,
                 ssh_user_tag,
+                variant_tag,
                 workspace_tag,
             ],
         )
