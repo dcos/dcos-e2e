@@ -36,7 +36,8 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
     for instance in ec2_instances:
         for tag in instance.tags:
             if tag['Key'] == CLUSTER_ID_TAG_KEY:
-                cluster_ids.add(tag['Value'])
+                if instance.state['Name'] != 'terminated':
+                    cluster_ids.add(tag['Value'])
 
     return cluster_ids
 
