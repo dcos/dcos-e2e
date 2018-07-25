@@ -283,33 +283,3 @@ class TestDCOSInstallation:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
-
-    def test_send_file(
-        self,
-        oss_artifact_url: str,
-    ) -> None:
-        """
-        It is possible to install DC/OS on an AWS cluster node by node.
-        """
-        cluster_backend = AWS()
-        with Cluster(
-            cluster_backend=cluster_backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            (master, ) = cluster.masters
-            master.send_file(
-                local_path=cluster_backend.ip_detect_path,
-                remote_path=Path('/home/centos') / 'ip-detect',
-                sudo=True,
-            )
-            mkdir_args = ['mkdir', '--parents', '/genconf']
-            master.run(
-                args=mkdir_args,
-                sudo=True,
-            )
-            master.send_file(
-                local_path=cluster_backend.ip_detect_path,
-                remote_path=Path('/genconf') / 'ip-detect',
-                sudo=True,
-            )
