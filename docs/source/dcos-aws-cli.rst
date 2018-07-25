@@ -28,3 +28,6 @@ CLI Reference
 
 .. click:: cli.dcos_aws:sync_code
   :prog: dcos-aws sync
+
+.. click:: cli.dcos_aws:wait
+  :prog: dcos-aws wait
