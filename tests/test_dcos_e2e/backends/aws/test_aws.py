@@ -257,8 +257,8 @@ class TestDCOSInstallation:
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
+                log_output_live=True,
             )
-
             cluster.wait_for_dcos_oss()
 
     def test_install_dcos_from_node(
