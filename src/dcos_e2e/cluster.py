@@ -212,12 +212,8 @@ class Cluster(ContextDecorator):
         # "albert@bekstil.net".
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
-        zk_client_port = '2181'
-        zk_host = str(any_master.public_ip_address)
-        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
-        zk_client.start()
-        zk_client.delete(path=path)
-        zk_client.stop()
+        delete_user_args = ['dcos-shell', 'zkCli.sh', 'delete', path]
+        any_master.run(args=delete_user_args)
 
     def wait_for_dcos_ee(
         self,

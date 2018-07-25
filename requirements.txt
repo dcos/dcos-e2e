@@ -13,7 +13,6 @@ docker==3.4.1
 docopt==0.6.2
 docutils==0.14
 google-api-python-client==1.7.4
-kazoo==2.5.0
 oauth2client==4.1.2
 paramiko==2.4.1
 passlib==1.7.1
