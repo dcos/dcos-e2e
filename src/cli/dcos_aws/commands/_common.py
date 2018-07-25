@@ -18,6 +18,7 @@ NODE_TYPE_MASTER_TAG_VALUE = 'master'
 NODE_TYPE_AGENT_TAG_VALUE = 'agent'
 NODE_TYPE_PUBLIC_AGENT_TAG_VALUE = 'public_agent'
 SSH_USER_TAG_KEY = 'dcos_e2e.ssh_user'
+VARIANT_TAG_KEY = 'dcos_e2e.variant'
 WORKSPACE_DIR_TAG_KEY = 'dcos_e2e.workspace_dir'
 
 
@@ -131,6 +132,17 @@ class ClusterInstances:
             if tag['Key'] == WORKSPACE_DIR_TAG_KEY:
                 workspace = Path(tag['Value'])
         return workspace
+
+    @property
+    def is_enterprise(self) -> bool:
+        """
+        Return whether the cluster is a DC/OS Enterprise cluster.
+        """
+        instance = next(iter(self.masters))
+        for tag in instance.tags:
+            if tag['Key'] == VARIANT_TAG_KEY:
+                variant = Path(tag['Value'])
+        return bool(variant == 'ee')
 
     @property
     def cluster(self) -> Cluster:
