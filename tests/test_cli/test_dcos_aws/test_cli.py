@@ -303,3 +303,44 @@ class TestRun:
         )
         # yapf: enable
         assert result.output == expected_help
+
+
+class TestSync:
+    """
+    Tests for the ``sync`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws sync --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_aws, ['sync', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws sync [OPTIONS] [DCOS_CHECKOUT_DIR]
+
+              Sync files from a DC/OS checkout to master nodes.
+
+              This syncs integration test files and bootstrap files.
+
+              ``DCOS_CHECKOUT_DIR`` should be set to the path of clone of an open source
+              DC/OS or DC/OS Enterprise repository.
+
+              By default the ``DCOS_CHECKOUT_DIR`` argument is set to the value of the
+              ``DCOS_CHECKOUT_DIR`` environment variable.
+
+              If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --aws-region TEXT      The AWS region to use.  [default: us-west-2]
+              --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
