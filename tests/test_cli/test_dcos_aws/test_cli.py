@@ -72,6 +72,7 @@ class TestDcosAWS:
               list    List all clusters.
               run     Run an arbitrary command on a node.
               sync    Sync files from a DC/OS checkout to master...
+              wait    Wait for DC/OS to start.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -377,6 +378,7 @@ class TestWait:
                                          Enterprise cluster, `admin` is used.
               -v, --verbose              Use verbose output. Use this option multiple times
                                          for more verbose output.
+              --aws-region TEXT          The AWS region to use.  [default: us-west-2]
               --help                     Show this message and exit.
             """,# noqa: E501,E261
         )
