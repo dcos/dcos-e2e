@@ -424,3 +424,38 @@ class TestWeb:
         )
         # yapf: enable
         assert result.output == expected_help
+
+
+class TestInspect:
+    """
+    Tests for the `inspect` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws inspect --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_aws,
+            ['inspect', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws inspect [OPTIONS]
+
+              Show cluster details.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --aws-region TEXT      The AWS region to use.  [default: us-west-2]
+              --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
