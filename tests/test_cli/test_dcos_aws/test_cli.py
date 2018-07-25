@@ -67,13 +67,14 @@ class TestDcosAWS:
               --help     Show this message and exit.
 
             Commands:
-              create  Create a DC/OS cluster.
-              doctor  Diagnose common issues which stop DC/OS E2E...
-              list    List all clusters.
-              run     Run an arbitrary command on a node.
-              sync    Sync files from a DC/OS checkout to master...
-              wait    Wait for DC/OS to start.
-              web     Open the browser at the web UI.
+              create   Create a DC/OS cluster.
+              doctor   Diagnose common issues which stop DC/OS E2E...
+              inspect  Show cluster details.
+              list     List all clusters.
+              run      Run an arbitrary command on a node.
+              sync     Sync files from a DC/OS checkout to master...
+              wait     Wait for DC/OS to start.
+              web      Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
