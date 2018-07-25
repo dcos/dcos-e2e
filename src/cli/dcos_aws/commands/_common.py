@@ -58,6 +58,59 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
     return cluster_ids
 
 
+class InstanceInspectView:
+    """
+    Details of a node from an instance.
+    """
+
+    def __init__(
+        self,
+        instance: ServiceResource,
+        aws_region: str,
+    ) -> None:
+        """
+        Args:
+            instance: The EC2 instance which represents the node.
+            aws_region: The AWS region the instance is on.
+        """
+        self._instance = instance
+        self._aws_region = aws_region
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        instance = self._instance
+        tag_dict = _tag_dict(instance=instance)
+        cluster_id = tag_dict[CLUSTER_ID_TAG_KEY]
+        role = tag_dict[NODE_TYPE_TAG_KEY]
+        public_ip_address = instance.public_ip_address
+        private_ip_address = instance.private_ip_address
+        cluster_instances = ClusterInstances(
+            cluster_id=cluster_id,
+            aws_region=self._aws_region,
+        )
+
+        instances = {
+            NODE_TYPE_MASTER_TAG_VALUE: cluster_instances.masters,
+            NODE_TYPE_AGENT_TAG_VALUE: cluster_instances.agents,
+            NODE_TYPE_PUBLIC_AGENT_TAG_VALUE: cluster_instances.public_agents,
+        }[role]
+
+        sorted_ips = sorted(
+            [instance.public_ip_address for instance in instances],
+        )
+
+        index = sorted_ips.index(public_ip_address)
+
+        return {
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
+            'ec2_instance_id': instance.id,
+            'public_ip_address': public_ip_address,
+            'private_ip_address': private_ip_address,
+        }
+
+
 class ClusterInstances:
     """
     A representation of a cluster constructed from EC2 instances.

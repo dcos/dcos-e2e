@@ -26,6 +26,9 @@ CLI Reference
 .. click:: cli.dcos_aws:run
   :prog: dcos-aws run
 
+.. click:: cli.dcos_aws:inspect_cluster
+  :prog: dcos-aws inspect
+
 .. click:: cli.dcos_aws:sync_code
   :prog: dcos-aws sync
 
