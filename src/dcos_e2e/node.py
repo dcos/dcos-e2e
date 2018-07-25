@@ -4,12 +4,13 @@ Tools for managing DC/OS cluster nodes.
 
 import stat
 import subprocess
+import tarfile
 import uuid
 from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
 
@@ -112,7 +113,9 @@ class Node:
         self,
         remote_build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
@@ -133,17 +136,32 @@ class Node:
             remote_build_artifact: The path on the node to a build artifact to
                 be installed on the node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
         """
         tempdir = Path(gettempdir())
 
         remote_genconf_dir = 'genconf'
         remote_genconf_path = remote_build_artifact.parent / remote_genconf_dir
+
+        self.send_file(
+            local_path=ip_detect_path,
+            remote_path=remote_genconf_path / 'ip-detect',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
         serve_dir_path = remote_genconf_path / 'serve'
         dcos_config = {
             **dcos_config,
@@ -165,6 +183,17 @@ class Node:
             user=user,
             sudo=True,
         )
+
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = remote_genconf_path / relative_installer_path
+            self.send_file(
+                local_path=host_path,
+                remote_path=destination_path,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
 
         genconf_args = [
             'cd',
@@ -217,7 +246,9 @@ class Node:
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
@@ -245,12 +276,17 @@ class Node:
             build_artifact: The path to a build artifact to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
@@ -272,17 +308,21 @@ class Node:
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
             user=user,
             role=role,
             log_output_live=log_output_live,
             transport=transport,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
 
     def install_dcos_from_url(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
@@ -310,12 +350,18 @@ class Node:
             build_artifact: The URL to a build artifact to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
@@ -343,6 +389,8 @@ class Node:
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             user=user,
             role=role,
             log_output_live=log_output_live,
@@ -516,21 +564,85 @@ class Node:
         chown_args = ['chown', '-R', user, str(remote_path.parent)]
         self.run(
             args=chown_args,
+            user=user,
             transport=transport,
-            sudo=True,
+            sudo=sudo,
         )
 
+        tempdir = Path(gettempdir())
+        tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
+        local_tar_path = tempdir / tar_name
+
+        is_dir = self.run(
+            args=[
+                'python',
+                '-c',
+                '"import os; print(os.path.isdir(\'{remote_path}\'))"'.format(
+                    remote_path=remote_path,
+                ),
+            ],
+            shell=True,
+        ).stdout.decode().strip()
+
+        with tarfile.open(str(local_tar_path), 'w', dereference=True) as tar:
+            arcname = remote_path.relative_to(remote_path.parent)
+            if is_dir == 'True':
+                filename = local_path.relative_to(local_path.parent)
+                arcname = arcname / filename
+            tar.add(str(local_path), arcname=str(arcname), recursive=True)
+
+        # `remote_path` may be a tmpfs mount.
+        # At the time of writing, for example, `/tmp` is a tmpfs mount
+        # on the Docker backend.
+        # Copying files to tmpfs mounts fails silently.
+        # See https://github.com/moby/moby/issues/22020.
+        home_path = self.run(
+            args=['echo', '$HOME'],
+            user=user,
+            transport=transport,
+            sudo=False,
+            shell=True,
+        ).stdout.strip().decode()
+        # Therefore, we create a temporary file within our home directory.
+        # We then remove the temporary file at the end of this function.
+
+        remote_tar_path = Path(home_path) / tar_name
+
         node_transport.send_file(
-            local_path=local_path,
-            remote_path=remote_path,
+            local_path=local_tar_path,
+            remote_path=remote_tar_path,
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
         )
 
+        Path(local_tar_path).unlink()
+
+        tar_args = [
+            'tar',
+            '-C',
+            str(remote_path.parent),
+            '-xvf',
+            str(remote_tar_path),
+        ]
+        self.run(
+            args=tar_args,
+            user=user,
+            transport=transport,
+            sudo=False,
+        )
+
         chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
         self.run(
             args=chown_args,
+            user=user,
             transport=transport,
-            sudo=True,
+            sudo=sudo,
+        )
+
+        self.run(
+            args=['rm', str(remote_tar_path)],
+            user=user,
+            transport=transport,
+            sudo=sudo,
         )

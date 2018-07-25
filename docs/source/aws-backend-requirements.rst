@@ -38,4 +38,10 @@ It is not expected that it will work out of the box with Windows, see :issue:`QU
 
 If your operating system is not supported, it may be possible to use Vagrant, or another Linux virtual machine.
 
+``dcos-aws doctor``
+~~~~~~~~~~~~~~~~~~~
+
+DC/OS E2E comes with the :ref:`dcos-aws-doctor` command.
+Run this command to check your system for common causes of problems.
+
 .. _maws: https://github.com/mesosphere/maws

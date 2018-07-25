@@ -7,10 +7,12 @@ from typing import List
 import click
 import click_spinner
 
+from cli.common.options import existing_cluster_id_option
+from cli.common.utils import check_cluster_id_exists
 from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers, existing_cluster_ids
-from ._options import existing_cluster_id_option, node_transport_option
+from ._options import node_transport_option
 
 
 @click.command('destroy-list')
@@ -53,6 +55,10 @@ def destroy(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,

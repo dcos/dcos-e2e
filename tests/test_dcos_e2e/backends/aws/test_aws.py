@@ -137,8 +137,10 @@ class TestRunIntegrationTest:
             'security': 'strict',
         }
 
+        cluster_backend = AWS(linux_distribution=linux_distribution)
+
         with Cluster(
-            cluster_backend=AWS(linux_distribution=linux_distribution),
+            cluster_backend=cluster_backend,
             masters=1,
         ) as cluster:
 
@@ -149,6 +151,7 @@ class TestRunIntegrationTest:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_ee(
@@ -248,12 +251,14 @@ class TestDCOSInstallation:
         """
         It is possible to install DC/OS on an AWS cluster from a local path.
         """
-        with Cluster(cluster_backend=AWS()) as cluster:
+        cluster_backend = AWS()
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                log_output_live=True,
             )
-
             cluster.wait_for_dcos_oss()
 
     def test_install_dcos_from_node(
@@ -263,8 +268,9 @@ class TestDCOSInstallation:
         """
         It is possible to install DC/OS on an AWS cluster node by node.
         """
+        cluster_backend = AWS()
         with Cluster(
-            cluster_backend=AWS(),
+            cluster_backend=cluster_backend,
             agents=0,
             public_agents=0,
         ) as cluster:
@@ -274,5 +280,6 @@ class TestDCOSInstallation:
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()

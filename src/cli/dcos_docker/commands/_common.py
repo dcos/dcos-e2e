@@ -17,7 +17,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Node, Role, Transport
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -40,6 +40,10 @@ DOCKER_STORAGE_DRIVERS = {
 CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 VARIANT_LABEL_KEY = 'dcos_e2e.variant'
+NODE_TYPE_LABEL_KEY = 'dcos_e2e.node_type'
+NODE_TYPE_MASTER_LABEL_VALUE = 'master'
+NODE_TYPE_AGENT_LABEL_VALUE = 'agent'
+NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE = 'public_agent'
 
 
 def docker_client() -> DockerClient:
@@ -87,20 +91,31 @@ class ContainerInspectView:
         Return dictionary with information to be shown to users.
         """
         container = self._container
-        index = container.name.split('-')[-1]
-        name_without_index = container.name[:-len('-' + index)]
-        if name_without_index.endswith('public-agent'):
-            role = 'public_agent'
-        elif name_without_index.endswith('agent'):
-            role = 'agent'
-        elif name_without_index.endswith('master'):
-            role = 'master'
+        role = container.labels[NODE_TYPE_LABEL_KEY]
+        container_ip = container.attrs['NetworkSettings']['IPAddress']
+        cluster_containers = ClusterContainers(
+            cluster_id=container.labels[CLUSTER_ID_LABEL_KEY],
+            transport=Transport.DOCKER_EXEC,
+        )
+
+        containers = {
+            NODE_TYPE_MASTER_LABEL_VALUE: cluster_containers.masters,
+            NODE_TYPE_AGENT_LABEL_VALUE: cluster_containers.agents,
+            NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE:
+            cluster_containers.public_agents,
+        }[role]
+
+        sorted_ips = sorted(
+            [ctr.attrs['NetworkSettings']['IPAddress'] for ctr in containers],
+        )
+
+        index = sorted_ips.index(container_ip)
 
         return {
             'e2e_reference': '{role}_{index}'.format(role=role, index=index),
             'docker_container_name': container.name,
             'docker_container_id': container.id,
-            'ip_address': container.attrs['NetworkSettings']['IPAddress'],
+            'ip_address': container_ip,
         }
 
 
@@ -118,18 +133,26 @@ class ClusterContainers:
         self._cluster_id_label = CLUSTER_ID_LABEL_KEY + '=' + cluster_id
         self._transport = transport
 
-    def _containers_by_node_type(
+    def _containers_by_role(
         self,
-        node_type: str,
+        role: Role,
     ) -> Set[Container]:
         """
         Return all containers in this cluster of a particular node type.
         """
+        node_types = {
+            Role.MASTER: NODE_TYPE_MASTER_LABEL_VALUE,
+            Role.AGENT: NODE_TYPE_AGENT_LABEL_VALUE,
+            Role.PUBLIC_AGENT: NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
+        }
         client = docker_client()
         filters = {
             'label': [
                 self._cluster_id_label,
-                'node_type={node_type}'.format(node_type=node_type),
+                '{key}={value}'.format(
+                    key=NODE_TYPE_LABEL_KEY,
+                    value=node_types[role],
+                ),
             ],
         }
         return set(client.containers.list(filters=filters))
@@ -153,21 +176,21 @@ class ClusterContainers:
         """
         Docker containers which represent master nodes.
         """
-        return self._containers_by_node_type(node_type='master')
+        return self._containers_by_role(role=Role.MASTER)
 
     @property
     def agents(self) -> Set[Container]:
         """
         Docker containers which represent agent nodes.
         """
-        return self._containers_by_node_type(node_type='agent')
+        return self._containers_by_role(role=Role.AGENT)
 
     @property
     def public_agents(self) -> Set[Container]:
         """
         Docker containers which represent public agent nodes.
         """
-        return self._containers_by_node_type(node_type='public_agent')
+        return self._containers_by_role(role=Role.PUBLIC_AGENT)
 
     @property
     def is_enterprise(self) -> bool:

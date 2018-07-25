@@ -37,6 +37,17 @@ class ExistingCluster(ClusterBackend):
         """
         return ExistingClusterManager
 
+    @property
+    def ip_detect_path(self) -> Path:  # pragma: no cover
+        """
+        Return the path to a ``ip-detect`` script.
+
+        Raises:
+            NotImplementedError: The ``ExistingCluster`` backend cannot
+                be associated with a specific ``ip-detect`` script.
+        """
+        raise NotImplementedError
+
 
 class ExistingClusterManager(ClusterManager):
     """
@@ -75,6 +86,7 @@ class ExistingClusterManager(ClusterManager):
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -89,6 +101,7 @@ class ExistingClusterManager(ClusterManager):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """

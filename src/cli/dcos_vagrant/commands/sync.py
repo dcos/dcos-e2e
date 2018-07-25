@@ -7,10 +7,11 @@ from pathlib import Path
 import click
 
 from cli.common.arguments import dcos_checkout_dir_argument
+from cli.common.options import existing_cluster_id_option
 from cli.common.sync import sync_code_to_masters
+from cli.common.utils import check_cluster_id_exists
 
-from ._common import ClusterVMs
-from ._options import existing_cluster_id_option
+from ._common import ClusterVMs, existing_cluster_ids
 
 
 @click.command('sync')
@@ -34,6 +35,10 @@ def sync_code(
     If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is
     used.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     cluster_containers = ClusterVMs(cluster_id=cluster_id)
     cluster = cluster_containers.cluster
     sync_code_to_masters(

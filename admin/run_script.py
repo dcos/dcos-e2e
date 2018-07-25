@@ -98,6 +98,8 @@ PATTERNS = {
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
     (EE_MASTER, ),
+    'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_node_installer_genconf_dir':  # noqa: E501
+    (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests':
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestSSLDisabled':
@@ -117,6 +119,12 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
     (OSS_1_9, ),
     'tests/test_dcos_e2e/test_node.py':
+    (),
+    'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_url':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_install.py::TestCopyFiles:test_install_node::test_install_from_path_with_genconf_files':  # noqa: E501
     (OSS_MASTER, ),
 }  # type: Dict[str, Tuple]
 
@@ -128,7 +136,7 @@ def _download_file(url: str, path: Path) -> None:
     label = 'Downloading to ' + str(path)
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
-    chunk_size = 100 * 1024
+    chunk_size = 1024
     with click.open_file(str(path), 'wb') as file_descriptor:
         content_iter = stream.iter_content(chunk_size=chunk_size)
         with click.progressbar(  # type: ignore

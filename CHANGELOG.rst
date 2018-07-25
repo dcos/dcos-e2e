@@ -7,6 +7,22 @@ Next
 ----
 
 - Fix bug which meant that a user could not log in after ``dcos-docker wait`` on DC/OS Open Source clusters.
+- Add ``files_to_copy_to_genconf_dir`` as an argument to ``Node.install_dcos_from_path`` and ``Node.install_dcos_from_url``.
+
+2018.07.25.0
+------------
+
+- Add the capability of sending a directory to a ``Node`` via ``Node.send_file``.
+- Add ``ip_detect_path`` to the each ``ClusterBackend`` as a property and to each install DC/OS function as a parameter.
+
+2018.07.23.1
+------------
+
+2018.07.23.0
+------------
+
+- Add an initial ``dcos-aws`` CLI.
+>>>>>>> origin/master
 
 2018.07.22.1
 ------------

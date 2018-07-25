@@ -51,8 +51,9 @@ def _oss_distribution_test(
     We use this rather than pytest parameterization so that we can separate
     the tests in ``.travis.yml``.
     """
+    cluster_backend = Docker(linux_distribution=distribution)
     with Cluster(
-        cluster_backend=Docker(linux_distribution=distribution),
+        cluster_backend=cluster_backend,
         masters=1,
         agents=0,
         public_agents=0,
@@ -61,6 +62,7 @@ def _oss_distribution_test(
             build_artifact=oss_artifact,
             dcos_config=cluster.base_config,
             log_output_live=True,
+            ip_detect_path=cluster_backend.ip_detect_path,
         )
         cluster.wait_for_dcos_oss()
         (master, ) = cluster.masters
@@ -90,8 +92,9 @@ def _enterprise_distribution_test(
         'license_key_contents': license_key_contents,
     }
 
+    cluster_backend = Docker(linux_distribution=distribution)
     with Cluster(
-        cluster_backend=Docker(linux_distribution=distribution),
+        cluster_backend=cluster_backend,
         masters=1,
         agents=0,
         public_agents=0,
@@ -102,6 +105,7 @@ def _enterprise_distribution_test(
                 **cluster.base_config,
                 **config,
             },
+            ip_detect_path=cluster_backend.ip_detect_path,
             log_output_live=True,
         )
         cluster.wait_for_dcos_ee(

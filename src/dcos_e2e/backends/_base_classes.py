@@ -42,6 +42,7 @@ class ClusterManager(abc.ABC):
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -55,6 +56,8 @@ class ClusterManager(abc.ABC):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script to use for installing
+                DC/OS.
             log_output_live: If ``True``, log output of the installation live.
         """
 
@@ -63,6 +66,7 @@ class ClusterManager(abc.ABC):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
     ) -> None:
         """
@@ -75,6 +79,8 @@ class ClusterManager(abc.ABC):
         Args:
             build_artifact: The path to a build artifact to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script to use for installing
+                DC/OS.
             log_output_live: If ``True``, log output of the installation live.
         """
 
@@ -133,4 +139,11 @@ class ClusterBackend(abc.ABC):
         """
         Return the :class:`ClusterManager` class to use to create and manage a
         cluster.
+        """
+
+    @property
+    @abc.abstractmethod
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to a backend specific ``ip-detect`` script.
         """

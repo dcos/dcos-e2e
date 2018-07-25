@@ -147,6 +147,7 @@ class TestDockerBackend:
             cluster.install_dcos_from_url(
                 build_artifact=oss_artifact_url,
                 dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
 

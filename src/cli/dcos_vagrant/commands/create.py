@@ -14,13 +14,13 @@ import click
 import click_spinner
 from passlib.hash import sha512_crypt
 
+from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
-    artifact_argument,
+    cluster_id_option,
     copy_to_master_option,
     extra_config_option,
     license_key_option,
-    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -28,7 +28,7 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import get_variant, set_logging
+from cli.common.utils import check_cluster_id_unique, get_variant, set_logging
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 
@@ -51,8 +51,16 @@ from ._common import (
 @license_key_option
 @security_mode_option
 @copy_to_master_option
-@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
+@cluster_id_option
 @verbosity_option
+@click.option(
+    '--enable-selinux-enforcing',
+    is_flag=True,
+    help=(
+        'With this flag set, SELinux is set to enforcing before DC/OS is '
+        'installed on the cluster.'
+    ),
+)
 def create(
     agents: int,
     artifact: str,
@@ -66,6 +74,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     cluster_id: str,
     verbose: int,
+    enable_selinux_enforcing: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -100,6 +109,10 @@ def create(
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
     set_logging(verbosity_level=verbose)
+    check_cluster_id_unique(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
@@ -155,6 +168,11 @@ def create(
         click.echo(doctor_message)
         sys.exit(exc.returncode)
 
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+    for node in nodes:
+        if enable_selinux_enforcing:
+            node.run(args=['setenforce', '1'], sudo=True)
+
     for node in cluster.masters:
         for path_pair in copy_to_master:
             local_path, remote_path = path_pair
@@ -171,6 +189,7 @@ def create(
                     **cluster.base_config,
                     **extra_config,
                 },
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
     except CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)

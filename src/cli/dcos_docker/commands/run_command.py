@@ -12,15 +12,22 @@ from cli.common.options import (
     dcos_login_pw_option,
     dcos_login_uname_option,
     environment_variables_option,
+    existing_cluster_id_option,
     no_test_env_run_option,
     sync_dir_run_option,
+    verbosity_option,
 )
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
+from cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e.node import Node, Transport
 
-from ._common import ClusterContainers, ContainerInspectView
-from ._options import existing_cluster_id_option, node_transport_option
+from ._common import (
+    ClusterContainers,
+    ContainerInspectView,
+    existing_cluster_ids,
+)
+from ._options import node_transport_option
 
 
 def _get_node(cluster_id: str, node_reference: str) -> Node:
@@ -31,7 +38,8 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's IP address
-            * A node's Docker container
+            * A node's Docker container name
+            * A node's Docker container ID
             * A reference in the format "<role>_<number>"
 
     Returns:
@@ -71,7 +79,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     message = (
         'No such node in cluster "{cluster_id}" with IP address, Docker '
         'container ID or node reference "{node_reference}". '
-        'Node references can be seen with ``dcos_docker inspect``.'
+        'Node references can be seen with ``dcos-docker inspect``.'
     ).format(
         cluster_id=cluster_id,
         node_reference=node_reference,
@@ -97,11 +105,12 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         'the node\'s Docker container name, '
         'the node\'s Docker container ID, '
         'a reference in the format "<role>_<number>". '
-        'These details be seen with ``dcos_docker inspect``.'
+        'These details be seen with ``dcos-docker inspect``.'
     ),
 )
 @environment_variables_option
 @node_transport_option
+@verbosity_option
 def run(
     cluster_id: str,
     node_args: Tuple[str],
@@ -112,6 +121,7 @@ def run(
     node: str,
     env: Dict[str, str],
     transport: Transport,
+    verbose: int,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -127,6 +137,11 @@ def run(
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
     """  # noqa: E501
+    set_logging(verbosity_level=verbose)
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     host = _get_node(cluster_id=cluster_id, node_reference=node)
 
     cluster_containers = ClusterContainers(

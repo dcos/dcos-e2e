@@ -4,10 +4,11 @@ Tools for opening a cluster's web UI.
 
 import click
 
+from cli.common.options import existing_cluster_id_option
+from cli.common.utils import check_cluster_id_exists
 from dcos_e2e.node import Transport
 
-from ._common import ClusterContainers
-from ._options import existing_cluster_id_option
+from ._common import ClusterContainers, existing_cluster_ids
 
 
 @click.command('web')
@@ -19,6 +20,10 @@ def web(cluster_id: str) -> None:
     Note that the web UI may not be available at first.
     Consider using ``dcos-docker wait`` before running this command.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         # The transport is not used so does not matter.
