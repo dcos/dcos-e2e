@@ -22,59 +22,15 @@ from cli.common.sync import sync_code_to_masters
 from cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e.node import Node, Transport
 
-from ._common import ClusterInstances, existing_cluster_ids
+from ._common import (
+    ClusterInstances,
+    InstanceInspectView,
+    existing_cluster_ids,
+)
 from ._options import aws_region_option
 
 
-def _get_node(cluster_id: str, node_reference: str) -> Node:
-    """
-    Get a node from a "reference".
-
-    Args:
-        cluster_id: The ID of a cluster.
-        node_reference: One of:
-            * A node's IP address
-            * A node's VM name
-            * A reference in the format "<role>_<number>"
-
-    Returns:
-        The ``Node`` from the given cluster with the given ID.
-
-    Raises:
-        click.BadParameter: There is no such node.
-    """
-    cluster_vms = ClusterInstances(cluster_id=cluster_id)
-
-    vm_names = {
-        *cluster_vms.masters,
-        *cluster_vms.agents,
-        *cluster_vms.public_agents,
-    }
-
-    for vm_name in vm_names:
-        inspect_data = InstanceInspectView(vm_name=vm_name).to_dict()
-        reference = inspect_data['e2e_reference']
-        ip_address = inspect_data['ip_address']
-        accepted = (
-            reference,
-            reference.upper(),
-            ip_address,
-            vm_name,
-        )
-
-        if node_reference in accepted:
-            return cluster_vms.to_node(vm_name=vm_name)
-
-    message = (
-        'No such node in cluster "{cluster_id}" with IP address, VM name or '
-        'node reference "{node_reference}". '
-        'Node references can be seen with ``dcos-vagrant inspect``.'
-    ).format(
-        cluster_id=cluster_id,
-        node_reference=node_reference,
-    )
-    raise click.BadParameter(message=message)
-def _get_node(cluster_id: str, node_reference: str) -> Node:
+def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
     """
     Get a node from a "reference".
 
@@ -82,8 +38,10 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's public IP address
-            * A node's VM name
+            * A node's private IP address
+            * A node's EC2 instance ID
             * A reference in the format "<role>_<number>"
+        aws_region: The AWS region the cluster is in.
 
     Returns:
         The ``Node`` from the given cluster with the given ID.
@@ -91,27 +49,36 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     Raises:
         click.BadParameter: There is no such node.
     """
-    cluster_vms = ClusterInstances(cluster_id=cluster_id)
+    cluster_instances = ClusterInstances(
+        cluster_id=cluster_id,
+        aws_region=aws_region,
+    )
 
-    vm_names = {
-        *cluster_vms.masters,
-        *cluster_vms.agents,
-        *cluster_vms.public_agents,
+    instances = {
+        *cluster_instances.masters,
+        *cluster_instances.agents,
+        *cluster_instances.public_agents,
     }
 
-    for vm_name in vm_names:
-        inspect_data = InstanceInspectView(vm_name=vm_name).to_dict()
+    for instance in instances:
+        inspect_data = InstanceInspectView(
+            instance=instance,
+            aws_region=aws_region,
+        ).to_dict()
         reference = inspect_data['e2e_reference']
-        ip_address = inspect_data['ip_address']
+        instance_id = inspect_data['ec2_instance_id']
+        public_ip_address = inspect_data['public_ip_address']
+        private_ip_address = inspect_data['private_ip_address']
         accepted = (
             reference,
             reference.upper(),
-            ip_address,
-            vm_name,
+            instance_id,
+            public_ip_address,
+            private_ip_address,
         )
 
         if node_reference in accepted:
-            return cluster_vms.to_node(vm_name=vm_name)
+            return cluster_instances.to_node(instance=instance)
 
     message = (
         'No such node in cluster "{cluster_id}" with IP address, VM name or '
