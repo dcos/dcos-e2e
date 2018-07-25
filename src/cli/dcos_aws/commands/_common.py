@@ -41,6 +41,51 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
     return cluster_ids
 
 
+class InstanceInspectView:
+    """
+    Details of a node from an instance.
+    """
+
+    def __init__(self, instance: ServiceResource) -> None:
+        """
+        Args:
+            EC2 instance: The EC2 instance which represents the node.
+        """
+        self._instance = instance
+
+    def to_dict(self) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        instance = self._instance
+        role = instance.labels[NODE_TYPE_LABEL_KEY]
+        instance_ip = instance.attrs['NetworkSettings']['IPAddress']
+        cluster_instances = ClusterContainers(
+            cluster_id=instance.labels[CLUSTER_ID_LABEL_KEY],
+            transport=Transport.DOCKER_EXEC,
+        )
+
+        instances = {
+            NODE_TYPE_MASTER_LABEL_VALUE: cluster_instances.masters,
+            NODE_TYPE_AGENT_LABEL_VALUE: cluster_instances.agents,
+            NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE:
+            cluster_instances.public_agents,
+        }[role]
+
+        sorted_ips = sorted(
+            [ctr.attrs['NetworkSettings']['IPAddress'] for ctr in instances],
+        )
+
+        index = sorted_ips.index(instance_ip)
+
+        return {
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
+            'docker_EC2 instance_name': EC2 instance.name,
+            'docker_EC2 instance_id': EC2 instance.id,
+            'ip_address': EC2 instance_ip,
+        }
+
+
 class ClusterInstances:
     """
     A representation of a cluster constructed from EC2 instances.
