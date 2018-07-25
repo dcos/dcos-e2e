@@ -271,9 +271,13 @@ class AWSCluster(ClusterManager):
         Raises:
             NotImplementedError: ``NotImplementedError`` because this function
                 backend by ``dcos-launch`` does not support a custom
-                ``ip-detect`` script.
+                ``ip-detect`` script or any other files supplied to the
+                installer by copying them to the ``/genconf`` directory.
         """
         if ip_detect_path != self._ip_detect_path:
+            raise NotImplementedError
+
+        if files_to_copy_to_genconf_dir:
             raise NotImplementedError
 
         # In order to install DC/OS with the preliminary dcos-launch
