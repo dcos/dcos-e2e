@@ -10,7 +10,7 @@ from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
 from typing import Optional  # noqa: F401
-from typing import Any, Dict, Set, Tuple, Type
+from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
@@ -131,7 +131,6 @@ class AWSCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: AWS,
     ) -> None:
         """
@@ -141,24 +140,9 @@ class AWSCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on the
-                installer node. This must be empty as it is not currently
-                supported.
             cluster_backend: Details of the specific AWS backend to use.
 
-        Raises:
-            NotImplementedError: ``files_to_copy_to_installer`` includes files
-                to copy to the installer.
         """
-        if files_to_copy_to_installer:
-            # Copying files to the installer is not yet supported.
-            # https://jira.mesosphere.com/browse/DCOS-21894
-            message = (
-                'Copying files to the installer is currently not supported by '
-                'the AWS backend.'
-            )
-            raise NotImplementedError(message)
-
         unique = 'dcos-e2e-{}'.format(str(uuid.uuid4()))
 
         self._path = cluster_backend.workspace_dir / unique
@@ -268,6 +252,7 @@ class AWSCluster(ClusterManager):
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a URL.
@@ -279,6 +264,9 @@ class AWSCluster(ClusterManager):
             ip_detect_path: The path to an ``ip-detect`` script to be used
                 during the DC/OS installation.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
 
         Raises:
             NotImplementedError: ``NotImplementedError`` because this function
@@ -300,6 +288,7 @@ class AWSCluster(ClusterManager):
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Install DC/OS from a given build artifact with a bootstrap node.
@@ -313,6 +302,9 @@ class AWSCluster(ClusterManager):
             ip_detect_path: The path to an ``ip-detect`` script to be used
                 during the DC/OS installation.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+                installer node. This must be empty as it is not currently
+                supported.
 
         Raises:
             NotImplementedError: ``NotImplementedError`` because the AWS
