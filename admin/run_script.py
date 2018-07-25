@@ -117,6 +117,10 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
     (OSS_1_9, ),
     'tests/test_dcos_e2e/test_node.py':
+    (),
+    'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_url':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path':  # noqa: E501
     (OSS_MASTER, ),
 }  # type: Dict[str, Tuple]
 
