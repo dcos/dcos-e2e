@@ -344,3 +344,41 @@ class TestSync:
         )
         # yapf: enable
         assert result.output == expected_help
+
+
+class TestWait:
+    """
+    Tests for the ``wait`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws wait --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_aws, ['wait', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws wait [OPTIONS]
+
+              Wait for DC/OS to start.
+
+            Options:
+              -c, --cluster-id TEXT      The ID of the cluster to use.  [default: default]
+              --superuser-username TEXT  The superuser username is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
+              --superuser-password TEXT  The superuser password is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
+              -v, --verbose              Use verbose output. Use this option multiple times
+                                         for more verbose output.
+              --help                     Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
