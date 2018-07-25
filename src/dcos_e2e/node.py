@@ -187,8 +187,6 @@ class Node:
         for host_path, installer_path in files_to_copy_to_genconf_dir:
             relative_installer_path = installer_path.relative_to('/genconf')
             destination_path = remote_genconf_path / relative_installer_path
-            # if host_path.is_dir():
-            #     destination_path = destination_path / host_path.stem
             self.send_file(
                 local_path=host_path,
                 remote_path=destination_path,
@@ -315,9 +313,7 @@ class Node:
             role=role,
             log_output_live=log_output_live,
             transport=transport,
-            files_to_copy_to_genconf_dir=list(
-                files_to_copy_to_genconf_dir or (),
-            ),
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
 
     def install_dcos_from_url(
@@ -394,9 +390,7 @@ class Node:
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=list(
-                files_to_copy_to_genconf_dir or (),
-            ),
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             user=user,
             role=role,
             log_output_live=log_output_live,
