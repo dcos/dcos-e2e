@@ -112,7 +112,6 @@ class Node:
         self,
         remote_build_artifact: Path,
         dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str] = None,
@@ -135,30 +134,51 @@ class Node:
             remote_build_artifact: The path on the node to a build artifact to
                 be installed on the node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to the ``ip-detect`` script to use for
-                installing DC/OS.
             role: The desired DC/OS role for the installation.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installing node. These are files to copy from the host to
-                the installing node before installing DC/OS.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
         """
         tempdir = Path(gettempdir())
 
         remote_genconf_dir = 'genconf'
         remote_genconf_path = remote_build_artifact.parent / remote_genconf_dir
 
-        self.send_file(
-            local_path=ip_detect_path,
-            remote_path=remote_genconf_path / 'ip-detect',
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            # This is a hack that only works because backends are abusing
+            # the bug of being able to supply ``ip_detect_contents`` in the
+            # DC/OS configuration file ``config.yaml``.
+            # As long as a ``Node`` is not aware of its backend this is the
+            # only way to select the backend-specific ``ip-detect`` script.
+            if installer_path == Path('/genconf/ip-detect'):
+                try:
+                    del dcos_config['ip_detect_contents']
+                except KeyError:
+                    pass
+            # This part only exists because of the AWS backend workaround
+            # for ip-detect-public-filename in 1.9. It can be removed in a
+            # follow-up after changing the backend to respect that parameter.
+            if installer_path == Path('/genconf/ip-detect-public'):
+                try:
+                    del dcos_config['ip_detect_public_contents']
+                except KeyError:
+                    pass
+
+            relative_installer_path = installer_path.relative_to('/genconf')
+
+            self.send_file(
+                local_path=host_path,
+                remote_path=remote_genconf_path / relative_installer_path,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
 
         serve_dir_path = remote_genconf_path / 'serve'
         dcos_config = {
@@ -181,16 +201,6 @@ class Node:
             user=user,
             sudo=True,
         )
-
-        for host_path, installer_path in files_to_copy_to_genconf_dir:
-            relative_installer_path = installer_path.relative_to('/genconf')
-            self.send_file(
-                local_path=host_path,
-                remote_path=remote_genconf_path / relative_installer_path,
-                transport=transport,
-                user=user,
-                sudo=True,
-            )
 
         genconf_args = [
             'cd',
@@ -243,11 +253,12 @@ class Node:
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
         role: Role,
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
+        files_to_copy_to_genconf_dir: Optional[Iterable[Tuple[Path, Path]]
+                                               ] = (),
     ) -> None:
         """
         Install DC/OS in a platform-independent way by using
@@ -272,14 +283,15 @@ class Node:
             build_artifact: The path to a build artifact to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to the ``ip-detect`` script to use for
-                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
@@ -301,22 +313,25 @@ class Node:
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
             user=user,
             role=role,
             log_output_live=log_output_live,
             transport=transport,
+            files_to_copy_to_genconf_dir=list(
+                files_to_copy_to_genconf_dir or (),
+            ),
         )
 
     def install_dcos_from_url(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
         role: Role,
         user: Optional[str] = None,
         log_output_live: bool = False,
         transport: Optional[Transport] = None,
+        files_to_copy_to_genconf_dir: Optional[Iterable[Tuple[Path, Path]]
+                                               ] = (),
     ) -> None:
         """
         Install DC/OS in a platform-independent way by using
@@ -341,14 +356,16 @@ class Node:
             build_artifact: The URL to a build artifact to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to the ``ip-detect`` script to use for
-                installing DC/OS.
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
             log_output_live: If ``True``, log output live.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
         """
         workspace_dir = Path('/dcos-e2e')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
@@ -376,7 +393,9 @@ class Node:
         self._install_dcos_from_node_path(
             remote_build_artifact=node_build_artifact,
             dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=list(
+                files_to_copy_to_genconf_dir or (),
+            ),
             user=user,
             role=role,
             log_output_live=log_output_live,
