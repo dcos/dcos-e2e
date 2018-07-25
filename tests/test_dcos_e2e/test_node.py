@@ -178,7 +178,6 @@ class TestSendFile:
         master_base_dir = '/etc/{random}'.format(random=random)
         master_destination_dir = Path(master_base_dir)
 
-        dcos_node.run(args=['mkdir', '-p', str(master_destination_dir)])
         dcos_node.send_file(
             local_path=Path(local_file_path),
             remote_path=master_destination_dir / dir_name / file_name,
@@ -214,7 +213,9 @@ class TestSendFile:
         local_file = tmpdir.join(file_name)
         local_file.write(content)
 
-        master_destination_path = Path('/etc/{random}'.format(random=uuid.uuid4().hex))
+        master_destination_path = Path(
+            '/etc/{random}'.format(random=uuid.uuid4().hex),
+        )
         dcos_node.run(args=['mkdir', '--parent', str(master_destination_path)])
         dcos_node.send_file(
             local_path=Path(str(local_file)),
