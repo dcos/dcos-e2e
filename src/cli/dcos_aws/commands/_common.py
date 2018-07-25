@@ -3,7 +3,7 @@ Common code for dcos-aws CLI modules.
 """
 
 from pathlib import Path
-from typing import Set
+from typing import Dict, Set
 
 import boto3
 from boto3.resources.base import ServiceResource
@@ -58,31 +58,36 @@ class InstanceInspectView:
         Return dictionary with information to be shown to users.
         """
         instance = self._instance
-        role = instance.labels[NODE_TYPE_LABEL_KEY]
-        instance_ip = instance.attrs['NetworkSettings']['IPAddress']
-        cluster_instances = ClusterContainers(
-            cluster_id=instance.labels[CLUSTER_ID_LABEL_KEY],
-            transport=Transport.DOCKER_EXEC,
+        for tag in instance.tags:
+            if tag['Key'] == CLUSTER_ID_TAG_KEY:
+                cluster_id = tag['Value']
+            if tag['Key'] == NODE_TYPE_TAG_KEY:
+                role = tag['Value']
+
+        public_ip_address = instance.public_ip_address
+        private_ip_address = instance.private_ip_address
+        cluster_instances = ClusterInstances(
+            cluster_id=cluster_id,
+            aws_region=instance.region_name,
         )
 
         instances = {
-            NODE_TYPE_MASTER_LABEL_VALUE: cluster_instances.masters,
-            NODE_TYPE_AGENT_LABEL_VALUE: cluster_instances.agents,
-            NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE:
-            cluster_instances.public_agents,
+            NODE_TYPE_MASTER_TAG_VALUE: cluster_instances.masters,
+            NODE_TYPE_AGENT_TAG_VALUE: cluster_instances.agents,
+            NODE_TYPE_PUBLIC_AGENT_TAG_VALUE: cluster_instances.public_agents,
         }[role]
 
         sorted_ips = sorted(
-            [ctr.attrs['NetworkSettings']['IPAddress'] for ctr in instances],
+            [instance.public_ip_address for instance in instances],
         )
 
-        index = sorted_ips.index(instance_ip)
+        index = sorted_ips.index(public_ip_address)
 
         return {
             'e2e_reference': '{role}_{index}'.format(role=role, index=index),
-            'docker_EC2 instance_name': EC2 instance.name,
-            'docker_EC2 instance_id': EC2 instance.id,
-            'ip_address': EC2 instance_ip,
+            'ec2_instance_id': instance.id,
+            'public_ip_address': public_ip_address,
+            'private_ip_address': private_ip_address,
         }
 
 
