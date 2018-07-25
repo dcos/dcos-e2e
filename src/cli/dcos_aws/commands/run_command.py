@@ -20,10 +20,108 @@ from cli.common.options import (
 from cli.common.run_command import run_command
 from cli.common.sync import sync_code_to_masters
 from cli.common.utils import check_cluster_id_exists, set_logging
-from dcos_e2e.node import Transport
+from dcos_e2e.node import Node, Transport
 
 from ._common import ClusterInstances, existing_cluster_ids
 from ._options import aws_region_option
+
+
+def _get_node(cluster_id: str, node_reference: str) -> Node:
+    """
+    Get a node from a "reference".
+
+    Args:
+        cluster_id: The ID of a cluster.
+        node_reference: One of:
+            * A node's IP address
+            * A node's VM name
+            * A reference in the format "<role>_<number>"
+
+    Returns:
+        The ``Node`` from the given cluster with the given ID.
+
+    Raises:
+        click.BadParameter: There is no such node.
+    """
+    cluster_vms = ClusterInstances(cluster_id=cluster_id)
+
+    vm_names = {
+        *cluster_vms.masters,
+        *cluster_vms.agents,
+        *cluster_vms.public_agents,
+    }
+
+    for vm_name in vm_names:
+        inspect_data = InstanceInspectView(vm_name=vm_name).to_dict()
+        reference = inspect_data['e2e_reference']
+        ip_address = inspect_data['ip_address']
+        accepted = (
+            reference,
+            reference.upper(),
+            ip_address,
+            vm_name,
+        )
+
+        if node_reference in accepted:
+            return cluster_vms.to_node(vm_name=vm_name)
+
+    message = (
+        'No such node in cluster "{cluster_id}" with IP address, VM name or '
+        'node reference "{node_reference}". '
+        'Node references can be seen with ``dcos-vagrant inspect``.'
+    ).format(
+        cluster_id=cluster_id,
+        node_reference=node_reference,
+    )
+    raise click.BadParameter(message=message)
+def _get_node(cluster_id: str, node_reference: str) -> Node:
+    """
+    Get a node from a "reference".
+
+    Args:
+        cluster_id: The ID of a cluster.
+        node_reference: One of:
+            * A node's public IP address
+            * A node's VM name
+            * A reference in the format "<role>_<number>"
+
+    Returns:
+        The ``Node`` from the given cluster with the given ID.
+
+    Raises:
+        click.BadParameter: There is no such node.
+    """
+    cluster_vms = ClusterInstances(cluster_id=cluster_id)
+
+    vm_names = {
+        *cluster_vms.masters,
+        *cluster_vms.agents,
+        *cluster_vms.public_agents,
+    }
+
+    for vm_name in vm_names:
+        inspect_data = InstanceInspectView(vm_name=vm_name).to_dict()
+        reference = inspect_data['e2e_reference']
+        ip_address = inspect_data['ip_address']
+        accepted = (
+            reference,
+            reference.upper(),
+            ip_address,
+            vm_name,
+        )
+
+        if node_reference in accepted:
+            return cluster_vms.to_node(vm_name=vm_name)
+
+    message = (
+        'No such node in cluster "{cluster_id}" with IP address, VM name or '
+        'node reference "{node_reference}". '
+        'Node references can be seen with ``dcos-vagrant inspect``.'
+    ).format(
+        cluster_id=cluster_id,
+        node_reference=node_reference,
+    )
+    raise click.BadParameter(message=message)
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
@@ -36,6 +134,20 @@ from ._options import aws_region_option
 @environment_variables_option
 @aws_region_option
 @verbosity_option
+@click.option(
+    '--node',
+    type=str,
+    default='master_0',
+    help=(
+        'A reference to a particular node to run the command on. '
+        'This can be one of: '
+        'The node\'s public IP address, '
+        'The node\'s private IP address, '
+        'the node\'s EC2 instance ID, '
+        'a reference in the format "<role>_<number>". '
+        'These details be seen with ``dcos-aws inspect``.'
+    ),
+)
 def run(
     cluster_id: str,
     node_args: Tuple[str],
@@ -46,6 +158,7 @@ def run(
     env: Dict[str, str],
     aws_region: str,
     verbose: int,
+    node: str,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -71,7 +184,11 @@ def run(
         aws_region=aws_region,
     )
     cluster = cluster_instances.cluster
-    host = next(iter(cluster.masters))
+    host = _get_node(
+        cluster_id=cluster_id,
+        node_reference=node,
+        aws_region=aws_region,
+    )
 
     if sync_dir is not None:
         sync_code_to_masters(
