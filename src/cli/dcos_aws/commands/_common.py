@@ -82,6 +82,7 @@ class InstanceInspectView:
         """
         instance = self._instance
         tag_dict = _tag_dict(instance=instance)
+        default_user = tag_dict[SSH_USER_TAG_KEY]
         cluster_id = tag_dict[CLUSTER_ID_TAG_KEY]
         role = tag_dict[NODE_TYPE_TAG_KEY]
         public_ip_address = instance.public_ip_address
@@ -108,6 +109,9 @@ class InstanceInspectView:
             'ec2_instance_id': instance.id,
             'public_ip_address': public_ip_address,
             'private_ip_address': private_ip_address,
+            'aws_region': self._aws_region,
+            'ssh_key': str(cluster_instances.workspace_dir / 'ssh' / 'id_rsa'),
+            'ssh_user': default_user,
         }
 
 
