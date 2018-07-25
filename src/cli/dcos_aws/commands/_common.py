@@ -3,7 +3,7 @@ Common code for dcos-aws CLI modules.
 """
 
 from pathlib import Path
-from typing import Set
+from typing import Dict, Set
 
 import boto3
 from boto3.resources.base import ServiceResource
@@ -22,6 +22,23 @@ VARIANT_TAG_KEY = 'dcos_e2e.variant'
 WORKSPACE_DIR_TAG_KEY = 'dcos_e2e.workspace_dir'
 
 
+def _tag_dict(instance: ServiceResource) -> Dict[str, str]:
+    """
+    Return an EC2 instance's tags as a dictionary.
+    """
+    tag_dict = dict()  # type: Dict[str, str]
+
+    if instance.tags is None:
+        return tag_dict
+
+    for tag in instance.tags:
+        key = tag['Key']
+        value = tag['Value']
+        tag_dict[key] = value
+
+    return tag_dict
+
+
 def existing_cluster_ids(aws_region: str) -> Set[str]:
     """
     Return the IDs of existing clusters.
@@ -34,10 +51,9 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
 
     cluster_ids = set()  # type: Set[str]
     for instance in ec2_instances:
-        for tag in instance.tags:
-            if tag['Key'] == CLUSTER_ID_TAG_KEY:
-                if instance.state['Name'] != 'terminated':
-                    cluster_ids.add(tag['Value'])
+        tag_dict = _tag_dict(instance=instance)
+        if CLUSTER_ID_TAG_KEY in tag_dict:
+            cluster_ids.add(tag_dict[CLUSTER_ID_TAG_KEY])
 
     return cluster_ids
 
@@ -68,10 +84,9 @@ class ClusterInstances:
 
         cluster_instances = set([])
         for instance in ec2_instances:
-            for tag in instance.tags:
-                if tag['Key'] == CLUSTER_ID_TAG_KEY:
-                    if tag['Value'] == self._cluster_id:
-                        cluster_instances.add(instance)
+            tag_dict = _tag_dict(instance=instance)
+            if tag_dict.get(CLUSTER_ID_TAG_KEY) == self._cluster_id:
+                cluster_instances.add(instance)
 
         node_types = {
             Role.MASTER: NODE_TYPE_MASTER_TAG_VALUE,
@@ -80,10 +95,9 @@ class ClusterInstances:
         }
         role_instances = set([])
         for instance in cluster_instances:
-            for tag in instance.tags:
-                if tag['Key'] == NODE_TYPE_TAG_KEY:
-                    if tag['Value'] == node_types[role]:
-                        role_instances.add(instance)
+            tag_dict = _tag_dict(instance=instance)
+            if tag_dict[NODE_TYPE_TAG_KEY] == node_types[role]:
+                role_instances.add(instance)
 
         return role_instances
 
@@ -94,9 +108,8 @@ class ClusterInstances:
         public_ip_address = instance.public_ip_address
         private_ip_address = instance.private_ip_address
         ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
-        for tag in instance.tags:
-            if tag['Key'] == SSH_USER_TAG_KEY:
-                default_user = tag['Value']
+        tag_dict = _tag_dict(instance=instance)
+        default_user = tag_dict[SSH_USER_TAG_KEY]
 
         return Node(
             public_ip_address=public_ip_address,
@@ -129,10 +142,8 @@ class ClusterInstances:
     @property
     def workspace_dir(self) -> Path:
         instance = next(iter(self.masters))
-        for tag in instance.tags:
-            if tag['Key'] == WORKSPACE_DIR_TAG_KEY:
-                workspace = Path(tag['Value'])
-        return workspace
+        tag_dict = _tag_dict(instance=instance)
+        return Path(tag_dict[WORKSPACE_DIR_TAG_KEY])
 
     @property
     def is_enterprise(self) -> bool:
@@ -140,9 +151,8 @@ class ClusterInstances:
         Return whether the cluster is a DC/OS Enterprise cluster.
         """
         instance = next(iter(self.masters))
-        for tag in instance.tags:
-            if tag['Key'] == VARIANT_TAG_KEY:
-                variant = Path(tag['Value'])
+        tag_dict = _tag_dict(instance=instance)
+        variant = tag_dict[VARIANT_TAG_KEY]
         return bool(variant == 'ee')
 
     @property
