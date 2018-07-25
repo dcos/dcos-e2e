@@ -419,6 +419,8 @@ class TestRun:
                                        node's VM name, a reference in the format
                                        "<role>_<number>". These details be seen with ``dcos-
                                        vagrant inspect``.
+              -v, --verbose            Use verbose output. Use this option multiple times
+                                       for more verbose output.
               --help                   Show this message and exit.
             """,# noqa: E501,E261
         )

@@ -67,9 +67,14 @@ class TestDcosAWS:
               --help     Show this message and exit.
 
             Commands:
-              create  Create a DC/OS cluster.
-              doctor  Diagnose common issues which stop DC/OS E2E...
-              list    List all clusters.
+              create   Create a DC/OS cluster.
+              doctor   Diagnose common issues which stop DC/OS E2E...
+              inspect  Show cluster details.
+              list     List all clusters.
+              run      Run an arbitrary command on a node.
+              sync     Sync files from a DC/OS checkout to master...
+              wait     Wait for DC/OS to start.
+              web      Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -242,3 +247,221 @@ class TestDoctor:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
+
+
+class TestRun:
+    """
+    Tests for the ``run`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws run --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_aws,
+            ['run', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws run [OPTIONS] NODE_ARGS...
+
+              Run an arbitrary command on a node.
+
+              This command sets up the environment so that ``pytest`` can be run.
+
+              For example, run ``dcos-aws run --cluster-id 1231599 pytest -k
+              test_tls.py``.
+
+              Or, with sync: ``dcos-aws run --sync-dir . --cluster-id 1231599 pytest -k
+              test_tls.py``.
+
+              To use special characters such as single quotes in your command, wrap the
+              whole command in double quotes.
+
+            Options:
+              -c, --cluster-id TEXT    The ID of the cluster to use.  [default: default]
+              --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
+                                       environment variable to.
+              --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` environment
+                                       variable to.
+              --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
+                                       will be synced to all master nodes before the command
+                                       is run.
+              --no-test-env            With this flag set, no environment variables are set
+                                       and the command is run in the home directory.
+              --env TEXT               Set environment variables in the format
+                                       "<KEY>=<VALUE>"
+              --aws-region TEXT        The AWS region to use.  [default: us-west-2]
+              -v, --verbose            Use verbose output. Use this option multiple times
+                                       for more verbose output.
+              --node TEXT              A reference to a particular node to run the command
+                                       on. This can be one of: The node's public IP address,
+                                       The node's private IP address, the node's EC2
+                                       instance ID, a reference in the format
+                                       "<role>_<number>". These details be seen with ``dcos-
+                                       aws inspect``.
+              --help                   Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestSync:
+    """
+    Tests for the ``sync`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws sync --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_aws, ['sync', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws sync [OPTIONS] [DCOS_CHECKOUT_DIR]
+
+              Sync files from a DC/OS checkout to master nodes.
+
+              This syncs integration test files and bootstrap files.
+
+              ``DCOS_CHECKOUT_DIR`` should be set to the path of clone of an open source
+              DC/OS or DC/OS Enterprise repository.
+
+              By default the ``DCOS_CHECKOUT_DIR`` argument is set to the value of the
+              ``DCOS_CHECKOUT_DIR`` environment variable.
+
+              If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --aws-region TEXT      The AWS region to use.  [default: us-west-2]
+              --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestWait:
+    """
+    Tests for the ``wait`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws wait --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(dcos_aws, ['wait', '--help'])
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws wait [OPTIONS]
+
+              Wait for DC/OS to start.
+
+            Options:
+              -c, --cluster-id TEXT      The ID of the cluster to use.  [default: default]
+              --superuser-username TEXT  The superuser username is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
+              --superuser-password TEXT  The superuser password is needed only on DC/OS
+                                         Enterprise clusters. By default, on a DC/OS
+                                         Enterprise cluster, `admin` is used.
+              -v, --verbose              Use verbose output. Use this option multiple times
+                                         for more verbose output.
+              --aws-region TEXT          The AWS region to use.  [default: us-west-2]
+              --help                     Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestWeb:
+    """
+    Tests for the ``web`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws web --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_aws,
+            ['web', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws web [OPTIONS]
+
+              Open the browser at the web UI.
+
+              Note that the web UI may not be available at first. Consider using ``dcos-
+              aws wait`` before running this command.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --aws-region TEXT      The AWS region to use.  [default: us-west-2]
+              --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestInspect:
+    """
+    Tests for the `inspect` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws inspect --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_aws,
+            ['inspect', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws inspect [OPTIONS]
+
+              Show cluster details.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --aws-region TEXT      The AWS region to use.  [default: us-west-2]
+              --help                 Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help

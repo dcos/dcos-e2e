@@ -23,24 +23,25 @@ from cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e.node import Node, Transport
 
 from ._common import (
-    ClusterContainers,
-    ContainerInspectView,
+    ClusterInstances,
+    InstanceInspectView,
     existing_cluster_ids,
 )
-from ._options import node_transport_option
+from ._options import aws_region_option
 
 
-def _get_node(cluster_id: str, node_reference: str) -> Node:
+def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
     """
     Get a node from a "reference".
 
     Args:
         cluster_id: The ID of a cluster.
         node_reference: One of:
-            * A node's IP address
-            * A node's Docker container name
-            * A node's Docker container ID
+            * A node's public IP address
+            * A node's private IP address
+            * A node's EC2 instance ID
             * A reference in the format "<role>_<number>"
+        aws_region: The AWS region the cluster is in.
 
     Returns:
         The ``Node`` from the given cluster with the given ID.
@@ -48,38 +49,41 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     Raises:
         click.BadParameter: There is no such node.
     """
-    cluster_containers = ClusterContainers(
+    cluster_instances = ClusterInstances(
         cluster_id=cluster_id,
-        transport=Transport.DOCKER_EXEC,
+        aws_region=aws_region,
     )
 
-    containers = {
-        *cluster_containers.masters,
-        *cluster_containers.agents,
-        *cluster_containers.public_agents,
+    instances = {
+        *cluster_instances.masters,
+        *cluster_instances.agents,
+        *cluster_instances.public_agents,
     }
 
-    for container in containers:
-        inspect_data = ContainerInspectView(container=container).to_dict()
+    for instance in instances:
+        inspect_data = InstanceInspectView(
+            instance=instance,
+            aws_region=aws_region,
+        ).to_dict()
         reference = inspect_data['e2e_reference']
-        ip_address = inspect_data['ip_address']
-        container_name = inspect_data['docker_container_name']
-        container_id = inspect_data['docker_container_id']
+        instance_id = inspect_data['ec2_instance_id']
+        public_ip_address = inspect_data['public_ip_address']
+        private_ip_address = inspect_data['private_ip_address']
         accepted = (
             reference,
             reference.upper(),
-            ip_address,
-            container_name,
-            container_id,
+            instance_id,
+            public_ip_address,
+            private_ip_address,
         )
 
         if node_reference in accepted:
-            return cluster_containers.to_node(container=container)
+            return cluster_instances.to_node(instance=instance)
 
     message = (
-        'No such node in cluster "{cluster_id}" with IP address, Docker '
-        'container ID or node reference "{node_reference}". '
-        'Node references can be seen with ``dcos-docker inspect``.'
+        'No such node in cluster "{cluster_id}" with IP address, VM name or '
+        'node reference "{node_reference}". '
+        'Node references can be seen with ``dcos-vagrant inspect``.'
     ).format(
         cluster_id=cluster_id,
         node_reference=node_reference,
@@ -94,6 +98,9 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 @dcos_login_pw_option
 @sync_dir_run_option
 @no_test_env_run_option
+@environment_variables_option
+@aws_region_option
+@verbosity_option
 @click.option(
     '--node',
     type=str,
@@ -101,16 +108,13 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     help=(
         'A reference to a particular node to run the command on. '
         'This can be one of: '
-        'The node\'s IP address, '
-        'the node\'s Docker container name, '
-        'the node\'s Docker container ID, '
+        'The node\'s public IP address, '
+        'The node\'s private IP address, '
+        'the node\'s EC2 instance ID, '
         'a reference in the format "<role>_<number>". '
-        'These details be seen with ``dcos-docker inspect``.'
+        'These details be seen with ``dcos-aws inspect``.'
     ),
 )
-@environment_variables_option
-@node_transport_option
-@verbosity_option
 def run(
     cluster_id: str,
     node_args: Tuple[str],
@@ -118,10 +122,10 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     no_test_env: bool,
-    node: str,
     env: Dict[str, str],
-    transport: Transport,
+    aws_region: str,
     verbose: int,
+    node: str,
 ) -> None:
     """
     Run an arbitrary command on a node.
@@ -129,10 +133,10 @@ def run(
     This command sets up the environment so that ``pytest`` can be run.
 
     For example, run
-    ``dcos-docker run --cluster-id 1231599 pytest -k test_tls.py``.
+    ``dcos-aws run --cluster-id 1231599 pytest -k test_tls.py``.
 
     Or, with sync:
-    ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
+    ``dcos-aws run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
 
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
@@ -140,15 +144,18 @@ def run(
     set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
-        existing_cluster_ids=existing_cluster_ids(),
+        existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
-    host = _get_node(cluster_id=cluster_id, node_reference=node)
-
-    cluster_containers = ClusterContainers(
+    cluster_instances = ClusterInstances(
         cluster_id=cluster_id,
-        transport=transport,
+        aws_region=aws_region,
     )
-    cluster = cluster_containers.cluster
+    cluster = cluster_instances.cluster
+    host = _get_node(
+        cluster_id=cluster_id,
+        node_reference=node,
+        aws_region=aws_region,
+    )
 
     if sync_dir is not None:
         sync_code_to_masters(
@@ -164,5 +171,5 @@ def run(
         dcos_login_uname=dcos_login_uname,
         dcos_login_pw=dcos_login_pw,
         env=env,
-        transport=transport,
+        transport=Transport.SSH,
     )
