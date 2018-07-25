@@ -105,7 +105,8 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
 
     oss_artifact = Path('/tmp/dcos_generate_config.sh')
 
-    with Cluster(cluster_backend=Docker()) as cluster:
+    cluster_backend = Docker()
+    with Cluster(cluster_backend=cluster_backend) as cluster:
         cluster.install_dcos_from_path(
             build_artifact=oss_artifact,
             dcos_config={
@@ -114,6 +115,7 @@ See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=lat
                     'check_time': True,
                 },
             },
+            ip_detect_path=cluster_backend.ip_detect_path,
         )
         (master, ) = cluster.masters
         result = master.run(args=['echo', '1'])
