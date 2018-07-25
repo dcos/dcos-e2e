@@ -73,6 +73,7 @@ class TestDcosAWS:
               run     Run an arbitrary command on a node.
               sync    Sync files from a DC/OS checkout to master...
               wait    Wait for DC/OS to start.
+              web     Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -380,6 +381,44 @@ class TestWait:
                                          for more verbose output.
               --aws-region TEXT          The AWS region to use.  [default: us-west-2]
               --help                     Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+
+class TestWeb:
+    """
+    Tests for the ``web`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help text is shown with `dcos-aws web --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_aws,
+            ['web', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-aws web [OPTIONS]
+
+              Open the browser at the web UI.
+
+              Note that the web UI may not be available at first. Consider using ``dcos-
+              aws wait`` before running this command.
+
+            Options:
+              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              --aws-region TEXT      The AWS region to use.  [default: us-west-2]
+              --help                 Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable
