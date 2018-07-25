@@ -523,8 +523,6 @@ class Node:
             sudo=sudo,
         )
 
-        # /genconf root:root
-
         stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
         stat_result = self.run(
             args=stat_cmd,
@@ -544,13 +542,11 @@ class Node:
             sudo=sudo,
         )
 
-        # /genconf centos:root
-
         tempdir = Path(gettempdir())
         tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
         local_tar_path = tempdir / tar_name
 
-        with tarfile.open(str(local_tar_path), 'w') as tar:
+        with tarfile.open(str(local_tar_path), 'w', dereference=True) as tar:
             arcname = remote_path.relative_to(remote_path.parent)
             tar.add(str(local_path), arcname=str(arcname), recursive=True)
 
@@ -568,8 +564,6 @@ class Node:
         ).stdout.strip().decode()
         # Therefore, we create a temporary file within our home directory.
         # We then remove the temporary file at the end of this function.
-
-        # /genconf centos:root
 
         remote_tar_path = Path(home_path) / tar_name
 
