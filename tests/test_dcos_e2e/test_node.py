@@ -168,37 +168,61 @@ class TestSendFile:
         user.
         """
         original_content = str(uuid.uuid4())
-        local_dir_name = 'local_dir'
-        remote_dir_name = 'remote_dir'
+        dir_name = 'directory'
         file_name = 'example_file.txt'
-        local_dir = tmpdir.mkdir(local_dir_name)
-        local_file = local_dir.join(file_name)
-        local_file.write(original_content)
+        dir_path = tmpdir.mkdir(dir_name)
+        local_file_path = dir_path.join(file_name)
+        local_file_path.write(original_content)
 
         random = uuid.uuid4().hex
         master_base_dir = '/etc/{random}'.format(random=random)
-        master_destination_dir = Path(master_base_dir) / remote_dir_name
+        master_destination_dir = Path(master_base_dir)
 
         dcos_node.run(args=['mkdir', '-p', str(master_destination_dir)])
         dcos_node.send_file(
-            local_path=Path(local_file),
-            remote_path=master_destination_dir / file_name,
+            local_path=Path(local_file_path),
+            remote_path=master_destination_dir / dir_name / file_name,
         )
 
-        args = ['cat', str(master_destination_dir / file_name)]
+        args = ['cat', str(master_destination_dir / dir_name / file_name)]
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == original_content
 
         new_content = str(uuid.uuid4())
-        local_file.write(new_content)
+        local_file_path.write(new_content)
 
         dcos_node.send_file(
-            local_path=Path(local_dir),
+            local_path=Path(dir_path),
             remote_path=master_destination_dir,
         )
-        args = ['cat', str(master_destination_dir / file_name)]
+        args = ['cat', str(master_destination_dir / dir_name / file_name)]
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == new_content
+
+    def test_send_file_to_directory(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node to a directory that
+        is mounted as tmpfs.
+        See ``DockerExecTransport.send_file`` for details.
+        """
+        content = str(uuid.uuid4())
+        file_name = 'example_file.txt'
+        local_file = tmpdir.join(file_name)
+        local_file.write(content)
+
+        master_destination_path = Path('/etc/{random}'.format(random=uuid.uuid4().hex))
+        dcos_node.run(args=['mkdir', '--parent', str(master_destination_path)])
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path / file_name)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == content
 
     def test_send_file_to_tmp_directory(
         self,
