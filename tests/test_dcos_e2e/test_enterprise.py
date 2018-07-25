@@ -12,6 +12,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Role
 
 
 class TestEnterpriseIntegrationTests:
@@ -292,9 +293,10 @@ class TestCopyFiles:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
                 ip_detect_path=cluster_backend.ip_detect_path,
+                role=Role.MASTER,
                 files_to_copy_to_genconf_dir=[(cert_dir_on_host, genconf)],
+                log_output_live=True,
             )
 
             cluster.wait_for_dcos_ee(
