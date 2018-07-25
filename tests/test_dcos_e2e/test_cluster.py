@@ -183,46 +183,6 @@ class TestCopyFiles:
             )
             assert cat_result.stdout.decode() == ip_detect_contents
 
-    def test_install_cluster_from_url(
-        self,
-        cluster_backend: ClusterBackend,
-        oss_artifact_url: str,
-        tmpdir: local,
-    ) -> None:
-        """
-        Install a DC/OS cluster with a custom ``ip-detect`` script.
-        """
-        with Cluster(
-            cluster_backend=cluster_backend,
-            masters=1,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-
-            (master, ) = cluster.masters
-            ip_detect_file = tmpdir.join('ip-detect')
-            ip_detect_contents = dedent(
-                """\
-                #!/bin/bash
-                echo {ip_address}
-                """,
-            ).format(ip_address=master.private_ip_address)
-            ip_detect_file.write(ip_detect_contents)
-
-            cluster.install_dcos_from_url(
-                build_artifact=oss_artifact_url,
-                dcos_config=cluster.base_config,
-                ip_detect_path=cluster_backend.ip_detect_path,
-                files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
-                ],
-            )
-            cluster.wait_for_dcos_oss()
-            cat_result = master.run(
-                args=['cat', '/opt/mesosphere/bin/detect_ip'],
-            )
-            assert cat_result.stdout.decode() == ip_detect_contents
-
 
 class TestInstallDcosFromPathLogging:
     """
