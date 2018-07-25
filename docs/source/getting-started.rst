@@ -35,6 +35,7 @@ In this example we will use a open source DC/OS artifact downloaded to :file:`/t
                 'resolvers': ['8.8.8.8'],
             },
        }
+       ip_detect_path=Docker().ip_detect_path,
    )
 
    cluster.wait_for_dcos_oss()
