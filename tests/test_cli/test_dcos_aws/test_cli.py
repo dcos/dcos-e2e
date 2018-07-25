@@ -301,6 +301,12 @@ class TestRun:
               --aws-region TEXT        The AWS region to use.  [default: us-west-2]
               -v, --verbose            Use verbose output. Use this option multiple times
                                        for more verbose output.
+              --node TEXT              A reference to a particular node to run the command
+                                       on. This can be one of: The node's public IP address,
+                                       The node's private IP address, the node's EC2
+                                       instance ID, a reference in the format
+                                       "<role>_<number>". These details be seen with ``dcos-
+                                       aws inspect``.
               --help                   Show this message and exit.
             """,# noqa: E501,E261
         )
