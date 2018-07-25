@@ -523,6 +523,8 @@ class Node:
             sudo=sudo,
         )
 
+        # /genconf root:root
+
         stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
         stat_result = self.run(
             args=stat_cmd,
@@ -539,8 +541,10 @@ class Node:
             args=chown_args,
             user=user,
             transport=transport,
-            sudo=True,
+            sudo=sudo,
         )
+
+        # /genconf centos:root
 
         tempdir = Path(gettempdir())
         tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
@@ -556,13 +560,16 @@ class Node:
         # Copying files to tmpfs mounts fails silently.
         # See https://github.com/moby/moby/issues/22020.
         home_path = self.run(
-            args=['bash', '-c', 'echo $HOME'],
+            args=['echo', '$HOME'],
             user=user,
             transport=transport,
-            sudo=True,
+            sudo=False,
+            shell=True,
         ).stdout.strip().decode()
         # Therefore, we create a temporary file within our home directory.
         # We then remove the temporary file at the end of this function.
+
+        # /genconf centos:root
 
         remote_tar_path = Path(home_path) / tar_name
 
@@ -576,14 +583,6 @@ class Node:
 
         Path(local_tar_path).unlink()
 
-        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
-        self.run(
-            args=chown_args,
-            user=user,
-            transport=transport,
-            sudo=True,
-        )
-
         tar_args = [
             'tar',
             '-C',
@@ -595,12 +594,20 @@ class Node:
             args=tar_args,
             user=user,
             transport=transport,
-            sudo=True,
+            sudo=False,
+        )
+
+        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
         )
 
         self.run(
             args=['rm', str(remote_tar_path)],
             user=user,
             transport=transport,
-            sudo=True,
+            sudo=sudo,
         )
