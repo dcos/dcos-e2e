@@ -22,7 +22,6 @@ Next
 ------------
 
 - Add an initial ``dcos-aws`` CLI.
->>>>>>> origin/master
 
 2018.07.22.1
 ------------
