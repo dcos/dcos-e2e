@@ -75,12 +75,9 @@ class InstanceInspectView:
         Return dictionary with information to be shown to users.
         """
         instance = self._instance
-        for tag in instance.tags:
-            if tag['Key'] == CLUSTER_ID_TAG_KEY:
-                cluster_id = tag['Value']
-            if tag['Key'] == NODE_TYPE_TAG_KEY:
-                role = tag['Value']
-
+        tag_dict = _tag_dict(instance=instance)
+        cluster_id = tag_dict[CLUSTER_ID_TAG_KEY]
+        role = tag_dict[NODE_TYPE_TAG_KEY]
         public_ip_address = instance.public_ip_address
         private_ip_address = instance.private_ip_address
         cluster_instances = ClusterInstances(
