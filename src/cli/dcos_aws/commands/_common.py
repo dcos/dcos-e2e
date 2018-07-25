@@ -59,7 +59,7 @@ class ClusterInstances:
         role: Role,
     ) -> Set[ServiceResource]:
         """
-        Return all containers in this cluster of a particular node type.
+        Return all EC2 instances in this cluster of a particular node type.
         """
         ec2 = boto3.resource('ec2', region_name=self._aws_region)
         ec2_instances = ec2.instances.all()
@@ -87,7 +87,7 @@ class ClusterInstances:
 
     def to_node(self, instance: ServiceResource) -> Node:
         """
-        Return the ``Node`` that is represented by a given ``container``.
+        Return the ``Node`` that is represented by a given EC2 instance.
         """
         public_ip_address = instance.public_ip_address
         private_ip_address = instance.private_ip_address
@@ -106,21 +106,21 @@ class ClusterInstances:
     @property
     def masters(self) -> Set[ServiceResource]:
         """
-        Docker containers which represent master nodes.
+        EC2 instances which represent master nodes.
         """
         return self._instances_by_role(role=Role.MASTER)
 
     @property
     def agents(self) -> Set[ServiceResource]:
         """
-        Docker containers which represent agent nodes.
+        EC2 instances which represent agent nodes.
         """
         return self._instances_by_role(role=Role.AGENT)
 
     @property
     def public_agents(self) -> Set[ServiceResource]:
         """
-        Docker containers which represent public agent nodes.
+        EC2 instances which represent public agent nodes.
         """
         return self._instances_by_role(role=Role.PUBLIC_AGENT)
 
@@ -135,7 +135,7 @@ class ClusterInstances:
     @property
     def cluster(self) -> Cluster:
         """
-        Return a ``Cluster`` constructed from the containers.
+        Return a ``Cluster`` constructed from the EC2 instances.
         """
         return Cluster.from_nodes(
             masters=set(map(self.to_node, self.masters)),
