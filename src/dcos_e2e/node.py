@@ -546,8 +546,22 @@ class Node:
         tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
         local_tar_path = tempdir / tar_name
 
+        is_dir = self.run(
+            args=[
+                'python',
+                '-c',
+                '"import os; print(os.path.isdir(\'{remote_path}\'))"'.format(
+                    remote_path=remote_path,
+                ),
+            ],
+            shell=True,
+        ).stdout.decode().strip()
+
         with tarfile.open(str(local_tar_path), 'w', dereference=True) as tar:
             arcname = remote_path.relative_to(remote_path.parent)
+            if is_dir == 'True':
+                filename = local_path.relative_to(local_path.parent)
+                arcname = arcname / filename
             tar.add(str(local_path), arcname=str(arcname), recursive=True)
 
         # `remote_path` may be a tmpfs mount.
