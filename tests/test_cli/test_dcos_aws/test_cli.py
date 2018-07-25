@@ -71,6 +71,7 @@ class TestDcosAWS:
               doctor  Diagnose common issues which stop DC/OS E2E...
               list    List all clusters.
               run     Run an arbitrary command on a node.
+              sync    Sync files from a DC/OS checkout to master...
             """,# noqa: E501,E261
         )
         # yapf: enable
