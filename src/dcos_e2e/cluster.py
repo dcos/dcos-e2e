@@ -8,7 +8,6 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from kazoo.client import KazooClient
 from retry import retry
 
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
