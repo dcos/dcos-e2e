@@ -12,6 +12,7 @@ missed adding an item to ``admin/run_script.py``.
 import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 from run_script import PATTERNS
@@ -25,6 +26,12 @@ CI_PATTERNS = set()
 for MATRIX_ITEM in TRAVIS_MATRIX:
     KEY, VALUE = MATRIX_ITEM.split('=')
     assert KEY == 'CI_PATTERN'
+    if VALUE in CI_PATTERNS:
+        raise Exception(
+            '"{pattern}" is duplicated in ".travis.yml".'.format(
+                pattern=VALUE,
+            ),
+        )
     # Special case for running no tests.
     if VALUE != "''":
         CI_PATTERNS.add(VALUE)
@@ -53,3 +60,13 @@ if CI_PATTERNS != PATTERNS.keys():
                 ),
             )
     sys.exit(1)
+
+for CI_PATTERN in CI_PATTERNS:
+    COLLECT_ONLY_RESULT = pytest.main(
+        [
+            '--collect-only',
+            CI_PATTERN,
+            '-qq',
+            '--disable-pytest-warnings',
+        ],
+    )
