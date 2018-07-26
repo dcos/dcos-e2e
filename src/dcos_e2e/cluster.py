@@ -205,13 +205,17 @@ class Cluster(ContextDecorator):
         # "albert@bekstil.net".
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
+        server_option = (
+            '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
+            'zk-5.zk:2181"',
+        )
         delete_user_args = [
             'source',
             '/opt/mesosphere/environment.export',
             '&&',
             'zkCli.sh',
             '-server',
-            '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181"',
+            server_option,
             'delete',
             path,
         ]
