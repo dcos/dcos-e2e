@@ -20,10 +20,10 @@ OSS_1_9_ARTIFACT_URL = OSS_PATTERN.format(version='1.9')
 OSS_1_10_ARTIFACT_URL = OSS_PATTERN.format(version='1.10')
 OSS_1_11_ARTIFACT_URL = OSS_PATTERN.format(version='1.11')
 
-EE_MASTER_ARTIFACT_URL = os.environ.get('EE_MASTER_ARTIFACT_URL')
-EE_1_9_ARTIFACT_URL = os.environ.get('EE_1_9_ARTIFACT_URL')
-EE_1_10_ARTIFACT_URL = os.environ.get('EE_1_10_ARTIFACT_URL')
-EE_1_11_ARTIFACT_URL = os.environ.get('EE_1_11_ARTIFACT_URL')
+EE_MASTER_ARTIFACT_URL = os.environ['EE_MASTER_ARTIFACT_URL']
+EE_1_9_ARTIFACT_URL = os.environ['EE_1_9_ARTIFACT_URL']
+EE_1_10_ARTIFACT_URL = os.environ['EE_1_10_ARTIFACT_URL']
+EE_1_11_ARTIFACT_URL = os.environ['EE_1_11_ARTIFACT_URL']
 
 OSS_MASTER_ARTIFACT_PATH = Path('/tmp/dcos_generate_config.sh')
 OSS_1_9_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_9.sh')
