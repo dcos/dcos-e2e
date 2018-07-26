@@ -210,7 +210,7 @@ class Cluster(ContextDecorator):
             'zk-5.zk:2181"'
         )
         delete_user_args = [
-            'source',
+            '.',
             '/opt/mesosphere/environment.export',
             '&&',
             'zkCli.sh',
