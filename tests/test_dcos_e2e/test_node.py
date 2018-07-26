@@ -192,7 +192,7 @@ class TestSendFile:
         local_file_path.write(new_content)
 
         dcos_node.send_file(
-            local_path=Path(dir_path),
+            local_path=Path(str(dir_path)),
             remote_path=master_destination_dir,
         )
         args = ['cat', str(master_destination_dir / dir_name / file_name)]
