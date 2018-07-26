@@ -20,6 +20,24 @@ from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
 
+class TestMini:
+    """
+    Temporary tests for narrowing issues.
+    """
+
+    def test_mini(self, oss_artifact: Path, cluster_backend: ClusterBackend):
+        """
+        Temporary test for narrowing issues.
+        """
+        with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
+            dcos_cluster.install_dcos_from_path(
+                dcos_config=dcos_cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                build_artifact=oss_artifact,
+                log_output_live=True,
+            )
+            dcos_cluster.wait_for_dcos_oss()
+
 class TestIntegrationTests:
     """
     Tests for running integration tests on a node.

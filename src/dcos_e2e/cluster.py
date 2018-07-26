@@ -205,8 +205,15 @@ class Cluster(ContextDecorator):
         # "albert@bekstil.net".
         email = 'albert@bekstil.net'
         path = '/dcos/users/{email}'.format(email=email)
-        delete_user_args = ['zkCli.sh', 'delete', path]
-        any_master.run(args=delete_user_args, log_output_live=True)
+        delete_user_args = [
+            'source',
+            '/opt/mesosphere/environment.export',
+            '&&',
+            'zkCli.sh',
+            'delete',
+            path,
+        ]
+        any_master.run(args=delete_user_args, shell=True, log_output_live=True)
 
     def wait_for_dcos_ee(
         self,
