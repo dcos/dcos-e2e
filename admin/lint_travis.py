@@ -1,10 +1,18 @@
 from pathlib import Path
+from run_script import PATTERNS
+import yaml
+
 travis_file = Path(__file__).parent.parent / '.travis.yml'
 travis_contents = travis_file.read_text()
-import yaml
 travis_dict = yaml.load(travis_contents)
+travis_matrix = travis_dict['env']['matrix']
 
-from run_script import PATTERNS
+ci_patterns = set()
+for matrix_item in travis_matrix:
+    key, value = matrix_item.split('=')
+    assert key == 'CI_PATTERN'
+    # Special case for running no tests.
+    if value != "''":
+        ci_patterns.add(value)
 
-
-import pdb; pdb.set_trace()
+assert ci_patterns == PATTERNS.keys()
