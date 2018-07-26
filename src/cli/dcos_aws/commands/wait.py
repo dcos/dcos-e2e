@@ -44,7 +44,7 @@ def wait(
         'A cluster may take some time to be ready.\n'
         'The amount of time it takes to start a cluster depends on a variety '
         'of factors.\n'
-        'If you are concerned that this is hanging, try "dcos-vagrant doctor" '
+        'If you are concerned that this is hanging, try "dcos-aws doctor" '
         'to diagnose common issues.'
     )
     click.echo(message)
