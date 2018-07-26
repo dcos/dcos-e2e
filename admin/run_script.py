@@ -20,10 +20,10 @@ OSS_1_9_ARTIFACT_URL = OSS_PATTERN.format(version='1.9')
 OSS_1_10_ARTIFACT_URL = OSS_PATTERN.format(version='1.10')
 OSS_1_11_ARTIFACT_URL = OSS_PATTERN.format(version='1.11')
 
-EE_MASTER_ARTIFACT_URL = os.environ['EE_MASTER_ARTIFACT_URL']
-EE_1_9_ARTIFACT_URL = os.environ['EE_1_9_ARTIFACT_URL']
-EE_1_10_ARTIFACT_URL = os.environ['EE_1_10_ARTIFACT_URL']
-EE_1_11_ARTIFACT_URL = os.environ['EE_1_11_ARTIFACT_URL']
+EE_MASTER_ARTIFACT_URL = os.environ.get('EE_MASTER_ARTIFACT_URL')
+EE_1_9_ARTIFACT_URL = os.environ.get('EE_1_9_ARTIFACT_URL')
+EE_1_10_ARTIFACT_URL = os.environ.get('EE_1_10_ARTIFACT_URL')
+EE_1_11_ARTIFACT_URL = os.environ.get('EE_1_11_ARTIFACT_URL')
 
 OSS_MASTER_ARTIFACT_PATH = Path('/tmp/dcos_generate_config.sh')
 OSS_1_9_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_9.sh')
@@ -130,7 +130,7 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path':  # noqa: E501
     (OSS_MASTER, ),
-    'tests/test_dcos_e2e/test_node_install.py::TestCopyFiles:test_install_node::test_install_from_path_with_genconf_files':  # noqa: E501
+    'tests/test_dcos_e2e/test_node_install.py::TestCopyFiles::test_install_from_path_with_genconf_files':  # noqa: E501
     (OSS_MASTER, ),
 }  # type: Dict[str, Tuple]
 

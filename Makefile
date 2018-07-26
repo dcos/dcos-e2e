@@ -93,6 +93,10 @@ linkcheck:
 spelling:
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
+.PHONY: travis
+travis:
+	python admin/lint_travis.py
+
 .PHONY: shellcheck
 shellcheck:
 	shellcheck --exclude SC2164,SC1091 admin/*.sh
@@ -124,7 +128,8 @@ lint: \
     shellcheck \
     spelling \
     vulture \
-    yapf
+    yapf \
+    travis
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
