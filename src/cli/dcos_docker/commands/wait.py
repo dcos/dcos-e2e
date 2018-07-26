@@ -21,6 +21,7 @@ from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers, existing_cluster_ids
 from ._options import node_transport_option
+from .doctor import doctor
 
 
 @click.command('wait')
@@ -42,7 +43,9 @@ from ._options import node_transport_option
 )
 @node_transport_option
 @verbosity_option
+@click.pass_context
 def wait(
+    ctx: click.core.Context,
     cluster_id: str,
     superuser_username: str,
     superuser_password: str,
@@ -65,9 +68,13 @@ def wait(
     )
 
     http_checks = not skip_http_checks
+    doctor_command_name = '{info_name} {doctor_name}'.format(
+        info_name=ctx.parent.info_name,
+        doctor_name=doctor.name,
+    )
     show_wait_help(
         is_enterprise=cluster_containers.is_enterprise,
-        doctor_command_name='dcos-docker doctor',
+        doctor_command_name=doctor_command_name,
     )
 
     with click_spinner.spinner():
