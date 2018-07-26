@@ -180,7 +180,7 @@ class TestSendFile:
         master_destination_dir = Path(master_base_dir)
 
         dcos_node.send_file(
-            local_path=Path(local_file_path),
+            local_path=Path(str(local_file_path)),
             remote_path=master_destination_dir / dir_name / file_name,
         )
 
