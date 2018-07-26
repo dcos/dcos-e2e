@@ -1,18 +1,31 @@
+"""
+Every test pattern we run on CI must also be specified in
+``admin/run_script.py``.
+
+This allows us to download only the required DC/OS artifacts.
+However, this is prone to error.
+
+This script attempts to help with that by telling test authors if they have
+missed adding an item to ``admin/run_script.py``.
+"""
+
 from pathlib import Path
-from run_script import PATTERNS
+
 import yaml
 
-travis_file = Path(__file__).parent.parent / '.travis.yml'
-travis_contents = travis_file.read_text()
-travis_dict = yaml.load(travis_contents)
-travis_matrix = travis_dict['env']['matrix']
+from run_script import PATTERNS
 
-ci_patterns = set()
-for matrix_item in travis_matrix:
-    key, value = matrix_item.split('=')
-    assert key == 'CI_PATTERN'
+TRAVIS_FILE = Path(__file__).parent.parent / '.travis.yml'
+TRAVIS_CONTENTS = TRAVIS_FILE.read_text()
+TRAVIS_DICT = yaml.load(TRAVIS_CONTENTS)
+TRAVIS_MATRIX = TRAVIS_DICT['env']['matrix']
+
+CI_PATTERNS = set()
+for MATRIX_ITEM in TRAVIS_MATRIX:
+    KEY, VALUE = MATRIX_ITEM.split('=')
+    assert KEY == 'CI_PATTERN'
     # Special case for running no tests.
-    if value != "''":
-        ci_patterns.add(value)
+    if VALUE != "''":
+        CI_PATTERNS.add(VALUE)
 
-assert ci_patterns == PATTERNS.keys()
+assert CI_PATTERNS == PATTERNS.keys()
