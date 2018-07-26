@@ -29,7 +29,9 @@ class TestMini:
         """
         Temporary test for narrowing issues.
         """
-        with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
+        # Passes with no agents or public agents
+        # Fails with all three
+        with Cluster(cluster_backend=cluster_backend, agents=0, public_agents=0) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
                 dcos_config=dcos_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
