@@ -9,7 +9,9 @@ This script attempts to help with that by telling test authors if they have
 missed adding an item to ``admin/run_script.py``.
 """
 
+import os
 import sys
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -59,14 +61,28 @@ if CI_PATTERNS != PATTERNS.keys():
                     item=RUN_SCRIPT_ONLY_ITEM,
                 ),
             )
-    sys.exit(1)
 
+
+COLLECT_ONLY_ERROR_RESULTS = set()
 for CI_PATTERN in CI_PATTERNS:
-    COLLECT_ONLY_RESULT = pytest.main(
-        [
-            '--collect-only',
-            CI_PATTERN,
-            '-qq',
-            '--disable-pytest-warnings',
-        ],
+
+    old_out = sys.stdout
+    old_err = sys.stderr
+    sys.stdout = open(os.devnull, 'w')
+    sys.stderr = open(os.devnull, 'w')
+    COLLECT_ONLY_RESULT = pytest.main(['--collect-only', CI_PATTERN])
+    sys.stdout = old_out
+    sys.stderr = old_err
+
+    if COLLECT_ONLY_RESULT != 0:
+        COLLECT_ONLY_ERROR_RESULTS.add(CI_PATTERN)
+
+for ERROR_PATTERN in COLLECT_ONLY_ERROR_RESULTS:
+    sys.stderr.write(
+        'Error finding tests with pattern "{pattern}".\n'.format(
+            pattern=ERROR_PATTERN,
+        ),
     )
+
+if CI_PATTERNS != PATTERNS.keys() or COLLECT_ONLY_ERROR_RESULTS:
+    sys.exit(1)
