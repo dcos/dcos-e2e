@@ -76,6 +76,14 @@ from ._options import aws_region_option
 @copy_to_master_option
 @verbosity_option
 @cluster_id_option
+@click.option(
+    '--enable-selinux-enforcing',
+    is_flag=True,
+    help=(
+        'With this flag set, SELinux is set to enforcing before DC/OS is '
+        'installed on the cluster.'
+    ),
+)
 def create(
     agents: int,
     artifact_url: str,
@@ -90,6 +98,7 @@ def create(
     verbose: int,
     aws_region: str,
     cluster_id: str,
+    enable_selinux_enforcing: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -245,6 +254,11 @@ def create(
                 workspace_tag,
             ],
         )
+
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+    for node in nodes:
+        if enable_selinux_enforcing:
+            node.run(args=['setenforce', '1'], sudo=True)
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
