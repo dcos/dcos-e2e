@@ -12,7 +12,11 @@ from cli.common.options import (
     superuser_username_option,
     verbosity_option,
 )
-from cli.common.utils import check_cluster_id_exists, set_logging
+from cli.common.utils import (
+    check_cluster_id_exists,
+    set_logging,
+    show_wait_help,
+)
 from dcos_e2e.node import Transport
 
 from ._common import ClusterContainers, existing_cluster_ids
@@ -55,19 +59,17 @@ def wait(
     )
     set_logging(verbosity_level=verbose)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    message = (
-        'A cluster may take some time to be ready.\n'
-        'The amount of time it takes to start a cluster depends on a variety '
-        'of factors.\n'
-        'If you are concerned that this is hanging, try "dcos-docker doctor" '
-        'to diagnose common issues.'
-    )
-    click.echo(message)
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,
     )
+
     http_checks = not skip_http_checks
+    show_wait_help(
+        is_enterprise=cluster_containers.is_enterprise,
+        doctor_command_name='dcos-docker doctor',
+    )
+
     with click_spinner.spinner():
         if cluster_containers.is_enterprise:
             cluster_containers.cluster.wait_for_dcos_ee(
