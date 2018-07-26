@@ -7,3 +7,4 @@ travis_dict = yaml.load(travis_contents)
 from run_script import PATTERNS
 
 
+import pdb; pdb.set_trace()
