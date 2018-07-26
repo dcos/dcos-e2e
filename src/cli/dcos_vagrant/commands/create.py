@@ -161,7 +161,6 @@ def create(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=[],
         )
     except CalledProcessError as exc:
         click.echo('Error creating cluster.', err=True)

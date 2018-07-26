@@ -19,6 +19,7 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestCustomKeyPair
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_path
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_node
+  - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_with_custom_genconf
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
@@ -27,6 +28,8 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
