@@ -274,7 +274,8 @@ class TestDCOSInstallation:
         tmpdir: local,
     ) -> None:
         """
-        It is possible to install DC/OS on an AWS cluster node by node.
+        It is possible to install DC/OS on an AWS including
+        custom files in the ``genconf`` directory.
         """
         cluster_backend = AWS()
         with Cluster(
