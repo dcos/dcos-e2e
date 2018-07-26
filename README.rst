@@ -135,11 +135,14 @@ A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
 
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor
+   $ dcos-docker download-artifact
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0
    default
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
+   # Get onto a node
+   $ dcos-docker run bash
    $ dcos-docker destroy
 
 
