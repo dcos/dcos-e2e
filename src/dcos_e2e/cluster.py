@@ -210,6 +210,8 @@ class Cluster(ContextDecorator):
             '/opt/mesosphere/environment.export',
             '&&',
             'zkCli.sh',
+            '--servers',
+            'zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,zk-5.zk:2181',
             'delete',
             path,
         ]
