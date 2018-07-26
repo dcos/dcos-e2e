@@ -159,7 +159,7 @@ def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
 
-def show_wait_help(is_enterprise: bool, doctor_command_name: str):
+def show_wait_help(is_enterprise: bool, doctor_command_name: str) -> None:
     """
     Show a message useful for "wait" commands to warn the user of potential
     issues.

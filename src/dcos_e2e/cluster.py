@@ -207,7 +207,7 @@ class Cluster(ContextDecorator):
         path = '/dcos/users/{email}'.format(email=email)
         server_option = (
             '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
-            'zk-5.zk:2181"',
+            'zk-5.zk:2181"'
         )
         delete_user_args = [
             'source',

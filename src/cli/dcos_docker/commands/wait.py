@@ -68,8 +68,10 @@ def wait(
     )
 
     http_checks = not skip_http_checks
+    parent = ctx.parent
+    assert parent is not None
     doctor_command_name = '{info_name} {doctor_name}'.format(
-        info_name=ctx.parent.info_name,
+        info_name=parent.info_name,
         doctor_name=doctor.name,
     )
     show_wait_help(
