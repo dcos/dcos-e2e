@@ -213,7 +213,7 @@ class Cluster(ContextDecorator):
             'delete',
             path,
         ]
-        any_master.run(args=delete_user_args, shell=True)
+        any_master.run(args=delete_user_args, shell=True, log_output_live=True)
 
     def wait_for_dcos_ee(
         self,
