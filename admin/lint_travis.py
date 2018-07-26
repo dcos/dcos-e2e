@@ -65,14 +65,13 @@ if CI_PATTERNS != PATTERNS.keys():
 
 COLLECT_ONLY_ERROR_RESULTS = set()
 for CI_PATTERN in CI_PATTERNS:
-
-    old_out = sys.stdout
-    old_err = sys.stderr
+    OLD_OUT = sys.stdout
+    OLD_ERR = sys.stderr
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
     COLLECT_ONLY_RESULT = pytest.main(['--collect-only', CI_PATTERN])
-    sys.stdout = old_out
-    sys.stderr = old_err
+    sys.stdout = OLD_OUT
+    sys.stderr = OLD_ERR
 
     if COLLECT_ONLY_RESULT != 0:
         COLLECT_ONLY_ERROR_RESULTS.add(CI_PATTERN)
