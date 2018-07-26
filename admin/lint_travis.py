@@ -11,8 +11,8 @@ missed adding an item to ``admin/run_script.py``.
 
 import os
 import sys
-import subprocess
 from pathlib import Path
+from typing import Set  # noqa: F401
 
 import pytest
 import yaml
@@ -24,7 +24,7 @@ TRAVIS_CONTENTS = TRAVIS_FILE.read_text()
 TRAVIS_DICT = yaml.load(TRAVIS_CONTENTS)
 TRAVIS_MATRIX = TRAVIS_DICT['env']['matrix']
 
-CI_PATTERNS = set()
+CI_PATTERNS = set()  # type: Set[str]
 for MATRIX_ITEM in TRAVIS_MATRIX:
     KEY, VALUE = MATRIX_ITEM.split('=')
     assert KEY == 'CI_PATTERN'
@@ -61,7 +61,6 @@ if CI_PATTERNS != PATTERNS.keys():
                     item=RUN_SCRIPT_ONLY_ITEM,
                 ),
             )
-
 
 COLLECT_ONLY_ERROR_RESULTS = set()
 for CI_PATTERN in CI_PATTERNS:
