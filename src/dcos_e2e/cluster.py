@@ -504,7 +504,7 @@ class Cluster(ContextDecorator):
             subprocess.CalledProcessError: If the ``pytest`` command fails.
         """
         args = [
-            'source',
+            '.',
             '/opt/mesosphere/environment.export',
             '&&',
             'cd',
