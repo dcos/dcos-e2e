@@ -1,7 +1,7 @@
 Installation
 ------------
 
-DC/OS E2E consists of a :doc:`library` and various :doc:`cli` tools.
+DC/OS E2E consists of a :doc:`library` and various :doc:`cli`.
 
 The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
 

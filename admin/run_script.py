@@ -20,10 +20,10 @@ OSS_1_9_ARTIFACT_URL = OSS_PATTERN.format(version='1.9')
 OSS_1_10_ARTIFACT_URL = OSS_PATTERN.format(version='1.10')
 OSS_1_11_ARTIFACT_URL = OSS_PATTERN.format(version='1.11')
 
-EE_MASTER_ARTIFACT_URL = os.environ['EE_MASTER_ARTIFACT_URL']
-EE_1_9_ARTIFACT_URL = os.environ['EE_1_9_ARTIFACT_URL']
-EE_1_10_ARTIFACT_URL = os.environ['EE_1_10_ARTIFACT_URL']
-EE_1_11_ARTIFACT_URL = os.environ['EE_1_11_ARTIFACT_URL']
+EE_MASTER_ARTIFACT_URL = os.environ.get('EE_MASTER_ARTIFACT_URL')
+EE_1_9_ARTIFACT_URL = os.environ.get('EE_1_9_ARTIFACT_URL')
+EE_1_10_ARTIFACT_URL = os.environ.get('EE_1_10_ARTIFACT_URL')
+EE_1_11_ARTIFACT_URL = os.environ.get('EE_1_11_ARTIFACT_URL')
 
 OSS_MASTER_ARTIFACT_PATH = Path('/tmp/dcos_generate_config.sh')
 OSS_1_9_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_9.sh')
@@ -70,6 +70,8 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_node':  # noqa: E501
     (),
+    'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_with_custom_genconf':  # noqa: E501
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
@@ -85,6 +87,10 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterSize':
+    (),
+    'tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url':  # noqa: E501
     (),
     'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
     (OSS_MASTER, ),

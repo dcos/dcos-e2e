@@ -45,7 +45,6 @@ class Cluster(ContextDecorator):
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        files_to_copy_to_installer: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -55,15 +54,11 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
         """
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=list(files_to_copy_to_installer),
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
@@ -102,7 +97,6 @@ class Cluster(ContextDecorator):
             masters=len(masters),
             agents=len(agents),
             public_agents=len(public_agents),
-            files_to_copy_to_installer=(),
             cluster_backend=backend,
         )
 
@@ -360,6 +354,7 @@ class Cluster(ContextDecorator):
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         log_output_live: bool = False,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Installs DC/OS using the DC/OS advanced installation method.
@@ -383,6 +378,9 @@ class Cluster(ContextDecorator):
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to a ``ip-detect`` script that will be
                 used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
         """
@@ -391,6 +389,7 @@ class Cluster(ContextDecorator):
                 build_artifact=build_artifact,
                 dcos_config=dcos_config,
                 ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
                 log_output_live=log_output_live,
             )
         except NotImplementedError:
@@ -404,6 +403,9 @@ class Cluster(ContextDecorator):
                         build_artifact=build_artifact,
                         dcos_config=dcos_config,
                         ip_detect_path=ip_detect_path,
+                        files_to_copy_to_genconf_dir=(
+                            files_to_copy_to_genconf_dir
+                        ),
                         role=role,
                         log_output_live=log_output_live,
                     )
@@ -413,6 +415,7 @@ class Cluster(ContextDecorator):
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         log_output_live: bool = False,
     ) -> None:
         """
@@ -422,6 +425,9 @@ class Cluster(ContextDecorator):
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to a ``ip-detect`` script that will be
                 used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
             log_output_live: If `True`, log output of the installation live.
                 If `True`, stderr is merged into stdout in the return value.
 
@@ -435,6 +441,7 @@ class Cluster(ContextDecorator):
                 build_artifact=build_artifact,
                 dcos_config=dcos_config,
                 ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
                 log_output_live=log_output_live,
             )
         except NotImplementedError:
@@ -449,6 +456,9 @@ class Cluster(ContextDecorator):
                         dcos_config=dcos_config,
                         ip_detect_path=ip_detect_path,
                         role=role,
+                        files_to_copy_to_genconf_dir=(
+                            files_to_copy_to_genconf_dir
+                        ),
                         log_output_live=log_output_live,
                     )
 

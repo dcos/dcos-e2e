@@ -113,14 +113,13 @@ class TestCopyFiles:
             'license_key_contents': license_key_contents,
         }
 
-        files_to_copy_to_installer = (
+        files_to_copy_to_genconf_dir = [
             (cert_path, installer_cert_path),
             (ca_key_path, installer_key_path),
-        )
+        ]
 
         with Cluster(
             cluster_backend=cluster_backend,
-            files_to_copy_to_installer=files_to_copy_to_installer,
             masters=1,
             agents=0,
             public_agents=0,
@@ -139,6 +138,7 @@ class TestCopyFiles:
                 },
                 log_output_live=True,
                 ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
 
             # We exercise the "http_checks=False" code here but we do not test
@@ -201,11 +201,10 @@ class TestCopyFiles:
             'license_key_contents': license_key_contents,
         }
 
-        files_to_copy_to_installer = ((cert_dir_on_host, genconf), )
+        files_to_copy_to_genconf_dir = ((cert_dir_on_host, genconf), )
 
         with Cluster(
             cluster_backend=cluster_backend,
-            files_to_copy_to_installer=files_to_copy_to_installer,
             masters=1,
             agents=0,
             public_agents=0,
@@ -224,6 +223,7 @@ class TestCopyFiles:
                 },
                 log_output_live=True,
                 ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
 
             cluster.wait_for_dcos_ee(
