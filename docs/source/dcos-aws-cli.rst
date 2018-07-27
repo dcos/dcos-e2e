@@ -23,6 +23,8 @@ Each of these and more are described in detail below.
 
 .. include:: aws-backend-requirements.rst
 
+.. include:: install-cli.rst
+
 CLI Reference
 -------------
 
