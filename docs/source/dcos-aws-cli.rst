@@ -49,6 +49,8 @@ CLI Reference
 .. click:: cli:dcos_aws
   :prog: dcos-aws
 
+.. _dcos-aws-create:
+
 .. click:: cli.dcos_aws:create
   :prog: dcos-aws create
 
@@ -63,11 +65,15 @@ CLI Reference
 .. click:: cli.dcos_aws:run
   :prog: dcos-aws run
 
+.. _dcos-aws-inspect:
+
 .. click:: cli.dcos_aws:inspect_cluster
   :prog: dcos-aws inspect
 
 .. click:: cli.dcos_aws:sync_code
   :prog: dcos-aws sync
+
+.. _dcos-aws-wait:
 
 .. click:: cli.dcos_aws:wait
   :prog: dcos-aws wait
