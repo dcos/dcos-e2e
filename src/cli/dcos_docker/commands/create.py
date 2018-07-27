@@ -233,9 +233,10 @@ def _validate_volumes(
     type=click.Path(exists=True),
     callback=validate_path_is_directory,
     help=(
-        'Path to a directory that contains additional files for '
-        'DC/OS installer. All files from this directory will be copied to the '
-        '`genconf` directory before running DC/OS installer.'
+        'Path to a directory that contains additional files for the DC/OS '
+        'installer. '
+        'All files from this directory will be copied to the "genconf" '
+        'directory before running the DC/OS installer.'
     ),
 )
 @copy_to_master_option
