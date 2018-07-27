@@ -14,7 +14,6 @@ from typing import Iterator, List
 import pytest
 from _pytest.logging import LogCaptureFixture
 from kazoo.client import KazooClient
-from kazoo.retry import KazooRetry
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
