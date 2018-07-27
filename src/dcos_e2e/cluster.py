@@ -156,6 +156,36 @@ class Cluster(ContextDecorator):
         if not http_checks:
             return
 
+        email = 'albert@bekstil.net'
+        path = '/dcos/users/{email}'.format(email=email)
+        server_option = (
+            '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
+            'zk-5.zk:2181"'
+        )
+
+        delete_user_args = [
+            '.',
+            '/opt/mesosphere/environment.export',
+            '&&',
+            'zkCli.sh',
+            '-server',
+            server_option,
+            'delete',
+            path,
+        ]
+
+        create_user_args = [
+            '.',
+            '/opt/mesosphere/environment.export',
+            '&&',
+            'zkCli.sh',
+            '-server',
+            server_option,
+            'create',
+            path,
+            email,
+        ]
+
         # The dcos-diagnostics check is not yet sufficient to determine
         # when a CLI login would be possible with DC/OS OSS. It only
         # checks the healthy state of the systemd units, not reachability
@@ -182,6 +212,8 @@ class Cluster(ContextDecorator):
         # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
         any_master = next(iter(self.masters))
+        # This allows this function to work even after a user has logged in.
+        any_master.run(args=create_user_args, shell=True, log_output_live=True)
 
         api_session = DcosApiSession(
             dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
@@ -203,22 +235,6 @@ class Cluster(ContextDecorator):
         # hard coded credentials "CI_CREDENTIALS".
         # These credentials match a user with the email address
         # "albert@bekstil.net".
-        email = 'albert@bekstil.net'
-        path = '/dcos/users/{email}'.format(email=email)
-        server_option = (
-            '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
-            'zk-5.zk:2181"'
-        )
-        delete_user_args = [
-            '.',
-            '/opt/mesosphere/environment.export',
-            '&&',
-            'zkCli.sh',
-            '-server',
-            server_option,
-            'delete',
-            path,
-        ]
         any_master.run(args=delete_user_args, shell=True, log_output_live=True)
 
     def wait_for_dcos_ee(
