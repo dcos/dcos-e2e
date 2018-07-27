@@ -52,7 +52,7 @@ DC/OS Enterprise
 There are multiple DC/OS Enterprise-only features available in :ref:`dcos-vagrant-create`.
 
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
-See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on how to provide a license key.
+See :ref:`dcos-vagrant-create` for details on how to provide a license key.
 
 Ask your sales representative for DC/OS Enterprise release artifacts.
 
@@ -67,7 +67,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` command.
 
-See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.
+See :ref:`dcos-vagrant-create` for details on this command and its options.
 
 Cluster IDs
 -----------
@@ -92,7 +92,7 @@ It is possible to run the following to run a command on an arbitrary master node
 
    $ dcos-vagrant run systemctl list-units
 
-See :ref:`the dcos-vagrant run reference <dcos-vagrant-run>` for more information on this command.
+See :ref:`dcos-vagrant-run` for more information on this command.
 
 Running commands on a cluster node using ``ssh``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,7 +157,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
    $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
-See :ref:`the dcos-vagrant run reference <dcos-vagrant-run>` for more information on this command.
+See :ref:`dcos-vagrant-run` for more information on this command.
 
 Viewing the Web UI
 ------------------
