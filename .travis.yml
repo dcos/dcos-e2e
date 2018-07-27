@@ -19,6 +19,7 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestCustomKeyPair
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_path
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_node
+  - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_with_custom_genconf
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
@@ -27,12 +28,15 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestDestroyNode
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
+  - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_node_installer_genconf_dir
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestSSLDisabled
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS
@@ -43,6 +47,9 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_node.py
+  - CI_PATTERN=tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_url
+  - CI_PATTERN=tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path
+  - CI_PATTERN=tests/test_dcos_e2e/test_node_install.py::TestCopyFiles::test_install_from_path_with_genconf_files
 before_install:
 - sudo modprobe aufs
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt

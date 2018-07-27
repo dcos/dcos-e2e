@@ -1326,7 +1326,7 @@ class TestRun:
                                              address, the node's Docker container name, the
                                              node's Docker container ID, a reference in the
                                              format "<role>_<number>". These details be seen
-                                             with ``dcos_docker inspect``.
+                                             with ``dcos-docker inspect``.
               --env TEXT                     Set environment variables in the format
                                              "<KEY>=<VALUE>"
               --transport [docker-exec|ssh]  The communication transport to use. On macOS
@@ -1336,6 +1336,8 @@ class TestRun:
                                              This can be provided by setting the
                                              `DCOS_DOCKER_TRANSPORT` environment variable.
                                              [default: docker-exec]
+              -v, --verbose                  Use verbose output. Use this option multiple
+                                             times for more verbose output.
               --help                         Show this message and exit.
             """,# noqa: E501,E261
         )

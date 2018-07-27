@@ -3,7 +3,7 @@ Helpers for interacting with existing clusters.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple, Type
+from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from dcos_e2e.node import Node
 
@@ -37,6 +37,17 @@ class ExistingCluster(ClusterBackend):
         """
         return ExistingClusterManager
 
+    @property
+    def ip_detect_path(self) -> Path:  # pragma: no cover
+        """
+        Return the path to a ``ip-detect`` script.
+
+        Raises:
+            NotImplementedError: The ``ExistingCluster`` backend cannot
+                be associated with a specific ``ip-detect`` script.
+        """
+        raise NotImplementedError
+
 
 class ExistingClusterManager(ClusterManager):
     """
@@ -48,7 +59,6 @@ class ExistingClusterManager(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: ExistingCluster,
     ) -> None:
         """
@@ -62,8 +72,6 @@ class ExistingClusterManager(ClusterManager):
             public_agents: The number of public agent nodes to create.
                 This must match the number of public agents in
                 `cluster_backend`.
-            files_to_copy_to_installer: Ignored pairs of host paths to paths
-                on the installer node.
             cluster_backend: Details of the specific existing cluster backend
                 to use.
         """
@@ -75,7 +83,9 @@ class ExistingClusterManager(ClusterManager):
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Raises:
@@ -89,7 +99,9 @@ class ExistingClusterManager(ClusterManager):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Raises:

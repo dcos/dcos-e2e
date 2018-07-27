@@ -4,7 +4,7 @@ Abstract base classes for cluster backends.
 
 import abc
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple, Type
+from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from ..node import Node
 
@@ -20,7 +20,6 @@ class ClusterManager(abc.ABC):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: 'ClusterBackend',
     ) -> None:
         """
@@ -30,9 +29,6 @@ class ClusterManager(abc.ABC):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
             cluster_backend: Details of the specific DC/OS Docker backend to
                 use.
         """
@@ -42,7 +38,9 @@ class ClusterManager(abc.ABC):
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a URL with a bootstrap node.
@@ -55,7 +53,12 @@ class ClusterManager(abc.ABC):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script to use for installing
+                DC/OS.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
 
     @abc.abstractmethod
@@ -63,7 +66,9 @@ class ClusterManager(abc.ABC):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a build artifact passed as a file system `Path`.
@@ -75,7 +80,12 @@ class ClusterManager(abc.ABC):
         Args:
             build_artifact: The path to a build artifact to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script to use for installing
+                DC/OS.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
 
     @abc.abstractmethod
@@ -133,4 +143,11 @@ class ClusterBackend(abc.ABC):
         """
         Return the :class:`ClusterManager` class to use to create and manage a
         cluster.
+        """
+
+    @property
+    @abc.abstractmethod
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to a backend specific ``ip-detect`` script.
         """

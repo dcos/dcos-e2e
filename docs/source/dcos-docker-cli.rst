@@ -12,11 +12,14 @@ A typical CLI workflow for open source DC/OS may look like the following.
 
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor
+   $ dcos-docker download-artifact
    $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0
    default
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
+   # Get onto a node
+   $ dcos-docker run bash
    $ dcos-docker destroy
 
 Each of these and more are described in detail below.
@@ -50,6 +53,45 @@ The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait <dcos-docker-wait>` command.
 
 To use this cluster, it is useful to find details using the :ref:`the dcos-docker inspect <dcos-docker-inspect>` command.
+
+Using a custom Docker network
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default DC/OS clusters are launched on the ``docker0`` network.
+
+To launch a DC/OS cluster on a custom Docker network the network must first be created using the standard Docker CLI.
+During :ref:`dcos-docker create <dcos-docker-create>` the command line option ``--network`` then takes the name of the Docker network as a parameter.
+
+DC/OS nodes utilize an environment-specific ``ip-detect`` script to detect their current private IP address.
+The default ``ip-detect`` script used by ``dcos-docker`` does only account for the ``docker0`` network case.
+Therefore, in order for DC/OS to operate on a custom network a custom ``ip-detect`` script needs to be provided and put into the ``genconf`` directory before installing DC/OS.
+
+The following IP detect script works for any custom Docker network:
+
+.. code-block:: console
+
+    #!/bin/bash -e
+    if [ -f /sbin/ip ]; then
+       IP_CMD=/sbin/ip
+    else
+       IP_CMD=/bin/ip
+    fi
+    $IP_CMD -4 -o addr show dev eth1 | awk '{split($4,a,"/");print a[1]}'
+
+The :ref:`dcos-docker create <dcos-docker-create>` command supports overwriting the default ``genconf`` directory with the
+contents of the directory supplied through the command line option ``--genconf-dir``.
+
+.. code-block:: console
+
+    # Create ip-detect as mentioned above
+    $ docker network create custom-bridge
+    $ mkdir custom-genconf
+    $ mv ip-detect custom-genconf/ip-detect
+    $ dcos-docker create /path/to/dcos_generate_config.sh
+        --network custom-bridge
+        --genconf-dir ./custom-genconf
+
+The custom Docker network is not cleaned up by the ``dcos-docker`` CLI.
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~
@@ -199,9 +241,25 @@ Viewing the Web UI
 ------------------
 
 To view the web UI of your cluster, use the :ref:`dcos-docker-web` command.
-If you instead want to view the web UI URL of your cluster, use the :ref:`dcos-docker-inspect` command.
+To see the web UI URL of your cluster, use the :ref:`dcos-docker-inspect` command.
 
 Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
+
+macOS
+~~~~~
+
+On macOS, by default, viewing the web UI requires IP routing to be set up.
+Use :ref:`dcos-docker-setup-mac-network` to set up IP routing.
+
+The web UI is served by master nodes on port ``80``.
+To view the web UI on macOS without setting up IP routing, use the ``--one-master-host-port-map`` option on the :ref:`dcos-docker-create` command to forward port ``80`` to your host.
+For example:
+
+.. code-block:: console
+
+   $ dcos-docker create /tmp/dcos_generate_config.ee.sh --one-master-host-port-map 70:80
+   $ dcos-docker wait
+   $ open localhost:70
 
 Using a Custom CA Certificate
 -----------------------------
@@ -257,7 +315,7 @@ CLI Reference
 .. click:: cli.dcos_docker:create
   :prog: dcos-docker create
 
-.. click:: cli.dcos_docker:LIST_CLUSTERS
+.. click:: cli.dcos_docker:list_clusters
   :prog: dcos-docker list
 
 .. _dcos-docker-wait:

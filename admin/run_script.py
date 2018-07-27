@@ -20,10 +20,10 @@ OSS_1_9_ARTIFACT_URL = OSS_PATTERN.format(version='1.9')
 OSS_1_10_ARTIFACT_URL = OSS_PATTERN.format(version='1.10')
 OSS_1_11_ARTIFACT_URL = OSS_PATTERN.format(version='1.11')
 
-EE_MASTER_ARTIFACT_URL = os.environ['EE_MASTER_ARTIFACT_URL']
-EE_1_9_ARTIFACT_URL = os.environ['EE_1_9_ARTIFACT_URL']
-EE_1_10_ARTIFACT_URL = os.environ['EE_1_10_ARTIFACT_URL']
-EE_1_11_ARTIFACT_URL = os.environ['EE_1_11_ARTIFACT_URL']
+EE_MASTER_ARTIFACT_URL = os.environ.get('EE_MASTER_ARTIFACT_URL')
+EE_1_9_ARTIFACT_URL = os.environ.get('EE_1_9_ARTIFACT_URL')
+EE_1_10_ARTIFACT_URL = os.environ.get('EE_1_10_ARTIFACT_URL')
+EE_1_11_ARTIFACT_URL = os.environ.get('EE_1_11_ARTIFACT_URL')
 
 OSS_MASTER_ARTIFACT_PATH = Path('/tmp/dcos_generate_config.sh')
 OSS_1_9_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_9.sh')
@@ -70,6 +70,8 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_from_node':  # noqa: E501
     (),
+    'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_with_custom_genconf':  # noqa: E501
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
@@ -86,6 +88,10 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterSize':
     (),
+    'tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url':  # noqa: E501
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests':
@@ -97,6 +103,8 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
+    (EE_MASTER, ),
+    'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_node_installer_genconf_dir':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests':
     (EE_MASTER, ),
@@ -117,6 +125,12 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
     (OSS_1_9, ),
     'tests/test_dcos_e2e/test_node.py':
+    (),
+    'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_url':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_install.py::TestCopyFiles::test_install_from_path_with_genconf_files':  # noqa: E501
     (OSS_MASTER, ),
 }  # type: Dict[str, Tuple]
 
@@ -128,7 +142,7 @@ def _download_file(url: str, path: Path) -> None:
     label = 'Downloading to ' + str(path)
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
-    chunk_size = 100 * 1024
+    chunk_size = 1024
     with click.open_file(str(path), 'wb') as file_descriptor:
         content_iter = stream.iter_content(chunk_size=chunk_size)
         with click.progressbar(  # type: ignore

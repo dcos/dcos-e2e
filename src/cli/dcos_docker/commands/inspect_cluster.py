@@ -7,10 +7,15 @@ from typing import Any, Dict  # noqa: F401
 
 import click
 
+from cli.common.options import existing_cluster_id_option
+from cli.common.utils import check_cluster_id_exists
 from dcos_e2e.node import Transport
 
-from ._common import ClusterContainers, ContainerInspectView
-from ._options import existing_cluster_id_option
+from ._common import (
+    ClusterContainers,
+    ContainerInspectView,
+    existing_cluster_ids,
+)
 
 
 @click.command('inspect')
@@ -30,6 +35,10 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         # The transport here is not relevant as we do not make calls to the

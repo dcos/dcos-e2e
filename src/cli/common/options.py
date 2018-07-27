@@ -4,7 +4,7 @@ Click options which are common across CLI tools.
 
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Set, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import click
 import yaml
@@ -12,52 +12,29 @@ import yaml
 from .validators import validate_path_is_directory, validate_path_pair
 
 
-def _make_validate_cluster_id(
-    existing_cluster_ids_func: Callable[[], Set[str]],
-) -> Callable[[
-    click.core.Context,
-    Union[click.core.Option, click.core.Parameter],
-    Optional[Union[int, bool, str]],
-], str]:
+def _validate_cluster_id(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> str:
     """
-    Return a Click validator for a new cluster ID.
-
-    Args:
-        existing_cluster_ids_func: A function which returns existing cluster
-            IDs.
+    Validate that a value is a valid cluster ID.
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
 
-    def _validate_cluster_id(
-        ctx: click.core.Context,
-        param: Union[click.core.Option, click.core.Parameter],
-        value: Optional[Union[int, bool, str]],
-    ) -> str:
-        """
-        Validate that a value is a valid cluster ID.
-        """
-        # We "use" variables to satisfy linting tools.
-        for _ in (ctx, param):
-            pass
+    # This matches the Docker ID regular expression.
+    # This regular expression can be seen by running:
+    # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
+    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
+        message = (
+            'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
+            'are allowed and the cluster ID cannot be empty.'
+        ).format(value=value)
+        raise click.BadParameter(message)
 
-        if value in existing_cluster_ids_func():
-            message = 'A cluster with the id "{value}" already exists.'.format(
-                value=value,
-            )
-            raise click.BadParameter(message=message)
-
-        # This matches the Docker ID regular expression.
-        # This regular expression can be seen by running:
-        # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
-        if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
-            message = (
-                'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
-                'are allowed and the cluster ID cannot be empty.'
-            ).format(value=value)
-            raise click.BadParameter(message)
-
-        return str(value)
-
-    return _validate_cluster_id
+    return str(value)
 
 
 def _validate_environment_variable(
@@ -246,20 +223,9 @@ def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An argument decorator for a DC/OS artifact.
-    """
-    function = click.argument(
-        'artifact',
-        type=click.Path(exists=True),
-    )(command)  # type: Callable[..., None]
-    return function
-
-
 def variant_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for a DC/OS variant.
+    An option decorator for a DC/OS variant.
     """
     function = click.option(
         '--variant',
@@ -279,7 +245,7 @@ def variant_option(command: Callable[..., None]) -> Callable[..., None]:
 
 def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for passing a license key.
+    An option decorator for passing a license key.
     """
     function = click.option(
         '--license-key',
@@ -296,7 +262,7 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
 
 def security_mode_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for the DC/OS Enterprise security mode.
+    An option decorator for the DC/OS Enterprise security mode.
     """
     function = click.option(
         '--security-mode',
@@ -413,81 +379,36 @@ def no_test_env_run_option(command: Callable[..., None],
     return function
 
 
-def make_cluster_id_option(
-    existing_cluster_ids_func: Callable[[], Set[str]],
-) -> Callable[[Callable[..., None]], Callable[..., None]]:
+def cluster_id_option(command: Callable[..., None]) -> Callable[..., None]:
     """
-    Return a Click option for choosing a new cluster ID.
-
-    Args:
-        existing_cluster_ids_func: A function which returns existing cluster
-            IDs.
+    A Click option for choosing a new cluster ID.
     """
-
-    def cluster_id_option(command: Callable[..., None]) -> Callable[..., None]:
-        function = click.option(
-            '-c',
-            '--cluster-id',
-            type=str,
-            default='default',
-            callback=_make_validate_cluster_id(
-                existing_cluster_ids_func=existing_cluster_ids_func,
-            ),
-            help=(
-                'A unique identifier for the cluster. '
-                'Use the value "default" to use this cluster for other '
-                'commands without specifying --cluster-id.'
-            ),
-        )(command)  # type: Callable[..., None]
-        return function
-
-    return cluster_id_option
+    function = click.option(
+        '-c',
+        '--cluster-id',
+        type=str,
+        default='default',
+        callback=_validate_cluster_id,
+        help=(
+            'A unique identifier for the cluster. '
+            'Use the value "default" to use this cluster for other '
+            'commands without specifying --cluster-id.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
 
 
-def make_existing_cluster_id_option(
-    existing_cluster_ids_func: Callable[[], Set[str]],
-) -> Callable[[Callable[..., None]], Callable[..., None]]:
+def existing_cluster_id_option(command: Callable[..., None],
+                               ) -> Callable[..., None]:
     """
-    Return a Click option for choosing an existing cluster ID.
-
-    Args:
-        existing_cluster_ids_func: A function which returns existing cluster
-            IDs.
+    An option decorator for an existing Cluster ID.
     """
-
-    def _validate_cluster_exists(
-        ctx: click.core.Context,
-        param: Union[click.core.Option, click.core.Parameter],
-        value: Optional[Union[int, bool, str]],
-    ) -> str:
-        """
-        Validate that a cluster exists with the given name.
-        """
-        # We "use" variables to satisfy linting tools.
-        for _ in (ctx, param):
-            pass
-
-        cluster_id = str(value)
-        if cluster_id not in existing_cluster_ids_func():
-            message = 'Cluster "{value}" does not exist'.format(value=value)
-            raise click.BadParameter(message)
-
-        return cluster_id
-
-    def existing_cluster_id_option(command: Callable[..., None],
-                                   ) -> Callable[..., None]:
-        """
-        An option decorator for one Cluster ID.
-        """
-        function = click.option(
-            '-c',
-            '--cluster-id',
-            type=str,
-            callback=_validate_cluster_exists,
-            default='default',
-            show_default=True,
-            help='The ID of the cluster to use.',
-        )(command)  # type: Callable[..., None]
-        return function
-
-    return existing_cluster_id_option
+    function = click.option(
+        '-c',
+        '--cluster-id',
+        type=str,
+        default='default',
+        show_default=True,
+        help='The ID of the cluster to use.',
+    )(command)  # type: Callable[..., None]
+    return function

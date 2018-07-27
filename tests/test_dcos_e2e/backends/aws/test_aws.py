@@ -4,6 +4,7 @@ Tests for the AWS backend.
 
 import uuid
 from pathlib import Path
+from textwrap import dedent
 
 import boto3
 import pytest
@@ -84,23 +85,6 @@ class TestUnsupported:
 
         assert str(excinfo.value) == expected_error
 
-    def test_copy_to_installer_not_supported(self) -> None:
-        """
-        The AWS backend does not support copying files to the installer.
-        """
-        with pytest.raises(NotImplementedError) as excinfo:
-            Cluster(
-                cluster_backend=AWS(),
-                files_to_copy_to_installer=[(Path('/'), Path('/'))],
-            )
-
-        expected_error = (
-            'Copying files to the installer is currently not supported by the '
-            'AWS backend.'
-        )
-
-        assert str(excinfo.value) == expected_error
-
     def test_destroy_node(self) -> None:
         """
         Destroying a particular node is not supported on the AWS backend.
@@ -137,8 +121,10 @@ class TestRunIntegrationTest:
             'security': 'strict',
         }
 
+        cluster_backend = AWS(linux_distribution=linux_distribution)
+
         with Cluster(
-            cluster_backend=AWS(linux_distribution=linux_distribution),
+            cluster_backend=cluster_backend,
             masters=1,
         ) as cluster:
 
@@ -149,6 +135,7 @@ class TestRunIntegrationTest:
                     **config,
                 },
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_ee(
@@ -248,12 +235,14 @@ class TestDCOSInstallation:
         """
         It is possible to install DC/OS on an AWS cluster from a local path.
         """
-        with Cluster(cluster_backend=AWS()) as cluster:
+        cluster_backend = AWS()
+        with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                log_output_live=True,
             )
-
             cluster.wait_for_dcos_oss()
 
     def test_install_dcos_from_node(
@@ -263,8 +252,9 @@ class TestDCOSInstallation:
         """
         It is possible to install DC/OS on an AWS cluster node by node.
         """
+        cluster_backend = AWS()
         with Cluster(
-            cluster_backend=AWS(),
+            cluster_backend=cluster_backend,
             agents=0,
             public_agents=0,
         ) as cluster:
@@ -274,5 +264,46 @@ class TestDCOSInstallation:
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+
+    def test_install_dcos_with_custom_genconf(
+        self,
+        oss_artifact_url: str,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to install DC/OS on an AWS including
+        custom files in the ``genconf`` directory.
+        """
+        cluster_backend = AWS()
+        with Cluster(
+            cluster_backend=cluster_backend,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_contents = dedent(
+                """\
+                #!/bin/bash
+                echo {ip_address}
+                """,
+            ).format(ip_address=master.private_ip_address)
+            ip_detect_file.write(ip_detect_contents)
+
+            cluster.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=cluster.base_config,
+                log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=[
+                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                ],
+            )
+            cluster.wait_for_dcos_oss()
+            cat_result = master.run(
+                args=['cat', '/opt/mesosphere/bin/detect_ip'],
+            )
+            assert cat_result.stdout.decode() == ip_detect_contents

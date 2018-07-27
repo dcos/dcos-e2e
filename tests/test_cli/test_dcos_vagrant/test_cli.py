@@ -174,6 +174,9 @@ class TestCreate:
                                               commands without specifying --cluster-id.
               -v, --verbose                   Use verbose output. Use this option multiple
                                               times for more verbose output.
+              --enable-selinux-enforcing      With this flag set, SELinux is set to
+                                              enforcing before DC/OS is installed on the
+                                              cluster.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )
@@ -411,6 +414,13 @@ class TestRun:
                                        and the command is run in the home directory.
               --env TEXT               Set environment variables in the format
                                        "<KEY>=<VALUE>"
+              --node TEXT              A reference to a particular node to run the command
+                                       on. This can be one of: The node's IP address, the
+                                       node's VM name, a reference in the format
+                                       "<role>_<number>". These details be seen with ``dcos-
+                                       vagrant inspect``.
+              -v, --verbose            Use verbose output. Use this option multiple times
+                                       for more verbose output.
               --help                   Show this message and exit.
             """,# noqa: E501,E261
         )

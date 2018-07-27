@@ -8,12 +8,14 @@ long time to run.
 import logging
 from pathlib import Path
 from subprocess import CalledProcessError
+from textwrap import dedent
 from typing import Iterator, List
 
 import pytest
 from _pytest.logging import LogCaptureFixture
 from kazoo.client import KazooClient
 from kazoo.retry import KazooRetry
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -39,6 +41,7 @@ class TestIntegrationTests:
         with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
             dcos_cluster.install_dcos_from_path(
                 dcos_config=dcos_cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
                 build_artifact=oss_artifact,
                 log_output_live=True,
             )
@@ -50,22 +53,10 @@ class TestIntegrationTests:
         """
         Return a ZooKeeper client connected to ``cluster``.
         """
-        retry_policy = KazooRetry(
-            max_tries=5,
-            delay=0.5,
-            backoff=1,
-            max_jitter=0.1,
-            max_delay=5,
-        )
         (master, ) = cluster.masters
         zk_client_port = '2181'
         zk_host = str(master.public_ip_address)
-        zk_client = KazooClient(
-            hosts=zk_host + ':' + zk_client_port,
-            timeout=5.0,
-            connection_retry=retry_policy,
-            command_retry=retry_policy,
-        )
+        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
         zk_client.start()
         try:
             yield zk_client
@@ -95,6 +86,8 @@ class TestIntegrationTests:
         zk_client.create(path=path, value=email.encode())
         cluster.wait_for_dcos_oss()
         assert zk_client.exists(path=path)
+        cluster.wait_for_dcos_oss()
+        assert not zk_client.exists(path=path)
 
     def test_run_pytest(self, cluster: Cluster) -> None:
         """
@@ -184,6 +177,92 @@ class TestClusterSize:
             assert len(cluster.public_agents) == public_agents
 
 
+class TestCopyFiles:
+    """
+    Tests for copying files to the cluster.
+    """
+
+    def test_install_cluster_from_path(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_artifact: Path,
+        tmpdir: local,
+    ) -> None:
+        """
+        Install a DC/OS cluster with a custom ``ip-detect`` script.
+        """
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+
+            (master, ) = cluster.masters
+            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_contents = dedent(
+                """\
+                #!/bin/bash
+                echo {ip_address}
+                """,
+            ).format(ip_address=master.private_ip_address)
+            ip_detect_file.write(ip_detect_contents)
+
+            cluster.install_dcos_from_path(
+                build_artifact=oss_artifact,
+                dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=[
+                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                ],
+            )
+            cluster.wait_for_dcos_oss()
+            cat_result = master.run(
+                args=['cat', '/opt/mesosphere/bin/detect_ip'],
+            )
+            assert cat_result.stdout.decode() == ip_detect_contents
+
+    def test_install_cluster_from_url(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_artifact_url: str,
+        tmpdir: local,
+    ) -> None:
+        """
+        Install a DC/OS cluster with a custom ``ip-detect`` script.
+        """
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+
+            (master, ) = cluster.masters
+            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_contents = dedent(
+                """\
+                #!/bin/bash
+                echo {ip_address}
+                """,
+            ).format(ip_address=master.private_ip_address)
+            ip_detect_file.write(ip_detect_contents)
+
+            cluster.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=[
+                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                ],
+            )
+            cluster.wait_for_dcos_oss()
+            cat_result = master.run(
+                args=['cat', '/opt/mesosphere/bin/detect_ip'],
+            )
+            assert cat_result.stdout.decode() == ip_detect_contents
+
+
 class TestInstallDcosFromPathLogging:
     """
     Tests for logs created when calling `install_dcos_from_path` on
@@ -236,6 +315,7 @@ class TestInstallDcosFromPathLogging:
             ) as cluster:
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
+                    ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,
                     log_output_live=True,
                 )
@@ -260,6 +340,7 @@ class TestInstallDcosFromPathLogging:
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
                     dcos_config=cluster.base_config,
+                    ip_detect_path=cluster_backend.ip_detect_path,
                 )
 
         assert not self._two_masters_error_logged(log_records=caplog.records)
@@ -282,11 +363,13 @@ class TestMultipleClusters:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             with Cluster(cluster_backend=cluster_backend) as cluster:
                 cluster.install_dcos_from_path(
                     build_artifact=oss_artifact,
                     dcos_config=cluster.base_config,
+                    ip_detect_path=cluster_backend.ip_detect_path,
                 )
 
 
@@ -364,6 +447,7 @@ class TestClusterFromNodes:
             cluster.install_dcos_from_url(
                 build_artifact=oss_artifact_url,
                 dcos_config=original_cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_oss()
@@ -391,6 +475,7 @@ class TestClusterFromNodes:
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=original_cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_oss()

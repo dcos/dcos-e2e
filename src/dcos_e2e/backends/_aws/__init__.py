@@ -2,16 +2,15 @@
 Helpers for creating and interacting with clusters on AWS.
 """
 
+import inspect
+import os
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
-from textwrap import dedent
 from typing import Optional  # noqa: F401
-from typing import Any, Dict, Set, Tuple, Type
-
-import yaml
+from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
@@ -33,6 +32,7 @@ class AWS(ClusterBackend):
         linux_distribution: Distribution = Distribution.CENTOS_7,
         workspace_dir: Optional[Path] = None,
         aws_key_pair: Optional[Tuple[str, Path]] = None,
+        aws_cloudformation_stack_name: Optional[str] = None,
     ) -> None:
         """
         Create a configuration for an AWS cluster backend.
@@ -55,6 +55,8 @@ class AWS(ClusterBackend):
                 key. The private key can then be used to connect to the
                 cluster. If this is not given, a new key pair will be
                 generated.
+            aws_cloudformation_stack_name: The name of the CloudFormation stack
+                to create. If this is not given, a random string is used.
 
         Attributes:
             admin_location: The IP address range from which the AWS nodes can
@@ -71,6 +73,8 @@ class AWS(ClusterBackend):
                 and the path is the local path to the corresponding private
                 key. The private key can then be used to connect to the
                 cluster.
+            aws_cloudformation_stack_name: The name of the CloudFormation stack
+                to create.
 
         Raises:
             NotImplementedError: In case an unsupported Linux distribution has
@@ -102,6 +106,7 @@ class AWS(ClusterBackend):
         self.aws_instance_type = aws_instance_type
         self.admin_location = admin_location
         self.aws_key_pair = aws_key_pair
+        self.aws_cloudformation_stack_name = aws_cloudformation_stack_name
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
@@ -110,6 +115,15 @@ class AWS(ClusterBackend):
         cluster.
         """
         return AWSCluster
+
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the AWS specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
 
 
 class AWSCluster(ClusterManager):
@@ -123,7 +137,6 @@ class AWSCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: Dict[Path, Path],
         cluster_backend: AWS,
     ) -> None:
         """
@@ -133,30 +146,16 @@ class AWSCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on the
-                installer node. This must be empty as it is not currently
-                supported.
             cluster_backend: Details of the specific AWS backend to use.
 
-        Raises:
-            NotImplementedError: ``files_to_copy_to_installer`` includes files
-                to copy to the installer.
         """
-        if files_to_copy_to_installer:
-            # Copying files to the installer is not yet supported.
-            # https://jira.mesosphere.com/browse/DCOS-21894
-            message = (
-                'Copying files to the installer is currently not supported by '
-                'the AWS backend.'
-            )
-            raise NotImplementedError(message)
-
-        unique = 'dcos-e2e-{}'.format(str(uuid.uuid4()))
+        unique = 'dcos-e2e-{random}'.format(random=str(uuid.uuid4()))
 
         self._path = cluster_backend.workspace_dir / unique
         self._path.mkdir(exist_ok=True)
         self._path = self._path.resolve() / unique
         self._path.mkdir(exist_ok=True)
+        self._ip_detect_path = cluster_backend.ip_detect_path
 
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
@@ -173,10 +172,13 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'coreos',
         }
 
+        deployment_name = (
+            cluster_backend.aws_cloudformation_stack_name or unique
+        )
         launch_config = {
             'admin_location': cluster_backend.admin_location,
             'aws_region': cluster_backend.aws_region,
-            'deployment_name': unique,
+            'deployment_name': deployment_name,
             # Supply a valid URL to the preliminary config.
             # This is replaced later before the DC/OS installation.
             'installer_url': 'https://example.com',
@@ -250,41 +252,16 @@ class AWSCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        # We include ``ip_detect_contents`` so that we can install DC/OS
-        # without putting an IP detect script on nodes.
-        ip_detect_contents = dedent(
-            """\
-            #!/bin/sh
-            set -o nounset -o errexit
-
-            if [ -e /etc/environment ]
-            then
-              set -o allexport
-              source /etc/environment
-              set +o allexport
-            fi
-
-            get_private_ip_from_metaserver()
-            {
-                curl -fsSL http://169.254.169.254/latest/meta-data/local-ipv4
-            }
-
-            echo ${COREOS_PRIVATE_IPV4:-$(get_private_ip_from_metaserver)}
-            """,
-        )
-        ip_detect_contents = yaml.dump(ip_detect_contents)
-        return {
-            **dict(self.launcher.config['dcos_config']),
-            **{
-                'ip_detect_contents': ip_detect_contents,
-            },
-        }
+        conf = self.launcher.config['dcos_config']  # type: Dict[str, Any]
+        return conf
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a URL.
@@ -293,8 +270,25 @@ class AWSCluster(ClusterManager):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to an ``ip-detect`` script to be used
+                during the DC/OS installation.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
+        Raises:
+            NotImplementedError: ``NotImplementedError`` because this function
+                backend by ``dcos-launch`` does not support a custom
+                ``ip-detect`` script or any other files supplied to the
+                installer by copying them to the ``/genconf`` directory.
         """
+        if ip_detect_path != self._ip_detect_path:
+            raise NotImplementedError
+
+        if files_to_copy_to_genconf_dir:
+            raise NotImplementedError
+
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``build_artifact`` URL is overwritten.
         self.launcher.config['installer_url'] = build_artifact
@@ -305,7 +299,9 @@ class AWSCluster(ClusterManager):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Install DC/OS from a given build artifact with a bootstrap node.
@@ -316,7 +312,12 @@ class AWSCluster(ClusterManager):
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to an ``ip-detect`` script to be used
+                during the DC/OS installation.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+                installer node. This must be empty as it is not currently
+                supported.
 
         Raises:
             NotImplementedError: ``NotImplementedError`` because the AWS

@@ -164,7 +164,7 @@ Viewing the Web UI
 ------------------
 
 To view the web UI of your cluster, use the :ref:`dcos-vagrant-web` command.
-If you instead want to view the web UI URL of your cluster, use the :ref:`dcos-vagrant-inspect` command.
+To see the web UI URL of your cluster, use the :ref:`dcos-vagrant-inspect` command.
 
 Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
 
@@ -179,7 +179,7 @@ CLI Reference
 .. click:: cli.dcos_vagrant:create
   :prog: dcos-vagrant create
 
-.. click:: cli.dcos_vagrant:LIST_CLUSTERS
+.. click:: cli.dcos_vagrant:list_clusters
   :prog: dcos-vagrant list
 
 .. _dcos-vagrant-wait:

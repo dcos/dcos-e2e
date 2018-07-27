@@ -2,16 +2,14 @@
 Vagrant backend.
 """
 
+import inspect
 import os
 import shutil
-import textwrap
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Tuple, Type
-
-import yaml
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type
 
 from dcos_e2e.node import Node
 
@@ -55,6 +53,15 @@ class Vagrant(ClusterBackend):
         cluster.
         """
         return VagrantCluster
+
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the Vagrant specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
 
 
 class VagrantCluster(ClusterManager):
@@ -143,7 +150,9 @@ class VagrantCluster(ClusterManager):
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a build artifact passed as an URL string.
@@ -152,7 +161,12 @@ class VagrantCluster(ClusterManager):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script that is used for
+                installing DC/OS.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+                installer node. This must be empty as it is not currently
+                supported.
         """
         raise NotImplementedError
 
@@ -160,7 +174,9 @@ class VagrantCluster(ClusterManager):
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a build artifact passed as a file system `Path`.
@@ -168,7 +184,12 @@ class VagrantCluster(ClusterManager):
         Args:
             build_artifact: The path to a build artifact to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script that is used for
+                installing DC/OS.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+                installer node. This must be empty as it is not currently
+                supported.
         """
         raise NotImplementedError
 
@@ -268,20 +289,7 @@ class VagrantCluster(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        master = next(iter(self.masters))
-
-        # pylint: disable=anomalous-backslash-in-string
-        ip_detect_contents = textwrap.dedent(
-            """\
-            #!/usr/bin/env bash
-            echo $(/usr/sbin/ip route show to match {master_ip} |
-            grep -Eo '[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}}\.[0-9]{{1,3}} '|
-            tail -1)
-            """.format(master_ip=master.private_ip_address),
-        )
-        # pylint: enable=anomalous-backslash-in-string
-
-        config = {
+        return {
             'check_time': 'false',
             'cluster_name': 'DCOS',
             'exhibitor_storage_backend': 'static',
@@ -289,10 +297,4 @@ class VagrantCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': 'vagrant',
-            # This is not a documented option.
-            # Users are instructed to instead provide a filename with
-            # 'ip_detect_contents_filename'.
-            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
-
-        return config

@@ -1,5 +1,7 @@
 """
 Tests for managing DC/OS cluster nodes.
+
+See ``test_node_install.py`` for more, related tests.
 """
 
 import logging
@@ -19,8 +21,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node, Role, Transport
+from dcos_e2e.node import Node, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
@@ -155,6 +156,73 @@ class TestSendFile:
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == content
+
+    def test_send_directory(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a directory to a cluster node as the default
+        user.
+        """
+        original_content = str(uuid.uuid4())
+        dir_name = 'directory'
+        file_name = 'example_file.txt'
+        dir_path = tmpdir.mkdir(dir_name)
+        local_file_path = dir_path.join(file_name)
+        local_file_path.write(original_content)
+
+        random = uuid.uuid4().hex
+        master_base_dir = '/etc/{random}'.format(random=random)
+        master_destination_dir = Path(master_base_dir)
+
+        dcos_node.send_file(
+            local_path=Path(str(local_file_path)),
+            remote_path=master_destination_dir / dir_name / file_name,
+        )
+
+        args = ['cat', str(master_destination_dir / dir_name / file_name)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == original_content
+
+        new_content = str(uuid.uuid4())
+        local_file_path.write(new_content)
+
+        dcos_node.send_file(
+            local_path=Path(str(dir_path)),
+            remote_path=master_destination_dir,
+        )
+        args = ['cat', str(master_destination_dir / dir_name / file_name)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == new_content
+
+    def test_send_file_to_directory(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node to a directory that
+        is mounted as tmpfs.
+        See ``DockerExecTransport.send_file`` for details.
+        """
+        content = str(uuid.uuid4())
+        file_name = 'example_file.txt'
+        local_file = tmpdir.join(file_name)
+        local_file.write(content)
+
+        master_destination_path = Path(
+            '/etc/{random}'.format(random=uuid.uuid4().hex),
+        )
+        dcos_node.run(args=['mkdir', '--parent', str(master_destination_path)])
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path / file_name)]
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
@@ -652,51 +720,3 @@ class TestRun:
 
         expected_message = '`log_output_live` and `tty` cannot both be `True`.'
         assert str(excinfo.value) == expected_message
-
-
-class TestAdvancedInstallationMethod:
-    """
-    Test installing DC/OS on a node.
-    """
-
-    def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
-        """
-        It is possible to install DC/OS on a node from a URL.
-        """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            for nodes, role in (
-                (cluster.masters, Role.MASTER),
-                (cluster.agents, Role.AGENT),
-                (cluster.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_url(
-                        build_artifact=oss_artifact_url,
-                        dcos_config=cluster.base_config,
-                        role=role,
-                    )
-            cluster.wait_for_dcos_oss()
-
-    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
-        """
-        It is possible to install DC/OS on a node from a path.
-        """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            for nodes, role in (
-                (cluster.masters, Role.MASTER),
-                (cluster.agents, Role.AGENT),
-                (cluster.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_path(
-                        build_artifact=oss_artifact,
-                        dcos_config=cluster.base_config,
-                        role=role,
-                    )
-            cluster.wait_for_dcos_oss()

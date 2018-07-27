@@ -11,7 +11,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import copyfile, copytree, rmtree
 from tempfile import gettempdir
-from typing import Any, Dict, List, Optional, Set, Tuple, Type
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type
 
 import docker
 import yaml
@@ -232,6 +232,15 @@ class Docker(ClusterBackend):
         """
         return DockerCluster
 
+    @property
+    def ip_detect_path(self) -> Path:
+        """
+        Return the path to the Docker specific ``ip-detect`` script.
+        """
+        current_file = inspect.stack()[0][1]
+        current_parent = Path(os.path.abspath(current_file)).parent
+        return current_parent / 'resources' / 'ip-detect'
+
 
 class DockerCluster(ClusterManager):
     """
@@ -243,7 +252,6 @@ class DockerCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: Docker,
     ) -> None:
         """
@@ -253,11 +261,6 @@ class DockerCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-                Currently on DC/OS Docker the only supported paths on the
-                installer are in the ``/genconf`` directory.
             cluster_backend: Details of the specific Docker backend to use.
         """
         self._default_user = 'root'
@@ -300,15 +303,6 @@ class DockerCluster(ClusterManager):
             public_key_path=public_key_path,
             private_key_path=ssh_dir / 'id_rsa',
         )
-
-        for host_path, installer_path in files_to_copy_to_installer:
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = self._genconf_dir / relative_installer_path
-            if host_path.is_dir():
-                destination_path = destination_path / host_path.stem
-                copytree(src=str(host_path), dst=str(destination_path))
-            else:
-                copyfile(src=str(host_path), dst=str(destination_path))
 
         self._master_prefix = self._cluster_id + '-master-'
         self._agent_prefix = self._cluster_id + '-agent-'
@@ -446,7 +440,9 @@ class DockerCluster(ClusterManager):
         self,
         build_artifact: str,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a URL with a bootstrap node.
@@ -456,7 +452,12 @@ class DockerCluster(ClusterManager):
             build_artifact: The URL string to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script that is used for
+                installing DC/OS.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
 
         Raises:
             NotImplementedError: ``NotImplementedError`` because the Docker
@@ -472,13 +473,7 @@ class DockerCluster(ClusterManager):
         list of nodes.
         """
         ssh_user = self._default_user
-
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
-        ip_detect_src = current_parent / 'resources' / 'ip-detect'
-        ip_detect_contents = Path(ip_detect_src).read_text()
-
-        config = {
+        return {
             'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
             # Without this, we see errors like:
             # "Time is not synchronized / marked as bad by the kernel.".
@@ -494,19 +489,15 @@ class DockerCluster(ClusterManager):
             'resolvers': ['8.8.8.8'],
             'ssh_port': 22,
             'ssh_user': ssh_user,
-            # This is not a documented option.
-            # Users are instructed to instead provide a filename with
-            # 'ip_detect_contents_filename'.
-            'ip_detect_contents': yaml.dump(ip_detect_contents),
         }
-
-        return config
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
         build_artifact: Path,
         dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
         log_output_live: bool,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
         Install DC/OS from a given build artifact.
@@ -515,14 +506,33 @@ class DockerCluster(ClusterManager):
             build_artifact: The ``Path`` to a build artifact to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script that is used for
+                installing DC/OS.
             log_output_live: If ``True``, log output of the installation live.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
 
         Raises:
             CalledProcessError: There was an error installing DC/OS on a node.
         """
+        copyfile(
+            src=str(ip_detect_path),
+            dst=str(self._genconf_dir / 'ip-detect'),
+        )
+
         config_yaml = yaml.dump(data=dcos_config)
         config_file_path = self._genconf_dir / 'config.yaml'
         config_file_path.write_text(data=config_yaml)
+
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = self._genconf_dir / relative_installer_path
+            if host_path.is_dir():
+                destination_path = destination_path / host_path.stem
+                copytree(src=str(host_path), dst=str(destination_path))
+            else:
+                copyfile(src=str(host_path), dst=str(destination_path))
 
         genconf_args = [
             'bash',

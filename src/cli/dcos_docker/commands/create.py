@@ -12,20 +12,17 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import click
 import click_spinner
 import docker
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
+from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
-    artifact_argument,
+    cluster_id_option,
     copy_to_master_option,
     extra_config_option,
     license_key_option,
-    make_cluster_id_option,
     masters_option,
     public_agents_option,
     security_mode_option,
@@ -33,7 +30,12 @@ from cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from cli.common.utils import get_variant, set_logging
+from cli.common.utils import (
+    check_cluster_id_unique,
+    get_variant,
+    set_logging,
+    write_key_pair,
+)
 from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -44,6 +46,10 @@ from ._common import (
     DOCKER_STORAGE_DRIVERS,
     DOCKER_VERSIONS,
     LINUX_DISTRIBUTIONS,
+    NODE_TYPE_AGENT_LABEL_VALUE,
+    NODE_TYPE_LABEL_KEY,
+    NODE_TYPE_MASTER_LABEL_VALUE,
+    NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
     existing_cluster_ids,
@@ -189,35 +195,6 @@ def _validate_volumes(
     return mounts
 
 
-def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
-    """
-    Write an RSA key pair for connecting to nodes via SSH.
-
-    Args:
-        public_key_path: Path to write public key to.
-        private_key_path: Path to a private key file to write.
-    """
-    rsa_key_pair = rsa.generate_private_key(
-        backend=default_backend(),
-        public_exponent=65537,
-        key_size=2048,
-    )
-
-    public_key = rsa_key_pair.public_key().public_bytes(
-        serialization.Encoding.OpenSSH,
-        serialization.PublicFormat.OpenSSH,
-    )
-
-    private_key = rsa_key_pair.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm=serialization.NoEncryption(),
-    )
-
-    public_key_path.write_bytes(data=public_key)
-    private_key_path.write_bytes(data=private_key)
-
-
 @click.command('create')
 @artifact_argument
 @click.option(
@@ -249,7 +226,7 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 @public_agents_option
 @extra_config_option
 @security_mode_option
-@make_cluster_id_option(existing_cluster_ids_func=existing_cluster_ids)
+@cluster_id_option
 @license_key_option
 @click.option(
     '--genconf-dir',
@@ -409,6 +386,10 @@ def create(
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
     set_logging(verbosity_level=verbose)
+    check_cluster_id_unique(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
@@ -417,7 +398,7 @@ def create(
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
     private_key_path = ssh_keypair_dir / 'id_rsa'
-    _write_key_pair(
+    write_key_pair(
         public_key_path=public_key_path,
         private_key_path=private_key_path,
     )
@@ -449,13 +430,13 @@ def create(
         if security_mode is not None:
             extra_config['security'] = security_mode
 
-    files_to_copy_to_installer = []
+    files_to_copy_to_genconf_dir = []
     if genconf_dir is not None:
         container_genconf_path = Path('/genconf')
         for genconf_file in genconf_dir.glob('*'):
             genconf_relative = genconf_file.relative_to(genconf_dir)
             relative_path = container_genconf_path / genconf_relative
-            files_to_copy_to_installer.append((genconf_file, relative_path))
+            files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
     cluster_backend = Docker(
         custom_container_mounts=custom_volume,
@@ -470,9 +451,13 @@ def create(
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
             VARIANT_LABEL_KEY: 'ee' if enterprise else '',
         },
-        docker_master_labels={'node_type': 'master'},
-        docker_agent_labels={'node_type': 'agent'},
-        docker_public_agent_labels={'node_type': 'public_agent'},
+        docker_master_labels={
+            NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE,
+        },
+        docker_agent_labels={NODE_TYPE_LABEL_KEY: NODE_TYPE_AGENT_LABEL_VALUE},
+        docker_public_agent_labels={
+            NODE_TYPE_LABEL_KEY: NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
+        },
         workspace_dir=workspace_dir,
         transport=transport,
         network=network,
@@ -485,7 +470,6 @@ def create(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=files_to_copy_to_installer,
         )
     except CalledProcessError as exc:
         click.echo('Error creating cluster.', err=True)
@@ -529,6 +513,8 @@ def create(
                     **cluster.base_config,
                     **extra_config,
                 },
+                ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
     except CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)

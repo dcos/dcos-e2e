@@ -1,0 +1,5 @@
+#!/bin/bash
+hostname -I | cut -d' ' -f2
+# This is a replacement script that works with CentOS.
+# The original dcos-vagrant script can be found here:
+# https://github.com/dcos/dcos-vagrant/blob/9f2199c7dd72a64f54ac81ec6ad0ba8d0ef92f69/lib/vagrant-dcos/provisioner.rb#L336
