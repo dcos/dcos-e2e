@@ -152,7 +152,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. code-block:: console
 
-   $ dcos-vagrant create /tmp/dcos_generate_config.ee.sh
+   $ dcos-vagrant create /tmp/dcos_generate_config.sh
    $ dcos-vagrant wait
    $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
