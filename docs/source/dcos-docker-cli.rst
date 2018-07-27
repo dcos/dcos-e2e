@@ -272,7 +272,7 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
 
    :file:`dcos-ca-certificate.crt`, :file:`dcos-ca-certificate-key.key`, and :file:`dcos-ca-certificate-chain.crt`.
 
-#. Put the above-mentioned files, into a directory, e.g. :file:`/path/to/genconf/`.
+#. Put the above-mentioned files into a directory, e.g. :file:`/path/to/genconf/`.
 
 #. Create a file containing the "extra" configuration.
 
