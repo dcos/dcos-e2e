@@ -173,9 +173,9 @@ class TestCreate:
                                               value of the `DCOS_LICENSE_KEY_PATH`
                                               environment variable.
               --genconf-dir PATH              Path to a directory that contains additional
-                                              files for DC/OS installer. All files from this
-                                              directory will be copied to the `genconf`
-                                              directory before running DC/OS installer.
+                                              files for the DC/OS installer. All files from
+                                              this directory will be copied to the "genconf"
+                                              directory before running the DC/OS installer.
               --copy-to-master TEXT           Files to copy to master nodes before
                                               installing DC/OS. This option can be given
                                               multiple times. Each option should be in the
