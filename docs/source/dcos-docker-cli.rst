@@ -296,7 +296,7 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
           --genconf-dir /path/to/genconf/ \
           --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
           --license-key /path/to/license.txt \
-          --extra-config config.yml \
+          --extra-config config.yml
 
 #. Verify that everything has worked.
 
