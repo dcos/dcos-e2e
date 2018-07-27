@@ -1031,7 +1031,9 @@ class TestDoctor:
               Diagnose common issues which stop DC/OS E2E from working correctly.
 
             Options:
-              --help  Show this message and exit.
+              -v, --verbose  Use verbose output. Use this option multiple times for more
+                             verbose output.
+              --help         Show this message and exit.
             """,# noqa: E501,E261
         )
         # yapf: enable

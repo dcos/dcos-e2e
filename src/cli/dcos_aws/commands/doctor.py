@@ -12,7 +12,6 @@ from cli.common.utils import set_logging
 
 
 @click.command('doctor')
-@click.command('doctor')
 @verbosity_option
 def doctor(verbose: int) -> None:
     """
