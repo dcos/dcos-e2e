@@ -97,7 +97,7 @@ DC/OS Enterprise
 There are multiple DC/OS Enterprise-only features available in :ref:`dcos-docker-create`.
 
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
-See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on how to provide a license key.
+See :ref:`dcos-docker-create` for details on how to provide a license key.
 
 Ask your sales representative for DC/OS Enterprise release artifacts.
 
@@ -112,7 +112,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
 
-See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
+See :ref:`dcos-docker-create` for details on this command and its options.
 
 Cluster IDs
 -----------
@@ -139,7 +139,7 @@ It is possible to run the following to run a command on an arbitrary master node
 
    $ dcos-docker run systemctl list-units
 
-See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+See :ref:`dcos-docker-run` for more information on this command.
 In particular see the ``--node`` option to choose a particular node to run the command on.
 
 Running commands on a cluster node using ``docker exec``
@@ -234,7 +234,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
-See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+See :ref:`dcos-docker-run` for more information on this command.
 
 Viewing the Web UI
 ------------------
