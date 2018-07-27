@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from kazoo.client import KazooClient
-from kazoo.handlers.threading import KazooTimeoutError
 from retry import retry
 
 from ._common import get_logger
@@ -141,22 +140,6 @@ class Cluster(ContextDecorator):
                 shell=True,
             )
 
-    @retry(
-        exceptions=(KazooTimeoutError),
-        tries=500,
-        delay=10,
-    )
-    def _wait_for_zookeeper(self) -> None:
-        """
-        Wait until ZooKeeper can be connected to.
-        """
-        zk_client_port = '2181'
-        any_master = next(iter(self.masters))
-        zk_host = str(any_master.public_ip_address)
-        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
-        LOGGER.info('Trying to connect to ZooKeeper.')
-        zk_client.start()
-        zk_client.stop()
 
     def wait_for_dcos_oss(self, http_checks: bool = True) -> None:
         """
@@ -204,7 +187,6 @@ class Cluster(ContextDecorator):
         # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
         any_master = next(iter(self.masters))
-        self._wait_for_zookeeper()
 
         # In order to create an API session, we create a user with the
         # hard coded credentials "CI_CREDENTIALS".
