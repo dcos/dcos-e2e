@@ -19,6 +19,7 @@ from cli.common.options import (
     agents_option,
     cluster_id_option,
     copy_to_master_option,
+    enable_selinux_enforcing_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
@@ -55,14 +56,7 @@ from ._common import (
 @copy_to_master_option
 @cluster_id_option
 @verbosity_option
-@click.option(
-    '--enable-selinux-enforcing',
-    is_flag=True,
-    help=(
-        'With this flag set, SELinux is set to enforcing before DC/OS is '
-        'installed on the cluster.'
-    ),
-)
+@enable_selinux_enforcing_option
 def create(
     agents: int,
     artifact: str,
