@@ -38,7 +38,7 @@ This can be done via `the releases page <https://dcos.io/releases/>`__ or with t
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
 
-Creating a cluster is possible with the ``dcos-vagrant create`` command.
+Creating a cluster is possible with the :ref:`dcos-vagrant-create` command.
 This command allows you to customize the cluster in many ways.
 
 See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.

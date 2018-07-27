@@ -25,6 +25,26 @@ Each of these and more are described in detail below.
 
 .. include:: install-cli.rst
 
+Creating a Cluster
+------------------
+
+To create a cluster you first need the link to a DC/OS release artifact.
+
+These can be found on `the releases page <https://dcos.io/releases/>`__.
+
+`DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
+Ask your sales representative for release artifacts.
+
+Creating a cluster is possible with the ``dcos-vagrant create`` command.
+This command allows you to customize the cluster in many ways.
+
+See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.
+
+The command returns when the DC/OS installation process has started.
+To wait until DC/OS has finished installing, use the :ref:`the dcos-vagrant wait <dcos-vagrant-wait>` command.
+
+To use this cluster, it is useful to find details using the :ref:`the dcos-vagrant inspect <dcos-vagrant-inspect>` command.
+
 CLI Reference
 -------------
 
