@@ -171,6 +171,9 @@ class TestCreate:
               -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
                                               value "default" to use this cluster for other
                                               commands without specifying --cluster-id.
+              --enable-selinux-enforcing      With this flag set, SELinux is set to
+                                              enforcing before DC/OS is installed on the
+                                              cluster.
               --help                          Show this message and exit.
             """,# noqa: E501,E261
         )

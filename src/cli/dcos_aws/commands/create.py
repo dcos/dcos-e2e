@@ -18,6 +18,7 @@ from cli.common.options import (
     agents_option,
     cluster_id_option,
     copy_to_master_option,
+    enable_selinux_enforcing_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
@@ -78,6 +79,7 @@ from ._options import aws_region_option
 @copy_to_master_option
 @verbosity_option
 @cluster_id_option
+@enable_selinux_enforcing_option
 def create(
     agents: int,
     artifact_url: str,
@@ -92,6 +94,7 @@ def create(
     verbose: int,
     aws_region: str,
     cluster_id: str,
+    enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
 ) -> None:
     """
@@ -248,6 +251,11 @@ def create(
                 workspace_tag,
             ],
         )
+
+    nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
+    for node in nodes:
+        if enable_selinux_enforcing:
+            node.run(args=['setenforce', '1'], sudo=True)
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
