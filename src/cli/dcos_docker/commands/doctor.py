@@ -19,6 +19,8 @@ from cli.common.doctor import (
     info,
     warn,
 )
+from cli.common.options import verbosity_option
+from cli.common.utils import set_logging
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
@@ -401,10 +403,12 @@ def _check_can_mount_in_docker() -> CheckLevels:
 
 
 @click.command('doctor')
-def doctor() -> None:
+@verbosity_option
+def doctor(verbose: int) -> None:
     """
     Diagnose common issues which stop DC/OS E2E from working correctly.
     """
+    set_logging(verbosity_level=verbose)
     check_functions = [
         check_1_9_sed,
         _check_docker_root_free_space,
