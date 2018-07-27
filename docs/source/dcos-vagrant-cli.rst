@@ -3,7 +3,7 @@
 ``dcos-vagrant`` CLI
 ====================
 
-The ``dcos-vagrant`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
+The ``dcos-vagrant`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Vagrant VMs.
 
 A typical CLI workflow for open source DC/OS may look like the following.
 :ref:`Install the CLI <installation>`, then create, manage and destroy a cluster:
@@ -38,15 +38,13 @@ This can be done via `the releases page <https://dcos.io/releases/>`__ or with t
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
 
-Creating a cluster is possible with the ``dcos-vagrant create`` command.
+Creating a cluster is possible with the :ref:`dcos-vagrant-create` command.
 This command allows you to customize the cluster in many ways.
 
-See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.
-
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`the dcos-vagrant wait <dcos-vagrant-wait>` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` command.
 
-To use this cluster, it is useful to find details using the :ref:`the dcos-vagrant inspect <dcos-vagrant-inspect>` command.
+To use this cluster, it is useful to find details using the :ref:`dcos-vagrant-inspect` command.
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~
@@ -71,12 +69,13 @@ To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` co
 
 See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.
 
-"default" Cluster ID
---------------------
+Cluster IDs
+-----------
 
-It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
-Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
-This means that you can use ``dcos-vagrant wait`` with no arguments to wait for the ``default`` cluster.
+Clusters have unique IDs.
+Multiple commands take ``--cluster-id`` options.
+Specify a cluster ID in :ref:`dcos-vagrant-create`, and then use it in other commands.
+Any command which takes a ``--cluster-id`` option defaults to using "default" if no cluster ID is given.
 
 Running commands on Cluster Nodes
 ---------------------------------
@@ -91,7 +90,7 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. code-block:: console
 
-   $ dcos-vagrant run --cluster-id example systemctl list-units
+   $ dcos-vagrant run systemctl list-units
 
 See :ref:`the dcos-vagrant run reference <dcos-vagrant-run>` for more information on this command.
 
@@ -111,7 +110,7 @@ For example, to use :ref:`dcos-vagrant-run` to run ``bash`` to get on to an arbi
 
 .. code-block:: console
 
-   $ dcos-vagrant run --cluster-id example bash
+   $ dcos-vagrant run bash
 
 Destroying Clusters
 -------------------
