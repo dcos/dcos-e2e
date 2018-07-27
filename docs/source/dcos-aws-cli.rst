@@ -107,7 +107,77 @@ For example, to use :ref:`dcos-aws-run` to run ``bash`` to get on to an arbitrar
 
 .. code-block:: console
 
-   $ dcos-vagrant run bash
+   $ dcos-aws run bash
+
+Destroying Clusters
+-------------------
+
+Destroying clusters is not currently supported.
+
+Running Integration Tests
+-------------------------
+
+The :ref:`dcos-aws-run` command is useful for running integration tests.
+
+To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
+
+.. code-block:: console
+
+   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh
+   $ dcos-aws wait
+   $ dcos-aws run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+
+There are multiple options and shortcuts for using these commands.
+See :ref:`dcos-aws-run` for more information on this command.
+
+Viewing the Web UI
+------------------
+
+To view the web UI of your cluster, use the :ref:`dcos-aws-web` command.
+To see the web UI URL of your cluster, use the :ref:`dcos-aws-inspect` command.
+
+Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
+
+Using a Custom CA Certificate
+-----------------------------
+
+On DC/OS Enterprise clusters, it is possible to use a custom CA certificate.
+See `the Custom CA certificate documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
+It is possible to use :ref:`dcos-aws-create` to create a cluster with a custom CA certificate.
+
+#. Create or obtain the necessary files:
+
+   :file:`dcos-ca-certificate.crt`, :file:`dcos-ca-certificate-key.key`, and :file:`dcos-ca-certificate-chain.crt`.
+
+#. Put the above-mentioned files into a directory, e.g. :file:`/path/to/genconf/`.
+
+#. Create a file containing the "extra" configuration.
+
+   :ref:`dcos-aws-create` takes an ``--extra-config`` option.
+   This adds the contents of the specified YAML file to a minimal DC/OS configuration.
+
+   Create a file with the following contents:
+
+   .. code:: yaml
+
+      ca_certificate_path: genconf/dcos-ca-certificate.crt
+      ca_certificate_key_path: genconf/dcos-ca-certificate-key.key
+      ca_certificate_chain_path: genconf/dcos-ca-certificate-chain.crt
+
+#. Create a cluster.
+
+   .. code:: console
+
+      dcos-aws create \
+          https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh \
+          --genconf-dir /path/to/genconf/ \
+          --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
+          --license-key /path/to/license.txt \
+          --extra-config config.yml
+
+#. Verify that everything has worked.
+
+   See `Verify installation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom/#verify-installation>`_ for steps to verify that the DC/OS Enterprise cluster was installed properly with the custom CA certificate.
 
 CLI Reference
 -------------
