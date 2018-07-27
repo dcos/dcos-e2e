@@ -140,7 +140,6 @@ class Cluster(ContextDecorator):
                 shell=True,
             )
 
-
     def wait_for_dcos_oss(self, http_checks: bool = True) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
