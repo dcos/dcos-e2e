@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.07.27.0
+------------
+
 - Fix bug which meant that a user could not log in after ``dcos-docker wait`` on DC/OS Open Source clusters.
 - Backwards incompatible change: Remove ``files_to_copy_to_installer`` from ``Cluster.__init__`` and add ``files_to_copy_to_genconf_dir`` as an argument to ``Cluster.install_dcos_from_path`` as well as ``Cluster.install_dcos_from_url``.
 - Add ``files_to_copy_to_genconf_dir`` as an argument to ``Node.install_dcos_from_path`` and ``Node.install_dcos_from_url``.
