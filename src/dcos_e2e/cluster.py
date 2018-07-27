@@ -8,6 +8,7 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
+from kazoo.client import KazooClient
 from retry import retry
 
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
@@ -215,6 +216,21 @@ class Cluster(ContextDecorator):
         # This allows this function to work even after a user has logged in.
         any_master.run(args=create_user_args, shell=True, log_output_live=True)
 
+        # In order to create an API session, we create a user with the
+        # hard coded credentials "CI_CREDENTIALS".
+        # These credentials match a user with the email address
+        # "albert@bekstil.net".
+        email = 'albert@bekstil.net'
+        path = '/dcos/users/{email}'.format(email=email)
+        zk_client_port = '2181'
+        zk_host = str(any_master.public_ip_address)
+        zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
+        zk_client.start()
+
+        path_existed = zk_client.exists(path=path)
+        if not path_existed:
+            zk_client.create(path=path, value=email.encode())
+
         api_session = DcosApiSession(
             dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
             masters=[str(n.public_ip_address) for n in self.masters],
@@ -230,6 +246,10 @@ class Cluster(ContextDecorator):
         # Only the first user can log in with SSO, before granting others
         # access.
         # Therefore, we delete the user who was created to wait for DC/OS.
+
+        if not path_existed:
+            zk_client.delete(path=path)
+        zk_client.stop()
         #
         # In order to create an API session, we create a user with the
         # hard coded credentials "CI_CREDENTIALS".
