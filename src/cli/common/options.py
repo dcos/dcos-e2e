@@ -430,3 +430,19 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
+
+
+def enable_selinux_enforcing_option(command: Callable[..., None],
+                                    ) -> Callable[..., None]:
+    """
+    An option decorator for setting the SELinux mode to "enforcing".
+    """
+    function = click.option(
+        '--enable-selinux-enforcing',
+        is_flag=True,
+        help=(
+            'With this flag set, SELinux is set to enforcing before DC/OS is '
+            'installed on the cluster.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
