@@ -56,7 +56,9 @@ def docker_client() -> DockerClient:
         message = (
             'Error: Cannot connect to Docker.\n'
             'Make sure that Docker is installed and running, '
-            'and that you can run "docker ps".'
+            'and that you can run "docker ps".\n'
+            'If "sudo docker ps" works, try following the instructions at '
+            'https://docs.docker.com/install/linux/linux-postinstall/.'
         )
         click.echo(message, err=True)
         sys.exit(1)
