@@ -23,9 +23,8 @@ def aws_region_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def linux_distribution_option(
-    command: Callable[..., None]
-) -> Callable[..., None]:
+def linux_distribution_option(command: Callable[..., None],
+                              ) -> Callable[..., None]:
     """
     An option decorator for choosing Linux distribution options on AWS.
     """
