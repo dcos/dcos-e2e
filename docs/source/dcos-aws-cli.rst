@@ -74,6 +74,41 @@ Multiple commands take ``--cluster-id`` options.
 Specify a cluster ID in :ref:`dcos-aws-create`, and then use it in other commands.
 Any command which takes a ``--cluster-id`` option defaults to using "default" if no cluster ID is given.
 
+Running commands on Cluster Nodes
+---------------------------------
+
+It is possible to run commands on a cluster node in multiple ways.
+These include using :ref:`dcos-aws-run` and ``ssh``.
+
+Running commands on a cluster node using :ref:`dcos-aws-run`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It is possible to run the following to run a command on an arbitrary master node.
+
+.. code-block:: console
+
+   $ dcos-aws run systemctl list-units
+
+See :ref:`dcos-aws-run` for more information on this command.
+
+Running commands on a cluster node using ``ssh``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One SSH key allows access to all nodes in the cluster.
+See this SSH key's path and the IP addresses of nodes using :ref:`dcos-aws-inspect`.
+
+Getting on to a Cluster Node
+----------------------------
+
+Sometimes it is useful to get onto a cluster node.
+To do this, you can use any of the ways of :ref:`running-commands`.
+
+For example, to use :ref:`dcos-aws-run` to run ``bash`` to get on to an arbitrary master node:
+
+.. code-block:: console
+
+   $ dcos-vagrant run bash
+
 CLI Reference
 -------------
 
@@ -92,6 +127,8 @@ CLI Reference
 
 .. click:: cli.dcos_aws:list_clusters
   :prog: dcos-aws list
+
+.. _dcos-aws-run:
 
 .. click:: cli.dcos_aws:run
   :prog: dcos-aws run
