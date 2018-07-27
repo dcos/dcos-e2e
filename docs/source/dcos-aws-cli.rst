@@ -66,6 +66,14 @@ To wait until DC/OS has finished installing, use the :ref:`dcos-aws-wait` comman
 
 See :ref:`dcos-aws-create` for details on this command and its options.
 
+Cluster IDs
+-----------
+
+Clusters have unique IDs.
+Multiple commands take ``--cluster-id`` options.
+Specify a cluster ID in :ref:`dcos-aws-create`, and then use it in other commands.
+Any command which takes a ``--cluster-id`` option defaults to using "default" if no cluster ID is given.
+
 CLI Reference
 -------------
 
