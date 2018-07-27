@@ -116,12 +116,13 @@ To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` com
 
 See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
 
-"default" Cluster ID
---------------------
+Cluster IDs
+-----------
 
-It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
-Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
-This means that you can use :ref:`dcos-docker-wait` with no arguments to wait for the ``default`` cluster.
+Clusters have unique IDs.
+Multiple commands take ``--cluster-id`` options.
+Specify a cluster ID in :ref:`dcos-docker-create`, and then use it in other commands.
+Any command which takes a ``--cluster-id`` option defaults to using "default" if no cluster ID is given.
 
 .. _running-commands:
 
@@ -138,7 +139,7 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. code-block:: console
 
-   $ dcos-docker run --cluster-id example systemctl list-units
+   $ dcos-docker run systemctl list-units
 
 See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
 In particular see the ``--node`` option to choose a particular node to run the command on.
@@ -155,7 +156,7 @@ Alternatively, use the ``--env`` flag to output commands to be evaluated as such
 
 .. code-block:: console
 
-   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ eval $(dcos-docker inspect --env)
    $ docker exec -it $MASTER_0 systemctl list-units
 
 Which environment variables are available depends on the size of your cluster.
@@ -177,13 +178,13 @@ For example, to use :ref:`dcos-docker-run` to run ``bash`` to get on to an arbit
 
 .. code-block:: console
 
-   $ dcos-docker run --cluster-id example bash
+   $ dcos-docker run example bash
 
 or, similarly, to use ``docker exec`` to get on to a specific node:
 
 .. code-block:: console
 
-   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ eval $(dcos-docker inspect --env)
    $ docker exec -it $MASTER_0 bash
 
 See :ref:`running-commands` for details on how to choose particular nodes.
