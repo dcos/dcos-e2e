@@ -412,3 +412,21 @@ def existing_cluster_id_option(command: Callable[..., None],
         help='The ID of the cluster to use.',
     )(command)  # type: Callable[..., None]
     return function
+
+
+def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An option decorator for a custom "genconf" directory.
+    """
+    function = click.option(
+        '--genconf-dir',
+        type=click.Path(exists=True),
+        callback=validate_path_is_directory,
+        help=(
+            'Path to a directory that contains additional files for the DC/OS '
+            'installer. '
+            'All files from this directory will be copied to the "genconf" '
+            'directory before running the DC/OS installer.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
