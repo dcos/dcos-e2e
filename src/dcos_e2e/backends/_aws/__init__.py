@@ -32,6 +32,7 @@ class AWS(ClusterBackend):
         linux_distribution: Distribution = Distribution.CENTOS_7,
         workspace_dir: Optional[Path] = None,
         aws_key_pair: Optional[Tuple[str, Path]] = None,
+        aws_cloudformation_stack_name: Optional[str] = None,
     ) -> None:
         """
         Create a configuration for an AWS cluster backend.
@@ -54,6 +55,8 @@ class AWS(ClusterBackend):
                 key. The private key can then be used to connect to the
                 cluster. If this is not given, a new key pair will be
                 generated.
+            aws_cloudformation_stack_name: The name of the CloudFormation stack
+                to create. If this is not given, a random string is used.
 
         Attributes:
             admin_location: The IP address range from which the AWS nodes can
@@ -70,6 +73,8 @@ class AWS(ClusterBackend):
                 and the path is the local path to the corresponding private
                 key. The private key can then be used to connect to the
                 cluster.
+            aws_cloudformation_stack_name: The name of the CloudFormation stack
+                to create.
 
         Raises:
             NotImplementedError: In case an unsupported Linux distribution has
@@ -101,6 +106,7 @@ class AWS(ClusterBackend):
         self.aws_instance_type = aws_instance_type
         self.admin_location = admin_location
         self.aws_key_pair = aws_key_pair
+        self.aws_cloudformation_stack_name = aws_cloudformation_stack_name
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
@@ -143,7 +149,7 @@ class AWSCluster(ClusterManager):
             cluster_backend: Details of the specific AWS backend to use.
 
         """
-        unique = 'dcos-e2e-{}'.format(str(uuid.uuid4()))
+        unique = 'dcos-e2e-{random}'.format(random=str(uuid.uuid4()))
 
         self._path = cluster_backend.workspace_dir / unique
         self._path.mkdir(exist_ok=True)
@@ -166,10 +172,13 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'coreos',
         }
 
+        deployment_name = (
+            cluster_backend.aws_cloudformation_stack_name or unique
+        )
         launch_config = {
             'admin_location': cluster_backend.admin_location,
             'aws_region': cluster_backend.aws_region,
-            'deployment_name': unique,
+            'deployment_name': deployment_name,
             # Supply a valid URL to the preliminary config.
             # This is replaced later before the DC/OS installation.
             'installer_url': 'https://example.com',
