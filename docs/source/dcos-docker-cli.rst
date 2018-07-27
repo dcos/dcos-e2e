@@ -229,7 +229,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. code-block:: console
 
-   $ dcos-docker create /tmp/dcos_generate_config.ee.sh
+   $ dcos-docker create /tmp/dcos_generate_config.sh
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
@@ -256,7 +256,7 @@ For example:
 
 .. code-block:: console
 
-   $ dcos-docker create /tmp/dcos_generate_config.ee.sh --one-master-host-port-map 70:80
+   $ dcos-docker create /tmp/dcos_generate_config.sh --one-master-host-port-map 70:80
    $ dcos-docker wait
    $ open localhost:70
 
