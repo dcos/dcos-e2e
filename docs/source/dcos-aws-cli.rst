@@ -216,5 +216,7 @@ CLI Reference
 .. click:: cli.dcos_aws:wait
   :prog: dcos-aws wait
 
+.. _dcos-aws-web:
+
 .. click:: cli.dcos_aws:web
   :prog: dcos-aws web
