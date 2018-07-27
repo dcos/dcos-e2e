@@ -57,7 +57,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
 .. code-block:: console
 
-   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh --variant enterprise \
+   $ dcos-aws create $DCOS_ENTERPRISE_URL --variant enterprise \
         --license-key /path/to/license.txt \
         --security-mode strict
 
@@ -169,7 +169,7 @@ It is possible to use :ref:`dcos-aws-create` to create a cluster with a custom C
    .. code:: console
 
       dcos-aws create \
-          https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh \
+          $DCOS_ENTERPRISE_URL \
           --genconf-dir /path/to/genconf/ \
           --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
           --license-key /path/to/license.txt \
