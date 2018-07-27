@@ -11,7 +11,6 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 from kazoo.client import KazooClient
 from retry import retry
 
-from ._common import get_logger
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
@@ -19,8 +18,6 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
 from .node import Node, Role, Transport
-
-LOGGER = get_logger(__name__)
 
 
 @retry(
