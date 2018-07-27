@@ -41,12 +41,10 @@ Ask your sales representative for release artifacts.
 Creating a cluster is possible with the :ref:`dcos-vagrant-create` command.
 This command allows you to customize the cluster in many ways.
 
-See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.
-
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`the dcos-vagrant wait <dcos-vagrant-wait>` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` command.
 
-To use this cluster, it is useful to find details using the :ref:`the dcos-vagrant inspect <dcos-vagrant-inspect>` command.
+To use this cluster, it is useful to find details using the :ref:`dcos-vagrant-inspect` command.
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~

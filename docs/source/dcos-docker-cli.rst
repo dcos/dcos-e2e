@@ -47,12 +47,10 @@ Ask your sales representative for release artifacts.
 Creating a cluster is possible with the :ref:`dcos-docker-create` command.
 This command allows you to customize the cluster in many ways.
 
-See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
-
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait <dcos-docker-wait>` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
 
-To use this cluster, it is useful to find details using the :ref:`the dcos-docker inspect <dcos-docker-inspect>` command.
+To use this cluster, it is useful to find details using the :ref:`dcos-docker-inspect` command.
 
 Using a custom Docker network
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
