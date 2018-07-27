@@ -41,7 +41,30 @@ This command allows you to customize the cluster in many ways.
 The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`dcos-aws-wait` command.
 
-iTo use this cluster, it is useful to find details using the :ref:`dcos-aws-inspect` command.
+To use this cluster, it is useful to find details using the :ref:`dcos-aws-inspect` command.
+
+DC/OS Enterprise
+~~~~~~~~~~~~~~~~
+
+There are multiple DC/OS Enterprise-only features available in :ref:`dcos-aws-create`.
+
+The only extra requirement is to give a valid license key, for DC/OS 1.11+.
+See :ref:`dcos-aws-create` for details on how to provide a license key.
+
+Ask your sales representative for DC/OS Enterprise release artifacts.
+
+For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
+
+.. code-block:: console
+
+   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh \
+        --license-key /path/to/license.txt \
+        --security-mode strict
+
+The command returns when the DC/OS installation process has started.
+To wait until DC/OS has finished installing, use the :ref:`dcos-aws-wait` command.
+
+See :ref:`dcos-aws-create` for details on this command and its options.
 
 CLI Reference
 -------------
