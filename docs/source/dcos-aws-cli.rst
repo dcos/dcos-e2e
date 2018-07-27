@@ -57,7 +57,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
 .. code-block:: console
 
-   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh \
+   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh --variant enterprise \
         --license-key /path/to/license.txt \
         --security-mode strict
 
