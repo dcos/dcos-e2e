@@ -40,6 +40,7 @@ from dcos_e2e.distributions import Distribution
 from ._common import (
     CLUSTER_ID_TAG_KEY,
     KEY_NAME_TAG_KEY,
+    LINUX_DISTRIBUTIONS,
     NODE_TYPE_AGENT_TAG_VALUE,
     NODE_TYPE_MASTER_TAG_VALUE,
     NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
@@ -49,7 +50,7 @@ from ._common import (
     WORKSPACE_DIR_TAG_KEY,
     existing_cluster_ids,
 )
-from ._options import aws_region_option
+from ._options import aws_region_option, linux_distribution_option
 
 
 @click.command('create')
@@ -72,6 +73,7 @@ from ._options import aws_region_option
 @extra_config_option
 @public_agents_option
 @aws_region_option
+@linux_distribution_option
 @workspace_dir_option
 @license_key_option
 @genconf_dir_option
@@ -93,6 +95,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     verbose: int,
     aws_region: str,
+    linux_distribution: str,
     cluster_id: str,
     enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
@@ -159,10 +162,12 @@ def create(
         aws_key_pair=(key_name, private_key_path),
         workspace_dir=workspace_dir,
         aws_region=aws_region,
+        linux_distribution=LINUX_DISTRIBUTIONS[linux_distribution],
     )
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
         Distribution.COREOS: 'core',
+        Distribution.UBUNTU_16_04: 'ubuntu',
     }
     default_user = ssh_user[cluster_backend.linux_distribution]
 
