@@ -76,7 +76,7 @@ See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details o
 
 It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
 Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
-This means that you can use ``dcos-vagrant wait`` with no arguments to wait for the ``default`` cluster.
+This means that you can use :ref:`dcos-vagrant-wait` with no arguments to wait for the ``default`` cluster.
 
 Running commands on Cluster Nodes
 ---------------------------------

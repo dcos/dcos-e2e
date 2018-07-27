@@ -121,7 +121,7 @@ See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on 
 
 It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
 Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
-This means that you can use ``dcos-docker wait`` with no arguments to wait for the ``default`` cluster.
+This means that you can use :ref:`dcos-docker-wait` with no arguments to wait for the ``default`` cluster.
 
 .. _running-commands:
 
