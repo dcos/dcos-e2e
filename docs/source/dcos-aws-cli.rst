@@ -107,7 +107,7 @@ For example, to use :ref:`dcos-aws-run` to run ``bash`` to get on to an arbitrar
 
 .. code-block:: console
 
-   $ dcos-vagrant run bash
+   $ dcos-aws run bash
 
 CLI Reference
 -------------
