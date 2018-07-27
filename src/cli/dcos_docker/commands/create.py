@@ -22,6 +22,7 @@ from cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
     extra_config_option,
+    genconf_dir_option,
     license_key_option,
     masters_option,
     public_agents_option,
@@ -36,7 +37,6 @@ from cli.common.utils import (
     set_logging,
     write_key_pair,
 )
-from cli.common.validators import validate_path_is_directory
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
@@ -228,16 +228,7 @@ def _validate_volumes(
 @security_mode_option
 @cluster_id_option
 @license_key_option
-@click.option(
-    '--genconf-dir',
-    type=click.Path(exists=True),
-    callback=validate_path_is_directory,
-    help=(
-        'Path to a directory that contains additional files for '
-        'DC/OS installer. All files from this directory will be copied to the '
-        '`genconf` directory before running DC/OS installer.'
-    ),
-)
+@genconf_dir_option
 @copy_to_master_option
 @workspace_dir_option
 @click.option(

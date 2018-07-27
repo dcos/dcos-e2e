@@ -3,7 +3,7 @@
 ``dcos-vagrant`` CLI
 ====================
 
-The ``dcos-vagrant`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
+The ``dcos-vagrant`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Vagrant VMs.
 
 A typical CLI workflow for open source DC/OS may look like the following.
 :ref:`Install the CLI <installation>`, then create, manage and destroy a cluster:
@@ -38,15 +38,13 @@ This can be done via `the releases page <https://dcos.io/releases/>`__ or with t
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
 
-Creating a cluster is possible with the ``dcos-vagrant create`` command.
+Creating a cluster is possible with the :ref:`dcos-vagrant-create` command.
 This command allows you to customize the cluster in many ways.
 
-See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.
-
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`the dcos-vagrant wait <dcos-vagrant-wait>` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` command.
 
-To use this cluster, it is useful to find details using the :ref:`the dcos-vagrant inspect <dcos-vagrant-inspect>` command.
+To use this cluster, it is useful to find details using the :ref:`dcos-vagrant-inspect` command.
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~
@@ -54,7 +52,7 @@ DC/OS Enterprise
 There are multiple DC/OS Enterprise-only features available in :ref:`dcos-vagrant-create`.
 
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
-See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on how to provide a license key.
+See :ref:`dcos-vagrant-create` for details on how to provide a license key.
 
 Ask your sales representative for DC/OS Enterprise release artifacts.
 
@@ -69,14 +67,15 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` command.
 
-See :ref:`the dcos-vagrant create reference <dcos-vagrant-create>` for details on this command and its options.
+See :ref:`dcos-vagrant-create` for details on this command and its options.
 
-"default" Cluster ID
---------------------
+Cluster IDs
+-----------
 
-It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
-Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
-This means that you can use ``dcos-vagrant wait`` with no arguments to wait for the ``default`` cluster.
+Clusters have unique IDs.
+Multiple commands take ``--cluster-id`` options.
+Specify a cluster ID in :ref:`dcos-vagrant-create`, and then use it in other commands.
+Any command which takes a ``--cluster-id`` option defaults to using "default" if no cluster ID is given.
 
 Running commands on Cluster Nodes
 ---------------------------------
@@ -91,9 +90,9 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. code-block:: console
 
-   $ dcos-vagrant run --cluster-id example systemctl list-units
+   $ dcos-vagrant run systemctl list-units
 
-See :ref:`the dcos-vagrant run reference <dcos-vagrant-run>` for more information on this command.
+See :ref:`dcos-vagrant-run` for more information on this command.
 
 Running commands on a cluster node using ``ssh``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,7 +110,7 @@ For example, to use :ref:`dcos-vagrant-run` to run ``bash`` to get on to an arbi
 
 .. code-block:: console
 
-   $ dcos-vagrant run --cluster-id example bash
+   $ dcos-vagrant run bash
 
 Destroying Clusters
 -------------------
@@ -158,7 +157,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
    $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
-See :ref:`the dcos-vagrant run reference <dcos-vagrant-run>` for more information on this command.
+See :ref:`dcos-vagrant-run` for more information on this command.
 
 Viewing the Web UI
 ------------------
@@ -167,6 +166,47 @@ To view the web UI of your cluster, use the :ref:`dcos-vagrant-web` command.
 To see the web UI URL of your cluster, use the :ref:`dcos-vagrant-inspect` command.
 
 Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
+
+Using a Custom CA Certificate
+-----------------------------
+
+On DC/OS Enterprise clusters, it is possible to use a custom CA certificate.
+See `the Custom CA certificate documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
+It is possible to use :ref:`dcos-vagrant-create` to create a cluster with a custom CA certificate.
+
+#. Create or obtain the necessary files:
+
+   :file:`dcos-ca-certificate.crt`, :file:`dcos-ca-certificate-key.key`, and :file:`dcos-ca-certificate-chain.crt`.
+
+#. Put the above-mentioned files into a directory, e.g. :file:`/path/to/genconf/`.
+
+#. Create a file containing the "extra" configuration.
+
+   :ref:`dcos-vagrant-create` takes an ``--extra-config`` option.
+   This adds the contents of the specified YAML file to a minimal DC/OS configuration.
+
+   Create a file with the following contents:
+
+   .. code:: yaml
+
+      ca_certificate_path: genconf/dcos-ca-certificate.crt
+      ca_certificate_key_path: genconf/dcos-ca-certificate-key.key
+      ca_certificate_chain_path: genconf/dcos-ca-certificate-chain.crt
+
+#. Create a cluster.
+
+   .. code:: console
+
+      dcos-vagrant create \
+          /path/to/dcos_generate_config.ee.sh \
+          --genconf-dir /path/to/genconf/ \
+          --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
+          --license-key /path/to/license.txt \
+          --extra-config config.yml
+
+#. Verify that everything has worked.
+
+   See `Verify installation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom/#verify-installation>`_ for steps to verify that the DC/OS Enterprise cluster was installed properly with the custom CA certificate.
 
 CLI Reference
 -------------

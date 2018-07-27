@@ -44,15 +44,13 @@ This can be done via `the releases page <https://dcos.io/releases/>`__ or with t
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
 
-Creating a cluster is possible with the ``dcos-docker create`` command.
+Creating a cluster is possible with the :ref:`dcos-docker-create` command.
 This command allows you to customize the cluster in many ways.
 
-See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
-
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`the dcos-docker wait <dcos-docker-wait>` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
 
-To use this cluster, it is useful to find details using the :ref:`the dcos-docker inspect <dcos-docker-inspect>` command.
+To use this cluster, it is useful to find details using the :ref:`dcos-docker-inspect` command.
 
 Using a custom Docker network
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -99,7 +97,7 @@ DC/OS Enterprise
 There are multiple DC/OS Enterprise-only features available in :ref:`dcos-docker-create`.
 
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
-See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on how to provide a license key.
+See :ref:`dcos-docker-create` for details on how to provide a license key.
 
 Ask your sales representative for DC/OS Enterprise release artifacts.
 
@@ -114,14 +112,15 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 The command returns when the DC/OS installation process has started.
 To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
 
-See :ref:`the dcos-docker create reference <dcos-docker-create>` for details on this command and its options.
+See :ref:`dcos-docker-create` for details on this command and its options.
 
-"default" Cluster ID
---------------------
+Cluster IDs
+-----------
 
-It can become tedious repeatedly typing the cluster ID, particularly if you only have one cluster.
-Any command which takes a ``cluster-id`` option defaults to using "default" if no cluster ID is given.
-This means that you can use ``dcos-docker wait`` with no arguments to wait for the ``default`` cluster.
+Clusters have unique IDs.
+Multiple commands take ``--cluster-id`` options.
+Specify a cluster ID in :ref:`dcos-docker-create`, and then use it in other commands.
+Any command which takes a ``--cluster-id`` option defaults to using "default" if no cluster ID is given.
 
 .. _running-commands:
 
@@ -138,9 +137,9 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. code-block:: console
 
-   $ dcos-docker run --cluster-id example systemctl list-units
+   $ dcos-docker run systemctl list-units
 
-See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+See :ref:`dcos-docker-run` for more information on this command.
 In particular see the ``--node`` option to choose a particular node to run the command on.
 
 Running commands on a cluster node using ``docker exec``
@@ -155,7 +154,7 @@ Alternatively, use the ``--env`` flag to output commands to be evaluated as such
 
 .. code-block:: console
 
-   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ eval $(dcos-docker inspect --env)
    $ docker exec -it $MASTER_0 systemctl list-units
 
 Which environment variables are available depends on the size of your cluster.
@@ -177,13 +176,13 @@ For example, to use :ref:`dcos-docker-run` to run ``bash`` to get on to an arbit
 
 .. code-block:: console
 
-   $ dcos-docker run --cluster-id example bash
+   $ dcos-docker run example bash
 
 or, similarly, to use ``docker exec`` to get on to a specific node:
 
 .. code-block:: console
 
-   $ eval $(dcos-docker inspect --cluster-id example --env)
+   $ eval $(dcos-docker inspect --env)
    $ docker exec -it $MASTER_0 bash
 
 See :ref:`running-commands` for details on how to choose particular nodes.
@@ -235,7 +234,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
-See :ref:`the dcos-docker run reference <dcos-docker-run>` for more information on this command.
+See :ref:`dcos-docker-run` for more information on this command.
 
 Viewing the Web UI
 ------------------
@@ -272,7 +271,7 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
 
    :file:`dcos-ca-certificate.crt`, :file:`dcos-ca-certificate-key.key`, and :file:`dcos-ca-certificate-chain.crt`.
 
-#. Put the above-mentioned files, into a directory, e.g. :file:`/path/to/genconf/`.
+#. Put the above-mentioned files into a directory, e.g. :file:`/path/to/genconf/`.
 
 #. Create a file containing the "extra" configuration.
 
@@ -296,7 +295,7 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
           --genconf-dir /path/to/genconf/ \
           --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
           --license-key /path/to/license.txt \
-          --extra-config config.yml \
+          --extra-config config.yml
 
 #. Verify that everything has worked.
 

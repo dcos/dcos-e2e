@@ -157,3 +157,27 @@ def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
+
+
+def show_wait_help(is_enterprise: bool, doctor_command_name: str) -> None:
+    """
+    Show a message useful for "wait" commands to warn the user of potential
+    issues.
+    """
+    message = (
+        'A cluster may take some time to be ready.\n'
+        'The amount of time it takes to start a cluster depends on a variety '
+        'of factors.\n'
+        'If you are concerned that this is hanging, try '
+        '"{doctor_command_name}" to diagnose common issues.'
+    ).format(doctor_command_name=doctor_command_name)
+    click.echo(message)
+
+    no_login_message = (
+        'If you cancel this command while it is running, '
+        'you may not be able to log in. '
+        'To resolve that, run this command again.'
+    )
+
+    if not is_enterprise:
+        click.echo(no_login_message)
