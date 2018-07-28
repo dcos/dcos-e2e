@@ -1,7 +1,6 @@
 """
 Helpers for creating and interacting with clusters on AWS.
 """
-
 import inspect
 import os
 import uuid
@@ -90,6 +89,7 @@ class AWS(ClusterBackend):
                 Distribution.CENTOS_7,
                 # Progress on COREOS support is tracked in JIRA:
                 # https://jira.mesosphere.com/browse/DCOS-21954
+                Distribution.UBUNTU_16_04,
             ],
         )
 
@@ -160,6 +160,7 @@ class AWSCluster(ClusterManager):
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
             Distribution.COREOS: 'core',
+            Distribution.UBUNTU_16_04: 'ubuntu',
         }
         self._default_user = ssh_user[cluster_backend.linux_distribution]
 
@@ -170,6 +171,7 @@ class AWSCluster(ClusterManager):
         aws_distros = {
             Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
             Distribution.COREOS: 'coreos',
+            Distribution.UBUNTU_16_04: 'ubuntu-16-04',
         }
 
         deployment_name = (
