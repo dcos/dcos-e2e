@@ -58,10 +58,21 @@ def download_artifact(
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
 
+    # See
+    # https://stackoverflow.com/questions/16694907/how-to-download-large-file-in-python-with-requests-py
+
     stream = requests.get(url, stream=True)
     content_length = int(stream.headers['Content-Length'])
+    total_written = 0
     chunk_size = 1024
-    with click.open_file(str(path), 'wb') as file_descriptor:
+    # See http://click.pocoo.org/6/arguments/#file-args for parameter
+    # information
+    with click.open_file(
+        filename=str(path),
+        mode='wb',
+        atomic=True,
+        lazy=True,
+    ) as file_descriptor:
         content_iter = stream.iter_content(chunk_size=chunk_size)
         with click.progressbar(  # type: ignore
             content_iter,
@@ -69,6 +80,9 @@ def download_artifact(
             label=label,
         ) as progress_bar:
             for chunk in progress_bar:
+                # Filter out keep-alive new chunks.
                 if chunk:
+                    total_written += len(chunk)
                     file_descriptor.write(chunk)  # type: ignore
-                    file_descriptor.flush()  # type: ignore
+
+    assert total_written == content_length
