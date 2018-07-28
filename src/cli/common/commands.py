@@ -2,7 +2,6 @@
 Common commands and command factories.
 """
 
-import os
 from pathlib import Path
 
 import click
@@ -83,9 +82,7 @@ def download_artifact(
             for chunk in progress_bar:
                 # Filter out keep-alive new chunks.
                 if chunk:
-                    total_written = len(chunk)
+                    total_written += len(chunk)
                     file_descriptor.write(chunk)  # type: ignore
-                    file_descriptor.flush()
-                    os.fsync(file_descriptor.fileno())
 
     assert total_written == content_length

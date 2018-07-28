@@ -161,7 +161,7 @@ def _download_file(url: str, path: Path) -> None:
             for chunk in progress_bar:
                 # Filter out keep-alive new chunks.
                 if chunk:
-                    total_written = len(chunk)
+                    total_written += len(chunk)
                     file_descriptor.write(chunk)  # type: ignore
 
     assert total_written == content_length
