@@ -2,6 +2,7 @@
 Common commands and command factories.
 """
 
+import os
 from pathlib import Path
 
 import click
@@ -84,5 +85,7 @@ def download_artifact(
                 if chunk:
                     total_written = len(chunk)
                     file_descriptor.write(chunk)  # type: ignore
+                    file_descriptor.flush()
+                    os.fsync(file_descriptor.fileno())
 
     assert total_written == content_length
