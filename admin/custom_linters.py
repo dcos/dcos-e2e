@@ -1,11 +1,5 @@
 """
-Every test pattern we run on CI must also be specified in
-``admin/run_script.py``.
-
-This allows us to download only the required DC/OS artifacts.
-However, this is prone to error.
-
-The tests here help show some errors early.
+Custom lint tests for DC/OS E2E.
 """
 
 import subprocess
@@ -111,3 +105,20 @@ def test_tests_collected_once() -> None:
     all_tests = _tests_from_pattern(ci_pattern='tests/')
     assert tests_to_patterns.keys() - all_tests == set()
     assert all_tests - tests_to_patterns.keys() == set()
+
+
+def test_init_files() -> None:
+    """
+    ``__init__`` files exist where they should do.
+
+    If ``__init__`` files are missing, linters may not run on all files that
+    they should run on.
+    """
+    directories = (Path('src'), Path('tests'))
+
+    for directory in directories:
+        files = directory.glob('**/*.py')
+        for python_file in files:
+            parent = python_file.parent
+            expected_init = parent / '__init__.py'
+            assert expected_init.exists()
