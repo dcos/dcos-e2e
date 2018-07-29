@@ -8,7 +8,9 @@ However, this is prone to error.
 The tests here help show some errors early.
 """
 
+import subprocess
 from pathlib import Path
+from typing import Dict  # noqa: F401
 from typing import Set
 
 import pytest
@@ -38,6 +40,21 @@ def _travis_ci_patterns() -> Set[str]:
     return ci_patterns
 
 
+def _tests_from_pattern(ci_pattern: str) -> Set[str]:
+    """
+    From a CI pattern, get all tests ``pytest`` would collect.
+    """
+    tests = set([])  # type: Set[str]
+    args = ['pytest', '--collect-only', ci_pattern, '-q']
+    result = subprocess.run(args=args, stdout=subprocess.PIPE)
+    output = result.stdout
+    for line in output.splitlines():
+        if line and not line.startswith(b'no tests ran in'):
+            tests.add(line.decode())
+
+    return tests
+
+
 def test_ci_patterns_match() -> None:
     """
     The patterns in ``.travis.yml`` must match the patterns in
@@ -64,6 +81,28 @@ def test_ci_patterns_valid() -> None:
         assert collect_only_result == 0, message
 
 
+def test_no_tests_run_twice() -> None:
+    """
+    Each test in the test suite is run at most once.
+    """
+    ci_patterns = _travis_ci_patterns()
+    tests_to_patterns = {}  # type: Dict[str, Set[str]]
+    for pattern in ci_patterns:
+        tests = _tests_from_pattern(ci_pattern=pattern)
+        for test in tests:
+            if test in tests_to_patterns:
+                tests_to_patterns[test].add(pattern)
+            else:
+                tests_to_patterns[test] = set([pattern])
+
+    for test_name, patterns in tests_to_patterns.items():
+        message = (
+            'Test "{test_name}" will be run once for each pattern in '
+            '{patterns}. '
+            'Each test should be run only once.'
+        ).format(test_name=test_name, patterns=patterns)
+        assert len(patterns) == 1, message
+
+
 # Future tests:
-# Are there tests duplicated across patterns?
 # Are there tests missing, which will lead to missing coverage?
