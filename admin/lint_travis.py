@@ -8,8 +8,6 @@ However, this is prone to error.
 The tests here help show some errors early.
 """
 
-import os
-import sys
 from pathlib import Path
 from typing import Set
 
@@ -63,13 +61,7 @@ def test_ci_patterns_valid() -> None:
     ci_patterns = _travis_ci_patterns()
 
     for ci_pattern in ci_patterns:
-        old_out = sys.stdout
-        old_err = sys.stderr
-        sys.stdout = open(os.devnull, 'w')
-        sys.stderr = open(os.devnull, 'w')
         collect_only_result = pytest.main(['--collect-only', ci_pattern])
-        sys.stdout = old_out
-        sys.stderr = old_err
 
         message = '"{ci_pattern}" does not match any tests.'.format(
             ci_pattern=ci_pattern,
