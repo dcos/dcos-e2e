@@ -51,8 +51,8 @@ def test_ci_patterns_match() -> None:
     ``admin/run_script.py``.
     """
     ci_patterns = _travis_ci_patterns()
-    assert ci_patterns - PATTERNS.keys() == {}
-    assert PATTERNS.keys() - ci_patterns == {}
+    assert ci_patterns - PATTERNS.keys() == set()
+    assert PATTERNS.keys() - ci_patterns == set()
 
 
 def test_ci_patterns_valid() -> None:
@@ -71,8 +71,12 @@ def test_ci_patterns_valid() -> None:
         sys.stdout = old_out
         sys.stderr = old_err
 
-        assert collect_only_result > 0
+        message = '"{ci_pattern}" does not match any tests.'.format(
+            ci_pattern=ci_pattern,
+        )
+        assert collect_only_result == 0, message
 
 
-# TODO are there tests duplicated across patterns
-# TODO are there tests missing
+# Future tests:
+# Are there tests duplicated across patterns?
+# Are there tests missing, which will lead to missing coverage?
