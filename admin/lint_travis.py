@@ -100,7 +100,10 @@ def test_tests_run_once() -> None:
             'Test "{test_name}" will be run once for each pattern in '
             '{patterns}. '
             'Each test should be run only once.'
-        ).format(test_name=test_name, patterns=patterns)
+        ).format(
+            test_name=test_name,
+            patterns=patterns,
+        )
         assert len(patterns) == 1, message
 
     all_tests = _tests_from_pattern(ci_pattern='tests/')
