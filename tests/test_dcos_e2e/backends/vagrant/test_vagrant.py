@@ -2,11 +2,13 @@
 Tests for the Vagrant backend.
 """
 
+import os
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Optional
 
+import pytest
 import yaml
 
 from dcos_e2e._vendor import vertigo_py
@@ -15,7 +17,10 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 
 
-# We skip these tests because VirtualBox is not available on Travis CI.
+@pytest.mark.skipif(
+    os.environ.get('TRAVIS') == 'true',
+    reason='It is not possible to run VirtualBox on Travis CI',
+)
 class TestRunIntegrationTest:  # pragma: no cover
     """
     Tests for functionality specific to the Vagrant backend.
@@ -96,7 +101,10 @@ def _get_vm_from_node(node: Node) -> str:
     return str(node_vm)
 
 
-# We skip these tests because VirtualBox is not available on Travis CI.
+@pytest.mark.skipif(
+    os.environ.get('TRAVIS') == 'true',
+    reason='It is not possible to run VirtualBox on Travis CI',
+)
 class TestVMDescription:  # pragma: no cover
     """
     Tests for the VirtualBox description of VMs representing nodes.

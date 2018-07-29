@@ -84,6 +84,8 @@ PATTERNS = {
     (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_docker.py':
     (),
+    'tests/test_dcos_e2e/backends/vagrant':
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterSize':
