@@ -81,9 +81,9 @@ def test_ci_patterns_valid() -> None:
         assert collect_only_result == 0, message
 
 
-def test_no_tests_run_twice() -> None:
+def test_tests_run_once() -> None:
     """
-    Each test in the test suite is run at most once.
+    Each test in the test suite is collected exactly once.
     """
     ci_patterns = _travis_ci_patterns()
     tests_to_patterns = {}  # type: Dict[str, Set[str]]
@@ -103,6 +103,6 @@ def test_no_tests_run_twice() -> None:
         ).format(test_name=test_name, patterns=patterns)
         assert len(patterns) == 1, message
 
-
-# Future tests:
-# Are there tests missing, which will lead to missing coverage?
+    all_tests = _tests_from_pattern(ci_pattern='tests/')
+    assert tests_to_patterns.keys() - all_tests == set()
+    assert all_tests - tests_to_patterns.keys() == set()
