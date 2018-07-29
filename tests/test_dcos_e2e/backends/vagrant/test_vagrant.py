@@ -16,7 +16,7 @@ from dcos_e2e.node import Node
 
 
 # We skip these tests because VirtualBox is not available on Travis CI.
-class TestRunIntegrationTest:  # pragma: nocover
+class TestRunIntegrationTest:  # pragma: no cover
     """
     Tests for functionality specific to the Vagrant backend.
     """
@@ -29,8 +29,9 @@ class TestRunIntegrationTest:  # pragma: nocover
         It is possible to run DC/OS integration tests on Vagrant.
         This test module only requires a single master node.
         """
+        cluster_backend = Vagrant()
         with Cluster(
-            cluster_backend=Vagrant(),
+            cluster_backend=cluster_backend,
             masters=1,
             agents=1,
             public_agents=1,
@@ -39,6 +40,7 @@ class TestRunIntegrationTest:  # pragma: nocover
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
                 log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
 
             cluster.wait_for_dcos_oss()
@@ -62,10 +64,10 @@ def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
         vm_name,
         property_name,
     ]
-    property_result = vertigo_py.execute(args=args)
+    property_result = vertigo_py.execute(args=args)  # type: ignore
     results = yaml.load(property_result)
     if results == 'No value set!':
-        return
+        return None
     return IPv4Address(results['Value'])
 
 
@@ -73,31 +75,34 @@ def _description_from_vm_name(vm_name: str) -> Optional[str]:
     """
     Given the name of a VirtualBox VM, return its description address.
     """
-    vm = vertigo_py.VM(name=vm_name)
-    info = vm.parse_info()
-    return info.get('description')
+    vertigo_vm = vertigo_py.VM(name=vm_name)  # type: ignore
+    info = vertigo_vm.parse_info()
+    if 'description' in info:
+        return str(info['description'])
+    return None
 
 
 def _get_vm_from_node(node: Node) -> str:
     """
     Return the container which represents the given ``node``.
     """
-    lines = vertigo_py.ls(option='vms').decode().strip().split('\n')
+    ls_result = bytes(vertigo_py.ls(option='vms'))  # type: ignore
+    lines = ls_result.decode().strip().split('\n')
     vm_names = set(line.split(' ')[0][1:-1] for line in lines)
     [node_vm] = [
         vm_name for vm_name in vm_names
         if _ip_from_vm_name(vm_name=vm_name) == node.private_ip_address
     ]
-    return node_vm
+    return str(node_vm)
 
 
 # We skip these tests because VirtualBox is not available on Travis CI.
-class TestVMDescription:  # pragma: nocover
+class TestVMDescription:  # pragma: no cover
     """
     Tests for the VirtualBox description of VMs representing nodes.
     """
 
-    def test_default(self):
+    def test_default(self) -> None:
         """
         By default, VMs include an empty description.
         """
@@ -112,7 +117,7 @@ class TestVMDescription:  # pragma: nocover
             description = _description_from_vm_name(vm_name=new_vm_name)
             assert description is None
 
-    def test_custom(self):
+    def test_custom(self) -> None:
         """
         It is possible to set a custom description for VMs.
         """
