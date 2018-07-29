@@ -8,6 +8,7 @@ However, this is prone to error.
 The tests here help show some errors early.
 """
 
+import subprocess
 from pathlib import Path
 from typing import Dict  # noqa: F401
 from typing import Set
@@ -40,7 +41,18 @@ def _travis_ci_patterns() -> Set[str]:
 
 
 def _tests_from_pattern(ci_pattern: str) -> Set[str]:
-    return set(['a'])
+    """
+    From a CI pattern, get all tests ``pytest`` would collect.
+    """
+    tests = set([])  # type: Set[str]
+    args = ['pytest', '--collect-only', ci_pattern, '-q']
+    result = subprocess.run(args=args, stdout=subprocess.PIPE)
+    output = result.stdout
+    for line in output.splitlines():
+        if line and not line.startswith(b'no tests ran in'):
+            tests.add(line.decode())
+
+    return tests
 
 
 def test_ci_patterns_match() -> None:
