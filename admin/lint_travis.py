@@ -56,6 +56,10 @@ def test_ci_patterns_match() -> None:
 
 
 def test_ci_patterns_valid() -> None:
+    """
+    All of the CI patterns in ``.travis.yml`` match at least one test in the
+    test suite.
+    """
     ci_patterns = _travis_ci_patterns()
 
     for ci_pattern in ci_patterns:
