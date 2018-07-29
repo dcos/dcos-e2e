@@ -9,6 +9,7 @@ The tests here help show some errors early.
 """
 
 from pathlib import Path
+from typing import Dict  # noqa: F401
 from typing import Set
 
 import pytest
@@ -38,6 +39,10 @@ def _travis_ci_patterns() -> Set[str]:
     return ci_patterns
 
 
+def _tests_from_pattern(ci_pattern: str) -> Set[str]:
+    return set(['a'])
+
+
 def test_ci_patterns_match() -> None:
     """
     The patterns in ``.travis.yml`` must match the patterns in
@@ -62,6 +67,20 @@ def test_ci_patterns_valid() -> None:
             ci_pattern=ci_pattern,
         )
         assert collect_only_result == 0, message
+
+
+def test_no_tests_run_twice() -> None:
+    ci_patterns = _travis_ci_patterns()
+    tests_to_patterns = {}  # type: Dict[str, Set[str]]
+    for pattern in ci_patterns:
+        tests = _tests_from_pattern(ci_pattern=pattern)
+        for test in tests:
+            if test in tests_to_patterns:
+                tests_to_patterns[test].add(pattern)
+            tests_to_patterns[test] = set([pattern])
+
+    for key, value in tests_to_patterns.items():
+        assert len(value) == 1
 
 
 # Future tests:
