@@ -81,9 +81,11 @@ def test_ci_patterns_valid() -> None:
         assert collect_only_result == 0, message
 
 
-def test_tests_run_once() -> None:
+def test_tests_collected_once() -> None:
     """
     Each test in the test suite is collected exactly once.
+
+    This does not necessarily mean that they are run - they may be skipped.
     """
     ci_patterns = _travis_ci_patterns()
     tests_to_patterns = {}  # type: Dict[str, Set[str]]

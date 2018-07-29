@@ -26,6 +26,7 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
+  - CI_PATTERN=tests/test_dcos_e2e/backends/vagrant
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path
