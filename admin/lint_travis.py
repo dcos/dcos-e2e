@@ -111,3 +111,17 @@ def test_tests_collected_once() -> None:
     all_tests = _tests_from_pattern(ci_pattern='tests/')
     assert tests_to_patterns.keys() - all_tests == set()
     assert all_tests - tests_to_patterns.keys() == set()
+
+
+def test_init_files() -> None:
+    """
+    Test init files exist.
+    """
+    directories = (Path('src'), Path('tests'))
+
+    for directory in directories:
+        files = directory.glob('**/*.py')
+        for python_file in files:
+            parent = python_file.parent
+            expected_init = parent / '__init__.py'
+            assert expected_init.exists()
