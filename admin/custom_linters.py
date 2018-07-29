@@ -109,7 +109,7 @@ def test_tests_collected_once() -> None:
 
 def test_init_files() -> None:
     """
-    Test init files exist.
+    Test init files exist where they should do.
     """
     directories = (Path('src'), Path('tests'))
 
