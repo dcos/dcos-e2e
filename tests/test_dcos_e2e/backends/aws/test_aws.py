@@ -268,6 +268,47 @@ class TestDCOSInstallation:
             )
             cluster.wait_for_dcos_oss()
 
+    def test_install_dcos_with_custom_ip_detect(
+        self,
+        oss_artifact_url: str,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to install DC/OS on an AWS with a custom IP detect
+        script.
+        """
+        cluster_backend = AWS()
+        with Cluster(
+            cluster_backend=cluster_backend,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_contents = dedent(
+                """\
+                #!/bin/bash
+                echo {ip_address}
+                """,
+            ).format(ip_address=master.private_ip_address)
+            ip_detect_file.write(ip_detect_contents)
+
+            cluster.install_dcos_from_url(
+                build_artifact=oss_artifact_url,
+                dcos_config=cluster.base_config,
+                log_output_live=True,
+                ip_detect_path=Path(str(ip_detect_file)),
+            )
+            cluster.wait_for_dcos_oss()
+            cat_result = master.run(
+                args=['cat', '/opt/mesosphere/bin/detect_ip'],
+            )
+            node_script_contents = cat_result.stdout.decode()
+            assert node_script_contents == ip_detect_contents
+            backend_script_path = cluster_backend.ip_detect_path
+            backend_script_contents = backend_script_path.read_text()
+            assert node_script_contents != backend_script_contents
+
     def test_install_dcos_with_custom_genconf(
         self,
         oss_artifact_url: str,
@@ -306,4 +347,8 @@ class TestDCOSInstallation:
             cat_result = master.run(
                 args=['cat', '/opt/mesosphere/bin/detect_ip'],
             )
-            assert cat_result.stdout.decode() == ip_detect_contents
+            node_script_contents = cat_result.stdout.decode()
+            assert node_script_contents == ip_detect_contents
+            backend_script_path = cluster_backend.ip_detect_path
+            backend_script_contents = backend_script_path.read_text()
+            assert node_script_contents != backend_script_contents
