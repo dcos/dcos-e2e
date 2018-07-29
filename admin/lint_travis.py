@@ -92,12 +92,17 @@ def test_no_tests_run_twice() -> None:
         for test in tests:
             if test in tests_to_patterns:
                 tests_to_patterns[test].add(pattern)
-            tests_to_patterns[test] = set([pattern])
+            else:
+                tests_to_patterns[test] = set([pattern])
 
-    for _, value in tests_to_patterns.items():
-        assert len(value) == 1
+    for test_name, patterns in tests_to_patterns.items():
+        message = (
+            'Test "{test_name}" will be run once for each pattern in '
+            '{patterns}. '
+            'Each test should be run only once.'
+        ).format(test_name=test_name, patterns=patterns)
+        assert len(patterns) == 1, message
 
 
 # Future tests:
-# Are there tests duplicated across patterns?
 # Are there tests missing, which will lead to missing coverage?
