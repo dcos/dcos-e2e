@@ -12,14 +12,15 @@ missed adding an item to ``admin/run_script.py``.
 import os
 import sys
 from pathlib import Path
-from typing import Set  # noqa: F401
+from typing import Set
 
 import pytest
 import yaml
 
 from run_script import PATTERNS
 
-def travis_ci_patterns() -> None:
+
+def _travis_ci_patterns() -> Set[str]:
     """
     Return the CI patterns given in the ``.travis.yml`` file.
     """
@@ -42,52 +43,42 @@ def travis_ci_patterns() -> None:
         if value != "''":
             ci_patterns.add(value)
 
-if CI_PATTERNS != PATTERNS.keys():
-    sys.stderr.write(
-        'The test patterns in ``.travis.yml`` and ``admin/run_script.py`` '
-        'differ:\n',
-    )
+    return ci_patterns
 
-    TRAVIS_ONLY = CI_PATTERNS - PATTERNS.keys()
-    if TRAVIS_ONLY:
-        for TRAVIS_ONLY_ITEM in TRAVIS_ONLY:
-            sys.stderr.write(
-                '    Only ``.travis.yml`` includes "{item}".\n'.format(
-                    item=TRAVIS_ONLY_ITEM,
-                ),
-            )
 
-    RUN_SCRIPT_ONLY = PATTERNS.keys() - CI_PATTERNS
-    if RUN_SCRIPT_ONLY:
-        for RUN_SCRIPT_ONLY_ITEM in RUN_SCRIPT_ONLY:
-            sys.stderr.write(
-                '    Only ``admin/run_script.py`` includes "{item}."\n'.format(
-                    item=RUN_SCRIPT_ONLY_ITEM,
-                ),
-            )
+def test_ci_patterns_match() -> None:
+    ci_patterns = _travis_ci_patterns()
+    assert ci_patterns - PATTERNS.keys() == {}
+    assert PATTERNS.keys() - ci_patterns == {}
 
-COLLECT_ONLY_ERROR_RESULTS = set()
-for CI_PATTERN in CI_PATTERNS:
-    OLD_OUT = sys.stdout
-    OLD_ERR = sys.stderr
-    sys.stdout = open(os.devnull, 'w')
-    sys.stderr = open(os.devnull, 'w')
-    COLLECT_ONLY_RESULT = pytest.main(['--collect-only', CI_PATTERN])
-    sys.stdout = OLD_OUT
-    sys.stderr = OLD_ERR
 
-    if COLLECT_ONLY_RESULT != 0:
-        COLLECT_ONLY_ERROR_RESULTS.add(CI_PATTERN)
-
-for ERROR_PATTERN in COLLECT_ONLY_ERROR_RESULTS:
-    sys.stderr.write(
-        'Error finding tests with pattern "{pattern}".\n'.format(
-            pattern=ERROR_PATTERN,
-        ),
-    )
-
-if CI_PATTERNS != PATTERNS.keys() or COLLECT_ONLY_ERROR_RESULTS:
-    sys.exit(1)
-
-# TODO are there tests duplicated across patterns
-# TODO are there tests missing
+if __name__ == '__main__':
+    pass
+    # CI_PATTERNS = travis_ci_patterns()
+    # if CI_PATTERNS != PATTERNS.keys():
+    #
+    # COLLECT_ONLY_ERROR_RESULTS = set()
+    # for CI_PATTERN in CI_PATTERNS:
+    #     OLD_OUT = sys.stdout
+    #     OLD_ERR = sys.stderr
+    #     sys.stdout = open(os.devnull, 'w')
+    #     sys.stderr = open(os.devnull, 'w')
+    #     COLLECT_ONLY_RESULT = pytest.main(['--collect-only', CI_PATTERN])
+    #     sys.stdout = OLD_OUT
+    #     sys.stderr = OLD_ERR
+    #
+    #     if COLLECT_ONLY_RESULT != 0:
+    #         COLLECT_ONLY_ERROR_RESULTS.add(CI_PATTERN)
+    #
+    # for ERROR_PATTERN in COLLECT_ONLY_ERROR_RESULTS:
+    #     sys.stderr.write(
+    #         'Error finding tests with pattern "{pattern}".\n'.format(
+    #             pattern=ERROR_PATTERN,
+    #         ),
+    #     )
+    #
+    # if CI_PATTERNS != PATTERNS.keys() or COLLECT_ONLY_ERROR_RESULTS:
+    #     sys.exit(1)
+    #
+    # # TODO are there tests duplicated across patterns
+    # # TODO are there tests missing

@@ -95,7 +95,7 @@ spelling:
 
 .PHONY: travis
 travis:
-	python admin/lint_travis.py
+	pytest -vvv admin/lint_travis.py
 
 .PHONY: shellcheck
 shellcheck:
