@@ -30,12 +30,7 @@ def _travis_ci_patterns() -> Set[str]:
     for matrix_item in travis_matrix:
         key, value = matrix_item.split('=')
         assert key == 'CI_PATTERN'
-        if value in ci_patterns:
-            raise Exception(
-                '"{pattern}" is duplicated in ".travis.yml".'.format(
-                    pattern=value,
-                ),
-            )
+        assert value not in ci_patterns
         # Special case for running no tests.
         if value != "''":
             ci_patterns.add(value)
