@@ -19,24 +19,28 @@ import yaml
 
 from run_script import PATTERNS
 
-TRAVIS_FILE = Path(__file__).parent.parent / '.travis.yml'
-TRAVIS_CONTENTS = TRAVIS_FILE.read_text()
-TRAVIS_DICT = yaml.load(TRAVIS_CONTENTS)
-TRAVIS_MATRIX = TRAVIS_DICT['env']['matrix']
+def travis_ci_patterns() -> None:
+    """
+    Return the CI patterns given in the ``.travis.yml`` file.
+    """
+    travis_file = Path(__file__).parent.parent / '.travis.yml'
+    travis_contents = travis_file.read_text()
+    travis_dict = yaml.load(travis_contents)
+    travis_matrix = travis_dict['env']['matrix']
 
-CI_PATTERNS = set()  # type: Set[str]
-for MATRIX_ITEM in TRAVIS_MATRIX:
-    KEY, VALUE = MATRIX_ITEM.split('=')
-    assert KEY == 'CI_PATTERN'
-    if VALUE in CI_PATTERNS:
-        raise Exception(
-            '"{pattern}" is duplicated in ".travis.yml".'.format(
-                pattern=VALUE,
-            ),
-        )
-    # Special case for running no tests.
-    if VALUE != "''":
-        CI_PATTERNS.add(VALUE)
+    ci_patterns = set()  # type: Set[str]
+    for matrix_item in travis_matrix:
+        key, value = matrix_item.split('=')
+        assert key == 'CI_PATTERN'
+        if value in ci_patterns:
+            raise Exception(
+                '"{pattern}" is duplicated in ".travis.yml".'.format(
+                    pattern=value,
+                ),
+            )
+        # Special case for running no tests.
+        if value != "''":
+            ci_patterns.add(value)
 
 if CI_PATTERNS != PATTERNS.keys():
     sys.stderr.write(
@@ -84,3 +88,6 @@ for ERROR_PATTERN in COLLECT_ONLY_ERROR_RESULTS:
 
 if CI_PATTERNS != PATTERNS.keys() or COLLECT_ONLY_ERROR_RESULTS:
     sys.exit(1)
+
+# TODO are there tests duplicated across patterns
+# TODO are there tests missing
