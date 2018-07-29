@@ -167,7 +167,15 @@ def _download_file(url: str, path: Path) -> None:
                     total_written += len(chunk)
                     file_descriptor.write(chunk)  # type: ignore
 
-    assert total_written == content_length
+    message = (
+        'Downloaded {total_written} bytes. '
+        'Expected {content_length} bytes.'
+    ).format(
+        total_written=total_written,
+        content_length=content_length,
+    )
+
+    assert total_written == content_length, message
 
 
 def download_artifacts(test_pattern: str) -> None:
