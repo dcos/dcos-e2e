@@ -57,7 +57,8 @@ class TestRunIntegrationTest:  # pragma: no cover
             )
 
 
-def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
+def _ip_from_vm_name(vm_name: str,
+                     ) -> Optional[IPv4Address]:  # pragma: no cover
     """
     Given the name of a VirtualBox VM, return its IP address.
     """
@@ -76,7 +77,8 @@ def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
     return IPv4Address(results['Value'])
 
 
-def _description_from_vm_name(vm_name: str) -> Optional[str]:
+def _description_from_vm_name(vm_name: str,
+                              ) -> Optional[str]:  # pragma: no cover
     """
     Given the name of a VirtualBox VM, return its description address.
     """
@@ -87,7 +89,7 @@ def _description_from_vm_name(vm_name: str) -> Optional[str]:
     return None
 
 
-def _get_vm_from_node(node: Node) -> str:
+def _get_vm_from_node(node: Node) -> str:  # pragma: no cover
     """
     Return the container which represents the given ``node``.
     """
