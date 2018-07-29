@@ -143,6 +143,7 @@ def _download_file(url: str, path: Path) -> None:
     """
     label = 'Downloading to ' + str(path)
     stream = requests.get(url, stream=True)
+    assert stream.ok
     content_length = int(stream.headers['Content-Length'])
     total_written = 0
     chunk_size = 1024
