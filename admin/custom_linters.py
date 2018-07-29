@@ -1,11 +1,5 @@
 """
-Every test pattern we run on CI must also be specified in
-``admin/run_script.py``.
-
-This allows us to download only the required DC/OS artifacts.
-However, this is prone to error.
-
-The tests here help show some errors early.
+Custom lint tests for DC/OS E2E.
 """
 
 import subprocess

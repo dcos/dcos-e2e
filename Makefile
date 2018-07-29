@@ -93,9 +93,9 @@ linkcheck:
 spelling:
 	$(MAKE) -C docs spelling SPHINXOPTS=$(SPHINXOPTS)
 
-.PHONY: travis
-travis:
-	pytest -vvv -x admin/lint_travis.py
+.PHONY: custom-linters
+custom-linters:
+	pytest -vvv -x admin/custom_linters.py
 
 .PHONY: shellcheck
 shellcheck:
@@ -115,6 +115,7 @@ autoflake:
 .PHONY: lint
 lint: \
     check-manifest \
+    custom-linters \
     doc8 \
     flake8 \
     isort \
@@ -128,8 +129,7 @@ lint: \
     shellcheck \
     spelling \
     vulture \
-    yapf \
-    travis
+    yapf
 
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
