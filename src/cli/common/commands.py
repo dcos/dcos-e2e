@@ -62,6 +62,7 @@ def download_artifact(
     # https://stackoverflow.com/questions/16694907/how-to-download-large-file-in-python-with-requests-py
 
     stream = requests.get(url, stream=True)
+    assert stream.ok
     content_length = int(stream.headers['Content-Length'])
     total_written = 0
     chunk_size = 1024
@@ -85,4 +86,11 @@ def download_artifact(
                     total_written += len(chunk)
                     file_descriptor.write(chunk)  # type: ignore
 
-    assert total_written == content_length
+    message = (
+        'Downloaded {total_written} bytes. '
+        'Expected {content_length} bytes.'
+    ).format(
+        total_written=total_written,
+        content_length=content_length,
+    )
+    assert total_written == content_length, message
