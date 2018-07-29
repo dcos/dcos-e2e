@@ -82,6 +82,9 @@ def test_ci_patterns_valid() -> None:
 
 
 def test_no_tests_run_twice() -> None:
+    """
+    Each test in the test suite is run at most once.
+    """
     ci_patterns = _travis_ci_patterns()
     tests_to_patterns = {}  # type: Dict[str, Set[str]]
     for pattern in ci_patterns:
@@ -91,7 +94,7 @@ def test_no_tests_run_twice() -> None:
                 tests_to_patterns[test].add(pattern)
             tests_to_patterns[test] = set([pattern])
 
-    for key, value in tests_to_patterns.items():
+    for _, value in tests_to_patterns.items():
         assert len(value) == 1
 
 
