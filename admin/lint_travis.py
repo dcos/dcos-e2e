@@ -100,7 +100,10 @@ def test_no_tests_run_twice() -> None:
             'Test "{test_name}" will be run once for each pattern in '
             '{patterns}. '
             'Each test should be run only once.'
-        ).format(test_name=test_name, patterns=patterns)
+        ).format(
+            test_name=test_name,
+            patterns=patterns,
+        )
         assert len(patterns) == 1, message
 
 
