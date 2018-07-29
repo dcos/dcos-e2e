@@ -5,8 +5,7 @@ Every test pattern we run on CI must also be specified in
 This allows us to download only the required DC/OS artifacts.
 However, this is prone to error.
 
-This script attempts to help with that by telling test authors if they have
-missed adding an item to ``admin/run_script.py``.
+The tests here help show some errors early.
 """
 
 import os
@@ -47,6 +46,10 @@ def _travis_ci_patterns() -> Set[str]:
 
 
 def test_ci_patterns_match() -> None:
+    """
+    The patterns in ``.travis.yml`` must match the patterns in
+    ``admin/run_script.py``.
+    """
     ci_patterns = _travis_ci_patterns()
     assert ci_patterns - PATTERNS.keys() == {}
     assert PATTERNS.keys() - ci_patterns == {}
