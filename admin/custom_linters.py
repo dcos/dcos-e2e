@@ -109,7 +109,10 @@ def test_tests_collected_once() -> None:
 
 def test_init_files() -> None:
     """
-    Test init files exist where they should do.
+    ``__init__`` files exist where they should do.
+
+    If ``__init__`` files are missing, linters may not run on all files that
+    they should run on.
     """
     directories = (Path('src'), Path('tests'))
 
