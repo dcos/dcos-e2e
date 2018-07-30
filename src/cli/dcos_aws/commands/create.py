@@ -168,6 +168,7 @@ def create(
         Distribution.CENTOS_7: 'centos',
         Distribution.COREOS: 'core',
         Distribution.UBUNTU_16_04: 'ubuntu',
+        Distribution.RHEL_7: 'ec2-user',
     }
     default_user = ssh_user[cluster_backend.linux_distribution]
 

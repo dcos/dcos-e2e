@@ -90,6 +90,7 @@ class AWS(ClusterBackend):
                 Distribution.CENTOS_7,
                 # Progress on COREOS support is tracked in JIRA:
                 # https://jira.mesosphere.com/browse/DCOS-21954
+                Distribution.RHEL_7,
             ],
         )
 
@@ -160,6 +161,7 @@ class AWSCluster(ClusterManager):
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
             Distribution.COREOS: 'core',
+            Distribution.RHEL_7: 'ec2-user'
         }
         self._default_user = ssh_user[cluster_backend.linux_distribution]
 
@@ -170,6 +172,7 @@ class AWSCluster(ClusterManager):
         aws_distros = {
             Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
             Distribution.COREOS: 'coreos',
+            Distribution.RHEL_7: 'rhel-7-dcos-prereqs',
         }
 
         deployment_name = (
