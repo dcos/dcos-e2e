@@ -12,6 +12,7 @@ import shutil
 import stat
 import subprocess
 import tempfile
+from typing import Optional
 
 import requests
 
@@ -51,18 +52,27 @@ class DcosCli():
         self.env = updated_env
 
     @classmethod
-    def new_cli(cls, download_url: str=DCOS_CLI_URL):
-        """ This method will download and correctly set the permission for a new dcos-cli binary
+    def new_cli(
+        cls,
+        download_url: str=DCOS_CLI_URL,
+        tmpdir: Optional[str]=None
+    ):
+        """Download and set execute permission for a new dcos-cli binary
 
-        :param download_url: URL of the dcos-cli binary to be used. If not set, a stable cli will be used
+        :param download_url: URL of the dcos-cli binary to be used.
+            If not set, a stable cli will be used.
         :type download_url: str
+        :param tmpdir: path to a temporary directory to contain the executable.
+            If not set, a temporary directory will be created.
+        :type tmpdir: Optional[str]
         """
-        tmpdir = tempfile.mkdtemp()
+        if tmpdir is None:
+            tmpdir = tempfile.mkdtemp()
         dcos_cli_path = os.path.join(tmpdir, "dcos")
         requests.packages.urllib3.disable_warnings()
         with open(dcos_cli_path, 'wb') as f:
             r = requests.get(download_url, stream=True, verify=True)
-            for chunk in r.iter_content(1024):
+            for chunk in r.iter_content(8192):
                 f.write(chunk)
 
         # make binary executable
@@ -73,10 +83,14 @@ class DcosCli():
 
     @staticmethod
     def clear_cli_dir():
-        """ The CLI can be heavily dependent on state stored in ~/.dcos which
-        should be cleaned up if other dcos-cli sessions aren't intended to access that state
+        """Remove the CLI state directory.
+
+        Cluster and installed plugins are stored in the CLI state directory.
+        Remove this directory to reset the CLI to its initial state.
         """
-        shutil.rmtree(os.path.expanduser("~/.dcos"))
+        path = os.path.expanduser("~/.dcos")
+        if os.path.exists(path):
+            shutil.rmtree(path)
 
     def exec_command(self, cmd: str, stdin=None) -> tuple:
         """Execute CLI command and processes result.
@@ -93,13 +107,19 @@ class DcosCli():
 
         log.info('CMD: {!r}'.format(cmd))
 
-        process = subprocess.run(
-            cmd,
-            stdin=stdin,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=self.env,
-            check=True)
+        try:
+            process = subprocess.run(
+                cmd,
+                stdin=stdin,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                env=self.env,
+                check=True)
+        except subprocess.CalledProcessError as e:
+            if e.stderr:
+                stderr = e.stderr.decode('utf-8')
+                log.error('STDERR: {}'.format(stderr))
+            raise
 
         stdout, stderr = process.stdout.decode('utf-8'), process.stderr.decode('utf-8')
 
@@ -108,7 +128,12 @@ class DcosCli():
 
         return (stdout, stderr)
 
-    def setup_enterprise(self, url: str, username: str=None, password: str=None):
+    def setup_enterprise(
+        self,
+        url: str,
+        username: Optional[str]=None,
+        password: Optional[str]=None
+    ):
         """ This method does the CLI setup for a Mesosphere Enterprise DC/OS cluster
 
         Note:
@@ -117,9 +142,9 @@ class DcosCli():
         :param url: URL of EE DC/OS cluster to setup the CLI with
         :type  url: str
         :param username: username to login with
-        :type username: str
+        :type username: Optional[str]
         :param password: password to use with username
-        :type password: str
+        :type password: Optional[str]
         """
         if not username:
             username = os.environ['DCOS_LOGIN_UNAME']
