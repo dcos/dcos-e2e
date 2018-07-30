@@ -159,14 +159,6 @@ def create(
     doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
 
-    cluster_tags = {
-        SSH_USER_TAG_KEY: default_user,
-        CLUSTER_ID_TAG_KEY: cluster_id,
-        WORKSPACE_DIR_TAG_KEY: str(workspace_dir),
-        KEY_NAME_TAG_KEY: key_name,
-        VARIANT_TAG_KEY: 'ee' if enterprise else '',
-    }
-
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
         Distribution.COREOS: 'core',
@@ -176,6 +168,14 @@ def create(
     distribution = LINUX_DISTRIBUTIONS[linux_distribution]
 
     default_user = ssh_user[distribution]
+
+    cluster_tags = {
+        SSH_USER_TAG_KEY: default_user,
+        CLUSTER_ID_TAG_KEY: cluster_id,
+        WORKSPACE_DIR_TAG_KEY: str(workspace_dir),
+        KEY_NAME_TAG_KEY: key_name,
+        VARIANT_TAG_KEY: 'ee' if enterprise else '',
+    }
 
     master_tags = {NODE_TYPE_TAG_KEY: NODE_TYPE_MASTER_TAG_VALUE}
     agent_tags = {NODE_TYPE_TAG_KEY: NODE_TYPE_AGENT_TAG_VALUE}
