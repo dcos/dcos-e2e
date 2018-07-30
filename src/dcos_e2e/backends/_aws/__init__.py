@@ -161,7 +161,7 @@ class AWSCluster(ClusterManager):
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
             Distribution.COREOS: 'core',
-            Distribution.RHEL_7: 'ec2-user'
+            Distribution.RHEL_7: 'ec2-user',
         }
         self._default_user = ssh_user[cluster_backend.linux_distribution]
 

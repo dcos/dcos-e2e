@@ -74,6 +74,12 @@ PATTERNS = {
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDCOSInstallation::test_install_dcos_with_custom_ip_detect':  # noqa: E501
     (),
+    'tests/test_dcos_e2e/backends/aws/test_distributions.py::TestCentos7':
+    (),
+    'tests/test_dcos_e2e/backends/aws/test_distributions.py::TestRHEL7::test_oss':  # noqa: E501
+    (),
+    'tests/test_dcos_e2e/backends/aws/test_distributions.py::TestRHEL7::test_enterprise':  # noqa: E501
+    (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
