@@ -10,6 +10,7 @@ RUN apt-get update \
 		debianutils \
 		dbus \
 		gawk \
+		gettext \
 		git \
 		iproute \
 		ipset \
@@ -26,7 +27,7 @@ RUN apt-get update \
 		tar \
 		tree \
 		unzip \
-                xfsprogs \
+		xfsprogs \
 		xz-utils \
 	&& rm -rf /var/lib/apt/lists/* \
 && ( \
