@@ -86,6 +86,13 @@ class AWS(ClusterBackend):
                 cluster.
             aws_cloudformation_stack_name: The name of the CloudFormation stack
                 to create.
+            ec2_instance_tags: Tags to add to the cluster node EC2 instances.
+            master_ec2_instance_tags: Tags to add to the cluster master node
+                EC2 instances.
+            agent_ec2_instance_tags: EC2 tags to add to the cluster agent node
+                EC2 instances.
+            public_agent_ec2_instance_tags: EC2 tags to add to the cluster
+                public agent node EC2 instances.
 
         Raises:
             NotImplementedError: In case an unsupported Linux distribution has
@@ -118,6 +125,10 @@ class AWS(ClusterBackend):
         self.admin_location = admin_location
         self.aws_key_pair = aws_key_pair
         self.aws_cloudformation_stack_name = aws_cloudformation_stack_name
+        self.ec2_instance_tags = ec2_instance_tags
+        self.master_ec2_instance_tags = master_ec2_instance_tags
+        self.agent_ec2_instance_tags = agent_ec2_instance_tags
+        self.public_agent_ec2_instance_tags = public_agent_ec2_instance_tags
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
@@ -257,6 +268,38 @@ class AWSCluster(ClusterManager):
         # This makes node IP addresses available to ``cluster_info``.
         # This also inserts bootstrap node information into ``cluster_info``.
         self.cluster_info = self.launcher.describe()
+
+        for nodes, tags in (
+            (self.master, cluster_backend.master_ec2_instance_tags),
+            (self.agents, cluster_backend.agent_ec2_instance_tags),
+            (self.master, cluster_backend.public_agent_ec2_instance_tags),
+        ):
+            node_public_ips = set(
+                str(node.public_ip_address) for node in nodes
+            )
+            instance_ids = [
+                instance.id for instance in ec2_instances
+                if instance.public_ip_address in node_public_ips
+            ]
+            nodes_tags = {**cluster_backend.ec2_instance_tags, **tags}
+
+            if not nodes:
+                continue
+
+            if not nodes_tags:
+                continue
+
+            ec2_tags = [
+                {
+                    'Key': key,
+                    'Value': value
+                } for key, value in node_tags.items()
+            ]
+
+            ec2.create_tags(
+                Resources=instance_ids,
+                Tags=ec2_tags,
+            )
 
     @property
     def base_config(self) -> Dict[str, Any]:
