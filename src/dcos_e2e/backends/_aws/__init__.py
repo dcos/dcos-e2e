@@ -288,7 +288,7 @@ class AWSCluster(ClusterManager):
             ec2_instances = ec2.instances.filter(
                 Filters=[
                     {
-                        'Name': 'public-ip-address',
+                        'Name': 'ip-address',
                         'Values': list(node_public_ips),
                     },
                 ],

@@ -51,13 +51,13 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
         aws_region: The region to get clusters from.
     """
     ec2 = boto3.resource('ec2', region_name=aws_region)
-    ec2_instances = ec2.instances.all()
+    ec2_filter = {'Name': 'tag:' + CLUSTER_ID_TAG_KEY, 'Values': ['*']}
+    ec2_instances = ec2.instances.filter(Filters=[ec2_filter])
 
     cluster_ids = set()  # type: Set[str]
     for instance in ec2_instances:
         tag_dict = _tag_dict(instance=instance)
-        if CLUSTER_ID_TAG_KEY in tag_dict:
-            cluster_ids.add(tag_dict[CLUSTER_ID_TAG_KEY])
+        cluster_ids.add(tag_dict[CLUSTER_ID_TAG_KEY])
 
     return cluster_ids
 
@@ -141,7 +141,8 @@ class ClusterInstances:
         Return all EC2 instances in this cluster of a particular node type.
         """
         ec2 = boto3.resource('ec2', region_name=self._aws_region)
-        ec2_instances = ec2.instances.all()
+        ec2_filter = {'Name': 'tag:' + CLUSTER_ID_TAG_KEY, 'Values': ['*']}
+        ec2_instances = ec2.instances.filter(Filters=[ec2_filter])
 
         cluster_instances = set([])
         for instance in ec2_instances:
