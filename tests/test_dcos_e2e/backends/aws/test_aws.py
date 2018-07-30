@@ -386,7 +386,7 @@ def _get_ec2_instance_from_node(
 
     [instance] = [
         instance for instance in ec2_instances
-        if instance.public_ip_address == node.public_ip_address
+        if instance.public_ip_address == str(node.public_ip_address)
     ]
     return instance
 
