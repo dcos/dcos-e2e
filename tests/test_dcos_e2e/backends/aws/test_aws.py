@@ -5,9 +5,11 @@ Tests for the AWS backend.
 import uuid
 from pathlib import Path
 from textwrap import dedent
+from typing import Dict
 
 import boto3
 import pytest
+from boto3.resources.base import ServiceResource
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -354,6 +356,23 @@ class TestDCOSInstallation:
             assert node_script_contents != backend_script_contents
 
 
+def _tag_dict(instance: ServiceResource) -> Dict[str, str]:
+    """
+    Return an EC2 instance's tags as a dictionary.
+    """
+    tag_dict = dict()  # type: Dict[str, str]
+
+    if instance.tags is None:
+        return tag_dict
+
+    for tag in instance.tags:
+        key = tag['Key']
+        value = tag['Value']
+        tag_dict[key] = value
+
+    return tag_dict
+
+
 class TestTags:
     """
     Tests for setting tags on EC2 instances.
@@ -379,7 +398,7 @@ class TestTags:
         public_agent_value = uuid.uuid4().hex
         public_agent_tags = {public_agent_key: public_agent_value}
 
-        cluster_backend = Docker(
+        cluster_backend = AWS(
             ec2_instance_tags=cluster_tags,
             master_ec2_instance_tags=master_tags,
             agent_ec2_instance_tags=agent_tags,
@@ -388,21 +407,33 @@ class TestTags:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             for node in cluster.masters:
-                node_tags = dict(_get_container_from_node(node=node).tags)
+                node_instance = _get_ec2_instance_from_node(
+                    node=node,
+                    aws_region=cluster_backend.aws_region,
+                )
+                node_tags = _tag_dict(instance=node_instance)
                 assert node_tags[cluster_key] == cluster_value
                 assert node_tags[master_key] == master_value
                 assert agent_key not in node_tags
                 assert public_agent_key not in node_tags
 
             for node in cluster.agents:
-                node_tags = dict(_get_container_from_node(node=node).tags)
+                node_instance = _get_ec2_instance_from_node(
+                    node=node,
+                    aws_region=cluster_backend.aws_region,
+                )
+                node_tags = _tag_dict(instance=node_instance)
                 assert node_tags[cluster_key] == cluster_value
                 assert node_tags[agent_key] == agent_value
                 assert master_key not in node_tags
                 assert public_agent_key not in node_tags
 
             for node in cluster.public_agents:
-                node_tags = dict(_get_container_from_node(node=node).tags)
+                node_instance = _get_ec2_instance_from_node(
+                    node=node,
+                    aws_region=cluster_backend.aws_region,
+                )
+                node_tags = _tag_dict(instance=node_instance)
                 assert node_tags[cluster_key] == cluster_value
                 assert node_tags[public_agent_key] == public_agent_value
                 assert master_key not in node_tags
