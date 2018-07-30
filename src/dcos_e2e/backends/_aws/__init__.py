@@ -12,6 +12,8 @@ from tempfile import gettempdir
 from typing import Optional  # noqa: F401
 from typing import Any, Dict, Iterable, Set, Tuple, Type
 
+import boto3
+
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
@@ -268,6 +270,8 @@ class AWSCluster(ClusterManager):
         # This makes node IP addresses available to ``cluster_info``.
         # This also inserts bootstrap node information into ``cluster_info``.
         self.cluster_info = self.launcher.describe()
+        ec2 = boto3.resource('ec2', region_name=cluster_backend.aws_region)
+        ec2_instances = ec2.instances.all()
 
         for nodes, tags in (
             (self.master, cluster_backend.master_ec2_instance_tags),
@@ -281,18 +285,18 @@ class AWSCluster(ClusterManager):
                 instance.id for instance in ec2_instances
                 if instance.public_ip_address in node_public_ips
             ]
-            nodes_tags = {**cluster_backend.ec2_instance_tags, **tags}
+            node_tags = {**cluster_backend.ec2_instance_tags, **tags}
 
             if not nodes:
                 continue
 
-            if not nodes_tags:
+            if not node_tags:
                 continue
 
             ec2_tags = [
                 {
                     'Key': key,
-                    'Value': value
+                    'Value': value,
                 } for key, value in node_tags.items()
             ]
 
