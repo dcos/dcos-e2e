@@ -156,7 +156,7 @@ class ClusterInstances:
             'Values': [node_types[role]],
         }
         filters = [cluster_id_tag_filter, node_role_filter]
-        ec2_instances = list(ec2.instances.filter(Filters=filters))
+        ec2_instances = set(ec2.instances.filter(Filters=filters))
         return ec2_instances
 
     def to_node(self, instance: ServiceResource) -> Node:

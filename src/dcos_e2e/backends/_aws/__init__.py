@@ -111,6 +111,8 @@ class AWS(ClusterBackend):
                 # Progress on COREOS support is tracked in JIRA:
                 # https://jira.mesosphere.com/browse/DCOS-21954
                 Distribution.RHEL_7,
+                # Support for Ubuntu is blocked on
+                # https://jira.mesosphere.com/browse/DCOS_OSS-3876.
             ],
         )
 
