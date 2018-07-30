@@ -29,7 +29,7 @@ def _get_node_distribution(node: Node) -> Distribution:
 
     distributions = {
         ('"centos"', '"7"'): Distribution.CENTOS_7,
-        ('"rhel"', '"7.3"'): Distribution.RHEL_7,
+        ('"rhel"', '"7.4"'): Distribution.RHEL_7,
     }
 
     distro_id = version_data['ID'].strip()
@@ -71,7 +71,7 @@ def _oss_distribution_test(
 
 def _enterprise_distribution_test(
     distribution: Distribution,
-    enterprise_artifact_url: str,
+    ee_artifact_url: str,
     license_key_contents: str,
 ) -> None:
     """
@@ -98,7 +98,7 @@ def _enterprise_distribution_test(
         public_agents=0,
     ) as cluster:
         cluster.install_dcos_from_url(
-            build_artifact=enterprise_artifact_url,
+            build_artifact=ee_artifact_url,
             dcos_config={
                 **cluster.base_config,
                 **config,
@@ -172,7 +172,7 @@ class TestRHEL7:
 
     def test_enterprise(
         self,
-        enterprise_artifact_url: str,
+        ee_artifact_url: str,
         license_key_contents: str,
     ) -> None:
         """
@@ -180,6 +180,6 @@ class TestRHEL7:
         """
         _enterprise_distribution_test(
             distribution=Distribution.RHEL_7,
-            enterprise_artifact_url=enterprise_artifact_url,
+            ee_artifact_url=ee_artifact_url,
             license_key_contents=license_key_contents,
         )
