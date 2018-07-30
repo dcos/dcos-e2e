@@ -127,10 +127,12 @@ class AWS(ClusterBackend):
         self.admin_location = admin_location
         self.aws_key_pair = aws_key_pair
         self.aws_cloudformation_stack_name = aws_cloudformation_stack_name
-        self.ec2_instance_tags = ec2_instance_tags
-        self.master_ec2_instance_tags = master_ec2_instance_tags
-        self.agent_ec2_instance_tags = agent_ec2_instance_tags
-        self.public_agent_ec2_instance_tags = public_agent_ec2_instance_tags
+        self.ec2_instance_tags = ec2_instance_tags or {}
+        self.master_ec2_instance_tags = master_ec2_instance_tags or {}
+        self.agent_ec2_instance_tags = agent_ec2_instance_tags or {}
+        self.public_agent_ec2_instance_tags = (
+            public_agent_ec2_instance_tags or {}
+        )
 
     @property
     def cluster_cls(self) -> Type['AWSCluster']:
@@ -288,6 +290,7 @@ class AWSCluster(ClusterManager):
                 instance.id for instance in ec2_instances
                 if instance.public_ip_address in node_public_ips
             ]
+
             node_tags = {**cluster_backend.ec2_instance_tags, **tags}
 
             if not nodes:
