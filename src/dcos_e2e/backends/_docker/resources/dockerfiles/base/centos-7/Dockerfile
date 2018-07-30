@@ -6,6 +6,7 @@ RUN yum install -y \
 		btrfs-progs \
 		ca-certificates \
 		curl \
+		gettext \
 		git \
 		iproute \
 		ipset \
@@ -22,7 +23,7 @@ RUN yum install -y \
 		tree \
 		unzip \
 		which \
-                xfsprogs \
+		xfsprogs \
 		xz \
 && ( \
 cd /lib/systemd/system/sysinit.target.wants/; \
