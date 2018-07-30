@@ -302,6 +302,25 @@ It is possible to use :ref:`dcos-docker-create` to create a cluster with a custo
 
    See `Verify installation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom/#verify-installation>`_ for steps to verify that the DC/OS Enterprise cluster was installed properly with the custom CA certificate.
 
+Using a loopback sidecar
+------------------------
+
+The :ref:`dcos-docker-create-loopback-sidecar` command can be used to create a
+loopback sidecar. This will provide all containers with a unformatted block
+device, mounted as a loopback device. It can be destroyed with
+:ref:`dcos-docker-destroy-loopback-sidecar`. All containers have access to this
+loopback device, hence care must be taken that only a single container has
+write-access to it.
+
+.. code:: console
+
+   $ dcos-docker create-loopback-sidecar sidecar1
+   /dev/loop0
+   $ dcos-docker create /tmp/dcos_generate_config.sh
+   $ dcos-docker wait
+   $ dcos-docker destroy-loopback-sidecar sidecar1
+
+
 .. include:: docker-backend-limitations.rst
 
 CLI Reference
@@ -370,3 +389,14 @@ CLI Reference
 
 .. click:: cli.dcos_docker:download_artifact
   :prog: dcos-docker download-artifact
+
+.. _dcos-docker-create-loopback-sidecar:
+
+.. click:: cli.dcos_docker:create_loopback_sidecar
+  :prog: dcos-docker create-loopback-sidecar
+
+.. _dcos-docker-destroy-loopback-sidecar:
+
+.. click:: cli.dcos_docker:destroy_loopback_sidecar
+  :prog: dcos-docker destroy-loopback-sidecar
+

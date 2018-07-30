@@ -74,20 +74,21 @@ class TestDcosDocker:
               --help     Show this message and exit.
 
             Commands:
-              create               Create a DC/OS cluster.
-              destroy              Destroy a cluster.
-              destroy-list         Destroy clusters.
-              destroy-mac-network  Destroy containers created by "dcos-docker...
-              doctor               Diagnose common issues which stop this CLI from
-                                   working...
-              download-artifact    Download a DC/OS Open Source artifact.
-              inspect              Show cluster details.
-              list                 List all clusters.
-              run                  Run an arbitrary command on a node.
-              setup-mac-network    Set up a network to connect to nodes on macOS.
-              sync                 Sync files from a DC/OS checkout to master nodes.
-              wait                 Wait for DC/OS to start.
-              web                  Open the browser at the web UI.
+              create                    Create a DC/OS cluster.
+              create-loopback-sidecar   Create a loopback sidecar.
+              destroy                   Destroy a cluster.
+              destroy-list              Destroy clusters.
+              destroy-loopback-sidecar  Destroy a loopback sidecar.
+              destroy-mac-network       Destroy containers created by "dcos-docker...
+              doctor                    Diagnose common issues which stop this CLI from...
+              download-artifact         Download a DC/OS Open Source artifact.
+              inspect                   Show cluster details.
+              list                      List all clusters.
+              run                       Run an arbitrary command on a node.
+              setup-mac-network         Set up a network to connect to nodes on macOS.
+              sync                      Sync files from a DC/OS checkout to master nodes.
+              wait                      Wait for DC/OS to start.
+              web                       Open the browser at the web UI.
             """,# noqa: E501,E261
         )
         # yapf: enable
@@ -1353,3 +1354,118 @@ class TestRun:
         )
         # yapf: enable
         assert result.output == expected_help
+
+
+class TestCreateLoopbackSidecar:
+    """
+    Tests for the ``create-loopback-sidecar`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help test is shown with
+        `dcos-docker create-loopback-sidecar --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['create-loopback-sidecar', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker create-loopback-sidecar [OPTIONS] NAME
+
+              Create a loopback sidecar.
+
+              A loopback sidecar provides a loopback device that points to a (unformatted)
+              block device.
+
+            Options:
+              --size INTEGER RANGE  Size (in Megabytes) of the block device.
+              --help                Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+    def test_sidecar_container_already_exists(self) -> None:
+        """
+        An error is shown if the given sidecar container already exists.
+        """
+        test_sidecar = 'test-sidecar'
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['create-loopback-sidecar', test_sidecar],
+        )
+        assert result.exit_code == 0
+
+        try:
+            result = runner.invoke(
+                dcos_docker,
+                ['create-loopback-sidecar', test_sidecar],
+            )
+            assert result.exit_code == 2
+            expected_error = 'Loopback sidecar "{name}" already exists'
+            expected_error = expected_error.format(name=test_sidecar)
+            assert expected_error in result.output
+        finally:
+            result = runner.invoke(
+                dcos_docker,
+                ['destroy-loopback-sidecar', test_sidecar],
+            )
+            assert result.exit_code == 0
+
+
+class TestDestroyLoopbackSidecar:
+    """
+    Tests for the ``destroy-loopback-sidecar`` subcommand.
+    """
+
+    def test_help(self) -> None:
+        """
+        Help test is shown with
+        `dcos-docker destroy-loopback-sidecar --help`.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-loopback-sidecar', '--help'],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0
+        # yapf breaks multi-line noqa, see
+        # https://github.com/google/yapf/issues/524.
+        # yapf: disable
+        expected_help = dedent(
+            """\
+            Usage: dcos-docker destroy-loopback-sidecar [OPTIONS] NAME
+
+              Destroy a loopback sidecar.
+
+            Options:
+              --help  Show this message and exit.
+            """,# noqa: E501,E261
+        )
+        # yapf: enable
+        assert result.output == expected_help
+
+    def test_sidecar_container_does_not_exist(self) -> None:
+        """
+        An error is shown if the given sidecar container does not exist.
+        """
+        does_not_exist = 'does-not-exist'
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-loopback-sidecar', does_not_exist],
+        )
+        assert result.exit_code == 2
+        expected_error = 'Loopback sidecar "{name}" does not exist'
+        expected_error = expected_error.format(name=does_not_exist)
+        assert expected_error in result.output

@@ -112,6 +112,8 @@ PATTERNS = {
     (),
     'tests/test_dcos_e2e/backends/vagrant':
     (),
+    'tests/test_dcos_e2e/docker_utils/test_loopback.py':
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestClusterSize':
