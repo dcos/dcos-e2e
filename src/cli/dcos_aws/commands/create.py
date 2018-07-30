@@ -167,6 +167,16 @@ def create(
         VARIANT_TAG_KEY: 'ee' if enterprise else '',
     }
 
+    ssh_user = {
+        Distribution.CENTOS_7: 'centos',
+        Distribution.COREOS: 'core',
+        Distribution.UBUNTU_16_04: 'ubuntu',
+    }
+
+    distribution = LINUX_DISTRIBUTIONS[linux_distribution]
+
+    default_user = ssh_user[distribution]
+
     master_tags = {NODE_TYPE_TAG_KEY: NODE_TYPE_MASTER_TAG_VALUE}
     agent_tags = {NODE_TYPE_TAG_KEY: NODE_TYPE_AGENT_TAG_VALUE}
     public_agent_tags = {NODE_TYPE_TAG_KEY: NODE_TYPE_PUBLIC_AGENT_TAG_VALUE}
@@ -174,18 +184,12 @@ def create(
         aws_key_pair=(key_name, private_key_path),
         workspace_dir=workspace_dir,
         aws_region=aws_region,
-        linux_distribution=LINUX_DISTRIBUTIONS[linux_distribution],
+        linux_distribution=distribution,
         ec2_instance_tags=cluster_tags,
         master_ec2_instance_tags=master_tags,
         agent_ec2_instance_tags=agent_tags,
         public_agent_ec2_instance_tags=public_agent_tags,
     )
-    ssh_user = {
-        Distribution.CENTOS_7: 'centos',
-        Distribution.COREOS: 'core',
-        Distribution.UBUNTU_16_04: 'ubuntu',
-    }
-    default_user = ssh_user[cluster_backend.linux_distribution]
 
     if enterprise:
         superuser_username = 'admin'
