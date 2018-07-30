@@ -373,6 +373,24 @@ def _tag_dict(instance: ServiceResource) -> Dict[str, str]:
     return tag_dict
 
 
+def _get_ec2_instance_from_node(
+    node: Node,
+    aws_region: str,
+) -> ServiceResource:
+    """
+    Return the EC2 instance which matches the given ``node`` on the given
+    ``aws_region``.
+    """
+    ec2 = boto3.resource('ec2', region_name=aws_region)
+    ec2_instances = ec2.instances.all()
+
+    [instance] = [
+        instance for instance in ec2_instances
+        if instance.public_ip_address == node.public_ip_address
+    ]
+    return instance
+
+
 class TestTags:
     """
     Tests for setting tags on EC2 instances.
