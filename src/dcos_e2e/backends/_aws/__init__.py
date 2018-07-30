@@ -274,9 +274,12 @@ class AWSCluster(ClusterManager):
         ec2_instances = ec2.instances.all()
 
         for nodes, tags in (
-            (self.master, cluster_backend.master_ec2_instance_tags),
+            (self.masters, cluster_backend.master_ec2_instance_tags),
             (self.agents, cluster_backend.agent_ec2_instance_tags),
-            (self.master, cluster_backend.public_agent_ec2_instance_tags),
+            (
+                self.public_agents,
+                cluster_backend.public_agent_ec2_instance_tags,
+            ),
         ):
             node_public_ips = set(
                 str(node.public_ip_address) for node in nodes
@@ -300,10 +303,7 @@ class AWSCluster(ClusterManager):
                 } for key, value in node_tags.items()
             ]
 
-            ec2.create_tags(
-                Resources=instance_ids,
-                Tags=ec2_tags,
-            )
+            ec2.create_tags(Resources=instance_ids, Tags=ec2_tags)
 
     @property
     def base_config(self) -> Dict[str, Any]:
