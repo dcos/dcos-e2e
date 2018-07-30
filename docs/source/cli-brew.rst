@@ -15,9 +15,3 @@ Homebrew installs the dependencies for the latest released version and so instal
 .. code:: sh
 
     brew install --HEAD https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
-
-Run :ref:`dcos-docker-doctor` to make sure that your system is ready to go for the :doc:`dcos-docker-cli`:
-
-.. code-block:: console
-
-   $ dcos-docker doctor
