@@ -16,6 +16,7 @@ CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
+    'rhel-7': Distribution.RHEL_7,
 }
 NODE_TYPE_TAG_KEY = 'dcos_e2e.node_type'
 NODE_TYPE_MASTER_TAG_VALUE = 'master'

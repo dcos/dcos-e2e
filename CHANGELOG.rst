@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add Red Hat Enterprise Linux 7.4 support to the AWS backend.
+
 2018.07.27.0
 ------------
 
