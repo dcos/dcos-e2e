@@ -121,7 +121,7 @@ class TestCentos7:
     Tests for using CentOS 7.
     """
 
-    def test_default(self) -> None:
+    def test_default_distribution(self) -> None:
         """
         The default Linux distribution is CentOS 7.
 
@@ -139,6 +139,15 @@ class TestCentos7:
             node_distribution = _get_node_distribution(node=master)
 
         assert node_distribution == Distribution.CENTOS_7
+
+    def test_set_distribution(self) -> None:
+        """
+        The Linux distribution can be set to CentOS 7.
+
+        This test does not wait for DC/OS and we do not test DC/OS Enterprise
+        because these are covered by other tests which use the default
+        settings.
+        """
 
         with Cluster(
             # The distribution is also CentOS 7 if it is explicitly set.
