@@ -7,7 +7,7 @@ import tempfile
 import uuid
 from pathlib import Path
 from subprocess import CalledProcessError
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import boto3
 import click
@@ -53,10 +53,50 @@ from ._common import (
 from ._options import aws_region_option, linux_distribution_option
 
 
+def _validate_tags(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Any,
+) -> Dict[str, int]:
+    """
+    Turn tag strings into a Dict.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    tags = {}  # type: Dict[str, int]
+    for tag_definition in value:
+        parts = tag_definition.split(':')
+
+        if len(parts) != 2:
+            message = (
+                '"{tag_definition}" is not a valid tag. '
+                'Please follow this syntax: <TAG_KEY>:<TAG_VALUE>.'
+            ).format(tag_definition=tag_definition)
+            raise click.BadParameter(message=message)
+
+        tag_key, tag_value = parts
+        if tag_key in tags:
+            message = ('Tag key "{tag_key}" specified multiple times.'
+                       ).format(tag_key=tag_key)
+            raise click.BadParameter(message=message)
+
+        tags[tag_key] = tag_value
+    return tags
+
+
 @click.command('create')
 @click.argument(
     'artifact_url',
     type=str,
+)
+@click.option(
+    '--custom-tag',
+    type=str,
+    callback=_validate_tags,
+    help='Add tags to EC2 instances in the format "<TAG_KEY>:<TAG_VALUE>".',
+    multiple=True,
 )
 @click.option(
     '--variant',
@@ -99,6 +139,7 @@ def create(
     cluster_id: str,
     enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
+    custom_tag: Dict[str, str],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -176,6 +217,7 @@ def create(
         WORKSPACE_DIR_TAG_KEY: str(workspace_dir),
         KEY_NAME_TAG_KEY: key_name,
         VARIANT_TAG_KEY: 'ee' if enterprise else '',
+        **custom_tag,
     }
 
     master_tags = {NODE_TYPE_TAG_KEY: NODE_TYPE_MASTER_TAG_VALUE}

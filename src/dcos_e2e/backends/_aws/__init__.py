@@ -276,7 +276,6 @@ class AWSCluster(ClusterManager):
         # This also inserts bootstrap node information into ``cluster_info``.
         self.cluster_info = self.launcher.describe()
         ec2 = boto3.resource('ec2', region_name=cluster_backend.aws_region)
-        ec2_instances = ec2.instances.all()
 
         for nodes, tags in (
             (self.masters, cluster_backend.master_ec2_instance_tags),
@@ -289,10 +288,15 @@ class AWSCluster(ClusterManager):
             node_public_ips = set(
                 str(node.public_ip_address) for node in nodes
             )
-            instance_ids = [
-                instance.id for instance in ec2_instances
-                if instance.public_ip_address in node_public_ips
-            ]
+            ec2_instances = ec2.instances.filter(
+                Filters=[
+                    {
+                        'Name': 'ip-address',
+                        'Values': list(node_public_ips),
+                    },
+                ],
+            )
+            instance_ids = [instance.id for instance in ec2_instances]
 
             node_tags = {**cluster_backend.ec2_instance_tags, **tags}
 

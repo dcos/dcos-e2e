@@ -52,13 +52,13 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
         aws_region: The region to get clusters from.
     """
     ec2 = boto3.resource('ec2', region_name=aws_region)
-    ec2_instances = ec2.instances.all()
+    ec2_filter = {'Name': 'tag:' + CLUSTER_ID_TAG_KEY, 'Values': ['*']}
+    ec2_instances = ec2.instances.filter(Filters=[ec2_filter])
 
     cluster_ids = set()  # type: Set[str]
     for instance in ec2_instances:
         tag_dict = _tag_dict(instance=instance)
-        if CLUSTER_ID_TAG_KEY in tag_dict:
-            cluster_ids.add(tag_dict[CLUSTER_ID_TAG_KEY])
+        cluster_ids.add(tag_dict[CLUSTER_ID_TAG_KEY])
 
     return cluster_ids
 
@@ -142,13 +142,11 @@ class ClusterInstances:
         Return all EC2 instances in this cluster of a particular node type.
         """
         ec2 = boto3.resource('ec2', region_name=self._aws_region)
-        ec2_instances = ec2.instances.all()
-
-        cluster_instances = set([])
-        for instance in ec2_instances:
-            tag_dict = _tag_dict(instance=instance)
-            if tag_dict.get(CLUSTER_ID_TAG_KEY) == self._cluster_id:
-                cluster_instances.add(instance)
+        ec2_filter = {
+            'Name': 'tag:' + CLUSTER_ID_TAG_KEY,
+            'Values': [self._cluster_id],
+        }
+        ec2_instances = ec2.instances.filter(Filters=[ec2_filter])
 
         node_types = {
             Role.MASTER: NODE_TYPE_MASTER_TAG_VALUE,
@@ -156,7 +154,7 @@ class ClusterInstances:
             Role.PUBLIC_AGENT: NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
         }
         role_instances = set([])
-        for instance in cluster_instances:
+        for instance in ec2_instances:
             tag_dict = _tag_dict(instance=instance)
             if tag_dict[NODE_TYPE_TAG_KEY] == node_types[role]:
                 role_instances.add(instance)
