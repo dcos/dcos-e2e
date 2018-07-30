@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.07.27.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.07.30.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -28,13 +28,13 @@ class Dcose2e < Formula
   end
 
   resource "azure-common" do
-    url "https://files.pythonhosted.org/packages/e0/c8/49ccf6e2f0edf3add1f915afa21d9a75947fb57c028d6792b5ed09b79159/azure-common-1.1.13.zip"
-    sha256 "b087e80e8f0adc858f0a2b9ba596bb791383f74834b4acc4b47b64ddfa1362e3"
+    url "https://files.pythonhosted.org/packages/bb/c1/ac3842e1016561953872d7ee15aae2d246fb989e5b236abd22ee40b2c39a/azure-common-1.1.14.zip"
+    sha256 "4f8fc8879cfded406d0032d86f5750d8c742658072aef5edb1d54a055a847645"
   end
 
   resource "azure-mgmt-network" do
-    url "https://files.pythonhosted.org/packages/94/a9/bf8ae648f37561c3195a7c2fc8d7eecea4b22e90460465b73b45fad5eec9/azure-mgmt-network-2.0.0rc2.zip"
-    sha256 "56922cd31a80bd2568aeed7839a0207d9550feb54897bbb9a2a967fed9390abd"
+    url "https://files.pythonhosted.org/packages/a7/21/27ba13d2d9fa7b9dc563542abd7d1adc435284f9edf6ec0f1f41d7bd7773/azure-mgmt-network-2.0.0.zip"
+    sha256 "b0b7629b528f92d0573ad7eebbb744fc56b8286f224cd819938448923c71fd20"
   end
 
   resource "azure-mgmt-nspkg" do
@@ -43,8 +43,8 @@ class Dcose2e < Formula
   end
 
   resource "azure-mgmt-resource" do
-    url "https://files.pythonhosted.org/packages/27/f0/ab10f7851e9437da02b981d79545cd7290380d396d822bf71f99d457637b/azure-mgmt-resource-1.2.2.zip"
-    sha256 "fe65dc43c8643a8c3e731783e98334258bf5dc57cf4ae063401e2b05b9d71d71"
+    url "https://files.pythonhosted.org/packages/48/31/5996d2af3e32cf6ccc3f44da401ae397e6302b08d7ef7d8736191a8bfe61/azure-mgmt-resource-2.0.0.zip"
+    sha256 "2e83289369be88d0f06792118db5a7d4ed7150f956aaae64c528808da5518d7f"
   end
 
   resource "azure-monitor" do
@@ -63,13 +63,13 @@ class Dcose2e < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/4f/28/1642a25573c8ffbdcec0ceb09cf5d941f5bc2a0be71179a5d2220e1df3e0/boto3-1.7.58.tar.gz"
-    sha256 "ce462e7505c03c3e6708ce6f264ac43d478886082af703ff69c502592df5d4f3"
+    url "https://files.pythonhosted.org/packages/15/43/81d8437ca09b7bc3370424582fd984aac44458573e9fdb4bfcdd03466503/boto3-1.7.65.tar.gz"
+    sha256 "c8492a53e0bfeca83fa03273dff7ab7d5ac5cf78a0ce1b7e9fc7f241ca6f4dd4"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/e5/7b/4f0d1613f33b32a8ad8f65c7973a389244e0aecd209db761f5d51291ebc4/botocore-1.10.58.tar.gz"
-    sha256 "e0e6b6d1fdbce81c28151136ee919d2cdeee13041559710cd5c93d7e4035a455"
+    url "https://files.pythonhosted.org/packages/8d/a2/4e9643b248aec2280aa5dcd2cb2e372fa05ab8c317d52abbf8ff87003d9a/botocore-1.10.65.tar.gz"
+    sha256 "35f626029a6b17bfd503ce3379b121606e3f965edcab2612bc75ce8603fdf08c"
   end
 
   resource "cachetools" do
@@ -108,8 +108,8 @@ class Dcose2e < Formula
   end
 
   resource "cryptography" do
-    url "https://files.pythonhosted.org/packages/ec/b2/faa78c1ab928d2b2c634c8b41ff1181f0abdd9adf9193211bd606ffa57e2/cryptography-2.2.2.tar.gz"
-    sha256 "9fc295bf69130a342e7a19a39d7bbeb15c0bcaabc7382ec33ef3b2b7d18d2f63"
+    url "https://files.pythonhosted.org/packages/79/a2/61c8625f96c8582d3053f89368c483ba62e56233d055e58e372f94a393f0/cryptography-2.3.tar.gz"
+    sha256 "c132bab45d4bd0fff1d3fe294d92b0a6eb8404e93337b3127bdec9f21de117e6"
   end
 
   resource "decorator" do
@@ -223,8 +223,8 @@ class Dcose2e < Formula
   end
 
   resource "pluggy" do
-    url "https://files.pythonhosted.org/packages/11/bf/cbeb8cdfaffa9f2ea154a30ae31a9d04a1209312e2919138b4171a1f8199/pluggy-0.6.0.tar.gz"
-    sha256 "7f8ae7f5bdf75671a718d2daf0a64b7885f74510bcd98b1a0bb420eb9a9d0cff"
+    url "https://files.pythonhosted.org/packages/a1/83/ef7d976c12d67a5c7a5bc2a47f0501c926cabae9d9fcfdc26d72abc9ba15/pluggy-0.7.1.tar.gz"
+    sha256 "95eb8364a4708392bae89035f45341871286a333f749c3141c20573d2b3876e1"
   end
 
   resource "py" do
@@ -258,8 +258,8 @@ class Dcose2e < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/55/50/399419c03c39bf41faa7cbd5a8976c076037b2d76adf2535610919806d67/pytest-3.6.3.tar.gz"
-    sha256 "0453c8676c2bee6feb0434748b068d5510273a916295fd61d306c4f22fbfd752"
+    url "https://files.pythonhosted.org/packages/05/b5/3197f0ae65c0b3037acd64c216a6d67a94693dad957f4e83e777b36688ae/pytest-3.6.4.tar.gz"
+    sha256 "341ec10361b64a24accaec3c7ba5f7d5ee1ca4cebea30f76fad3dd12db9f0541"
   end
 
   resource "python-dateutil" do
