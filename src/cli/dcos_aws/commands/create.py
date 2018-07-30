@@ -139,6 +139,7 @@ def create(
     cluster_id: str,
     enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
+    custom_tag: Dict[str, str],
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -215,6 +216,7 @@ def create(
         WORKSPACE_DIR_TAG_KEY: str(workspace_dir),
         KEY_NAME_TAG_KEY: key_name,
         VARIANT_TAG_KEY: 'ee' if enterprise else '',
+        **custom_tag,
     }
 
     master_tags = {NODE_TYPE_TAG_KEY: NODE_TYPE_MASTER_TAG_VALUE}
