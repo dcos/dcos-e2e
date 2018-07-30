@@ -61,6 +61,13 @@ class AWS(ClusterBackend):
                 generated.
             aws_cloudformation_stack_name: The name of the CloudFormation stack
                 to create. If this is not given, a random string is used.
+            ec2_instance_tags: Tags to add to the cluster node EC2 instances.
+            master_ec2_instance_tags: Tags to add to the cluster master node
+                EC2 instances.
+            agent_ec2_instance_tags: EC2 tags to add to the cluster agent node
+                EC2 instances.
+            public_agent_ec2_instance_tags: EC2 tags to add to the cluster
+                public agent node EC2 instances.
 
         Attributes:
             admin_location: The IP address range from which the AWS nodes can
