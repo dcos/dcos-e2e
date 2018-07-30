@@ -131,6 +131,8 @@ class TestCreate:
                               If none of these are set, ``license_key_contents`` is not given.
 
             Options:
+              --custom-tag TEXT               Add tags to EC2 instances in the format
+                                              "<TAG_KEY>:<TAG_VALUE>".
               --variant [oss|enterprise]      Choose the DC/OS variant. If the variant does
                                               not match the variant of the given artifact
                                               URL, an error will occur.
