@@ -1,3 +1,5 @@
+.. _dcos-aws_cli:
+
 ``dcos-aws`` CLI
 ================
 

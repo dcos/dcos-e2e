@@ -1,3 +1,5 @@
+.. _aws_backend:
+
 AWS Backend
 ===========
 
