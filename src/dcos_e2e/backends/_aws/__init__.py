@@ -33,6 +33,10 @@ class AWS(ClusterBackend):
         workspace_dir: Optional[Path] = None,
         aws_key_pair: Optional[Tuple[str, Path]] = None,
         aws_cloudformation_stack_name: Optional[str] = None,
+        ec2_instance_tags: Optional[Dict[str, str]] = None,
+        master_ec2_instance_tags: Optional[Dict[str, str]] = None,
+        agent_ec2_instance_tags: Optional[Dict[str, str]] = None,
+        public_agent_ec2_instance_tags: Optional[Dict[str, str]] = None,
     ) -> None:
         """
         Create a configuration for an AWS cluster backend.
