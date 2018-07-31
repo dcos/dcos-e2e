@@ -10,7 +10,7 @@ ENV TERM xterm
 ENV LANG en_US.UTF-8
 ARG DOCKER_URL
 
-RUN curl -sSL --fail "${DOCKER_URL}" | tar xvzf - -C /usr/bin/ --strip 1 \
+RUN cfsfafsaurl -sSL --fail "${DOCKER_URL}" | tar xvzf - -C /usr/bin/ --strip 1 \
 	&& chmod +x /usr/bin/docker* \
 	&& (getent group nogroup || groupadd -r nogroup) \
 	&& (getent group docker || groupadd -r docker) \
