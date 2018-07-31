@@ -352,6 +352,29 @@ def _check_docker_supports_mounts() -> CheckLevels:
     return CheckLevels.NONE
 
 
+def _check_can_build() -> CheckLevels:
+    """
+    Check that the default cluster images can be built.
+    """
+    cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
+    try:
+        with Cluster(cluster_backend=cluster_backend):
+            pass
+    except docker.errors.BuildError as exc:
+        message = (
+            'There was an error building a Docker image. '
+            'The Docker logs follow.\n'
+            '\n'
+        )
+        for item in exc.build_log:
+            if 'stream' in item:
+                message += '\t' + item['stream']
+        error(message=message)
+        return CheckLevels.ERROR
+
+    return CheckLevels.NONE
+
+
 def _check_can_mount_in_docker() -> CheckLevels:
     """
     Check for an incompatibility between some systemd versions and some
@@ -420,6 +443,9 @@ def doctor(verbose: int) -> None:
         check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
+        # These two start ``Cluster``s, and so they come last.
+        _check_can_build,
+        # This comes last because it depends on ``_check_can_build``.
         _check_can_mount_in_docker,
     ]
 

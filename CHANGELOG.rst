@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add a ``dcos-docker doctor`` check that relevant Docker images can be built.
+
 2018.07.30.0
 ------------
 
