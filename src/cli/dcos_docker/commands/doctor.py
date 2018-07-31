@@ -358,7 +358,7 @@ def _check_can_build() -> CheckLevels:
     """
     cluster_backend = Docker(docker_version=DockerVersion.v1_13_1)
     try:
-        with Cluster(cluster_backend=cluster_backend) as cluster:
+        with Cluster(cluster_backend=cluster_backend):
             pass
     except docker.errors.BuildError as exc:
         message = (
@@ -371,6 +371,8 @@ def _check_can_build() -> CheckLevels:
                 message += '\t' + item['stream']
         error(message=message)
         return CheckLevels.ERROR
+
+    return CheckLevels.NONE
 
 
 def _check_can_mount_in_docker() -> CheckLevels:
@@ -443,6 +445,7 @@ def doctor(verbose: int) -> None:
         _check_tmp_free_space,
         # These two start ``Cluster``s, and so they come last.
         _check_can_build,
+        # This comes last because it depends on ``_check_can_build``.
         _check_can_mount_in_docker,
     ]
 
