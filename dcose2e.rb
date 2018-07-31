@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.07.30.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.07.31.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -188,8 +188,8 @@ class Dcose2e < Formula
   end
 
   resource "more-itertools" do
-    url "https://files.pythonhosted.org/packages/c0/2f/6773347277d76c5ade4414a6c3f785ef27e7f5c4b0870ec7e888e66a8d83/more-itertools-4.2.0.tar.gz"
-    sha256 "2b6b9893337bfd9166bee6a62c2b0c9fe7735dcf85948b387ec8cba30e85d8e8"
+    url "https://files.pythonhosted.org/packages/88/ff/6d485d7362f39880810278bdc906c13300db05485d9c65971dec1142da6a/more-itertools-4.3.0.tar.gz"
+    sha256 "c476b5d3a34e12d40130bc2f935028b5f636df8f372dc2c1c01dc19681b2039e"
   end
 
   resource "msrest" do
