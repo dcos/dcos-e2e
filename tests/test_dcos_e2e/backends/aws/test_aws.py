@@ -361,11 +361,9 @@ def _tag_dict(instance: ServiceResource) -> Dict[str, str]:
     Return an EC2 instance's tags as a dictionary.
     """
     tag_dict = dict()  # type: Dict[str, str]
+    tags = instance.tags or {}
 
-    if instance.tags is None:
-        return tag_dict
-
-    for tag in instance.tags:
+    for tag in tags:
         key = tag['Key']
         value = tag['Value']
         tag_dict[key] = value
@@ -382,12 +380,17 @@ def _get_ec2_instance_from_node(
     ``aws_region``.
     """
     ec2 = boto3.resource('ec2', region_name=aws_region)
-    ec2_instances = ec2.instances.all()
+    [instance] = list(
+        ec2.instances.filter(
+            Filters=[
+                {
+                    'Name': 'ip-address',
+                    'Values': [str(node.public_ip_address)],
+                },
+            ],
+        ),
+    )
 
-    [instance] = [
-        instance for instance in ec2_instances
-        if instance.public_ip_address == str(node.public_ip_address)
-    ]
     return instance
 
 
