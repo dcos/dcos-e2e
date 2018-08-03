@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.07.31.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.08.03.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -148,8 +148,8 @@ class Dcose2e < Formula
   end
 
   resource "google-auth" do
-    url "https://files.pythonhosted.org/packages/a2/39/0c3d41aa96c1bdb9dcc4f646909b82e4c0ed9a1a398e869627a21a0563c4/google-auth-1.5.0.tar.gz"
-    sha256 "1745c9066f698eac3da99cef082914495fb71bc09597ba7626efbbb64c4acc57"
+    url "https://files.pythonhosted.org/packages/7e/cd/dae5c39974b040741215ed346263152c93af21a22dc124c7ad451fbee417/google-auth-1.5.1.tar.gz"
+    sha256 "9ca363facbf2622d9ba828017536ccca2e0f58bd15e659b52f312172f8815530"
   end
 
   resource "google-auth-httplib2" do

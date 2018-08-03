@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.08.03.0
+------------
+
 - Pin ``msrestazure`` pip dependency to specific version to avoid dependency conflict.
 
 2018.07.31.0
