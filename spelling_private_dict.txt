@@ -59,6 +59,7 @@ makefile
 mesos
 mkstemp
 modprobe
+msrestazure
 multi
 mypy
 noqa
