@@ -20,6 +20,12 @@ with open('requirements.txt') as requirements:
     # Similarly, without the following, some users get:
     # The 'secretstorage' distribution was not found and is required by keyring
     INSTALL_REQUIRES.append('secretstorage')
+    # At the time of writing, with the latest versions of the DC/OS E2E direct
+    # dependencies, there is a version conflict for ``msrestazure``, an
+    # indirect dependency.
+    # Therefore, we pin a particular version which satisfies all requirements.
+    # See DCOS-40131.
+    INSTALL_REQUIRES.append('msrestazure==0.4.34')
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
