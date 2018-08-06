@@ -67,6 +67,7 @@ def install_dcos(
         cluster: onprem.OnpremCluster,
         node_client: ssh_client.SshClient,
         prereqs_script_path: str,
+        install_prereqs: bool,
         bootstrap_script_url: str,
         parallelism: int):
     """
@@ -83,7 +84,7 @@ def install_dcos(
     # do genconf and configure bootstrap if necessary
     all_client = get_client(cluster, 'cluster_hosts', node_client, parallelism=parallelism)
     # install prereqs if enabled
-    if prereqs_script_path:
+    if install_prereqs:
         log.info('Installing prerequisites on cluster hosts')
         check_results(
             all_client.run_command('run', [util.read_file(prereqs_script_path)]), node_client, 'install_prereqs')

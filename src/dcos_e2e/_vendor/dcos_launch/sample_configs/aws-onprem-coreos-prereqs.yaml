@@ -1,13 +1,14 @@
 ---
 launch_config_version: 1
-deployment_name: dcos-onprem-with-prereqs-install
+deployment_name: dcos-onprem-coreos-prereqs
 installer_url: https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
 platform: aws
 provider: onprem
 aws_region: us-west-2
-os_name: cent-os-7
+os_name: coreos
 instance_type: m4.xlarge
 install_prereqs: True
+prereqs_script_filename: run_coreos_prereqs.sh
 dcos_config:
   cluster_name: My Awesome DC/OS
   resolvers:
@@ -17,7 +18,8 @@ dcos_config:
   master_discovery: static
   exhibitor_storage_backend: static
 num_masters: 1
-num_private_agents: 1
+num_private_agents: 2
 num_public_agents: 1
-ssh_user: centos
+ssh_user: core
 key_helper: true
+

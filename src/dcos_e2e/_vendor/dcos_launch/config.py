@@ -6,9 +6,9 @@ import sys
 import uuid
 
 import requests
-
 import cerberus
 import yaml
+
 from ..dcos_launch import util
 from ..dcos_launch.platforms import aws, gcp
 
@@ -363,7 +363,7 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
     },
     'prereqs_script_filename': {
         'type': 'string',
-        'default': 'unset'
+        'default': 'install_prereqs.sh'
     },
     'install_prereqs': {
         'type': 'boolean',

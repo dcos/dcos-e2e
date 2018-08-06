@@ -191,16 +191,14 @@ echo "{{\\"fault_domain\\":{{\\"region\\":{{\\"name\\": \\"$REGION\\"}},\\"zone\
             complete_config, genconf_dir = self.get_completed_onprem_config()
             platforms_onprem.do_genconf(t, genconf_dir, installer_path)
 
-        prereqs_script = ''
-        if self.config['prereqs_script_filename'] == 'unset' and self.config['install_prereqs']:
-            prereqs_script = config.expand_path(
-                pkg_resources.resource_filename(dcos_launch.__name__, 'scripts/install_prereqs.sh'),
-                self.config['config_dir'])
+        prereqs_script_path = config.expand_path(pkg_resources.resource_filename(
+            dcos_launch.__name__, 'scripts/' + self.config['prereqs_script_filename']), self.config['config_dir'])
 
         platforms_onprem.install_dcos(
             cluster,
             self.get_ssh_client(),
-            prereqs_script,
+            prereqs_script_path,
+            self.config['install_prereqs'],
             complete_config['bootstrap_url'] + '/dcos_install.sh',
             self.config['onprem_install_parallelism'])
 
