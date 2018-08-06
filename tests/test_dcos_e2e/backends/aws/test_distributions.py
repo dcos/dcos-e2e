@@ -192,3 +192,35 @@ class TestRHEL7:
             ee_artifact_url=ee_artifact_url,
             license_key_contents=license_key_contents,
         )
+
+
+class TestCoreOS:
+    """
+    Tests for the CoreOS distribution option.
+    """
+
+    def test_oss(
+        self,
+        oss_artifact_url: str,
+    ) -> None:
+        """
+        DC/OS OSS can start up on CoreOS.
+        """
+        _oss_distribution_test(
+            distribution=Distribution.COREOS,
+            oss_artifact_url=oss_artifact_url,
+        )
+
+    def test_enterprise(
+        self,
+        ee_artifact_url: str,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on CoreOS.
+        """
+        _enterprise_distribution_test(
+            distribution=Distribution.COREOS,
+            ee_artifact_url=ee_artifact_url,
+            license_key_contents=license_key_contents,
+        )
