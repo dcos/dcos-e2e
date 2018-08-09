@@ -109,6 +109,7 @@ class AWS(ClusterBackend):
             [
                 Distribution.CENTOS_7,
                 Distribution.RHEL_7,
+                Distribution.COREOS,
                 # Support for Ubuntu is blocked on
                 # https://jira.mesosphere.com/browse/DCOS_OSS-3876.
             ],
