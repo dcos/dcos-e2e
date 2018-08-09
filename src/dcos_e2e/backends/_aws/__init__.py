@@ -190,6 +190,12 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'core',
             Distribution.RHEL_7: 'ec2-user',
         }
+
+        prereqs_script_filename = {
+            Distribution.CENTOS_7: 'install_prereqs.sh',
+            Distribution.COREOS: 'run_coreos_prereqs.sh',
+            Distribution.RHEL_7: 'install_prereqs.sh',
+        }[cluster_backend.linux_distribution]
         self._default_user = ssh_user[cluster_backend.linux_distribution]
 
         self.cluster_backend = cluster_backend
@@ -220,6 +226,8 @@ class AWSCluster(ClusterManager):
             'os_name': aws_distros[cluster_backend.linux_distribution],
             'platform': 'aws',
             'provider': 'onprem',
+            'install_prereqs': True,
+            'prereqs_script_filename': prereqs_script_filename,
         }
 
         if cluster_backend.aws_key_pair is None:
