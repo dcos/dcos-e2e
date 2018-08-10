@@ -118,6 +118,8 @@ typeshed
 ubuntu
 ui
 uname
+uninstall
+uninstalling
 untar
 url
 username
