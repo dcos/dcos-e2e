@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.08.03.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.08.13.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -33,8 +33,8 @@ class Dcose2e < Formula
   end
 
   resource "azure-mgmt-network" do
-    url "https://files.pythonhosted.org/packages/a7/21/27ba13d2d9fa7b9dc563542abd7d1adc435284f9edf6ec0f1f41d7bd7773/azure-mgmt-network-2.0.0.zip"
-    sha256 "b0b7629b528f92d0573ad7eebbb744fc56b8286f224cd819938448923c71fd20"
+    url "https://files.pythonhosted.org/packages/23/af/df2d8fc56d1fc043b3f50fc0a3e45903ca4254330349f01bf1893ddffa93/azure-mgmt-network-2.0.1.zip"
+    sha256 "8d75dc6eac82f0593106903d0fd616115b4472772f867535dd5d21f2e5e21cdf"
   end
 
   resource "azure-mgmt-nspkg" do
@@ -63,13 +63,13 @@ class Dcose2e < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/15/43/81d8437ca09b7bc3370424582fd984aac44458573e9fdb4bfcdd03466503/boto3-1.7.65.tar.gz"
-    sha256 "c8492a53e0bfeca83fa03273dff7ab7d5ac5cf78a0ce1b7e9fc7f241ca6f4dd4"
+    url "https://files.pythonhosted.org/packages/1b/71/6595e88388e3d1f01315f6a1d8862b54cc7d8f07b26922ab2633ec0c0bbd/boto3-1.7.74.tar.gz"
+    sha256 "26a47c7052692ce20d5b75d2901b71965eea97bf561ab2cbd099eb0b07998883"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/8d/a2/4e9643b248aec2280aa5dcd2cb2e372fa05ab8c317d52abbf8ff87003d9a/botocore-1.10.65.tar.gz"
-    sha256 "35f626029a6b17bfd503ce3379b121606e3f965edcab2612bc75ce8603fdf08c"
+    url "https://files.pythonhosted.org/packages/5b/b6/9e2ae6a47bdd9cc381d7efcf918c5a9d39bbef9a202eb557c821ef28f371/botocore-1.10.74.tar.gz"
+    sha256 "653b0badcd0c19e825b88275ac27ddab3536649f09d901410fc2c39936d77a27"
   end
 
   resource "cachetools" do
@@ -83,8 +83,8 @@ class Dcose2e < Formula
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/4d/9c/46e950a6f4d6b4be571ddcae21e7bc846fcbb88f1de3eff0f6dd0a6be55d/certifi-2018.4.16.tar.gz"
-    sha256 "13e698f54293db9f89122b0581843a782ad0934a4fe0172d2a980ba77fc61bb7"
+    url "https://files.pythonhosted.org/packages/53/0d/d1d13a63563cc50a27b310f5612645bef06d29a5022a7e79ac659dd0fc50/certifi-2018.8.13.tar.gz"
+    sha256 "4c1d68a1408dd090d2f3a869aa94c3947cc1d967821d1ed303208c9f41f0f2f4"
   end
 
   resource "cffi" do
@@ -118,8 +118,8 @@ class Dcose2e < Formula
   end
 
   resource "docker" do
-    url "https://files.pythonhosted.org/packages/f4/cb/5e15c50ec90daa926777f79e7e5cbc00fe2539e677a14c0a491d01f45479/docker-3.4.1.tar.gz"
-    sha256 "ad077b49660b711d20f50f344f70cfae014d635ef094bf21b0d7df5f0aeedf99"
+    url "https://files.pythonhosted.org/packages/66/d0/2f6702857613e8dc9190bd1224434be6e8b25bb86812a1642947baf320b8/docker-3.5.0.tar.gz"
+    sha256 "bc693be5a84b3b9e5aaf156068c5c0a445ee5138c638c3fbc857133bf67ebe07"
   end
 
   resource "docker-pycreds" do
@@ -170,11 +170,6 @@ class Dcose2e < Formula
   resource "isodate" do
     url "https://files.pythonhosted.org/packages/b1/80/fb8c13a4cd38eb5021dc3741a9e588e4d1de88d895c1910c6fc8a08b7a70/isodate-0.6.0.tar.gz"
     sha256 "2e364a3d5759479cdb2d37cce6b9376ea504db2ff90252a2e5b7cc89cc9ff2d8"
-  end
-
-  resource "jeepney" do
-    url "https://files.pythonhosted.org/packages/18/17/7dbc70bc13dc9c8ba8c9b25fbc8b75dffb6bc7e56c3d7cecd87e6b563e5f/jeepney-0.3.1.tar.gz"
-    sha256 "a6f2aa72e61660248d4d524dfccb6405f17c693b69af5d60dd7f2bab807d907e"
   end
 
   resource "jmespath" do
@@ -258,8 +253,8 @@ class Dcose2e < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/05/b5/3197f0ae65c0b3037acd64c216a6d67a94693dad957f4e83e777b36688ae/pytest-3.6.4.tar.gz"
-    sha256 "341ec10361b64a24accaec3c7ba5f7d5ee1ca4cebea30f76fad3dd12db9f0541"
+    url "https://files.pythonhosted.org/packages/1c/b5/336b6b600eb9d2a9b7c99b16be7913dfd1f68d23c82f5a78d774a239183f/pytest-3.7.1.tar.gz"
+    sha256 "86a8dbf407e437351cef4dba46736e9c5a6e3c3ac71b2e942209748e76ff2086"
   end
 
   resource "python-dateutil" do
@@ -305,11 +300,6 @@ class Dcose2e < Formula
   resource "s3transfer" do
     url "https://files.pythonhosted.org/packages/9a/66/c6a5ae4dbbaf253bd662921b805e4972451a6d214d0dc9fb3300cb642320/s3transfer-0.1.13.tar.gz"
     sha256 "90dc18e028989c609146e241ea153250be451e05ecc0c2832565231dacdf59c1"
-  end
-
-  resource "SecretStorage" do
-    url "https://files.pythonhosted.org/packages/65/02/1f0d2a7b1221bc9a15f8b8d4de2c8ad8272c4d0af76cbdc72e2cf51d42e0/SecretStorage-3.0.1.tar.gz"
-    sha256 "819087ca89c0d6c5711692f41fb26f786af9dcc5bb89d567722a66edfbb2a689"
   end
 
   resource "six" do
