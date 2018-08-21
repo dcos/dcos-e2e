@@ -52,6 +52,7 @@ from ._common import (
     NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
     VARIANT_LABEL_KEY,
     WORKSPACE_DIR_LABEL_KEY,
+    docker_client,
     existing_cluster_ids,
 )
 from ._options import node_transport_option
@@ -69,7 +70,7 @@ def _validate_docker_network(
     # We "use" variables to satisfy linting tools.
     for _ in (ctx, param):
         pass
-    client = docker.from_env(version='auto')
+    client = docker_client()
     try:
         return client.networks.get(network_id=value)
     except docker.errors.NotFound:
