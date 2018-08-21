@@ -12,3 +12,5 @@ Windows is not currently supported, but we provide instructions on using DC/OS E
 .. include:: cli-linuxbrew.rst
 
 .. include:: install-python.rst
+
+.. include:: uninstall.rst

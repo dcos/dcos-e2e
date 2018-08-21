@@ -6,6 +6,11 @@ Changelog
 Next
 ----
 
+2018.08.13.0
+------------
+
+- Add instructions for uninstalling DC/OS E2E.
+
 2018.08.03.0
 ------------
 

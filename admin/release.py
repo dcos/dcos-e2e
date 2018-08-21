@@ -21,14 +21,12 @@ def get_homebrew_formula(version: str) -> str:
     requirements_file = Path(__file__).parent.parent / 'requirements.txt'
     lines = requirements_file.read_text().strip().split('\n')
     requirements = [line for line in lines if not line.startswith('#')]
-    # Keyring is not a direct dependency but without it some users get:
-    #
-    # Cannot load 'keyring' on your system (either not installed, or not
-    # configured correctly): No module named 'keyring'
-    requirements.append('keyring')
-    # Similarly, without the following, some users get:
-    # The 'secretstorage' distribution was not found and is required by keyring
-    requirements.append('secretstorage')
+    # At the time of writing, with the latest versions of the DC/OS E2E direct
+    # dependencies, there is a version conflict for ``msrestazure``, an
+    # indirect dependency.
+    # Therefore, we pin a particular version which satisfies all requirements.
+    # See DCOS-40131.
+    requirements.append('msrestazure==0.4.34')
     first = requirements[0]
 
     args = ['poet', first]

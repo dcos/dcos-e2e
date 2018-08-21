@@ -23,6 +23,7 @@ RUN yum install -y \
 		tree \
 		unzip \
 		which \
+                # This is needed to run DC/OS E2E on hosts with XFS.
 		xfsprogs \
 		xz \
 && ( \
