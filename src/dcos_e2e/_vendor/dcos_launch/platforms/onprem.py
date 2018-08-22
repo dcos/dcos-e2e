@@ -7,7 +7,6 @@ import sys
 
 import retrying
 
-from ...dcos_launch import util
 from ...dcos_test_utils import onprem, ssh_client
 
 log = logging.getLogger(__name__)
@@ -86,8 +85,10 @@ def install_dcos(
     # install prereqs if enabled
     if install_prereqs:
         log.info('Installing prerequisites on cluster hosts')
-        check_results(
-            all_client.run_command('run', [util.read_file(prereqs_script_path)]), node_client, 'install_prereqs')
+        with open(prereqs_script_path, 'r') as p:
+            commands = p.readlines()
+            check_results(
+                all_client.run_command('run', commands), node_client, 'install_prereqs')
         log.info('Prerequisites installed.')
     # download install script from boostrap host and run it
     remote_script_path = '/tmp/install_dcos.sh'

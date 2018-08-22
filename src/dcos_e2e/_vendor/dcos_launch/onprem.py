@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import shutil
-import typing
 
 import pkg_resources
 import yaml
@@ -38,7 +37,7 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
     def get_bootstrap_ssh_client(self):
         return self.get_ssh_client(user='bootstrap_ssh_user')
 
-    def get_completed_onprem_config(self) -> typing.Tuple[dict, str]:
+    def get_completed_onprem_config(self, genconf_dir) -> dict:
         """ Will fill in the necessary and/or recommended sections of the config file, including:
         * starting a ZK backend if left undefined
         * filling in the master_list for a static exhibitor backend
@@ -73,18 +72,18 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
 
         # Check for ip-detect configuration and inject defaults if not present
         # set the simple default IP detect script if not provided
-        genconf_dir = self.config['genconf_dir']
         if not os.path.exists(genconf_dir):
             os.makedirs(genconf_dir)
         for script in ('ip_detect', 'ip_detect_public', 'fault_domain_detect'):
             script_hyphen = script.replace('_', '-')
-            default_path_local = os.path.join(genconf_dir, script_hyphen)
+            default_script_path = os.path.join(genconf_dir, script_hyphen)
             filename_key = script + '_filename'
+            script_path = os.path.join(genconf_dir, onprem_config.get(filename_key, script_hyphen))
 
             if script == 'fault_domain_detect':
                 if 'fault_domain_helper' in self.config:
                     # fault_domain_helper is enabled; use it
-                    with open(default_path_local, 'w') as f:
+                    with open(default_script_path, 'w') as f:
                         f.write(self._fault_domain_helper())
                     continue
                 elif onprem_config.get('fault_domain_enabled') == 'false':
@@ -93,34 +92,33 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
                     continue
 
             if filename_key in onprem_config:
-                if not onprem_config[script + '_filename'].startswith('genconf'):
-                    raise util.LauncherError(
-                        'ValidationError',
-                        'Only files in the genconf folder will be copied')
-                local_script_path = onprem_config[filename_key].replace('genconf', genconf_dir)
-                if not os.path.exists(local_script_path):
-                    raise util.LauncherError(
-                        'MissingInput',
-                        '{} script must exist at the given path ({})'.format(
-                            script_hyphen, local_script_path))
+                if os.path.isabs(onprem_config[filename_key]) and os.path.exists(onprem_config[filename_key]):
+                    continue
+                if os.path.exists(script_path):
+                    if onprem_config[filename_key] != script_hyphen:
+                        shutil.copyfile(script_path, default_script_path)
+                    continue
+                if not os.path.exists(script_path):
+                    raise util.LauncherError('FileNotFoundError', '{} script must exist in the genconf dir ({})'.format(
+                        onprem_config[filename_key], genconf_dir))
             elif script + '_contents' in onprem_config:
                 continue
-            elif os.path.exists(default_path_local):
+            elif os.path.exists(default_script_path):
                 continue
-            elif script == 'ip_detect_public':
-                # this is a special case where DC/OS does not expect this field by default
-                onprem_config[filename_key] = os.path.join('genconf', script_hyphen)
 
             # use a sensible default
             shutil.copyfile(
                 pkg_resources.resource_filename(
                     dcos_launch.__name__, script_hyphen + '/{}.sh'.format(self.config['platform'])),
-                default_path_local)
+                default_script_path)
 
         with open(os.path.join(genconf_dir, 'config.yaml'), 'w') as f:
+            if 'ip_detect_contents' not in onprem_config:
+                # this is a special case where DC/OS does not expect this field by default
+                onprem_config['ip_detect_public_filename'] = os.path.join(os.pardir, 'genconf', 'ip-detect-public')
             f.write(yaml.safe_dump(onprem_config))
         log.debug('Generated cluster configuration: {}'.format(onprem_config))
-        return onprem_config, genconf_dir
+        return onprem_config
 
     def _fault_domain_helper(self) -> str:
         """ Will create a script with cluster hostnames baked in so that
@@ -188,7 +186,8 @@ echo "{{\\"fault_domain\\":{{\\"region\\":{{\\"name\\": \\"$REGION\\"}},\\"zone\
         bootstrap_ssh_client.wait_for_ssh_connection(bootstrap_host)
         with bootstrap_ssh_client.tunnel(bootstrap_host) as t:
             installer_path = platforms_onprem.prepare_bootstrap(t, self.config['installer_url'])
-            complete_config, genconf_dir = self.get_completed_onprem_config()
+            genconf_dir = config.expand_path(self.config['genconf_dir'], self.config['config_dir'])
+            complete_config = self.get_completed_onprem_config(genconf_dir)
             platforms_onprem.do_genconf(t, genconf_dir, installer_path)
 
         prereqs_script_path = config.expand_path(pkg_resources.resource_filename(

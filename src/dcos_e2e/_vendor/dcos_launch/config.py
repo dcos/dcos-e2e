@@ -185,6 +185,10 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
     validator.allow_unknown = False
     if not validator.validate(user_config):
         _raise_errors(validator)
+    if 'genconf_dir' in user_config:
+        if 'dcos_config' in user_config:
+            genconf_dir = expand_path(user_config['genconf_dir'], user_config['config_dir'])
+            _validate_genconf_scripts(genconf_dir, user_config['dcos_config'])
     return validator.normalized(user_config)
 
 
@@ -263,7 +267,18 @@ def _validate_fault_domain_helper(field, value, error):
 
 def _validate_genconf_dir(field, value, error):
     if not value.endswith('genconf'):
-        error(field, 'genconf_dir must be named geconf')
+        error(field, 'genconf_dir must be named genconf')
+
+
+def _validate_genconf_scripts(genconf_dir, dcos_config):
+    for script in ('ip_detect', 'ip_detect_public', 'fault_domain_detect'):
+        filename_key = script + '_filename'
+        if filename_key in dcos_config:
+            if os.path.isabs(dcos_config[filename_key]):
+                continue
+            if not os.path.exists(os.path.join(genconf_dir, dcos_config[filename_key])):
+                raise util.LauncherError('FileNotFoundError', '{} script must exist in the genconf dir ({})'.format(
+                    dcos_config[filename_key], genconf_dir))
 
 
 ONPREM_DEPLOY_COMMON_SCHEMA = {
@@ -311,16 +326,12 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'default_setter': lambda doc: yaml.load(util.read_file(os.path.join(doc['genconf_dir'], 'config.yaml'))),
         'schema': {
             'ip_detect_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'ip_detect_contents'},
             'ip_detect_public_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'ip_detect_public_contents'},
             'fault_domain_detect_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'fault_domain_detect_contents'},
             'license_key_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'license_key_contents'},
             # the following are fields that will be injected by dcos-launch
             'agent_list': {'readonly': True},
@@ -331,7 +342,6 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'type': 'string',
         'required': False,
         'default': 'genconf',
-        'coerce': 'expand_local_path',
         'validator': _validate_genconf_dir
         },
     'fault_domain_helper': {
