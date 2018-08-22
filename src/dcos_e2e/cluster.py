@@ -29,15 +29,7 @@ def _wait_for_ssh(node: Node) -> None:
     Retry up to five times (arbitrary) until SSH is available on the given
     node.
     """
-    args = [
-        'systemctl',
-        'status',
-        'sshd',
-        '||',
-        'systemctl',
-        'status',
-        'sshd.socket',
-    ]
+    args = ['systemctl', 'status', 'sshd']
     node.run(args=args, log_output_live=True, shell=True)
 
 
