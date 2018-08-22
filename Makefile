@@ -79,7 +79,7 @@ pylint:
 
 .PHONY: pyroma
 pyroma:
-	pyroma .
+	pyroma --min 10 .
 
 .PHONY: vulture
 vulture:
