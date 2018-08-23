@@ -6,6 +6,11 @@ Changelog
 Next
 ----
 
+2018.08.22.0
+------------
+
+- Improve diagnostics when creating a Docker-backed cluster with no running Docker daemon.
+
 2018.08.13.0
 ------------
 
