@@ -10,7 +10,7 @@ from typing import Set
 import pytest
 import yaml
 
-from run_script import PATTERNS
+from download_artifacts import PATTERNS
 
 
 def _travis_ci_patterns() -> Set[str]:
