@@ -147,7 +147,13 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
             auth_user = DcosUser({'token': dcos_acs_token})
         masters = os.getenv('MASTER_HOSTS')
         slaves = os.getenv('SLAVE_HOSTS')
+        windows_slaves = os.getenv('WINDOWS_HOSTS')
         public_slaves = os.getenv('PUBLIC_SLAVE_HOSTS')
+        windows_public_slaves = os.getenv('WINDOWS_PUBLIC_HOSTS')
+        if windows_slaves:
+            slaves = ",".join((slaves, windows_slaves))
+        if windows_public_slaves:
+            public_slaves = ",".join((public_slaves, windows_public_slaves))
         return {
             'auth_user': auth_user,
             'dcos_url': os.getenv('DCOS_DNS_ADDRESS', 'http://leader.mesos'),

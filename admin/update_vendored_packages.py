@@ -44,14 +44,14 @@ def main() -> None:
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
         https_address='https://github.com/dcos/dcos-launch',
-        git_reference='339f61828ab239726ae923b55b8a5fb9d12f4abb',
+        git_reference='d330f458034dd02b1b71e08b70ffb772dd008fab',
     )
 
     test_utils = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_test_utils',
         https_address='https://github.com/dcos/dcos-test-utils',
-        git_reference='3ebfc18ff9c5a1aa382311474a9192a68c98b0a7',
+        git_reference='5361c8623cd0751f9312cf79b66dde6f09da1e74',
     )
 
     # We have a fix at https://github.com/click-contrib/sphinx-click/pull/27
