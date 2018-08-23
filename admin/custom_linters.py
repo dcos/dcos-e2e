@@ -52,7 +52,7 @@ def _tests_from_pattern(ci_pattern: str) -> Set[str]:
 def test_ci_patterns_match() -> None:
     """
     The patterns in ``.travis.yml`` must match the patterns in
-    ``admin/run_script.py``.
+    ``admin/download_artfacts.py``.
     """
     ci_patterns = _travis_ci_patterns()
     assert ci_patterns - PATTERNS.keys() == set()
