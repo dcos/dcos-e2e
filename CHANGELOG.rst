@@ -6,8 +6,8 @@ Changelog
 Next
 ----
 
-2018.08.24.0
-------------
+- Support for CoreOS on the AWS backend.
+
 
 2018.08.22.0
 ------------
