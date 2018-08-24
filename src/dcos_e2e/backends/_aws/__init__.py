@@ -192,10 +192,11 @@ class AWSCluster(ClusterManager):
         }
 
         install_prereqs = {
-            Distribution.CENTOS_7: True,
             Distribution.COREOS: True,
-            # There is a bug hit when using ``install_prereqs`` with RHEL.
+            # There is a bug hit when using ``install_prereqs`` with some
+            # distributions.
             # See https://jira.mesosphere.com/browse/DCOS-40894.
+            Distribution.CENTOS_7: False,
             Distribution.RHEL_7: False,
         }[cluster_backend.linux_distribution]
 
