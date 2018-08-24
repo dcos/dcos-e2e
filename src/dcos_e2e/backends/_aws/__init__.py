@@ -191,6 +191,14 @@ class AWSCluster(ClusterManager):
             Distribution.RHEL_7: 'ec2-user',
         }
 
+        install_prereqs = {
+            Distribution.CENTOS_7: True,
+            Distribution.COREOS: True,
+            # There is a bug hit when using ``install_prereqs`` with RHEL.
+            # See https://jira.mesosphere.com/browse/DCOS-40894.
+            Distribution.RHEL_7: False,
+        }[cluster_backend.linux_distribution]
+
         prereqs_script_filename = {
             Distribution.CENTOS_7: 'install_prereqs.sh',
             Distribution.COREOS: 'run_coreos_prereqs.sh',
@@ -226,7 +234,7 @@ class AWSCluster(ClusterManager):
             'os_name': aws_distros[cluster_backend.linux_distribution],
             'platform': 'aws',
             'provider': 'onprem',
-            'install_prereqs': True,
+            'install_prereqs': install_prereqs,
             'prereqs_script_filename': prereqs_script_filename,
         }
 
