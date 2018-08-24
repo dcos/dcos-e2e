@@ -108,9 +108,8 @@ class AWS(ClusterBackend):
         supported_distributions = set(
             [
                 Distribution.CENTOS_7,
-                # Progress on COREOS support is tracked in JIRA:
-                # https://jira.mesosphere.com/browse/DCOS-21954
                 Distribution.RHEL_7,
+                Distribution.COREOS,
                 # Support for Ubuntu is blocked on
                 # https://jira.mesosphere.com/browse/DCOS_OSS-3876.
             ],
@@ -191,6 +190,21 @@ class AWSCluster(ClusterManager):
             Distribution.COREOS: 'core',
             Distribution.RHEL_7: 'ec2-user',
         }
+
+        install_prereqs = {
+            Distribution.COREOS: True,
+            # There is a bug hit when using ``install_prereqs`` with some
+            # distributions.
+            # See https://jira.mesosphere.com/browse/DCOS-40894.
+            Distribution.CENTOS_7: False,
+            Distribution.RHEL_7: False,
+        }[cluster_backend.linux_distribution]
+
+        prereqs_script_filename = {
+            Distribution.CENTOS_7: 'install_prereqs.sh',
+            Distribution.COREOS: 'run_coreos_prereqs.sh',
+            Distribution.RHEL_7: 'install_prereqs.sh',
+        }[cluster_backend.linux_distribution]
         self._default_user = ssh_user[cluster_backend.linux_distribution]
 
         self.cluster_backend = cluster_backend
@@ -221,6 +235,8 @@ class AWSCluster(ClusterManager):
             'os_name': aws_distros[cluster_backend.linux_distribution],
             'platform': 'aws',
             'provider': 'onprem',
+            'install_prereqs': install_prereqs,
+            'prereqs_script_filename': prereqs_script_filename,
         }
 
         if cluster_backend.aws_key_pair is None:
