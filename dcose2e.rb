@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.08.13.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.08.24.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -63,13 +63,13 @@ class Dcose2e < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/1b/71/6595e88388e3d1f01315f6a1d8862b54cc7d8f07b26922ab2633ec0c0bbd/boto3-1.7.74.tar.gz"
-    sha256 "26a47c7052692ce20d5b75d2901b71965eea97bf561ab2cbd099eb0b07998883"
+    url "https://files.pythonhosted.org/packages/e3/36/e9532791d80c35271cc6fbc47a0fdad435f2706df09f5f9fea8b450b3aa6/boto3-1.7.81.tar.gz"
+    sha256 "5e51c8bc058b60ce4aa0e30a30336867ff3cb0d4357a324623556c8103ea361c"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/5b/b6/9e2ae6a47bdd9cc381d7efcf918c5a9d39bbef9a202eb557c821ef28f371/botocore-1.10.74.tar.gz"
-    sha256 "653b0badcd0c19e825b88275ac27ddab3536649f09d901410fc2c39936d77a27"
+    url "https://files.pythonhosted.org/packages/4f/1d/a3894c56c391fd7b3bfe1118922f2de8755b8b86b48dbe2156267646cbac/botocore-1.10.81.tar.gz"
+    sha256 "c8845c8ad82e4292636ad0ed93b73c15aa15dbf750fd92a1e65d126c755062d3"
   end
 
   resource "cachetools" do
@@ -83,8 +83,8 @@ class Dcose2e < Formula
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/53/0d/d1d13a63563cc50a27b310f5612645bef06d29a5022a7e79ac659dd0fc50/certifi-2018.8.13.tar.gz"
-    sha256 "4c1d68a1408dd090d2f3a869aa94c3947cc1d967821d1ed303208c9f41f0f2f4"
+    url "https://files.pythonhosted.org/packages/e1/0f/f8d5e939184547b3bdc6128551b831a62832713aa98c2ccdf8c47ecc7f17/certifi-2018.8.24.tar.gz"
+    sha256 "376690d6f16d32f9d1fe8932551d80b23e9d393a8578c5633a2ed39a64861638"
   end
 
   resource "cffi" do
@@ -108,8 +108,8 @@ class Dcose2e < Formula
   end
 
   resource "cryptography" do
-    url "https://files.pythonhosted.org/packages/79/a2/61c8625f96c8582d3053f89368c483ba62e56233d055e58e372f94a393f0/cryptography-2.3.tar.gz"
-    sha256 "c132bab45d4bd0fff1d3fe294d92b0a6eb8404e93337b3127bdec9f21de117e6"
+    url "https://files.pythonhosted.org/packages/22/21/233e38f74188db94e8451ef6385754a98f3cad9b59bedf3a8e8b14988be4/cryptography-2.3.1.tar.gz"
+    sha256 "8d10113ca826a4c29d5b85b2c4e045ffa8bad74fb525ee0eceb1d38d4c70dfd6"
   end
 
   resource "decorator" do
@@ -253,8 +253,8 @@ class Dcose2e < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/1c/b5/336b6b600eb9d2a9b7c99b16be7913dfd1f68d23c82f5a78d774a239183f/pytest-3.7.1.tar.gz"
-    sha256 "86a8dbf407e437351cef4dba46736e9c5a6e3c3ac71b2e942209748e76ff2086"
+    url "https://files.pythonhosted.org/packages/34/73/3ad0ffb79c312022fb6d81694aff5a32d83f55ae6d2174a0437c0298cf07/pytest-3.7.2.tar.gz"
+    sha256 "3459a123ad5532852d36f6f4501dfe1acf4af1dd9541834a164666aa40395b02"
   end
 
   resource "python-dateutil" do
@@ -318,8 +318,8 @@ class Dcose2e < Formula
   end
 
   resource "websocket-client" do
-    url "https://files.pythonhosted.org/packages/28/85/df04ec21c622728316b591c2852fd20a0e74324eeb6ca26f351844ba815f/websocket_client-0.48.0.tar.gz"
-    sha256 "18f1170e6a1b5463986739d9fd45c4308b0d025c1b2f9b88788d8f69e8a5eb4a"
+    url "https://files.pythonhosted.org/packages/bb/ae/4ff2ae1f722d0c23dc4cdf74a4e05b0d1bbe752dc28620b9fe05c53e61aa/websocket_client-0.51.0.tar.gz"
+    sha256 "030bbfbf29ac9e315ffb207ed5ed42b6981b5038ea00d1e13b02b872cc95e8f6"
   end
 
 
