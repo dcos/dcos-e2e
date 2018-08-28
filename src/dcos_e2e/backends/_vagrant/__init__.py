@@ -74,7 +74,6 @@ class VagrantCluster(ClusterManager):
         masters: int,
         agents: int,
         public_agents: int,
-        files_to_copy_to_installer: List[Tuple[Path, Path]],
         cluster_backend: Vagrant,
     ) -> None:
         """
@@ -84,22 +83,8 @@ class VagrantCluster(ClusterManager):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
             cluster_backend: Details of the specific Docker backend to use.
-
-        Raises:
-            NotImplementedError: ``files_to_copy_to_installer`` includes files
-                to copy to the installer.
         """
-        if files_to_copy_to_installer:
-            message = (
-                'Copying files to the installer is currently not supported by '
-                'the Vagrant backend.'
-            )
-            raise NotImplementedError(message)
-
         cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
         self._master_prefix = cluster_id + '-master-'
         self._agent_prefix = cluster_id + '-agent-'
