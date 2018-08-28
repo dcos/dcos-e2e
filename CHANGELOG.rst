@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.08.28.0
+------------
+
 - Support for CoreOS on the AWS backend.
 - Fix an issue which prevented the Vagrant backend from working.
 
