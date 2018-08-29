@@ -18,6 +18,11 @@ with open('requirements.txt') as requirements:
     # Therefore, we pin a particular version which satisfies all requirements.
     # See DCOS-40131.
     INSTALL_REQUIRES.append('msrestazure==0.4.34')
+
+    # Without the following, some users get:
+    # The 'secretstorage' distribution was not found and is required by keyring
+    INSTALL_REQUIRES.append('secretstorage')
+
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
