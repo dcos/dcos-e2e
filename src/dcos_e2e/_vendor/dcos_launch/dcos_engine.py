@@ -22,7 +22,7 @@ dcos_launch.util = ___vendorize__0
 log = logging.getLogger(__name__)
 
 
-def generate_acs_engine_template(
+def generate_dcos_engine_template(
         linux_ssh_public_key: str,
         num_masters: int,
         master_vm_size: str,
@@ -37,9 +37,9 @@ def generate_acs_engine_template(
         windows_admin_user: str,
         windows_admin_password: str,
         linux_admin_user: str,
-        acs_engine_dcos_orchestrator_release: str,
+        dcos_engine_orchestrator_release: str,
         ):
-    """ Generates the template provided to ACS-engine
+    """ Generates the template provided to dcos-engine
     """
     unique_id = str(uuid.uuid4())[:8] + 'dcos'
     template = {
@@ -47,7 +47,7 @@ def generate_acs_engine_template(
         "properties": {
             "orchestratorProfile": {
                 "orchestratorType": "DCOS",
-                "orchestratorRelease": acs_engine_dcos_orchestrator_release
+                "orchestratorRelease": dcos_engine_orchestrator_release
             },
             "masterProfile": {
                 "count": num_masters,
@@ -103,30 +103,30 @@ def generate_acs_engine_template(
     return template
 
 
-def run_acs_engine(acs_engine_url: str, acs_engine_template):
-    """ Runs the ACS engine
+def run_dcos_engine(dcos_engine_url: str, dcos_engine_template):
+    """ Runs the dcos-engine
     """
     tmpdir = tempfile.mkdtemp()
-    # pull down acs engine in temp dir
+    # pull down dcos engine in temp dir
     download_path = os.path.join(tmpdir, 'download.tar.gz')
     with open(download_path, 'wb') as f:
-        r = requests.get(acs_engine_url)
+        r = requests.get(dcos_engine_url)
         for chunk in r.iter_content(1024):
             f.write(chunk)
     extract_path = os.path.join(tmpdir, 'extract')
     with tarfile.open(download_path) as tar:
         tar.extractall(path=extract_path)
-    extracted_name = acs_engine_url.split('/')[-1].rstrip('.tar.gz')
-    acs_engine_bin_path = os.path.join(extract_path, extracted_name, 'acs-engine')
+    extracted_name = dcos_engine_url.split('/')[-1].rstrip('.tar.gz')
+    dcos_engine_bin_path = os.path.join(extract_path, extracted_name, 'dcos-engine')
     # inject parameters into the JSON (keyhelper, agent definitions)
     acs_template_path = os.path.join(tmpdir, 'acs_template.json')
     with open(acs_template_path, 'w') as f:
-        json.dump(acs_engine_template, f)
+        json.dump(dcos_engine_template, f)
     # run acs vs template
-    cmd = [acs_engine_bin_path, 'generate', acs_template_path]
+    cmd = [dcos_engine_bin_path, 'generate', acs_template_path]
     subprocess.check_call(cmd, cwd=tmpdir)
 
-    cluster_name = acs_engine_template['properties']['masterProfile']['dnsPrefix']
+    cluster_name = dcos_engine_template['properties']['masterProfile']['dnsPrefix']
     with open(os.path.join(tmpdir, '_output/{}/azuredeploy.json'.format(cluster_name)), 'r') as f:
         arm_template = json.load(f)
     with open(os.path.join(tmpdir, '_output/{}/azuredeploy.parameters.json'.format(cluster_name)), 'r') as f:
@@ -137,7 +137,7 @@ def run_acs_engine(acs_engine_url: str, acs_engine_template):
     return arm_template, arm_template_parameters
 
 
-class ACSEngineLauncher(dcos_launch.util.AbstractLauncher):
+class DcosEngineLauncher(dcos_launch.util.AbstractLauncher):
     def __init__(self, config: dict, env=None):
         if env is None:
             azure_subscription_id = dcos_launch.util.set_from_env('AZURE_SUBSCRIPTION_ID')
@@ -164,7 +164,7 @@ class ACSEngineLauncher(dcos_launch.util.AbstractLauncher):
             self.config.update({
                 'ssh_private_key': private_key.decode(),
                 'ssh_public_key': public_key.decode()})
-        acs_engine_template = generate_acs_engine_template(
+        dcos_engine_template = generate_dcos_engine_template(
             self.config['ssh_public_key'],
             self.config['num_masters'],
             self.config['master_vm_size'],
@@ -179,23 +179,26 @@ class ACSEngineLauncher(dcos_launch.util.AbstractLauncher):
             self.config['windows_admin_user'],
             self.config['windows_admin_password'],
             self.config['linux_admin_user'],
-            self.config['acs_engine_dcos_orchestrator_release'])
+            self.config['dcos_engine_orchestrator_release'])
         windows_image_source_url = self.config.get('windows_image_source_url')
         if windows_image_source_url:
-            acs_engine_template["properties"]["windowsProfile"]["WindowsImageSourceUrl"] = windows_image_source_url
+            dcos_engine_template["properties"]["windowsProfile"]["WindowsImageSourceUrl"] = windows_image_source_url
         else:
             # Use the official Azure image if a custom VHD was not specified
             # via the windows_image_source_url config option
             windows_publisher = self.config.get('windows_publisher')
             windows_offer = self.config.get('windows_offer')
             windows_sku = self.config.get('windows_sku')
-            acs_engine_template["properties"]["windowsProfile"]["WindowsPublisher"] = windows_publisher
-            acs_engine_template["properties"]["windowsProfile"]["WindowsOffer"] = windows_offer
-            acs_engine_template["properties"]["windowsProfile"]["WindowsSku"] = windows_sku
+            dcos_engine_template["properties"]["windowsProfile"]["WindowsPublisher"] = windows_publisher
+            dcos_engine_template["properties"]["windowsProfile"]["WindowsOffer"] = windows_offer
+            dcos_engine_template["properties"]["windowsProfile"]["WindowsSku"] = windows_sku
         linux_bs_url = self.config.get('dcos_linux_bootstrap_url')
-        arm_template, self.config['template_parameters'] = run_acs_engine(self.config['acs_engine_tarball_url'], acs_engine_template)  # noqa
+        arm_template, self.config['template_parameters'] = run_dcos_engine(self.config['dcos_engine_tarball_url'], dcos_engine_template)  # noqa
         if linux_bs_url:
             self.config['template_parameters']['dcosBootstrapURL'] = linux_bs_url
+        windows_bs_url = self.config.get('dcos_windows_bootstrap_url')
+        if windows_bs_url:
+            self.config['template_parameters']['dcosWindowsBootstrapURL'] = windows_bs_url
         self.azure_wrapper.deploy_template_to_new_resource_group(
             self.config.get('template_url'),
             self.config['deployment_name'],

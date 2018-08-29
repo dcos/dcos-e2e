@@ -119,8 +119,8 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
         validator.schema.update(TERRAFORM_COMMON_SCHEMA)
     elif provider in ('aws', 'azure'):
         validator.schema.update(TEMPLATE_DEPLOY_COMMON_SCHEMA)
-    elif provider == 'acs-engine':
-        validator.schema.update(ACS_ENGINE_SCHEMA)
+    elif provider == 'dcos-engine':
+        validator.schema.update(DCOS_ENGINE_SCHEMA)
     else:
         raise Exception('Unknown provider!: {}'.format(provider))
 
@@ -199,7 +199,7 @@ COMMON_SCHEMA = {
         'allowed': [
             'aws',
             'azure',
-            'acs-engine',
+            'dcos-engine',
             'onprem',
             'terraform']},
     'config_dir': {
@@ -480,24 +480,24 @@ def get_platform_dependent_url(url_to_format: str, error_msg: str) -> str:
         raise Exception(error_msg)
 
 
-ACS_ENGINE_SCHEMA = {
+DCOS_ENGINE_SCHEMA = {
     'deployment_name': {
         'type': 'string',
         'required': True},
-    'acs_version': {
+    'dcos_engine_version': {
         'type': 'string',
-        'default_setter': lambda doc: get_latest_github_release('Azure', 'acs-engine', '0.16.2')
+        'default_setter': lambda doc: get_latest_github_release('Azure', 'dcos-engine', '0.2.0')
     },
-    'acs_engine_tarball_url': {
+    'dcos_engine_tarball_url': {
         'type': 'string',
         'default_setter': lambda doc: get_platform_dependent_url(
-            'https://github.com/Azure/acs-engine/releases/download/v{0}/acs-engine-v{0}-{1}-amd64.tar.gz'.
-                format(doc['acs_version'], '{}'),
-            'No ACS-Engine distribution for {}'.format(sys.platform))},
+            'https://github.com/Azure/dcos-engine/releases/download/v{0}/dcos-engine-v{0}-{1}-amd64.tar.gz'.
+                format(doc['dcos_engine_version'], '{}'),
+            'No DCOS-Engine distribution for {}'.format(sys.platform))},
     'acs_template_filename': {
         'type': 'string',
         'required': False},
-    'acs_engine_dcos_orchestrator_release': {
+    'dcos_engine_orchestrator_release': {
         'type': 'string',
         'default': '1.11'},
     'platform': {
@@ -550,6 +550,9 @@ ACS_ENGINE_SCHEMA = {
     'template_parameters': {
         'type': 'dict'},
     'dcos_linux_bootstrap_url': {
+        'type': 'string',
+        'required': False},
+    'dcos_windows_bootstrap_url': {
         'type': 'string',
         'required': False},
     'windows_publisher': {
