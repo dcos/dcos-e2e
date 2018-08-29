@@ -44,7 +44,7 @@ def main() -> None:
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
         https_address='https://github.com/dcos/dcos-launch',
-        git_reference='d330f458034dd02b1b71e08b70ffb772dd008fab',
+        git_reference='2442b5246684c0663162e51136b2fe7a5c7ef3e1',
     )
 
     test_utils = _Requirement(
