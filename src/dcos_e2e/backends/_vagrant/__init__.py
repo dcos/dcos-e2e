@@ -9,7 +9,7 @@ import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Type
+from typing import Any, Dict, Iterable, Optional, Set, Tuple, Type
 
 from dcos_e2e.node import Node
 
