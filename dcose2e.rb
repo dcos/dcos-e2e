@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.08.28.0.tar.gz"
+  url "https://github.com/dcos/dcos-e2e/archive/2018.08.29.0.tar.gz"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -172,6 +172,11 @@ class Dcose2e < Formula
     sha256 "2e364a3d5759479cdb2d37cce6b9376ea504db2ff90252a2e5b7cc89cc9ff2d8"
   end
 
+  resource "jeepney" do
+    url "https://files.pythonhosted.org/packages/18/17/7dbc70bc13dc9c8ba8c9b25fbc8b75dffb6bc7e56c3d7cecd87e6b563e5f/jeepney-0.3.1.tar.gz"
+    sha256 "a6f2aa72e61660248d4d524dfccb6405f17c693b69af5d60dd7f2bab807d907e"
+  end
+
   resource "jmespath" do
     url "https://files.pythonhosted.org/packages/e5/21/795b7549397735e911b032f255cff5fb0de58f96da794274660bca4f58ef/jmespath-0.9.3.tar.gz"
     sha256 "6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64"
@@ -300,6 +305,11 @@ class Dcose2e < Formula
   resource "s3transfer" do
     url "https://files.pythonhosted.org/packages/9a/66/c6a5ae4dbbaf253bd662921b805e4972451a6d214d0dc9fb3300cb642320/s3transfer-0.1.13.tar.gz"
     sha256 "90dc18e028989c609146e241ea153250be451e05ecc0c2832565231dacdf59c1"
+  end
+
+  resource "SecretStorage" do
+    url "https://files.pythonhosted.org/packages/65/02/1f0d2a7b1221bc9a15f8b8d4de2c8ad8272c4d0af76cbdc72e2cf51d42e0/SecretStorage-3.0.1.tar.gz"
+    sha256 "819087ca89c0d6c5711692f41fb26f786af9dcc5bb89d567722a66edfbb2a689"
   end
 
   resource "six" do
