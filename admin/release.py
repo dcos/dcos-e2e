@@ -27,6 +27,11 @@ def get_homebrew_formula(version: str) -> str:
     # Therefore, we pin a particular version which satisfies all requirements.
     # See DCOS-40131.
     requirements.append('msrestazure==0.4.34')
+
+    # Without the following, some users get:
+    # The 'secretstorage' distribution was not found and is required by keyring
+    requirements.append('secretstorage')
+
     first = requirements[0]
 
     args = ['poet', first]
