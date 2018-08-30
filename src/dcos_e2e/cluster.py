@@ -31,7 +31,15 @@ def _wait_for_ssh(node: Node) -> None:
     """
     # In theory we could just use any args and specify the transport as SSH.
     # However, this would not work on macOS without a special network set up.
-    args = ['systemctl', 'status', 'sshd.socket']
+    args = [
+        'systemctl',
+        'status',
+        'sshd.socket',
+        '||',
+        'systemctl',
+        'status',
+        'sshd',
+    ]
     node.run(
         args=args,
         log_output_live=True,
