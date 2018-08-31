@@ -29,12 +29,21 @@ def _wait_for_ssh(node: Node) -> None:
     Retry up to five times (arbitrary) until SSH is available on the given
     node.
     """
-    args = ['echo', '1']
+    # In theory we could just use any args and specify the transport as SSH.
+    # However, this would not work on macOS without a special network set up.
+    args = [
+        'systemctl',
+        'status',
+        'sshd.socket',
+        '||',
+        'systemctl',
+        'status',
+        'sshd',
+    ]
     node.run(
         args=args,
         log_output_live=True,
         shell=True,
-        transport=Transport.SSH,
     )
 
 
