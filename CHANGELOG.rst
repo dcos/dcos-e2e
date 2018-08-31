@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.08.31.0
+------------
+
 - Fix using macOS with no custom network.
 
 2018.08.28.0
