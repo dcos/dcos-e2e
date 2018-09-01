@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- The ``--variant`` option is now required for the ``dcos-aws`` CLI.
+
 2018.08.31.0
 ------------
 
@@ -16,7 +18,6 @@ Next
 
 - Support for CoreOS on the AWS backend.
 - Fix an issue which prevented the Vagrant backend from working.
-
 
 2018.08.22.0
 ------------

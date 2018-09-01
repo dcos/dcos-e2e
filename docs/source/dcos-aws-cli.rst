@@ -12,7 +12,7 @@ A typical CLI workflow for open source DC/OS may look like the following.
 
    # Fix issues shown by dcos-aws doctor
    $ dcos-aws doctor
-   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh --agents 0
+   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh --variant oss
    default
    $ dcos-aws wait
    $ dcos-aws run --sync-dir /path/to/dcos/checkout pytest -k test_tls
@@ -172,6 +172,7 @@ It is possible to use :ref:`dcos-aws-create` to create a cluster with a custom C
 
       dcos-aws create \
           $DCOS_ENTERPRISE_URL \
+          --variant enterprise \
           --genconf-dir /path/to/genconf/ \
           --copy-to-master /path/to/genconf/dcos-ca-certificate-key.key:/var/lib/dcos/pki/tls/CA/private/custom_ca.key \
           --license-key /path/to/license.txt \
