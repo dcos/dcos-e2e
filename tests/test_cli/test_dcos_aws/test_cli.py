@@ -135,7 +135,7 @@ class TestCreate:
                                               "<TAG_KEY>:<TAG_VALUE>".
               --variant [oss|enterprise]      Choose the DC/OS variant. If the variant does
                                               not match the variant of the given artifact
-                                              URL, an error will occur.
+                                              URL, an error will occur.   [required]
               --masters INTEGER               The number of master nodes.  [default: 1]
               --agents INTEGER                The number of agent nodes.  [default: 1]
               --extra-config PATH             The path to a file including DC/OS
