@@ -101,7 +101,7 @@ def _validate_tags(
 @click.option(
     '--variant',
     type=click.Choice(['oss', 'enterprise']),
-    default='oss',
+    required=True,
     help=(
         'Choose the DC/OS variant. '
         'If the variant does not match the variant of the given artifact URL, '
