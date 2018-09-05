@@ -181,3 +181,12 @@ pull-images:
 	docker pull quay.io/shift/coreos:stable-1298.7.0
 	# This is used by the ``dcos-docker doctor`` command.
 	docker pull luca3m/sleep
+
+pyinstaller:
+	docker build -t dcos-docker-packaging -f docker/Docker.package docker/
+	rm -rf dist/dcos-docker
+	rm -rf dcos-docker.spec
+	docker run --rm -v $(CURDIR):/e2e dcos-docker-packaging bash -c " \
+		pip3 install -e . && \
+		pyinstaller ./bin/dcos-docker --onefile \
+	"
