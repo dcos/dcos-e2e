@@ -7,7 +7,7 @@ One way to install the CLI on Linux is with a prebuilt package.
   - Stable?
 
 
-To install or upgrade to the latest stable version, |VERSION|:
+To install or upgrade to the latest stable version:
 # TODO if we need to it will be possible to make the version dynamic with Sphinx
 
 TODO: Be careful if the URLs are version specific
