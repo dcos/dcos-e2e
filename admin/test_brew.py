@@ -17,11 +17,11 @@ def test_brew(tmpdir: local) -> None:
     archive_file = Path(str(tmpdir.join('archive.tar.gz')))
     archive_file.touch()
 
-    with Path(str(archive_file)).open('wb') as af:
+    with archive_file.open('wb') as outstream:
         archive(
             repo=local_repository,
             committish=committish,
-            outstream=af,
+            outstream=outstream,
         )
     import pdb; pdb.set_trace()
 
