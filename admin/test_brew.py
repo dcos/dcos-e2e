@@ -71,7 +71,6 @@ def test_brew(tmpdir: local) -> None:
         '&&',
         'dcos-docker',
         '--help',
-        '&&fsa',
     ]
 
     command = '/bin/bash -c "{command}"'.format(command=' '.join(command))
