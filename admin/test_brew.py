@@ -1,4 +1,5 @@
 """
+Tests for Homebrew and Linuxbrew.
 """
 
 import subprocess
