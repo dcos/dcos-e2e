@@ -24,8 +24,8 @@ def get_version() -> str:
     utc_now = datetime.datetime.utcnow()
     date_format = '%Y.%m.%d'
     date_str = utc_now.strftime(date_format)
-    repo = Repo('.')
-    tag_labels = tag_list(repo)
+    local_repository = Repo('.')
+    tag_labels = tag_list(repo=local_repository)
     tag_labels = [item.decode() for item in tag_labels]
     today_tag_labels = [
         item for item in tag_labels if item.startswith(date_str)
@@ -100,7 +100,7 @@ def update_homebrew(version_str: str, repository: Repository) -> None:
     )
     homebrew_formula_contents = get_homebrew_formula(
         archive_url=archive_url,
-        repository=repository,
+        head_url=repository.clone_url,
     )
     homebrew_file = Path('dcose2e.rb')
     homebrew_file.write_text(homebrew_formula_contents)
