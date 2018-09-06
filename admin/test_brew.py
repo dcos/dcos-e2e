@@ -38,8 +38,10 @@ def test_brew(tmpdir: local) -> None:
         archive_url=archive_url,
     )
 
-    homebrew_file = Path(str(tmpdir.join('dcose2e.rb')))
+    homebrew_filename = 'dcose2e.rb'
+    homebrew_file = Path(str(tmpdir.join(homebrew_filename)))
     homebrew_file.write_text(homebrew_formula_contents)
+    container_homebrew_file_path = '/' + homebrew_filename
 
     archive_mount = Mount(
         source=str(archive_file),
@@ -48,7 +50,7 @@ def test_brew(tmpdir: local) -> None:
 
     homebrew_file_mount = Mount(
         source=str(homebrew_file),
-        target=container_archive_path,
+        target=container_homebrew_file_path,
     )
 
     mounts = [archive_mount, homebrew_file_mount]
@@ -59,8 +61,16 @@ def test_brew(tmpdir: local) -> None:
         mounts=mounts,
     )
 
-    container.stop()
-    container.remove(v=True)
+    install_cmd = ['brew', 'install', container_homebrew_file_path]
+    test_cmd = ['dcos-docker', '--help']
+    cmds = [install_cmd, test_cmd]
+    try:
+        for cmd in cmds:
+            exit_code, output = container.exec_run(cmd=cmd)
+            assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
+    finally:
+        container.stop()
+        container.remove(v=True)
     import pdb; pdb.set_trace()
 
     # TODO make archive - test can you do archive from file:///
@@ -72,6 +82,7 @@ def test_brew(tmpdir: local) -> None:
     # docker run -it linuxbrew/linuxbrew
     # TODO send file to container
     # TODO install from Linuxbrew
+    # TODO also for Vagrant and AWS
     # dcos-docker help
 
     # TODO move this to tests/
