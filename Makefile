@@ -18,7 +18,7 @@ EE_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.ee.sh
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
-include Makefile.lint
+include lint.mk
 
 
 .PHONY: lint
