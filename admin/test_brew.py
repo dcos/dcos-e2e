@@ -12,3 +12,5 @@ def test_brew():
     # docker run -it linuxbrew/linuxbrew
     # TODO send file to container
     # TODO install from Linuxbrew
+
+    # TODO move this to tests/
