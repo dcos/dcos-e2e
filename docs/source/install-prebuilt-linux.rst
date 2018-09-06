@@ -22,6 +22,3 @@ TODO: Be careful if the URLs are version specific
 
    curl -O /usr/local/bin/dcos-aws <URL> && \
    chmod +x /usr/local/bin/dcos-aws
-
-
-* Uninstall -> The uninstall doc
