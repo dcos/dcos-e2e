@@ -8,6 +8,7 @@ import re
 import subprocess
 from pathlib import Path
 from textwrap import dedent
+from typing import List
 
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
@@ -107,6 +108,7 @@ def update_changelog(version: str) -> None:
 def create_github_release(
     github_token: str,
     version: str,
+    artifacts: List[Path],
 ) -> None:
     """
     Create a tag and release on GitHub.
@@ -115,14 +117,24 @@ def create_github_release(
     org = github_client.get_organization('dcos')
     repository = org.get_repo('dcos-e2e')
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
-    repository.create_git_tag_and_release(
+    release = repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
         release_name='Release ' + version,
         release_message='See ' + changelog_url,
         type='commit',
         object=repository.get_commits()[0].sha,
+        draft=True,
     )
+
+    for artifact_path in artifacts:
+        release.upload_asset(
+            path=str(artifact_path),
+            label=artifact_path.name,
+            # content_type="",
+        )
+
+    # TODO Change the release to be not a draft
 
 
 def commit_and_push(version: str) -> None:
@@ -167,6 +179,16 @@ def update_vagrantfile(version: str) -> None:
     vagrantfile.write_text(updated)
 
 
+def build_linux_artifacts() -> List[Path]:
+    """
+    TODO
+    """
+    subprocess.check_call(
+        ['make', 'pyinstaller'],
+    )
+    return [Path('dist/dcos-docker')]
+
+
 def main() -> None:
     github_token = os.environ['GITHUB_TOKEN']
     version_str = get_version()
@@ -174,9 +196,11 @@ def main() -> None:
     update_homebrew(version_str=version_str)
     update_vagrantfile(version=version_str)
     commit_and_push(version=version_str)
+    linux_artifacts = build_linux_artifacts()
     create_github_release(
         github_token=github_token,
         version=version_str,
+        artifacts=linux_artifacts,
     )
 
 
