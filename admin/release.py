@@ -198,7 +198,7 @@ def get_repo(github_token: str, github_owner: str) -> Repository:
 
 def main() -> None:
     github_token = os.environ['GITHUB_TOKEN']
-    github_owner = 'dcos'
+    github_owner = os.environ['GITHUB_OWNER']
     repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
     update_changelog(version=version_str)
