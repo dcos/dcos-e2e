@@ -7,6 +7,7 @@ Next
 ----
 
 - The ``--variant`` option is now required for the ``dcos-aws`` CLI.
+- TODO
 
 2018.08.31.0
 ------------

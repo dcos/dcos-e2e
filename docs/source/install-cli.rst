@@ -10,4 +10,6 @@ The library and CLI can be installed together with ``pip`` on any Linux and macO
 
 .. include:: install-python.rst
 
+.. include:: install-prebuilt-linux.rst
+
 .. include:: run-doctor.rst
