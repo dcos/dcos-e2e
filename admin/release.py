@@ -11,10 +11,10 @@ from textwrap import dedent
 
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
-from github import Github
+from github import Github, Repository, UnknownObjectException
 
 
-def get_homebrew_formula(version: str) -> str:
+def get_homebrew_formula(version: str, repository: Repository) -> str:
     """
     Return the contents of a Homebrew formula for the DC/OS E2E CLI.
     """
@@ -42,13 +42,24 @@ def get_homebrew_formula(version: str) -> str:
     result = subprocess.run(args=args, stdout=subprocess.PIPE, check=True)
     resource_stanzas = str(result.stdout.decode())
 
+    # We could use:
+    # ```
+    # repository.get_archive_link(archive_format='tarball', version=version)
+    # ```
+    #
+    # However, this is broken in PyGitHub 1.40, and will be fixed in the next
+    # release to PyPI.
+    archive_url = '{html_url}/archive/{version}.tar.gz'.format(
+        html_url=repository.html_url,
+        version=version,
+    )
     pattern = dedent(
         """\
         class Dcose2e < Formula
           include Language::Python::Virtualenv
 
-          url "https://github.com/dcos/dcos-e2e/archive/{version}.tar.gz"
-          head "https://github.com/dcos/dcos-e2e.git"
+          url "{archive_url}"
+          head "{clone_url}"
           homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
           depends_on "python3"
           depends_on "pkg-config"
@@ -68,7 +79,12 @@ def get_homebrew_formula(version: str) -> str:
         """,
     )
 
-    return pattern.format(resource_stanzas=resource_stanzas, version=version)
+    return pattern.format(
+        resource_stanzas=resource_stanzas,
+        archive_url=archive_url,
+        version=version,
+        clone_url=repository.clone_url,
+    )
 
 
 def get_version() -> str:
@@ -105,15 +121,12 @@ def update_changelog(version: str) -> None:
 
 
 def create_github_release(
-    github_token: str,
+    repository: Repository,
     version: str,
 ) -> None:
     """
     Create a tag and release on GitHub.
     """
-    github_client = Github(github_token)
-    org = github_client.get_organization('dcos')
-    repository = org.get_repo('dcos-e2e')
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
     repository.create_git_tag_and_release(
         tag=version,
@@ -125,11 +138,11 @@ def create_github_release(
     )
 
 
-def commit_and_push(version: str) -> None:
+def commit_and_push(version: str, repository: Repository) -> None:
     """
     Commit and push all changes.
     """
-    repo = Repo('.')
+    local_repository = Repo('.')
     paths = ['dcose2e.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
     _, ignored = add(paths=paths)
     assert not ignored
@@ -137,17 +150,20 @@ def commit_and_push(version: str) -> None:
     commit(message=message)
     branch_name = 'master'
     push(
-        repo=repo,
-        remote_location='git@github.com:dcos/dcos-e2e.git',
+        repo=local_repository,
+        remote_location=repo.ssh_url,
         refspecs=branch_name.encode('utf-8'),
     )
 
 
-def update_homebrew(version_str: str) -> None:
+def update_homebrew(version_str: str, repository: Repository) -> None:
     """
     Update the Homebrew file.
     """
-    homebrew_formula_contents = get_homebrew_formula(version=version_str)
+    homebrew_formula_contents = get_homebrew_formula(
+        version=version_str,
+        repository=repository,
+    )
     homebrew_file = Path('dcose2e.rb')
     homebrew_file.write_text(homebrew_formula_contents)
 
@@ -167,15 +183,32 @@ def update_vagrantfile(version: str) -> None:
     vagrantfile.write_text(updated)
 
 
+def get_repo(github_token: str, github_owner: str) -> Repository:
+    """
+    Get a GitHub repository.
+    """
+    try:
+        github_user_or_org = github_client.get_organization(github_owner)
+    except UnknownObjectException:
+        github_user_or_org = github_client.get_user(github_owner)
+
+    return github_user_or_org.get_repo('dcos-e2e')
+
+
 def main() -> None:
     github_token = os.environ['GITHUB_TOKEN']
+    github_owner = 'dcos'
+    repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
     update_changelog(version=version_str)
-    update_homebrew(version_str=version_str)
+    update_homebrew(
+        version_str=version_str,
+        repository=repository,
+    )
     update_vagrantfile(version=version_str)
-    commit_and_push(version=version_str)
+    commit_and_push(version=version_str, repository=repository)
     create_github_release(
-        github_token=github_token,
+        repository=repository,
         version=version_str,
     )
 
