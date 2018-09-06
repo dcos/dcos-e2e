@@ -11,3 +11,7 @@ To uninstall DC/OS E2E, use one of the following methods, depending on how you i
 
    # --force uninstalls all versions of DC/OS E2E which have been installed.
    brew uninstall dcose2e --force
+
+.. code:: sh
+
+    # TODO
