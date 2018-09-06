@@ -38,6 +38,12 @@ with open('dev-requirements.txt') as dev_requirements:
         if not line.startswith('#'):
             DEV_REQUIRES.append(line)
 
+with open('packaging-requirements.txt') as package_requirements:
+    PACKAGING_REQUIRES = []
+    for line in package_requirements.readlines():
+        if not line.startswith('#'):
+            PACKAGING_REQUIRES.append(line)
+
 with open('README.rst') as f:
     LONG_DESCRIPTION = f.read()
 
@@ -59,6 +65,7 @@ setup(
     url='https://github.com/dcos/dcos-e2e',
     extras_require={
         'dev': DEV_REQUIRES,
+        'packaging': PACKAGING_REQUIRES,
     },
     classifiers=[
         'Operating System :: POSIX',
