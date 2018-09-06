@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.09.06.0
+------------
+
 - The ``--variant`` option is now required for the ``dcos-aws`` CLI.
 - Add the ability to do a release to a fork.
 
