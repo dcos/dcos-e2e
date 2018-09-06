@@ -58,6 +58,9 @@ def test_brew(tmpdir: local) -> None:
 
     mounts = [archive_mount, homebrew_file_mount]
     command = [
+        'sleep',
+        '1000000000',
+        '&&',
         'brew',
         'install',
         container_homebrew_file_path,
@@ -66,6 +69,8 @@ def test_brew(tmpdir: local) -> None:
         '--help',
         '&&fsa',
     ]
+
+    command = '/bin/bash -c "{command}"'.format(command=' '.join(command))
 
     container = client.containers.run(
         image=linuxbrew_image,
