@@ -58,6 +58,9 @@ def test_brew(tmpdir: local) -> None:
         detach=True,
         mounts=mounts,
     )
+
+    container.stop()
+    container.remove(v=True)
     import pdb; pdb.set_trace()
 
     # TODO make archive - test can you do archive from file:///
