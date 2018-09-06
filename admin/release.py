@@ -11,7 +11,7 @@ from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
 from github import Github, Repository, UnknownObjectException
 
-from .homebrew import get_homebrew_formula
+from homebrew import get_homebrew_formula
 
 
 def get_version() -> str:
