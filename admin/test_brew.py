@@ -3,9 +3,13 @@
 
 from pathlib import Path
 
+import docker
+from docker.types import Mount
 from dulwich.porcelain import archive
 from dulwich.repo import Repo
 from py.path import local  # pylint: disable=no-name-in-module, import-error
+
+from admin.homebrew import get_homebrew_formula
 
 
 def test_brew(tmpdir: local) -> None:
@@ -23,6 +27,35 @@ def test_brew(tmpdir: local) -> None:
             committish=committish,
             outstream=outstream,
         )
+
+    client = docker.from_env(version='auto')
+    linuxbrew_image = 'linuxbrew/linuxbrew'
+    container_archive_path = '/archive.tar.gz'
+    archive_url = 'file://' + container_archive_path
+
+    homebrew_formula_contents = get_homebrew_formula(
+        repository=local_repository,
+        archive_url=archive_url,
+    )
+
+    homebrew_file = Path(str(tmpdir.join('dcose2e.rb')))
+    homebrew_file.write(homebrew_formula_contents)
+
+    archive_mount = Mount(
+        source=str(archive_file),
+        target=container_archive_path,
+    )
+
+    homebrew_file_mount = Mount(
+        source=str(homebrew_file),
+        target=container_archive_path,
+    )
+
+    container = client.containers.run(
+        image=linuxbrew_image,
+        detach=True,
+        mounts=mounts,
+    )
     import pdb; pdb.set_trace()
 
     # TODO make archive - test can you do archive from file:///
