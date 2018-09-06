@@ -182,11 +182,13 @@ pull-images:
 	# This is used by the ``dcos-docker doctor`` command.
 	docker pull luca3m/sleep
 
-pyinstaller:
-	docker build -t dcos-docker-packaging -f docker/Docker.package docker/
-	rm -rf dist/dcos-docker
-	rm -rf dcos-docker.spec
-	docker run --rm -v $(CURDIR):/e2e dcos-docker-packaging bash -c " \
-		pip3 install -e . && \
-		pyinstaller ./bin/dcos-docker --onefile \
+.PHONY: linux-package
+linux-package:
+	rm -rf dist/
+	rm -rf dcos-*.spec
+	docker run --rm -v $(CURDIR):/e2e python:3.6 bash -c " \
+		pip3 install -e .[dev] && \
+		pyinstaller ./bin/dcos-docker --onefile && \
+		pyinstaller ./bin/dcos-vagrant --onefile && \
+		pyinstaller ./bin/dcos-aws --onefile \
 	"
