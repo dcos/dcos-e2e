@@ -14,7 +14,8 @@ from admin.homebrew import get_homebrew_formula
 
 def test_brew(tmpdir: local) -> None:
     """
-    XXX
+    It is possible to create a Homebrew formula and to install this with
+    Linuxbrew.
     """
     local_repository = Repo('.')
     archive_file = Path(str(tmpdir.join('1.tar.gz')))
@@ -22,8 +23,15 @@ def test_brew(tmpdir: local) -> None:
     # We do not use ``dulwich.porcelain.archive`` because it has no option to
     # use a gzip format.
     args = [
-        'git', 'archive', '--format', 'tar.gz', '-o',
-        str(archive_file), '--prefix', '1/', 'HEAD'
+        'git',
+        'archive',
+        '--format',
+        'tar.gz',
+        '-o',
+        str(archive_file),
+        '--prefix',
+        '1/',
+        'HEAD',
     ]
     subprocess.run(args=args, check=True)
 
@@ -57,7 +65,7 @@ def test_brew(tmpdir: local) -> None:
     )
 
     mounts = [archive_mount, homebrew_file_mount]
-    command = [
+    command_list = [
         'brew',
         'install',
         container_homebrew_file_path,
@@ -72,7 +80,9 @@ def test_brew(tmpdir: local) -> None:
         '--help',
     ]
 
-    command = '/bin/bash -c "{command}"'.format(command=' '.join(command))
+    command = '/bin/bash -c "{command}"'.format(
+        command=' '.join(command_list),
+    )
 
     client.containers.run(
         image=linuxbrew_image,
@@ -80,5 +90,3 @@ def test_brew(tmpdir: local) -> None:
         command=command,
         environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
     )
-
-    # TODO use get version for the archive name
