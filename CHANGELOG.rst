@@ -7,7 +7,7 @@ Next
 ----
 
 - The ``--variant`` option is now required for the ``dcos-aws`` CLI.
-- TODO
+- Added the ability to install on Linux from a pre-built binary.
 
 2018.08.31.0
 ------------
