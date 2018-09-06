@@ -14,6 +14,6 @@ To uninstall DC/OS E2E, use one of the following methods, depending on how you i
 
 .. code:: sh
 
-   rm -rf /usr/local/bin/dcos-docker
-   rm -rf /usr/local/bin/dcos-vagrant
-   rm -rf /usr/local/bin/dcos-aws
+   rm -f /usr/local/bin/dcos-docker
+   rm -f /usr/local/bin/dcos-vagrant
+   rm -f /usr/local/bin/dcos-aws
