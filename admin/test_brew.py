@@ -32,10 +32,11 @@ def test_brew(tmpdir: local) -> None:
     linuxbrew_image = 'linuxbrew/linuxbrew'
     container_archive_path = '/archive.tar.gz'
     archive_url = 'file://' + container_archive_path
+    head_url = 'file://' + str(Path(local_repository.path).absolute())
 
     homebrew_formula_contents = get_homebrew_formula(
-        repository=local_repository,
         archive_url=archive_url,
+        head_url=head_url,
     )
 
     homebrew_filename = 'dcose2e.rb'

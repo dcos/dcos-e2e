@@ -100,7 +100,7 @@ def update_homebrew(version_str: str, repository: Repository) -> None:
     )
     homebrew_formula_contents = get_homebrew_formula(
         archive_url=archive_url,
-        repository=repository,
+        head_url=repository.clone_url,
     )
     homebrew_file = Path('dcose2e.rb')
     homebrew_file.write_text(homebrew_formula_contents)

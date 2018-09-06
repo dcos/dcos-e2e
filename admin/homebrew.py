@@ -6,10 +6,8 @@ import subprocess
 from pathlib import Path
 from textwrap import dedent
 
-from github import Repository
 
-
-def get_homebrew_formula(repository: Repository, archive_url: str) -> str:
+def get_homebrew_formula(archive_url: str, head_url: str) -> str:
     """
     Return the contents of a Homebrew formula for the DC/OS E2E CLI.
     """
@@ -43,7 +41,7 @@ def get_homebrew_formula(repository: Repository, archive_url: str) -> str:
           include Language::Python::Virtualenv
 
           url "{archive_url}"
-          head "{clone_url}"
+          head "{head_url}"
           homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
           depends_on "python3"
           depends_on "pkg-config"
@@ -66,5 +64,5 @@ def get_homebrew_formula(repository: Repository, archive_url: str) -> str:
     return pattern.format(
         resource_stanzas=resource_stanzas,
         archive_url=archive_url,
-        clone_url=repository.clone_url,
+        head_url=head_url,
     )
