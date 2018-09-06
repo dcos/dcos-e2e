@@ -10,27 +10,14 @@ from setuptools import find_packages, setup
 # Also, they require users to use ``--process-dependency-links``.
 DEPENDENCY_LINKS = []
 
+def _dependencies_from_requirements_file(file_name):
 with open('requirements.txt') as requirements:
     INSTALL_REQUIRES = []
-    # At the time of writing, with the latest versions of the DC/OS E2E direct
-    # dependencies, there is a version conflict for ``msrestazure``, an
-    # indirect dependency.
-    # Therefore, we pin a particular version which satisfies all requirements.
-    # See DCOS-40131.
-    INSTALL_REQUIRES.append('msrestazure==0.4.34')
-
-    # Without the following, some users get:
-    # The 'secretstorage' distribution was not found and is required by keyring
-    INSTALL_REQUIRES.append('secretstorage')
 
     for line in requirements.readlines():
         if line.startswith('#'):
             continue
-        if line.startswith('--find-links'):
-            _, link = line.split('--find-links ')
-            DEPENDENCY_LINKS.append(link)
-        else:
-            INSTALL_REQUIRES.append(line)
+        INSTALL_REQUIRES.append(line)
 
 with open('dev-requirements.txt') as dev_requirements:
     DEV_REQUIRES = []
