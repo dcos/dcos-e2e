@@ -45,13 +45,15 @@ def test_brew(tmpdir: local) -> None:
     container_homebrew_file_path = '/' + homebrew_filename
 
     archive_mount = Mount(
-        source=str(archive_file),
+        source=str(archive_file.absolute()),
         target=container_archive_path,
+        type='bind',
     )
 
     homebrew_file_mount = Mount(
-        source=str(homebrew_file),
+        source=str(homebrew_file.absolute()),
         target=container_homebrew_file_path,
+        type='bind',
     )
 
     mounts = [archive_mount, homebrew_file_mount]
