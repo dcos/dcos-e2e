@@ -57,24 +57,27 @@ def test_brew(tmpdir: local) -> None:
     )
 
     mounts = [archive_mount, homebrew_file_mount]
+    command = [
+        'brew',
+        'install',
+        container_homebrew_file_path,
+        '&&',
+        'dcos-docker',
+        '--help',
+        '&&fsa',
+    ]
 
     container = client.containers.run(
         image=linuxbrew_image,
-        detach=True,
         mounts=mounts,
+        command=command,
+        environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
     )
 
-    install_cmd = ['brew', 'install', container_homebrew_file_path]
-    test_cmd = ['dcos-docker', '--help']
-    cmds = [install_cmd, test_cmd]
-    try:
-        for cmd in cmds:
-            exit_code, output = container.exec_run(cmd=cmd)
-            assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
-    finally:
-        container.stop()
-        container.remove(v=True)
+    container.wait()
     import pdb; pdb.set_trace()
+    container.stop()
+    container.remove(v=True)
 
     # TODO make archive - test can you do archive from file:///
     # git archive --format=tar.gz -o /tmp/my-repo.tar.gz --prefix=my-repo/ master
