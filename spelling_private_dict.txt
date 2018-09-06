@@ -131,6 +131,7 @@ validators
 vbguest
 vendored
 vendoring
+versioned
 versioning
 virtualbox
 virtualization

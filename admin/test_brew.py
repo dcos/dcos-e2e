@@ -1,11 +1,11 @@
 """
 """
 
+import subprocess
 from pathlib import Path
 
 import docker
 from docker.types import Mount
-from dulwich.porcelain import archive
 from dulwich.repo import Repo
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
@@ -17,23 +17,19 @@ def test_brew(tmpdir: local) -> None:
     XXX
     """
     local_repository = Repo('.')
-    committish = b'HEAD'
     archive_file = Path(str(tmpdir.join('1.tar.gz')))
     archive_file.touch()
-    import subprocess
-    args = ['git', 'archive', '--format', 'tar.gz', '-o', str(archive_file), '--prefix', '1/', 'HEAD']
+    # We do not use ``dulwich.porcelain.archive`` because it has no option to
+    # use a gzip format.
+    args = [
+        'git', 'archive', '--format', 'tar.gz', '-o',
+        str(archive_file), '--prefix', '1/', 'HEAD'
+    ]
     subprocess.run(args=args, check=True)
-
-    # with archive_file.open('wb') as outstream:
-    #     archive(
-    #         repo=local_repository,
-    #         committish=committish,
-    #         outstream=outstream,
-    #     )
 
     client = docker.from_env(version='auto')
     linuxbrew_image = 'linuxbrew/linuxbrew'
-    # The path needs to look like a versioned artifact to Linuxbrew
+    # The path needs to look like a versioned artifact to Linuxbrew.
     container_archive_path = '/1.tar.gz'
     archive_url = 'file://' + container_archive_path
     head_url = 'file://' + str(Path(local_repository.path).absolute())
@@ -62,43 +58,27 @@ def test_brew(tmpdir: local) -> None:
 
     mounts = [archive_mount, homebrew_file_mount]
     command = [
-        # 'sleep',
-        # '1000000000',
-        # '&&',
         'brew',
         'install',
         container_homebrew_file_path,
         '&&',
         'dcos-docker',
         '--help',
+        '&&',
+        'dcos-aws',
+        '--help',
+        '&&',
+        'dcos-vagrant',
+        '--help',
     ]
 
     command = '/bin/bash -c "{command}"'.format(command=' '.join(command))
 
-    container = client.containers.run(
+    client.containers.run(
         image=linuxbrew_image,
         mounts=mounts,
         command=command,
         environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
     )
 
-    container.wait()
-    import pdb; pdb.set_trace()
-    container.stop()
-    container.remove(v=True)
-
-
     # TODO use get version for the archive name
-    # TODO make archive - test can you do archive from file:///
-    # git archive --format=tar.gz -o /tmp/my-repo.tar.gz --prefix=my-repo/ master
-    # If so, this probably needs to be in the container
-    # TODO admin/homebrew
-    # TODO write file
-    # TODO start container
-    # docker run -it linuxbrew/linuxbrew
-    # TODO send file to container
-    # TODO install from Linuxbrew
-    # TODO also for Vagrant and AWS
-    # dcos-docker help
-
-    # TODO move this to tests/
