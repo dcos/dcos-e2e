@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+from cli.dcos_aws import dcos_aws
+
+dcos_aws()
