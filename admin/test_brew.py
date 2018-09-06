@@ -17,8 +17,11 @@ def test_brew(tmpdir: local) -> None:
     It is possible to create a Homebrew formula and to install this with
     Linuxbrew.
     """
+    # Homebrew requires the archive name to look like a valid version.
+    version = '1'
+    archive_name = '{version}.tar.gz'.format(version=version)
     local_repository = Repo('.')
-    archive_file = Path(str(tmpdir.join('1.tar.gz')))
+    archive_file = Path(str(tmpdir.join(archive_name)))
     archive_file.touch()
     # We do not use ``dulwich.porcelain.archive`` because it has no option to
     # use a gzip format.
@@ -30,7 +33,7 @@ def test_brew(tmpdir: local) -> None:
         '-o',
         str(archive_file),
         '--prefix',
-        '1/',
+        '{version}/'.format(version=version),
         'HEAD',
     ]
     subprocess.run(args=args, check=True)
@@ -38,7 +41,7 @@ def test_brew(tmpdir: local) -> None:
     client = docker.from_env(version='auto')
     linuxbrew_image = 'linuxbrew/linuxbrew'
     # The path needs to look like a versioned artifact to Linuxbrew.
-    container_archive_path = '/1.tar.gz'
+    container_archive_path = '/' + archive_name
     archive_url = 'file://' + container_archive_path
     head_url = 'file://' + str(Path(local_repository.path).absolute())
 
