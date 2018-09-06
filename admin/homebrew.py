@@ -9,7 +9,7 @@ from textwrap import dedent
 from github import Repository
 
 
-def get_homebrew_formula(version: str, repository: Repository) -> str:
+def get_homebrew_formula(repository: Repository, archive_url: str) -> str:
     """
     Return the contents of a Homebrew formula for the DC/OS E2E CLI.
     """
@@ -37,17 +37,6 @@ def get_homebrew_formula(version: str, repository: Repository) -> str:
     result = subprocess.run(args=args, stdout=subprocess.PIPE, check=True)
     resource_stanzas = str(result.stdout.decode())
 
-    # We could use:
-    # ```
-    # repository.get_archive_link(archive_format='tarball', version=version)
-    # ```
-    #
-    # However, this is broken in PyGitHub 1.40, and will be fixed in the next
-    # release to PyPI.
-    archive_url = '{html_url}/archive/{version}.tar.gz'.format(
-        html_url=repository.html_url,
-        version=version,
-    )
     pattern = dedent(
         """\
         class Dcose2e < Formula
@@ -77,6 +66,5 @@ def get_homebrew_formula(version: str, repository: Repository) -> str:
     return pattern.format(
         resource_stanzas=resource_stanzas,
         archive_url=archive_url,
-        version=version,
         clone_url=repository.clone_url,
     )
