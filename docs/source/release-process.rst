@@ -34,6 +34,7 @@ Perform a Release
 
     .. code:: sh
 
+       export GITHUB_OWNER=dcos
        curl https://raw.githubusercontent.com/dcos/dcos-e2e/master/admin/release.sh | bash
 
 .. _Homebrew: https://brew.sh/
