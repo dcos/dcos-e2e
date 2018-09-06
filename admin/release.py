@@ -151,7 +151,7 @@ def commit_and_push(version: str, repository: Repository) -> None:
     branch_name = 'master'
     push(
         repo=local_repository,
-        remote_location=repo.ssh_url,
+        remote_location=repository.ssh_url,
         refspecs=branch_name.encode('utf-8'),
     )
 
@@ -187,6 +187,7 @@ def get_repo(github_token: str, github_owner: str) -> Repository:
     """
     Get a GitHub repository.
     """
+    github_client = Github(github_token)
     try:
         github_user_or_org = github_client.get_organization(github_owner)
     except UnknownObjectException:
