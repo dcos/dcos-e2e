@@ -39,7 +39,7 @@ def test_brew(tmpdir: local) -> None:
     )
 
     homebrew_file = Path(str(tmpdir.join('dcose2e.rb')))
-    homebrew_file.write(homebrew_formula_contents)
+    homebrew_file.write_text(homebrew_formula_contents)
 
     archive_mount = Mount(
         source=str(archive_file),
@@ -50,6 +50,8 @@ def test_brew(tmpdir: local) -> None:
         source=str(homebrew_file),
         target=container_archive_path,
     )
+
+    mounts = [archive_mount, homebrew_file_mount]
 
     container = client.containers.run(
         image=linuxbrew_image,
