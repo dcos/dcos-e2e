@@ -90,6 +90,8 @@ pull-images:
 	docker pull quay.io/shift/coreos:stable-1298.7.0
 	# This is used by the ``dcos-docker doctor`` command.
 	docker pull luca3m/sleep
+	# This is used for testing installation.
+	docker pull linuxbrew/linuxbrew
 
 .PHONY: linux-package
 linux-package:

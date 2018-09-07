@@ -55,6 +55,8 @@ ALL_ARTIFACTS = (
 PATTERNS = {
     'tests/test_cli':
     ALL_ARTIFACTS,
+    'tests/test_admin':
+    (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults':
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest':

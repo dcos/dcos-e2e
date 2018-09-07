@@ -12,6 +12,7 @@ python:
 env:
   matrix:
   - CI_PATTERN=''
+  - CI_PATTERN=tests/test_admin
   - CI_PATTERN=tests/test_cli
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest
