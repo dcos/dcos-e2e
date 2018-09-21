@@ -2,6 +2,7 @@
 Setup script for DC/OS End to End tests.
 """
 
+from pathlib import Path
 import versioneer
 from setuptools import find_packages, setup
 
@@ -10,29 +11,28 @@ from setuptools import find_packages, setup
 # Also, they require users to use ``--process-dependency-links``.
 DEPENDENCY_LINKS = []
 
-def _dependencies_from_requirements_file(file_name):
-with open('requirements.txt') as requirements:
-    INSTALL_REQUIRES = []
 
-    for line in requirements.readlines():
-        if line.startswith('#'):
-            continue
-        INSTALL_REQUIRES.append(line)
+def _dependencies_from_requirements_file(requirements_file: Path):
+    """
+    Return requirements from a requirements file.
 
-with open('dev-requirements.txt') as dev_requirements:
-    DEV_REQUIRES = []
-    for line in dev_requirements.readlines():
-        if not line.startswith('#'):
-            DEV_REQUIRES.append(line)
+    This expects a requirements file with no ``--find-links`` lines.
+    """
+    lines = requirements_file.read_text().split('\n')
+    return [line for line in lines if not line.startswith('#')]
 
-with open('packaging-requirements.txt') as package_requirements:
-    PACKAGING_REQUIRES = []
-    for line in package_requirements.readlines():
-        if not line.startswith('#'):
-            PACKAGING_REQUIRES.append(line)
 
-with open('README.rst') as f:
-    LONG_DESCRIPTION = f.read()
+INSTALL_REQUIRES = _dependencies_from_requirements_file(
+    requirements_file=Path('requirements.txt'),
+)
+DEV_REQUIRES = _dependencies_from_requirements_file(
+    requirements_file=Path('dev-requirements.txt'),
+)
+PACKAGING_REQUIRES = _dependencies_from_requirements_file(
+    requirements_file=Path('packaging-requirements.txt'),
+)
+
+LONG_DESCRIPTION = Path('README.rst').read_text()
 
 setup(
     name='DCOS E2E',
