@@ -18,13 +18,19 @@ def _dependencies_from_requirements_file(requirements_file: Path):
 
     This expects a requirements file with no ``--find-links`` lines.
     """
-    lines = requirements_file.read_text().split('\n')
+    lines = requirements_file.read_text().strip().split('\n')
     return [line for line in lines if not line.startswith('#')]
 
 
-INSTALL_REQUIRES = _dependencies_from_requirements_file(
+_DIRECT_REQUIRES = _dependencies_from_requirements_file(
     requirements_file=Path('requirements.txt'),
 )
+
+_INDIRECT_REQUIRES = _dependencies_from_requirements_file(
+    requirements_file=Path('indirect-requirements.txt'),
+)
+
+INSTALL_REQUIRES = _DIRECT_REQUIRES + _INDIRECT_REQUIRES
 DEV_REQUIRES = _dependencies_from_requirements_file(
     requirements_file=Path('dev-requirements.txt'),
 )
