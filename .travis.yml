@@ -13,7 +13,14 @@ env:
   matrix:
   - CI_PATTERN=''
   - CI_PATTERN=tests/test_admin
-  - CI_PATTERN=tests/test_cli/test_common
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_master
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_11
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_10
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_9
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_master
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_11
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_10
+  - CI_PATTERN=tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_9
   - CI_PATTERN=tests/test_cli/test_dcos_aws
   - CI_PATTERN=tests/test_cli/test_dcos_docker
   - CI_PATTERN=tests/test_cli/test_dcos_vagrant

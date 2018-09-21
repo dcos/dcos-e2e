@@ -2,8 +2,6 @@
 Tests for ``_is_enterprise``.
 """
 
-import shutil
-import uuid
 from pathlib import Path
 
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
@@ -133,4 +131,3 @@ class TestEnterprise:
             build_artifact=enterprise_1_9_artifact,
             workspace_dir=Path(str(tmpdir)),
         )
-
