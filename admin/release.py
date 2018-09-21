@@ -87,17 +87,11 @@ def update_homebrew(version_str: str, repository: Repository) -> None:
     """
     Update the Homebrew file.
     """
-    # We could use:
-    # ```
-    # repository.get_archive_link(archive_format='tarball', version=version)
-    # ```
-    #
-    # However, this is broken in PyGitHub 1.40, and will be fixed in the next
-    # release to PyPI.
-    archive_url = '{html_url}/archive/{version}.tar.gz'.format(
-        html_url=repository.html_url,
-        version=version_str,
+    archive_url = repository.get_archive_link(
+        archive_format='tarball',
+        version=version,
     )
+
     homebrew_formula_contents = get_homebrew_formula(
         archive_url=archive_url,
         head_url=repository.clone_url,
