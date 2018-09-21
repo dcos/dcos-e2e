@@ -5,14 +5,10 @@ Setup script for DC/OS End to End tests.
 from pathlib import Path
 import versioneer
 from setuptools import find_packages, setup
-
-# Avoid dependency links because they are not supported by Read The Docs.
-#
-# Also, they require users to use ``--process-dependency-links``.
-DEPENDENCY_LINKS = []
+from typing import List
 
 
-def _dependencies_from_requirements_file(requirements_file: Path):
+def _get_dependencies(requirements_file: Path) -> List[str]:
     """
     Return requirements from a requirements file.
 
@@ -22,19 +18,19 @@ def _dependencies_from_requirements_file(requirements_file: Path):
     return [line for line in lines if not line.startswith('#')]
 
 
-_DIRECT_REQUIRES = _dependencies_from_requirements_file(
+_DIRECT_REQUIRES = _get_dependencies(
     requirements_file=Path('requirements.txt'),
 )
 
-_INDIRECT_REQUIRES = _dependencies_from_requirements_file(
+_INDIRECT_REQUIRES = _get_dependencies(
     requirements_file=Path('indirect-requirements.txt'),
 )
 
 INSTALL_REQUIRES = _DIRECT_REQUIRES + _INDIRECT_REQUIRES
-DEV_REQUIRES = _dependencies_from_requirements_file(
+DEV_REQUIRES = _get_dependencies(
     requirements_file=Path('dev-requirements.txt'),
 )
-PACKAGING_REQUIRES = _dependencies_from_requirements_file(
+PACKAGING_REQUIRES = _get_dependencies(
     requirements_file=Path('packaging-requirements.txt'),
 )
 
@@ -69,7 +65,7 @@ setup(
     # Avoid dependency links because they are not supported by Read The Docs.
     #
     # Also, they require users to use ``--process-dependency-links``.
-    dependency_links=DEPENDENCY_LINKS,
+    dependency_links=[],
     entry_points="""
         [console_scripts]
         dcos-docker=cli.dcos_docker:dcos_docker

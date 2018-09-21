@@ -5,9 +5,10 @@ Tools for creating Homebrew recipes.
 import subprocess
 from pathlib import Path
 from textwrap import dedent
+from typing import List
 
 
-def _dependencies_from_requirements_file(requirements_file: Path):
+def _get_dependencies(requirements_file: Path) -> List[str]:
     """
     Return requirements from a requirements file.
 
@@ -22,10 +23,10 @@ def get_homebrew_formula(archive_url: str, head_url: str) -> str:
     Return the contents of a Homebrew formula for the DC/OS E2E CLI.
     """
     repository_root = Path(__file__).parent.parent
-    direct_requires = _dependencies_from_requirements_file(
+    direct_requires = _get_dependencies(
         requirements_file=repository_root / 'requirements.txt',
     )
-    indirect_requires = _dependencies_from_requirements_file(
+    indirect_requires = _get_dependencies(
         requirements_file=repository_root / 'indirect-requirements.txt',
     )
 
