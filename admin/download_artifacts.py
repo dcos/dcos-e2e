@@ -41,20 +41,29 @@ EE_1_9 = (EE_1_9_ARTIFACT_URL, EE_1_9_ARTIFACT_PATH)
 EE_1_10 = (EE_1_10_ARTIFACT_URL, EE_1_10_ARTIFACT_PATH)
 EE_1_11 = (EE_1_11_ARTIFACT_URL, EE_1_11_ARTIFACT_PATH)
 
-ALL_ARTIFACTS = (
-    OSS_MASTER,
-    OSS_1_9,
-    OSS_1_10,
-    OSS_1_11,
-    EE_MASTER,
-    EE_1_9,
-    EE_1_10,
-    EE_1_11,
-)
 
 PATTERNS = {
-    'tests/test_cli':
-    ALL_ARTIFACTS,
+    'tests/test_cli/test_dcos_aws': (),
+    'tests/test_cli/test_dcos_docker': (),
+    'tests/test_cli/test_dcos_vagrant': (),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_master':  # noqa: E501
+    (OSS_MASTER, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_11':  # noqa: E501
+    (OSS_1_11, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_10':  # noqa: E501
+    (OSS_1_10, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_9':  # noqa: E501
+    (OSS_1_9, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_master':  # noqa: E501
+    (EE_MASTER, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_11':  # noqa: E501
+    (EE_1_11, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_10':  # noqa: E501
+    (EE_1_10, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_9':  # noqa: E501
+    (EE_1_9, ),
+    'tests/test_admin':
+    (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults':
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest':

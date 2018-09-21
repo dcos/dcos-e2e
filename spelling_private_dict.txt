@@ -30,6 +30,7 @@ diff
 dir
 dockerfile
 drf
+dulwich
 enum
 env
 eval
@@ -37,6 +38,7 @@ fallback
 filename
 func
 genconf
+gzip
 homebrew
 hwclock
 idna
@@ -131,6 +133,7 @@ validators
 vbguest
 vendored
 vendoring
+versioned
 versioning
 virtualbox
 virtualization
