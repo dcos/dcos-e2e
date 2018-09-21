@@ -10,19 +10,25 @@ from _pytest.tmpdir import TempdirFactory
 
 from cli.common.utils import _is_enterprise
 
+def _oss_test(artifact: Path, workspace_dir: Path):
+    """
+    ``False`` is returned when given a DC/OS OSS artifact.
+    """
+    assert not _is_enterprise(
+        build_artifact=artifact,
+        workspace_dir=workspace_dir,
+    )
+
 
 class TestIsEnterprise:
     """
     Tests for ``_is_enterprise``.
     """
 
-    def test_oss(
+    def test_master(
         self,
         oss_artifact: Path,
-        oss_1_11_artifact: Path,
-        oss_1_10_artifact: Path,
-        oss_1_9_artifact: Path,
-        tmpdir_factory: TempdirFactory,
+        enterprise_artifact: Path,
     ) -> None:
         """
         ``False`` is returned when given a DC/OS OSS artifact.
