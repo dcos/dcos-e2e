@@ -16,6 +16,9 @@ from cli.common.utils import _is_enterprise
 class TestOSS:
     """
     Tests for giving OSS artifacts to ``_is_enterprise``.
+
+    We could use pytest parametrization to consolidate these tests, but then we
+    would have to store all artifacts and Travis builders run out of space.
     """
 
     def test_master(
@@ -74,6 +77,9 @@ class TestOSS:
 class TestEnterprise:
     """
     Tests for giving Enterprise artifacts to ``_is_enterprise``.
+
+    We could use pytest parametrization to consolidate these tests, but then we
+    would have to store all artifacts and Travis builders run out of space.
     """
 
     def test_master(
