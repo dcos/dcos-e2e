@@ -15,7 +15,7 @@ class TestOSS:
     """
     Tests for giving OSS artifacts to ``_is_enterprise``.
 
-    We could use pytest parametrization to consolidate these tests, but then we
+    We could use pytest parameterization to consolidate these tests, but then we
     would have to store all artifacts and Travis builders run out of space.
     """
 
@@ -76,7 +76,7 @@ class TestEnterprise:
     """
     Tests for giving Enterprise artifacts to ``_is_enterprise``.
 
-    We could use pytest parametrization to consolidate these tests, but then we
+    We could use pytest parameterization to consolidate these tests, but then we
     would have to store all artifacts and Travis builders run out of space.
     """
 
