@@ -3,7 +3,6 @@ Release the next version of DC/OS E2E.
 """
 
 import datetime
-import os
 import re
 from pathlib import Path
 
@@ -146,6 +145,7 @@ def release(github_token: str, github_owner: str) -> None:
         repository=repository,
         version=version_str,
     )
+
 
 if __name__ == '__main__':
     release()
