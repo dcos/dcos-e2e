@@ -10,4 +10,4 @@ cd dcos-e2e
 virtualenv -p python3 release
 source release/bin/activate
 pip install --editable .[dev]
-python admin/release.py
+python admin/release.py "${GITHUB_TOKEN}" "${GITHUB_OWNER}"

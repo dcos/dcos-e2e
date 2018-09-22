@@ -7,6 +7,7 @@ import os
 import re
 from pathlib import Path
 
+import click
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
 from github import Github, Repository, UnknownObjectException
@@ -128,9 +129,10 @@ def get_repo(github_token: str, github_owner: str) -> Repository:
     return github_user_or_org.get_repo('dcos-e2e')
 
 
-def main() -> None:
-    github_token = os.environ['GITHUB_TOKEN']
-    github_owner = os.environ['GITHUB_OWNER']
+@click.command('release')
+@click.argument('github_token')
+@click.argument('github_owner')
+def release(github_token: str, github_owner: str) -> None:
     repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
     update_changelog(version=version_str)
@@ -145,6 +147,5 @@ def main() -> None:
         version=version_str,
     )
 
-
 if __name__ == '__main__':
-    main()
+    release()
