@@ -89,7 +89,7 @@ def update_homebrew(version_str: str, repository: Repository) -> None:
     """
     archive_url = repository.get_archive_link(
         archive_format='tarball',
-        version=version,
+        version=version_str,
     )
 
     homebrew_formula_contents = get_homebrew_formula(
