@@ -78,8 +78,9 @@ def _validate_tags(
 
         tag_key, tag_value = parts
         if tag_key in tags:
-            message = ('Tag key "{tag_key}" specified multiple times.'
-                       ).format(tag_key=tag_key)
+            message = 'Tag key "{tag_key}" specified multiple times.'.format(
+                tag_key=tag_key,
+            )
             raise click.BadParameter(message=message)
 
         tags[tag_key] = tag_value
