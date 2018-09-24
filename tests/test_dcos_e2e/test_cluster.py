@@ -12,6 +12,7 @@ from textwrap import dedent
 from typing import Iterator, List
 
 import pytest
+import timeout_decorator
 from _pytest.logging import LogCaptureFixture
 from kazoo.client import KazooClient
 from py.path import local  # pylint: disable=no-name-in-module, import-error
@@ -70,6 +71,9 @@ class TestIntegrationTests:
         """
         Exercise ``wait_for_dcos_oss`` code.
         """
+        with pytest.raises(timeout_decorator.timeout_decorator.TimeoutError):
+            cluster.wait_for_dcos_oss(timeout=0)
+
         # We exercise the "http_checks=False" code here but we do not test
         # its functionality. It is a temporary measure while we wait for
         # more thorough dcos-checks.
