@@ -12,7 +12,8 @@ import requests
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
-from dcos_e2e.cluster import Cluster, WaitForDCOSTimeoutError
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e.node import Role
 
 
@@ -397,7 +398,7 @@ class TestWaitForDCOS:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             (master, ) = cluster.masters
-            with pytest.raises(WaitForDCOSTimeoutError):
+            with pytest.raises(DCOSTimeoutError):
                 cluster.wait_for_dcos_ee(timeout=0)
 
             cluster.wait_for_dcos_ee(

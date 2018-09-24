@@ -17,7 +17,8 @@ from kazoo.client import KazooClient
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
-from dcos_e2e.cluster import Cluster, WaitForDCOSTimeoutError
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.exceptions import DCOSTimeoutError
 
 
 class TestIntegrationTests:
@@ -70,7 +71,7 @@ class TestIntegrationTests:
         """
         Exercise ``wait_for_dcos_oss`` code.
         """
-        with pytest.raises(WaitForDCOSTimeoutError):
+        with pytest.raises(DCOSTimeoutError):
             cluster.wait_for_dcos_oss(timeout=0)
 
         # We exercise the "http_checks=False" code here but we do not test
