@@ -12,13 +12,12 @@ from textwrap import dedent
 from typing import Iterator, List
 
 import pytest
-import timeout_decorator
 from _pytest.logging import LogCaptureFixture
 from kazoo.client import KazooClient
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
-from dcos_e2e.cluster import Cluster
+from dcos_e2e.cluster import Cluster, WaitForDCOSTimeoutError
 
 
 class TestIntegrationTests:
@@ -71,7 +70,7 @@ class TestIntegrationTests:
         """
         Exercise ``wait_for_dcos_oss`` code.
         """
-        with pytest.raises(timeout_decorator.timeout_decorator.TimeoutError):
+        with pytest.raises(WaitForDCOSTimeoutError):
             cluster.wait_for_dcos_oss(timeout=0)
 
         # We exercise the "http_checks=False" code here but we do not test

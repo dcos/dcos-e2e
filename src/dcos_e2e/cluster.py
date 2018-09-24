@@ -8,6 +8,7 @@ from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
+import retrying
 import timeout_decorator
 from retry import retry
 
@@ -18,6 +19,14 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
 from .node import Node, Role, Transport
+
+
+class WaitForDCOSTimeoutError(Exception):
+    """
+    Raise this in case ``wait_for_dcos`` does not succeed within a certain time
+    boundary on either OSS or Enterprise.
+    """
+    pass
 
 
 @retry(
@@ -169,14 +178,13 @@ class Cluster(ContextDecorator):
         Raises:
             RetryError: Raised if cluster component did not become
                 healthy within time boundary set by ``dcos_test_utils``.
-            timeout_decorator.timeout_decorator.TimeoutError:
-                Raised if cluster component did not become
-                healthy within user set time boundary.
+            WaitForDCOSTimeoutError: Raised if cluster component did not become
+                healthy within timeout boundary.
         """
 
         @timeout_decorator.timeout(
             timeout,
-            timeout_exception=TimeoutError
+            timeout_exception=WaitForDCOSTimeoutError,
         )
         def wait_for_dcos_oss_until_timeout() -> None:
             """
@@ -261,7 +269,10 @@ class Cluster(ContextDecorator):
                 auth_user=DcosUser(credentials=CI_CREDENTIALS),
             )
 
-            api_session.wait_for_dcos()  # type: ignore
+            try:
+                api_session.wait_for_dcos()  # type: ignore
+            except retrying.RetryError:
+                raise WaitForDCOSTimeoutError
 
             # Only the first user can log in with SSO, before granting others
             # access.
@@ -299,11 +310,8 @@ class Cluster(ContextDecorator):
                 macOS without a VPN set up.
 
         Raises:
-            RetryError: Raised if cluster component did not become
-                healthy within time boundary set by ``dcos_test_utils``.
-            timeout_decorator.timeout_decorator.TimeoutError:
-                Raised if cluster component did not become
-                healthy within user set time boundary.
+            WaitForDCOSTimeoutError: Raised if cluster component did not become
+                healthy within timeout boundary.
         """
 
         @timeout_decorator.timeout(timeout)
@@ -363,17 +371,25 @@ class Cluster(ContextDecorator):
             )
 
             if ssl_enabled:
-                response = enterprise_session.get(
-                    # We wait for 10 minutes which is arbitrary but should
-                    # be more than enough after all systemd units are healthy.
-                    '/ca/dcos-ca.crt',
-                    retry_timeout=60 * 10,
-                    verify=False,
-                )
+                try:
+                    response = enterprise_session.get(
+                        # We wait for 10 minutes which is arbitrary but should
+                        # be more than enough after all systemd units are
+                        # healthy.
+                        '/ca/dcos-ca.crt',
+                        retry_timeout=60 * 10,
+                        verify=False,
+                    )
+                except retrying.RetryError:
+                    raise WaitForDCOSTimeoutError
+
                 response.raise_for_status()
                 enterprise_session.set_ca_cert()
 
-            enterprise_session.wait_for_dcos()
+            try:
+                enterprise_session.wait_for_dcos()  # type: ignore
+            except retrying.RetryError:
+                raise WaitForDCOSTimeoutError
 
         wait_for_dcos_ee_until_timeout()
 
