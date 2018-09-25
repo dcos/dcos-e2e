@@ -171,9 +171,14 @@ class Cluster(ContextDecorator):
                 start up is considered a failure.
 
         Raises:
+            ValueError: In case ``timeout_seconds`` is < 1.
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
-                did not become ready within timeout the boundary.
+                did not become ready within the timeout boundary.
         """
+
+        if timeout_seconds < 1:
+            message = '``timeout_seconds`` must be ``None`` or >= 1.'
+            raise ValueError(message)
 
         @timeout_decorator.timeout(
             timeout_seconds,
@@ -262,10 +267,23 @@ class Cluster(ContextDecorator):
                 auth_user=DcosUser(credentials=CI_CREDENTIALS),
             )
 
-            try:
-                api_session.wait_for_dcos()  # type: ignore
-            except retrying.RetryError:  # pragma: no cover
-                raise DCOSTimeoutError
+            # DC/OS Test Utils raises its own timeout, a
+            # ``retrying.RetryError``.
+            #
+            # At the time of writing it is not customisable when this is hit.
+            # We want to only time out when ``timeout`` seconds have passed,
+            # even if this is after DC/OS Test Utils' own timeout.
+            # Therefore we ignore the DC/OS Test Utils ``RetryError`` and try
+            # again if we hit it.
+            #
+            # We do not include the ignoring of this ``RetryError`` in our test
+            # coverage because we do not want to have a test which runs for
+            # long enough to hit that error.
+            while True:
+                try:
+                    api_session.wait_for_dcos()
+                except retrying.RetryError:  # pragma: no cover
+                     pass
 
             # Only the first user can log in with SSO, before granting others
             # access.
@@ -305,15 +323,14 @@ class Cluster(ContextDecorator):
                 start up is considered a failure.
 
         Raises:
+            ValueError: In case ``timeout_seconds`` is < 1.
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
                 did not become ready within the timeout boundary.
         """
 
-        if timeout_seconds == 0:
-            raise ValueError('Value smaller than 1 are not supported')
-
-        if timeout_seconds is None:
-            timeout_seconds = 0
+        if timeout_seconds < 1:
+            message = '``timeout_seconds`` must be ``None`` or >= 1.'
+            raise ValueError(message)
 
         @timeout_decorator.timeout(
             timeout_seconds,
