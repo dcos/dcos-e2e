@@ -71,8 +71,14 @@ class TestIntegrationTests:
         """
         Exercise ``wait_for_dcos_oss`` code.
         """
-        with pytest.raises(DCOSTimeoutError):
-            cluster.wait_for_dcos_oss(timeout_seconds=1)
+        for timeout_seconds in [1, 2]:
+            time_before_waiting = time.monotonic()
+            with pytest.raises(DCOSTimeoutError):
+                cluster.wait_for_dcos_oss(timeout_seconds=timeout_seconds)
+            time_after_waiting = time.monotonic()
+            time_difference = time_after_waiting - time_before_waiting
+            maximum_acceptable = timeout_seconds + 0.1
+            assert timeout_seconds < time_difference < maximum_acceptable
 
         # We exercise the "http_checks=False" code here but we do not test
         # its functionality. It is a temporary measure while we wait for
