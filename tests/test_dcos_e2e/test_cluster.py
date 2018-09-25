@@ -6,6 +6,7 @@ long time to run.
 """
 
 import logging
+import time
 from pathlib import Path
 from subprocess import CalledProcessError
 from textwrap import dedent

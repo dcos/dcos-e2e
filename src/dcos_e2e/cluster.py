@@ -269,7 +269,7 @@ class Cluster(ContextDecorator):
             # DC/OS Test Utils raises its own timeout, a
             # ``retrying.RetryError``.
             #
-            # At the time of writing it is not customisable when this is hit.
+            # At the time of writing it is not customizable when this is hit.
             # We want to only time out when ``timeout`` seconds have passed,
             # even if this is after DC/OS Test Utils' own timeout.
             # Therefore we ignore the DC/OS Test Utils ``RetryError`` and try
@@ -405,7 +405,7 @@ class Cluster(ContextDecorator):
             # DC/OS Test Utils raises its own timeout, a
             # ``retrying.RetryError``.
             #
-            # At the time of writing it is not customisable when this is hit.
+            # At the time of writing it is not customizable when this is hit.
             # We want to only time out when ``timeout`` seconds have passed,
             # even if this is after DC/OS Test Utils' own timeout.
             # Therefore we ignore the DC/OS Test Utils ``RetryError`` and try
