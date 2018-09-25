@@ -6,7 +6,7 @@ import json
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 import retrying
 import timeout_decorator
@@ -48,6 +48,20 @@ def _wait_for_ssh(node: Node) -> None:
         log_output_live=True,
         shell=True,
     )
+
+
+@retry(exceptions=(retrying.RetryError, ))
+def _test_utils_wait_for_dcos(
+    session: Union[DcosApiSession, EnterpriseApiSession],
+) -> None:
+    """
+    Wait for DC/OS using DC/OS Test Utils.
+
+    DC/OS Test Utils raises its own timeout, a ``retrying.RetryError``.
+    We want to ignore this error and use our own timeouts, so we wrap this in
+    our own retried function.
+    """
+    session.wait_for_dcos()
 
 
 class Cluster(ContextDecorator):
@@ -264,23 +278,7 @@ class Cluster(ContextDecorator):
                 auth_user=DcosUser(credentials=CI_CREDENTIALS),
             )
 
-            # DC/OS Test Utils raises its own timeout, a
-            # ``retrying.RetryError``.
-            #
-            # At the time of writing it is not customizable when this is hit.
-            # We want to only time out when ``timeout`` seconds have passed,
-            # even if this is after DC/OS Test Utils' own timeout.
-            # Therefore we ignore the DC/OS Test Utils ``RetryError`` and try
-            # again if we hit it.
-            #
-            # We do not include the ignoring of this ``RetryError`` in our test
-            # coverage because we do not want to have a test which runs for
-            # long enough to hit that error.
-            while True:
-                try:
-                    api_session.wait_for_dcos()  # type: ignore
-                except retrying.RetryError:  # pragma: no cover
-                    pass
+            _test_utils_wait_for_dcos(session=api_session)
 
             # Only the first user can log in with SSO, before granting others
             # access.
@@ -397,23 +395,7 @@ class Cluster(ContextDecorator):
                 # This is already done in enterprise_session.wait_for_dcos()
                 enterprise_session.set_ca_cert()
 
-            # DC/OS Test Utils raises its own timeout, a
-            # ``retrying.RetryError``.
-            #
-            # At the time of writing it is not customizable when this is hit.
-            # We want to only time out when ``timeout`` seconds have passed,
-            # even if this is after DC/OS Test Utils' own timeout.
-            # Therefore we ignore the DC/OS Test Utils ``RetryError`` and try
-            # again if we hit it.
-            #
-            # We do not include the ignoring of this ``RetryError`` in our test
-            # coverage because we do not want to have a test which runs for
-            # long enough to hit that error.
-            while True:
-                try:
-                    enterprise_session.wait_for_dcos()
-                except retrying.RetryError:  # pragma: no cover
-                    pass
+            _test_utils_wait_for_dcos(session=enterprise_session)
 
         wait_for_dcos_ee_until_timeout()
 
