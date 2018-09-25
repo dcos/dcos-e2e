@@ -399,7 +399,11 @@ class TestWaitForDCOS:
             )
             (master, ) = cluster.masters
             with pytest.raises(DCOSTimeoutError):
-                cluster.wait_for_dcos_ee(timeout=0)
+                cluster.wait_for_dcos_ee(
+                    superuser_username=superuser_username,
+                    superuser_password=superuser_password,
+                    timeout=1,
+                )
 
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,

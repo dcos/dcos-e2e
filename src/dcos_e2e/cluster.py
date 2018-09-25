@@ -15,10 +15,10 @@ from retry import retry
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
-# Ignore a spurious error - this import is used in a type hint.
-from .exceptions import DCOSTimeoutError
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
+# Ignore a spurious error - this import is used in a type hint.
+from .exceptions import DCOSTimeoutError
 from .node import Node, Role, Transport
 
 
@@ -156,7 +156,7 @@ class Cluster(ContextDecorator):
     def wait_for_dcos_oss(
         self,
         http_checks: bool = True,
-        timeout: int = 60 * 60,
+        timeout: int = 0,
     ) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
@@ -167,12 +167,14 @@ class Cluster(ContextDecorator):
                 fully ready. This is useful in cases where an HTTP connection
                 cannot be made to the cluster. For example, this is useful on
                 macOS without a VPN set up.
+            timeout: Timeout after which a DC/OS start up is considered to be
+                a failure. The value 0 leads to an infinite timeout.
 
         Raises:
             RetryError: Raised if cluster component did not become
                 healthy within time boundary set by ``dcos_test_utils``.
-            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster component did not become
-                healthy within timeout boundary.
+            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster component
+                did not become healthy within timeout boundary.
         """
 
         @timeout_decorator.timeout(
@@ -264,7 +266,7 @@ class Cluster(ContextDecorator):
 
             try:
                 api_session.wait_for_dcos()  # type: ignore
-            except retrying.RetryError:
+            except retrying.RetryError:  # pragma: no cover
                 raise DCOSTimeoutError
 
             # Only the first user can log in with SSO, before granting others
@@ -288,7 +290,7 @@ class Cluster(ContextDecorator):
         superuser_username: str,
         superuser_password: str,
         http_checks: bool = True,
-        timeout: int = 60 * 60,
+        timeout: int = 0,
     ) -> None:
         """
         Wait until the DC/OS Enterprise boot process has completed.
@@ -301,13 +303,18 @@ class Cluster(ContextDecorator):
                 fully ready. This is useful in cases where an HTTP connection
                 cannot be made to the cluster. For example, this is useful on
                 macOS without a VPN set up.
+            timeout: Timeout after which a DC/OS start up is considered to be
+                a failure. The value 0 leads to an infinite timeout.
 
         Raises:
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster component
             did not become healthy within timeout boundary.
         """
 
-        @timeout_decorator.timeout(timeout)
+        @timeout_decorator.timeout(
+            timeout,
+            timeout_exception=DCOSTimeoutError,
+        )
         def wait_for_dcos_ee_until_timeout() -> None:
             """
             Wait until DC/OS Enterprise is up or timeout hits.
@@ -373,14 +380,14 @@ class Cluster(ContextDecorator):
                         retry_timeout=60 * 10,
                         verify=False,
                     )
-                except retrying.RetryError:
+                except retrying.RetryError:  # pragma: no cover
                     raise DCOSTimeoutError
 
                 response.raise_for_status()
                 enterprise_session.set_ca_cert()
 
             try:
-                enterprise_session.wait_for_dcos()  # type: ignore
+                enterprise_session.wait_for_dcos()
             except retrying.RetryError:
                 raise DCOSTimeoutError
 
