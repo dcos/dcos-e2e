@@ -156,7 +156,6 @@ class Cluster(ContextDecorator):
     def wait_for_dcos_oss(
         self,
         http_checks: bool = True,
-        timeout_seconds: Optional[int] = None,
     ) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
@@ -167,20 +166,19 @@ class Cluster(ContextDecorator):
                 fully ready. This is useful in cases where an HTTP connection
                 cannot be made to the cluster. For example, this is useful on
                 macOS without a VPN set up.
-            timeout_seconds: Optional timeout in seconds after which a DC/OS
-                start up is considered a failure.
 
         Raises:
-            ValueError: In case ``timeout_seconds`` is < 1.
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
-                did not become ready within the timeout boundary.
+                did not become ready within one hour.
         """
-        if timeout_seconds is not None and timeout_seconds < 1:
-            message = '``timeout_seconds`` must be ``None`` or >= 1.'
-            raise ValueError(message)
 
         @timeout_decorator.timeout(
-            timeout_seconds,
+            # We choose a one hour timeout based on experience that the cluster
+            # will almost certainly not start up after this time.
+            #
+            # In the future we may want to increase this or make it
+            # customizable.
+            60 * 60,
             timeout_exception=DCOSTimeoutError,
         )
         def wait_for_dcos_oss_until_timeout() -> None:
@@ -305,7 +303,6 @@ class Cluster(ContextDecorator):
         superuser_username: str,
         superuser_password: str,
         http_checks: bool = True,
-        timeout_seconds: Optional[int] = None,
     ) -> None:
         """
         Wait until the DC/OS Enterprise boot process has completed.
@@ -318,20 +315,18 @@ class Cluster(ContextDecorator):
                 fully ready. This is useful in cases where an HTTP connection
                 cannot be made to the cluster. For example, this is useful on
                 macOS without a VPN set up.
-            timeout_seconds: Optional timeout in seconds after which a DC/OS
-                start up is considered a failure.
 
         Raises:
-            ValueError: In case ``timeout_seconds`` is < 1.
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
-                did not become ready within the timeout boundary.
+                did not become ready within one hour.
         """
-        if timeout_seconds is not None and timeout_seconds < 1:
-            message = '``timeout_seconds`` must be ``None`` or >= 1.'
-            raise ValueError(message)
 
         @timeout_decorator.timeout(
-            timeout_seconds,
+            # will almost certainly not start up after this time.
+            #
+            # In the future we may want to increase this or make it
+            # customizable.
+            60 * 60,
             timeout_exception=DCOSTimeoutError,
         )
         def wait_for_dcos_ee_until_timeout() -> None:

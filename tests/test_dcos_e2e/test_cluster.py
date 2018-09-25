@@ -6,7 +6,6 @@ long time to run.
 """
 
 import logging
-import time
 from pathlib import Path
 from subprocess import CalledProcessError
 from textwrap import dedent
@@ -19,7 +18,6 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.exceptions import DCOSTimeoutError
 
 
 class TestIntegrationTests:
@@ -72,15 +70,6 @@ class TestIntegrationTests:
         """
         Exercise ``wait_for_dcos_oss`` code.
         """
-        for timeout_seconds in [1, 2]:
-            time_before_waiting = time.monotonic()
-            with pytest.raises(DCOSTimeoutError):
-                cluster.wait_for_dcos_oss(timeout_seconds=timeout_seconds)
-            time_after_waiting = time.monotonic()
-            time_difference = time_after_waiting - time_before_waiting
-            maximum_acceptable = timeout_seconds + 0.1
-            assert timeout_seconds < time_difference < maximum_acceptable
-
         # We exercise the "http_checks=False" code here but we do not test
         # its functionality. It is a temporary measure while we wait for
         # more thorough dcos-checks.

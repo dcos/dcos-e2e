@@ -5,5 +5,5 @@ Custom exceptions.
 
 class DCOSTimeoutError(Exception):
     """
-    Raise this in case of a timeout regarding DC/OS.
+    Raised if DC/OS does not become ready within a given time boundary.
     """
