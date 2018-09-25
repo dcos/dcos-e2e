@@ -402,7 +402,7 @@ class TestWaitForDCOS:
                 cluster.wait_for_dcos_ee(
                     superuser_username=superuser_username,
                     superuser_password=superuser_password,
-                    timeout=1,
+                    timeout_seconds=1,
                 )
 
             cluster.wait_for_dcos_ee(

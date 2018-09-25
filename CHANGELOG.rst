@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Previously ``_wait_for_node_poststart`` and therefore ``wait_for_dcos_oss`` and ``wait_for_dcos_ee`` had a fixed number of retries on querying DC/OS ``node-poststart``. The fixed retry has been removed in favor of a ``timeout_seconds`` parameter for the ladder two functions.
+
 2018.09.06.0
 ------------
 

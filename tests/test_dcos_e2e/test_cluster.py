@@ -72,7 +72,7 @@ class TestIntegrationTests:
         Exercise ``wait_for_dcos_oss`` code.
         """
         with pytest.raises(DCOSTimeoutError):
-            cluster.wait_for_dcos_oss(timeout=1)
+            cluster.wait_for_dcos_oss(timeout_seconds=1)
 
         # We exercise the "http_checks=False" code here but we do not test
         # its functionality. It is a temporary measure while we wait for

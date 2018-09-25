@@ -15,9 +15,9 @@ from retry import retry
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
+# Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
-# Ignore a spurious error - this import is used in a type hint.
 from .exceptions import DCOSTimeoutError
 from .node import Node, Role, Transport
 
@@ -156,7 +156,7 @@ class Cluster(ContextDecorator):
     def wait_for_dcos_oss(
         self,
         http_checks: bool = True,
-        timeout: int = 0,
+        timeout_seconds: Optional[int] = None,
     ) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
@@ -167,8 +167,8 @@ class Cluster(ContextDecorator):
                 fully ready. This is useful in cases where an HTTP connection
                 cannot be made to the cluster. For example, this is useful on
                 macOS without a VPN set up.
-            timeout: Timeout after which a DC/OS start up is considered to be
-                a failure. The value 0 leads to an infinite timeout.
+            timeout_seconds: Optional timeout in seconds after which a DC/OS
+                start up is considered a failure.
 
         Raises:
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
@@ -176,7 +176,7 @@ class Cluster(ContextDecorator):
         """
 
         @timeout_decorator.timeout(
-            timeout,
+            timeout_seconds,
             timeout_exception=DCOSTimeoutError,
         )
         def wait_for_dcos_oss_until_timeout() -> None:
@@ -288,7 +288,7 @@ class Cluster(ContextDecorator):
         superuser_username: str,
         superuser_password: str,
         http_checks: bool = True,
-        timeout: int = 0,
+        timeout_seconds: Optional[int] = None,
     ) -> None:
         """
         Wait until the DC/OS Enterprise boot process has completed.
@@ -301,16 +301,22 @@ class Cluster(ContextDecorator):
                 fully ready. This is useful in cases where an HTTP connection
                 cannot be made to the cluster. For example, this is useful on
                 macOS without a VPN set up.
-            timeout: Timeout after which a DC/OS start up is considered to be
-                a failure. The value 0 leads to an infinite timeout.
+            timeout_seconds: Optional timeout in seconds after which a DC/OS
+                start up is considered a failure.
 
         Raises:
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
                 did not become ready within the timeout boundary.
         """
 
+        if timeout_seconds == 0:
+            raise ValueError('Value smaller than 1 are not supported')
+
+        if timeout_seconds is None:
+            timeout_seconds = 0
+
         @timeout_decorator.timeout(
-            timeout,
+            timeout_seconds,
             timeout_exception=DCOSTimeoutError,
         )
         def wait_for_dcos_ee_until_timeout() -> None:
@@ -369,17 +375,20 @@ class Cluster(ContextDecorator):
             )
 
             if ssl_enabled:
-                try:
-                    response = enterprise_session.get(
-                        # We wait for 10 minutes which is arbitrary but should
-                        # be more than enough after all systemd units are
-                        # healthy.
-                        '/ca/dcos-ca.crt',
-                        retry_timeout=60 * 10,
-                        verify=False,
-                    )
-                except retrying.RetryError:  # pragma: no cover
-                    raise DCOSTimeoutError
+                retryError = False
+                while not retryError:
+                    try:
+                        response = enterprise_session.get(
+                            # We wait for 10 minutes which is arbitrary but
+                            # should be more than enough after all systemd
+                            # units are healthy.
+                            '/ca/dcos-ca.crt',
+                            retry_timeout=60 * 10,
+                            verify=False,
+                        )
+                        retryError = False
+                    except retrying.RetryError:  # pragma: no cover
+                        retryError = True
 
                 response.raise_for_status()
                 enterprise_session.set_ca_cert()
