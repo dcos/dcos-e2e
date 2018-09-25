@@ -175,8 +175,7 @@ class Cluster(ContextDecorator):
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
                 did not become ready within the timeout boundary.
         """
-
-        if timeout_seconds < 1:
+        if timeout_seconds is not None and timeout_seconds < 1:
             message = '``timeout_seconds`` must be ``None`` or >= 1.'
             raise ValueError(message)
 
@@ -281,9 +280,9 @@ class Cluster(ContextDecorator):
             # long enough to hit that error.
             while True:
                 try:
-                    api_session.wait_for_dcos()
+                    api_session.wait_for_dcos()  # type: ignore
                 except retrying.RetryError:  # pragma: no cover
-                     pass
+                    pass
 
             # Only the first user can log in with SSO, before granting others
             # access.
@@ -327,8 +326,7 @@ class Cluster(ContextDecorator):
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
                 did not become ready within the timeout boundary.
         """
-
-        if timeout_seconds < 1:
+        if timeout_seconds is not None and timeout_seconds < 1:
             message = '``timeout_seconds`` must be ``None`` or >= 1.'
             raise ValueError(message)
 
@@ -420,7 +418,7 @@ class Cluster(ContextDecorator):
                 try:
                     enterprise_session.wait_for_dcos()
                 except retrying.RetryError:  # pragma: no cover
-                     pass
+                    pass
 
         wait_for_dcos_ee_until_timeout()
 
