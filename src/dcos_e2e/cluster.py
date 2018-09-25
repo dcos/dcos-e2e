@@ -171,10 +171,8 @@ class Cluster(ContextDecorator):
                 a failure. The value 0 leads to an infinite timeout.
 
         Raises:
-            RetryError: Raised if cluster component did not become
-                healthy within time boundary set by ``dcos_test_utils``.
-            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster component
-                did not become healthy within timeout boundary.
+            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
+                did not become ready within timeout the boundary.
         """
 
         @timeout_decorator.timeout(
@@ -307,8 +305,8 @@ class Cluster(ContextDecorator):
                 a failure. The value 0 leads to an infinite timeout.
 
         Raises:
-            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster component
-            did not become healthy within timeout boundary.
+            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
+                did not become ready within the timeout boundary.
         """
 
         @timeout_decorator.timeout(
@@ -388,7 +386,7 @@ class Cluster(ContextDecorator):
 
             try:
                 enterprise_session.wait_for_dcos()
-            except retrying.RetryError:
+            except retrying.RetryError:  # pragma: no cover
                 raise DCOSTimeoutError
 
         wait_for_dcos_ee_until_timeout()
