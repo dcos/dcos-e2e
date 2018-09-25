@@ -61,7 +61,7 @@ def _test_utils_wait_for_dcos(
     We want to ignore this error and use our own timeouts, so we wrap this in
     our own retried function.
     """
-    session.wait_for_dcos()
+    session.wait_for_dcos()  # type: ignore
 
 
 class Cluster(ContextDecorator):
