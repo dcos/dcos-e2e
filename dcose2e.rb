@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://github.com/dcos/dcos-e2e/archive/2018.09.06.0.tar.gz"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.09.25.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -28,13 +28,13 @@ class Dcose2e < Formula
   end
 
   resource "azure-common" do
-    url "https://files.pythonhosted.org/packages/bb/c1/ac3842e1016561953872d7ee15aae2d246fb989e5b236abd22ee40b2c39a/azure-common-1.1.14.zip"
-    sha256 "4f8fc8879cfded406d0032d86f5750d8c742658072aef5edb1d54a055a847645"
+    url "https://files.pythonhosted.org/packages/35/46/1cc91b5b6d3ea4ba239e202414102f196cd611f85afa77300432244b8902/azure-common-1.1.15.zip"
+    sha256 "8139e399d8c15f1dfcbc6254ccf98a835888cdaf500487b58d6af3e4bb3726a2"
   end
 
   resource "azure-mgmt-network" do
-    url "https://files.pythonhosted.org/packages/23/af/df2d8fc56d1fc043b3f50fc0a3e45903ca4254330349f01bf1893ddffa93/azure-mgmt-network-2.0.1.zip"
-    sha256 "8d75dc6eac82f0593106903d0fd616115b4472772f867535dd5d21f2e5e21cdf"
+    url "https://files.pythonhosted.org/packages/eb/4b/bae36713bb209ac647f030e19b0b81147c18290cc42405655c0e9582a52b/azure-mgmt-network-2.2.1.zip"
+    sha256 "a4327bccc435ca4f829ac18f82f17923b490958c202af7a86044ccabeaaa5401"
   end
 
   resource "azure-mgmt-nspkg" do
@@ -63,13 +63,13 @@ class Dcose2e < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/e3/36/e9532791d80c35271cc6fbc47a0fdad435f2706df09f5f9fea8b450b3aa6/boto3-1.7.81.tar.gz"
-    sha256 "5e51c8bc058b60ce4aa0e30a30336867ff3cb0d4357a324623556c8103ea361c"
+    url "https://files.pythonhosted.org/packages/65/49/212aae4e83e81a46f992243f499e520be42c0ff992472f6a649d4905f800/boto3-1.9.8.tar.gz"
+    sha256 "d8f9aa40e30ea166ca7e67fe2db15b3d2c41fd2f4a308e4c10f607980ea7ce65"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/4f/1d/a3894c56c391fd7b3bfe1118922f2de8755b8b86b48dbe2156267646cbac/botocore-1.10.81.tar.gz"
-    sha256 "c8845c8ad82e4292636ad0ed93b73c15aa15dbf750fd92a1e65d126c755062d3"
+    url "https://files.pythonhosted.org/packages/3f/94/37c4286d9ec89ee5296095c29754594c0433586ceccccf8e76627223226c/botocore-1.12.8.tar.gz"
+    sha256 "38ee0fbc13a22b904d0e573ac78b4dbc5c3eb633ace76a08959086307a664234"
   end
 
   resource "cachetools" do
@@ -173,8 +173,8 @@ class Dcose2e < Formula
   end
 
   resource "jeepney" do
-    url "https://files.pythonhosted.org/packages/18/17/7dbc70bc13dc9c8ba8c9b25fbc8b75dffb6bc7e56c3d7cecd87e6b563e5f/jeepney-0.3.1.tar.gz"
-    sha256 "a6f2aa72e61660248d4d524dfccb6405f17c693b69af5d60dd7f2bab807d907e"
+    url "https://files.pythonhosted.org/packages/16/1d/74adf3b164a8d19a60d0fcf706a751ffa2a1eaa8e5bbb1b6705c92a05263/jeepney-0.4.tar.gz"
+    sha256 "6089412a5de162c04747f0220f6b2223b8ba660acd041e52a76426ca550e3c70"
   end
 
   resource "jmespath" do
@@ -183,8 +183,8 @@ class Dcose2e < Formula
   end
 
   resource "keyring" do
-    url "https://files.pythonhosted.org/packages/a0/c9/c08bf10bd057293ff385abaef38e7e548549bbe81e95333157684e75ebc6/keyring-13.2.1.tar.gz"
-    sha256 "6364bb8c233f28538df4928576f4e051229e0451651073ab20b315488da16a58"
+    url "https://files.pythonhosted.org/packages/7c/c0/4f48b2b1ff9eec624624142e9be28a6c91b494fd1513df4ef7544da3886c/keyring-15.1.0.tar.gz"
+    sha256 "6232b972dfbd44fd9bd649242dbf17f616988b152d4268f9ca1dcc704b467381"
   end
 
   resource "more-itertools" do
@@ -203,8 +203,8 @@ class Dcose2e < Formula
   end
 
   resource "oauth2client" do
-    url "https://files.pythonhosted.org/packages/50/30/f89a4fc014a03e180840d432e73ffb96da422f2a8094ff3539f0f0c46661/oauth2client-4.1.2.tar.gz"
-    sha256 "bd3062c06f8b10c6ef7a890b22c2740e5f87d61b6e1f4b1c90d069cdfc9dadb5"
+    url "https://files.pythonhosted.org/packages/a6/7b/17244b1083e8e604bf154cf9b716aecd6388acd656dd01893d0d244c94d9/oauth2client-4.1.3.tar.gz"
+    sha256 "d486741e451287f69568a4d26d70d9acd73a2bbfa275746c535b4209891cccc6"
   end
 
   resource "oauthlib" do
@@ -213,8 +213,8 @@ class Dcose2e < Formula
   end
 
   resource "paramiko" do
-    url "https://files.pythonhosted.org/packages/29/65/83181630befb17cd1370a6abb9a87957947a43c2332216e5975353f61d64/paramiko-2.4.1.tar.gz"
-    sha256 "33e36775a6c71790ba7692a73f948b329cf9295a72b0102144b031114bd2a4f3"
+    url "https://files.pythonhosted.org/packages/a4/57/86681372e7a8d642718cadeef38ead1c24c4a1af21ae852642bf974e37c7/paramiko-2.4.2.tar.gz"
+    sha256 "a8975a7df3560c9f1e2b43dc54ebd40fd00a7017392ca5445ce7df409f900fcb"
   end
 
   resource "passlib" do
@@ -228,8 +228,8 @@ class Dcose2e < Formula
   end
 
   resource "py" do
-    url "https://files.pythonhosted.org/packages/35/77/a0a2a4126cf454e6ac772942898379e2fe78f2b7885df0461a5b8f8a8040/py-1.5.4.tar.gz"
-    sha256 "3fd59af7435864e1a243790d322d763925431213b6b8529c6ca71081ace3bbf7"
+    url "https://files.pythonhosted.org/packages/4f/38/5f427d1eedae73063ce4da680d2bae72014995f9fdeaa57809df61c968cd/py-1.6.0.tar.gz"
+    sha256 "06a30435d058473046be836d3fc4f27167fd84c45b99704f2fb5509ef61f9af1"
   end
 
   resource "pyasn1" do
@@ -243,8 +243,8 @@ class Dcose2e < Formula
   end
 
   resource "pycparser" do
-    url "https://files.pythonhosted.org/packages/8c/2d/aad7f16146f4197a11f8e91fb81df177adcc2073d36a17b1491fd09df6ed/pycparser-2.18.tar.gz"
-    sha256 "99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810f7b226"
+    url "https://files.pythonhosted.org/packages/68/9e/49196946aee219aead1290e00d1e7fdeab8567783e83e1b9ab5585e6206a/pycparser-2.19.tar.gz"
+    sha256 "a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
   end
 
   resource "PyJWT" do
@@ -258,8 +258,8 @@ class Dcose2e < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/34/73/3ad0ffb79c312022fb6d81694aff5a32d83f55ae6d2174a0437c0298cf07/pytest-3.7.2.tar.gz"
-    sha256 "3459a123ad5532852d36f6f4501dfe1acf4af1dd9541834a164666aa40395b02"
+    url "https://files.pythonhosted.org/packages/bf/4f/3cc568e63e2e68de369bfb76758db3aa168e34976fcc87fdfb2c19c645d9/pytest-3.8.0.tar.gz"
+    sha256 "a8a07f84e680482eb51e244370aaf2caa6301ef265f37c2bdefb3dd3b663f99d"
   end
 
   resource "python-dateutil" do
@@ -298,8 +298,8 @@ class Dcose2e < Formula
   end
 
   resource "rsa" do
-    url "https://files.pythonhosted.org/packages/14/89/adf8b72371e37f3ca69c6cb8ab6319d009c4a24b04a31399e5bd77d9bb57/rsa-3.4.2.tar.gz"
-    sha256 "25df4e10c263fb88b5ace923dd84bf9aa7f5019687b5e55382ffcdb8bede9db5"
+    url "https://files.pythonhosted.org/packages/cb/d0/8f99b91432a60ca4b1cd478fd0bdf28c1901c58e3a9f14f4ba3dba86b57f/rsa-4.0.tar.gz"
+    sha256 "1a836406405730121ae9823e19c6e806c62bbad73f890574fff50efa4122c487"
   end
 
   resource "s3transfer" do
@@ -317,6 +317,11 @@ class Dcose2e < Formula
     sha256 "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
   end
 
+  resource "timeout-decorator" do
+    url "https://files.pythonhosted.org/packages/a2/bc/bc7395efa9212c5507c489cd348ad50ac437dbfc94fa5d88f87e58f9fa3c/timeout-decorator-0.4.0.tar.gz"
+    sha256 "e49d214b17a096ca5162865ccb79f516840e5ba21b394f531f1f1d50e2e293ad"
+  end
+
   resource "uritemplate" do
     url "https://files.pythonhosted.org/packages/cd/db/f7b98cdc3f81513fb25d3cbe2501d621882ee81150b745cdd1363278c10a/uritemplate-3.0.0.tar.gz"
     sha256 "c02643cebe23fc8adb5e6becffe201185bf06c40bda5c0b4028a93f1527d011d"
@@ -328,8 +333,8 @@ class Dcose2e < Formula
   end
 
   resource "websocket-client" do
-    url "https://files.pythonhosted.org/packages/30/c8/82ac8ae45073034af51c6296c35346caab4fa26456c19f9cf64d2b978971/websocket_client-0.52.0.tar.gz"
-    sha256 "3c9924675eaf0b27ae22feeeab4741bb4149b94820bd3a143eeaf8b62f64d821"
+    url "https://files.pythonhosted.org/packages/fb/1f/9acd71b77e66fafb19cfb023e50cbb7ed2c3be3c72db999162bd36c518c4/websocket_client-0.53.0.tar.gz"
+    sha256 "c42b71b68f9ef151433d6dcc6a7cb98ac72d2ad1e3a74981ca22bc5d9134f166"
   end
 
 

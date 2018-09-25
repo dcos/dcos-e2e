@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.09.25.0
+------------
+
 - ``wait_for_dcos_oss`` and ``wait_for_dcos_ee`` now raise a custom ``DCOSTimeoutError`` if DC/OS has not started within one hour.
 
 2018.09.06.0
