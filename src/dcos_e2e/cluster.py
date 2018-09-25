@@ -375,28 +375,35 @@ class Cluster(ContextDecorator):
             )
 
             if ssl_enabled:
-                retryError = False
-                while not retryError:
-                    try:
-                        response = enterprise_session.get(
-                            # We wait for 10 minutes which is arbitrary but
-                            # should be more than enough after all systemd
-                            # units are healthy.
-                            '/ca/dcos-ca.crt',
-                            retry_timeout=60 * 10,
-                            verify=False,
-                        )
-                        retryError = False
-                    except retrying.RetryError:  # pragma: no cover
-                        retryError = True
-
+                response = enterprise_session.get(
+                    # Avoid hitting a RetryError in the get function.
+                    # Waiting a year is considered equivalent to an
+                    # infinite timeout.
+                    '/ca/dcos-ca.crt',
+                    retry_timeout=60 * 60 * 24 * 365,
+                    verify=False,
+                )
                 response.raise_for_status()
+                # This is already done in enterprise_session.wait_for_dcos()
                 enterprise_session.set_ca_cert()
 
-            try:
-                enterprise_session.wait_for_dcos()
-            except retrying.RetryError:  # pragma: no cover
-                raise DCOSTimeoutError
+            # DC/OS Test Utils raises its own timeout, a
+            # ``retrying.RetryError``.
+            #
+            # At the time of writing it is not customisable when this is hit.
+            # We want to only time out when ``timeout`` seconds have passed,
+            # even if this is after DC/OS Test Utils' own timeout.
+            # Therefore we ignore the DC/OS Test Utils ``RetryError`` and try
+            # again if we hit it.
+            #
+            # We do not include the ignoring of this ``RetryError`` in our test
+            # coverage because we do not want to have a test which runs for
+            # long enough to hit that error.
+            while True:
+                try:
+                    enterprise_session.wait_for_dcos()
+                except retrying.RetryError:  # pragma: no cover
+                     pass
 
         wait_for_dcos_ee_until_timeout()
 
