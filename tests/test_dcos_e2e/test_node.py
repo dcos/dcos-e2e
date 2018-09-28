@@ -5,6 +5,8 @@ See ``test_node_install.py`` for more, related tests.
 """
 
 import logging
+import os
+import tempfile
 import textwrap
 import uuid
 from ipaddress import IPv4Address
@@ -426,6 +428,36 @@ class TestPopen:
         stdout, stderr = echo_result.communicate()
         assert echo_result.returncode == 0
         assert stdout.strip().decode() == 'Hello,\nWorld!'
+        assert stderr.strip().decode() == ''
+
+    def test_streaming(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        Command output can be streamed with ``popen``.
+        """
+        echo_result = dcos_node.popen(args=['echo', 'Hello,\nWorld!'])
+        _, path = tempfile.mkstemp()
+        try:
+            with open(path, 'wb') as tmp:
+                while True:
+                    chunk = echo_result.stdout.read(1)
+                    if chunk:
+                        tmp.write(chunk)
+                    else:
+                        break
+
+            with open(path, 'rb') as tmp:
+                streamed_data = tmp.read()
+        finally:
+            os.unlink(path)
+
+        assert streamed_data == b'Hello,\nWorld!\n'
+
+        stdout, stderr = echo_result.communicate()
+        assert echo_result.returncode == 0
+        assert stdout.strip().decode() == ''
         assert stderr.strip().decode() == ''
 
     def test_pass_env(
