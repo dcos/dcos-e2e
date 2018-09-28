@@ -324,7 +324,7 @@ class Cluster(ContextDecorator):
             #
             # In the future we may want to increase this or make it
             # customizable.
-            60,
+            4 * 60,
             timeout_exception=DCOSTimeoutError,
         )
         def wait_for_dcos_ee_until_timeout() -> None:
