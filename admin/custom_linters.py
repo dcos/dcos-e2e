@@ -3,6 +3,7 @@ Custom lint tests for DC/OS E2E.
 """
 
 import subprocess
+import sys
 from pathlib import Path
 from typing import Dict  # noqa: F401
 from typing import Set
@@ -140,12 +141,17 @@ def test_pydocstyle() -> None:
         path_issue_pairs.append((path, issue))
 
     real_errors = []
+    ignored_path_substrings = ('_vendor', '_version.py', 'versioneer.py', './tests')
     for pair in path_issue_pairs:
         path, issue = pair
-        if (
-            '_vendor' not in path and '_version.py' not in path
-            and 'versioneer.py' not in path
-        ):
+        ignore = False
+        for substring in ignored_path_substrings:
+            if substring in path:
+                ignore = True
+
+        if not ignore:
+            sys.stderr.write(path + '\n')
+            sys.stderr.write(issue + '\n')
             real_errors.append(pair)
 
     assert not real_errors
