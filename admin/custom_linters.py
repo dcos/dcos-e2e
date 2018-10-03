@@ -122,3 +122,20 @@ def test_init_files() -> None:
             parent = python_file.parent
             expected_init = parent / '__init__.py'
             assert expected_init.exists()
+
+def test_pydocstyle() -> None:
+    """
+    Run ``pydocstyle`` and ignore errors.
+    We could use the "match" ``pydocstyle`` setting, but this involves regular
+    expressions and got too complex.
+    """
+    args = ['pydocstyle']
+    pydocstyle_result = subprocess.run(args=args, stdout=subprocess.PIPE)
+    lines = pydocstyle_result.stdout.decode().strip().split('\n')
+    path_issue_pairs = []
+    for item_number in range(int(len(lines) / 2)):
+        path = lines[item_number * 2] * 2
+        issue = lines[item_number * 2 + 1]
+        path_issue_pairs.append((path, issue))
+
+    import pdb; pdb.set_trace()
