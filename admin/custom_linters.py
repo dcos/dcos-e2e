@@ -141,7 +141,12 @@ def test_pydocstyle() -> None:
         path_issue_pairs.append((path, issue))
 
     real_errors = []
-    ignored_path_substrings = ('_vendor', '_version.py', 'versioneer.py', './tests')
+    ignored_path_substrings = (
+        '_vendor',
+        '_version.py',
+        'versioneer.py',
+        './tests',
+    )
     for pair in path_issue_pairs:
         path, issue = pair
         ignore = False
