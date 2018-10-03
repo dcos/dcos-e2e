@@ -142,7 +142,10 @@ def test_pydocstyle() -> None:
     real_errors = []
     for pair in path_issue_pairs:
         path, issue = pair
-        if ('_vendor' not in path and '_version.py' not in path):
+        if (
+            '_vendor' not in path and '_version.py' not in path
+            and 'versioneer.py' not in path
+        ):
             real_errors.append(pair)
-    import pdb
-    pdb.set_trace()
+
+    assert not real_errors
