@@ -200,6 +200,9 @@ class ClusterInstances:
 
     @property
     def workspace_dir(self) -> Path:
+        """
+        The workspace directory to put temporary files in.
+        """
         instance = next(iter(self.masters))
         tag_dict = _tag_dict(instance=instance)
         return Path(tag_dict[WORKSPACE_DIR_TAG_KEY])
