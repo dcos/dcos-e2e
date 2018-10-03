@@ -36,6 +36,10 @@ def validate_path_pair(
     param: Union[click.core.Option, click.core.Parameter],
     value: Any,
 ) -> List[Tuple[Path, Path]]:
+    """
+    Validate a pair of paths expected to be in the format:
+    /absolute/local/path:/remote/path.
+    """
     # We "use" variables to satisfy linting tools.
     for _ in (ctx, param):
         pass

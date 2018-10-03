@@ -16,7 +16,7 @@ from homebrew import get_homebrew_formula
 
 def get_version() -> str:
     """
-    Returns the next version of DC/OS E2E.
+    Return the next version of DC/OS E2E.
     This is today’s date in the format ``YYYY.MM.DD.MICRO``.
     ``MICRO`` refers to the number of releases created on this date,
     starting from ``0``.
@@ -132,6 +132,9 @@ def get_repo(github_token: str, github_owner: str) -> Repository:
 @click.argument('github_token')
 @click.argument('github_owner')
 def release(github_token: str, github_owner: str) -> None:
+    """
+    Perform a release.
+    """
     repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
     update_changelog(version=version_str)

@@ -230,6 +230,9 @@ class ClusterVMs:
 
     @property
     def workspace_dir(self) -> Path:
+        """
+        The workspace directory to put temporary files in.
+        """
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
@@ -241,6 +244,9 @@ class ClusterVMs:
     # that shows a warning on machines that do not have Vagrant installed.
     @property
     def vagrant_client(self) -> Any:
+        """
+        A Vagrant client attached to this cluster.
+        """
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
