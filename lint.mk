@@ -53,10 +53,6 @@ pip-extra-reqs:
 pip-missing-reqs:
 	pip-missing-reqs src/
 
-.PHONY: pydocstyle
-pydocstyle:
-	pydocstyle
-
 .PHONY: pylint
 pylint:
 	pylint *.py src/ tests/ admin/
