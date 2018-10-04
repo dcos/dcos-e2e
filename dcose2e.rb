@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.09.25.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.10.04.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -38,8 +38,8 @@ class Dcose2e < Formula
   end
 
   resource "azure-mgmt-nspkg" do
-    url "https://files.pythonhosted.org/packages/fe/66/66eb0d5ead69b7371649466fa160a166de0d1ddafc4a1d7a172858a8abc9/azure-mgmt-nspkg-2.0.0.zip"
-    sha256 "e36488d4f5d7d668ef5cc3e6e86f081448fd60c9bf4e051d06ff7cfc5a653e6f"
+    url "https://files.pythonhosted.org/packages/c4/d4/a9a140ee15abd8b0a542c0d31b7212acf173582c10323b09380c79a1178b/azure-mgmt-nspkg-3.0.2.zip"
+    sha256 "8b2287f671529505b296005e6de9150b074344c2c7d1c805b3f053d081d58c52"
   end
 
   resource "azure-mgmt-resource" do
@@ -53,8 +53,8 @@ class Dcose2e < Formula
   end
 
   resource "azure-nspkg" do
-    url "https://files.pythonhosted.org/packages/06/a2/77820fa07ec4657d6456b67edfa78856b4789ada42d1bb8e8485df19824e/azure-nspkg-2.0.0.zip"
-    sha256 "fe19ee5d8c66ee8ef62557fc7310f59cffb7230f0a94701eef79f6e3191fdc7b"
+    url "https://files.pythonhosted.org/packages/39/31/b24f494eca22e0389ac2e81b1b734453f187b69c95f039aa202f6f798b84/azure-nspkg-3.0.2.zip"
+    sha256 "e7d3cea6af63e667d87ba1ca4f8cd7cb4dfca678e4c55fc1cedb320760e39dd0"
   end
 
   resource "bcrypt" do
@@ -63,13 +63,13 @@ class Dcose2e < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/65/49/212aae4e83e81a46f992243f499e520be42c0ff992472f6a649d4905f800/boto3-1.9.8.tar.gz"
-    sha256 "d8f9aa40e30ea166ca7e67fe2db15b3d2c41fd2f4a308e4c10f607980ea7ce65"
+    url "https://files.pythonhosted.org/packages/cd/a5/282e7156769fe32b8f121b4afb79d6492ea4a9a11dca3e291929c7038bb6/boto3-1.9.14.tar.gz"
+    sha256 "1ae24968d87f5ee557814ee2980f262811bebaf747b57d08eaf8b8f12534fee7"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/3f/94/37c4286d9ec89ee5296095c29754594c0433586ceccccf8e76627223226c/botocore-1.12.8.tar.gz"
-    sha256 "38ee0fbc13a22b904d0e573ac78b4dbc5c3eb633ace76a08959086307a664234"
+    url "https://files.pythonhosted.org/packages/4b/d9/01372d69121cbec020d0682bc2cb3bd09b01b0a2f8de8593af483c81f9f1/botocore-1.12.14.tar.gz"
+    sha256 "5317aa5cd5f66761d5366c5c80aa8ccd1d798f59a107ccc62437f9d88f5ecab0"
   end
 
   resource "cachetools" do
@@ -98,8 +98,8 @@ class Dcose2e < Formula
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/95/d9/c3336b6b5711c3ab9d1d3a80f1a3e2afeb9d8c02a7166462f6cc96570897/click-6.7.tar.gz"
-    sha256 "f15516df478d5a56180fbf80e68f206010e6d160fc39fa508b65e035fd75130b"
+    url "https://files.pythonhosted.org/packages/f8/5c/f60e9d8a1e77005f664b76ff8aeaee5bc05d0a91798afd7f53fc998dbc47/Click-7.0.tar.gz"
+    sha256 "5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"
   end
 
   resource "click-spinner" do
@@ -253,13 +253,13 @@ class Dcose2e < Formula
   end
 
   resource "PyNaCl" do
-    url "https://files.pythonhosted.org/packages/08/19/cf56e60efd122fa6d2228118a9b345455b13ffe16a14be81d025b03b261f/PyNaCl-1.2.1.tar.gz"
-    sha256 "e0d38fa0a75f65f556fb912f2c6790d1fa29b7dd27a1d9cc5591b281321eaaa9"
+    url "https://files.pythonhosted.org/packages/61/ab/2ac6dea8489fa713e2b4c6c5b549cc962dd4a842b5998d9e80cf8440b7cd/PyNaCl-1.3.0.tar.gz"
+    sha256 "0c6100edd16fefd1557da078c7a31e7b7d7a52ce39fdca2bec29d4f7b6e7600c"
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/bf/4f/3cc568e63e2e68de369bfb76758db3aa168e34976fcc87fdfb2c19c645d9/pytest-3.8.0.tar.gz"
-    sha256 "a8a07f84e680482eb51e244370aaf2caa6301ef265f37c2bdefb3dd3b663f99d"
+    url "https://files.pythonhosted.org/packages/22/77/8dba15a7ec756b040e82bc216120d19dffb5f4a1e4f896822fd3a45bd0a8/pytest-3.8.1.tar.gz"
+    sha256 "95529588ff4e85114a0b0ad8e9cf0131ca47d46b28230e25366c5aba66b1d854"
   end
 
   resource "python-dateutil" do
