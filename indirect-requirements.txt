@@ -10,3 +10,8 @@ msrestazure==0.4.34
 # Without the following, some users get:
 # The 'secretstorage' distribution was not found and is required by keyring
 SecretStorage==3.1.0
+# Requirements from DC/OS Launch
+azure-common==1.1.15
+azure-mgmt-network==2.2.1
+azure-mgmt-resource==2.0.0
+azure-monitor==0.3.1
