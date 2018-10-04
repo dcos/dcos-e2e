@@ -78,13 +78,13 @@ class TestDcosDocker:
               destroy              Destroy a cluster.
               destroy-list         Destroy clusters.
               destroy-mac-network  Destroy containers created by "dcos-docker...
-              doctor               Diagnose common issues which stop DC/OS E2E...
+              doctor               Diagnose common issues which stop DC/OS E2E from...
               download-artifact    Download a DC/OS Open Source artifact.
               inspect              Show cluster details.
               list                 List all clusters.
               run                  Run an arbitrary command on a node.
-              setup-mac-network    Set up a network to connect to nodes on...
-              sync                 Sync files from a DC/OS checkout to master...
+              setup-mac-network    Set up a network to connect to nodes on macOS.
+              sync                 Sync files from a DC/OS checkout to master nodes.
               wait                 Wait for DC/OS to start.
               web                  Open the browser at the web UI.
             """,# noqa: E501,E261
@@ -436,7 +436,7 @@ class TestCreate:
         )
         assert result.exit_code == 2
         expected_error = (
-            'Error: Invalid value for "artifact": '
+            'Error: Invalid value for "ARTIFACT": '
             'Path "/not/a/path" does not exist.'
         )
         assert expected_error in result.output
@@ -464,6 +464,7 @@ class TestCreate:
         expected_message = dedent(
             """\
             Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Try "dcos-docker create --help" for help.
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
             """,# noqa: E501,E261
