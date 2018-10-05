@@ -3,6 +3,7 @@ Create binaries for the CLIs.
 """
 
 import logging
+import shutil
 from pathlib import Path
 from typing import Set
 
@@ -22,6 +23,10 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     Returns:
         A set of paths to the built binaries.
     """
+
+    shutil.rmtree(str(repo_root / 'dist'))
+    for path in repo_root.glob('dcos-*.spec'):
+        shutil.rmtree(str(path))
 
     target_dir = '/e2e'
     code_mount = Mount(
@@ -56,4 +61,4 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         line = line.decode().strip()
         LOGGER.info(line)
 
-    return set([repo_root / 'dist' / binary for binary in binaries])
+    return set(repo_root / 'dist' / binary for binary in binaries)

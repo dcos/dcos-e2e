@@ -62,7 +62,9 @@ PATTERNS = {
     (EE_1_10, ),
     'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_9':  # noqa: E501
     (EE_1_9, ),
-    'tests/test_admin':
+    'tests/test_admin/test_brew.py':
+    (),
+    'tests/test_admin/test_binaries.py':
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults':
     (),

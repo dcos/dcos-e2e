@@ -41,7 +41,7 @@ def test_linux_binaries() -> None:
     for remote_path in remote_paths:
         cmd_in_container = [
             'chmod',
-            '+x',
+            '777',
             str(remote_path),
             '&&',
             str(remote_path),
