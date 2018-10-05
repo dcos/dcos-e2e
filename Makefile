@@ -92,6 +92,7 @@ pull-images:
 	docker pull luca3m/sleep
 	# This is used for testing installation.
 	docker pull linuxbrew/linuxbrew
+    docker pull python:3.6
 
 .PHONY: linux-package
 linux-package:

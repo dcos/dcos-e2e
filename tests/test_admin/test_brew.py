@@ -103,7 +103,7 @@ def make_linux_binaries() -> Set[Path]:
     Create binaries for Linux in a Docker container.
     """
 
-    repo_root = Path(__file__).parent.parent
+    repo_root = Path(__file__).parent.parent.parent
     target_dir = '/e2e'
     code_mount = Mount(
         source=str(repo_root.absolute()),
@@ -119,7 +119,7 @@ def make_linux_binaries() -> Set[Path]:
     cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
 
     client = docker.from_env(version='auto')
-    client.containers.run(
+    container = client.containers.run(
         image='python:3.6',
         mounts=[code_mount],
         command=cmd,
