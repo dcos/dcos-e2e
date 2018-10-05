@@ -4,6 +4,7 @@ Tests for Homebrew and Linuxbrew.
 
 import subprocess
 from pathlib import Path
+from typing import Set
 
 import docker
 from docker.types import Mount
@@ -93,4 +94,49 @@ def test_brew(tmpdir: local) -> None:
         mounts=mounts,
         command=command,
         environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
+        remove=True,
     )
+
+
+def make_linux_binaries() -> Set[Path]:
+    """
+    Create binaries for Linux in a Docker container.
+    """
+
+    repo_root = Path(__file__).parent.parent
+    target_dir = '/e2e'
+    code_mount = Mount(
+        source=str(repo_root.absolute()),
+        target=target_dir,
+        type='bind',
+    )
+
+    binaries = ('dcos-docker', 'dcos-vagrant', 'dcos-aws')
+
+    cmd_in_container = ['pip3', 'install', '-e', '.[packaging]']
+    for binary in binaries:
+        cmd_in_container += ['&&', 'pyinstaller', './bin/{binary}'.format(binary=binary), '--onefile',]
+    cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
+
+    client = docker.from_env(version='auto')
+    client.containers.run(
+        image='python:3.6',
+        mounts=[code_mount],
+        command=cmd,
+        working_dir=target_dir,
+        remove=True,
+    )
+    dist_dir = repo_root / 'dist'
+    binary_paths = set([])
+    for binary in binaries:
+        binary_paths.add(dist_dir / binary)
+
+    return binary_paths
+
+
+def test_pyinstaller() -> None:
+    binary_paths = make_linux_binaries()
+    # container = new_linux_container()
+    # copy_to(container, [binary_packages])
+    # container.run(install_cmds)
+    # container.run(check_working)
