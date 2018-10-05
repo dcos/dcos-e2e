@@ -71,12 +71,12 @@ class TestDcosVagrant:
               create             Create a DC/OS cluster.
               destroy            Destroy a cluster.
               destroy-list       Destroy clusters.
-              doctor             Diagnose common issues which stop DC/OS E2E...
+              doctor             Diagnose common issues which stop DC/OS E2E from working...
               download-artifact  Download a DC/OS Open Source artifact.
               inspect            Show cluster details.
               list               List all clusters.
               run                Run an arbitrary command on a node.
-              sync               Sync files from a DC/OS checkout to master...
+              sync               Sync files from a DC/OS checkout to master nodes.
               wait               Wait for DC/OS to start.
               web                Open the browser at the web UI.
             """,# noqa: E501,E261

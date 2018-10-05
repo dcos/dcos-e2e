@@ -15,5 +15,6 @@ It includes a library which is focused on helping you to write tests which requi
    node
    enterprise
    distributions
+   exceptions
    docker-versions
    docker-storage-driver

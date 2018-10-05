@@ -82,6 +82,9 @@ class Node:
         return bool(hash(self) == hash(other))
 
     def __hash__(self) -> int:
+        """
+        Return a hash which is unique for this node.
+        """
         return hash((self.public_ip_address, self.private_ip_address))
 
     def __str__(self) -> str:

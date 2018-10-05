@@ -6,6 +6,17 @@ Changelog
 Next
 ----
 
+2018.10.04.0
+------------
+
+2018.09.25.0
+------------
+
+- ``wait_for_dcos_oss`` and ``wait_for_dcos_ee`` now raise a custom ``DCOSTimeoutError`` if DC/OS has not started within one hour.
+
+2018.09.06.0
+------------
+
 - The ``--variant`` option is now required for the ``dcos-aws`` CLI.
 - Added the ability to install on Linux from a pre-built binary.
 - Add the ability to do a release to a fork.

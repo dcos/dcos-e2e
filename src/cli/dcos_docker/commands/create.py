@@ -113,8 +113,9 @@ def _validate_port_map(
 
         host_port, container_port = parts
         if not host_port.isdigit():
-            message = ('Host port "{host_port}" is not an integer.'
-                       ).format(host_port=host_port)
+            message = 'Host port "{host_port}" is not an integer.'.format(
+                host_port=host_port,
+            )
             raise click.BadParameter(message=message)
         if not container_port.isdigit():
             message = ('Container port "{container_port}" is an integer.'

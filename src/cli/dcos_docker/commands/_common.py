@@ -215,6 +215,9 @@ class ClusterContainers:
 
     @property
     def workspace_dir(self) -> Path:
+        """
+        The workspace directory to put temporary files in.
+        """
         container = next(iter(self.masters))
         workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
         return Path(workspace_dir)

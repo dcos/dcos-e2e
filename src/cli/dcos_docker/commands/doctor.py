@@ -319,7 +319,7 @@ def _check_selinux() -> CheckLevels:
 
 def _check_docker_supports_mounts() -> CheckLevels:
     """
-    This is to avoid:
+    Check to is to avoid:
 
     docker.errors.InvalidVersion: mounts param is not supported in API versions
     < 1.30

@@ -10,7 +10,7 @@ import click
 def dcos_checkout_dir_argument(command: Callable[..., None],
                                ) -> Callable[..., None]:
     """
-    An argument decorator for choosing a DC/OS checkout directory.
+    Decorate a function to allow choosing a DC/OS checkout directory.
     """
     function = click.argument(
         'dcos_checkout_dir',
@@ -23,7 +23,7 @@ def dcos_checkout_dir_argument(command: Callable[..., None],
 
 def node_args_argument(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for choosing arguments to run on a node.
+    Decorate a function to allow choosing arguments to run on a node.
     """
     function = click.argument(
         'node_args',
@@ -36,7 +36,7 @@ def node_args_argument(command: Callable[..., None]) -> Callable[..., None]:
 
 def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
     """
-    An argument decorator for a DC/OS artifact.
+    Decorate a function to allow choosing a DC/OS artifact.
     """
     function = click.argument(
         'artifact',

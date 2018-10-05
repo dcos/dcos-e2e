@@ -1,4 +1,5 @@
 AbstractLauncher
+RetryError
 adam
 admin
 api
@@ -30,6 +31,7 @@ diff
 dir
 dockerfile
 drf
+dulwich
 enum
 env
 eval
@@ -37,6 +39,7 @@ fallback
 filename
 func
 genconf
+gzip
 homebrew
 hwclock
 idna
@@ -80,6 +83,7 @@ powershell
 pragma
 preflight
 py
+pydocstyle
 pyperclip
 pytest
 reachability
@@ -131,6 +135,7 @@ validators
 vbguest
 vendored
 vendoring
+versioned
 versioning
 virtualbox
 virtualization
