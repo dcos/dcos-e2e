@@ -2,6 +2,7 @@
 Tests for Homebrew and Linuxbrew.
 """
 
+import logging
 import subprocess
 from pathlib import Path
 from typing import Set
@@ -12,6 +13,9 @@ from dulwich.repo import Repo
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from admin.homebrew import get_homebrew_formula
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def test_brew(tmpdir: local) -> None:
@@ -125,7 +129,12 @@ def make_linux_binaries() -> Set[Path]:
         command=cmd,
         working_dir=target_dir,
         remove=True,
+        detach=True,
     )
+    for line in container.logs(stream=True):
+        line = line.decode().strip()
+        LOGGER.info(line)
+
     dist_dir = repo_root / 'dist'
     binary_paths = set([])
     for binary in binaries:
