@@ -55,8 +55,8 @@ def create_github_release(
     Create a tag and release on GitHub.
     """
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
-    release_name='Release ' + version,
-    release_message='See ' + changelog_url,
+    release_name = 'Release ' + version
+    release_message = 'See ' + changelog_url
     release = repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
@@ -66,14 +66,12 @@ def create_github_release(
         object=repository.get_commits()[0].sha,
         draft=True,
     )
-
-    import pdb; pdb.set_trace()
-
     release.update_release(
         name=release_name,
         message=release_message,
         draft=False,
     )
+
 
 def commit_and_push(version: str, repository: Repository) -> None:
     """
