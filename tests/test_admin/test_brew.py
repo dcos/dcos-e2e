@@ -145,7 +145,31 @@ def make_linux_binaries() -> Set[Path]:
 
 def test_pyinstaller() -> None:
     binary_paths = make_linux_binaries()
-    # container = new_linux_container()
-    # copy_to(container, [binary_packages])
-    # container.run(install_cmds)
-    # container.run(check_working)
+    mounts = []
+    remote_binaries_dir = Path('/binaries')
+    remote_paths = []
+    for path in binary_paths:
+        remote_path = remote_binaries_dir / path.name
+        mounts.append(
+            Mount(
+                source=str(path.absolute()),
+                target=str(remote_path),
+                type='bind',
+            )
+        )
+        remote_paths.append(remote_path)
+
+    for remote_path in remote_paths:
+        cmd_in_container = ['chmod', '+x', str(remote_path), '&&', str(remote_path), '--help']
+        cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
+        client = docker.from_env(version='auto')
+        container = client.containers.run(
+            image='python:3.6',
+            mounts=mounts,
+            command=cmd,
+            remove=True,
+            detach=True,
+        )
+        for line in container.logs(stream=True):
+            line = line.decode().strip()
+            LOGGER.info(line)
