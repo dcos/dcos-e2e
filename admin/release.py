@@ -4,8 +4,8 @@ Release the next version of DC/OS E2E.
 
 import datetime
 import re
+import subprocess
 from pathlib import Path
-from textwrap import dedent
 from typing import List
 
 import click
@@ -58,24 +58,28 @@ def create_github_release(
     Create a tag and release on GitHub.
     """
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
+    release_name = 'Release ' + version
+    release_message = 'See ' + changelog_url
     release = repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
-        release_name='Release ' + version,
-        release_message='See ' + changelog_url,
+        release_name=release_name,
+        release_message=release_message,
         type='commit',
         object=repository.get_commits()[0].sha,
         draft=True,
     )
-
     for artifact_path in artifacts:
         release.upload_asset(
             path=str(artifact_path),
             label=artifact_path.name,
             # content_type="",
         )
-
-    # TODO Change the release to be not a draft
+    release.update_release(
+        name=release_name,
+        message=release_message,
+        draft=False,
+    )
 
 
 def commit_and_push(version: str, repository: Repository) -> None:
