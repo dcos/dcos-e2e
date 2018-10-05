@@ -2,10 +2,8 @@
 Tests for Homebrew and Linuxbrew.
 """
 
-import logging
 import subprocess
 from pathlib import Path
-from typing import Set
 
 import docker
 from docker.types import Mount
@@ -13,9 +11,6 @@ from dulwich.repo import Repo
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from admin.homebrew import get_homebrew_formula
-
-
-LOGGER = logging.getLogger(__name__)
 
 
 def test_brew(tmpdir: local) -> None:
@@ -100,76 +95,3 @@ def test_brew(tmpdir: local) -> None:
         environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
         remove=True,
     )
-
-
-def make_linux_binaries() -> Set[Path]:
-    """
-    Create binaries for Linux in a Docker container.
-    """
-
-    repo_root = Path(__file__).parent.parent.parent
-    target_dir = '/e2e'
-    code_mount = Mount(
-        source=str(repo_root.absolute()),
-        target=target_dir,
-        type='bind',
-    )
-
-    binaries = ('dcos-docker', 'dcos-vagrant', 'dcos-aws')
-
-    cmd_in_container = ['pip3', 'install', '-e', '.[packaging]']
-    for binary in binaries:
-        cmd_in_container += ['&&', 'pyinstaller', './bin/{binary}'.format(binary=binary), '--onefile',]
-    cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
-
-    client = docker.from_env(version='auto')
-    container = client.containers.run(
-        image='python:3.6',
-        mounts=[code_mount],
-        command=cmd,
-        working_dir=target_dir,
-        remove=True,
-        detach=True,
-    )
-    for line in container.logs(stream=True):
-        line = line.decode().strip()
-        LOGGER.info(line)
-
-    dist_dir = repo_root / 'dist'
-    binary_paths = set([])
-    for binary in binaries:
-        binary_paths.add(dist_dir / binary)
-
-    return binary_paths
-
-
-def test_pyinstaller() -> None:
-    binary_paths = make_linux_binaries()
-    mounts = []
-    remote_binaries_dir = Path('/binaries')
-    remote_paths = []
-    for path in binary_paths:
-        remote_path = remote_binaries_dir / path.name
-        mounts.append(
-            Mount(
-                source=str(path.absolute()),
-                target=str(remote_path),
-                type='bind',
-            )
-        )
-        remote_paths.append(remote_path)
-
-    for remote_path in remote_paths:
-        cmd_in_container = ['chmod', '+x', str(remote_path), '&&', str(remote_path), '--help']
-        cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
-        client = docker.from_env(version='auto')
-        container = client.containers.run(
-            image='python:3.6',
-            mounts=mounts,
-            command=cmd,
-            remove=True,
-            detach=True,
-        )
-        for line in container.logs(stream=True):
-            line = line.decode().strip()
-            LOGGER.info(line)

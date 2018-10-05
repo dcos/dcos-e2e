@@ -136,9 +136,7 @@ def build_linux_artifacts() -> List[Path]:
     """
     TODO
     """
-    subprocess.check_call(
-        ['make', 'pyinstaller'],
-    )
+    subprocess.check_call(['make', 'pyinstaller'])
     return [Path('dist/dcos-docker')]
 
 
