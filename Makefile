@@ -92,15 +92,4 @@ pull-images:
 	docker pull luca3m/sleep
 	# This is used for testing installation.
 	docker pull linuxbrew/linuxbrew
-    docker pull python:3.6
-
-.PHONY: linux-package
-linux-package:
-	rm -rf dist/
-	rm -rf dcos-*.spec
-	docker run --rm -v $(CURDIR):/e2e --workdir /e2e python:3.6 bash -c " \
-		pip3 install -e .[packaging] && \
-		pyinstaller ./bin/dcos-docker --onefile && \
-		pyinstaller ./bin/dcos-vagrant --onefile && \
-		pyinstaller ./bin/dcos-aws --onefile \
-	"
+	docker pull python:3.6

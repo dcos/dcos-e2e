@@ -22,6 +22,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     Returns:
         A set of paths to the built binaries.
     """
+    client = docker.from_env(version='auto')
 
     target_dir = '/e2e'
     code_mount = Mount(
@@ -29,6 +30,21 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         target=target_dir,
         type='bind',
     )
+
+    dist_dir = repo_root / 'dist'
+    for path in list(repo_root.glob('dcos-*.spec')) + [dist_dir]:
+        container_path = Path(target_dir) / str(path.relative_to(repo_root))
+        container = client.containers.run(
+            image='python:3.6',
+            mounts=[code_mount],
+            command=['rm', '-rf', str(container_path)],
+            working_dir=target_dir,
+            remove=True,
+            detach=True,
+        )
+        for line in container.logs(stream=True):
+            line = line.decode().strip()
+            LOGGER.info(line)
 
     bin_dir = repo_root / 'bin'
     binaries = list(bin_dir.iterdir())
@@ -38,12 +54,11 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         cmd_in_container += [
             '&&',
             'pyinstaller',
-            './bin/{binary}'.format(binary=binary),
+            './bin/{binary}'.format(binary=binary.name),
             '--onefile',
         ]
     cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
 
-    client = docker.from_env(version='auto')
     container = client.containers.run(
         image='python:3.6',
         mounts=[code_mount],
@@ -56,4 +71,4 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         line = line.decode().strip()
         LOGGER.info(line)
 
-    return set([repo_root / 'dist' / binary for binary in binaries])
+    return set(repo_root / 'dist' / binary.name for binary in binaries)

@@ -60,7 +60,7 @@ def create_github_release(
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
     release_name = 'Release ' + version
     release_message = 'See ' + changelog_url
-    release = repository.create_git_tag_and_release(
+    github_release = repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
         release_name=release_name,
@@ -70,12 +70,12 @@ def create_github_release(
         draft=True,
     )
     for artifact_path in artifacts:
-        release.upload_asset(
+        github_release.upload_asset(
             path=str(artifact_path),
             label=artifact_path.name,
             # content_type="",
         )
-    release.update_release(
+    github_release.update_release(
         name=release_name,
         message=release_message,
         draft=False,

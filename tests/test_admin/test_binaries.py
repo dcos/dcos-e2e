@@ -38,6 +38,8 @@ def test_linux_binaries() -> None:
         )
         remote_paths.append(remote_path)
 
+    client = docker.from_env(version='auto')
+
     for remote_path in remote_paths:
         cmd_in_container = [
             'chmod',
@@ -48,14 +50,9 @@ def test_linux_binaries() -> None:
             '--help',
         ]
         cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
-        client = docker.from_env(version='auto')
-        container = client.containers.run(
+        client.containers.run(
             image='python:3.6',
             mounts=mounts,
             command=cmd,
             remove=True,
-            detach=True,
         )
-        for line in container.logs(stream=True):
-            line = line.decode().strip()
-            LOGGER.info(line)
