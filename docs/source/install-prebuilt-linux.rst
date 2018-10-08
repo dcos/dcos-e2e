@@ -3,23 +3,14 @@ CLI on Linux with Pre-built Packages
 
 One way to install the CLI on Linux is with a pre-built package.
 
-* Initial install
-  - Stable?
+.. version-prompt:: bash
 
-
-To install or upgrade to the latest stable version:
-# TODO if we need to it will be possible to make the version dynamic with Sphinx
-e.g. using |release|
-
-TODO: Be careful if the URLs are version specific
-
-.. prompt:: bash
-
-   curl -O /usr/local/bin/dcos-docker <URL> && \
+   # Install dcos-docker
+   curl -L -O /usr/local/bin/dcos-docker https://github.com/dcos/dcos-e2e/releases/download/|release|/dcos-docker && \
    chmod +x /usr/local/bin/dcos-docker
-
-   curl -O /usr/local/bin/dcos-vagrant <URL> && \
+   # Install dcos-vagrant
+   curl -L -O /usr/local/bin/dcos-vagrant https://github.com/dcos/dcos-e2e/releases/download/|release|/dcos-vagrant && \
    chmod +x /usr/local/bin/dcos-vagrant
-
-   curl -O /usr/local/bin/dcos-aws <URL> && \
+   # Install dcos-aws
+   curl -L -O /usr/local/bin/dcos-aws https://github.com/dcos/dcos-e2e/releases/download/|release|/dcos-aws && \
    chmod +x /usr/local/bin/dcos-aws
