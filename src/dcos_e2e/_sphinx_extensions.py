@@ -2,8 +2,9 @@
 Custom Sphinx extensions.
 """
 
-from sphinx.application import Sphinx
 from typing import List
+
+from sphinx.application import Sphinx
 
 import dcos_e2e
 
