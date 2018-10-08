@@ -93,4 +93,5 @@ def test_brew(tmpdir: local) -> None:
         mounts=mounts,
         command=command,
         environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
+        remove=True,
     )
