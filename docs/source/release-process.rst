@@ -26,13 +26,13 @@ Perform a Release
 
 #. Set environment variables to GitHub credentials, e.g.:
 
-    .. code:: sh
+    .. prompt:: bash
 
        export GITHUB_TOKEN=75c72ad718d9c346c13d30ce762f121647b502414
 
 #. Perform a release:
 
-    .. code:: sh
+    .. prompt:: bash
 
        export GITHUB_OWNER=dcos
        curl https://raw.githubusercontent.com/"$GITHUB_OWNER"/dcos-e2e/master/admin/release.sh | bash
