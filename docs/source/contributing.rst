@@ -13,45 +13,45 @@ Install Contribution Dependencies
 
 On Ubuntu, install system requirements:
 
-.. code:: sh
+.. prompt:: bash
 
    apt install -y gcc python3-dev
 
 Install dependencies in a virtual environment.
 
-.. code:: sh
+.. prompt:: bash
 
     pip3 install --editable .[dev]
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
-.. code:: sh
+.. prompt:: bash
 
     gem install travis --no-rdoc --no-ri
 
 Spell checking requires ``enchant``.
 This can be installed on macOS, for example, with `Homebrew`_:
 
-.. code:: sh
+.. prompt:: bash
 
     brew install enchant
 
 and on Ubuntu with ``apt``:
 
-.. code:: sh
+.. prompt:: bash
 
     apt install -y enchant
 
 Linting Bash requires `shellcheck`_:
 This can be installed on macOS, for example, with `Homebrew`_:
 
-.. code:: sh
+.. prompt:: bash
 
     brew install shellcheck
 
 and on Ubuntu with ``apt``:
 
-.. code:: sh
+.. prompt:: bash
 
     apt-get install -y shellcheck
 
@@ -62,19 +62,19 @@ Linting
 
 Run lint tools:
 
-.. code:: sh
+.. prompt:: bash
 
     make lint
 
 These can be run in parallel with:
 
-.. code:: sh
+.. prompt:: bash
 
    make lint --jobs --output-sync=target
 
 To fix some lint errors, run the following:
 
-.. code:: sh
+.. prompt:: bash
 
     make fix-lint
 
@@ -87,13 +87,13 @@ See the :doc:`AWS backend documentation <aws-backend>` for details of what is ne
 
 Download dependencies which are used by the tests:
 
-.. code:: sh
+.. prompt:: bash
 
     make download-artifacts
 
 or, to additionally download a DC/OS Enterprise artifact, run the following:
 
-.. code:: sh
+.. prompt:: bash
 
     make EE_ARTIFACT_URL=<http://...> download-artifacts
 
@@ -101,20 +101,20 @@ The DC/OS Enterprise artifact is required for some tests.
 
 A license key is required for some tests:
 
-.. code:: sh
+.. prompt:: bash
 
     cp /path/to/license-key.txt /tmp/license-key.txt
 
 Run ``pytest``:
 
-.. code:: sh
+.. prompt:: bash
 
     pytest
 
 To run the tests concurrently, use `pytest-xdist <https://github.com/pytest-dev/pytest-xdist>`__.
 For example:
 
-.. code:: sh
+.. prompt:: bash
 
     pytest -n 2
 
@@ -123,7 +123,7 @@ Documentation
 
 Run the following commands to build and open the documentation:
 
-.. code:: sh
+.. prompt:: bash
 
     make docs
     make open-docs
@@ -158,7 +158,7 @@ We do not use `encrypted secret files <https://docs.travis-ci.com/user/encryptin
 
 We do not add an encrypted environment variable to ``.travis.yml`` because the license is too large.
 
-.. code:: sh
+.. prompt:: bash
 
     travis env set --repo mesosphere/dcos-e2e LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
 
@@ -174,7 +174,7 @@ To update these links use the following commands, after setting the following en
 * ``EE_1_10_ARTIFACT_URL``
 * ``EE_1_11_ARTIFACT_URL``
 
-.. code:: sh
+.. prompt:: bash
 
     travis env set --repo mesosphere/dcos-e2e EE_MASTER_ARTIFACT_URL $EE_MASTER_ARTIFACT_URL
     travis env set --repo mesosphere/dcos-e2e EE_1_9_ARTIFACT_URL $EE_1_9_ARTIFACT_URL
@@ -191,7 +191,7 @@ To update the credentials use the following commands, after setting the followin
 * ``AWS_ACCESS_KEY_ID``
 * ``AWS_SECRET_ACCESS_KEY``
 
-.. code:: sh
+.. prompt:: bash
 
     travis env set --repo mesosphere/dcos-e2e AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
     travis env set --repo mesosphere/dcos-e2e AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
@@ -257,7 +257,7 @@ Update the SHAs in ``admin/update_vendored_packages.py``.
 
 The following creates a commit with changes to the vendored packages:
 
-.. code:: sh
+.. prompt:: bash
 
    admin/update_vendored_packages.sh
 
@@ -266,7 +266,7 @@ Testing the Homebrew Recipe
 
 Install `Homebrew`_ or `Linuxbrew`_.
 
-.. code:: sh
+.. prompt:: bash
 
    brew install dcose2e.rb
    brew audit dcosdocker

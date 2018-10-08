@@ -14,14 +14,16 @@ import dcos_e2e
 sys.path.insert(0, os.path.abspath('.'))
 
 extensions = [
+    'dcos_e2e._vendor.sphinx_click.ext',
+    'dcos_e2e._sphinx_extensions',
+    'sphinx-prompt',
     'sphinx.ext.autodoc',
-    'sphinx_paramlinks',
     'sphinx.ext.extlinks',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
-    'sphinx.ext.intersphinx',
+    'sphinx_paramlinks',
     'sphinxcontrib.spelling',
-    'dcos_e2e._vendor.sphinx_click.ext',
 ]
 
 templates_path = ['_templates']
