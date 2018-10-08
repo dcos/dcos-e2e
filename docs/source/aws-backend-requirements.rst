@@ -41,7 +41,7 @@ If your operating system is not supported, it may be possible to use Vagrant, or
 ``dcos-aws doctor``
 ~~~~~~~~~~~~~~~~~~~
 
-DC/OS E2E comes with the :ref:`dcos-aws-doctor` command.
+|project| comes with the :ref:`dcos-aws-doctor` command.
 Run this command to check your system for common causes of problems.
 
 .. _maws: https://github.com/mesosphere/maws
