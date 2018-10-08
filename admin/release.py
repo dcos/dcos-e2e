@@ -13,6 +13,7 @@ from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
 from github import Github, Repository, UnknownObjectException
 
+from binaries import make_linux_binaries
 from homebrew import get_homebrew_formula
 
 
@@ -132,14 +133,6 @@ def update_vagrantfile(version: str) -> None:
     vagrantfile.write_text(updated)
 
 
-def build_linux_artifacts() -> List[Path]:
-    """
-    TODO
-    """
-    subprocess.check_call(['make', 'pyinstaller'])
-    return [Path('dist/dcos-docker')]
-
-
 def get_repo(github_token: str, github_owner: str) -> Repository:
     """
     Get a GitHub repository.
@@ -168,7 +161,7 @@ def release(github_token: str, github_owner: str) -> None:
         repository=repository,
     )
     update_vagrantfile(version=version_str)
-    linux_artifacts = build_linux_artifacts()
+    linux_artifacts = make_linux_binaries()
     commit_and_push(version=version_str, repository=repository)
     create_github_release(
         repository=repository,
