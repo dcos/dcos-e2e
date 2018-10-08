@@ -8,6 +8,7 @@ from textwrap import dedent
 
 import dcos_e2e
 
+
 def test_version_prompt(tmpdir):
     """
     The ``version-prompt`` directive replaces the placemarker
@@ -18,11 +19,14 @@ def test_version_prompt(tmpdir):
     release = version.split('+')[0]
     source_directory = tmpdir.mkdir('source')
     source_file = source_directory.join('contents.rst')
-    source_file.write(dedent('''
+    source_file_content= dedent(
+        """\
         .. version-prompt:: bash $
 
            $ PRE-|release|-POST
-        '''))
+        """,
+    )
+    source_file.write(source_file_content)
     destination_directory = tmpdir.mkdir('destination')
     args = [
         'sphinx-build',
@@ -39,7 +43,7 @@ def test_version_prompt(tmpdir):
         # Source file to process.
         str(source_file),
     ]
-    sphinx_build = subprocess.check_output(args=args)
+    subprocess.check_output(args=args)
     expected = 'PRE-{release}-POST'.format(release=release)
     content_html = Path(str(destination_directory)) / 'contents.html'
     assert expected in content_html.read_text()

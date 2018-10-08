@@ -31,8 +31,9 @@ class VersionPrompt(sphinx_prompt.PromptDirective):
         placeholder = '|release|'
         version = dcos_e2e.__version__
         release = version.split('+')[0]
-        self.content = [item.replace(placeholder, release) for
-                        item in self.content]
+        self.content = [
+            item.replace(placeholder, release) for item in self.content
+        ]
         return sphinx_prompt.PromptDirective.run(self)
 
 
