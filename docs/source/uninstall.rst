@@ -3,9 +3,13 @@ Uninstall
 
 To uninstall DC/OS E2E, use one of the following methods, depending on how you installed DC/OS E2E.
 
+For ``pip`` installations:
+
 .. code:: sh
 
    pip3 uninstall -y dcos-e2e
+
+For Homebrew or Linuxbrew installations:
 
 .. code:: sh
 
