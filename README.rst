@@ -33,13 +33,13 @@ Or, if you prefer, see "Library and CLI with Python" below for an alternative.
 
 Then install the latest stable version:
 
-.. code:: sh
+.. prompt:: bash
 
     brew install https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
 
 To upgrade from an older version, run the following command:
 
-.. code:: sh
+.. prompt:: bash
 
     brew upgrade https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
 
@@ -59,19 +59,19 @@ To avoid interfering with your system's Python, we recommend using a `virtualenv
 
 Check the Python version:
 
-.. code:: sh
+.. prompt:: bash
 
    python3 --version
 
 On Fedora, install Python development requirements:
 
-.. code:: sh
+.. prompt:: bash
 
    sudo dnf install -y git python3-devel
 
 On Ubuntu, install Python development requirements:
 
-.. code:: sh
+.. prompt:: bash
 
    apt install -y gcc python3-dev
 
@@ -80,7 +80,7 @@ See `available versions <https://github.com/dcos/dcos-e2e/tags>`_.
 
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
-.. code:: sh
+.. prompt:: bash
 
     pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@master
 
