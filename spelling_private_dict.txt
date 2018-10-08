@@ -81,6 +81,7 @@ postflight
 poststart
 powershell
 pragma
+pre
 preflight
 py
 pydocstyle
