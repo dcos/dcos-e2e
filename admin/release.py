@@ -57,7 +57,7 @@ def create_github_release(
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
     release_name = 'Release ' + version
     release_message = 'See ' + changelog_url
-    release = repository.create_git_tag_and_release(
+    github_release = repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
         release_name=release_name,
@@ -66,7 +66,7 @@ def create_github_release(
         object=repository.get_commits()[0].sha,
         draft=True,
     )
-    release.update_release(
+    github_release.update_release(
         name=release_name,
         message=release_message,
         draft=False,
