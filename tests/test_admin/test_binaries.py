@@ -21,6 +21,7 @@ def test_linux_binaries() -> None:
     binary_paths = make_linux_binaries(
         repo_root=Path(__file__).parent.parent.parent,
     )
+    import pdb; pdb.set_trace()
     binary_path_names = set(path.name for path in binary_paths)
     assert binary_path_names == {'dcos-docker', 'dcos-aws', 'dcos-vagrant'}
 
@@ -38,24 +39,21 @@ def test_linux_binaries() -> None:
         )
         remote_paths.append(remote_path)
 
+    client = docker.from_env(version='auto')
+
     for remote_path in remote_paths:
         cmd_in_container = [
             'chmod',
-            '777',
+            '+x',
             str(remote_path),
             '&&',
             str(remote_path),
             '--help',
         ]
         cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
-        client = docker.from_env(version='auto')
-        container = client.containers.run(
+        client.containers.run(
             image='python:3.6',
             mounts=mounts,
             command=cmd,
             remove=True,
-            detach=True,
         )
-        for line in container.logs(stream=True):
-            line = line.decode().strip()
-            LOGGER.info(line)
