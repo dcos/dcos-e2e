@@ -24,16 +24,22 @@ def test_version_prompt(tmpdir):
            $ PRE-|release|-POST
         '''))
     destination_directory = tmpdir.mkdir('destination')
-    sphinx_build = subprocess.check_output([
-        'sphinx-build', '-b', 'html',
-        '-C',   # don't look for config file, use -D flags instead
-        '-D', 'extensions=dcos_e2e._sphinx_extensions',
-        # directory containing source/config files
+    args = [
+        'sphinx-build',
+        '-b',
+        'html',
+        # Do not look for config file, use -D flags instead.
+        '-C',
+        '-D',
+        'extensions=dcos_e2e._sphinx_extensions',
+        # Directory containing source and config files.
         str(source_directory),
-        # directory containing build files
+        # Directory containing build files.
         str(destination_directory),
+        # Source file to process.
         str(source_file),
-    ])  # source file to process
+    ]
+    sphinx_build = subprocess.check_output(args=args)
     expected = 'PRE-{release}-POST'.format(release=release)
     content_html = Path(str(destination_directory)) / 'contents.html'
     assert expected in content_html.read_text()
