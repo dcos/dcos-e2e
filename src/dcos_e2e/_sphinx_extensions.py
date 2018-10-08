@@ -23,6 +23,7 @@ class VersionPrompt(sphinx_prompt.PromptDirective):
        $ dcos-docker --version
        dcos-docker, version |release|
     """
+
     def run(self):
         """
         Replace the release placeholder with the release version.
