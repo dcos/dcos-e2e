@@ -16,7 +16,7 @@ For Homebrew or Linuxbrew installations:
    # --force uninstalls all versions of DC/OS E2E which have been installed.
    brew uninstall dcose2e --force
 
-For installations from prebuilt packages:
+For installations from pre-built packages:
 
 .. code:: sh
 

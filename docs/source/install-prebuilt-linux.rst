@@ -1,7 +1,7 @@
-CLI on Linux with Prebuilt Packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CLI on Linux with Pre-built Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-One way to install the CLI on Linux is with a prebuilt package.
+One way to install the CLI on Linux is with a pre-built package.
 
 * Initial install
   - Stable?
