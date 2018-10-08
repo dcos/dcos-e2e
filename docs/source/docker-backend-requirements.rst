@@ -57,13 +57,13 @@ The only supported way to use the Docker backend on Windows is using Vagrant and
     vagrant plugin install vagrant-cachier
     vagrant plugin install vagrant-vbguest
 
-- Start Powershell and download the DC/OS E2E ``Vagrantfile`` to a directory containing a DC/OS installer file:
+- Start Powershell and download the |project| ``Vagrantfile`` to a directory containing a DC/OS installer file:
 
 .. code:: ps1
 
     ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/dcos/dcos-e2e/master/vagrant/Vagrantfile')) | Set-Content -LiteralPath Vagrantfile
 
-- By default, the :file:`Vagrantfile` installs DC/OS E2E from the most recent release at the time it is downloaded.
+- By default, the :file:`Vagrantfile` installs |project| from the most recent release at the time it is downloaded.
   To use a different release, or any Git reference, set the environment variable ``DCOS_E2E_REF``:
 
 .. code:: ps1
@@ -101,7 +101,7 @@ You can manually remove the route in PowerShell Run as Administrator using:
 ``dcos-docker doctor``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-DC/OS E2E comes with the :ref:`dcos-docker-doctor` command.
+|project| comes with the :ref:`dcos-docker-doctor` command.
 Run this command to check your system for common causes of problems.
 
 .. _VirtualBox: https://www.virtualbox.org/wiki/Downloads
