@@ -25,6 +25,7 @@ env:
   - CI_PATTERN=tests/test_cli/test_dcos_aws
   - CI_PATTERN=tests/test_cli/test_dcos_docker
   - CI_PATTERN=tests/test_cli/test_dcos_vagrant
+  - CI_PATTERN=tests/test_dcos_e2e/test_version_extensions.py
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported
