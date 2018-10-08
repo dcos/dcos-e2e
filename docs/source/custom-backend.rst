@@ -1,7 +1,7 @@
 Custom Backends
 ===============
 
-DC/OS E2E supports pluggable backends.
+|project| supports pluggable backends.
 You may wish to create a new backend to support a new cloud provider for example.
 
 How to Create a Custom Backend

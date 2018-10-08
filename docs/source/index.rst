@@ -1,7 +1,7 @@
-DC/OS E2E
+|project|
 =========
 
-DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environments.
+|project| is a tool for spinning up and managing DC/OS clusters in test environments.
 
 .. include:: installation.rst
 
@@ -10,7 +10,7 @@ DC/OS E2E is a tool for spinning up and managing DC/OS clusters in test environm
 CLI
 ---
 
-DC/OS E2E also provides multiple command line interface tools.
+|project| also provides multiple command line interface tools.
 These allow you to create, manage and destroy DC/OS clusters on various backends.
 See :doc:`cli` for details.
 

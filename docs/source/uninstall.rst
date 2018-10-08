@@ -1,7 +1,7 @@
 Uninstall
 ~~~~~~~~~
 
-To uninstall DC/OS E2E, use one of the following methods, depending on how you installed DC/OS E2E.
+To uninstall |project|, use one of the following methods, depending on how you installed |project|.
 
 For ``pip`` installations:
 

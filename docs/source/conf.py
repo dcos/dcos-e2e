@@ -108,3 +108,7 @@ autodoc_member_order = 'bysource'
 extlinks = {
     'issue': ('https://jira.mesosphere.com/browse/%s', 'issue '),
 }
+
+rst_epilog = """
+.. |project| replace:: DC/OS E2E
+"""
