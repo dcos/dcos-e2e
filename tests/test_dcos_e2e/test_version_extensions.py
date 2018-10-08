@@ -15,7 +15,7 @@ import dcos_e2e
 
 def test_version_prompt(tmpdir: local) -> None:
     """
-    The ``version-prompt`` directive replaces the placemarker
+    The ``version-prompt`` directive replaces the placeholder
     ``|release|`` in a source file with the current installable version in
     the output file.
     """

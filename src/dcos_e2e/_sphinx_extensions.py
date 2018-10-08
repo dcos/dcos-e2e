@@ -8,12 +8,12 @@ from sphinx.application import Sphinx
 
 import dcos_e2e
 
-# Due to the dash in the name, the sphinx-prompt module is unloadable
-# using a normal import.
-sphinx_prompt = __import__('sphinx-prompt')
+# Due to the dash in the name, we cannot import sphinx-prompt using a normal
+# import.
+_SPHINX_PROMPT = __import__('sphinx-prompt')
 
 
-class VersionPrompt(sphinx_prompt.PromptDirective):  # type: ignore
+class VersionPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
     """
     Similar to PromptDirective but replaces a placeholder with the
     latest release.
@@ -33,10 +33,10 @@ class VersionPrompt(sphinx_prompt.PromptDirective):  # type: ignore
         placeholder = '|release|'
         version = dcos_e2e.__version__
         release = version.split('+')[0]
-        self.content: List[str] = [
+        self.content: List[str] = [  # noqa: E501 pylint: disable=attribute-defined-outside-init
             item.replace(placeholder, release) for item in self.content
         ]
-        return list(sphinx_prompt.PromptDirective.run(self))
+        return list(_SPHINX_PROMPT.PromptDirective.run(self))
 
 
 def setup(app: Sphinx) -> None:
