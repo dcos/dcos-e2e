@@ -19,7 +19,7 @@ def test_version_prompt(tmpdir):
     release = version.split('+')[0]
     source_directory = tmpdir.mkdir('source')
     source_file = source_directory.join('contents.rst')
-    source_file_content= dedent(
+    source_file_content = dedent(
         """\
         .. version-prompt:: bash $
 
