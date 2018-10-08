@@ -24,12 +24,8 @@ On Ubuntu, install Python development requirements:
 
    apt install -y gcc python3-dev
 
-Optionally replace ``master`` with a particular version of DC/OS E2E.
-The latest release is |release|.
-See `available versions <https://github.com/dcos/dcos-e2e/tags>`_.
-
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
-.. prompt:: bash
+.. version-prompt:: bash
 
-    pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@master
+    pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@|release|
