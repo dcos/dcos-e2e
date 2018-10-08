@@ -3,7 +3,6 @@ Create binaries for the CLIs.
 """
 
 import logging
-import shutil
 from pathlib import Path
 from typing import Set
 
@@ -32,21 +31,20 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         type='bind',
     )
 
-#     dist_dir = repo_root / 'dist'
-#     for path in list(repo_root.glob('dcos-*.spec')) + [dist_dir]:
-#         import pdb; pdb.set_trace()
-#         container_path = Path(target_dir) / str(path.relative_to(repo_root))
-#         container = client.containers.run(
-#             image='python:3.6',
-#             mounts=[code_mount],
-#             command=['rm', '-rf', str(container_path)],
-#             working_dir=target_dir,
-#             remove=True,
-#             detach=True,
-#         )
-#         for line in container.logs(stream=True):
-#             line = line.decode().strip()
-#             LOGGER.info(line)
+    dist_dir = repo_root / 'dist'
+    for path in list(repo_root.glob('dcos-*.spec')) + [dist_dir]:
+        container_path = Path(target_dir) / str(path.relative_to(repo_root))
+        container = client.containers.run(
+            image='python:3.6',
+            mounts=[code_mount],
+            command=['rm', '-rf', str(container_path)],
+            working_dir=target_dir,
+            remove=True,
+            detach=True,
+        )
+        for line in container.logs(stream=True):
+            line = line.decode().strip()
+            LOGGER.info(line)
 
     bin_dir = repo_root / 'bin'
     binaries = list(bin_dir.iterdir())

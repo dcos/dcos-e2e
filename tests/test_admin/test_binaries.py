@@ -21,7 +21,6 @@ def test_linux_binaries() -> None:
     binary_paths = make_linux_binaries(
         repo_root=Path(__file__).parent.parent.parent,
     )
-    import pdb; pdb.set_trace()
     binary_path_names = set(path.name for path in binary_paths)
     assert binary_path_names == {'dcos-docker', 'dcos-aws', 'dcos-vagrant'}
 
