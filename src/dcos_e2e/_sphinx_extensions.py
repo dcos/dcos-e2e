@@ -24,6 +24,9 @@ class VersionPrompt(sphinx_prompt.PromptDirective):
        dcos-docker, version |release|
     """
     def run(self):
+        """
+        Replace the release placeholder with the release version.
+        """
         placeholder = '|release|'
         version = dcos_e2e.__version__
         release = version.split('+')[0]
@@ -33,4 +36,7 @@ class VersionPrompt(sphinx_prompt.PromptDirective):
 
 
 def setup(app):
+    """
+    Add the custom directives to Sphinx.
+    """
     app.add_directive('version-prompt', VersionPrompt)
