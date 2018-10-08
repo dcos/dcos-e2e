@@ -9,11 +9,11 @@ from typing import List
 import dcos_e2e
 
 # Due to the dash in the name, the sphinx-prompt module is unloadable
-# using a normal import - use the importlib machinery instead.
-sphinx_prompt = importlib.import_module('sphinx-prompt')
+# using a normal import.
+sphinx_prompt = __import__('sphinx-prompt')
 
 
-class VersionPrompt(sphinx_prompt.PromptDirective):
+class VersionPrompt(sphinx_prompt.PromptDirective):  # type: ignore
     """
     Similar to PromptDirective but replaces a placeholder with the
     latest release.
@@ -33,10 +33,9 @@ class VersionPrompt(sphinx_prompt.PromptDirective):
         placeholder = '|release|'
         version = dcos_e2e.__version__
         release = version.split('+')[0]
-        self.content = [
+        self.content: List[str] = [
             item.replace(placeholder, release) for item in self.content
         ]
-        # import rpdb; rpdb.set_trace()
         return list(sphinx_prompt.PromptDirective.run(self))
 
 
