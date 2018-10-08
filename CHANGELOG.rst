@@ -40,7 +40,7 @@ Next
 2018.08.13.0
 ------------
 
-- Add instructions for uninstalling DC/OS E2E.
+- Add instructions for uninstalling |project|.
 
 2018.08.03.0
 ------------
@@ -304,8 +304,8 @@ Next
 2018.02.28.0
 ------------
 
-- Add ``Vagrantfile`` to run DC/OS E2E in a virtual machine.
-- Add instructions for running DC/OS E2E on Windows.
+- Add ``Vagrantfile`` to run |project| in a virtual machine.
+- Add instructions for running |project| on Windows.
 - Allow relative paths for the build artifact.
 
 2018.02.27.0
@@ -464,3 +464,5 @@ Next
 ------------
 
 -  Initial release.
+
+.. |project| replace:: DC/OS E2E
