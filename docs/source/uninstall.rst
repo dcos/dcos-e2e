@@ -18,7 +18,7 @@ For Homebrew or Linuxbrew installations:
 
 For installations from pre-built packages:
 
-.. code:: sh
+.. prompt:: bash
 
    rm -f /usr/local/bin/dcos-docker
    rm -f /usr/local/bin/dcos-vagrant

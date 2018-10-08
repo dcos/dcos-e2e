@@ -13,7 +13,7 @@ e.g. using |release|
 
 TODO: Be careful if the URLs are version specific
 
-.. code:: sh
+.. prompt:: bash
 
    curl -O /usr/local/bin/dcos-docker <URL> && \
    chmod +x /usr/local/bin/dcos-docker
