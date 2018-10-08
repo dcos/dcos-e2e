@@ -3,6 +3,8 @@ Custom Sphinx extensions.
 """
 
 import importlib
+from sphinx.application import Sphinx
+from typing import List
 
 import dcos_e2e
 
@@ -24,7 +26,7 @@ class VersionPrompt(sphinx_prompt.PromptDirective):
        dcos-docker, version |release|
     """
 
-    def run(self):
+    def run(self) -> List:
         """
         Replace the release placeholder with the release version.
         """
@@ -34,10 +36,11 @@ class VersionPrompt(sphinx_prompt.PromptDirective):
         self.content = [
             item.replace(placeholder, release) for item in self.content
         ]
-        return sphinx_prompt.PromptDirective.run(self)
+        # import rpdb; rpdb.set_trace()
+        return list(sphinx_prompt.PromptDirective.run(self))
 
 
-def setup(app):
+def setup(app: Sphinx) -> None:
     """
     Add the custom directives to Sphinx.
     """
