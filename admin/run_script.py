@@ -38,5 +38,3 @@ if __name__ == '__main__':
         subprocess.check_call(['make', 'lint'])
         subprocess.check_call(['dcos-docker', 'doctor'])
         subprocess.check_call(['make', 'docs'])
-        # TODO maybe run `make linux-package`
-        # TODO run `./dist/dcos-docker --help`
