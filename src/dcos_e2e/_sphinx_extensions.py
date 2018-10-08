@@ -2,7 +2,6 @@
 Custom Sphinx extensions.
 """
 
-import importlib
 from sphinx.application import Sphinx
 from typing import List
 
