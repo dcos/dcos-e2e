@@ -13,4 +13,6 @@ Windows is not currently supported, but we provide instructions on using DC/OS E
 
 .. include:: install-python.rst
 
+.. include:: install-prebuilt-linux.rst
+
 .. include:: uninstall.rst
