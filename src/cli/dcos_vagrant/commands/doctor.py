@@ -73,7 +73,7 @@ def check_vagrant_plugins() -> CheckLevels:
 @verbosity_option
 def doctor(verbose: int) -> None:
     """
-    Diagnose common issues which stop DC/OS E2E from working correctly.
+    Diagnose common issues which stop this ClI from working correctly.
     """
     set_logging(verbosity_level=verbose)
     check_functions = [

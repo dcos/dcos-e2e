@@ -1,5 +1,5 @@
 """
-Common utilities for making DC/OS E2E CLIs.
+Common utilities for making CLIs.
 """
 import json
 import logging

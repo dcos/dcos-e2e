@@ -1,5 +1,5 @@
 """
-Release the next version of DC/OS E2E.
+Release the next version.
 """
 
 import datetime
@@ -18,7 +18,7 @@ from homebrew import get_homebrew_formula
 
 def get_version() -> str:
     """
-    Return the next version of DC/OS E2E.
+    Return the next version.
     This is today’s date in the format ``YYYY.MM.DD.MICRO``.
     ``MICRO`` refers to the number of releases created on this date,
     starting from ``0``.

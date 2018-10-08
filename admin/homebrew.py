@@ -20,7 +20,7 @@ def _get_dependencies(requirements_file: Path) -> List[str]:
 
 def get_homebrew_formula(archive_url: str, head_url: str) -> str:
     """
-    Return the contents of a Homebrew formula for the DC/OS E2E CLI.
+    Return the contents of a Homebrew formula for the CLIs.
     """
     repository_root = Path(__file__).parent.parent
     direct_requires = _get_dependencies(

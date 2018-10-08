@@ -1,5 +1,5 @@
 """
-Custom lint tests for DC/OS E2E.
+Custom lint tests.
 """
 
 import subprocess

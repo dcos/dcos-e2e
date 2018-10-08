@@ -78,7 +78,7 @@ class TestDcosDocker:
               destroy              Destroy a cluster.
               destroy-list         Destroy clusters.
               destroy-mac-network  Destroy containers created by "dcos-docker...
-              doctor               Diagnose common issues which stop DC/OS E2E from...
+              doctor               Diagnose common issues which stop this CLI from...
               download-artifact    Download a DC/OS Open Source artifact.
               inspect              Show cluster details.
               list                 List all clusters.
@@ -1031,7 +1031,7 @@ class TestDoctor:
             """\
             Usage: dcos-docker doctor [OPTIONS]
 
-              Diagnose common issues which stop DC/OS E2E from working correctly.
+              Diagnose common issues which stop this CLI from working correctly.
 
             Options:
               -v, --verbose  Use verbose output. Use this option multiple times for more

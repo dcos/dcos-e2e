@@ -71,7 +71,7 @@ class TestDcosVagrant:
               create             Create a DC/OS cluster.
               destroy            Destroy a cluster.
               destroy-list       Destroy clusters.
-              doctor             Diagnose common issues which stop DC/OS E2E from working...
+              doctor             Diagnose common issues which stop this CLI from working...
               download-artifact  Download a DC/OS Open Source artifact.
               inspect            Show cluster details.
               list               List all clusters.
@@ -280,7 +280,7 @@ class TestDoctor:
             """\
             Usage: dcos-vagrant doctor [OPTIONS]
 
-              Diagnose common issues which stop DC/OS E2E from working correctly.
+              Diagnose common issues which stop this CLI from working correctly.
 
             Options:
               -v, --verbose  Use verbose output. Use this option multiple times for more
