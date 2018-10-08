@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.abspath('.'))
 
 extensions = [
     'dcos_e2e._vendor.sphinx_click.ext',
+    'dcos_e2e._sphinx_extensions',
     'sphinx-prompt',
     'sphinx.ext.autodoc',
     'sphinx.ext.extlinks',

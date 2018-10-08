@@ -1,3 +1,11 @@
+"""
+Custom Sphinx extensions.
+"""
+
+import importlib
+
+import dcos_e2e
+
 # Due to the dash in the name, the sphinx-prompt module is unloadable
 # using a normal import - use the importlib machinery instead.
 sphinx_prompt = importlib.import_module('sphinx-prompt')
