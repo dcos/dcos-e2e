@@ -6,10 +6,14 @@ import subprocess
 from pathlib import Path
 from textwrap import dedent
 
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
+
 import dcos_e2e
 
 
-def test_version_prompt(tmpdir):
+def test_version_prompt(tmpdir: local) -> None:
     """
     The ``version-prompt`` directive replaces the placemarker
     ``|release|`` in a source file with the current installable version in
