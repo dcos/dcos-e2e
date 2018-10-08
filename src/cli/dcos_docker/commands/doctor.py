@@ -340,7 +340,7 @@ def _check_docker_supports_mounts() -> CheckLevels:
         if 'mounts param is not supported' in str(exc):
             message = (
                 'The Docker API version must be >= 1.30. '
-                'This is because DC/OS E2E uses the ``mounts`` parameter.'
+                'This is because this tool uses the ``mounts`` parameter.'
             )
             error(message=message)
             return CheckLevels.ERROR
@@ -429,7 +429,7 @@ def _check_can_mount_in_docker() -> CheckLevels:
 @verbosity_option
 def doctor(verbose: int) -> None:
     """
-    Diagnose common issues which stop DC/OS E2E from working correctly.
+    Diagnose common issues which stop this CLI from working correctly.
     """
     set_logging(verbosity_level=verbose)
     check_functions = [

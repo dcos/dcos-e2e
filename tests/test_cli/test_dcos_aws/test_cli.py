@@ -68,7 +68,7 @@ class TestDcosAWS:
 
             Commands:
               create   Create a DC/OS cluster.
-              doctor   Diagnose common issues which stop DC/OS E2E from working correctly.
+              doctor   Diagnose common issues which stop this CLI from working correctly.
               inspect  Show cluster details.
               list     List all clusters.
               run      Run an arbitrary command on a node.
@@ -239,7 +239,7 @@ class TestDoctor:
             """\
             Usage: dcos-aws doctor [OPTIONS]
 
-              Diagnose common issues which stop DC/OS E2E from working correctly.
+              Diagnose common issues which stop this CLI from working correctly.
 
             Options:
               -v, --verbose  Use verbose output. Use this option multiple times for more

@@ -214,7 +214,7 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     except docker.errors.APIError as exc:
         if exc.status_code == 409:
             message = (
-                'Error: A DC/OS E2E network container is already running. '
+                'Error: A custom macOS network container is already running. '
                 'Use --force to destroy conflicting containers.'
             )
             click.echo(message, err=True)
