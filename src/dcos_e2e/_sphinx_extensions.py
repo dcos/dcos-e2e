@@ -40,7 +40,7 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
         new_content = []
         self.content = (  # pylint: disable=attribute-defined-outside-init
             self.content
-        ) # type: List[str]
+        )  # type: List[str]
         existing_content = self.content
         for item in existing_content:
             for pair in placeholder_replace_pairs:
