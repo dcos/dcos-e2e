@@ -111,6 +111,6 @@ extlinks = {
 
 rst_epilog = """
 .. |project| replace:: DC/OS E2E
-.. |github-owner| replace: dcos
-.. |github-repository| replace: dcos-e2e
+.. |github-owner| replace:: dcos
+.. |github-repository| replace:: dcos-e2e
 """
