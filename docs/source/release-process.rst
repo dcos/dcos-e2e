@@ -34,7 +34,7 @@ Perform a Release
 
     .. smart-prompt:: bash
 
-       export GITHUB_OWNER=dcos
+       export GITHUB_OWNER=|github-owner|
        curl https://raw.githubusercontent.com/"$GITHUB_OWNER"/dcos-e2e/master/admin/release.sh | bash
 
 .. _Homebrew: https://brew.sh/

@@ -16,7 +16,7 @@ _SPHINX_PROMPT = __import__('sphinx-prompt')
 class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
     """
     Similar to PromptDirective but replaces a placeholder with the
-    latest release and other veriables.
+    latest release and other variables.
 
     Usage example:
 
@@ -38,7 +38,9 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
             ('|github-repository|', 'dcos-e2e'),
         )
         new_content = []
-        self.content = self.content  # type: List[str]
+        self.content = (  # pylint: disable=attribute-defined-outside-init
+            self.content
+        ) # type: List[str]
         existing_content = self.content
         for item in existing_content:
             for pair in placeholder_replace_pairs:
@@ -46,9 +48,9 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
                 item = item.replace(original, replacement)
             new_content.append(item)
 
-        self.content = (
+        self.content = (  # pylint: disable=attribute-defined-outside-init
             new_content
-        )  # pylint: disable=attribute-defined-outside-init
+        )
         return list(_SPHINX_PROMPT.PromptDirective.run(self))
 
 

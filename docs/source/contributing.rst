@@ -160,7 +160,7 @@ We do not add an encrypted environment variable to ``.travis.yml`` because the l
 
 .. smart-prompt:: bash
 
-    travis env set --repo mesosphere/dcos-e2e LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
+    travis env set --repo |github-owner|/|github-repository| LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
 
 Updating the DC/OS Enterprise build artifact links
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,10 +176,10 @@ To update these links use the following commands, after setting the following en
 
 .. smart-prompt:: bash
 
-    travis env set --repo mesosphere/dcos-e2e EE_MASTER_ARTIFACT_URL $EE_MASTER_ARTIFACT_URL
-    travis env set --repo mesosphere/dcos-e2e EE_1_9_ARTIFACT_URL $EE_1_9_ARTIFACT_URL
-    travis env set --repo mesosphere/dcos-e2e EE_1_10_ARTIFACT_URL $EE_1_10_ARTIFACT_URL
-    travis env set --repo mesosphere/dcos-e2e EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
+    travis env set --repo |github-owner|/|github-repository| EE_MASTER_ARTIFACT_URL $EE_MASTER_ARTIFACT_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_9_ARTIFACT_URL $EE_1_9_ARTIFACT_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_10_ARTIFACT_URL $EE_1_10_ARTIFACT_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
 
 Updating the Amazon Web Services credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -193,8 +193,8 @@ To update the credentials use the following commands, after setting the followin
 
 .. smart-prompt:: bash
 
-    travis env set --repo mesosphere/dcos-e2e AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
-    travis env set --repo mesosphere/dcos-e2e AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
+    travis env set --repo |github-owner|/|github-repository| AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
+    travis env set --repo |github-owner|/|github-repository| AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
 
 Currently credentials are taken from the OneLogin Secure Notes note ``dcos-e2e integration testing AWS credentials``.
 
