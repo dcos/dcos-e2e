@@ -37,7 +37,6 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
             ('|github-owner|', 'dcos'),
             ('|github-repository|', 'dcos-e2e'),
         )
-        placeholder = '|release|'
         new_content = []
         for item in self.content:
             for pair in placeholder_replace_pairs:
@@ -47,7 +46,7 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
 
         self.content = (
             new_content
-        ) # pylint: disable=attribute-defined-outside-init
+        )  # pylint: disable=attribute-defined-outside-init
         return list(_SPHINX_PROMPT.PromptDirective.run(self))
 
 
