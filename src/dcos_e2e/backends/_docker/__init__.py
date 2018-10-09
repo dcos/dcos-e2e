@@ -2,8 +2,6 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
-import inspect
-import os
 import socket
 import subprocess
 import uuid
@@ -237,8 +235,7 @@ class Docker(ClusterBackend):
         """
         Return the path to the Docker specific ``ip-detect`` script.
         """
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
+        current_parent = Path(__file__).parent
         return current_parent / 'resources' / 'ip-detect'
 
 
