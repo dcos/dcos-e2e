@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 # The next line is managed by `admin/release.py` - check there before modifying
-DEFAULT_DCOS_E2E_REF = '2018.10.09.0'
+DEFAULT_DCOS_E2E_REF = '2018.10.09.1'
 
 dcos_e2e_git_ref = ENV.fetch('DCOS_E2E_REF', DEFAULT_DCOS_E2E_REF)
 
