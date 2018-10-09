@@ -2,8 +2,6 @@
 Helpers for building Docker images.
 """
 
-import inspect
-import os
 from pathlib import Path
 
 import docker
@@ -23,8 +21,7 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     }
 
     distro_path_segment = dcos_docker_distros[linux_distribution]
-    current_file = inspect.stack()[0][1]
-    current_parent = Path(os.path.abspath(current_file)).parent
+    current_parent = Path(__file__).parent.resolve()
     dockerfiles = current_parent / 'resources' / 'dockerfiles' / 'base'
     return dockerfiles / distro_path_segment
 
@@ -33,8 +30,7 @@ def _docker_dockerfile() -> Path:
     """
     Return the directory including a Dockerfile to use to install Docker.
     """
-    current_file = inspect.stack()[0][1]
-    current_parent = Path(os.path.abspath(current_file)).parent
+    current_parent = Path(__file__).parent.resolve()
     return current_parent / 'resources' / 'dockerfiles' / 'base-docker'
 
 
