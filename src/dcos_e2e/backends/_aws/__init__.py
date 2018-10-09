@@ -2,8 +2,6 @@
 Helpers for creating and interacting with clusters on AWS.
 """
 
-import inspect
-import os
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -149,8 +147,7 @@ class AWS(ClusterBackend):
         """
         Return the path to the AWS specific ``ip-detect`` script.
         """
-        current_file = inspect.stack()[0][1]
-        current_parent = Path(os.path.abspath(current_file)).parent
+        current_parent = Path(__file__).parent
         return current_parent / 'resources' / 'ip-detect'
 
 
