@@ -15,7 +15,7 @@ import dcos_e2e
 
 def test_version_prompt(tmpdir: local) -> None:
     """
-    The ``version-prompt`` directive replaces the placeholder
+    The ``smart-prompt`` directive replaces the placeholder
     ``|release|`` in a source file with the current installable version in
     the output file.
     """
@@ -25,7 +25,7 @@ def test_version_prompt(tmpdir: local) -> None:
     source_file = source_directory.join('contents.rst')
     source_file_content = dedent(
         """\
-        .. version-prompt:: bash $
+        .. smart-prompt:: bash $
 
            $ PRE-|release|-POST
         """,

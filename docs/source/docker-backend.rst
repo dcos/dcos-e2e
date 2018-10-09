@@ -24,7 +24,7 @@ Cleaning Up and Fixing "Out of Space" Errors
 If a test is interrupted, it can leave behind containers, volumes and files.
 To remove these, run the following:
 
-.. prompt:: bash
+.. smart-prompt:: bash
 
     docker stop $(docker ps -a -q --filter="name=dcos-e2e")
     docker rm --volumes $(docker ps -a -q --filter="name=dcos-e2e")

@@ -5,20 +5,20 @@ To uninstall |project|, use one of the following methods, depending on how you i
 
 For ``pip`` installations:
 
-.. prompt:: bash
+.. smart-prompt:: bash
 
    pip3 uninstall -y dcos-e2e
 
 For Homebrew or Linuxbrew installations:
 
-.. prompt:: bash
+.. smart-prompt:: bash
 
    # --force uninstalls all versions of DC/OS E2E which have been installed.
    brew uninstall dcose2e --force
 
 For installations from pre-built packages:
 
-.. prompt:: bash
+.. smart-prompt:: bash
 
    rm -f /usr/local/bin/dcos-docker
    rm -f /usr/local/bin/dcos-vagrant
