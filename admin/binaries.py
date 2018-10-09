@@ -31,6 +31,17 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         type='bind',
     )
 
+    # TODO Clean this up, use the --add-data command, delete the spec file
+    with open('MANIFEST.in') as manifest_file:
+        for line in manifest_file.readlines():
+            if line.startswith('recursive-include'):
+                _, path, _ = line.split()
+            else:
+                _, path = line.split()
+            if path.startswith('src/'):
+                path_without_src = path[len('src/'):]
+                datas.append((path, path_without_src))
+
     dist_dir = repo_root / 'dist'
     for path in list(repo_root.glob('dcos-*.spec')) + [dist_dir]:
         container_path = Path(target_dir) / str(path.relative_to(repo_root))
