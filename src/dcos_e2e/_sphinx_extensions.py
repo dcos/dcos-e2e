@@ -38,7 +38,8 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
             ('|github-repository|', 'dcos-e2e'),
         )
         new_content = []
-        for item in self.content:
+        existing_content = self.content  # type: List[str]
+        for item in existing_content:
             for pair in placeholder_replace_pairs:
                 original, replacement = pair
                 item = item.replace(original, replacement)
