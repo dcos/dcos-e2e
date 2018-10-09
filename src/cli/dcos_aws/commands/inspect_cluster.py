@@ -8,7 +8,7 @@ from typing import Any, Dict  # noqa: F401
 import click
 
 from cli.common.options import existing_cluster_id_option, verbosity_option
-from cli.common.utils import check_cluster_id_exists
+from cli.common.utils import check_cluster_id_exists, set_logging
 
 from ._common import (
     ClusterInstances,
@@ -26,6 +26,7 @@ def inspect_cluster(cluster_id: str, aws_region: str, verbose: int) -> None:
     """
     Show cluster details.
     """
+    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),

@@ -7,8 +7,8 @@ from typing import Any, Dict  # noqa: F401
 
 import click
 
-from cli.common.options import existing_cluster_id_option
-from cli.common.utils import check_cluster_id_exists
+from cli.common.options import existing_cluster_id_option, verbosity_option
+from cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e.node import Transport
 
 from ._common import (
@@ -25,7 +25,8 @@ from ._common import (
     is_flag=True,
     help='Show details in an environment variable format to eval.',
 )
-def inspect_cluster(cluster_id: str, env: bool) -> None:
+@verbosity_option
+def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
     """
     Show cluster details.
 
@@ -35,6 +36,7 @@ def inspect_cluster(cluster_id: str, env: bool) -> None:
     Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
+    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),

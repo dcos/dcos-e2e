@@ -15,7 +15,7 @@ from ._options import aws_region_option
 @existing_cluster_id_option
 @aws_region_option
 @verbosity_option
-def web(cluster_id: str, aws_region: str, verbosity: int) -> None:
+def web(cluster_id: str, aws_region: str, verbose: int) -> None:
     """
     Open the browser at the web UI.
 

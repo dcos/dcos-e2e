@@ -2,6 +2,7 @@
 Vagrant backend.
 """
 
+import os
 import shutil
 import uuid
 from ipaddress import IPv4Address
