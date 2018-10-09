@@ -8,19 +8,19 @@ To avoid interfering with your system's Python, we recommend using a `virtualenv
 
 Check the Python version:
 
-.. prompt:: bash
+.. smart-prompt:: bash
 
    python3 --version
 
 On Fedora, install Python development requirements:
 
-.. prompt:: bash
+.. smart-prompt:: bash
 
    sudo dnf install -y git python3-devel
 
 On Ubuntu, install Python development requirements:
 
-.. prompt:: bash
+.. smart-prompt:: bash
 
    apt install -y gcc python3-dev
 
