@@ -26,6 +26,6 @@ On Ubuntu, install Python development requirements:
 
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
-.. version-prompt:: bash
+.. smart-prompt:: bash
 
-    pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@|release|
+    pip3 install --upgrade git+https://github.com/|github-owner|/|github-repository|.git@|release|
