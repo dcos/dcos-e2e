@@ -235,7 +235,7 @@ class Docker(ClusterBackend):
         """
         Return the path to the Docker specific ``ip-detect`` script.
         """
-        current_parent = Path(__file__).parent
+        current_parent = Path(__file__).parent.resolve()
         return current_parent / 'resources' / 'ip-detect'
 
 

@@ -21,7 +21,7 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     }
 
     distro_path_segment = dcos_docker_distros[linux_distribution]
-    current_parent = Path(__file__).parent
+    current_parent = Path(__file__).parent.resolve()
     dockerfiles = current_parent / 'resources' / 'dockerfiles' / 'base'
     return dockerfiles / distro_path_segment
 
@@ -30,7 +30,7 @@ def _docker_dockerfile() -> Path:
     """
     Return the directory including a Dockerfile to use to install Docker.
     """
-    current_parent = Path(__file__).parent
+    current_parent = Path(__file__).parent.resolve()
     return current_parent / 'resources' / 'dockerfiles' / 'base-docker'
 
 
