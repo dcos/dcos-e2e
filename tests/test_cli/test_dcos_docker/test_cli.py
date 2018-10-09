@@ -78,7 +78,8 @@ class TestDcosDocker:
               destroy              Destroy a cluster.
               destroy-list         Destroy clusters.
               destroy-mac-network  Destroy containers created by "dcos-docker...
-              doctor               Diagnose common issues which stop this CLI from...
+              doctor               Diagnose common issues which stop this CLI from
+                                   working...
               download-artifact    Download a DC/OS Open Source artifact.
               inspect              Show cluster details.
               list                 List all clusters.

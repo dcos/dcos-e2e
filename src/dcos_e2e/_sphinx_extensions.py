@@ -33,9 +33,9 @@ class VersionPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
         placeholder = '|release|'
         version = dcos_e2e.__version__
         release = version.split('+')[0]
-        self.content: List[str] = [  # noqa: E501 pylint: disable=attribute-defined-outside-init
+        self.content = [  # pylint: disable=attribute-defined-outside-init
             item.replace(placeholder, release) for item in self.content
-        ]
+        ]  # type: List[str]
         return list(_SPHINX_PROMPT.PromptDirective.run(self))
 
 

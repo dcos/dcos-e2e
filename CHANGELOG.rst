@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.10.09.0
+------------
+
 2018.10.04.0
 ------------
 
@@ -40,7 +43,7 @@ Next
 2018.08.13.0
 ------------
 
-- Add instructions for uninstalling |project|.
+- Add instructions for uninstalling |project-name|.
 
 2018.08.03.0
 ------------
@@ -304,8 +307,8 @@ Next
 2018.02.28.0
 ------------
 
-- Add ``Vagrantfile`` to run |project| in a virtual machine.
-- Add instructions for running |project| on Windows.
+- Add ``Vagrantfile`` to run |project-name| in a virtual machine.
+- Add instructions for running |project-name| on Windows.
 - Allow relative paths for the build artifact.
 
 2018.02.27.0
@@ -465,4 +468,9 @@ Next
 
 -  Initial release.
 
-.. |project| replace:: DC/OS E2E
+.. This document is included in the source tree as well as the Sphinx documentation.
+.. We automatically define |project| in all Sphinx documentation.
+.. Defining |project| twice causes an error.
+.. We need it defined both in the source tree view (GitHub preview) and in Sphinx.
+.. We therefore use |project-name| in this document.
+.. |project-name| replace:: DC/OS E2E
