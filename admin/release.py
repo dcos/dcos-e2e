@@ -69,6 +69,8 @@ def create_github_release(
         draft=True,
     )
 
+    # We need to make the artifacts just after creating a tag so that the
+    # --version output is exactly the one of the tag.
     linux_artifacts = make_linux_binaries(repo_root=Path('.'))
     for artifact_path in linux_artifacts:
         github_release.upload_asset(
