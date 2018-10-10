@@ -18,7 +18,37 @@ def _get_dependencies(requirements_file: Path) -> List[str]:
     return [line for line in lines if not line.startswith('#')]
 
 
-def get_homebrew_formula(archive_url: str, head_url: str) -> str:
+def _get_class_name(homebrew_recipe_filename: str) -> str:
+    """
+    The Ruby class name depends on the file name.
+
+     The first character is capitalized.
+     Some characters are removed, and if a character is removed, the next
+     character is capitalized.
+
+     Returns:
+         The Ruby class name to use, given a file name.
+    """
+    stem = Path(homebrew_recipe_filename).stem
+    disallowed_characters = {'-', '.', '+'}
+    class_name = ''
+    for index, character in enumerate(list(stem)):
+        if character not in disallowed_characters:
+            if index == 0:
+                class_name += character.upper()
+            elif list(stem)[index - 1] in disallowed_characters:
+                class_name += character.upper()
+            else:
+                class_name += character
+
+    return class_name
+
+
+def get_homebrew_formula(
+    archive_url: str,
+    head_url: str,
+    homebrew_recipe_filename: str,
+) -> str:
     """
     Return the contents of a Homebrew formula for the CLIs.
     """
@@ -44,7 +74,7 @@ def get_homebrew_formula(archive_url: str, head_url: str) -> str:
 
     pattern = dedent(
         """\
-        class Dcose2e < Formula
+        class {class_name} < Formula
           include Language::Python::Virtualenv
 
           url "{archive_url}"
@@ -68,7 +98,11 @@ def get_homebrew_formula(archive_url: str, head_url: str) -> str:
         """,
     )
 
+    class_name = _get_class_name(
+        homebrew_recipe_filename=homebrew_recipe_filename,
+    )
     return pattern.format(
+        class_name=class_name,
         resource_stanzas=resource_stanzas,
         archive_url=archive_url,
         head_url=head_url,
