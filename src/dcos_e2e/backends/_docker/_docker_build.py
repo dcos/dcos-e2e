@@ -54,7 +54,7 @@ def build_docker_image(
     base_dockerfile = _base_dockerfile(linux_distribution=linux_distribution)
     print('EXISTS')
     print(base_dockerfile.exists())
-    print(list(base_dockerfile.iterdir()))
+    # print(list(base_dockerfile.iterdir()))
     docker_dockerfile = _docker_dockerfile()
 
     docker_urls = {

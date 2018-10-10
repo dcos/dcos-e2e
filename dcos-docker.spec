@@ -2,21 +2,11 @@
 
 block_cipher = None
 
-datas = []
-with open('MANIFEST.in') as manifest_file:
-    for line in manifest_file.readlines():
-        if line.startswith('recursive-include'):
-            _, path, _ = line.split()
-        else:
-            _, path = line.split()
-        if path.startswith('src/'):
-            path_without_src = path[len('src/'):]
-            datas.append((path, path_without_src))
 
 a = Analysis(['bin/dcos-docker'],
              pathex=['/Users/Adam/Documents/mesosphere/dcos/dcos-e2e'],
              binaries=[],
-             datas=datas,
+             datas=[],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],

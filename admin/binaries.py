@@ -39,6 +39,10 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
             else:
                 _, path = line.split()
             if path.startswith('src/'):
+                if Path(path).is_file():
+                    parent = Path(path).parent
+                    path = str(parent)
+
                 path_without_src = path[len('src/'):]
                 datas.append((path, path_without_src))
 
@@ -68,6 +72,19 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
             './bin/{binary}'.format(binary=binary.name),
             '--onefile',
         ]
+        for data in datas:
+            source, destination = data
+            data_str = '{source}:{destination}'.format(
+                source=source,
+                destination=destination,
+            )
+            add_data_command = [
+                '--add-data',
+                source,
+                destination,
+            ]
+            cmd_in_container += add_data_command
+
     cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
 
     container = client.containers.run(
