@@ -49,7 +49,19 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     bin_dir = repo_root / 'bin'
     binaries = list(bin_dir.iterdir())
 
-    cmd_in_container = ['pip3', 'install', '-e', '.[packaging]']
+    # We explicitly do not use ``-e / --editable``.
+    # When using ``-e`` or ``--editable`` ``pip`` will only create an EGG in
+    # the virtual environment that links the dcos-e2e source directory and skip
+    # the creation of a PKG_INFO file including the non-source file locations
+    # which are required for PyInstaller to include them.  These paths are the
+    # ones mentioned in ``MANIFEST.in``.
+
+    # In addition ``versioneer`` replaces the dynamic ``_version.py`` file with
+    # a static one only when creating a non-editable Python EGG.  This is
+    # required for the PyInstaller binary to determine the version string
+    # because the git tags used by the dynamic ``_version.py`` are not
+    # included.
+    cmd_in_container = ['pip3', 'install', '.[packaging]']
     for binary in binaries:
         cmd_in_container += [
             '&&',

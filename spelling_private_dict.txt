@@ -138,6 +138,7 @@ vbguest
 vendored
 vendoring
 versioned
+versioneer
 versioning
 virtualbox
 virtualization
