@@ -42,7 +42,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
                 _, manifest_path, _ = line.split()
             else:
                 _, manifest_path = line.split()
-            if path.startswith('src/'):
+            if manifest_path.startswith('src/'):
                 if Path(manifest_path).is_file():
                     parent = Path(manifest_path).parent
                     manifest_path = str(parent)
