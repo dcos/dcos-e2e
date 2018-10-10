@@ -22,12 +22,12 @@ def _get_class_name(homebrew_recipe_filename: str) -> str:
     """
     The Ruby class name depends on the file name.
 
-     The first character is capitalized.
-     Some characters are removed, and if a character is removed, the next
-     character is capitalized.
+    The first character is capitalized.
+    Some characters are removed, and if a character is removed, the next
+    character is capitalized.
 
-     Returns:
-         The Ruby class name to use, given a file name.
+    Returns:
+        The Ruby class name to use, given a file name.
     """
     stem = Path(homebrew_recipe_filename).stem
     disallowed_characters = {'-', '.', '+'}
