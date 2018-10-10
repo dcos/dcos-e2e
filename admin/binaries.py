@@ -80,8 +80,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
             )
             add_data_command = [
                 '--add-data',
-                source,
-                destination,
+                data_str,
             ]
             cmd_in_container += add_data_command
 
