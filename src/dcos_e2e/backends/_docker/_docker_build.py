@@ -22,9 +22,6 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
 
     distro_path_segment = dcos_docker_distros[linux_distribution]
     current_parent = Path(__file__).parent.resolve()
-    print(current_parent)
-    import time
-    # time.sleep(500)
     dockerfiles = current_parent / 'resources' / 'dockerfiles' / 'base'
     return dockerfiles / distro_path_segment
 
@@ -34,9 +31,6 @@ def _docker_dockerfile() -> Path:
     Return the directory including a Dockerfile to use to install Docker.
     """
     current_parent = Path(__file__).parent.resolve()
-    print(current_parent)
-    import time
-    # time.sleep(500)
     return current_parent / 'resources' / 'dockerfiles' / 'base-docker'
 
 
@@ -52,9 +46,6 @@ def build_docker_image(
 
     client = docker.from_env(version='auto')
     base_dockerfile = _base_dockerfile(linux_distribution=linux_distribution)
-    print('EXISTS')
-    print(base_dockerfile.exists())
-    # print(list(base_dockerfile.iterdir()))
     docker_dockerfile = _docker_dockerfile()
 
     docker_urls = {
