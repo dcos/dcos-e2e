@@ -50,7 +50,7 @@ def test_brew(tmpdir: local) -> None:
     homebrew_formula_contents = get_homebrew_formula(
         archive_url=archive_url,
         head_url=head_url,
-        homebrew_filename='dcose2e.rb',
+        homebrew_recipe_filename=homebrew_filename,
     )
 
     homebrew_file = Path(str(tmpdir.join(homebrew_filename)))
