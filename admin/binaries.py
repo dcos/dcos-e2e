@@ -101,7 +101,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         detach=True,
     )
     for line in container.logs(stream=True):
-        line = line.decode().strip()
+        line = line.strip()
         LOGGER.info(line)
 
     return set(repo_root / 'dist' / binary.name for binary in binaries)
