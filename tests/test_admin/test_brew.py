@@ -75,13 +75,13 @@ def test_brew(tmpdir: local) -> None:
         container_homebrew_file_path,
         '&&',
         'dcos-docker',
-        '--help',
+        '--version',
         '&&',
         'dcos-aws',
-        '--help',
+        '--version',
         '&&',
         'dcos-vagrant',
-        '--help',
+        '--version',
     ]
 
     command = '/bin/bash -c "{command}"'.format(
