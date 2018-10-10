@@ -19,19 +19,11 @@ from .commands.wait import wait
 from .commands.web import web
 
 @click.group(name='dcos-docker')
-@click.version_option(version=dcos_e2e.__version__.split('+')[0])
+@click.version_option(version=dcos_e2e.__version__)
 def dcos_docker() -> None:
     """
     Manage DC/OS clusters on Docker.
     """
-    print("HELLO2")
-    import dcos_e2e
-    # print(dcos_e2e._foobar.foo())
-    # from pathlib import Path
-    print(dcos_e2e.__version__)
-    # print(Path(dcos_e2e._version.__file__).read_text())
-    # print(dir(dcos_e2e))
-
 
 
 dcos_docker.add_command(create)
