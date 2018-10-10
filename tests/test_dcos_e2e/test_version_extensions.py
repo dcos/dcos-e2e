@@ -6,11 +6,10 @@ import subprocess
 from pathlib import Path
 from textwrap import dedent
 
+import dcos_e2e
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
-
-import dcos_e2e
 
 
 def test_version_prompt(tmpdir: local) -> None:

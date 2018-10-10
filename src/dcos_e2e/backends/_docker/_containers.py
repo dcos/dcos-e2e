@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import docker
-
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 

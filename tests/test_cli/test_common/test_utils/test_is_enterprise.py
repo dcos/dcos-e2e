@@ -4,11 +4,10 @@ Tests for ``_is_enterprise``.
 
 from pathlib import Path
 
+from cli.common.utils import _is_enterprise
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
-
-from cli.common.utils import _is_enterprise
 
 
 class TestOSS:

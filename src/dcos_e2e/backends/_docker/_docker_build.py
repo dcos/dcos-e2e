@@ -5,7 +5,6 @@ Helpers for building Docker images.
 from pathlib import Path
 
 import docker
-
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_versions import DockerVersion
 

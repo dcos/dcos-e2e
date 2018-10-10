@@ -12,10 +12,9 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import docker
-from docker.models.containers import Container
-
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
+from docker.models.containers import Container
 
 LOGGER = get_logger(__name__)
 

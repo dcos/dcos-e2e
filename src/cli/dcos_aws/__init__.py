@@ -3,7 +3,6 @@ A CLI for controlling DC/OS clusters on AWS.
 """
 
 import click
-
 import dcos_e2e
 
 from .commands.create import create

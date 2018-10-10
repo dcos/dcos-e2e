@@ -12,8 +12,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import boto3
 import click
 import click_spinner
-from passlib.hash import sha512_crypt
-
 from cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -36,6 +34,7 @@ from cli.common.utils import (
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from passlib.hash import sha512_crypt
 
 from ._common import (
     CLUSTER_ID_TAG_KEY,

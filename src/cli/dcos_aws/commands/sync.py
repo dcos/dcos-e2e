@@ -5,7 +5,6 @@ Tools for syncing code to a cluster.
 from pathlib import Path
 
 import click
-
 from cli.common.arguments import dcos_checkout_dir_argument
 from cli.common.options import existing_cluster_id_option, verbosity_option
 from cli.common.sync import sync_code_to_masters

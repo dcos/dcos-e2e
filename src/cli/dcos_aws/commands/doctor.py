@@ -5,7 +5,6 @@ Checks for showing up common sources of errors with the AWS backend.
 import sys
 
 import click
-
 from cli.common.doctor import CheckLevels, check_ssh
 from cli.common.options import verbosity_option
 from cli.common.utils import set_logging

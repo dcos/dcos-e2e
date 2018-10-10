@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 
 import pytest
-
 from dcos_e2e.backends import ClusterBackend, Docker
 
 

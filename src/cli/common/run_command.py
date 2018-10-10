@@ -7,7 +7,6 @@ import sys
 from typing import Dict, List
 
 import click
-
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node, Transport
 

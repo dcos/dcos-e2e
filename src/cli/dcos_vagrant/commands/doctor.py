@@ -7,7 +7,6 @@ import sys
 
 import click
 import docker
-
 from cli.common.doctor import (
     CheckLevels,
     check_1_9_sed,

@@ -10,14 +10,13 @@ from typing import Dict, Set
 
 import click
 import docker
-from docker.client import DockerClient
-from docker.models.containers import Container
-
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node, Role, Transport
+from docker.client import DockerClient
+from docker.models.containers import Container
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,

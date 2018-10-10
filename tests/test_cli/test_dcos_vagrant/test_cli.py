@@ -18,9 +18,8 @@ from textwrap import dedent
 from typing import List
 
 import pytest
-from click.testing import CliRunner
-
 from cli import dcos_vagrant
+from click.testing import CliRunner
 
 
 class TestDcosVagrant:

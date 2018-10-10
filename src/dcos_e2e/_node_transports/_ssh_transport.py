@@ -9,7 +9,6 @@ from shlex import quote
 from typing import Any, Dict, List
 
 import paramiko
-
 from dcos_e2e._common import run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
 

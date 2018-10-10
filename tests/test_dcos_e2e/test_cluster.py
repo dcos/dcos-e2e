@@ -13,11 +13,10 @@ from typing import Iterator, List
 
 import pytest
 from _pytest.logging import LogCaptureFixture
-from kazoo.client import KazooClient
-from py.path import local  # pylint: disable=no-name-in-module, import-error
-
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from kazoo.client import KazooClient
+from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 
 class TestIntegrationTests:
