@@ -335,6 +335,8 @@ class TestInspect:
 
             Options:
               -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+              -v, --verbose          Use verbose output. Use this option multiple times for
+                                     more verbose output.
               --help                 Show this message and exit.
             """,# noqa: E501,E261
         )
