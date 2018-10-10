@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.10.10.0
+------------
+
 - Fix issues which stopped pre-built Linux binaries from working.
 
 2018.09.25.0
