@@ -31,6 +31,24 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         type='bind',
     )
 
+    # MANIFEST.in describes files that must be available which are not
+    # necessarily Python files.
+    # These include e.g. Dockerfiles.
+    # We still need to include these in the binary.
+    with open('MANIFEST.in') as manifest_file:
+        for line in manifest_file.readlines():
+            if line.startswith('recursive-include'):
+                _, path, _ = line.split()
+            else:
+                _, path = line.split()
+            if path.startswith('src/'):
+                if Path(path).is_file():
+                    parent = Path(path).parent
+                    path = str(parent)
+
+                path_without_src = path[len('src/'):]
+                datas.append((path, path_without_src))
+
     dist_dir = repo_root / 'dist'
     for path in list(repo_root.glob('dcos-*.spec')) + [dist_dir]:
         container_path = Path(target_dir) / str(path.relative_to(repo_root))
@@ -50,14 +68,8 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     binaries = list(bin_dir.iterdir())
 
     # We explicitly do not use ``-e / --editable``.
-    # When using ``-e`` or ``--editable`` ``pip`` will only create an EGG in
-    # the virtual environment that links the dcos-e2e source directory and skip
-    # the creation of a PKG_INFO file including the non-source file locations
-    # which are required for PyInstaller to include them.  These paths are the
-    # ones mentioned in ``MANIFEST.in``.
-
-    # In addition ``versioneer`` replaces the dynamic ``_version.py`` file with
-    # a static one only when creating a non-editable Python EGG.  This is
+    # This is because ``versioneer`` replaces the dynamic ``_version.py`` file
+    # with a static one only when creating a non-editable Python EGG.  This is
     # required for the PyInstaller binary to determine the version string
     # because the git tags used by the dynamic ``_version.py`` are not
     # included.
@@ -69,6 +81,14 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
             './bin/{binary}'.format(binary=binary.name),
             '--onefile',
         ]
+        for data in datas:
+            source, destination = data
+            data_str = '{source}:{destination}'.format(
+                source=source,
+                destination=destination,
+            )
+            add_data_command = ['--add-data', data_str]
+            cmd_in_container += add_data_command
     cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
 
     container = client.containers.run(

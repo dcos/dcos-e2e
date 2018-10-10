@@ -5,7 +5,6 @@ Release the next version.
 import datetime
 import re
 from pathlib import Path
-from typing import Set
 
 import click
 from dulwich.porcelain import add, commit, push, tag_list
