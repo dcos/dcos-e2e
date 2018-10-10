@@ -5,7 +5,6 @@ Release the next version.
 import datetime
 import re
 from pathlib import Path
-from typing import Set
 
 import click
 from dulwich.porcelain import add, commit, push, tag_list
@@ -52,7 +51,6 @@ def update_changelog(version: str) -> None:
 def create_github_release(
     repository: Repository,
     version: str,
-    artifacts: Set[Path],
 ) -> None:
     """
     Create a tag and release on GitHub.
@@ -69,7 +67,11 @@ def create_github_release(
         object=repository.get_commits()[0].sha,
         draft=True,
     )
-    for artifact_path in artifacts:
+
+    # We need to make the artifacts just after creating a tag so that the
+    # --version output is exactly the one of the tag.
+    linux_artifacts = make_linux_binaries(repo_root=Path('.'))
+    for artifact_path in linux_artifacts:
         github_release.upload_asset(
             path=str(artifact_path),
             label=artifact_path.name,
@@ -159,13 +161,8 @@ def release(github_token: str, github_owner: str) -> None:
         repository=repository,
     )
     update_vagrantfile(version=version_str)
-    linux_artifacts = make_linux_binaries(repo_root=Path('.'))
     commit_and_push(version=version_str, repository=repository)
-    create_github_release(
-        repository=repository,
-        version=version_str,
-        artifacts=linux_artifacts,
-    )
+    create_github_release(repository=repository, version=version_str)
 
 
 if __name__ == '__main__':
