@@ -18,6 +18,7 @@ from .commands.sync import sync_code
 from .commands.wait import wait
 from .commands.web import web
 
+
 @click.group(name='dcos-docker')
 # We set the ``version`` parameter because in PyInstaller binaries,
 # ``pkg_resources`` is not available.
