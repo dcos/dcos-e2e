@@ -11,6 +11,7 @@ from typing import Dict  # noqa: F401
 from typing import Any, Optional, Set
 
 import yaml
+
 from cli._vendor import vertigo_py
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node

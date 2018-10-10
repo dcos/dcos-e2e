@@ -7,6 +7,7 @@ from typing import Dict, Set
 
 import boto3
 from boto3.resources.base import ServiceResource
+
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role

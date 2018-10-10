@@ -6,6 +6,7 @@ import json
 from typing import Any, Dict  # noqa: F401
 
 import click
+
 from cli.common.options import existing_cluster_id_option, verbosity_option
 from cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e.node import Transport

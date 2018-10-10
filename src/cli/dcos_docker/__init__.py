@@ -3,6 +3,7 @@ A CLI for controlling DC/OS clusters on Docker.
 """
 
 import click
+
 import dcos_e2e
 from cli.common.commands import download_artifact
 
@@ -16,7 +17,6 @@ from .commands.run_command import run
 from .commands.sync import sync_code
 from .commands.wait import wait
 from .commands.web import web
-
 
 @click.group(name='dcos-docker')
 # We set the ``version`` parameter because in PyInstaller binaries,

@@ -12,6 +12,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import click
 import click_spinner
+from passlib.hash import sha512_crypt
+
 from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
@@ -31,7 +33,6 @@ from cli.common.options import (
 from cli.common.utils import check_cluster_id_unique, get_variant, set_logging
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
-from passlib.hash import sha512_crypt
 
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,

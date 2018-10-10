@@ -4,8 +4,9 @@ Custom Sphinx extensions.
 
 from typing import List
 
-import dcos_e2e
 from sphinx.application import Sphinx
+
+import dcos_e2e
 
 # Due to the dash in the name, we cannot import sphinx-prompt using a normal
 # import.

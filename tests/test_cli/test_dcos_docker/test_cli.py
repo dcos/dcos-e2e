@@ -21,11 +21,12 @@ from textwrap import dedent
 from typing import List
 
 import pytest
-from cli import dcos_docker
 from click.testing import CliRunner
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
+
+from cli import dcos_docker
 
 
 class TestDcosDocker:

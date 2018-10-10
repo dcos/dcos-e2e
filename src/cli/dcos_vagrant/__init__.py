@@ -3,6 +3,7 @@ A CLI for controlling DC/OS clusters on Vagrant.
 """
 
 import click
+
 import dcos_e2e
 from cli.common.commands import download_artifact
 

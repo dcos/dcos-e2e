@@ -5,6 +5,7 @@ Tools for waiting for a cluster.
 import click
 import click_spinner
 import urllib3
+
 from cli.common.options import (
     existing_cluster_id_option,
     superuser_password_option,

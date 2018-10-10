@@ -5,13 +5,14 @@ Tests for installing DC/OS on cluster nodes.
 from pathlib import Path
 from textwrap import dedent
 
+# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
+# are disabled.
+from py.path import local  # pylint: disable=no-name-in-module, import-error
+
 from dcos_e2e.backends import ClusterBackend, Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Role
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 
 class TestAdvancedInstallationMethod:

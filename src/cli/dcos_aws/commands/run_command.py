@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 import click
+
 from cli.common.arguments import node_args_argument
 from cli.common.options import (
     dcos_login_pw_option,

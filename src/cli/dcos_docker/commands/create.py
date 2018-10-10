@@ -12,6 +12,10 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import click
 import click_spinner
 import docker
+from docker.models.networks import Network
+from docker.types import Mount
+from passlib.hash import sha512_crypt
+
 from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
@@ -36,9 +40,6 @@ from cli.common.utils import (
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
-from docker.models.networks import Network
-from docker.types import Mount
-from passlib.hash import sha512_crypt
 
 from ._common import (
     CLUSTER_ID_LABEL_KEY,

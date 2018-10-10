@@ -8,10 +8,11 @@ import uuid
 from pathlib import Path
 
 import requests
+from passlib.hash import sha512_crypt
+
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Role
-from passlib.hash import sha512_crypt
 
 
 class TestEnterpriseIntegrationTests:
