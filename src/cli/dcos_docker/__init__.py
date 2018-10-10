@@ -4,6 +4,7 @@ A CLI for controlling DC/OS clusters on Docker.
 
 import click
 
+import dcos_e2e
 from cli.common.commands import download_artifact
 
 from .commands.create import create
@@ -17,17 +18,19 @@ from .commands.sync import sync_code
 from .commands.wait import wait
 from .commands.web import web
 
-
 @click.group(name='dcos-docker')
-@click.version_option(version='a.1')
+@click.version_option(version=dcos_e2e.__version__.split('+')[0])
 def dcos_docker() -> None:
     """
     Manage DC/OS clusters on Docker.
     """
-    print("HELLO")
+    print("HELLO2")
     import dcos_e2e
+    # print(dcos_e2e._foobar.foo())
+    # from pathlib import Path
     print(dcos_e2e.__version__)
-    print(dir(dcos_e2e))
+    # print(Path(dcos_e2e._version.__file__).read_text())
+    # print(dir(dcos_e2e))
 
 
 

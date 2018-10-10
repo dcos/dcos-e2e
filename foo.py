@@ -1,6 +1,23 @@
 from pathlib import Path
+from textwrap import dedent
 
 datas = []
+
+# version_file = dedent(
+#     """\
+#     def foo():
+#         return 'ADAM'
+#     # def get_versions():
+#     #     return {"version": "0+HELLO", "full-revisionid": None,
+#     #                 "dirty": None,
+#     #                 "error": "unable to find root of source tree",
+#     #             }
+#     #
+#     """
+# )
+#
+# Path('src/foobar').write_text(version_file)
+
 with open('MANIFEST.in') as manifest_file:
     for line in manifest_file.readlines():
         if line.startswith('recursive-include'):
@@ -14,6 +31,7 @@ with open('MANIFEST.in') as manifest_file:
 
             path_without_src = path[len('src/'):]
             datas.append((path, path_without_src))
+
 
 binaries = [Path('./bin/dcos-docker')]
 cmd_in_container = []
