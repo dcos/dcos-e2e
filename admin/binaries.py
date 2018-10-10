@@ -31,7 +31,6 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         type='bind',
     )
 
-    # TODO Clean this up, use the --add-data command, delete the spec file
     with open('MANIFEST.in') as manifest_file:
         for line in manifest_file.readlines():
             if line.startswith('recursive-include'):
