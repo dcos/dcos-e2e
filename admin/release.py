@@ -162,11 +162,7 @@ def release(github_token: str, github_owner: str) -> None:
     )
     update_vagrantfile(version=version_str)
     commit_and_push(version=version_str, repository=repository)
-    create_github_release(
-        repository=repository,
-        version=version_str,
-        artifacts=linux_artifacts,
-    )
+    create_github_release(repository=repository, version=version_str)
 
 
 if __name__ == '__main__':

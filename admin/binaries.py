@@ -35,6 +35,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     # necessarily Python files.
     # These include e.g. Dockerfiles.
     # We still need to include these in the binary.
+    datas = []
     with open('MANIFEST.in') as manifest_file:
         for line in manifest_file.readlines():
             if line.startswith('recursive-include'):
