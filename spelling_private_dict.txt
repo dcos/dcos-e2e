@@ -45,6 +45,7 @@ hwclock
 idna
 iff
 init
+installable
 invalidversion
 ip
 journalctl
