@@ -39,16 +39,16 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     with open('MANIFEST.in') as manifest_file:
         for line in manifest_file.readlines():
             if line.startswith('recursive-include'):
-                _, path, _ = line.split()
+                _, manifest_path, _ = line.split()
             else:
-                _, path = line.split()
+                _, manifest_path = line.split()
             if path.startswith('src/'):
-                if Path(path).is_file():
-                    parent = Path(path).parent
-                    path = str(parent)
+                if Path(manifest_path).is_file():
+                    parent = Path(manifest_path).parent
+                    manifest_path = str(parent)
 
-                path_without_src = path[len('src/'):]
-                datas.append((path, path_without_src))
+                path_without_src = manifest_path[len('src/'):]
+                datas.append((manifest_path, path_without_src))
 
     dist_dir = repo_root / 'dist'
     for path in list(repo_root.glob('dcos-*.spec')) + [dist_dir]:
