@@ -47,7 +47,7 @@ def test_linux_binaries() -> None:
             str(remote_path),
             '&&',
             str(remote_path),
-            '--help',
+            '--version',
         ]
         cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
         client.containers.run(
