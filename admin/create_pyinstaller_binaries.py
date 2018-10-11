@@ -110,9 +110,8 @@ def create_binary(script: Path) -> None:
 if __name__ == '__main__':
     editable = is_editable()
     require_editable(editable=editable)
-    # TODO Check if version file exists
-    # repo_root = Path(__file__).parent.parent
-    # remove_existing_files(repo_root=repo_root)
-    # script_dir = repo_root / 'bin'
-    # for script in script_dir.iterdir():
-    #     create_binary(script=script)
+    repo_root = Path(__file__).parent.parent
+    remove_existing_files(repo_root=repo_root)
+    script_dir = repo_root / 'bin'
+    for script in script_dir.iterdir():
+        create_binary(script=script)
