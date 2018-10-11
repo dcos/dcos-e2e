@@ -8,6 +8,7 @@ Next
 
 - Show full path on ``download-artifact`` downloads.
 - Default to downloading to the current directory for ``download-artifact`` downloads.
+- Use a TTY on CLI run commands only if Stdin is a TTY.
 
 2018.10.10.0
 ------------
