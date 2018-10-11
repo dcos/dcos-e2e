@@ -66,10 +66,17 @@ def create_github_release(
         release_message=release_message,
         type='commit',
         object=repository.get_commits()[0].sha,
-        draft=True,
+        draft=False,
     )
-    local_repository = Repo('.')
-    local_repository.fetch(target=local_repository)
+
+    from dulwich.client import HttpGitClient
+    local = Repo('.')
+    client = HttpGitClient('https://github.com/timaa2k/')
+    remote_refs = client.fetch("dcos-e2e.git",local)
+    for key, value in remote_refs.items():
+        local.refs[key] = value
+
+    local[b'HEAD'] = remote_refs[b'refs/heads/master']
 
     # We need to make the artifacts just after creating a tag so that the
     # --version output is exactly the one of the tag.
@@ -79,11 +86,11 @@ def create_github_release(
             path=str(artifact_path),
             label=artifact_path.name,
         )
-    github_release.update_release(
-        name=release_name,
-        message=release_message,
-        draft=False,
-    )
+    # github_release.update_release(
+    #     name=release_name,
+    #     message=release_message,
+    #     draft=False,
+    # )
 
 
 def commit_and_push(version: str, repository: Repository) -> None:
