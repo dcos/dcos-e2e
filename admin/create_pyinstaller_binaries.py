@@ -6,8 +6,16 @@ For this to work as expected, we expect that NOT EDITABLE.
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
+def dist_is_editable():
+    """Is distribution an editable install?"""
+    for path_item in sys.path:
+        egg_link = Path(path_item) / 'DCOS-E2E.egg-link'
+        if egg_link.exists():
+            return True
+    return False
 
 def remove_existing_files(repo_root: Path) -> None:
     dist_dir = repo_root / 'dist'
@@ -60,9 +68,10 @@ def create_binary(script: Path) -> None:
 
 
 if __name__ == '__main__':
+    print(dist_is_editable())
     # TODO Check if version file exists
-    repo_root = Path(__file__).parent.parent
-    remove_existing_files(repo_root=repo_root)
-    script_dir = repo_root / 'bin'
-    for script in script_dir.iterdir():
-        create_binary(script=script)
+    # repo_root = Path(__file__).parent.parent
+    # remove_existing_files(repo_root=repo_root)
+    # script_dir = repo_root / 'bin'
+    # for script in script_dir.iterdir():
+    #     create_binary(script=script)
