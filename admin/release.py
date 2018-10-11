@@ -68,6 +68,8 @@ def create_github_release(
         object=repository.get_commits()[0].sha,
         draft=True,
     )
+    local_repository = Repo('.')
+    local_repository.fetch(target=local_repository)
 
     # We need to make the artifacts just after creating a tag so that the
     # --version output is exactly the one of the tag.
