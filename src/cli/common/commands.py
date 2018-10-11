@@ -28,7 +28,7 @@ import requests
 @click.option(
     '--download-path',
     type=str,
-    default='/tmp/dcos_generate_config.sh',
+    default='./dcos_generate_config.sh',
     show_default=True,
     help='The path to download a release artifact to.',
 )

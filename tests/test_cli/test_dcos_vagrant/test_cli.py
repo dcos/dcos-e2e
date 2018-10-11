@@ -515,7 +515,7 @@ class TestDownloadArtifact:
                                     https://dcos.io/releases/ for available releases.
                                     [default: stable]
               --download-path TEXT  The path to download a release artifact to.  [default:
-                                    /tmp/dcos_generate_config.sh]
+                                    ./dcos_generate_config.sh]
               --help                Show this message and exit.
             """,# noqa: E501,E261
         )
