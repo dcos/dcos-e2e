@@ -58,6 +58,9 @@ def create_github_release(
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
     release_name = 'Release ' + version
     release_message = 'See ' + changelog_url
+
+    import pdb; pdb.set_trace()
+
     github_release = repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
@@ -67,6 +70,8 @@ def create_github_release(
         object=repository.get_commits()[0].sha,
         draft=True,
     )
+
+    import pdb; pdb.set_trace()
 
     # We need to make the artifacts just after creating a tag so that the
     # --version output is exactly the one of the tag.
