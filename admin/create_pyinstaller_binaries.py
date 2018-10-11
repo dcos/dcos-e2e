@@ -75,16 +75,21 @@ def remove_existing_files(repo_root: Path) -> None:
         path.unlink()
 
 
-def create_binary(script: Path) -> None:
+def create_binary(script: Path, repo_root: Path) -> None:
     """
     Use PyInstaller to create a binary from a script.
+
+    Args:
+        script: The script to create a binary for.
+        repo_root: The path to the root of the repository.
     """
     # MANIFEST.in describes files that must be available which are not
     # necessarily Python files.
     # These include e.g. Dockerfiles.
     # We still need to include these in the binary.
     datas = []
-    with open('MANIFEST.in') as manifest_file:
+    manifest = repo_root / 'MANIFEST.in'
+    with manifest.open() as manifest_file:
         for line in manifest_file.readlines():
             if line.startswith('recursive-include'):
                 _, manifest_path, _ = line.split()
@@ -96,7 +101,7 @@ def create_binary(script: Path) -> None:
                     manifest_path = str(parent)
 
                 path_without_src = manifest_path[len('src/'):]
-                datas.append((manifest_path, path_without_src))
+                datas.append((str(repo_root / manifest_path), path_without_src))
 
     pyinstaller_command = ['pyinstaller', script.resolve(), '--onefile']
     for data in datas:
@@ -109,6 +114,7 @@ def create_binary(script: Path) -> None:
         pyinstaller_command += add_data_command
 
     subprocess.check_output(args=pyinstaller_command)
+    # TODO choose dist dir from repo root
 
 
 @click.command('create_binaries')
@@ -128,11 +134,11 @@ def create_binaries(accept_editable: bool) -> None:
     editable = is_editable()
     if not accept_editable:
         require_editable(editable=editable)
-    repo_root = Path(__file__).parent.parent
+    repo_root = Path(__file__).resolve().parent.parent
     remove_existing_files(repo_root=repo_root)
     script_dir = repo_root / 'bin'
     for script in script_dir.iterdir():
-        create_binary(script=script)
+        create_binary(script=script, repo_root=repo_root)
 
 
 if __name__ == '__main__':
