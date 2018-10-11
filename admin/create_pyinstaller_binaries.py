@@ -60,6 +60,7 @@ def create_binary(script: Path) -> None:
 
 
 if __name__ == '__main__':
+    # TODO Check if version file exists
     repo_root = Path(__file__).parent.parent
     remove_existing_files(repo_root=repo_root)
     script_dir = repo_root / 'bin'
