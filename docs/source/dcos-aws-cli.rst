@@ -59,7 +59,8 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
 .. code-block:: console
 
-   $ dcos-aws create $DCOS_ENTERPRISE_URL --variant enterprise \
+   $ dcos-aws create $DCOS_ENTERPRISE_URL \
+        --variant enterprise \
         --license-key /path/to/license.txt \
         --security-mode strict
 
@@ -125,7 +126,9 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. code-block:: console
 
-   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh
+   $ dcos-aws create \
+        --variant oss \
+        https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh
    $ dcos-aws wait
    $ dcos-aws run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 

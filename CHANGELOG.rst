@@ -6,8 +6,8 @@ Changelog
 Next
 ----
 
-2018.10.10.1
-------------
+- Show full path on ``download-artifact`` downloads.
+- Default to downloading to the current directory for ``download-artifact`` downloads.
 
 2018.10.10.0
 ------------
