@@ -39,6 +39,7 @@ def run_command(
         env: Environment variables to set before running the command.
     """
     columns, rows = click.get_terminal_size()
+    tty = sys.stdin.isatty()
 
     env = {
         # LINES and COLUMNS are needed if using the ``DOCKER_EXEC`` transport.
@@ -55,7 +56,7 @@ def run_command(
             host.run(
                 args=args,
                 log_output_live=False,
-                tty=True,
+                tty=tty,
                 shell=True,
                 env=env,
                 transport=transport,
@@ -68,7 +69,7 @@ def run_command(
     try:
         cluster.run_integration_tests(
             pytest_command=args,
-            tty=True,
+            tty=tty,
             env=env,
             test_host=host,
             transport=transport,
