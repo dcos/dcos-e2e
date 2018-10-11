@@ -38,13 +38,14 @@ def require_editable(editable: bool) -> None:
 
     message = dedent(
 		"""\
-		We explicitly require the package to have been installed without the use
-		of ``-e / --editable``.
+		We explicitly require the package to have been installed without the
+		use of ``-e / --editable``.
 
-		This is because ``versioneer`` replaces the dynamic ``_version.py`` file
-		with a static one only when creating a non-editable Python EGG.  This is
-		required for the PyInstaller binary to determine the version string
-		because the git tags used by the dynamic ``_version.py`` are not
+		This is because ``versioneer`` replaces the dynamic ``_version.py``
+		file with a static one only when creating a non-editable Python EGG.
+
+		This is required for the PyInstaller binary to determine the version
+		string because the git tags used by the dynamic ``_version.py`` are not
 		included.
 		""",
 	)
