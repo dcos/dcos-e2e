@@ -31,12 +31,6 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         type='bind',
     )
 
-    # We explicitly do not use ``-e / --editable``.
-    # This is because ``versioneer`` replaces the dynamic ``_version.py`` file
-    # with a static one only when creating a non-editable Python EGG.  This is
-    # required for the PyInstaller binary to determine the version string
-    # because the git tags used by the dynamic ``_version.py`` are not
-    # included.
     cmd_in_container = [
         'pip3',
         'install',

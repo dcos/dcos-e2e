@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from textwrap import dedent
 
 def is_editable() -> bool:
     """
@@ -30,7 +31,32 @@ def is_editable() -> bool:
             return True
     return False
 
+def require_editable(editable: bool) -> None:
+    """
+    Require the package to have been installed not in editable mode.
+    """
+
+    message = dedent(
+		"""\
+		We explicitly require the package to have been installed without the use
+		of ``-e / --editable``.
+
+		This is because ``versioneer`` replaces the dynamic ``_version.py`` file
+		with a static one only when creating a non-editable Python EGG.  This is
+		required for the PyInstaller binary to determine the version string
+		because the git tags used by the dynamic ``_version.py`` are not
+		included.
+		""",
+	)
+    if editable:
+        raise Exception(message)
+
 def remove_existing_files(repo_root: Path) -> None:
+    """
+    Remove files created when building binaries.
+
+    This is to stop interference with future builds.
+    """
     dist_dir = repo_root / 'dist'
     build_dir = repo_root / 'build'
     try:
@@ -81,7 +107,8 @@ def create_binary(script: Path) -> None:
 
 
 if __name__ == '__main__':
-    print(is_editable())
+    editable = is_editable()
+    require_editable(editable=editable)
     # TODO Check if version file exists
     # repo_root = Path(__file__).parent.parent
     # remove_existing_files(repo_root=repo_root)
