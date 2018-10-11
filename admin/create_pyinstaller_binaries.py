@@ -11,11 +11,12 @@ from pathlib import Path
 
 def remove_existing_files(repo_root: Path) -> None:
     dist_dir = repo_root / 'dist'
+    build_dir = repo_root / 'build'
+    shutil.rmtree(path=dist_dir)
+    shutil.rmtree(path=build_dir)
     if dist_dir.exists():
         for path in repo_root.glob('dcos-*.spec'):
             path.unlink()
-
-        shutil.rmtree(path=dist_dir)
 
 
 def create_binary(script: Path) -> None:
