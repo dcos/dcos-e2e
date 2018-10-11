@@ -113,7 +113,7 @@ def create_binary(script: Path, repo_root: Path) -> None:
                 data_item = (str(repo_root / manifest_path), path_without_src)
                 datas.append(data_item)
 
-    pyinstaller_command = ['pyinstaller', script.resolve(), '--onefile']
+    pyinstaller_command = ['pyinstaller', str(script.resolve()), '--onefile']
     for data in datas:
         source, destination = data
         data_str = '{source}:{destination}'.format(
@@ -147,7 +147,7 @@ def create_binaries(accept_editable: bool) -> None:
         require_editable(editable=editable)
     repo_root = Path(__file__).resolve().parent.parent
     script_dir = repo_root / 'bin'
-    scripts = list(script_dir.iterdir())
+    scripts = set(script_dir.iterdir())
     remove_existing_files(scripts=scripts)
     for script in scripts:
         create_binary(script=script, repo_root=repo_root)
