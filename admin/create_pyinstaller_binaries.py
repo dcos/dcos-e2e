@@ -24,7 +24,7 @@ def is_editable() -> bool:
     package_name = dcos_e2e.__name__
     # Normalize as per https://www.python.org/dev/peps/pep-0440/.
     normalized_package_name = package_name.replace('_', '-').lower()
-    distributions = {v.key: v for v in pkg_resources.working_set}
+    distributions = {v.key: v for v in set(pkg_resources.working_set)}
     distribution = distributions[normalized_package_name]
     project_name = distribution.project_name
     for path_item in sys.path:
