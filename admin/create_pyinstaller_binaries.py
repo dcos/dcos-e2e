@@ -1,10 +1,10 @@
 """
 Make PyInstaller binaries for the platform that this is being run on.
-
-For this to work as expected, we expect that NOT EDITABLE.
 """
 
 import dcos_e2e
+
+import click
 
 import pkg_resources
 import shutil
@@ -37,18 +37,18 @@ def require_editable(editable: bool) -> None:
     """
 
     message = dedent(
-		"""\
-		We explicitly require the package to have been installed without the
-		use of ``-e / --editable``.
+        """\
+        We explicitly require the package to have been installed without the
+        use of ``-e / --editable``.
 
-		This is because ``versioneer`` replaces the dynamic ``_version.py``
-		file with a static one only when creating a non-editable Python EGG.
+        This is because ``versioneer`` replaces the dynamic ``_version.py``
+        file with a static one only when creating a non-editable Python EGG.
 
-		This is required for the PyInstaller binary to determine the version
-		string because the git tags used by the dynamic ``_version.py`` are not
-		included.
-		""",
-	)
+        This is required for the PyInstaller binary to determine the version
+        string because the git tags used by the dynamic ``_version.py`` are not
+        included.
+        """,
+    )
     if editable:
         raise Exception(message)
 
@@ -70,6 +70,7 @@ def remove_existing_files(repo_root: Path) -> None:
     except FileNotFoundError:
         pass
 
+    # TODO actual filenames read from bin dir
     for path in repo_root.glob('dcos-*.spec'):
         path.unlink()
 
@@ -107,11 +108,29 @@ def create_binary(script: Path) -> None:
     subprocess.check_output(args=pyinstaller_command)
 
 
-if __name__ == '__main__':
+@click.command('create_binaries')
+@click.option(
+    '--accept-editable',
+    is_flag=True,
+    help=(
+        'For --version to work appropriately on the binary, we require the '
+        'package to be installed not in --editable mode. '
+        'Use this flag to override that requirement.'
+    ),
+)
+def create_binaries(accept_editable: bool) -> None:
+    """
+    Make PyInstaller binaries for the platform that this is being run on.
+    """
     editable = is_editable()
-    require_editable(editable=editable)
+    if not accept_editable:
+        require_editable(editable=editable)
     repo_root = Path(__file__).parent.parent
     remove_existing_files(repo_root=repo_root)
     script_dir = repo_root / 'bin'
     for script in script_dir.iterdir():
         create_binary(script=script)
+
+
+if __name__ == '__main__':
+    create_binaries()
