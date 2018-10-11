@@ -43,7 +43,7 @@ def download_artifact(
 
     For DC/OS Enterprise release artifacts, contact your sales representative.
     """
-    path = Path(download_path)
+    path = Path(download_path).resolve()
     label = 'Downloading to ' + str(path)
     base_url = 'https://downloads.dcos.io/dcos/'
     url = base_url + dcos_version + '/dcos_generate_config.sh'
@@ -66,8 +66,8 @@ def download_artifact(
     content_length = int(stream.headers['Content-Length'])
     total_written = 0
     chunk_size = 1024
-    # See http://click.pocoo.org/6/arguments/#file-args for parameter
-    # information
+    # See http://click.pocoo.org/7/arguments/#file-args for parameter
+    # information.
     with click.open_file(
         filename=str(path),
         mode='wb',
