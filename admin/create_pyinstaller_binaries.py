@@ -4,15 +4,28 @@ Make PyInstaller binaries for the platform that this is being run on.
 For this to work as expected, we expect that NOT EDITABLE.
 """
 
+import dcos_e2e
+
+import pkg_resources
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-def dist_is_editable():
-    """Is distribution an editable install?"""
+def is_editable() -> bool:
+    """
+    Return whether this project is an editable package.
+
+    See https://stackoverflow.com/a/40835950.
+    """
+    package_name = dcos_e2e.__name__
+    # Normalize as per https://www.python.org/dev/peps/pep-0440/.
+    normalized_package_name = package_name.replace('_', '-').lower()
+    distributions = {v.key: v for v in pkg_resources.working_set}
+    distribution = distributions[normalized_package_name]
+    project_name = distribution.project_name
     for path_item in sys.path:
-        egg_link = Path(path_item) / 'DCOS-E2E.egg-link'
+        egg_link = Path(path_item) / (project_name + '.egg-link')
         if egg_link.exists():
             return True
     return False
@@ -68,7 +81,7 @@ def create_binary(script: Path) -> None:
 
 
 if __name__ == '__main__':
-    print(dist_is_editable())
+    print(is_editable())
     # TODO Check if version file exists
     # repo_root = Path(__file__).parent.parent
     # remove_existing_files(repo_root=repo_root)
