@@ -45,13 +45,14 @@ def test_brew(tmpdir: local) -> None:
     container_archive_path = '/' + archive_name
     archive_url = 'file://' + container_archive_path
     head_url = 'file://' + str(Path(local_repository.path).absolute())
+    homebrew_filename = 'dcose2e.rb'
 
     homebrew_formula_contents = get_homebrew_formula(
         archive_url=archive_url,
         head_url=head_url,
+        homebrew_recipe_filename=homebrew_filename,
     )
 
-    homebrew_filename = 'dcose2e.rb'
     homebrew_file = Path(str(tmpdir.join(homebrew_filename)))
     homebrew_file.write_text(homebrew_formula_contents)
     container_homebrew_file_path = '/' + homebrew_filename
