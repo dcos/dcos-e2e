@@ -76,6 +76,9 @@ def remove_existing_files(repo_root: Path) -> None:
 
 
 def create_binary(script: Path) -> None:
+    """
+    Use PyInstaller to create a binary from a script.
+    """
     # MANIFEST.in describes files that must be available which are not
     # necessarily Python files.
     # These include e.g. Dockerfiles.
