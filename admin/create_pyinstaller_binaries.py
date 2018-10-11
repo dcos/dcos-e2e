@@ -2,17 +2,18 @@
 Make PyInstaller binaries for the platform that this is being run on.
 """
 
-import dcos_e2e
-from typing import Set
-
-import click
-
-import pkg_resources
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 from textwrap import dedent
+from typing import Set
+
+import click
+import pkg_resources
+
+import dcos_e2e
+
 
 def is_editable() -> bool:
     """
@@ -31,6 +32,7 @@ def is_editable() -> bool:
         if egg_link.exists():
             return True
     return False
+
 
 def require_editable(editable: bool) -> None:
     """
@@ -54,6 +56,7 @@ def require_editable(editable: bool) -> None:
     )
     if editable:
         raise Exception(message)
+
 
 def remove_existing_files(scripts: Set[Path]) -> None:
     """
@@ -107,7 +110,8 @@ def create_binary(script: Path, repo_root: Path) -> None:
                     manifest_path = str(parent)
 
                 path_without_src = manifest_path[len('src/'):]
-                datas.append((str(repo_root / manifest_path), path_without_src))
+                data_item = (str(repo_root / manifest_path), path_without_src)
+                datas.append(data_item)
 
     pyinstaller_command = ['pyinstaller', script.resolve(), '--onefile']
     for data in datas:
