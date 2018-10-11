@@ -3,6 +3,7 @@ Release the next version.
 """
 
 import datetime
+import logging
 import re
 from pathlib import Path
 
@@ -154,6 +155,7 @@ def release(github_token: str, github_owner: str) -> None:
     """
     Perform a release.
     """
+    logging.basicConfig(level=logging.DEBUG)
     repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
     update_changelog(version=version_str)
