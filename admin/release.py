@@ -8,6 +8,7 @@ import re
 from pathlib import Path
 
 import click
+from dulwich.client import HttpGitClient
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
 from github import Github, Repository, UnknownObjectException
@@ -69,28 +70,35 @@ def create_github_release(
         draft=False,
     )
 
-    from dulwich.client import HttpGitClient
-    local = Repo('.')
-    client = HttpGitClient('https://github.com/timaa2k/')
-    remote_refs = client.fetch("dcos-e2e.git",local)
-    for key, value in remote_refs.items():
-        local.refs[key] = value
+    # The artifacts we build must be built from the tag we just created.
+    # This tag is created remotely on GitHub using the GitHub HTTP API.
+    #
+    # We fetch all tags from GitHub and set our local HEAD to the latest master
+    # from GitHub.
+    #
+    # One symptom of this is that ``dcos-docker --version`` from the
+    # PyInstaller binaries shows the correct version.
+    local_repository = Repo('.')
+    client = HttpGitClient(repository.owner.html_url)
+    remote_refs = client.fetch(repository.name + '.git', local_repository)
 
-    local[b'HEAD'] = remote_refs[b'refs/heads/master']
+    # Update the local tags and references with the remote ones.
+    for key, value in remote_refs.items():
+        local_repository.refs[key] = value
+
+    # Advance local HEAD to remote master HEAD.
+    local_repository[b'HEAD'] = remote_refs[b'refs/heads/master']
 
     # We need to make the artifacts just after creating a tag so that the
     # --version output is exactly the one of the tag.
+    # No tag exists when the GitHub release is a draft.
+    # This means that temporarily we have a release without binaries.
     linux_artifacts = make_linux_binaries(repo_root=Path('.'))
     for artifact_path in linux_artifacts:
         github_release.upload_asset(
             path=str(artifact_path),
             label=artifact_path.name,
         )
-    # github_release.update_release(
-    #     name=release_name,
-    #     message=release_message,
-    #     draft=False,
-    # )
 
 
 def commit_and_push(version: str, repository: Repository) -> None:
