@@ -21,10 +21,8 @@ def run_test(test_pattern: str) -> None:
             '--capture',
             'no',
             test_pattern,
-            '--cov',
-            'src/dcos_e2e',
-            '--cov',
-            'tests',
+            '--cov=src/dcos_e2e',
+            '--cov=tests',
         ],
     )
     sys.exit(result)
