@@ -523,6 +523,7 @@ def create(
             cluster_id=cluster_id,
             transport=transport,
             skip_http_checks=bool(transport == Transport.DOCKER_EXEC),
+            verbose=verbose,
         )
         return
 
