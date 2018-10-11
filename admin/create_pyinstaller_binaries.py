@@ -3,6 +3,7 @@ Make PyInstaller binaries for the platform that this is being run on.
 """
 
 import dcos_e2e
+from typing import Set
 
 import click
 
@@ -47,19 +48,21 @@ def require_editable(editable: bool) -> None:
         This is required for the PyInstaller binary to determine the version
         string because the git tags used by the dynamic ``_version.py`` are not
         included.
+
+        Use --accept-editable to ignore this error.
         """,
     )
     if editable:
         raise Exception(message)
 
-def remove_existing_files(repo_root: Path) -> None:
+def remove_existing_files(scripts: Set[Path]) -> None:
     """
     Remove files created when building binaries.
 
     This is to stop interference with future builds.
     """
-    dist_dir = repo_root / 'dist'
-    build_dir = repo_root / 'build'
+    dist_dir = Path('.') / 'dist'
+    build_dir = Path('.') / 'build'
     try:
         shutil.rmtree(path=dist_dir)
     except FileNotFoundError:
@@ -70,9 +73,12 @@ def remove_existing_files(repo_root: Path) -> None:
     except FileNotFoundError:
         pass
 
-    # TODO actual filenames read from bin dir
-    for path in repo_root.glob('dcos-*.spec'):
-        path.unlink()
+    for script in scripts:
+        path = Path(script.name + '.spec')
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
 
 
 def create_binary(script: Path, repo_root: Path) -> None:
@@ -114,7 +120,6 @@ def create_binary(script: Path, repo_root: Path) -> None:
         pyinstaller_command += add_data_command
 
     subprocess.check_output(args=pyinstaller_command)
-    # TODO choose dist dir from repo root
 
 
 @click.command('create_binaries')
@@ -130,14 +135,17 @@ def create_binary(script: Path, repo_root: Path) -> None:
 def create_binaries(accept_editable: bool) -> None:
     """
     Make PyInstaller binaries for the platform that this is being run on.
+
+    All binaries will be created in ``./dist``.
     """
     editable = is_editable()
     if not accept_editable:
         require_editable(editable=editable)
     repo_root = Path(__file__).resolve().parent.parent
-    remove_existing_files(repo_root=repo_root)
     script_dir = repo_root / 'bin'
-    for script in script_dir.iterdir():
+    scripts = list(script_dir.iterdir())
+    remove_existing_files(scripts=scripts)
+    for script in scripts:
         create_binary(script=script, repo_root=repo_root)
 
 
