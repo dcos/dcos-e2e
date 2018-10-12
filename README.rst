@@ -35,13 +35,13 @@ Then install the latest stable version:
 
 .. code-block:: console
 
-    brew install https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
+   $ brew install https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
 
 To upgrade from an older version, run the following command:
 
 .. code-block:: console
 
-    brew upgrade https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
+   $ brew upgrade https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
 
 Run ``dcos-docker doctor`` to make sure that your system is ready to go for the ``dcos-docker`` CLI:
 
@@ -61,19 +61,19 @@ Check the Python version:
 
 .. code-block:: console
 
-   python3 --version
+   $ python3 --version
 
 On Fedora, install Python development requirements:
 
 .. code-block:: console
 
-   sudo dnf install -y git python3-devel
+   $ sudo dnf install -y git python3-devel
 
 On Ubuntu, install Python development requirements:
 
 .. code-block:: console
 
-   apt install -y gcc python3-dev
+   $ apt install -y gcc python3-dev
 
 Optionally replace ``master`` with a particular version of |project|.
 See `available versions <https://github.com/dcos/dcos-e2e/tags>`_.
@@ -82,7 +82,7 @@ If you are not in a virtualenv, you may have to use ``sudo`` before the followin
 
 .. code-block:: console
 
-    pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@master
+   $ pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@master
 
 Run ``dcos-docker doctor`` to make sure that your system is ready to go for the Docker backend:
 
@@ -136,7 +136,7 @@ A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor
    $ dcos-docker download-artifact
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0
+   $ dcos-docker create ./dcos_generate_config.sh --agents 0
    default
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls

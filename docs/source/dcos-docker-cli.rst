@@ -13,7 +13,7 @@ A typical CLI workflow for open source DC/OS may look like the following.
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor
    $ dcos-docker download-artifact
-   $ dcos-docker create /tmp/dcos_generate_config.sh --agents 0
+   $ dcos-docker create ./dcos_generate_config.sh --agents 0
    default
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
@@ -229,7 +229,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. code-block:: console
 
-   $ dcos-docker create /tmp/dcos_generate_config.sh
+   $ dcos-docker create ./dcos_generate_config.sh
    $ dcos-docker wait
    $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
@@ -256,7 +256,7 @@ For example:
 
 .. code-block:: console
 
-   $ dcos-docker create /tmp/dcos_generate_config.sh --one-master-host-port-map 70:80
+   $ dcos-docker create ./dcos_generate_config.sh --one-master-host-port-map 70:80
    $ dcos-docker wait
    $ open localhost:70
 

@@ -12,7 +12,7 @@ A typical CLI workflow for open source DC/OS may look like the following.
 
    # Fix issues shown by dcos-vagrant doctor
    $ dcos-vagrant doctor
-   $ dcos-vagrant create /tmp/dcos_generate_config.sh --agents 0
+   $ dcos-vagrant create ./dcos_generate_config.sh --agents 0
    default
    $ dcos-vagrant wait
    $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls
@@ -152,7 +152,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. code-block:: console
 
-   $ dcos-vagrant create /tmp/dcos_generate_config.sh
+   $ dcos-vagrant create ./dcos_generate_config.sh
    $ dcos-vagrant wait
    $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
