@@ -67,12 +67,12 @@ def remove_existing_files(scripts: Set[Path]) -> None:
     dist_dir = Path('.') / 'dist'
     build_dir = Path('.') / 'build'
     try:
-        shutil.rmtree(path=dist_dir)
+        shutil.rmtree(path=str(dist_dir))
     except FileNotFoundError:
         pass
 
     try:
-        shutil.rmtree(path=build_dir)
+        shutil.rmtree(path=str(build_dir))
     except FileNotFoundError:
         pass
 
