@@ -5,6 +5,7 @@ Utilities to connect to nodes with Docker exec.
 import io
 import os
 import subprocess
+import sys
 import tarfile
 import uuid
 from ipaddress import IPv4Address
@@ -54,8 +55,10 @@ def _compose_docker_command(
         user,
     ]
 
-    if tty:
+    if sys.stdin.isatty():
         docker_exec_args.append('--interactive')
+
+    if tty:
         docker_exec_args.append('--tty')
 
     for key, value in env.items():

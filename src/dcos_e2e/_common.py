@@ -77,6 +77,7 @@ def run_subprocess(
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
     # See http://stackoverflow.com/a/18423003.
+
     if log_output_live:
         process_stderr = STDOUT
     else:
