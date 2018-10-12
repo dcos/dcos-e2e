@@ -39,7 +39,7 @@ def run_command(
         env: Environment variables to set before running the command.
     """
     columns, rows = click.get_terminal_size()
-    tty = sys.stdin.isatty()
+    tty = True
 
     env = {
         # LINES and COLUMNS are needed if using the ``DOCKER_EXEC`` transport.

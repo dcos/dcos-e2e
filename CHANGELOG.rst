@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- The ``docker-exec`` transport uses interactive mode only when running in a terminal.
+
 2018.10.11.3
 ------------
 
