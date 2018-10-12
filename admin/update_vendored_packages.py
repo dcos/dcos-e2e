@@ -54,15 +54,6 @@ def main() -> None:
         git_reference='5361c8623cd0751f9312cf79b66dde6f09da1e74',
     )
 
-    # We have a fix at https://github.com/click-contrib/sphinx-click/pull/27
-    # that we require.
-    sphinx_click = _Requirement(
-        target_directory=dcos_e2e_target_directory,
-        package_name='sphinx_click',
-        https_address='https://github.com/adamtheturtle/sphinx-click',
-        git_reference='fix-envvar-duplicates',
-    )
-
     vertigo_e2e = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='vertigo',
@@ -80,7 +71,6 @@ def main() -> None:
     requirements = [
         dcos_launch,
         test_utils,
-        sphinx_click,
         vertigo_e2e,
         vertigo_cli,
     ]

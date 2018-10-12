@@ -14,7 +14,6 @@ import dcos_e2e
 sys.path.insert(0, os.path.abspath('.'))
 
 extensions = [
-    'dcos_e2e._vendor.sphinx_click.ext',
     'dcos_e2e._sphinx_extensions',
     'sphinx-prompt',
     'sphinx.ext.autodoc',
@@ -22,6 +21,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
+    'sphinx_click.ext',
     'sphinx_paramlinks',
     'sphinxcontrib.spelling',
 ]
