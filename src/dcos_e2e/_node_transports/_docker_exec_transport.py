@@ -55,7 +55,9 @@ def _compose_docker_command(
         user,
     ]
 
-    if sys.stdin.isatty():
+    # Do not cover this because there is currently no test for
+    # using this in a terminal in the CI.
+    if sys.stdin.isatty():  # pragma: no cover
         docker_exec_args.append('--interactive')
 
     if tty:
