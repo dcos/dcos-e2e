@@ -5,6 +5,7 @@ See ``test_node_install.py`` for more, related tests.
 """
 
 import logging
+import sys
 import textwrap
 import uuid
 from ipaddress import IPv4Address
@@ -563,6 +564,8 @@ class TestRun:
         """
         If the ``tty`` parameter is set to ``True``, a TTY is created.
         """
+        message = 'Use ``--capture=no / -s`` to run this test.'
+        assert sys.stdout.isatty(), message
         filename = uuid.uuid4().hex
         script = textwrap.dedent(
             """
