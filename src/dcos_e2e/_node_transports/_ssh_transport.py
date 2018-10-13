@@ -94,6 +94,7 @@ class SSHTransport(NodeTransport):
         tty: bool,
         ssh_key_path: Path,
         public_ip_address: IPv4Address,
+        capture_output: bool,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -133,7 +134,7 @@ class SSHTransport(NodeTransport):
         return run_subprocess(
             args=ssh_args,
             log_output_live=log_output_live,
-            pipe_output=not tty,
+            pipe_output=capture_output,
         )
 
     def popen(

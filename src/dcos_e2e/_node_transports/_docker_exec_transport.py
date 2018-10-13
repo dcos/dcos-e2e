@@ -87,6 +87,7 @@ class DockerExecTransport(NodeTransport):
         tty: bool,
         ssh_key_path: Path,
         public_ip_address: IPv4Address,
+        capture_output: bool,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -101,11 +102,10 @@ class DockerExecTransport(NodeTransport):
                 values.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
-                This means that the values of stdout and stderr will not be in
-                the returned ``subprocess.CompletedProcess``.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
+            capture_output: Whether to capture output in the result.
 
         Returns:
             The representation of the finished process.
@@ -125,7 +125,7 @@ class DockerExecTransport(NodeTransport):
         return run_subprocess(
             args=docker_exec_args,
             log_output_live=log_output_live,
-            pipe_output=not tty,
+            pipe_output=capture_output,
         )
 
     def popen(

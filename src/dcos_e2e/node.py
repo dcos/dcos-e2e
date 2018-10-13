@@ -472,6 +472,7 @@ class Node:
             tty=tty,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
+            capture_output=not tty,
         )
 
     def popen(
