@@ -448,10 +448,6 @@ class Node:
         """
 
         env = dict(env or {})
-        if tty:
-            # We do this to get consistent line endings across transports.
-            # See https://github.com/moby/moby/issues/8513.
-            args = ['stty', '-ocrnl', '&&'] + args
 
         if shell:
             args = ['/bin/sh', '-c', ' '.join(args)]

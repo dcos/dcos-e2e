@@ -564,8 +564,6 @@ class TestRun:
         """
         If the ``tty`` parameter is set to ``True``, a TTY is created.
         """
-        message = 'Use ``--capture=no / -s`` to run this test.'
-        assert sys.stdout.isatty(), message
         filename = uuid.uuid4().hex
         script = textwrap.dedent(
             """
@@ -582,6 +580,10 @@ class TestRun:
             tty=tty,
             shell=True,
         )
+
+        if not sys.stdout.isatty():
+            reason = 'Use ``--capture=no / -s`` to run this test.'
+            raise pytest.skip(reason)
 
         assert echo_result.returncode == 0
         run_result = dcos_node.run(args=['cat', filename])
