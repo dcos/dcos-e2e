@@ -555,8 +555,11 @@ class TestRun:
 
         dcos_node.run(args=['userdel', '-r', testuser])
 
+    # We skip coverage on this test because CI may not be a TTY.
+    # However, we do not skip the whole test so we at least cover more code in
+    # the implementation.
     @pytest.mark.parametrize('tty', [True, False])
-    def test_tty(
+    def test_tty(   # pragma: no cover
         self,
         dcos_node: Node,
         tty: bool,
@@ -564,8 +567,6 @@ class TestRun:
         """
         If the ``tty`` parameter is set to ``True``, a TTY is created.
         """
-        message = 'Use ``--capture=no / -s`` to run this test.'
-        assert sys.stdout.isatty(), message
         filename = uuid.uuid4().hex
         script = textwrap.dedent(
             """
@@ -582,6 +583,13 @@ class TestRun:
             tty=tty,
             shell=True,
         )
+
+        if not sys.stdout.isatty():
+            reason = (
+                'For this test to be valid, stdout must be a TTY. '
+                'Use ``--capture=no / -s`` to run this test.'
+            )
+            raise pytest.skip(reason)
 
         assert echo_result.returncode == 0
         run_result = dcos_node.run(args=['cat', filename])
