@@ -203,6 +203,7 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         ).stdout.strip().decode()
 
         tmp_path = '{home}/dcos-docker-{uuid}'.format(
@@ -218,6 +219,7 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         )
 
         container = _get_container_from_ip_address(public_ip_address)
@@ -243,6 +245,7 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         )
 
         self.run(
@@ -253,6 +256,7 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         )
 
 
