@@ -114,6 +114,7 @@ class SSHTransport(NodeTransport):
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
+            capture_output: Whether to capture output in the result.
 
         Returns:
             The representation of the finished process.
