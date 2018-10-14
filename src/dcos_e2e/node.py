@@ -38,21 +38,21 @@ class Transport(Enum):
 
 class Output(Enum):
     """
-    Output capture and display options for running commands.
+    Output capture options for running commands.
+
+    When using :py:class:`~dcos_e2e.node.Output.LOG_AND_CAPTURE`,
+    stdout and stderr are merged into stdout.
 
     Attributes:
         LOG_AND_CAPTURE: Log output at the debug level. stdout and stderr are
             merged into stdout in the captured output.
         CAPTURE: Capture stdout and stderr.
-        TTY: Allocate a pseudo-TTY. This means that the user's console is
-            attached to the streams of the process. No output is captured.
-            When using a TTY, different transports may use different line
-            endings.
+        NO_CAPTURE: Do not capture stdout or stderr.
     """
 
     LOG_AND_CAPTURE = 1
     CAPTURE = 2
-    TTY = 3
+    NO_CAPTURE = 3
 
 
 class Node:
@@ -441,6 +441,10 @@ class Node:
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
+            tty: Allocate a pseudo-TTY. This means that the user's console is
+                attached to the streams of the process.
+                When using a TTY, different transports may use different line
+                endings.
             shell: If ``False`` (the default), each argument is passed as a
                 literal value to the command.  If True, the command line is
                 interpreted as a shell command, with a special meaning applied
@@ -474,6 +478,19 @@ class Node:
 
         transport = transport or self.default_transport
         node_transport = self._get_node_transport(transport=transport)
+
+        capture_output = {
+            Output.CAPTURE: True,
+            Output.LOG_AND_CAPTURE: True,
+            Output.NO_CAPTURE: False,
+        }[output]
+
+        log_output_live = {
+            Output.CAPTURE: False,
+            Output.LOG_AND_CAPTURE: True,
+            Output.NO_CAPTURE: False,
+        }[output]
+
         return node_transport.run(
             args=args,
             user=user,
@@ -482,7 +499,7 @@ class Node:
             tty=tty,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
-            capture_output=not tty,
+            capture_output=capture_output,
         )
 
     def popen(
