@@ -33,6 +33,8 @@ def node_transport_option(command: Callable[..., None],
             'It also requires the "ssh" command to be available. '
             'This can be provided by setting the `DCOS_DOCKER_TRANSPORT` '
             'environment variable.'
+            'When using a TTY, different transports may use different line '
+            'endings.'
         ),
     )(command)  # type: Callable[..., None]
     return function
