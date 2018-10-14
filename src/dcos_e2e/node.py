@@ -119,9 +119,9 @@ class Node:
         ip_detect_path: Path,
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-        user: Optional[str] = None,
-        log_output_live: bool = False,
-        transport: Optional[Transport] = None,
+        user: Optional[str],
+        log_output_live: bool,
+        transport: Optional[Transport],
     ) -> None:
         """
         Install DC/OS in a platform-independent way by using
