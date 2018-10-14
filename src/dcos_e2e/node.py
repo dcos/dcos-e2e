@@ -36,6 +36,18 @@ class Transport(Enum):
     DOCKER_EXEC = 2
 
 
+class Output(Enum):
+    """
+    Output capture options for running commands.
+
+    Note that when using :py:class:`~dcos_e2e.node.Output.LOG_AND_CAPTURE`,
+    stdout and stderr are merged into stdout.
+    """
+
+    LOG_AND_CAPTURE = 1
+    CAPTURE = 2
+
+
 class Node:
     """
     A record of a DC/OS cluster node.

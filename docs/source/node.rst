@@ -38,3 +38,10 @@ Transports
 .. autoclass:: dcos_e2e.node.Transport
    :members:
    :undoc-members:
+
+Outputs
+-------
+
+.. autoclass:: dcos_e2e.node.Output
+   :members:
+   :undoc-members:
