@@ -433,6 +433,8 @@ class Node:
                 terminal is attached to the streams of the process.
                 This means that the values of stdout and stderr will not be in
                 the returned ``subprocess.CompletedProcess``.
+                When using a TTY, different transports may use different line
+                endings.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             sudo: Whether to use "sudo" to run commands.
