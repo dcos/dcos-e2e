@@ -98,6 +98,7 @@ def set_logging(verbosity_level: int) -> None:
         2: logging.DEBUG,
         3: logging.NOTSET,
     }
+    logging.basicConfig(level=logging.NOTSET)
     # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(verbosity_level or 0)])
 
