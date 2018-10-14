@@ -38,14 +38,21 @@ class Transport(Enum):
 
 class Output(Enum):
     """
-    Output capture options for running commands.
+    Output capture and display options for running commands.
 
-    Note that when using :py:class:`~dcos_e2e.node.Output.LOG_AND_CAPTURE`,
-    stdout and stderr are merged into stdout.
+    Attributes:
+        LOG_AND_CAPTURE: Log output at the debug level. stdout and stderr are
+            merged into stdout in the captured output.
+        CAPTURE: Capture stdout and stderr.
+        TTY: Allocate a pseudo-TTY. This means that the user's console is
+            attached to the streams of the process. No output is captured.
+            When using a TTY, different transports may use different line
+            endings.
     """
 
     LOG_AND_CAPTURE = 1
     CAPTURE = 2
+    TTY = 3
 
 
 class Node:
@@ -416,7 +423,7 @@ class Node:
         self,
         args: List[str],
         user: Optional[str] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
         tty: bool = False,
@@ -430,8 +437,7 @@ class Node:
             args: The command to run on the node.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live. If ``True``, stderr
-                is merged into stdout in the return value.
+            output: What happens with stdout and stderr.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
@@ -441,12 +447,6 @@ class Node:
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
-            tty: If ``True``, allocate a pseudo-tty. This means that the users
-                terminal is attached to the streams of the process.
-                This means that the values of stdout and stderr will not be in
-                the returned ``subprocess.CompletedProcess``.
-                When using a TTY, different transports may use different line
-                endings.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             sudo: Whether to use "sudo" to run commands.
@@ -471,10 +471,6 @@ class Node:
 
         if user is None:
             user = self.default_user
-
-        if log_output_live and tty:
-            message = '`log_output_live` and `tty` cannot both be `True`.'
-            raise ValueError(message)
 
         transport = transport or self.default_transport
         node_transport = self._get_node_transport(transport=transport)
