@@ -21,7 +21,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node, Role
+from dcos_e2e.node import Node, Output, Role
 
 
 class TestDefaults:
@@ -122,7 +122,7 @@ class TestRunIntegrationTest:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
 
@@ -138,7 +138,7 @@ class TestRunIntegrationTest:
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
 
 
@@ -229,7 +229,7 @@ class TestDCOSInstallation:
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
             cluster.wait_for_dcos_oss()
 
@@ -251,7 +251,7 @@ class TestDCOSInstallation:
                 build_artifact=oss_artifact_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -284,7 +284,7 @@ class TestDCOSInstallation:
             cluster.install_dcos_from_url(
                 build_artifact=oss_artifact_url,
                 dcos_config=cluster.base_config,
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=Path(str(ip_detect_file)),
             )
             cluster.wait_for_dcos_oss()
@@ -325,7 +325,7 @@ class TestDCOSInstallation:
             cluster.install_dcos_from_url(
                 build_artifact=oss_artifact_url,
                 dcos_config=cluster.base_config,
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
                     (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
