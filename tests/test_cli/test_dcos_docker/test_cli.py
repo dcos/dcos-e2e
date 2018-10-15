@@ -53,7 +53,11 @@ class TestHelp:
     Test help texts.
     """
 
-    @pytest.mark.parametrize('command', _COMMANDS)
+    @pytest.mark.parametrize(
+        'command',
+        _COMMANDS,
+        ids=[str(cmd) for cmd in _COMMANDS],
+    )
     def test_help(self, command: List[str]) -> None:
         """
         Expected help text is shown for ``dcos-docker`` commands.
