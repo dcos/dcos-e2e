@@ -44,7 +44,7 @@ class TestDcosDocker:
 
 class TestHelp:
     """
-    XXX
+    Test help texts.
     """
 
     @pytest.mark.parametrize('command', [
@@ -69,7 +69,7 @@ class TestHelp:
         command: List[str],
     ) -> None:
         """
-        Expected help text is shown fo ``dcos-docker`` commands.
+        Expected help text is shown for ``dcos-docker`` commands.
 
         This help text is defined in files.
         To update these files, run the command
