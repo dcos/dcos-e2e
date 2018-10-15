@@ -47,7 +47,7 @@ class TestEnterpriseIntegrationTests:
                     **config,
                 },
                 ip_detect_path=cluster_backend.ip_detect_path,
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
@@ -60,7 +60,7 @@ class TestEnterpriseIntegrationTests:
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
 
 
@@ -136,7 +136,7 @@ class TestCopyFiles:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
@@ -221,7 +221,7 @@ class TestCopyFiles:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
@@ -296,7 +296,7 @@ class TestCopyFiles:
                 ip_detect_path=cluster_backend.ip_detect_path,
                 role=Role.MASTER,
                 files_to_copy_to_genconf_dir=[(cert_dir_on_host, genconf)],
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
 
             cluster.wait_for_dcos_ee(
@@ -343,7 +343,7 @@ class TestSSLDisabled:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -392,7 +392,7 @@ class TestWaitForDCOS:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             (master, ) = cluster.masters

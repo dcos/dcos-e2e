@@ -31,7 +31,7 @@ class Test19:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_9_artifact,
                 dcos_config=cluster.base_config,
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -58,7 +58,7 @@ class Test19:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -84,7 +84,7 @@ class Test110:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_10_artifact,
                 dcos_config=cluster.base_config,
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -114,7 +114,7 @@ class Test110:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -140,7 +140,7 @@ class Test111:
             cluster.install_dcos_from_path(
                 build_artifact=oss_1_11_artifact,
                 dcos_config=cluster.base_config,
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -170,7 +170,7 @@ class Test111:
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(

@@ -60,7 +60,7 @@ def _oss_distribution_test(
         cluster.install_dcos_from_url(
             build_artifact=oss_artifact_url,
             dcos_config=cluster.base_config,
-            log_output_live=True,
+            output=Output.CAPTURE,
             ip_detect_path=cluster_backend.ip_detect_path,
         )
         cluster.wait_for_dcos_oss()
@@ -105,7 +105,7 @@ def _enterprise_distribution_test(
                 **config,
             },
             ip_detect_path=cluster_backend.ip_detect_path,
-            log_output_live=True,
+            output=Output.CAPTURE,
         )
         cluster.wait_for_dcos_ee(
             superuser_username=superuser_username,

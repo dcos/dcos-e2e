@@ -265,7 +265,7 @@ class Cluster(ContextDecorator):
             any_master.run(
                 args=create_user_args,
                 shell=True,
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
 
             api_session = DcosApiSession(
@@ -291,7 +291,7 @@ class Cluster(ContextDecorator):
             any_master.run(
                 args=delete_user_args,
                 shell=True,
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
 
         wait_for_dcos_oss_until_timeout()

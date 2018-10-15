@@ -42,7 +42,7 @@ class TestIntegrationTests:
                 dcos_config=dcos_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 build_artifact=oss_artifact,
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
             dcos_cluster.wait_for_dcos_oss()
             yield dcos_cluster
@@ -89,7 +89,7 @@ class TestIntegrationTests:
         pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
         cluster.run_integration_tests(
             pytest_command=pytest_command,
-            log_output_live=True,
+            output=Output.CAPTURE,
         )
 
         # An error is raised with an unsuccessful command.
@@ -97,7 +97,7 @@ class TestIntegrationTests:
             pytest_command = ['pytest', 'test_no_such_file.py']
             result = cluster.run_integration_tests(
                 pytest_command=pytest_command,
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
             # This result will not be printed if the test passes, but it
             # may provide useful debugging information.
@@ -308,7 +308,7 @@ class TestInstallDcosFromPathLogging:
                     build_artifact=oss_artifact,
                     ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,
-                    log_output_live=True,
+                    output=Output.CAPTURE,
                 )
 
         assert self._two_masters_error_logged(log_records=caplog.records)
