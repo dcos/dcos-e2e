@@ -47,10 +47,6 @@ class TestHelp:
     XXX
     """
 
-    @pytest.mark.parametrize('help_arguments', [
-        [],
-        ['--help'],
-    ])
     @pytest.mark.parametrize('command', [
         [],
         ['create'],
@@ -71,20 +67,24 @@ class TestHelp:
     def test_help(
         self,
         command: List[str],
-        help_arguments: List[str],
     ) -> None:
         """
         Help test is shown with ``dcos-docker`` and ``dcos-docker --help``.
         """
         runner = CliRunner()
-        arguments = command + help_arguments
+        arguments = command + ['--help']
         result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
         assert result.exit_code == 0
         help_output_filename = '-'.join(['dcos-docker'] + command) + '.txt'
         help_outputs_dir = Path(__file__).parent / 'help_outputs'
         expected_help_file = help_outputs_dir / help_output_filename
-        expected_help = expected_help_file.read_text()
-        assert result.output == expected_help
+        try:
+            expected_help = expected_help_file.read_text()
+            assert result.output == expected_help
+        except (AssertionError, FileNotFoundError):  # pragma: no cover
+            if os.getenv('FIX_CLI_TESTS') == '1':
+                expected_help_file.write_text(result.output)
+            raise
 
 
 class TestCreate:
