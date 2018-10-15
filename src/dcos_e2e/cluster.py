@@ -555,14 +555,14 @@ class Cluster(ContextDecorator):
                         files_to_copy_to_genconf_dir=(
                             files_to_copy_to_genconf_dir
                         ),
-                        log_output_live=log_output_live,
+                        output=output,
                     )
 
     def run_integration_tests(
         self,
         pytest_command: List[str],
         env: Optional[Dict[str, Any]] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         tty: bool = False,
         test_host: Optional[Node] = None,
         transport: Optional[Transport] = None,
@@ -575,9 +575,7 @@ class Cluster(ContextDecorator):
             env: Environment variables to be set on the node before running
                 the `pytest_command`. On enterprise clusters,
                 ``DCOS_LOGIN_UNAME`` and ``DCOS_LOGIN_PW`` must be set.
-            log_output_live: If ``True``, log output of the ``pytest_command``
-                live. If ``True``, ``stderr`` is merged into ``stdout`` in the
-                return value.
+            output: What happens with stdout and stderr.
             test_host: The node to run the given command on. if not given, an
                 arbitrary master node is used.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
@@ -628,7 +626,7 @@ class Cluster(ContextDecorator):
 
         return test_host.run(
             args=args,
-            log_output_live=log_output_live,
+            output=output,
             env=environment_variables,
             tty=tty,
             shell=True,
