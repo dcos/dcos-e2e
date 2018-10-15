@@ -19,7 +19,7 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
 from .exceptions import DCOSTimeoutError
-from .node import Node, Role, Transport
+from .node import Node, Output, Role, Transport
 
 
 @retry(
@@ -45,7 +45,7 @@ def _wait_for_ssh(node: Node) -> None:
     ]
     node.run(
         args=args,
-        log_output_live=True,
+        output=Output.LOG_AND_CAPTURE,
         shell=True,
     )
 
@@ -163,7 +163,7 @@ class Cluster(ContextDecorator):
                     '--diag',
                 ],
                 # Keep in mind this must be run as privileged user.
-                log_output_live=True,
+                output=Output.LOG_AND_CAPTURE,
                 shell=True,
             )
 
@@ -451,7 +451,7 @@ class Cluster(ContextDecorator):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
@@ -479,8 +479,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
+            output: What happens with stdout and stderr.
         """
         try:
             self._cluster.install_dcos_from_url_with_bootstrap_node(
@@ -488,7 +487,7 @@ class Cluster(ContextDecorator):
                 dcos_config=dcos_config,
                 ip_detect_path=ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-                log_output_live=log_output_live,
+                output=output,
             )
         except NotImplementedError:
             for nodes, role in (
@@ -505,7 +504,7 @@ class Cluster(ContextDecorator):
                             files_to_copy_to_genconf_dir
                         ),
                         role=role,
-                        log_output_live=log_output_live,
+                        output=output,
                     )
 
     def install_dcos_from_path(
@@ -514,7 +513,7 @@ class Cluster(ContextDecorator):
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
     ) -> None:
         """
         Args:
@@ -526,8 +525,7 @@ class Cluster(ContextDecorator):
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-            log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
+            output: What happens with stdout and stderr.
 
         Raises:
             NotImplementedError: `NotImplementedError` because it is more
@@ -540,7 +538,7 @@ class Cluster(ContextDecorator):
                 dcos_config=dcos_config,
                 ip_detect_path=ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-                log_output_live=log_output_live,
+                output=output,
             )
         except NotImplementedError:
             for nodes, role in (

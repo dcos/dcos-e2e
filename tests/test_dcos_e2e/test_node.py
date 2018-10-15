@@ -716,18 +716,3 @@ class TestRun:
             ),
         )
         assert bool(len(debug_messages & matching_messages)) is log_output_live
-
-    def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
-        """
-        A ``ValueError`` is raised if ``tty`` is ``True`` and
-        ``log_output_live`` is ``True``.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            dcos_node.run(
-                args=['echo', '1'],
-                log_output_live=True,
-                tty=True,
-            )
-
-        expected_message = '`log_output_live` and `tty` cannot both be `True`.'
-        assert str(excinfo.value) == expected_message
