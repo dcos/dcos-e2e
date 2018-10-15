@@ -672,7 +672,6 @@ class TestRun:
         assert echo_result.stdout.strip().decode() == 'hello, world'
         assert echo_result.stderr.strip().decode() == ''
 
-    @pytest.mark.parametrize('shell', [True, False])
     def test_error(
         self,
         caplog: LogCaptureFixture,
@@ -686,7 +685,6 @@ class TestRun:
         with pytest.raises(CalledProcessError) as excinfo:
             dcos_node.run(
                 args=['rm', 'does_not_exist'],
-                shell=shell,
                 log_output_live=log_output_live,
             )
 
