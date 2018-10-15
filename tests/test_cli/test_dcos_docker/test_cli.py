@@ -42,12 +42,16 @@ class TestDcosDocker:
         expected = 'dcos-docker, version'
         assert expected in result.output
 
+
 class TestHelp:
     """
     Test help texts.
     """
 
-    @pytest.mark.parametrize('command', [] + [[item] for item in dcos_docker.commands.keys()])
+    @pytest.mark.parametrize(
+        'command',
+        [] + [[item] for item in dcos_docker.commands.keys()],
+    )
     def test_help(
         self,
         command: List[str],
