@@ -20,13 +20,12 @@ Options:
                                  VPN set up.
   --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                  the SSH transport requires IP routing to be set
-                                 up. See "dcos-docker setup-mac-network".It also
-                                 requires the "ssh" command to be available.
-                                 This can be provided by setting the
-                                 `DCOS_DOCKER_TRANSPORT` environment
-                                 variable.When using a TTY, different transports
-                                 may use different line endings.  [default:
-                                 docker-exec]
+                                 up. See "dcos-docker setup-mac-network". It
+                                 also requires the "ssh" command to be
+                                 available. This can be provided by setting the
+                                 `DCOS_DOCKER_TRANSPORT` environment variable.
+                                 When using a TTY, different transports may use
+                                 different line endings.  [default: docker-exec]
   -v, --verbose                  Use verbose output. Use this option multiple
                                  times for more verbose output.
   --help                         Show this message and exit.
