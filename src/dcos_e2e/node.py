@@ -139,7 +139,7 @@ class Node:
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str],
-        log_output_live: bool,
+        output: Output,
         transport: Optional[Transport],
     ) -> None:
         """
@@ -163,7 +163,7 @@ class Node:
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live.
+            output: What happens with stdout and stderr.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
@@ -272,7 +272,7 @@ class Node:
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         transport: Optional[Transport] = None,
     ) -> None:
         """
@@ -303,7 +303,7 @@ class Node:
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live.
+            output: What happens with stdout and stderr.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
@@ -318,6 +318,7 @@ class Node:
             user=user,
             transport=transport,
             sudo=True,
+            output=Output.CAPTURE,
         )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
@@ -333,7 +334,7 @@ class Node:
             ip_detect_path=ip_detect_path,
             user=user,
             role=role,
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
