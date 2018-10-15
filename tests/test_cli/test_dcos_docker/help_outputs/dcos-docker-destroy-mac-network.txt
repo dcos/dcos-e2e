@@ -1,6 +1,0 @@
-Usage: dcos-docker destroy-mac-network [OPTIONS]
-
-  Destroy containers created by "dcos-docker setup-mac-network".
-
-Options:
-  --help  Show this message and exit.

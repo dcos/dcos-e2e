@@ -1,6 +1,0 @@
-Usage: dcos-docker list [OPTIONS]
-
-  List all clusters.
-
-Options:
-  --help  Show this message and exit.
