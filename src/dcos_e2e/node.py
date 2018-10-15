@@ -442,16 +442,16 @@ class Node:
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
-            tty: Allocate a pseudo-TTY. This means that the user's console is
-                attached to the streams of the process.
-                When using a TTY, different transports may use different line
-                endings.
             shell: If ``False`` (the default), each argument is passed as a
                 literal value to the command.  If True, the command line is
                 interpreted as a shell command, with a special meaning applied
                 to some characters (e.g. $, &&, >). This means the caller must
                 quote arguments if they may contain these special characters,
                 including whitespace.
+            tty: If ``True``, allocate a pseudo-tty. This means that the users
+                terminal is attached to the streams of the process.
+                When using a TTY, different transports may use different line
+                endings.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             sudo: Whether to use "sudo" to run commands.
