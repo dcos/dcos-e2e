@@ -20,7 +20,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Node, Output, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
@@ -570,9 +570,9 @@ class TestRun:
             """
             if [ -t 1 ]
             then
-            echo True > {filename}
+            echo True
             else
-            echo False > {filename}
+            echo False
             fi
             """,
         ).format(filename=filename)
@@ -590,8 +590,7 @@ class TestRun:
             raise pytest.skip(reason)
 
         assert echo_result.returncode == 0
-        run_result = dcos_node.run(args=['cat', filename])
-        assert run_result.stdout.strip().decode() == str(tty)
+        assert echo_result.stdout.strip().decode() == str(tty)
 
     def test_shell(
         self,
