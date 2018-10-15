@@ -60,37 +60,9 @@ class TestDcosDocker:
         runner = CliRunner()
         result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
         assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker [OPTIONS] COMMAND [ARGS]...
-
-              Manage DC/OS clusters on Docker.
-
-            Options:
-              --version  Show the version and exit.
-              --help     Show this message and exit.
-
-            Commands:
-              create               Create a DC/OS cluster.
-              destroy              Destroy a cluster.
-              destroy-list         Destroy clusters.
-              destroy-mac-network  Destroy containers created by "dcos-docker...
-              doctor               Diagnose common issues which stop this CLI from
-                                   working...
-              download-artifact    Download a DC/OS Open Source artifact.
-              inspect              Show cluster details.
-              list                 List all clusters.
-              run                  Run an arbitrary command on a node.
-              setup-mac-network    Set up a network to connect to nodes on macOS.
-              sync                 Sync files from a DC/OS checkout to master nodes.
-              wait                 Wait for DC/OS to start.
-              web                  Open the browser at the web UI.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
+        help_outputs_dir = Path(__file__).parent / 'help_outputs'
+        help_output_filename = 'base_command.txt'
+        expected_help = (help_outputs_dir / help_output_filename).read_text()
         assert result.output == expected_help
 
 
