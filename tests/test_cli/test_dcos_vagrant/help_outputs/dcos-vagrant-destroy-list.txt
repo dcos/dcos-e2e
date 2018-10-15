@@ -1,0 +1,8 @@
+Usage: dcos-vagrant destroy-list [OPTIONS] [CLUSTER_IDS]...
+
+  Destroy clusters.
+
+  To destroy all clusters, run ``dcos-vagrant destroy $(dcos-vagrant list)``.
+
+Options:
+  --help  Show this message and exit.
