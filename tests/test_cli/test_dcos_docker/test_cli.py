@@ -535,30 +535,8 @@ class TestDestroy:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker destroy [OPTIONS]
-
-              Destroy a cluster.
-
-            Options:
-              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
-                                             default]
-              --transport [docker-exec|ssh]  The communication transport to use. On macOS
-                                             the SSH transport requires IP routing to be set
-                                             up. See "dcos-docker setup-mac-network".It also
-                                             requires the "ssh" command to be available.
-                                             This can be provided by setting the
-                                             `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: docker-exec]
-              --help                         Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
+        help_outputs_dir = Path(__file__).parent / 'help_outputs'
+        help_output_filename = 'destroy.txt'
 
     def test_cluster_does_not_exist(self) -> None:
         """
