@@ -4,7 +4,6 @@ Tests for managing DC/OS cluster nodes.
 See ``test_node_install.py`` for more, related tests.
 """
 
-import logging
 import sys
 import textwrap
 import uuid
@@ -15,7 +14,6 @@ from typing import Iterator
 
 import pytest
 from _pytest.fixtures import SubRequest
-from _pytest.logging import LogCaptureFixture
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
@@ -672,21 +670,12 @@ class TestRun:
         assert echo_result.stdout.strip().decode() == 'hello, world'
         assert echo_result.stderr.strip().decode() == ''
 
-    def test_error(
-        self,
-        caplog: LogCaptureFixture,
-        dcos_node: Node,
-        shell: bool,
-        log_output_live: bool,
-    ) -> None:
+    def test_error(self, dcos_node: Node) -> None:
         """
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(
-                args=['rm', 'does_not_exist'],
-                log_output_live=log_output_live,
-            )
+            dcos_node.run(args=['rm', 'does_not_exist'])
 
         exception = excinfo.value
         assert exception.returncode == 1
