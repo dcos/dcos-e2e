@@ -5,7 +5,7 @@ Helpers for interacting with existing clusters.
 from pathlib import Path
 from typing import Any, Dict, Iterable, Set, Tuple, Type
 
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Output
 
 from ._base_classes import ClusterBackend, ClusterManager
 
@@ -84,7 +84,7 @@ class ExistingClusterManager(ClusterManager):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        log_output_live: bool,
+        output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
@@ -100,7 +100,7 @@ class ExistingClusterManager(ClusterManager):
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        log_output_live: bool,
+        output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """

@@ -673,7 +673,6 @@ class TestRun:
         assert echo_result.stderr.strip().decode() == ''
 
     @pytest.mark.parametrize('shell', [True, False])
-    @pytest.mark.parametrize('log_output_live', [True, False])
     def test_error(
         self,
         caplog: LogCaptureFixture,
@@ -693,26 +692,3 @@ class TestRun:
 
         exception = excinfo.value
         assert exception.returncode == 1
-        error_message = (
-            'rm: cannot remove ‘does_not_exist’: No such file or directory'
-        )
-        if log_output_live:
-            assert exception.stderr.strip() == b''
-            assert exception.stdout.decode().strip() == error_message
-        else:
-            assert exception.stdout.strip() == b''
-            assert exception.stderr.decode().strip() == error_message
-        # The stderr output is not in the debug log output.
-        debug_messages = set(
-            filter(
-                lambda record: record.levelno == logging.DEBUG,
-                caplog.records,
-            ),
-        )
-        matching_messages = set(
-            filter(
-                lambda record: 'No such file' in record.getMessage(),
-                caplog.records,
-            ),
-        )
-        assert bool(len(debug_messages & matching_messages)) is log_output_live

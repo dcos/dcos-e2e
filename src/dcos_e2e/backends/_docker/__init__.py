@@ -23,7 +23,7 @@ from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Node, Output, Transport
 
 from ._containers import start_dcos_container
 from ._docker_build import build_docker_image
@@ -438,7 +438,7 @@ class DockerCluster(ClusterManager):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        log_output_live: bool,
+        output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
@@ -451,7 +451,7 @@ class DockerCluster(ClusterManager):
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for
                 installing DC/OS.
-            log_output_live: If ``True``, log output of the installation live.
+            output: What happens with stdout and stderr.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
@@ -493,7 +493,7 @@ class DockerCluster(ClusterManager):
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        log_output_live: bool,
+        output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
@@ -505,7 +505,7 @@ class DockerCluster(ClusterManager):
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for
                 installing DC/OS.
-            log_output_live: If ``True``, log output of the installation live.
+            output: What happens with stdout and stderr.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
@@ -544,6 +544,18 @@ class DockerCluster(ClusterManager):
         )
         installer_port = _get_open_port()
 
+        log_output_live = {
+            Output.CAPTURE: False,
+            Output.LOG_AND_CAPTURE: True,
+            Output.NO_CAPTURE: False,
+        }[output]
+
+        capture_output = {
+            Output.CAPTURE: True,
+            Output.LOG_AND_CAPTURE: True,
+            Output.NO_CAPTURE: False,
+        }[output]
+
         run_subprocess(
             args=genconf_args,
             env={
@@ -552,6 +564,7 @@ class DockerCluster(ClusterManager):
             },
             log_output_live=log_output_live,
             cwd=str(self._path),
+            pipe_output=capture_output,
         )
 
         for role, nodes in [
