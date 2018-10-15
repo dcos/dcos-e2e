@@ -8,7 +8,6 @@ This is because automated tests for this would be very slow.
 
 import os
 from pathlib import Path
-from textwrap import dedent
 from typing import List
 
 import pytest
@@ -54,6 +53,7 @@ class TestDoctor:
             catch_exceptions=False,
         )
         assert result.exit_code == 0
+
 
 _SUBCOMMANDS = [[item] for item in dcos_aws.commands.keys()]
 _BASE_COMMAND = [[]]  # type: List[List[str]]
