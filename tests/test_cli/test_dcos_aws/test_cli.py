@@ -4,15 +4,10 @@ Tests for the AWS CLI.
 This mostly provides error case coverage.
 We rely mostly on manual testing.
 This is because automated tests for this would be very slow.
-
-For developing help texts, it is useful to add a breakpoint on failure and then
-to capture what the help text actually is with:
-
-  .. code: python
-
-       import pyperclip; pyperclip.copy(result.output)
 """
 
+import os
+from pathlib import Path
 from textwrap import dedent
 from typing import List
 
