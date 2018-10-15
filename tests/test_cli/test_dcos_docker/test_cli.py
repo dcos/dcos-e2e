@@ -49,20 +49,48 @@ class TestDcosDocker:
         expected = 'dcos-docker, version'
         assert expected in result.output
 
-    @pytest.mark.parametrize('arguments', [
+class TestHelp:
+    """
+    XXX
+    """
+
+    @pytest.mark.parametrize('help_arguments', [
         [],
         ['--help'],
     ])
-    def test_help(self, arguments: List[str]) -> None:
+    @pytest.mark.parametrize('command', [
+        [],
+        ['create'],
+        ['destroy'],
+        ['destroy-list'],
+        ['destroy-mac-network'],
+        ['doctor'],
+        ['download-artifact'],
+        ['inspect'],
+        ['list'],
+        ['run'],
+        ['setup-mac-network'],
+        ['sync'],
+        ['wait'],
+        ['web'],
+    ],
+    )
+    def test_help(
+        self,
+        command: List[str],
+        help_arguments: List[str],
+    ) -> None:
         """
         Help test is shown with `dcos-docker` and `dcos-docker --help`.
         """
         runner = CliRunner()
+        arguments = command + help_arguments
         result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
         assert result.exit_code == 0
+        help_output_filename = '-'.join(['dcos-docker'] + command) + '.txt'
         help_outputs_dir = Path(__file__).parent / 'help_outputs'
-        help_output_filename = 'base_command.txt'
-        expected_help = (help_outputs_dir / help_output_filename).read_text()
+        expected_help_file = help_outputs_dir / help_output_filename
+        expected_help = expected_help_file.read_text()
         assert result.output == expected_help
 
 
