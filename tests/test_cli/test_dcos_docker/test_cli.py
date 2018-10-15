@@ -99,22 +99,6 @@ class TestCreate:
     Tests for the `create` subcommand.
     """
 
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker create --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['create', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        help_outputs_dir = Path(__file__).parent / 'help_outputs'
-        help_output_filename = 'create.txt'
-        expected_help = (help_outputs_dir / help_output_filename).read_text()
-        assert result.output == expected_help
-
     def test_copy_to_master_bad_format(
         self,
         oss_artifact: Path,
@@ -552,20 +536,6 @@ class TestDestroy:
     Tests for the `destroy` subcommand.
     """
 
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker destroy --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['destroy', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        help_outputs_dir = Path(__file__).parent / 'help_outputs'
-        help_output_filename = 'destroy.txt'
-
     def test_cluster_does_not_exist(self) -> None:
         """
         An error is shown if the given cluster does not exist.
@@ -586,42 +556,6 @@ class TestDestroyList:
     """
     Tests for the `destroy-list` subcommand.
     """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker destroy --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['destroy-list', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker destroy-list [OPTIONS] [CLUSTER_IDS]...
-
-              Destroy clusters.
-
-              To destroy all clusters, run ``dcos-docker destroy $(dcos-docker list)``.
-
-            Options:
-              --transport [docker-exec|ssh]  The communication transport to use. On macOS
-                                             the SSH transport requires IP routing to be set
-                                             up. See "dcos-docker setup-mac-network".It also
-                                             requires the "ssh" command to be available.
-                                             This can be provided by setting the
-                                             `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: docker-exec]
-              --help                         Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
         """
@@ -659,76 +593,10 @@ class TestDestroyList:
         assert expected_error in result.output
 
 
-class TestList:
-    """
-    Tests for the `list` subcommand.
-    """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker list --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['list', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker list [OPTIONS]
-
-              List all clusters.
-
-            Options:
-              --help  Show this message and exit.
-            """,
-        )
-        assert result.output == expected_help
-
-
 class TestInspect:
     """
     Tests for the `inspect` subcommand.
     """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker inspect --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['inspect', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker inspect [OPTIONS]
-
-              Show cluster details.
-
-              To quickly get environment variables to use with Docker tooling, use the
-              ``--env`` flag.
-
-              Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run ``docker
-              exec -it $MASTER_0`` to enter the first master, for example.
-
-            Options:
-              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
-              --env                  Show details in an environment variable format to eval.
-              -v, --verbose          Use verbose output. Use this option multiple times for
-                                     more verbose output.
-              --help                 Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
 
     def test_cluster_does_not_exist(self) -> None:
         """
@@ -751,53 +619,6 @@ class TestWait:
     Tests for the ``wait`` subcommand.
     """
 
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker wait --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['wait', '--help'])
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker wait [OPTIONS]
-
-              Wait for DC/OS to start.
-
-            Options:
-              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
-                                             default]
-              --superuser-username TEXT      The superuser username is needed only on DC/OS
-                                             Enterprise clusters. By default, on a DC/OS
-                                             Enterprise cluster, `admin` is used.
-              --superuser-password TEXT      The superuser password is needed only on DC/OS
-                                             Enterprise clusters. By default, on a DC/OS
-                                             Enterprise cluster, `admin` is used.
-              --skip-http-checks             Do not wait for checks which require an HTTP
-                                             connection to the cluster. If this flag is
-                                             used, this command may return before DC/OS is
-                                             fully ready. Use this flag in cases where an
-                                             HTTP connection cannot be made to the cluster.
-                                             For example this is useful on macOS without a
-                                             VPN set up.
-              --transport [docker-exec|ssh]  The communication transport to use. On macOS
-                                             the SSH transport requires IP routing to be set
-                                             up. See "dcos-docker setup-mac-network".It also
-                                             requires the "ssh" command to be available.
-                                             This can be provided by setting the
-                                             `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: docker-exec]
-              -v, --verbose                  Use verbose output. Use this option multiple
-                                             times for more verbose output.
-              --help                         Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
-
     def test_cluster_does_not_exist(self) -> None:
         """
         An error is shown if the given cluster does not exist.
@@ -811,89 +632,10 @@ class TestWait:
         assert expected_error in result.output
 
 
-class TestSync:
-    """
-    Tests for the ``sync`` subcommand.
-    """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker sync --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['sync', '--help'])
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker sync [OPTIONS] [DCOS_CHECKOUT_DIR]
-
-              Sync files from a DC/OS checkout to master nodes.
-
-              This syncs integration test files and bootstrap files.
-
-              ``DCOS_CHECKOUT_DIR`` should be set to the path of clone of an open source
-              DC/OS or DC/OS Enterprise repository.
-
-              By default the ``DCOS_CHECKOUT_DIR`` argument is set to the value of the
-              ``DCOS_CHECKOUT_DIR`` environment variable.
-
-              If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
-
-            Options:
-              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
-                                             default]
-              --transport [docker-exec|ssh]  The communication transport to use. On macOS
-                                             the SSH transport requires IP routing to be set
-                                             up. See "dcos-docker setup-mac-network".It also
-                                             requires the "ssh" command to be available.
-                                             This can be provided by setting the
-                                             `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: docker-exec]
-              -v, --verbose                  Use verbose output. Use this option multiple
-                                             times for more verbose output.
-              --help                         Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
-
-
 class TestDoctor:
     """
     Tests for the ``doctor`` subcommand.
     """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker doctor --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['doctor', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker doctor [OPTIONS]
-
-              Diagnose common issues which stop this CLI from working correctly.
-
-            Options:
-              -v, --verbose  Use verbose output. Use this option multiple times for more
-                             verbose output.
-              --help         Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
 
     def test_doctor(self) -> None:
         """
@@ -904,127 +646,10 @@ class TestDoctor:
         assert result.exit_code == 0
 
 
-class TestDownloadArtifact:
-    """
-    Tests for the ``download-artifact`` subcommand.
-    """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker download-artifact --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['download-artifact', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker download-artifact [OPTIONS]
-
-              Download a DC/OS Open Source artifact.
-
-              For DC/OS Enterprise release artifacts, contact your sales representative.
-
-            Options:
-              --dcos-version TEXT   The DC/OS Open Source artifact version to download. This
-                                    can be in one of the following formats: ``stable``,
-                                    ``testing/master``, ``testing/<DC/OS MAJOR RELEASE>``,
-                                    ``stable/<DC/OS MINOR RELEASE>``,
-                                    ``testing/pull/<GITHUB-PR-NUMBER>``.
-                                    See
-                                    https://dcos.io/releases/ for available releases.
-                                    [default: stable]
-              --download-path TEXT  The path to download a release artifact to.  [default:
-                                    ./dcos_generate_config.sh]
-              --help                Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
-
-
-class TestWeb:
-    """
-    Tests for the ``web`` subcommand.
-    """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker web --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['web', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker web [OPTIONS]
-
-              Open the browser at the web UI.
-
-              Note that the web UI may not be available at first. Consider using ``dcos-
-              docker wait`` before running this command.
-
-            Options:
-              -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
-              -v, --verbose          Use verbose output. Use this option multiple times for
-                                     more verbose output.
-              --help                 Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
-
-
 class TestSetupMacNetwork():
     """
     Tests for the ``setup-mac-network`` subcommand.
     """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker setup-mac-network --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['setup-mac-network', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker setup-mac-network [OPTIONS]
-
-              Set up a network to connect to nodes on macOS.
-
-              This creates an OpenVPN configuration file and describes how to use it.
-
-            Options:
-              --force                   Overwrite any files and destroy conflicting
-                                        containers from previous uses of this command.
-              --configuration-dst PATH  The location to create an OpenVPN configuration
-                                        file.  [default: ~/Documents/docker-for-mac.ovpn]
-              --help                    Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
 
     def test_suffix_not_ovpn(self, tmpdir: local) -> None:
         """
@@ -1097,109 +722,3 @@ class TestSetupMacNetwork():
         # yapf: enable
         assert result.exit_code == 2
         assert result.output == expected_error
-
-
-class TestDestroyMacNetwork():
-    """
-    Tests for the ``destroy-mac-network`` subcommand.
-    """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker destroy-mac-network --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['destroy-mac-network', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker destroy-mac-network [OPTIONS]
-
-              Destroy containers created by "dcos-docker setup-mac-network".
-
-            Options:
-              --help  Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
-
-
-class TestRun:
-    """
-    Tests for the ``run`` subcommand.
-    """
-
-    def test_help(self) -> None:
-        """
-        Help text is shown with `dcos-docker run --help`.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['run', '--help'],
-            catch_exceptions=False,
-        )
-        assert result.exit_code == 0
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
-        expected_help = dedent(
-            """\
-            Usage: dcos-docker run [OPTIONS] NODE_ARGS...
-
-              Run an arbitrary command on a node.
-
-              This command sets up the environment so that ``pytest`` can be run.
-
-              For example, run ``dcos-docker run --cluster-id 1231599 pytest -k
-              test_tls.py``.
-
-              Or, with sync: ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k
-              test_tls.py``.
-
-              To use special characters such as single quotes in your command, wrap the
-              whole command in double quotes.
-
-            Options:
-              -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
-                                             default]
-              --dcos-login-uname TEXT        The username to set the ``DCOS_LOGIN_UNAME``
-                                             environment variable to.
-              --dcos-login-pw TEXT           The password to set the ``DCOS_LOGIN_PW``
-                                             environment variable to.
-              --sync-dir PATH                The path to a DC/OS checkout. Part of this
-                                             checkout will be synced to all master nodes
-                                             before the command is run.
-              --no-test-env                  With this flag set, no environment variables
-                                             are set and the command is run in the home
-                                             directory.
-              --node TEXT                    A reference to a particular node to run the
-                                             command on. This can be one of: The node's IP
-                                             address, the node's Docker container name, the
-                                             node's Docker container ID, a reference in the
-                                             format "<role>_<number>". These details be seen
-                                             with ``dcos-docker inspect``.
-              --env TEXT                     Set environment variables in the format
-                                             "<KEY>=<VALUE>"
-              --transport [docker-exec|ssh]  The communication transport to use. On macOS
-                                             the SSH transport requires IP routing to be set
-                                             up. See "dcos-docker setup-mac-network".It also
-                                             requires the "ssh" command to be available.
-                                             This can be provided by setting the
-                                             `DCOS_DOCKER_TRANSPORT` environment variable.
-                                             [default: docker-exec]
-              -v, --verbose                  Use verbose output. Use this option multiple
-                                             times for more verbose output.
-              --help                         Show this message and exit.
-            """,# noqa: E501,E261
-        )
-        # yapf: enable
-        assert result.output == expected_help
