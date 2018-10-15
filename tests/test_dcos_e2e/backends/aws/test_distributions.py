@@ -9,7 +9,7 @@ from passlib.hash import sha512_crypt
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Output
 
 
 def _get_node_distribution(node: Node) -> Distribution:

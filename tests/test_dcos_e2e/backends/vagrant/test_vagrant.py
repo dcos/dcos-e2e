@@ -14,7 +14,7 @@ import yaml
 from dcos_e2e._vendor import vertigo_py
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Output
 
 
 @pytest.mark.skipif(

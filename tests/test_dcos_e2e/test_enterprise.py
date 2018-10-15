@@ -1,5 +1,5 @@
 """
-Tests for using the test harness with a DC/OS Enterprise cluster.
+5ests for using the test harness with a DC/OS Enterprise cluster.
 """
 
 import json
@@ -12,7 +12,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Role
+from dcos_e2e.node import Output, Role
 
 
 class TestEnterpriseIntegrationTests:

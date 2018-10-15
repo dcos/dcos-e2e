@@ -173,7 +173,6 @@ class Node:
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-
         """
         tempdir = Path(gettempdir())
 
