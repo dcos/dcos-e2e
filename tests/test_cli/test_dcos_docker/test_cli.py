@@ -43,19 +43,18 @@ class TestDcosDocker:
         assert expected in result.output
 
 
+_SUBCOMMANDS = [[item] for item in dcos_docker.commands.keys()]
+_BASE_COMMAND = [[]]  # type: List[List[str]]
+_COMMANDS = _BASE_COMMAND + _SUBCOMMANDS
+
+
 class TestHelp:
     """
     Test help texts.
     """
 
-    @pytest.mark.parametrize(
-        'command',
-        [] + [[item] for item in dcos_docker.commands.keys()],
-    )
-    def test_help(
-        self,
-        command: List[str],
-    ) -> None:
+    @pytest.mark.parametrize('command', _COMMANDS)
+    def test_help(self, command: List[str]) -> None:
         """
         Expected help text is shown for ``dcos-docker`` commands.
 
