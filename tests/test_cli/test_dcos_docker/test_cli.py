@@ -69,7 +69,11 @@ class TestHelp:
         command: List[str],
     ) -> None:
         """
-        Help test is shown with ``dcos-docker`` and ``dcos-docker --help``.
+        Expected help text is shown fo ``dcos-docker`` commands.
+
+        This help text is defined in files.
+        To update these files, run the command
+        ``bash admin/update_cli_tests.sh``.
         """
         runner = CliRunner()
         arguments = command + ['--help']
