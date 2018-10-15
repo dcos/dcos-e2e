@@ -10,6 +10,7 @@
 #  * Make a change which changes expected help text for CLI commands
 #  * Run this script
 #  * Inspect the diff to check that changes are as expected
+#  * Commit and push
 
 set -ex
 
