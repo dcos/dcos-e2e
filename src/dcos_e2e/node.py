@@ -44,9 +44,13 @@ class Output(Enum):
     stdout and stderr are merged into stdout.
 
     Attributes:
-        LOG_AND_CAPTURE: Log output at the debug level. stdout and stderr are
-            merged into stdout in the captured output.
-        CAPTURE: Capture stdout and stderr.
+        LOG_AND_CAPTURE: Log output at the debug level. If the code returns a
+            ``subprocess.CompletedProcess``, the stdout and stderr will be
+            contained in the return value. However, they will be merged into
+            stderr.
+        CAPTURE: Capture stdout and stderr. If the code returns a
+            ``subprocess.CompletedProcess``, the stdout and stderr will be
+            contained in the return value.
         NO_CAPTURE: Do not capture stdout or stderr.
     """
 
@@ -230,7 +234,7 @@ class Node:
 
         self.run(
             args=genconf_args,
-            log_output_live=True,
+            output=output,
             shell=True,
             transport=transport,
             user=user,
@@ -239,7 +243,7 @@ class Node:
 
         self.run(
             args=['rm', str(remote_build_artifact)],
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             user=user,
             sudo=True,
@@ -258,7 +262,7 @@ class Node:
         self.run(
             args=setup_args,
             shell=True,
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             user=user,
             sudo=True,
