@@ -4,6 +4,12 @@
 # as expected.
 #
 # Expected output is stored in files.
+# This script updates those files.
+#
+# The expected use of this script:
+#  * Make a change which changes expected help text for CLI commands
+#  * Run this script
+#  * Inspect the diff to check that changes are as expected
 
 set -ex
 
