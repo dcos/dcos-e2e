@@ -47,23 +47,7 @@ class TestHelp:
     Test help texts.
     """
 
-    @pytest.mark.parametrize('command', [
-        [],
-        ['create'],
-        ['destroy'],
-        ['destroy-list'],
-        ['destroy-mac-network'],
-        ['doctor'],
-        ['download-artifact'],
-        ['inspect'],
-        ['list'],
-        ['run'],
-        ['setup-mac-network'],
-        ['sync'],
-        ['wait'],
-        ['web'],
-    ],
-    )
+    @pytest.mark.parametrize('command', [] + list(dcos_docker.commands.keys()))
     def test_help(
         self,
         command: List[str],
