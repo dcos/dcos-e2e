@@ -71,8 +71,10 @@ class TestHelp:
             assert result.output == expected_help
         except (AssertionError, FileNotFoundError):  # pragma: no cover
             if os.getenv('FIX_CLI_TESTS') == '1':
+                expected_help_file.touch()
                 expected_help_file.write_text(result.output)
-            raise
+            else:
+                raise
 
 
 class TestCreate:
