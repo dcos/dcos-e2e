@@ -351,7 +351,7 @@ class Node:
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         transport: Optional[Transport] = None,
     ) -> None:
         """
@@ -382,7 +382,7 @@ class Node:
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live.
+            output: What happens with stdout and stderr.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
@@ -408,7 +408,7 @@ class Node:
                 '-o',
                 str(node_build_artifact),
             ],
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             user=user,
             sudo=True,
@@ -420,7 +420,7 @@ class Node:
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             user=user,
             role=role,
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
         )
 
@@ -466,8 +466,6 @@ class Node:
         Raises:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
-            ValueError: ``log_output_live`` and ``tty`` are both set to
-                ``True``.
         """
 
         env = dict(env or {})
