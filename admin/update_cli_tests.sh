@@ -25,3 +25,8 @@ mkdir -p tests/test_cli/test_dcos_vagrant/help_outputs
 git rm -f tests/test_cli/test_dcos_vagrant/help_outputs/*.txt || true
 pytest tests/test_cli/test_dcos_vagrant/test_cli.py::TestHelp::test_help || true
 git add tests/test_cli/test_dcos_vagrant/help_outputs/*.txt
+
+mkdir -p tests/test_cli/test_dcos_aws/help_outputs
+git rm -f tests/test_cli/test_dcos_aws/help_outputs/*.txt || true
+pytest tests/test_cli/test_dcos_aws/test_cli.py::TestHelp::test_help || true
+git add tests/test_cli/test_dcos_aws/help_outputs/*.txt
