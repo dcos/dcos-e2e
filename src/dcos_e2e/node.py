@@ -2,7 +2,6 @@
 Tools for managing DC/OS cluster nodes.
 """
 
-import stat
 import subprocess
 import tarfile
 import uuid
@@ -56,7 +55,9 @@ class Node:
                 running on this node.
             default_user: The default username to use for connections.
             ssh_key_path: The path to an SSH key which can be used to SSH to
-                the node as the ``default_user`` user.
+                the node as the ``default_user`` user. The file must only have
+                permissions to be read by (and optionally written to) the
+                owner.
             default_transport: The transport to use for communicating with
                 nodes.
 
@@ -70,7 +71,6 @@ class Node:
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address
         self.default_user = default_user
-        ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
         self.default_transport = default_transport
 
