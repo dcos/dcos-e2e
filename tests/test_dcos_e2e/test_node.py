@@ -829,7 +829,7 @@ class TestOutput:
         args = ['rm', 'does_not_exist']
         output = Output.CAPTURE
         with pytest.raises(subprocess.CalledProcessError):
-            result = dcos_node.run(args=args, shell=True, output=output)
+            dcos_node.run(args=args, shell=True, output=output)
         [record] = caplog.records
         record.levelno == logging.ERROR
         expected_message = 'No such file or directory'
