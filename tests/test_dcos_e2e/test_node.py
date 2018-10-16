@@ -5,6 +5,7 @@ See ``test_node_install.py`` for more, related tests.
 """
 
 import logging
+import subprocess
 import sys
 import textwrap
 import uuid
@@ -560,7 +561,7 @@ class TestRun:
     # However, we do not skip the whole test so we at least cover more code in
     # the implementation.
     @pytest.mark.parametrize('tty', [True, False])
-    def test_tty(   # pragma: no cover
+    def test_tty(
         self,
         dcos_node: Node,
         tty: bool,
@@ -585,15 +586,15 @@ class TestRun:
             shell=True,
         )
 
-        if not sys.stdout.isatty():
+        if not sys.stdout.isatty():  # pragma: no cover
             reason = (
                 'For this test to be valid, stdout must be a TTY. '
                 'Use ``--capture=no / -s`` to run this test.'
             )
             raise pytest.skip(reason)
-
-        assert echo_result.returncode == 0
-        assert echo_result.stdout.strip().decode() == str(tty)
+        else:  # pragma: no cover
+            assert echo_result.returncode == 0
+            assert echo_result.stdout.strip().decode() == str(tty)
 
     def test_shell(
         self,
@@ -814,5 +815,21 @@ class TestOutput:
         assert captured.out.strip() == stdout_message
         assert captured.err.strip() == stderr_message
 
-    def test_errors(self, caplog: LogCaptureFixture, dcos_node: Node) -> None:
-        pass
+    @pytest.mark.parametrize('output', list(Output))
+    def test_errors(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+        output: Output,
+    ) -> None:
+        """
+        Errors are always logged at the error level.
+        """
+        args = ['rm', 'does_not_exist']
+        output = Output.CAPTURE
+        with pytest.raises(subprocess.CalledProcessError):
+            result = dcos_node.run(args=args, shell=True, output=output)
+        [record] = caplog.records
+        record.levelno == logging.ERROR
+        expected_message = 'No such file or directory'
+        assert expected_message in record.message
