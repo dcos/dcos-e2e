@@ -4,6 +4,7 @@ Tests for managing DC/OS cluster nodes.
 See ``test_node_install.py`` for more, related tests.
 """
 
+import logging
 import sys
 import textwrap
 import uuid
@@ -679,16 +680,56 @@ class TestRun:
         exception = excinfo.value
         assert exception.returncode == 1
 
+
 class TestOutput:
     """
     Test for run outputs.
+    # TODO also test in all tests, adding to stderr
     """
 
-    def test_capture(capsys, caplog):
-        args = ['echo', 1]
+    def test_default(self, capsys, caplog, dcos_node):
+        """
+        Tip: Rpdb
+        """
+        message = uuid.uuid4().hex
+        args = ['echo', message]
+        result = dcos_node.run(args=args)
+        assert result.stdout.strip().decode() == message
+        assert caplog.records == []
+        captured = capsys.readouterr()
+        assert captured.out == ''
+        assert captured.err == ''
 
-    def test_log_and_capture(capsys, caplog):
-        pass
 
-    def test_no_capture(capsys, caplog):
-        pass
+    def test_capture(self, capsys, caplog, dcos_node):
+        message = uuid.uuid4().hex
+        args = ['echo', message]
+        result = dcos_node.run(args=args, output=Output.CAPTURE)
+        assert result.stdout.strip().decode() == message
+        assert caplog.records == []
+        captured = capsys.readouterr()
+        assert captured.out == ''
+        assert captured.err == ''
+
+    def test_log_and_capture(self, capsys, caplog, dcos_node):
+        message = uuid.uuid4().hex
+        args = ['echo', message]
+        result = dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
+        assert result.stdout.strip().decode() == message
+        [record] = caplog.records
+        assert record.message == message
+        assert record.levelno == logging.DEBUG
+        captured = capsys.readouterr()
+        assert captured.out == ''
+        assert captured.err == ''
+
+    def test_no_capture(self, capsys, caplog, dcos_node):
+        message = uuid.uuid4().hex
+        args = ['echo', message]
+        result = dcos_node.run(args=args, output=Output.NO_CAPTURE)
+        assert result.stdout is None
+        assert result.stderr == b''
+        assert caplog.records == []
+        captured = capsys.readouterr()
+        assert captured.out == ''
+        assert captured.err == ''
