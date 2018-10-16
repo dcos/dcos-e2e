@@ -713,7 +713,6 @@ class TestOutput:
         assert captured.out == ''
         assert captured.err == ''
 
-
     def test_capture(self, capsys, caplog, dcos_node):
         """
         When given ``Output.CAPTURE``, stderr and stdout are captured in the
@@ -760,9 +759,11 @@ class TestOutput:
 
         # stderr is merged into stdout.
         # This is not ideal but for now it is the case.
-        assert result.stdout.strip().decode().split('\n') == (
-            [stdout_message, stderr_message]
-        )
+        assert set(result.stdout.strip().decode().split('\n')) == set([
+            stdout_message,
+            stderr_message,
+        ])
+
         stdout_log, stderr_log = caplog.records
         assert stdout_log.message == stdout_message
         assert stdout_log.levelno == logging.DEBUG
@@ -777,24 +778,14 @@ class TestOutput:
     def test_no_capture(self, capsys, caplog, dcos_node):
         """
         When given ``Output.NO_CAPTURE``, stderr is captured.
-
-        stderr is logged.
         """
         stdout_message = uuid.uuid4().hex
         stderr_message = uuid.uuid4().hex
         args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
         result = dcos_node.run(args=args, shell=True, output=Output.NO_CAPTURE)
         assert result.stdout is None
-        assert result.stderr.strip().decode() == stderr_message
-        args_log, result_log = caplog.records
+        assert result.stderr is None
 
-        assert args_log.levelno == logging.WARNING
-        assert stdout_message in args_log.message
-        assert stderr_message in args_log.message
-        assert 'echo' in args_log.message
-
-        assert result_log.levelno == logging.WARNING
-        assert result_log.message == stderr_message
         captured = capsys.readouterr()
         assert captured.out == ''
         assert captured.err == ''

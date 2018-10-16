@@ -69,8 +69,9 @@ def _compose_ssh_command(
         'UserKnownHostsFile=/dev/null',
         # Ignore warnings about remote host identification changes and new
         # hosts being added to the known hosts file in particular.
+        # Also ignore "Connection to xxx.xxx.xxx.xxx closed".
         '-o',
-        'LogLevel=ERROR',
+        'LogLevel=QUIET',
         str(public_ip_address),
     ] + [
         '{key}={value}'.format(key=k, value=quote(str(v)))

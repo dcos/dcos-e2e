@@ -81,7 +81,7 @@ def run_subprocess(
     if log_output_live:
         process_stderr = STDOUT
     else:
-        process_stderr = PIPE
+        process_stderr = PIPE if pipe_output else None
 
     with Popen(
         args=args,
