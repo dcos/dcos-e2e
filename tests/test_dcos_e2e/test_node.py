@@ -683,13 +683,14 @@ class TestRun:
 
 class TestOutput:
     """
-    Test for run outputs.
-    # TODO also test in all tests, adding to stderr
+    Tests for the ``output`` parameter of ``Node.run``.
     """
 
     def test_default(self, capsys, caplog, dcos_node):
         """
-        Tip: Rpdb
+        By default, stderr and stdout are captured in the output.
+
+        stderr is logged.
         """
         stdout_message = uuid.uuid4().hex
         stderr_message = uuid.uuid4().hex
@@ -714,10 +715,16 @@ class TestOutput:
 
 
     def test_capture(self, capsys, caplog, dcos_node):
+        """
+        When given ``Output.CAPTURE``, stderr and stdout are captured in the
+        output.
+
+        stderr is logged.
+        """
         stdout_message = uuid.uuid4().hex
         stderr_message = uuid.uuid4().hex
         args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
-        result = dcos_node.run(args=args, shell=True)
+        result = dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
         assert result.stdout.strip().decode() == stdout_message
         assert result.stderr.strip().decode() == stderr_message
 
@@ -736,6 +743,12 @@ class TestOutput:
         assert captured.err == ''
 
     def test_log_and_capture(self, capsys, caplog, dcos_node):
+        """
+        When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
+        in the output as stdout.
+
+        stdout and stderr are logged.
+        """
         stdout_message = uuid.uuid4().hex
         stderr_message = uuid.uuid4().hex
         args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
@@ -762,6 +775,11 @@ class TestOutput:
         assert captured.err == ''
 
     def test_no_capture(self, capsys, caplog, dcos_node):
+        """
+        When given ``Output.NO_CAPTURE``, stderr is captured.
+
+        stderr is logged.
+        """
         stdout_message = uuid.uuid4().hex
         stderr_message = uuid.uuid4().hex
         args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
