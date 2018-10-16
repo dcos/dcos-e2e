@@ -6,6 +6,7 @@ Changelog
 Next
 ----
 
+- Remove ``log_output_live`` parameters on various functions in favor of new ``output`` options.
 - ``Node.__init__``'s ``ssh_key_path`` parameter now expects a path to an SSH key file with specific permissions.
    See the documentation for this class for details.
 

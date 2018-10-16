@@ -14,7 +14,7 @@ import yaml
 from dcos_e2e._vendor import vertigo_py
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Output
 
 
 @pytest.mark.skipif(
@@ -44,7 +44,7 @@ class TestRunIntegrationTest:  # pragma: no cover
             cluster.install_dcos_from_path(
                 build_artifact=oss_artifact,
                 dcos_config=cluster.base_config,
-                log_output_live=True,
+                output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
 
@@ -53,7 +53,7 @@ class TestRunIntegrationTest:  # pragma: no cover
             # No error is raised with a successful command.
             cluster.run_integration_tests(
                 pytest_command=['pytest', '-vvv', '-s', '-x', 'test_units.py'],
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
 
 
