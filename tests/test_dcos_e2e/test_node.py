@@ -691,7 +691,7 @@ class TestOutput:
 
     def test_default(
         self,
-        cafd: CaptureFixture,
+        capfd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
@@ -723,7 +723,7 @@ class TestOutput:
 
     def test_capture(
         self,
-        cafd: CaptureFixture,
+        capfd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
@@ -756,7 +756,7 @@ class TestOutput:
 
     def test_log_and_capture(
         self,
-        cafd: CaptureFixture,
+        capfd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
@@ -777,6 +777,7 @@ class TestOutput:
 
         # stderr is merged into stdout.
         # This is not ideal but for now it is the case.
+        # The order is not necessarily preserved.
         assert set(result.stdout.strip().decode().split('\n')) == set(
             [
                 stdout_message,
@@ -784,12 +785,12 @@ class TestOutput:
             ]
         )
 
-        stdout_log, stderr_log = caplog.records
-        assert stdout_log.message == stdout_message
-        assert stdout_log.levelno == logging.DEBUG
+        first_log, second_log = caplog.records
+        assert first_log.levelno == logging.DEBUG
+        assert second_log.levelno == logging.DEBUG
 
-        assert stderr_log.message == stderr_message
-        assert stderr_log.levelno == logging.DEBUG
+        messages = set([first_log.message, second_log.message])
+        assert messages == set([stdout_message, stderr_message])
 
         captured = capfd.readouterr()
         assert captured.out == ''
@@ -797,7 +798,7 @@ class TestOutput:
 
     def test_no_capture(
         self,
-        cafd: CaptureFixture,
+        capfd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
