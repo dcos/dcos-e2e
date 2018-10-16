@@ -14,6 +14,7 @@ from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
 
 import pytest
+from _pytest.capture import CaptureFixture
 from _pytest.logging import LogCaptureFixture
 from _pytest.fixtures import SubRequest
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
@@ -689,7 +690,7 @@ class TestOutput:
     Also test an error
     """
 
-    def test_default(self, capfd, caplog: LogCaptureFixture, dcos_node: Node):
+    def test_default(self, cafd: CaptureFixture, caplog: LogCaptureFixture, dcos_node: Node):
         """
         By default, stderr and stdout are captured in the output.
 
@@ -716,7 +717,7 @@ class TestOutput:
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_capture(self, capfd, caplog: LogCaptureFixture, dcos_node: Node):
+    def test_capture(self, cafd: CaptureFixture, caplog: LogCaptureFixture, dcos_node: Node):
         """
         When given ``Output.CAPTURE``, stderr and stdout are captured in the
         output.
@@ -744,7 +745,7 @@ class TestOutput:
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_log_and_capture(self, capfd, caplog: LogCaptureFixture, dcos_node: Node):
+    def test_log_and_capture(self, cafd: CaptureFixture, caplog: LogCaptureFixture, dcos_node: Node):
         """
         When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
         in the output as stdout.
@@ -778,7 +779,7 @@ class TestOutput:
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_no_capture(self, capfd, caplog: LogCaptureFixture, dcos_node: Node):
+    def test_no_capture(self, cafd: CaptureFixture, caplog: LogCaptureFixture, dcos_node: Node):
         """
         When given ``Output.NO_CAPTURE``, no output is captured.
         """
