@@ -2,6 +2,7 @@
 Tests for the AWS backend.
 """
 
+import stat
 import uuid
 from pathlib import Path
 from textwrap import dedent
@@ -169,6 +170,8 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
+
+    private_key_path.chmod(mode=stat.S_IRUSR)
 
 
 class TestCustomKeyPair:

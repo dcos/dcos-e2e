@@ -2,6 +2,7 @@
 Helpers for creating and interacting with clusters on AWS.
 """
 
+import stat
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -275,6 +276,7 @@ class AWSCluster(ClusterManager):
         self._ssh_key_path = self._path / 'id_rsa'
         private_key = self.cluster_info['ssh_private_key']
         self._ssh_key_path.write_bytes(private_key.encode())
+        self._ssh_key_path.chmod(mode=stat.S_IRUSR)
 
         # Wait for the AWS stack setup completion.
         self.launcher.wait()
