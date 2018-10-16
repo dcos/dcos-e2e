@@ -691,7 +691,6 @@ class TestOutput:
 
     def test_default(
         self,
-        capfd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
@@ -717,13 +716,8 @@ class TestOutput:
         assert result_log.levelno == logging.WARNING
         assert result_log.message == stderr_message
 
-        captured = capfd.readouterr()
-        assert captured.out == ''
-        assert captured.err == ''
-
     def test_capture(
         self,
-        capfd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
@@ -750,13 +744,8 @@ class TestOutput:
         assert result_log.levelno == logging.WARNING
         assert result_log.message == stderr_message
 
-        captured = capfd.readouterr()
-        assert captured.out == ''
-        assert captured.err == ''
-
     def test_log_and_capture(
         self,
-        capfd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
@@ -788,10 +777,6 @@ class TestOutput:
 
         messages = set([first_log.message, second_log.message])
         assert messages == expected_messages
-
-        captured = capfd.readouterr()
-        assert captured.out == ''
-        assert captured.err == ''
 
     def test_no_capture(
         self,
