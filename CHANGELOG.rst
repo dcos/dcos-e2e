@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Remove ``log_output_live`` parameters on various functions in favour of new ``output`` options.
+
 2018.10.13.0
 ------------
 
