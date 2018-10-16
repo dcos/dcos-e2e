@@ -684,9 +684,11 @@ class TestRun:
 class TestOutput:
     """
     Tests for the ``output`` parameter of ``Node.run``.
+
+    Also test an error
     """
 
-    def test_default(self, capfd, caplog, dcos_node):
+    def test_default(self, capfd, caplog, dcos_node: Node):
         """
         By default, stderr and stdout are captured in the output.
 
@@ -713,7 +715,7 @@ class TestOutput:
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_capture(self, capfd, caplog, dcos_node):
+    def test_capture(self, capfd, caplog, dcos_node: Node):
         """
         When given ``Output.CAPTURE``, stderr and stdout are captured in the
         output.
@@ -741,7 +743,7 @@ class TestOutput:
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_log_and_capture(self, capfd, caplog, dcos_node):
+    def test_log_and_capture(self, capfd, caplog, dcos_node: Node):
         """
         When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
         in the output as stdout.
@@ -775,7 +777,7 @@ class TestOutput:
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_no_capture(self, capfd, caplog, dcos_node):
+    def test_no_capture(self, capfd, caplog, dcos_node: Node):
         """
         When given ``Output.NO_CAPTURE``, no output is captured.
         """
