@@ -686,8 +686,6 @@ class TestRun:
 class TestOutput:
     """
     Tests for the ``output`` parameter of ``Node.run``.
-
-    Also test an error
     """
 
     def test_default(
