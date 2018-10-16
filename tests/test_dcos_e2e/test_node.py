@@ -782,7 +782,7 @@ class TestOutput:
             [
                 stdout_message,
                 stderr_message,
-            ]
+            ],
         )
 
         first_log, second_log = caplog.records
