@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+- ``Node.__init__``'s ``ssh_key_path`` parameter now expects a path to an SSH key file with specific permissions.
+   See the documentation for this class for details.
+
 2018.10.13.0
 ------------
 

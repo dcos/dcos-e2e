@@ -3,6 +3,7 @@ Helpers for creating and interacting with clusters on Docker.
 """
 
 import socket
+import stat
 import subprocess
 import uuid
 from ipaddress import IPv4Address
@@ -58,6 +59,8 @@ def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
+
+    private_key_path.chmod(mode=stat.S_IRUSR)
 
 
 def _get_open_port() -> int:
