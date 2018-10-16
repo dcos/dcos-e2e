@@ -296,8 +296,8 @@ class TestInstallDcosFromPathLogging:
         oss_artifact: Path,
     ) -> None:
         """
-        If `log_output_live` is given as `True`, the installation output is
-        logged live.
+        If ``output`` is given as ``Output.LOG_AND_CAPTURE``, the installation
+        output is logged live.
         """
         with pytest.raises(CalledProcessError):
             # It is not possible to install DC/OS with two master nodes.
@@ -309,7 +309,7 @@ class TestInstallDcosFromPathLogging:
                     build_artifact=oss_artifact,
                     ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,
-                    output=Output.CAPTURE,
+                    output=Output.LOG_AND_CAPTURE,
                 )
 
         assert self._two_masters_error_logged(log_records=caplog.records)
