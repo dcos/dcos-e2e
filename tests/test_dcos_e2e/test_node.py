@@ -691,45 +691,92 @@ class TestOutput:
         """
         Tip: Rpdb
         """
-        message = uuid.uuid4().hex
-        args = ['echo', message]
-        result = dcos_node.run(args=args)
-        assert result.stdout.strip().decode() == message
-        assert caplog.records == []
+        stdout_message = uuid.uuid4().hex
+        stderr_message = uuid.uuid4().hex
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(args=args, shell=True)
+        assert result.stdout.strip().decode() == stdout_message
+        assert result.stderr.strip().decode() == stderr_message
+
+        args_log, result_log = caplog.records
+
+        assert args_log.levelno == logging.WARNING
+        assert stdout_message in args_log.message
+        assert stderr_message in args_log.message
+        assert 'echo' in args_log.message
+
+        assert result_log.levelno == logging.WARNING
+        assert result_log.message == stderr_message
+
         captured = capsys.readouterr()
         assert captured.out == ''
         assert captured.err == ''
 
 
     def test_capture(self, capsys, caplog, dcos_node):
-        message = uuid.uuid4().hex
-        args = ['echo', message]
-        result = dcos_node.run(args=args, output=Output.CAPTURE)
-        assert result.stdout.strip().decode() == message
-        assert caplog.records == []
+        stdout_message = uuid.uuid4().hex
+        stderr_message = uuid.uuid4().hex
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(args=args, shell=True)
+        assert result.stdout.strip().decode() == stdout_message
+        assert result.stderr.strip().decode() == stderr_message
+
+        args_log, result_log = caplog.records
+
+        assert args_log.levelno == logging.WARNING
+        assert stdout_message in args_log.message
+        assert stderr_message in args_log.message
+        assert 'echo' in args_log.message
+
+        assert result_log.levelno == logging.WARNING
+        assert result_log.message == stderr_message
+
         captured = capsys.readouterr()
         assert captured.out == ''
         assert captured.err == ''
 
     def test_log_and_capture(self, capsys, caplog, dcos_node):
-        message = uuid.uuid4().hex
-        args = ['echo', message]
-        result = dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
-        assert result.stdout.strip().decode() == message
-        [record] = caplog.records
-        assert record.message == message
-        assert record.levelno == logging.DEBUG
+        stdout_message = uuid.uuid4().hex
+        stderr_message = uuid.uuid4().hex
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(
+            args=args,
+            shell=True,
+            output=Output.LOG_AND_CAPTURE,
+        )
+
+        # stderr is merged into stdout.
+        # This is not ideal but for now it is the case.
+        assert result.stdout.strip().decode().split('\n') == (
+            [stdout_message, stderr_message]
+        )
+        stdout_log, stderr_log = caplog.records
+        assert stdout_log.message == stdout_message
+        assert stdout_log.levelno == logging.DEBUG
+
+        assert stderr_log.message == stderr_message
+        assert stderr_log.levelno == logging.DEBUG
+
         captured = capsys.readouterr()
         assert captured.out == ''
         assert captured.err == ''
 
     def test_no_capture(self, capsys, caplog, dcos_node):
-        message = uuid.uuid4().hex
-        args = ['echo', message]
-        result = dcos_node.run(args=args, output=Output.NO_CAPTURE)
+        stdout_message = uuid.uuid4().hex
+        stderr_message = uuid.uuid4().hex
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(args=args, shell=True, output=Output.NO_CAPTURE)
         assert result.stdout is None
-        assert result.stderr == b''
-        assert caplog.records == []
+        assert result.stderr.strip().decode() == stderr_message
+        args_log, result_log = caplog.records
+
+        assert args_log.levelno == logging.WARNING
+        assert stdout_message in args_log.message
+        assert stderr_message in args_log.message
+        assert 'echo' in args_log.message
+
+        assert result_log.levelno == logging.WARNING
+        assert result_log.message == stderr_message
         captured = capsys.readouterr()
         assert captured.out == ''
         assert captured.err == ''
