@@ -678,3 +678,17 @@ class TestRun:
 
         exception = excinfo.value
         assert exception.returncode == 1
+
+class TestOutput:
+    """
+    Test for run outputs.
+    """
+
+    def test_capture(capsys, caplog):
+        args = ['echo', 1]
+
+    def test_log_and_capture(capsys, caplog):
+        pass
+
+    def test_no_capture(capsys, caplog):
+        pass
