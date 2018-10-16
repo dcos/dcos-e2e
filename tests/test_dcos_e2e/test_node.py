@@ -686,7 +686,7 @@ class TestOutput:
     Tests for the ``output`` parameter of ``Node.run``.
     """
 
-    def test_default(self, capsys, caplog, dcos_node):
+    def test_default(self, capfd, caplog, dcos_node):
         """
         By default, stderr and stdout are captured in the output.
 
@@ -709,11 +709,11 @@ class TestOutput:
         assert result_log.levelno == logging.WARNING
         assert result_log.message == stderr_message
 
-        captured = capsys.readouterr()
+        captured = capfd.readouterr()
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_capture(self, capsys, caplog, dcos_node):
+    def test_capture(self, capfd, caplog, dcos_node):
         """
         When given ``Output.CAPTURE``, stderr and stdout are captured in the
         output.
@@ -737,11 +737,11 @@ class TestOutput:
         assert result_log.levelno == logging.WARNING
         assert result_log.message == stderr_message
 
-        captured = capsys.readouterr()
+        captured = capfd.readouterr()
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_log_and_capture(self, capsys, caplog, dcos_node):
+    def test_log_and_capture(self, capfd, caplog, dcos_node):
         """
         When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
         in the output as stdout.
@@ -771,13 +771,13 @@ class TestOutput:
         assert stderr_log.message == stderr_message
         assert stderr_log.levelno == logging.DEBUG
 
-        captured = capsys.readouterr()
+        captured = capfd.readouterr()
         assert captured.out == ''
         assert captured.err == ''
 
-    def test_no_capture(self, capsys, caplog, dcos_node):
+    def test_no_capture(self, capfd, caplog, dcos_node):
         """
-        When given ``Output.NO_CAPTURE``, stderr is captured.
+        When given ``Output.NO_CAPTURE``, no output is captured.
         """
         stdout_message = uuid.uuid4().hex
         stderr_message = uuid.uuid4().hex
@@ -786,6 +786,6 @@ class TestOutput:
         assert result.stdout is None
         assert result.stderr is None
 
-        captured = capsys.readouterr()
-        assert captured.out == ''
-        assert captured.err == ''
+        captured = capfd.readouterr()
+        assert captured.out.strip() == stdout_message
+        assert captured.err.strip() == stderr_message
