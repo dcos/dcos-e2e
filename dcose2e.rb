@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.10.13.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.10.16.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
   depends_on "python3"
@@ -93,8 +93,8 @@ class Dcose2e < Formula
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/e1/0f/f8d5e939184547b3bdc6128551b831a62832713aa98c2ccdf8c47ecc7f17/certifi-2018.8.24.tar.gz"
-    sha256 "376690d6f16d32f9d1fe8932551d80b23e9d393a8578c5633a2ed39a64861638"
+    url "https://files.pythonhosted.org/packages/41/b6/4f0cefba47656583217acd6cd797bc2db1fede0d53090fdc28ad2c8e0716/certifi-2018.10.15.tar.gz"
+    sha256 "6d58c986d22b038c8c0df30d639f23a3e6d172a05c3583e766f4c0b785c0986a"
   end
 
   resource "cffi" do
@@ -218,8 +218,8 @@ class Dcose2e < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/df/d9/4587f9b6a75c35bf5fb6f65962115ffbab2490bf20811972756de34461b4/msrest-0.6.0.tar.gz"
-    sha256 "6ff380d3f5251459ba8489718a010b7c4dc74654a079268f681d7dbc12672235"
+    url "https://files.pythonhosted.org/packages/f7/63/cf85cfa172be9da3c64c6f1f54430411137b81b398bb0e13a04154e9a6df/msrest-0.6.1.tar.gz"
+    sha256 "c087b91d68281a870e8cdff84f20dd55bbd6685daa76a307493e6e3a4343fc56"
   end
 
   resource "msrestazure" do
@@ -253,13 +253,13 @@ class Dcose2e < Formula
   end
 
   resource "pluggy" do
-    url "https://files.pythonhosted.org/packages/a1/83/ef7d976c12d67a5c7a5bc2a47f0501c926cabae9d9fcfdc26d72abc9ba15/pluggy-0.7.1.tar.gz"
-    sha256 "95eb8364a4708392bae89035f45341871286a333f749c3141c20573d2b3876e1"
+    url "https://files.pythonhosted.org/packages/65/25/81d0de17cd00f8ca994a4e74e3c4baf7cd25072c0b831dad5c7d9d6138f8/pluggy-0.8.0.tar.gz"
+    sha256 "447ba94990e8014ee25ec853339faf7b0fc8050cdc3289d4d71f7f410fb90095"
   end
 
   resource "py" do
-    url "https://files.pythonhosted.org/packages/4f/38/5f427d1eedae73063ce4da680d2bae72014995f9fdeaa57809df61c968cd/py-1.6.0.tar.gz"
-    sha256 "06a30435d058473046be836d3fc4f27167fd84c45b99704f2fb5509ef61f9af1"
+    url "https://files.pythonhosted.org/packages/c7/fa/eb6dd513d9eb13436e110aaeef9a1703437a8efa466ce6bb2ff1d9217ac7/py-1.7.0.tar.gz"
+    sha256 "bf92637198836372b520efcba9e020c330123be8ce527e535d185ed4b6f45694"
   end
 
   resource "pyasn1" do
