@@ -778,19 +778,16 @@ class TestOutput:
         # stderr is merged into stdout.
         # This is not ideal but for now it is the case.
         # The order is not necessarily preserved.
-        assert set(result.stdout.strip().decode().split('\n')) == set(
-            [
-                stdout_message,
-                stderr_message,
-            ],
-        )
+        expected_messages = set([stdout_message, stderr_message])
+        result_stdout = result.stdout.strip().decode()
+        assert set(result_stdout.split('\n')) == expected_messages
 
         first_log, second_log = caplog.records
         assert first_log.levelno == logging.DEBUG
         assert second_log.levelno == logging.DEBUG
 
         messages = set([first_log.message, second_log.message])
-        assert messages == set([stdout_message, stderr_message])
+        assert messages == expected_messages
 
         captured = capfd.readouterr()
         assert captured.out == ''
@@ -799,7 +796,6 @@ class TestOutput:
     def test_no_capture(
         self,
         capfd: CaptureFixture,
-        caplog: LogCaptureFixture,
         dcos_node: Node,
     ) -> None:
         """
@@ -831,6 +827,6 @@ class TestOutput:
         with pytest.raises(subprocess.CalledProcessError):
             dcos_node.run(args=args, shell=True, output=output)
         [record] = caplog.records
-        record.levelno == logging.ERROR
+        assert record.levelno == logging.ERROR
         expected_message = 'No such file or directory'
         assert expected_message in record.message
