@@ -74,14 +74,13 @@ def run_subprocess(
         Exception: An exception was raised in getting the output from the call.
     """
     process_stdout = PIPE if pipe_output else None
+    process_stderr = PIPE if pipe_output else None
+
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
     # See http://stackoverflow.com/a/18423003.
-
     if log_output_live:
         process_stderr = STDOUT
-    else:
-        process_stderr = PIPE if pipe_output else None
 
     with Popen(
         args=args,
