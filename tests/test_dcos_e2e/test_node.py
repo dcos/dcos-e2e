@@ -693,7 +693,7 @@ class TestOutput:
         cafd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
-    ):
+    ) -> None:
         """
         By default, stderr and stdout are captured in the output.
 
@@ -725,7 +725,7 @@ class TestOutput:
         cafd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
-    ):
+    ) -> None:
         """
         When given ``Output.CAPTURE``, stderr and stdout are captured in the
         output.
@@ -758,7 +758,7 @@ class TestOutput:
         cafd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
-    ):
+    ) -> None:
         """
         When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
         in the output as stdout.
@@ -799,7 +799,7 @@ class TestOutput:
         cafd: CaptureFixture,
         caplog: LogCaptureFixture,
         dcos_node: Node,
-    ):
+    ) -> None:
         """
         When given ``Output.NO_CAPTURE``, no output is captured.
         """
@@ -813,3 +813,6 @@ class TestOutput:
         captured = capfd.readouterr()
         assert captured.out.strip() == stdout_message
         assert captured.err.strip() == stderr_message
+
+    def test_errors(self, caplog: LogCaptureFixture, dcos_node: Node) -> None:
+        pass
