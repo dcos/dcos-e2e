@@ -3,6 +3,7 @@ Common utilities for making CLIs.
 """
 import json
 import logging
+import stat
 import subprocess
 import sys
 from pathlib import Path
@@ -158,6 +159,8 @@ def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
     public_key_path.write_bytes(data=public_key)
     private_key_path.write_bytes(data=private_key)
+
+    private_key_path.chmod(mode=stat.S_IRUSR)
 
 
 def show_wait_help(is_enterprise: bool, doctor_command_name: str) -> None:
