@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.10.17.0
+------------
+
 - Fix an issue which stopped the SSH transport from working on CLIs.
 
 2018.10.16.0
