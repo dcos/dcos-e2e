@@ -72,11 +72,15 @@ download-artifacts:
 .PHONY: docs
 docs:
 	make -C docs/library clean html SPHINXOPTS=$(SPHINXOPTS)
+	make -C docs/cli clean html SPHINXOPTS=$(SPHINXOPTS)
 
 .PHONY: open-docs
 open-docs:
 	xdg-open docs/library/build/html/index.html >/dev/null 2>&1 || \
 	open docs/library/build/html/index.html >/dev/null 2>&1 || \
+	echo "Requires 'xdg-open' or 'open' but neither is available."
+	xdg-open docs/cli/build/html/index.html >/dev/null 2>&1 || \
+	open docs/cli/build/html/index.html >/dev/null 2>&1 || \
 	echo "Requires 'xdg-open' or 'open' but neither is available."
 
 # We pull Docker images before the tests start to catch any flakiness early.
