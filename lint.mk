@@ -68,10 +68,12 @@ vulture:
 .PHONY: linkcheck
 linkcheck:
 	$(MAKE) -C docs/library linkcheck SPHINXOPTS=$(SPHINXOPTS)
+	$(MAKE) -C docs/cli linkcheck SPHINXOPTS=$(SPHINXOPTS)
 
 .PHONY: spelling
 spelling:
 	$(MAKE) -C docs/library spelling SPHINXOPTS=$(SPHINXOPTS)
+	$(MAKE) -C docs/cli spelling SPHINXOPTS=$(SPHINXOPTS)
 
 .PHONY: custom-linters
 custom-linters:
