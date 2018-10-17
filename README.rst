@@ -8,6 +8,7 @@
 =========
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
+It includes a Python library and various CLI tools.
 
 See the full documentation on `Read the Docs <http://dcos-e2e.readthedocs.io/>`_.
 
@@ -19,76 +20,9 @@ Installation
 
 |project| consists of a `library`_ and various `CLI`_ tools.
 
-The tools CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
+See XXX for CLI installation options.
 
-Windows is not currently supported, but we provide instructions on using |project| on Windows with Vagrant on particular `backends`_\ ' documentation.
-
-
-CLI on macOS With Homebrew or Linux with Linuxbrew
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To install the CLI on macOS, install `Homebrew`_.
-To install the CLI on Linux, install `Linuxbrew`_.
-Or, if you prefer, see "Library and CLI with Python" below for an alternative.
-
-Then install the latest stable version:
-
-.. code-block:: console
-
-   $ brew install https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
-
-To upgrade from an older version, run the following command:
-
-.. code-block:: console
-
-   $ brew upgrade https://raw.githubusercontent.com/dcos/dcos-e2e/master/dcose2e.rb
-
-Run ``dcos-docker doctor`` to make sure that your system is ready to go for the ``dcos-docker`` CLI:
-
-.. code-block:: console
-
-   $ dcos-docker doctor
-
-Library and CLI with Python
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If the CLI has been installed with Homebrew or Linuxbrew, you do not need to install the library to use the CLI.
-
-Requires Python 3.5.2+.
-To avoid interfering with your system's Python, we recommend using a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_.
-
-Check the Python version:
-
-.. code-block:: console
-
-   $ python3 --version
-
-On Fedora, install Python development requirements:
-
-.. code-block:: console
-
-   $ sudo dnf install -y git python3-devel
-
-On Ubuntu, install Python development requirements:
-
-.. code-block:: console
-
-   $ apt install -y gcc python3-dev
-
-Optionally replace ``master`` with a particular version of |project|.
-See `available versions <https://github.com/dcos/dcos-e2e/tags>`_.
-
-If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
-
-.. code-block:: console
-
-   $ pip3 install --upgrade git+https://github.com/dcos/dcos-e2e.git@master
-
-Run ``dcos-docker doctor`` to make sure that your system is ready to go for the Docker backend:
-
-.. code-block:: console
-
-   $ dcos-docker doctor
+See XXX for library installation options.
 
 Python Library
 --------------
