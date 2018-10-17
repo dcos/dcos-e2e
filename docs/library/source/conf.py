@@ -101,7 +101,7 @@ linkcheck_ignore = [
     r'https://www.virtualbox.org/wiki/Downloads',
 ]
 
-spelling_word_list_filename = '../../spelling_private_dict.txt'
+spelling_word_list_filename = '../../../spelling_private_dict.txt'
 
 autodoc_member_order = 'bysource'
 
