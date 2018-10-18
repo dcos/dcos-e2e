@@ -18,11 +18,11 @@ See the full documentation on `Read the Docs <http://dcos-e2e.readthedocs.io/>`_
 Installation
 ------------
 
-|project| consists of a `library`_ and various `CLI`_ tools.
+|project| consists of a Python `library`_ and various `CLI`_ tools.
 
 See the full `CLI`_ documentation for CLI installation options.
 
-See XXX for library installation options.
+To install the library, follow the `library installation instructions`_.
 
 Python Library
 --------------
@@ -98,3 +98,4 @@ See the full `CLI`_ documentation for information on other CLI tools provided by
 .. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html
 .. _backends: http://dcos-e2e.readthedocs.io/en/latest/backends.html
 .. |project| replace:: DC/OS E2E
+.. _library_installation_instructions: https://dcos-e2e.readthedocs.io/en/latest/installation.html#library-and-cli-with-python
