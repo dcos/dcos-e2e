@@ -11,3 +11,5 @@ CLI Tools
    dcos-aws-cli
 
 .. include:: install-cli.rst
+
+.. include:: uninstall.rst

@@ -2,25 +2,14 @@
 =========
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
-
-.. include:: installation.rst
-
-.. include:: getting-started.rst
-
-CLI
----
-
-|project| also provides multiple command line interface tools.
-These allow you to create, manage and destroy DC/OS clusters on various backends.
-See :doc:`cli` for details.
+It consists of a :doc:`library` and various :doc:`cli`.
 
 Reference
 ---------
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
-   installation
    library
    cli
    dcos-docker-cli

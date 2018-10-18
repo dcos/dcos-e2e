@@ -1,7 +1,7 @@
 Uninstall
 ~~~~~~~~~
 
-To uninstall |project|, use one of the following methods, depending on how you installed |project|.
+To uninstall the |project| CLI tools, use one of the following methods, depending on how you installed |project|.
 
 For ``pip`` installations:
 
