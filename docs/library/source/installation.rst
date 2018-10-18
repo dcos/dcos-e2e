@@ -1,18 +1,13 @@
-Installation
-------------
-
-|project| consists of a :doc:`library` and various :doc:`cli`.
-
-The CLI can be installed with Homebrew on macOS, and the library and CLI can be installed together with ``pip`` on any Linux and macOS.
-
-Windows is not currently supported, but we provide instructions on using |project| on Windows with Vagrant on particular :doc:`backends`\ ' documentation.
-
-.. include:: cli-homebrew.rst
-
-.. include:: cli-linuxbrew.rst
+Installing the Python Library
+-----------------------------
 
 .. include:: install-python.rst
 
-.. include:: install-prebuilt-linux.rst
+Uninstall
+~~~~~~~~~
 
-.. include:: uninstall.rst
+To uninstall the |project| library, use the following instructions:
+
+.. smart-prompt:: bash
+
+   pip3 uninstall -y dcos-e2e
