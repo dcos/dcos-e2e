@@ -20,7 +20,7 @@ Installation
 
 |project| consists of a `library`_ and various `CLI`_ tools.
 
-See XXX for CLI installation options.
+See the full `CLI`_ documentation for CLI installation options.
 
 See XXX for library installation options.
 
