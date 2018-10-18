@@ -1,8 +1,9 @@
 Installing the CLI
 ------------------
 
-The CLI can be installed with Homebrew on macOS or Linuxbrew on Linux.
-The library and CLI can be installed together with ``pip`` on any Linux and macOS.
+The CLI can be installed in various ways.
+
+.. contents::
 
 .. include:: cli-homebrew.rst
 
