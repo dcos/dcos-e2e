@@ -1,4 +1,4 @@
-Linux With Linuxbrew
+Linux with Linuxbrew
 ~~~~~~~~~~~~~~~~~~~~
 
 To install on Linux with `Linuxbrew`_, install `Linuxbrew`_, then install the latest stable version:
