@@ -1,8 +1,7 @@
-CLI on macOS With Homebrew
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+macOS With Homebrew
+~~~~~~~~~~~~~~~~~~~
 
-To install the CLI on macOS, install `Homebrew`_.
-
+Install `Homebrew`_.
 Then install the latest stable version:
 
 .. include:: cli-brew.rst
