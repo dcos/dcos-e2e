@@ -18,8 +18,6 @@ extensions = [
     'sphinx-prompt',
     'sphinx.ext.autodoc',
     'sphinx.ext.extlinks',
-    'sphinx.ext.napoleon',
-    'sphinx_autodoc_typehints',
     'sphinx_click.ext',
     'sphinx_paramlinks',
     'sphinxcontrib.spelling',
@@ -99,7 +97,7 @@ extlinks = {
 }
 
 rst_epilog = """
-.. |project| replace:: DC/OS E2E
+.. |project| replace:: {project}
 .. |github-owner| replace:: dcos
 .. |github-repository| replace:: dcos-e2e
-"""
+""".format(project=project)
