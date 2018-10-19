@@ -30,8 +30,11 @@ class DockerLoopbackVolume():
         """
         self.size = size
 
-        self.container, self.path = \
-            DockerLoopbackVolume.create(name, size, labels)
+        self.container, self.path = DockerLoopbackVolume.create(
+            name=name,
+            size=size,
+            labels=labels,
+        )
 
     @staticmethod
     def create(
@@ -58,7 +61,7 @@ class DockerLoopbackVolume():
         # and might already be pulled as it is a distribution supported
         # by DC/OS.
         container = client.containers.create(
-            name='dcos-e2e-loopback-sidecar-{}'.format(name),
+            name='dcos-e2e-loopback-sidecar-{name}'.format(name=name),
             privileged=True,
             detach=True,
             tty=True,
@@ -67,8 +70,9 @@ class DockerLoopbackVolume():
         )
         container.start()
 
-        create_loopback_device = \
-            'dd if=/dev/zero of=/volume0 bs=1M count={0};'.format(size)
+        create_loopback_device = (
+            'dd if=/dev/zero of=/volume0 bs=1M count={size};'
+        ).format(size=size)
 
         exit_code, output = container.exec_run(
             cmd=['/bin/bash', '-c', create_loopback_device],
@@ -84,7 +88,9 @@ class DockerLoopbackVolume():
 
         path = output.decode().rstrip()
 
-        write_device_path = 'echo {0} > loopback_device_path'.format(path)
+        write_device_path = 'echo {path} > loopback_device_path'.format(
+            path=path,
+        )
 
         exit_code, output = container.exec_run(
             cmd=['/bin/bash', '-c', write_device_path],
