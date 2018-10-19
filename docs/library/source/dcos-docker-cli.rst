@@ -398,4 +398,3 @@ CLI Reference
 
 .. click:: cli.dcos_docker:destroy_loopback_sidecar
   :prog: dcos-docker destroy-loopback-sidecar
-

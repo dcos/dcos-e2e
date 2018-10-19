@@ -388,3 +388,13 @@ CLI Reference
 
 .. click:: cli.dcos_docker:download_artifact
   :prog: dcos-docker download-artifact
+
+.. _dcos-docker-create-loopback-sidecar:
+
+.. click:: cli.dcos_docker:create_loopback_sidecar
+  :prog: dcos-docker create-loopback-sidecar
+
+.. _dcos-docker-destroy-loopback-sidecar:
+
+.. click:: cli.dcos_docker:destroy_loopback_sidecar
+  :prog: dcos-docker destroy-loopback-sidecar
