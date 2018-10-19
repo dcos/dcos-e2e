@@ -117,7 +117,7 @@ class DockerLoopbackVolume():
 
         path = output.decode().rstrip()
 
-        delete_loopback_device = 'losetup -d {0}'.format(path)
+        delete_loopback_device = 'losetup -d {path}'.format(path=path)
 
         exit_code, output = container.exec_run(
             cmd=['/bin/bash', '-c', delete_loopback_device],
