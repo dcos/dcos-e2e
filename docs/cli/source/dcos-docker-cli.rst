@@ -1,7 +1,7 @@
 .. _dcos-docker_cli:
 
-``dcos-docker`` CLI
-===================
+``dcos-docker``
+===============
 
 The ``dcos-docker`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
