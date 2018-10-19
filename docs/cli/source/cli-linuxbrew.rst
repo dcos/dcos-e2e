@@ -1,8 +1,7 @@
-CLI on Linux With Linuxbrew
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Linux With Linuxbrew
+~~~~~~~~~~~~~~~~~~~~
 
-One way to install the CLI on Linux is with `Linuxbrew`_.
-Install `Linuxbrew`_, then install the latest stable version:
+To install on Linux with `Linuxbrew`_, install `Linuxbrew`_, then install the latest stable version:
 
 .. include:: cli-brew.rst
 
