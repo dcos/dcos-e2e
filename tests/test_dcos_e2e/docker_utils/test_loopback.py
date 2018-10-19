@@ -1,17 +1,8 @@
 from typing import Tuple
 
 import docker
-import pytest
 
 from dcos_e2e.docker_utils import DockerLoopbackVolume
-
-# We ignore this error because it conflicts with `pytest` standard usage.
-# pylint: disable=redefined-outer-name
-
-
-@pytest.fixture
-def loopback_sidecar() -> Tuple[docker.models.containers.Container, str]:
-    return DockerLoopbackVolume.create(name='test', size=1)
 
 
 class TestDockerLoopbackVolume:
@@ -30,8 +21,9 @@ class TestDockerLoopbackVolume:
             size=1,
             labels=labels,
         ) as device:
-            cmd = 'lsblk {}'.format(device.path)
-            exit_code, output = device.container.exec_run(cmd=cmd)
+            exit_code, output = device.container.exec_run(
+                cmd=['lsblk', device.path],
+            )
             assert exit_code == 0, cmd + ': ' + output.decode()
 
             for key, value in labels.items():
@@ -53,19 +45,16 @@ class TestDockerLoopbackVolume:
             for key, value in labels.items():
                 assert container.labels[key] == value
 
-            cmd = 'lsblk {}'.format(path)
-            exit_code, output = container.exec_run(cmd=cmd)
+            exit_code, output = container.exec_run(cmd=['lsblk', path])
             assert exit_code == 0, cmd + ': ' + output.decode()
 
         finally:
             DockerLoopbackVolume.destroy(container)
 
-    def test_destroy(
-        self,
-        loopback_sidecar: Tuple[docker.models.containers.Container, str],
-    ) -> None:
+    def test_destroy(self) -> None:
         """
         Calling `DockerLoopbackVolume.destroy` destroys a sidecar container
         without throwing an exception.
         """
-        DockerLoopbackVolume.destroy(loopback_sidecar[0])
+        container, _ = DockerLoopbackVolume.create(name='test', size=1)
+        DockerLoopbackVolume.destroy(container=container)

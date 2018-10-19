@@ -108,20 +108,14 @@ class DockerLoopbackVolume():
         Args:
             container: The container to destroy.
         """
-        read_device_path = 'cat loopback_device_path'
-
         exit_code, output = container.exec_run(
-            cmd=['/bin/bash', '-c', read_device_path],
+            cmd=['cat', 'loopback_device_path'],
         )
         assert exit_code == 0, output.decode()
 
         path = output.decode().rstrip()
 
-        delete_loopback_device = 'losetup -d {path}'.format(path=path)
-
-        exit_code, output = container.exec_run(
-            cmd=['/bin/bash', '-c', delete_loopback_device],
-        )
+        exit_code, output = container.exec_run(cmd=['losetup', '-d', path])
         assert exit_code == 0, output.decode()
 
         container.stop()
