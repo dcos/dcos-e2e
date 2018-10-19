@@ -1,7 +1,3 @@
-from typing import Tuple
-
-import docker
-
 from dcos_e2e.docker_utils import DockerLoopbackVolume
 
 
