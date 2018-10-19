@@ -59,6 +59,7 @@ linux
 linuxbrew
 login
 logout
+loopback
 macOS
 macos
 makefile

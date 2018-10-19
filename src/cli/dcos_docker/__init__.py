@@ -8,7 +8,9 @@ import dcos_e2e
 from cli.common.commands import download_artifact
 
 from .commands.create import create
+from .commands.create_loopback_sidecar import create_loopback_sidecar
 from .commands.destroy import destroy, destroy_list
+from .commands.destroy_loopback_sidecar import destroy_loopback_sidecar
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
 from .commands.list_clusters import list_clusters
@@ -32,8 +34,10 @@ def dcos_docker() -> None:
 
 
 dcos_docker.add_command(create)
+dcos_docker.add_command(create_loopback_sidecar)
 dcos_docker.add_command(destroy)
 dcos_docker.add_command(destroy_list)
+dcos_docker.add_command(destroy_loopback_sidecar)
 dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
 dcos_docker.add_command(download_artifact)

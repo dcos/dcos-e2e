@@ -6,7 +6,7 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
 import click
 import docker
@@ -38,12 +38,14 @@ DOCKER_STORAGE_DRIVERS = {
 }
 
 CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
+SIDECAR_NAME_LABEL_KEY = 'dcos_e2e.sidecar_name'
 WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 VARIANT_LABEL_KEY = 'dcos_e2e.variant'
 NODE_TYPE_LABEL_KEY = 'dcos_e2e.node_type'
 NODE_TYPE_MASTER_LABEL_VALUE = 'master'
 NODE_TYPE_AGENT_LABEL_VALUE = 'agent'
 NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE = 'public_agent'
+NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE = 'loopback'
 
 
 def docker_client() -> DockerClient:
@@ -74,6 +76,31 @@ def existing_cluster_ids() -> Set[str]:
     return set(
         container.labels[CLUSTER_ID_LABEL_KEY] for container in containers
     )
+
+
+def loopback_sidecar_by_name(name: str,
+                             ) -> Optional[docker.models.containers.Container]:
+    """
+    Return a loopback sidecar container.
+    """
+    client = docker_client()
+    filters = {
+        'label': [
+            '{key}={value}'.format(
+                key=NODE_TYPE_LABEL_KEY,
+                value=NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
+            ),
+            '{key}={value}'.format(
+                key=SIDECAR_NAME_LABEL_KEY,
+                value=name,
+            ),
+        ],
+    }
+    containers = client.containers.list(filters=filters)
+    assert len(containers) <= 1, \
+        'found multiple sidecar containers with the same name'
+
+    return next(iter(containers), None)
 
 
 class ContainerInspectView:

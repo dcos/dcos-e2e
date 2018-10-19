@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add ``dcos-docker create-loopback-sidecar`` and ``dcos-docker destroy-loopback-sidecar`` commands to provide unformatted block devices to DC/OS.
+
 2018.10.17.1
 ------------
 

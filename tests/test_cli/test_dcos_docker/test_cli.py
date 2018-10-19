@@ -713,3 +713,58 @@ class TestSetupMacNetwork():
         # yapf: enable
         assert result.exit_code == 2
         assert result.output == expected_error
+
+
+class TestCreateLoopbackSidecar:
+    """
+    Tests for the ``create-loopback-sidecar`` subcommand.
+    """
+
+    def test_sidecar_container_already_exists(self) -> None:
+        """
+        An error is shown if the given sidecar container already exists.
+        """
+        test_sidecar = 'test-sidecar'
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['create-loopback-sidecar', test_sidecar],
+        )
+        assert result.exit_code == 0
+
+        try:
+            result = runner.invoke(
+                dcos_docker,
+                ['create-loopback-sidecar', test_sidecar],
+            )
+            assert result.exit_code == 2
+            expected_error = 'Loopback sidecar "{name}" already exists'
+            expected_error = expected_error.format(name=test_sidecar)
+            assert expected_error in result.output
+        finally:
+            result = runner.invoke(
+                dcos_docker,
+                ['destroy-loopback-sidecar', test_sidecar],
+            )
+            assert result.exit_code == 0
+
+
+class TestDestroyLoopbackSidecar:
+    """
+    Tests for the ``destroy-loopback-sidecar`` subcommand.
+    """
+
+    def test_sidecar_container_does_not_exist(self) -> None:
+        """
+        An error is shown if the given sidecar container does not exist.
+        """
+        does_not_exist = 'does-not-exist'
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['destroy-loopback-sidecar', does_not_exist],
+        )
+        assert result.exit_code == 2
+        expected_error = 'Loopback sidecar "{name}" does not exist'
+        expected_error = expected_error.format(name=does_not_exist)
+        assert expected_error in result.output
