@@ -18,7 +18,6 @@ extensions = [
     'sphinx-prompt',
     'sphinx.ext.autodoc',
     'sphinx.ext.extlinks',
-    'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinx_autodoc_typehints',
     'sphinx_click.ext',
@@ -61,18 +60,8 @@ html_sidebars = {
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'DCOSE2Edoc'
 autoclass_content = 'init'
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.5', None),
-    'docker': ('http://docker-py.readthedocs.io/en/stable', None),
-}
 nitpicky = True
 warning_is_error = True
-nitpick_ignore = [
-    ('py:exc', 'RetryError'),
-    # See https://bugs.python.org/issue31024 for why Sphinx cannot find this.
-    ('py:class', 'typing.Tuple'),
-    ('py:class', 'docker.types.services.Mount'),
-]
 
 html_show_copyright = False
 html_show_sphinx = False

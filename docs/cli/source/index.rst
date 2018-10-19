@@ -20,6 +20,7 @@ Reference
 .. toctree::
    :maxdepth: 2
 
+   install-cli
    versioning-and-api-stability
    contributing
 
