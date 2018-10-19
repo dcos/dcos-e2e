@@ -2,9 +2,7 @@
 Helpers for creating loopback devices on Docker.
 """
 
-from typing import Any, Dict, Optional, Tuple
-
-import docker
+from typing import Any, Dict, Optional
 
 
 class DockerLoopbackVolume():
