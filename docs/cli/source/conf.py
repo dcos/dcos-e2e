@@ -27,7 +27,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = 'DC/OS E2E'
+project = 'DC/OS E2E CLI Tools'
 copyright = '2018, Adam Dangoor'  # pylint: disable=redefined-builtin
 author = 'Adam Dangoor'
 
