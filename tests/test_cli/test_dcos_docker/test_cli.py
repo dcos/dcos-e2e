@@ -713,7 +713,6 @@ class TestSetupMacNetwork():
         # yapf: enable
         assert result.exit_code == 2
         assert result.output == expected_error
-<<<<<<< HEAD
 
 
 class TestDestroyMacNetwork():
