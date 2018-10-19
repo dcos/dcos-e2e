@@ -5,11 +5,13 @@ Reference
 ---------
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
+   versioning-and-api-stability
    contributing
 
 .. toctree::
    :hidden:
 
+   changelog
    release-process
