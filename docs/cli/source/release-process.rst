@@ -5,13 +5,17 @@ Outcomes
 --------
 
 * A new ``git`` tag available to install.
+* A release on GitHub.
 * An updated `Homebrew`_ recipe.
+* A changed Vagrantfile.
+* Linux binaries.
 * The new version title in the changelog.
 
 Prerequisites
 -------------
 
 * ``python3`` on your ``PATH`` set to Python 3.5+.
+* Docker available and set up for your user.
 * ``virtualenv``.
 * Push access to this repository.
 * Trust that ``master`` is ready and high enough quality for release.

@@ -275,6 +275,7 @@ def create(
             node.send_file(
                 local_path=local_path,
                 remote_path=remote_path,
+                sudo=True,
             )
 
     files_to_copy_to_genconf_dir = []

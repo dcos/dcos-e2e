@@ -9,7 +9,7 @@ from typing import Dict, List
 import click
 
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Node, Output, Transport
 
 
 def run_command(
@@ -39,7 +39,7 @@ def run_command(
         env: Environment variables to set before running the command.
     """
     columns, rows = click.get_terminal_size()
-    tty = True
+    tty = sys.stdout.isatty()
 
     env = {
         # LINES and COLUMNS are needed if using the ``DOCKER_EXEC`` transport.
@@ -55,7 +55,7 @@ def run_command(
         try:
             host.run(
                 args=args,
-                log_output_live=False,
+                output=Output.NO_CAPTURE,
                 tty=tty,
                 shell=True,
                 env=env,
@@ -73,6 +73,7 @@ def run_command(
             env=env,
             test_host=host,
             transport=transport,
+            output=Output.NO_CAPTURE,
         )
     except subprocess.CalledProcessError as exc:
         sys.exit(exc.returncode)

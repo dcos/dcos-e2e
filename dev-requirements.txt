@@ -9,10 +9,10 @@ flake8==3.5.0
 homebrew-pypi-poet==0.10.0
 isort==4.3.4
 kazoo==2.5.0
-mypy==0.630
+mypy==0.641
 pip_check_reqs==2.0.3
-py==1.6.0
-pydocstyle==2.1.1
+py==1.7.0
+pydocstyle==3.0.0
 pyenchant==2.0.0
 pygithub==1.43.2
 pylint==2.1.1

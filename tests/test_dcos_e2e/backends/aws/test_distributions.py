@@ -9,7 +9,7 @@ from passlib.hash import sha512_crypt
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Output
 
 
 def _get_node_distribution(node: Node) -> Distribution:
@@ -60,7 +60,7 @@ def _oss_distribution_test(
         cluster.install_dcos_from_url(
             build_artifact=oss_artifact_url,
             dcos_config=cluster.base_config,
-            log_output_live=True,
+            output=Output.CAPTURE,
             ip_detect_path=cluster_backend.ip_detect_path,
         )
         cluster.wait_for_dcos_oss()
@@ -105,7 +105,7 @@ def _enterprise_distribution_test(
                 **config,
             },
             ip_detect_path=cluster_backend.ip_detect_path,
-            log_output_live=True,
+            output=Output.CAPTURE,
         )
         cluster.wait_for_dcos_ee(
             superuser_username=superuser_username,

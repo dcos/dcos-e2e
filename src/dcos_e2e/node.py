@@ -2,7 +2,6 @@
 Tools for managing DC/OS cluster nodes.
 """
 
-import stat
 import subprocess
 import tarfile
 import uuid
@@ -36,6 +35,29 @@ class Transport(Enum):
     DOCKER_EXEC = 2
 
 
+class Output(Enum):
+    """
+    Output capture options for running commands.
+
+    When using :py:class:`~dcos_e2e.node.Output.LOG_AND_CAPTURE`,
+    stdout and stderr are merged into stdout.
+
+    Attributes:
+        LOG_AND_CAPTURE: Log output at the debug level. If the code returns a
+            ``subprocess.CompletedProcess``, the stdout and stderr will be
+            contained in the return value. However, they will be merged into
+            stderr.
+        CAPTURE: Capture stdout and stderr. If the code returns a
+            ``subprocess.CompletedProcess``, the stdout and stderr will be
+            contained in the return value.
+        NO_CAPTURE: Do not capture stdout or stderr.
+    """
+
+    LOG_AND_CAPTURE = 1
+    CAPTURE = 2
+    NO_CAPTURE = 3
+
+
 class Node:
     """
     A record of a DC/OS cluster node.
@@ -56,7 +78,9 @@ class Node:
                 running on this node.
             default_user: The default username to use for connections.
             ssh_key_path: The path to an SSH key which can be used to SSH to
-                the node as the ``default_user`` user.
+                the node as the ``default_user`` user. The file must only have
+                permissions to be read by (and optionally written to) the
+                owner.
             default_transport: The transport to use for communicating with
                 nodes.
 
@@ -70,7 +94,6 @@ class Node:
         self.public_ip_address = public_ip_address
         self.private_ip_address = private_ip_address
         self.default_user = default_user
-        ssh_key_path.chmod(mode=stat.S_IRUSR)
         self._ssh_key_path = ssh_key_path
         self.default_transport = default_transport
 
@@ -120,7 +143,7 @@ class Node:
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str],
-        log_output_live: bool,
+        output: Output,
         transport: Optional[Transport],
     ) -> None:
         """
@@ -144,13 +167,12 @@ class Node:
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live.
+            output: What happens with stdout and stderr.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-
         """
         tempdir = Path(gettempdir())
 
@@ -211,7 +233,7 @@ class Node:
 
         self.run(
             args=genconf_args,
-            log_output_live=True,
+            output=output,
             shell=True,
             transport=transport,
             user=user,
@@ -220,7 +242,7 @@ class Node:
 
         self.run(
             args=['rm', str(remote_build_artifact)],
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             user=user,
             sudo=True,
@@ -239,7 +261,7 @@ class Node:
         self.run(
             args=setup_args,
             shell=True,
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             user=user,
             sudo=True,
@@ -253,7 +275,7 @@ class Node:
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         transport: Optional[Transport] = None,
     ) -> None:
         """
@@ -284,7 +306,7 @@ class Node:
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live.
+            output: What happens with stdout and stderr.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
@@ -299,6 +321,7 @@ class Node:
             user=user,
             transport=transport,
             sudo=True,
+            output=Output.CAPTURE,
         )
         node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
@@ -314,7 +337,7 @@ class Node:
             ip_detect_path=ip_detect_path,
             user=user,
             role=role,
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
@@ -327,7 +350,7 @@ class Node:
         role: Role,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         user: Optional[str] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         transport: Optional[Transport] = None,
     ) -> None:
         """
@@ -358,7 +381,7 @@ class Node:
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live.
+            output: What happens with stdout and stderr.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
@@ -384,7 +407,7 @@ class Node:
                 '-o',
                 str(node_build_artifact),
             ],
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
             user=user,
             sudo=True,
@@ -396,7 +419,7 @@ class Node:
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             user=user,
             role=role,
-            log_output_live=log_output_live,
+            output=output,
             transport=transport,
         )
 
@@ -404,7 +427,7 @@ class Node:
         self,
         args: List[str],
         user: Optional[str] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         env: Optional[Dict[str, Any]] = None,
         shell: bool = False,
         tty: bool = False,
@@ -418,8 +441,7 @@ class Node:
             args: The command to run on the node.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
-            log_output_live: If ``True``, log output live. If ``True``, stderr
-                is merged into stdout in the return value.
+            output: What happens with stdout and stderr.
             env: Environment variables to be set on the node before running
                 the command. A mapping of environment variable names to
                 values.
@@ -431,8 +453,6 @@ class Node:
                 including whitespace.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
-                This means that the values of stdout and stderr will not be in
-                the returned ``subprocess.CompletedProcess``.
                 When using a TTY, different transports may use different line
                 endings.
             transport: The transport to use for communicating with nodes. If
@@ -445,8 +465,6 @@ class Node:
         Raises:
             subprocess.CalledProcessError: The process exited with a non-zero
                 code.
-            ValueError: ``log_output_live`` and ``tty`` are both set to
-                ``True``.
         """
 
         env = dict(env or {})
@@ -460,12 +478,21 @@ class Node:
         if user is None:
             user = self.default_user
 
-        if log_output_live and tty:
-            message = '`log_output_live` and `tty` cannot both be `True`.'
-            raise ValueError(message)
-
         transport = transport or self.default_transport
         node_transport = self._get_node_transport(transport=transport)
+
+        capture_output = {
+            Output.CAPTURE: True,
+            Output.LOG_AND_CAPTURE: True,
+            Output.NO_CAPTURE: False,
+        }[output]
+
+        log_output_live = {
+            Output.CAPTURE: False,
+            Output.LOG_AND_CAPTURE: True,
+            Output.NO_CAPTURE: False,
+        }[output]
+
         return node_transport.run(
             args=args,
             user=user,
@@ -474,7 +501,7 @@ class Node:
             tty=tty,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
-            capture_output=not tty,
+            capture_output=capture_output,
         )
 
     def popen(

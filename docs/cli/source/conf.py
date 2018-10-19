@@ -18,9 +18,6 @@ extensions = [
     'sphinx-prompt',
     'sphinx.ext.autodoc',
     'sphinx.ext.extlinks',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.napoleon',
-    'sphinx_autodoc_typehints',
     'sphinx_click.ext',
     'sphinx_paramlinks',
     'sphinxcontrib.spelling',
@@ -30,7 +27,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = 'DC/OS E2E'
+project = 'DC/OS E2E CLI Tools'
 copyright = '2018, Adam Dangoor'  # pylint: disable=redefined-builtin
 author = 'Adam Dangoor'
 
@@ -61,18 +58,8 @@ html_sidebars = {
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'DCOSE2Edoc'
 autoclass_content = 'init'
-intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.5', None),
-    'docker': ('http://docker-py.readthedocs.io/en/stable', None),
-}
 nitpicky = True
 warning_is_error = True
-nitpick_ignore = [
-    ('py:exc', 'RetryError'),
-    # See https://bugs.python.org/issue31024 for why Sphinx cannot find this.
-    ('py:class', 'typing.Tuple'),
-    ('py:class', 'docker.types.services.Mount'),
-]
 
 html_show_copyright = False
 html_show_sphinx = False
@@ -101,7 +88,7 @@ linkcheck_ignore = [
     r'https://www.virtualbox.org/wiki/Downloads',
 ]
 
-spelling_word_list_filename = '../../spelling_private_dict.txt'
+spelling_word_list_filename = '../../../spelling_private_dict.txt'
 
 autodoc_member_order = 'bysource'
 
@@ -110,7 +97,7 @@ extlinks = {
 }
 
 rst_epilog = """
-.. |project| replace:: DC/OS E2E
+.. |project| replace:: {project}
 .. |github-owner| replace:: dcos
 .. |github-repository| replace:: dcos-e2e
-"""
+""".format(project=project)

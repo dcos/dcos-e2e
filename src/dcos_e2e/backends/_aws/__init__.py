@@ -2,6 +2,7 @@
 Helpers for creating and interacting with clusters on AWS.
 """
 
+import stat
 import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -16,7 +17,7 @@ from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Output
 
 
 class AWS(ClusterBackend):
@@ -275,6 +276,7 @@ class AWSCluster(ClusterManager):
         self._ssh_key_path = self._path / 'id_rsa'
         private_key = self.cluster_info['ssh_private_key']
         self._ssh_key_path.write_bytes(private_key.encode())
+        self._ssh_key_path.chmod(mode=stat.S_IRUSR)
 
         # Wait for the AWS stack setup completion.
         self.launcher.wait()
@@ -337,7 +339,7 @@ class AWSCluster(ClusterManager):
         build_artifact: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        log_output_live: bool,
+        output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
@@ -349,7 +351,7 @@ class AWSCluster(ClusterManager):
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to an ``ip-detect`` script to be used
                 during the DC/OS installation.
-            log_output_live: If ``True``, log output of the installation live.
+            output: What happens with stdout and stderr.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
@@ -377,7 +379,7 @@ class AWSCluster(ClusterManager):
         build_artifact: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        log_output_live: bool,
+        output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
@@ -391,7 +393,7 @@ class AWSCluster(ClusterManager):
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to an ``ip-detect`` script to be used
                 during the DC/OS installation.
-            log_output_live: If ``True``, log output of the installation live.
+            output: What happens with stdout and stderr.
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
                 installer node. This must be empty as it is not currently
                 supported.
