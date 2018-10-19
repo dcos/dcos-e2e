@@ -1,8 +1,7 @@
 |project|
 =========
 
-|project| is a tool for spinning up and managing DC/OS clusters in test environments.
-It comes with multiple CLI tools:
+|project| can be used for spinning up and managing DC/OS clusters in test environments.
 
 .. toctree::
    :maxdepth: 1
