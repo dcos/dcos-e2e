@@ -2,6 +2,7 @@ Installing the CLI
 ------------------
 
 The CLI can be installed in various ways.
+Choose one which works on your operating system.
 
 .. contents::
 
