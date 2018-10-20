@@ -20,3 +20,4 @@ It includes a library which is focused on helping you to write tests which requi
    docker-storage-driver
    changelog
    contributing
+   release-process
