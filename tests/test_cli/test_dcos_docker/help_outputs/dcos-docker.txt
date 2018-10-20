@@ -17,6 +17,7 @@ Commands:
   download-artifact         Download a DC/OS Open Source artifact.
   inspect                   Show cluster details.
   list                      List all clusters.
+  list-loopback-sidecars    List loopback sidecars.
   run                       Run an arbitrary command on a node.
   setup-mac-network         Set up a network to connect to nodes on macOS.
   sync                      Sync files from a DC/OS checkout to master nodes.

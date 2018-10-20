@@ -10,7 +10,7 @@ from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
     SIDECAR_NAME_LABEL_KEY,
-    loopback_sidecar_by_name,
+    loopback_sidecars_by_name,
 )
 
 
@@ -21,11 +21,7 @@ from ._common import (
     default=256,
     help='Size (in Megabytes) of the block device.',
 )
-@click.argument(
-    'name',
-    type=str,
-    required=True,
-)
+@click.argument('name', type=str, required=True)
 def create_loopback_sidecar(size: int, name: str) -> None:
     """
     Create a loopback sidecar.
@@ -34,7 +30,7 @@ def create_loopback_sidecar(size: int, name: str) -> None:
     (unformatted) block device.
     """
 
-    if loopback_sidecar_by_name(name=name) is not None:
+    if loopback_sidecars_by_name(name=name):
         message = 'Loopback sidecar "{name}" already exists'.format(
             name=name,
         )

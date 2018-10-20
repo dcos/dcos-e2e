@@ -28,8 +28,6 @@ class DockerLoopbackVolume():
             labels: Docker labels to add to the container.
 
         Attributes:
-            container: The Docker container which the block device is running
-                in.
             path: The path to the block device inside the container.
         """
         client = docker.from_env(version='auto')
@@ -37,7 +35,7 @@ class DockerLoopbackVolume():
         # We use CentOS 7 here, as it provides all the binaries we need
         # and might already be pulled as it is a distribution supported
         # by DC/OS.
-        self.container = client.containers.create(
+        self._container = client.containers.create(
             name='dcos-e2e-loopback-sidecar-{random}'.format(
                 random=uuid.uuid4().hex,
             ),
@@ -47,20 +45,24 @@ class DockerLoopbackVolume():
             image='centos:7',
             labels=labels or {},
         )
-        self.container.start()
+        self._container.start()
 
-        create_loopback_device = (
-            'dd if=/dev/zero of=/volume0 bs=1M count={size};'
-        ).format(size=size)
+        create_loopback_device = [
+            'dd',
+            'if=/dev/zero',
+            'of=volume0',
+            'bs=1M',
+            'count={size}'.format(size=size),
+        ]
 
-        exit_code, output = self.container.exec_run(
-            cmd=['/bin/bash', '-c', create_loopback_device],
+        exit_code, output = self._container.exec_run(
+            cmd=create_loopback_device,
         )
         assert exit_code == 0, output.decode()
 
         setup_loopback_device = 'losetup --find --show /volume0;'
 
-        exit_code, output = self.container.exec_run(
+        exit_code, output = self._container.exec_run(
             cmd=['/bin/bash', '-c', setup_loopback_device],
         )
         assert exit_code == 0, output.decode()
@@ -71,7 +73,7 @@ class DockerLoopbackVolume():
             path=self.path,
         )
 
-        exit_code, output = self.container.exec_run(
+        exit_code, output = self._container.exec_run(
             cmd=['/bin/bash', '-c', write_device_path],
         )
         assert exit_code == 0, output.decode()
@@ -114,5 +116,5 @@ class DockerLoopbackVolume():
         """
         On exiting, destroy the loopback volume.
         """
-        DockerLoopbackVolume.destroy(self.container)
+        DockerLoopbackVolume.destroy(self._container)
         return True
