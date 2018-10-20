@@ -21,11 +21,7 @@ from ._common import (
     default=256,
     help='Size (in Megabytes) of the block device.',
 )
-@click.argument(
-    'name',
-    type=str,
-    required=True,
-)
+@click.argument('name', type=str, required=True)
 def create_loopback_sidecar(size: int, name: str) -> None:
     """
     Create a loopback sidecar.

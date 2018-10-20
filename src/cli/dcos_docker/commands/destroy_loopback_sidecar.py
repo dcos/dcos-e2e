@@ -11,10 +11,7 @@ from ._common import loopback_sidecar_by_name
 
 
 @click.command('destroy-loopback-sidecar')
-@click.argument(
-    'name',
-    type=str,
-)
+@click.argument('name', type=str)
 def destroy_loopback_sidecar(name: str) -> None:
     """
     Destroy a loopback sidecar.

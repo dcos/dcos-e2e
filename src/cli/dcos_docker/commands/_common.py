@@ -78,8 +78,7 @@ def existing_cluster_ids() -> Set[str]:
     )
 
 
-def loopback_sidecar_by_name(name: str,
-                             ) -> Optional[docker.models.containers.Container]:
+def loopback_sidecars_by_name(name: str) -> Optional[Container]:
     """
     Return a loopback sidecar container.
     """
