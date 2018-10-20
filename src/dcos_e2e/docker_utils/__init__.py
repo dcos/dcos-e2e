@@ -2,6 +2,7 @@
 Helpers for creating loopback devices on Docker.
 """
 
+import uuid
 from typing import Any, Dict, Optional, Tuple
 
 import docker
@@ -58,6 +59,9 @@ class DockerLoopbackVolume():
         # and might already be pulled as it is a distribution supported
         # by DC/OS.
         container = client.containers.create(
+            name='dcos-e2e-loopback-sidecar-{random}'.format(
+                random=uuid.uuid4().hex,
+            ),
             privileged=True,
             detach=True,
             tty=True,
