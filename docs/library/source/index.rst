@@ -1,20 +1,20 @@
-|project|
-=========
+Python Library
+==============
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
 
-Reference
----------
+It includes a library which is focused on helping you to write tests which require DC/OS clusters.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   library
-   versioning-and-api-stability
-   contributing
-
-.. toctree::
-   :hidden:
-
-   changelog
-   release-process
+   installation
+   getting-started
+   cluster
+   backends
+   node
+   enterprise
+   distributions
+   exceptions
+   docker-versions
+   docker-storage-driver
