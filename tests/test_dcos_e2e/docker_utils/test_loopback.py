@@ -26,20 +26,6 @@ class TestDockerLoopbackVolume:
 
             assert exit_code == 0, device.path + ': ' + output.decode()
 
-        new_container_2 = client.containers.create(
-            privileged=True,
-            detach=True,
-            tty=True,
-            image='centos:7',
-        )
-        new_container_2.start()
-        exit_code, output = new_container_2.exec_run(
-            cmd=block_device_exists_cmd,
-        )
-
-        # TODO new container can access this
-        assert exit_code == 1
-
     def test_labels(self) -> None:
         """
         The given labels are applied to the new container.
@@ -70,7 +56,6 @@ class TestDockerLoopbackVolume:
             new_container = client.containers.create(
                 privileged=True,
                 detach=True,
-                tty=True,
                 image='centos:7',
             )
             new_container.start()
@@ -96,7 +81,6 @@ class TestDockerLoopbackVolume:
         new_container = client.containers.create(
             privileged=True,
             detach=True,
-            tty=True,
             image='centos:7',
         )
         new_container.start()
@@ -104,11 +88,11 @@ class TestDockerLoopbackVolume:
             cmd=block_device_exists_cmd,
         )
 
-        import pdb; pdb.set_trace()
-        assert exit_code == 1, output.decode()
+        assert exit_code != 0, output.decode()
         # TODO new container
 
     # TODO destroy new container
     # TODO update CLI
     # TODO remove tty in tests and implementation
     # TODO test size
+    # TODO use label instead of file on disk
