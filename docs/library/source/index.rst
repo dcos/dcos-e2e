@@ -2,7 +2,6 @@
 =========
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
-It consists of a :doc:`library` and various :doc:`cli`.
 
 Reference
 ---------
@@ -11,10 +10,6 @@ Reference
    :maxdepth: 2
 
    library
-   cli
-   dcos-docker-cli
-   dcos-vagrant-cli
-   dcos-aws-cli
    versioning-and-api-stability
    contributing
 
