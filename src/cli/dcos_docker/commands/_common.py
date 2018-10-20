@@ -6,7 +6,7 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, Optional, Set
+from typing import Dict, List, Set
 
 import click
 import docker
@@ -78,9 +78,9 @@ def existing_cluster_ids() -> Set[str]:
     )
 
 
-def loopback_sidecars_by_name(name: str) -> Optional[Container]:
+def loopback_sidecars_by_name(name: str) -> List[Container]:
     """
-    Return a loopback sidecar container.
+    Return all loopback sidecar containers with the given sidecar ``name``.
     """
     client = docker_client()
     filters = {
@@ -95,8 +95,7 @@ def loopback_sidecars_by_name(name: str) -> Optional[Container]:
             ),
         ],
     }
-    containers = client.containers.list(filters=filters)
-    return next(iter(containers), None)
+    return client.containers.list(filters=filters)
 
 
 class ContainerInspectView:
