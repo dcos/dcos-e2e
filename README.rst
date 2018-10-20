@@ -2,9 +2,9 @@
 
 |codecov|
 
-|Library Documentation Status|, Library
+|Library Documentation Status| **: Library**
 
-|CLI Documentation Status|, CLI
+|CLI Documentation Status| **: CLI**
 
 |project|
 =========
