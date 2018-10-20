@@ -103,4 +103,4 @@ See the full `CLI`_ documentation for information on other CLI tools provided by
 .. _library: https://dcos-e2e.readthedocs.io/en/latest/library.html
 .. _backends: https://dcos-e2e.readthedocs.io/en/latest/backends.html
 .. |project| replace:: DC/OS E2E
-.. _library installation instructions: https://dcos-e2e.readthedocs.io/en/latest/installation.html#library-and-cli-with-python
+.. _library installation instructions: https://dcos-e2e.readthedocs.io/en/latest/installation.html
