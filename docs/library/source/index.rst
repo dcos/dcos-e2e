@@ -1,9 +1,13 @@
-Python Library
-==============
+|project| Python Library
+========================
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
 
 It includes a library which is focused on helping you to write tests which require DC/OS clusters.
+
+.. include:: installation.rst
+
+.. include:: getting-started.rst
 
 .. toctree::
    :maxdepth: 1
