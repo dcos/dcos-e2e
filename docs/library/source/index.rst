@@ -11,10 +11,6 @@ Reference
    :maxdepth: 2
 
    library
-   cli
-   dcos-docker-cli
-   dcos-vagrant-cli
-   dcos-aws-cli
    versioning-and-api-stability
    contributing
 
