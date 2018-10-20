@@ -67,12 +67,10 @@ class DockerLoopbackVolume():
 
         self.path = output.decode().rstrip()
 
-        write_device_path = 'echo {path} > loopback_device_path'.format(
-            path=self.path,
-        )
+        write_device_path = ['echo', self.path, '>', 'loopback_device_path']
 
         exit_code, output = self.container.exec_run(
-            cmd=['/bin/bash', '-c', write_device_path],
+            cmd=['/bin/bash', '-c', ' '.join(write_device_path)],
         )
         assert exit_code == 0, output.decode()
 
