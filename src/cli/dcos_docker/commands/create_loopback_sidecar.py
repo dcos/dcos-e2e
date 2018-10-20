@@ -34,13 +34,13 @@ def create_loopback_sidecar(size: int, name: str) -> None:
     (unformatted) block device.
     """
 
-    if loopback_sidecar_by_name(name) is not None:
+    if loopback_sidecar_by_name(name=name) is not None:
         message = 'Loopback sidecar "{name}" already exists'.format(
             name=name,
         )
         raise click.BadParameter(message)
 
-    _, path = DockerLoopbackVolume.create(
+    loopback_volume = DockerLoopbackVolume(
         size=size,
         labels={
             NODE_TYPE_LABEL_KEY: NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
@@ -48,4 +48,4 @@ def create_loopback_sidecar(size: int, name: str) -> None:
         },
     )
 
-    click.echo(path)
+    click.echo(loopback_volume.path)

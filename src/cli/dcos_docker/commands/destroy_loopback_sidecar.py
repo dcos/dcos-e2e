@@ -19,7 +19,7 @@ def destroy_loopback_sidecar(name: str) -> None:
     """
     Destroy a loopback sidecar.
     """
-    loopback_sidecar = loopback_sidecar_by_name(name)
+    loopback_sidecar = loopback_sidecar_by_name(name=name)
 
     if loopback_sidecar is None:
         message = 'Loopback sidecar "{name}" does not exist'.format(
