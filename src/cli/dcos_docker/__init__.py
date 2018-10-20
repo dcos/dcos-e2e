@@ -13,6 +13,7 @@ from .commands.destroy import destroy, destroy_list
 from .commands.destroy_loopback_sidecar import destroy_loopback_sidecar
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
+from .commands.list_loopback_sidecars import list_loopback_sidecars
 from .commands.list_clusters import list_clusters
 from .commands.mac_network import destroy_mac_network, setup_mac_network
 from .commands.run_command import run
@@ -43,6 +44,7 @@ dcos_docker.add_command(doctor)
 dcos_docker.add_command(download_artifact)
 dcos_docker.add_command(inspect_cluster)
 dcos_docker.add_command(list_clusters)
+dcos_docker.add_command(list_loopback_sidecars)
 dcos_docker.add_command(run)
 dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(sync_code)
