@@ -16,8 +16,6 @@ class TestDockerLoopbackVolume:
         An instance of ``DockerLoopbackVolume`` provides a container which can
         access a block device.
         """
-        client = docker.from_env(version='auto')
-
         with DockerLoopbackVolume(size=1) as device:
             block_device_exists_cmd = ['lsblk', device.path]
             exit_code, output = device.container.exec_run(
@@ -93,5 +91,3 @@ class TestDockerLoopbackVolume:
         new_container.remove()
 
         assert exit_code != 0, output.decode()
-
-    # TODO update CLI
