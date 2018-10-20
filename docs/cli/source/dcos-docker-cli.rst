@@ -308,7 +308,6 @@ Using a Loopback Sidecar
 The :ref:`dcos-docker-create-loopback-sidecar` command can be used to create a
 loopback sidecar.
 This will provide all containers with a unformatted block device, mounted as a loopback device.
-Loopback sidecars can be destroyed with :ref:`dcos-docker-destroy-loopback-sidecar`.
 All containers have access to this loopback device.
 Therefore, care must be taken that only a single container has write-access to it.
 
@@ -319,6 +318,9 @@ Therefore, care must be taken that only a single container has write-access to i
    $ dcos-docker create /tmp/dcos_generate_config.sh
    $ dcos-docker wait
    $ dcos-docker destroy-loopback-sidecar sidecar1
+
+Loopback sidecars can be listed with :ref:`dcos-docker-list-loopback-sidecars`.
+Loopback sidecars can be destroyed with :ref:`dcos-docker-destroy-loopback-sidecar`.
 
 .. include:: docker-backend-limitations.rst
 
@@ -398,3 +400,8 @@ CLI Reference
 
 .. click:: cli.dcos_docker:destroy_loopback_sidecar
   :prog: dcos-docker destroy-loopback-sidecar
+
+.. _dcos-docker-list-loopback-sidecars:
+
+.. click:: cli.dcos_docker:list_loopback_sidecars
+  :prog: dcos-docker list-loopback-sidecars
