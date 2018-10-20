@@ -768,3 +768,21 @@ class TestDestroyLoopbackSidecar:
         expected_error = 'Loopback sidecar "{name}" does not exist'
         expected_error = expected_error.format(name=does_not_exist)
         assert expected_error in result.output
+
+
+class TestListLoopbackSidecars:
+    """
+    Tests for the ``list-loopback-sidecars`` subcommand.
+    """
+
+    def test_no_error(self) -> None:
+        """
+        A success code is given.
+        """
+        runner = CliRunner()
+        result = runner.invoke(
+            dcos_docker,
+            ['list-loopback-sidecars', does_not_exist],
+            catch_exceptions=False,
+        )
+        assert result.exit_code == 0

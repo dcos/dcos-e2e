@@ -1,47 +1,29 @@
 """
-Tools for creating sidecar containers.
+Tools for listing sidecar containers.
 """
 
 import click
+import click_spinner
 
 from dcos_e2e.docker_utils import DockerLoopbackVolume
 
-from ._common import (
-    NODE_TYPE_LABEL_KEY,
-    NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
-    SIDECAR_NAME_LABEL_KEY,
-    loopback_sidecars_by_name,
-)
+from ._common import loopback_sidecars_by_name
 
 
-@click.command('create-loopback-sidecar')
-@click.option(
-    '--size',
-    type=click.IntRange(min=1),
-    default=256,
-    help='Size (in Megabytes) of the block device.',
-)
-@click.argument('name', type=str, required=True)
-def create_loopback_sidecar(size: int, name: str) -> None:
+@click.command('destroy-loopback-sidecar')
+@click.argument('name', type=str)
+def destroy_loopback_sidecar(name: str) -> None:
     """
-    Create a loopback sidecar.
-
-    A loopback sidecar provides a loopback device that points to a
-    (unformatted) block device.
+    Destroy a loopback sidecar.
     """
+    loopback_sidecars = loopback_sidecars_by_name(name=name)
 
-    if loopback_sidecars_by_name(name=name):
-        message = 'Loopback sidecar "{name}" already exists'.format(
+    if not loopback_sidecars:
+        message = 'Loopback sidecar "{name}" does not exist'.format(
             name=name,
         )
         raise click.BadParameter(message)
 
-    loopback_volume = DockerLoopbackVolume(
-        size=size,
-        labels={
-            NODE_TYPE_LABEL_KEY: NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
-            SIDECAR_NAME_LABEL_KEY: name,
-        },
-    )
-
-    click.echo(loopback_volume.path)
+    (loopback_sidecar, ) = loopback_sidecars
+    with click_spinner.spinner():
+        DockerLoopbackVolume.destroy(container=loopback_sidecar)
