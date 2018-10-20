@@ -96,9 +96,6 @@ def loopback_sidecars_by_name(name: str) -> Optional[Container]:
         ],
     }
     containers = client.containers.list(filters=filters)
-    assert len(containers) <= 1, \
-        'found multiple sidecar containers with the same name'
-
     return next(iter(containers), None)
 
 
