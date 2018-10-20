@@ -85,19 +85,20 @@ Some tests require the Docker backend and some tests require the AWS backend.
 See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
 See the :doc:`AWS backend documentation <aws-backend>` for details of what is needed for the AWS backend.
 
+To run the full test suite, set environment variables for DC/OS Enterprise artifact URLs:
+
+.. smart-prompt:: bash
+
+   export EE_MASTER_ARTIFACT_URL=https://...
+   export EE_1_9_ARTIFACT_URL=https://...
+   export EE_1_10_ARTIFACT_URL=https://...
+   export EE_1_11_ARTIFACT_URL=https://...
+
 Download dependencies which are used by the tests:
 
 .. smart-prompt:: bash
 
-    make download-artifacts
-
-or, to additionally download a DC/OS Enterprise artifact, run the following:
-
-.. smart-prompt:: bash
-
-    make EE_ARTIFACT_URL=<http://...> download-artifacts
-
-The DC/OS Enterprise artifact is required for some tests.
+   python admin/download_artifacts.py
 
 A license key is required for some tests:
 

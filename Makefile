@@ -1,20 +1,5 @@
 SHELL := /bin/bash -euxo pipefail
 
-OSS_MASTER_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
-OSS_1_9_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.9/dcos_generate_config.sh
-OSS_1_10_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.10/dcos_generate_config.sh
-OSS_1_11_ARTIFACT_URL := https://downloads.dcos.io/dcos/testing/1.11/dcos_generate_config.sh
-
-OSS_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.sh
-OSS_1_9_ARTIFACT_PATH := /tmp/dcos_generate_config_1_9.sh
-OSS_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.sh
-OSS_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.sh
-
-EE_MASTER_ARTIFACT_PATH := /tmp/dcos_generate_config.ee.sh
-EE_1_9_ARTIFACT_PATH := /tmp/dcos_generate_config_1_9.ee.sh
-EE_1_10_ARTIFACT_PATH := /tmp/dcos_generate_config_1_10.ee.sh
-EE_1_11_ARTIFACT_PATH := /tmp/dcos_generate_config_1_11.ee.sh
-
 # Treat Sphinx warnings as errors
 SPHINXOPTS := -W
 
@@ -53,22 +38,6 @@ clean:
 fix-lint: autoflake fix-yapf
 	isort --recursive --apply
 
-.PHONY: clean-artifacts
-clean-artifacts:
-	rm -rf $(OSS_MASTER_ARTIFACT_PATH)
-	rm -rf $(EE_MASTER_ARTIFACT_PATH)
-
-.PHONY: download-artifacts
-download-artifacts:
-	curl -o $(OSS_MASTER_ARTIFACT_PATH) $(OSS_MASTER_ARTIFACT_URL)
-	curl -o $(OSS_1_9_ARTIFACT_PATH) $(OSS_1_9_ARTIFACT_URL)
-	curl -o $(OSS_1_10_ARTIFACT_PATH) $(OSS_1_10_ARTIFACT_URL)
-	curl -o $(OSS_1_11_ARTIFACT_PATH) $(OSS_1_11_ARTIFACT_URL)
-	if [ -n "$(EE_MASTER_ARTIFACT_URL)" ]; then curl -o $(EE_MASTER_ARTIFACT_PATH) $(EE_MASTER_ARTIFACT_URL); fi
-	if [ -n "$(EE_1_9_ARTIFACT_URL)" ]; then curl -o $(EE_1_9_ARTIFACT_PATH) $(EE_1_9_ARTIFACT_URL); fi
-	if [ -n "$(EE_1_10_ARTIFACT_URL)" ]; then curl -o $(EE_1_10_ARTIFACT_PATH) $(EE_1_10_ARTIFACT_URL); fi
-	if [ -n "$(EE_1_11_ARTIFACT_URL)" ]; then curl -o $(EE_1_11_ARTIFACT_PATH) $(EE_1_11_ARTIFACT_URL); fi
-
 .PHONY: docs
 docs:
 	make -C docs/library clean html SPHINXOPTS=$(SPHINXOPTS)
@@ -78,10 +47,10 @@ docs:
 open-docs:
 	xdg-open docs/library/build/html/index.html >/dev/null 2>&1 || \
 	open docs/library/build/html/index.html >/dev/null 2>&1 || \
-	echo "Requires 'xdg-open' or 'open' but neither is available."
+	echo "Requires 'xdg-open' or 'open' and the docs to be built."
 	xdg-open docs/cli/build/html/index.html >/dev/null 2>&1 || \
 	open docs/cli/build/html/index.html >/dev/null 2>&1 || \
-	echo "Requires 'xdg-open' or 'open' but neither is available."
+	echo "Requires 'xdg-open' or 'open' and the docs to be built."
 
 # We pull Docker images before the tests start to catch any flakiness early.
 # See https://jira.mesosphere.com/browse/DCOS_OSS-2120 for details of
