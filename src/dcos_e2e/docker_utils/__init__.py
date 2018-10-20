@@ -24,7 +24,6 @@ class DockerLoopbackVolume():
         disk to a cluster.
 
         Args:
-            name: Unique name of the loopback volume.
             size: Size of the block device in Megabytes.
             labels: Docker labels to add to the container.
         """
@@ -45,7 +44,6 @@ class DockerLoopbackVolume():
         in a container.
 
         Args:
-            name: Unique name of the loopback volume.
             size: Size of the block device in Megabytes.
             labels: Docker labels to add to the container.
 
