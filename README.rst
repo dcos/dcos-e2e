@@ -63,7 +63,7 @@ CLI
 ---
 
 |project| also provides multiple command line interface tools.
-These allow you to create, manage and destroy DC/OS clusters on various backends.
+These allow you to create, manage and destroy DC/OS clusters on various backends, such as Docker, Vagrant and AWS.
 
 A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
 
