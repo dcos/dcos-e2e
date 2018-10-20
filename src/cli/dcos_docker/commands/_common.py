@@ -80,7 +80,7 @@ def existing_cluster_ids() -> Set[str]:
 
 def loopback_sidecars_by_name(name: str) -> List[Container]:
     """
-    Return a loopback sidecar container.
+    Return all loopback sidecar containers with the given sidecar ``name``.
     """
     client = docker_client()
     filters = {
@@ -95,8 +95,7 @@ def loopback_sidecars_by_name(name: str) -> List[Container]:
             ),
         ],
     }
-    containers = client.containers.list(filters=filters)
-    return containers
+    return list(client.containers.list(filters=filters))
 
 
 class ContainerInspectView:
