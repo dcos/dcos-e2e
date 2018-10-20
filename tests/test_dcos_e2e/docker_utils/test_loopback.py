@@ -13,7 +13,6 @@ class TestDockerLoopbackVolume:
         labels = {'foo': 'bar'}
 
         with DockerLoopbackVolume(
-            name='test',
             size=1,
             labels=labels,
         ) as device:
@@ -31,11 +30,7 @@ class TestDockerLoopbackVolume:
         """
         labels = {'foo': 'bar'}
 
-        container, path = DockerLoopbackVolume.create(
-            name='test',
-            size=1,
-            labels=labels,
-        )
+        container, path = DockerLoopbackVolume.create(size=1, labels=labels)
 
         try:
             for key, value in labels.items():
@@ -52,5 +47,5 @@ class TestDockerLoopbackVolume:
         Calling `DockerLoopbackVolume.destroy` destroys a sidecar container
         without throwing an exception.
         """
-        container, _ = DockerLoopbackVolume.create(name='test', size=1)
+        container, _ = DockerLoopbackVolume.create(size=1)
         DockerLoopbackVolume.destroy(container=container)

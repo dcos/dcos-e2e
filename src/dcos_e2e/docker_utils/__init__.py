@@ -2,6 +2,7 @@
 Helpers for creating loopback devices on Docker.
 """
 
+import uuid
 from typing import Any, Dict, Optional, Tuple
 
 import docker
@@ -14,7 +15,6 @@ class DockerLoopbackVolume():
 
     def __init__(
         self,
-        name: str,
         size: int,
         labels: Optional[Dict[str, str]] = None,
     ) -> None:
@@ -24,21 +24,18 @@ class DockerLoopbackVolume():
         disk to a cluster.
 
         Args:
-            name: Unique name of the loopback volume.
             size: Size of the block device in Megabytes.
             labels: Docker labels to add to the container.
         """
         self.size = size
 
         self.container, self.path = DockerLoopbackVolume.create(
-            name=name,
             size=size,
             labels=labels,
         )
 
     @staticmethod
     def create(
-        name: str,
         size: int,
         labels: Optional[Dict[str, str]] = None,
     ) -> Tuple[docker.models.containers.Container, str]:
@@ -47,7 +44,6 @@ class DockerLoopbackVolume():
         in a container.
 
         Args:
-            name: Unique name of the loopback volume.
             size: Size of the block device in Megabytes.
             labels: Docker labels to add to the container.
 
@@ -61,7 +57,9 @@ class DockerLoopbackVolume():
         # and might already be pulled as it is a distribution supported
         # by DC/OS.
         container = client.containers.create(
-            name='dcos-e2e-loopback-sidecar-{name}'.format(name=name),
+            name='dcos-e2e-loopback-sidecar-{random}'.format(
+                random=uuid.uuid4().hex,
+            ),
             privileged=True,
             detach=True,
             tty=True,
