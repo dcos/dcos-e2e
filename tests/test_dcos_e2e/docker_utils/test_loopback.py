@@ -38,11 +38,15 @@ class TestDockerLoopbackVolume:
         """
         The given labels are applied to the new container.
         """
-        labels = {uuid.uuid4().hex: uuid.uuid4().hex}
+        client = docker.from_env(version='auto')
+        key = uuid.uuid4().hex
+        value = uuid.uuid4().hex
+        labels = {key: value}
 
         with DockerLoopbackVolume(size=1, labels=labels) as device:
+            [existing_container] = client.containers.list(filters=filters)
             for key, value in labels.items():
-                assert device.container.labels[key] == value
+                assert existing_container.labels[key] == value
 
     def test_multiple(self) -> None:
         """
@@ -57,9 +61,13 @@ class TestDockerLoopbackVolume:
         The container and block device are destroyed.
         """
         client = docker.from_env(version='auto')
+        key = uuid.uuid4().hex
+        value = uuid.uuid4().hex
+        labels = {key: value}
 
-        with DockerLoopbackVolume(size=1, labels='...') as device:
-            existing_container = get_container_from_label...
+        with DockerLoopbackVolume(size=1, labels=labels) as device:
+            filters = {'label': ['{key}={value}'.format(key=key, value=value)]}
+            [existing_container] = client.containers.list(filters=filters)
             block_device_exists_cmd = ['lsblk', device.path]
 
         with pytest.raises(docker.errors.NotFound):
