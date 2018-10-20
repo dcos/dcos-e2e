@@ -27,8 +27,6 @@ class DockerLoopbackVolume():
             size: Size of the block device in Megabytes.
             labels: Docker labels to add to the container.
         """
-        self.size = size
-
         self.container, self.path = DockerLoopbackVolume.create(
             size=size,
             labels=labels,
