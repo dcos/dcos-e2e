@@ -31,7 +31,7 @@ If you are not in a virtualenv, you may have to use ``sudo`` before the followin
 Uninstall
 ~~~~~~~~~
 
-To uninstall the |project| library, use the following instructions:
+To uninstall |project|, run the following command:
 
 .. smart-prompt:: bash
 
