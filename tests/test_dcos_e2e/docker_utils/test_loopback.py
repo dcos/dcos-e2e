@@ -19,33 +19,13 @@ class TestDockerLoopbackVolume:
             exit_code, output = device.container.exec_run(
                 cmd=['lsblk', device.path],
             )
+
+            # TODO new container can access this
             assert exit_code == 0, device.path + ': ' + output.decode()
 
             for key, value in labels.items():
                 assert device.container.labels[key] == value
 
-    def test_create(self) -> None:
-        """
-        Calling `DockerLoopbackVolume.create` creates a sidecar container.
-        """
-        labels = {'foo': 'bar'}
-
-        container, path = DockerLoopbackVolume.create(size=1, labels=labels)
-
-        try:
-            for key, value in labels.items():
-                assert container.labels[key] == value
-
-            exit_code, output = container.exec_run(cmd=['lsblk', path])
-            assert exit_code == 0, path + ': ' + output.decode()
-
-        finally:
-            DockerLoopbackVolume.destroy(container)
-
-    def test_destroy(self) -> None:
-        """
-        Calling `DockerLoopbackVolume.destroy` destroys a sidecar container
-        without throwing an exception.
-        """
-        container, _ = DockerLoopbackVolume.create(size=1)
-        DockerLoopbackVolume.destroy(container=container)
+        # TODO new container cannot access
+        # TODO old container is gone
+        # TODO update CLI

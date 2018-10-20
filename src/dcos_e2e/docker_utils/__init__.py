@@ -3,7 +3,7 @@ Helpers for creating loopback devices on Docker.
 """
 
 import uuid
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 import docker
 
@@ -32,34 +32,12 @@ class DockerLoopbackVolume():
                 in.
             path: The path to the block device inside the container.
         """
-        self.container, self.path = DockerLoopbackVolume.create(
-            size=size,
-            labels=labels,
-        )
-
-    @staticmethod
-    def create(
-        size: int,
-        labels: Optional[Dict[str, str]] = None,
-    ) -> Tuple[docker.models.containers.Container, str]:
-        """
-        Create a loopback device pointing to a block device running
-        in a container.
-
-        Args:
-            size: Size of the block device in Megabytes.
-            labels: Docker labels to add to the container.
-
-        Returns:
-            A tuple containing the container and the path of
-            the loopback device.
-        """
         client = docker.from_env(version='auto')
 
         # We use CentOS 7 here, as it provides all the binaries we need
         # and might already be pulled as it is a distribution supported
         # by DC/OS.
-        container = client.containers.create(
+        self.container = client.containers.create(
             name='dcos-e2e-loopback-sidecar-{random}'.format(
                 random=uuid.uuid4().hex,
             ),
@@ -69,36 +47,35 @@ class DockerLoopbackVolume():
             image='centos:7',
             labels=labels or {},
         )
-        container.start()
+        self.container.start()
 
         create_loopback_device = (
             'dd if=/dev/zero of=/volume0 bs=1M count={size};'
         ).format(size=size)
 
-        exit_code, output = container.exec_run(
+        exit_code, output = self.container.exec_run(
             cmd=['/bin/bash', '-c', create_loopback_device],
         )
         assert exit_code == 0, output.decode()
 
         setup_loopback_device = 'losetup --find --show /volume0;'
 
-        exit_code, output = container.exec_run(
+        exit_code, output = self.container.exec_run(
             cmd=['/bin/bash', '-c', setup_loopback_device],
         )
         assert exit_code == 0, output.decode()
 
-        path = output.decode().rstrip()
+        self.path = output.decode().rstrip()
 
         write_device_path = 'echo {path} > loopback_device_path'.format(
-            path=path,
+            path=self.path,
         )
 
-        exit_code, output = container.exec_run(
+        exit_code, output = self.container.exec_run(
             cmd=['/bin/bash', '-c', write_device_path],
         )
         assert exit_code == 0, output.decode()
 
-        return (container, path)
 
     @staticmethod
     def destroy(container: docker.models.containers.Container) -> None:
