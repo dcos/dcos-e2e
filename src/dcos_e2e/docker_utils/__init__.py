@@ -47,13 +47,15 @@ class DockerLoopbackVolume():
         )
         self._container.start()
 
-        create_loopback_device = (
-            'dd if=/dev/zero of=/volume0 bs=1M count={size};'
-        ).format(size=size)
+        create_loopback_device = [
+            'dd',
+            'if=/dev/zero',
+            'of=volume0',
+            'bs=1M',
+            'count={size}'.format(size=size),
+        ]
 
-        exit_code, output = self._container.exec_run(
-            cmd=['/bin/bash', '-c', create_loopback_device],
-        )
+        exit_code, output = self._container.exec_run(cmd=create_loopback_device)
         assert exit_code == 0, output.decode()
 
         setup_loopback_device = 'losetup --find --show /volume0;'
