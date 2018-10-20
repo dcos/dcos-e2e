@@ -93,7 +93,7 @@ or, to additionally download a DC/OS Enterprise artifact, run the following:
 
     make EE_ARTIFACT_URL=<http://...> download-artifacts
 
-The DC/OS Enterprise artifact is required for some tests.
+DC/OS Enterprise artifacts are required for some tests.
 
 A license key is required for some tests:
 
