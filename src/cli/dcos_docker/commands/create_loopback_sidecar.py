@@ -34,7 +34,7 @@ def create_loopback_sidecar(size: int, name: str) -> None:
     (unformatted) block device.
     """
 
-    if loopback_sidecar_by_name(name) is not None:
+    if loopback_sidecar_by_name(name=name) is not None:
         message = 'Loopback sidecar "{name}" already exists'.format(
             name=name,
         )
