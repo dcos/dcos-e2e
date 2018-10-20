@@ -93,6 +93,3 @@ class TestDockerLoopbackVolume:
 
     # TODO destroy new container
     # TODO update CLI
-    # TODO remove tty in tests and implementation
-    # TODO test size
-    # TODO use label instead of file on disk
