@@ -1,8 +1,10 @@
-|Build Status|
+Tests: |Build Status|
 
-|codecov|
+Coverage: |codecov|
 
-|Documentation Status|
+Library Documentation: |Library Documentation Status|
+
+CLI Documentation: |CLI Documentation Status|
 
 |project|
 =========
@@ -10,7 +12,7 @@
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
 It includes a Python library and various CLI tools.
 
-See the full documentation on `Read the Docs <http://dcos-e2e.readthedocs.io/>`_.
+See the full documentation on Read the Docs for the `library`_ and `CLI`_.
 
 .. contents::
    :local:
@@ -29,7 +31,7 @@ Python Library
 
 Below is a small example of using |project| as a Python library with a Docker backend.
 Other backends include AWS and Vagrant.
-See the `full documentation <http://dcos-e2e.readthedocs.io/en/latest/?badge=latest>`_ for more details on these and other features.
+See the `library`_ documentation for more details on these and other features.
 
 .. code:: python
 
@@ -62,7 +64,7 @@ CLI
 ---
 
 |project| also provides multiple command line interface tools.
-These allow you to create, manage and destroy DC/OS clusters on various backends.
+These allow you to create, manage and destroy DC/OS clusters on various backends, such as Docker, Vagrant and AWS.
 
 A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
 
@@ -90,14 +92,17 @@ See the full `CLI`_ documentation for information on other CLI tools provided by
    :target: https://travis-ci.org/dcos/dcos-e2e
 .. |codecov| image:: https://codecov.io/gh/dcos/dcos-e2e/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/dcos/dcos-e2e
-.. |Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
+.. |Library Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
-   :alt: Documentation Status
+   :alt: Library Documentation Status
+.. |CLI Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e-cli/badge/?version=latest
+   :target: http://dcos-e2e-cli.readthedocs.io/en/latest/?badge=latest
+   :alt: CLI Documentation Status
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
-.. _CLI: http://dcos-e2e.readthedocs.io/en/latest/cli.html
-.. _dcos-docker CLI: http://dcos-e2e.readthedocs.io/en/latest/dcos-docker-cli.html
-.. _library: http://dcos-e2e.readthedocs.io/en/latest/library.html
-.. _backends: http://dcos-e2e.readthedocs.io/en/latest/backends.html
+.. _CLI: https://dcos-e2e-cli.readthedocs.io/en/latest/
+.. _dcos-docker CLI: https://dcos-e2e-cli.readthedocs.io/en/latest/dcos-docker-cli.html
+.. _library: https://dcos-e2e.readthedocs.io/en/latest/library.html
+.. _backends: https://dcos-e2e.readthedocs.io/en/latest/backends.html
 .. |project| replace:: DC/OS E2E
-.. _library installation instructions: https://dcos-e2e.readthedocs.io/en/latest/installation.html#library-and-cli-with-python
+.. _library installation instructions: https://dcos-e2e.readthedocs.io/en/latest/installation.html
