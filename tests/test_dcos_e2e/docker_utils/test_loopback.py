@@ -9,7 +9,8 @@ class TestDockerLoopbackVolume:
 
     def test_loopback(self) -> None:
         """
-        An instance of `DockerLoopbackVolume` provides a block device.
+        An instance of ``DockerLoopbackVolume`` provides a container which can
+        access a block device.
         """
         client = docker.from_env(version='auto')
         labels = {'foo': 'bar'}
@@ -55,8 +56,24 @@ class TestDockerLoopbackVolume:
         # TODO new container can access this
         assert exit_code == 1
 
+    def test_labels(self) -> None:
+        """
+        The given labels are applied to the new container.
+        """
+
+    def test_multiple(self) -> None:
+        """
+        Multiple sidecars can exist at once.
+        """
+
+    def test_accessible_multiple_containers(self) -> None:
+        """
+        The block device created is accessible to multiple containers.
+        """
+
         # TODO new container cannot access
         # TODO destroy new container
         # TODO old container is gone
         # TODO update CLI
         # TODO remove tty
+        # TODO test size
