@@ -76,7 +76,6 @@ class DockerLoopbackVolume():
         )
         assert exit_code == 0, output.decode()
 
-
     @staticmethod
     def destroy(container: docker.models.containers.Container) -> None:
         """
