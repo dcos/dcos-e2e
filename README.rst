@@ -30,6 +30,7 @@ Python Library
 --------------
 
 Below is a small example of using |project| as a Python library with a Docker backend.
+Other backends include AWS and Vagrant.
 See the `library`_ documentation for more details on these and other features.
 
 .. code:: python
@@ -83,6 +84,7 @@ A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
 
 
 Each of these commands and more are described in detail in the full `dcos-docker CLI`_ documentation.
+Other CLI tools include ``dcos-aws`` and ``dcos-vagrant``.
 
 See the full `CLI`_ documentation for information on other CLI tools provided by |project|.
 
