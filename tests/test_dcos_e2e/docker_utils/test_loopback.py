@@ -33,7 +33,6 @@ class TestDockerLoopbackVolume:
 
             assert exit_code == 0, device.path + ': ' + output.decode()
 
-
     def test_labels(self) -> None:
         """
         The given labels are applied to the new container.
@@ -43,7 +42,8 @@ class TestDockerLoopbackVolume:
         value = uuid.uuid4().hex
         labels = {key: value}
 
-        with DockerLoopbackVolume(size=1, labels=labels) as device:
+        with DockerLoopbackVolume(size=1, labels=labels):
+            filters = {'label': ['{key}={value}'.format(key=key, value=value)]}
             [existing_container] = client.containers.list(filters=filters)
             for key, value in labels.items():
                 assert existing_container.labels[key] == value
