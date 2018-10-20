@@ -13,39 +13,7 @@ class TestDockerLoopbackVolume:
 
     def test_loopback(self) -> None:
         """
-        An instance of ``DockerLoopbackVolume`` provides a container which can
-        access a block device.
-        """
-        with DockerLoopbackVolume(size=1) as device:
-            block_device_exists_cmd = ['lsblk', device.path]
-            exit_code, output = device.container.exec_run(
-                cmd=block_device_exists_cmd,
-            )
-
-            assert exit_code == 0, device.path + ': ' + output.decode()
-
-    def test_labels(self) -> None:
-        """
-        The given labels are applied to the new container.
-        """
-        labels = {uuid.uuid4().hex: uuid.uuid4().hex}
-
-        with DockerLoopbackVolume(size=1, labels=labels) as device:
-            for key, value in labels.items():
-                assert device.container.labels[key] == value
-
-    def test_multiple(self) -> None:
-        """
-        Multiple sidecars can exist at once.
-        """
-        with DockerLoopbackVolume(size=1) as first:
-            with DockerLoopbackVolume(size=1) as second:
-                assert first.path != second.path
-                assert first.container != second.container
-
-    def test_accessible_multiple_containers(self) -> None:
-        """
-        The block device created is accessible to multiple containers.
+        A block device is created which is accessible to multiple containers.
         """
         client = docker.from_env(version='auto')
 
@@ -65,14 +33,33 @@ class TestDockerLoopbackVolume:
 
             assert exit_code == 0, device.path + ': ' + output.decode()
 
+
+    def test_labels(self) -> None:
+        """
+        The given labels are applied to the new container.
+        """
+        labels = {uuid.uuid4().hex: uuid.uuid4().hex}
+
+        with DockerLoopbackVolume(size=1, labels=labels) as device:
+            for key, value in labels.items():
+                assert device.container.labels[key] == value
+
+    def test_multiple(self) -> None:
+        """
+        Multiple sidecars can exist at once.
+        """
+        with DockerLoopbackVolume(size=1) as first:
+            with DockerLoopbackVolume(size=1) as second:
+                assert first.path != second.path
+
     def test_destroy(self) -> None:
         """
         The container and block device are destroyed.
         """
         client = docker.from_env(version='auto')
 
-        with DockerLoopbackVolume(size=1) as device:
-            existing_container = device.container
+        with DockerLoopbackVolume(size=1, labels='...') as device:
+            existing_container = get_container_from_label...
             block_device_exists_cmd = ['lsblk', device.path]
 
         with pytest.raises(docker.errors.NotFound):
