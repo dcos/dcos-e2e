@@ -3,11 +3,13 @@ Tools for destroying sidecar containers.
 """
 
 import click
-import click_spinner
 
-from dcos_e2e.docker_utils import DockerLoopbackVolume
-
-from ._common import docker_client, NODE_TYPE_LABEL_KEY, NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE, SIDECAR_NAME_LABEL_KEY
+from ._common import (
+    NODE_TYPE_LABEL_KEY,
+    NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
+    SIDECAR_NAME_LABEL_KEY,
+    docker_client,
+)
 
 
 @click.command('list-loopback-sidecars')
