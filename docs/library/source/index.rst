@@ -2,7 +2,6 @@
 =========
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
-It consists of a :doc:`library` and various :doc:`cli`.
 
 Reference
 ---------
