@@ -79,9 +79,7 @@ class TestDockerLoopbackVolume:
             image='centos:7',
         )
         new_container.start()
-        exit_code, output = new_container.exec_run(
-            cmd=block_device_exists_cmd,
-        )
+        exit_code, output = new_container.exec_run(cmd=block_device_exists_cmd)
         new_container.stop()
         new_container.remove()
 
