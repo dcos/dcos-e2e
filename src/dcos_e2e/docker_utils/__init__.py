@@ -26,6 +26,11 @@ class DockerLoopbackVolume():
         Args:
             size: Size of the block device in Megabytes.
             labels: Docker labels to add to the container.
+
+        Attributes:
+            container: The Docker container which the block device is running
+                in.
+            path: The path to the block device inside the container.
         """
         self.container, self.path = DockerLoopbackVolume.create(
             size=size,
