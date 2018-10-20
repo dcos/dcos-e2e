@@ -14,7 +14,6 @@ class DockerLoopbackVolume():
 
     def __init__(
         self,
-        name: str,
         size: int,
         labels: Optional[Dict[str, str]] = None,
     ) -> None:
@@ -31,14 +30,12 @@ class DockerLoopbackVolume():
         self.size = size
 
         self.container, self.path = DockerLoopbackVolume.create(
-            name=name,
             size=size,
             labels=labels,
         )
 
     @staticmethod
     def create(
-        name: str,
         size: int,
         labels: Optional[Dict[str, str]] = None,
     ) -> Tuple[docker.models.containers.Container, str]:
@@ -61,7 +58,6 @@ class DockerLoopbackVolume():
         # and might already be pulled as it is a distribution supported
         # by DC/OS.
         container = client.containers.create(
-            name='dcos-e2e-loopback-sidecar-{name}'.format(name=name),
             privileged=True,
             detach=True,
             tty=True,
