@@ -26,4 +26,5 @@ def list_loopback_sidecars() -> None:
     }
     loopback_sidecars = client.containers.list(filters=filters)
     for loopback_sidecar in loopback_sidecars:
-        click.echo(loopback_sidecars)
+        name = loopback_sidecar.labels[SIDECAR_NAME_LABEL_KEY]
+        click.echo(name)
