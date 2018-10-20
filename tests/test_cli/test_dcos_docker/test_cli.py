@@ -782,7 +782,7 @@ class TestListLoopbackSidecars:
         runner = CliRunner()
         result = runner.invoke(
             dcos_docker,
-            ['list-loopback-sidecars', does_not_exist],
+            ['list-loopback-sidecars'],
             catch_exceptions=False,
         )
         assert result.exit_code == 0

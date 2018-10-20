@@ -95,7 +95,7 @@ def loopback_sidecars_by_name(name: str) -> List[Container]:
             ),
         ],
     }
-    return client.containers.list(filters=filters)
+    return list(client.containers.list(filters=filters))
 
 
 class ContainerInspectView:

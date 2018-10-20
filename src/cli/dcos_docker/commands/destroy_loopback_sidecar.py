@@ -24,6 +24,6 @@ def destroy_loopback_sidecar(name: str) -> None:
         )
         raise click.BadParameter(message)
 
-    (loopback_sidecar, ) = loopback_sidecars
+    [loopback_sidecar] = loopback_sidecars
     with click_spinner.spinner():
         DockerLoopbackVolume.destroy(container=loopback_sidecar)
