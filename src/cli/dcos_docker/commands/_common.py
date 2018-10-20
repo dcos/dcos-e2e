@@ -6,7 +6,7 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Set
 
 import click
 import docker
