@@ -1,10 +1,10 @@
-Tests: |Build Status|
+|Build Status|
 
-Coverage: |codecov|
+|codecov|
 
-Library Documentation: |Library Documentation Status|
+|Library Documentation Status|, Library
 
-CLI Documentation: |CLI Documentation Status|
+|CLI Documentation Status|, CLI
 
 |project|
 =========
