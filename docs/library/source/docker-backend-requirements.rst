@@ -77,7 +77,7 @@ The only supported way to use the Docker backend on Windows is using Vagrant and
     vagrant up
     vagrant ssh
 
-You can now run ``dcos-docker`` commands or use the :doc:`library`.
+You can now run ``dcos-docker`` commands or use the library.
 
 To connect to the cluster nodes from the Windows host (e.g. to use the DC/OS web interface), in PowerShell Run as Administrator, and add the Virtual Machine as a gateway:
 
