@@ -81,19 +81,20 @@ To fix some lint errors, run the following:
 Tests for this package
 ----------------------
 
+To run the full test suite, set environment variables for DC/OS Enterprise artifact URLs:
+
+.. smart-prompt:: bash
+
+   export EE_MASTER_ARTIFACT_URL=https://...
+   export EE_1_9_ARTIFACT_URL=https://...
+   export EE_1_10_ARTIFACT_URL=https://...
+   export EE_1_11_ARTIFACT_URL=https://...
+
 Download dependencies which are used by the tests:
 
 .. smart-prompt:: bash
 
-    make download-artifacts
-
-or, to additionally download a DC/OS Enterprise artifact, run the following:
-
-.. smart-prompt:: bash
-
-    make EE_ARTIFACT_URL=<http://...> download-artifacts
-
-The DC/OS Enterprise artifact is required for some tests.
+   python admin/download_artifacts.py
 
 A license key is required for some tests:
 
