@@ -62,6 +62,8 @@ class TestDockerLoopbackVolume:
             exit_code, output = new_container.exec_run(
                 cmd=block_device_exists_cmd,
             )
+            new_container.stop()
+            new_container.remove()
 
             assert exit_code == 0, device.path + ': ' + output.decode()
 
@@ -87,9 +89,9 @@ class TestDockerLoopbackVolume:
         exit_code, output = new_container.exec_run(
             cmd=block_device_exists_cmd,
         )
+        new_container.stop()
+        new_container.remove()
 
         assert exit_code != 0, output.decode()
-        # TODO new container
 
-    # TODO destroy new container
     # TODO update CLI
