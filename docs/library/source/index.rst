@@ -21,3 +21,4 @@ It includes a library which is focused on helping you to write tests which requi
    changelog
    contributing
    release-process
+   versioning-and-api-stability
