@@ -14,3 +14,9 @@ Storage
 ~~~~~~~
 
 Docker does not support storage features expected in a real DC/OS environment.
+
+Reboot
+~~~~~~
+
+DC/OS nodes cannot be rebooted.
+The cluster cannot survive a system reboot.
