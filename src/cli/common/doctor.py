@@ -63,7 +63,7 @@ def check_1_9_sed() -> CheckLevels:
             'The version of ``sed`` is not compatible with installers for '
             'DC/OS 1.9 and below. '
             'See '
-            'http://dcos-e2e.readthedocs.io/en/latest/versioning-and-api-stability.html#dc-os-1-9-and-below'  # noqa: E501
+            'http://dcos-e2e-cli.readthedocs.io/en/latest/versioning-and-api-stability.html#dc-os-1-9-and-below'  # noqa: E501
             '.'
         )
         warn(message=message)
