@@ -1,5 +1,5 @@
-macOS or Linux with Python
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+With Python (``pip``)
+~~~~~~~~~~~~~~~~~~~~~
 
 Requires Python 3.5.2+.
 To avoid interfering with your system's Python, we recommend using a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_.

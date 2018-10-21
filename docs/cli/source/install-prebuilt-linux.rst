@@ -1,5 +1,5 @@
-Linux with Pre-built Packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Linux Packages
+~~~~~~~~~~~~~~
 
 .. smart-prompt:: bash
 
