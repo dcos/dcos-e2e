@@ -71,6 +71,7 @@ def get_homebrew_formula(
 
     result = subprocess.run(args=args, stdout=subprocess.PIPE, check=True)
     resource_stanzas = str(result.stdout.decode())
+    homepage_url = 'http://dcos-e2e-cli.readthedocs.io/en/latest/'
 
     pattern = dedent(
         """\
@@ -79,7 +80,7 @@ def get_homebrew_formula(
 
           url "{archive_url}"
           head "{head_url}"
-          homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
+          homepage "{homepage_url}"
           depends_on "python3"
           depends_on "pkg-config"
 
@@ -106,4 +107,5 @@ def get_homebrew_formula(
         resource_stanzas=resource_stanzas,
         archive_url=archive_url,
         head_url=head_url,
+        homepage_url=homepage_url,
     )
