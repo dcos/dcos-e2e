@@ -6,7 +6,7 @@
 The ``dcos-docker`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
 A typical CLI workflow for open source DC/OS may look like the following.
-:ref:`Install the CLI <installation>`, then create, manage and destroy a cluster:
+Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
 .. code-block:: console
 
@@ -28,11 +28,6 @@ Each of these and more are described in detail below.
    :local:
 
 .. include:: docker-backend-requirements.rst
-
-.. _installation:
-
-.. include:: install-cli.rst
-
 
 Creating a Cluster
 ------------------

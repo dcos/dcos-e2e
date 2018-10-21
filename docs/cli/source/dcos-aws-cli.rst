@@ -6,7 +6,7 @@
 The ``dcos-aws`` CLI allows you to create and manage open source DC/OS and DC/OS Enterprise clusters on AWS EC2 instances.
 
 A typical CLI workflow for open source DC/OS may look like the following.
-:ref:`Install the CLI <installation>`, then create and manage a cluster:
+Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
 .. code-block:: console
 
@@ -24,8 +24,6 @@ Each of these and more are described in detail below.
    :local:
 
 .. include:: aws-backend-requirements.rst
-
-.. include:: install-cli.rst
 
 Creating a Cluster
 ------------------

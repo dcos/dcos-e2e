@@ -6,7 +6,7 @@
 The ``dcos-vagrant`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Vagrant VMs.
 
 A typical CLI workflow for open source DC/OS may look like the following.
-:ref:`Install the CLI <installation>`, then create, manage and destroy a cluster:
+Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
 .. code-block:: console
 
@@ -25,8 +25,6 @@ Each of these and more are described in detail below.
    :local:
 
 .. include:: vagrant-backend-requirements.rst
-
-.. include:: install-cli.rst
 
 Creating a Cluster
 ------------------
