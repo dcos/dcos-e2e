@@ -3,6 +3,8 @@
 
 |project| can be used for spinning up and managing DC/OS clusters in test environments.
 
+It is built on top of the DC/OS E2E Python `library`_.
+
 .. toctree::
    :maxdepth: 1
 
@@ -29,3 +31,5 @@ Reference
 
    changelog
    release-process
+
+.. _library: https://dcos-e2e.readthedocs.io/en/latest/
