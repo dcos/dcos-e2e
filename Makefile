@@ -29,6 +29,7 @@ lint: \
 .PHONY: clean
 clean:
 	# Ignore errors in case there are no containers to remove.
+	- for sidecar in $$(dcos-docker list-loopback-sidecars); do dcos-docker destroy-loopback-sidecar $$sidecar; done
 	- docker stop $$(docker ps -a -q --filter="name=dcos-e2e") | :
 	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-e2e") | :
 	- docker network rm $$(docker network ls -q --filter="name=dcos-e2e") | :
