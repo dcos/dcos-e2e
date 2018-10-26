@@ -108,8 +108,10 @@ class TestEquality:
                             )
 
                             should_match = bool(
-                                public_ip_address == node_public_ip_address and
-                                private_ip_address == node_private_ip_address,
+                                (public_ip_address, private_ip_address) == (
+                                    node_public_ip_address,
+                                    node_private_ip_address,
+                                ),
                             )
 
                             do_match = bool(node == other_node)
