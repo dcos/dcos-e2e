@@ -82,6 +82,22 @@ def enterprise_1_11_artifact() -> Path:
 
 
 @pytest.fixture(scope='session')
+def oss_1_12_artifact() -> Path:
+    """
+    Return the path to a build artifact for DC/OS OSS 1.12.
+    """
+    return Path('/tmp/dcos_generate_config_1_12.sh')
+
+
+@pytest.fixture(scope='session')
+def enterprise_1_12_artifact() -> Path:
+    """
+    Return the path to a build artifact for DC/OS Enterprise 1.12.
+    """
+    return Path('/tmp/dcos_generate_config_1_12.ee.sh')
+
+
+@pytest.fixture(scope='session')
 def oss_artifact_url() -> str:
     """
     Return the url to a build artifact for DC/OS OSS.
