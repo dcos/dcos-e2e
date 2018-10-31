@@ -40,10 +40,12 @@ OSS_MASTER = (OSS_MASTER_ARTIFACT_URL, OSS_MASTER_ARTIFACT_PATH)
 OSS_1_9 = (OSS_1_9_ARTIFACT_URL, OSS_1_9_ARTIFACT_PATH)
 OSS_1_10 = (OSS_1_10_ARTIFACT_URL, OSS_1_10_ARTIFACT_PATH)
 OSS_1_11 = (OSS_1_11_ARTIFACT_URL, OSS_1_11_ARTIFACT_PATH)
+OSS_1_12 = (OSS_1_12_ARTIFACT_URL, OSS_1_12_ARTIFACT_PATH)
 EE_MASTER = (EE_MASTER_ARTIFACT_URL, EE_MASTER_ARTIFACT_PATH)
 EE_1_9 = (EE_1_9_ARTIFACT_URL, EE_1_9_ARTIFACT_PATH)
 EE_1_10 = (EE_1_10_ARTIFACT_URL, EE_1_10_ARTIFACT_PATH)
 EE_1_11 = (EE_1_11_ARTIFACT_URL, EE_1_11_ARTIFACT_PATH)
+EE_1_12 = (EE_1_12_ARTIFACT_URL, EE_1_12_ARTIFACT_PATH)
 
 
 PATTERNS = {
@@ -54,6 +56,8 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_11':  # noqa: E501
     (OSS_1_11, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_12':  # noqa: E501
+    (OSS_1_12, ),
     'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_10':  # noqa: E501
     (OSS_1_10, ),
     'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestOSS::test_1_9':  # noqa: E501
@@ -62,6 +66,8 @@ PATTERNS = {
     (EE_MASTER, ),
     'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_11':  # noqa: E501
     (EE_1_11, ),
+    'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_12':  # noqa: E501
+    (EE_1_12, ),
     'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_10':  # noqa: E501
     (EE_1_10, ),
     'tests/test_cli/test_common/test_utils/test_is_enterprise.py::TestEnterprise::test_1_9':  # noqa: E501
@@ -154,6 +160,10 @@ PATTERNS = {
     (EE_1_11, ),
     'tests/test_dcos_e2e/test_legacy.py::Test111::test_oss':
     (OSS_1_11, ),
+    'tests/test_dcos_e2e/test_legacy.py::Test112::test_enterprise':
+    (EE_1_12, ),
+    'tests/test_dcos_e2e/test_legacy.py::Test112::test_oss':
+    (OSS_1_12, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise':
     (EE_1_9, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
