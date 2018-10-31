@@ -32,6 +32,19 @@ class TestOSS:
             workspace_dir=Path(str(tmpdir)),
         )
 
+    def test_1_12(
+        self,
+        oss_1_12_artifact: Path,
+        tmpdir: local,
+    ) -> None:
+        """
+        ``False`` is returned when given a DC/OS OSS 1.12 artifact.
+        """
+        assert not _is_enterprise(
+            build_artifact=oss_1_12_artifact,
+            workspace_dir=Path(str(tmpdir)),
+        )
+
     def test_1_11(
         self,
         oss_1_11_artifact: Path,
@@ -90,6 +103,19 @@ class TestEnterprise:
         """
         assert _is_enterprise(
             build_artifact=enterprise_artifact,
+            workspace_dir=Path(str(tmpdir)),
+        )
+
+    def test_1_12(
+        self,
+        enterprise_1_12_artifact: Path,
+        tmpdir: local,
+    ) -> None:
+        """
+        ``True`` is returned when given a DC/OS Enterprise 1.12 artifact.
+        """
+        assert _is_enterprise(
+            build_artifact=enterprise_1_12_artifact,
             workspace_dir=Path(str(tmpdir)),
         )
 
