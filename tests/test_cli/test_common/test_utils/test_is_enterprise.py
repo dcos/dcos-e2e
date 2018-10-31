@@ -108,7 +108,7 @@ class TestEnterprise:
 
     def test_1_12(
         self,
-        enterprise_1_11_artifact: Path,
+        enterprise_1_12_artifact: Path,
         tmpdir: local,
     ) -> None:
         """
