@@ -399,14 +399,13 @@ def create(
     artifact_path = Path(artifact).resolve()
 
     if variant == 'auto':
-        variant = get_variant(
+        dcos_variant = get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
             doctor_message=doctor_message,
         )
 
-    enterprise = bool(variant == 'enterprise')
-    if enterprise:
+    if dcos_variant == DCOSVariant.ENTERPRISE:
         superuser_username = 'admin'
         superuser_password = 'admin'
 
@@ -442,7 +441,7 @@ def create(
         docker_container_labels={
             CLUSTER_ID_LABEL_KEY: cluster_id,
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
-            VARIANT_LABEL_KEY: 'ee' if enterprise else '',
+            VARIANT_LABEL_KEY: str(dcos_variant.name),
         },
         docker_master_labels={
             NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE,
