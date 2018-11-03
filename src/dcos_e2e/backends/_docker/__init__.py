@@ -125,9 +125,9 @@ class Docker(ClusterBackend):
 
         Args:
             workspace_dir: The directory in which large temporary files will be
-                created. These files will be deleted at the end of a test run.
-                This is equivalent to `dir` in
-                :py:func:`tempfile.mkstemp`.
+                created. These files will be deleted when the cluster is
+                destroyed.
+                This is equivalent to `dir` in :py:func:`tempfile.mkstemp`.
             custom_container_mounts: Custom mounts add to all node containers.
                 See `mounts` in `Containers.run`_.
             custom_master_mounts: Custom mounts add to master node containers.
