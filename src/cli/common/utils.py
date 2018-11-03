@@ -19,63 +19,6 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from dcos_artifact_tools import DCOSArtifactDetails, DCOSVariant
 
 
-class DCOSVariant(Enum):
-    """
-    Variants of DC/OS.
-    """
-
-    OSS = 1
-    ENTERPRISE = 2
-
-class DCOSArtifactDetails:
-    """
-    Details of a DC/OS Artifact.
-    """
-
-    def __init__(self, build_artifact: Path, workspace_dir: Path):
-        """
-        Raises:
-            ValueError: XXX
-            CalledProcessError: XXX
-        """
-        if ' ' in str(build_artifact):
-            raise ValueError('No spaces allowed in path to the build artifact.')
-
-        result = subprocess.check_output(
-            args=['bash', str(build_artifact), '--version'],
-            cwd=str(workspace_dir),
-            stderr=subprocess.PIPE,
-        )
-
-        result = result.decode()
-        result = ' '.join(
-            [
-                line for line in result.splitlines()
-                if not line.startswith('Extracting image')
-                and not line.startswith('Loaded image') and '.tar' not in line
-            ],
-        )
-
-        version_info = json.loads(result)
-        variant = version_info['variant']
-
-        self.version = version_info['version']
-        self.variant = {
-            'ee': DCOSVariant.ENTERPRISE,
-            '': DCOSVariant.OSS,
-        }[variant]
-
-
-def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
-    """
-    Return whether the build artifact is an Enterprise artifact.
-
-    Raises:
-        ValueError: A space is in the build artifact path.
-    """
-    return bool(variant == 'ee')
-
-
 def get_variant(
     artifact_path: Path,
     doctor_message: str,
