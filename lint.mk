@@ -7,9 +7,8 @@ yapf:
 	yapf \
 	    --diff \
 	    --recursive \
-	    --exclude src/cli/_vendor \
-	    --exclude src/dcos_e2e/_vendor \
-	    --exclude src/dcos_e2e/_version.py \
+	    --exclude 'src/*/_vendor' \
+	    --exclude 'src/*/_version.py' \
 	    --exclude release/ \
 	    --exclude versioneer.py \
 	    .
@@ -19,9 +18,8 @@ fix-yapf:
 	yapf \
 	    --in-place \
 	    --recursive \
-	    --exclude src/cli/_vendor \
-	    --exclude src/dcos_e2e/_vendor \
-	    --exclude src/dcos_e2e/_version.py \
+	    --exclude 'src/*/_vendor' \
+	    --exclude 'src/*/_version.py' \
 	    --exclude versioneer.py \
 	    .
 
