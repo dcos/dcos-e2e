@@ -270,8 +270,8 @@ class DockerCluster(ClusterManager):
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
         #
-        # Starting with "dcos-e2e" allows `make clean` to remove these and
-        # only these containers.
+        # Starting with "dcos-e2e" allows ``dcos-docker clean`` to remove these
+        # and only these containers.
         self._cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
 
         # We work in a new directory.
