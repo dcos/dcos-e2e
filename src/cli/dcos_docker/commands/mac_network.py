@@ -28,7 +28,7 @@ import docker
 from ._common import docker_client
 
 # We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
-# with "make clean".
+# with "dcos-docker clean".
 _PROXY_CONTAINER_NAME = 'e2e-proxy'
 _OPENVPN_CONTAINER_NAME = 'e2e-openvpn'
 
