@@ -137,7 +137,7 @@ PATTERNS = {
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters':
-    (OSS_MASTER, ),
+    (),
     'tests/test_dcos_e2e/test_cluster.py::TestDestroyNode':
     (),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer':  # noqa: E501
