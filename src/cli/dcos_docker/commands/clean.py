@@ -2,6 +2,13 @@
 XXX
 """
 
+from ._common import (
+    NODE_TYPE_LABEL_KEY,
+    NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
+    docker_client,
+)
+
+
 def clean():
     client = docker_client()
 

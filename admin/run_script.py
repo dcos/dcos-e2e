@@ -5,7 +5,7 @@ Run tests and linters on Travis CI.
 import os
 import subprocess
 import sys
-from typing import Dict, Tuple  # noqa: F401
+from typing import Dict  # noqa: F401
 
 import pytest
 
