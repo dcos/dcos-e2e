@@ -46,12 +46,8 @@ docs:
 
 .PHONY: open-docs
 open-docs:
-	xdg-open docs/library/build/html/index.html >/dev/null 2>&1 || \
-	open docs/library/build/html/index.html >/dev/null 2>&1 || \
-	echo "Requires 'xdg-open' or 'open' and the docs to be built."
-	xdg-open docs/cli/build/html/index.html >/dev/null 2>&1 || \
-	open docs/cli/build/html/index.html >/dev/null 2>&1 || \
-	echo "Requires 'xdg-open' or 'open' and the docs to be built."
+	python -c 'import os, webbrowser; webbrowser.open("file://" + os.path.abspath("docs/library/build/html/index.html"))'
+	python -c 'import os, webbrowser; webbrowser.open("file://" + os.path.abspath("docs/cli/build/html/index.html"))'
 
 # We pull Docker images before the tests start to catch any flakiness early.
 # See https://jira.mesosphere.com/browse/DCOS_OSS-2120 for details of
