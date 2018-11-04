@@ -343,26 +343,15 @@ class TestMultipleClusters:
     Tests for working with multiple clusters.
     """
 
-    def test_two_clusters(
-        self,
-        cluster_backend: ClusterBackend,
-        oss_artifact: Path,
-    ) -> None:
+    def test_two_clusters(self, cluster_backend: ClusterBackend) -> None:
         """
         It is possible to start two clusters.
         """
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
-                build_artifact=oss_artifact,
-                dcos_config=cluster.base_config,
-                ip_detect_path=cluster_backend.ip_detect_path,
-            )
-            with Cluster(cluster_backend=cluster_backend) as cluster:
-                cluster.install_dcos_from_path(
-                    build_artifact=oss_artifact,
-                    dcos_config=cluster.base_config,
-                    ip_detect_path=cluster_backend.ip_detect_path,
-                )
+        # What is not tested here is that two cluster installations of DC/OS
+        # can be started at the same time.
+        with Cluster(cluster_backend=cluster_backend):
+            with Cluster(cluster_backend=cluster_backend):
+                pass
 
 
 class TestClusterFromNodes:
