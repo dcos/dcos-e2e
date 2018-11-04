@@ -7,6 +7,8 @@ Options:
   --help     Show this message and exit.
 
 Commands:
+  clean                     Remove containers, volumes and networks created
+                            by...
   create                    Create a DC/OS cluster.
   create-loopback-sidecar   Create a loopback sidecar.
   destroy                   Destroy a cluster.
