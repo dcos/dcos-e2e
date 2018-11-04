@@ -9,17 +9,8 @@ from io import BytesIO
 from pathlib import Path
 from shutil import copy, copytree, rmtree
 from tempfile import TemporaryDirectory
-from typing import (  # noqa: F401
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    List,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import Any  # noqa: F401
+from typing import Union
 
 import click
 import click_spinner
