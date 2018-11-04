@@ -1,6 +1,8 @@
 """
-XXX
+Clean all Docker artefacts from using the Docker backend.
 """
+
+import click
 
 from ._common import (
     NODE_TYPE_LABEL_KEY,
@@ -9,7 +11,11 @@ from ._common import (
 )
 
 
+@click.command('clean')
 def clean():
+    """
+    Remove containers, volumes and networks created by this tool.
+    """
     client = docker_client()
 
     filters = {
@@ -28,7 +34,7 @@ def clean():
 
     node_containers = client.containers.list(filters=filters, all=True)
 
-    for container in containers:
+    for container in node_containers:
         container.stop()
         container.remove(v=True)
 
