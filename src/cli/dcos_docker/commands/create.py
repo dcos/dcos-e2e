@@ -398,12 +398,15 @@ def create(
 
     artifact_path = Path(artifact).resolve()
 
-    if variant == 'auto':
-        dcos_variant = get_variant(
+    dcos_variant = {
+        'auto': get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
             doctor_message=doctor_message,
-        )
+        ),
+        'oss': DCOSVariant.OSS,
+        'enterprise': DCOSVariant.ENTERPRISE,
+    }[variant]
 
     if dcos_variant == DCOSVariant.ENTERPRISE:
         superuser_username = 'admin'
