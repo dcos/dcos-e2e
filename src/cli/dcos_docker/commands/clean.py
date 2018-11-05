@@ -1,5 +1,5 @@
 """
-Clean all Docker artefacts from using the Docker backend.
+Clean all Docker artifacts from using the Docker backend.
 """
 
 import click
