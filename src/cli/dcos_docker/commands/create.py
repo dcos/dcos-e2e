@@ -430,6 +430,11 @@ def create(
             relative_path = container_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
+    variant_label_value = {
+        DCOSVariant.OSS: VARIANT_OSS_LABEL_VALUE,
+        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
+    }[dcos_variant]
+
     cluster_backend = Docker(
         custom_container_mounts=custom_volume,
         custom_master_mounts=custom_master_volume,
@@ -441,7 +446,7 @@ def create(
         docker_container_labels={
             CLUSTER_ID_LABEL_KEY: cluster_id,
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
-            VARIANT_LABEL_KEY: str(dcos_variant.name),
+            VARIANT_LABEL_KEY: variant_label_value,
         },
         docker_master_labels={
             NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE,
