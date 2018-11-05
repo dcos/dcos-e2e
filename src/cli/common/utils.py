@@ -16,14 +16,14 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from cli._vendor.artifact_utils import get_dcos_installer_details
+from cli._vendor.artifact_utils import DCOSVariant, get_dcos_installer_details
 
 
 def get_variant(
     artifact_path: Path,
     doctor_message: str,
     workspace_dir: Path,
-) -> str:
+) -> DCOSVariant:
     """
     Get the variant of a DC/OS artifact.
 
@@ -42,7 +42,7 @@ def get_variant(
     try:
         with click_spinner.spinner():
             return get_dcos_installer_details(
-                build_artifact=artifact_path,
+                installer=artifact_path,
                 workspace_dir=workspace_dir,
             ).variant
     except subprocess.CalledProcessError as exc:
