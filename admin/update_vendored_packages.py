@@ -71,7 +71,7 @@ def main() -> None:
     dcos_installer_tools = _Requirement(
         target_directory=dcos_cli_target_directory,
         package_name='dcos_installer_tools',
-        https_address='https://github.com/adamtheturtle/dcos_installer_tools',
+        https_address='https://github.com/adamtheturtle/dcos-installer-tools',
         git_reference='c887a360514c1d00cd7c4064858f80bc0b2d2687',
     )
 
