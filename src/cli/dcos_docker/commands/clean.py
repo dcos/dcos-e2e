@@ -10,12 +10,18 @@ from ._common import (
     docker_client,
 )
 
+from cli.common.options import verbosity_option
+from cli.common.utils import set_logging
+
 
 @click.command('clean')
-def clean():
+@verbosity_option
+def clean(verbose: int) -> None:
     """
     Remove containers, volumes and networks created by this tool.
     """
+    set_logging(verbosity_level=verbose)
+
     client = docker_client()
 
     filters = {
@@ -32,13 +38,13 @@ def clean():
 
     node_filters = {'name': 'dcos-e2e'}
 
-    node_containers = client.containers.list(filters=filters, all=True)
+    node_containers = client.containers.list(filters=node_filters, all=True)
 
     for container in node_containers:
         container.stop()
         container.remove(v=True)
 
     network_filters = {'name': 'dcos-e2e'}
-    networks = client.networks.list(filters=filters)
+    networks = client.networks.list(filters=network_filters)
     for network in networks:
         network.remove()
