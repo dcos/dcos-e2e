@@ -50,9 +50,7 @@ EE_1_12 = (EE_1_12_ARTIFACT_URL, EE_1_12_ARTIFACT_PATH)
 
 
 PATTERNS = {
-    'tests/test_cli/test_dcos_aws': (),
-    'tests/test_cli/test_dcos_docker': (),
-    'tests/test_cli/test_dcos_vagrant': (),
+    'tests/test_cli': (),
     'tests/test_admin/test_brew.py':
     (),
     'tests/test_admin/test_binaries.py':
