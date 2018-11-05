@@ -16,7 +16,7 @@ import click_spinner
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from dcos_artifact_tools import DCOSArtifactDetails, DCOSVariant
+from dcos_artifact_tools import get_dcos_installer_details
 
 
 def get_variant(
@@ -41,10 +41,10 @@ def get_variant(
     """
     try:
         with click_spinner.spinner():
-            artifact_details = DCOSArtifactDetails(
+            return get_dcos_installer_details(
                 build_artifact=artifact_path,
                 workspace_dir=workspace_dir,
-            )
+            ).variant
     except subprocess.CalledProcessError as exc:
         rmtree(path=str(workspace_dir), ignore_errors=True)
         click.echo(doctor_message)
@@ -55,8 +55,6 @@ def get_variant(
     except ValueError as exc:
         click.echo(str(exc), err=True)
         sys.exit(1)
-
-    return artifact_details.variant
 
 
 def set_logging(verbosity_level: int) -> None:
