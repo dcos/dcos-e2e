@@ -7,6 +7,7 @@ import click
 import dcos_e2e
 from cli.common.commands import download_artifact
 
+from .commands.clean import clean
 from .commands.create import create
 from .commands.create_loopback_sidecar import create_loopback_sidecar
 from .commands.destroy import destroy, destroy_list
@@ -34,6 +35,7 @@ def dcos_docker() -> None:
     """
 
 
+dcos_docker.add_command(clean)
 dcos_docker.add_command(create)
 dcos_docker.add_command(create_loopback_sidecar)
 dcos_docker.add_command(destroy)
