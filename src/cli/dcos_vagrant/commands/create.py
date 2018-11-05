@@ -38,8 +38,8 @@ from dcos_e2e.cluster import Cluster
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,
     VARIANT_DESCRIPTION_KEY,
-    VARIANT_ENTERPRISE_LABEL_VALUE,
-    VARIANT_OSS_LABEL_VALUE,
+    VARIANT_ENTERPRISE_DESCRIPTION_VALUE,
+    VARIANT_OSS_DESCRIPTION_VALUE,
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
@@ -135,8 +135,8 @@ def create(
     }[variant]
 
     variant_label_value = {
-        DCOSVariant.OSS: VARIANT_OSS_LABEL_VALUE,
-        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
+        DCOSVariant.OSS: VARIANT_OSS_DESCRIPTION_VALUE,
+        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_DESCRIPTION_VALUE,
     }[dcos_variant]
 
     description = {

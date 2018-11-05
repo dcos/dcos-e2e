@@ -16,7 +16,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from cli.vendor.dcos_artifact_tools import get_dcos_installer_details
+from cli._vendor.artifact_utils import get_dcos_installer_details
 
 
 def get_variant(
