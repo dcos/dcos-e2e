@@ -118,24 +118,31 @@ def create(
 
     artifact_path = Path(artifact).resolve()
 
-    if variant == 'auto':
-        variant = get_variant(
+    dcos_variant = {
+        'auto': get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
             doctor_message=doctor_message,
-        )
+        ),
+        'oss': DCOSVariant.OSS,
+        'enterprise': DCOSVariant.ENTERPRISE,
+    }[variant]
 
-    enterprise = bool(variant == 'enterprise')
+    variant_label_value = {
+        DCOSVariant.OSS: VARIANT_OSS_LABEL_VALUE,
+        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
+    }[dcos_variant]
+
     description = {
         CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
         WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
-        VARIANT_DESCRIPTION_KEY: 'ee' if enterprise else '',
+        VARIANT_DESCRIPTION_KEY: variant_label_value,
     }
     cluster_backend = Vagrant(
         workspace_dir=workspace_dir,
         virtualbox_description=json.dumps(obj=description),
     )
-    if enterprise:
+    if dcos_variant == DCOSVariant.ENTERPRISE:
         superuser_username = 'admin'
         superuser_password = 'admin'
 
