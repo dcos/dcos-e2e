@@ -68,7 +68,15 @@ def main() -> None:
         git_reference='77d7aa5d994e2650ece9e8aded6e9bffda21a2ac',
     )
 
+    dcos_installer_tools = _Requirement(
+        target_directory=dcos_cli_target_directory,
+        package_name='dcos_installer_tools',
+        https_address='https://github.com/adamtheturtle/dcos_installer_tools',
+        git_reference='c887a360514c1d00cd7c4064858f80bc0b2d2687',
+    )
+
     requirements = [
+        dcos_installer_tools,
         dcos_launch,
         test_utils,
         vertigo_e2e,
