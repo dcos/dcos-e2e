@@ -3,4 +3,6 @@ Usage: dcos-docker clean [OPTIONS]
   Remove containers, volumes and networks created by this tool.
 
 Options:
-  --help  Show this message and exit.
+  -v, --verbose  Use verbose output. Use this option multiple times for more
+                 verbose output.
+  --help         Show this message and exit.
