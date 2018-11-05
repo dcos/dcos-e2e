@@ -16,6 +16,7 @@ from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
+from cli._vendor.artifact_utils import DCOSVariant
 from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
@@ -50,7 +51,9 @@ from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_MASTER_LABEL_VALUE,
     NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
+    VARIANT_ENTERPRISE_LABEL_VALUE,
     VARIANT_LABEL_KEY,
+    VARIANT_OSS_LABEL_VALUE,
     WORKSPACE_DIR_LABEL_KEY,
     docker_client,
     existing_cluster_ids,
@@ -398,15 +401,20 @@ def create(
 
     artifact_path = Path(artifact).resolve()
 
-    if variant == 'auto':
-        variant = get_variant(
+    dcos_variant = {
+        'auto':
+        get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
             doctor_message=doctor_message,
-        )
+        ),
+        'oss':
+        DCOSVariant.OSS,
+        'enterprise':
+        DCOSVariant.ENTERPRISE,
+    }[variant]
 
-    enterprise = bool(variant == 'enterprise')
-    if enterprise:
+    if dcos_variant == DCOSVariant.ENTERPRISE:
         superuser_username = 'admin'
         superuser_password = 'admin'
 
@@ -431,6 +439,11 @@ def create(
             relative_path = container_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
+    variant_label_value = {
+        DCOSVariant.OSS: VARIANT_OSS_LABEL_VALUE,
+        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
+    }[dcos_variant]
+
     cluster_backend = Docker(
         custom_container_mounts=custom_volume,
         custom_master_mounts=custom_master_volume,
@@ -442,7 +455,7 @@ def create(
         docker_container_labels={
             CLUSTER_ID_LABEL_KEY: cluster_id,
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
-            VARIANT_LABEL_KEY: 'ee' if enterprise else '',
+            VARIANT_LABEL_KEY: variant_label_value,
         },
         docker_master_labels={
             NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE,

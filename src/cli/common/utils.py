@@ -1,7 +1,7 @@
 """
 Common utilities for making CLIs.
 """
-import json
+
 import logging
 import stat
 import subprocess
@@ -16,42 +16,14 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-
-def _is_enterprise(build_artifact: Path, workspace_dir: Path) -> bool:
-    """
-    Return whether the build artifact is an Enterprise artifact.
-
-    Raises:
-        ValueError: A space is in the build artifact path.
-    """
-    if ' ' in str(build_artifact):
-        raise ValueError('No spaces allowed in path to the build artifact.')
-
-    result = subprocess.check_output(
-        args=['bash', str(build_artifact), '--version'],
-        cwd=str(workspace_dir),
-        stderr=subprocess.PIPE,
-    )
-
-    result = result.decode()
-    result = ' '.join(
-        [
-            line for line in result.splitlines()
-            if not line.startswith('Extracting image')
-            and not line.startswith('Loaded image') and '.tar' not in line
-        ],
-    )
-
-    version_info = json.loads(result)
-    variant = version_info['variant']
-    return bool(variant == 'ee')
+from cli._vendor.artifact_utils import DCOSVariant, get_dcos_installer_details
 
 
 def get_variant(
     artifact_path: Path,
     doctor_message: str,
     workspace_dir: Path,
-) -> str:
+) -> DCOSVariant:
     """
     Get the variant of a DC/OS artifact.
 
@@ -69,10 +41,10 @@ def get_variant(
     """
     try:
         with click_spinner.spinner():
-            enterprise = _is_enterprise(
-                build_artifact=artifact_path,
+            return get_dcos_installer_details(
+                installer=artifact_path,
                 workspace_dir=workspace_dir,
-            )
+            ).variant
     except subprocess.CalledProcessError as exc:
         rmtree(path=str(workspace_dir), ignore_errors=True)
         click.echo(doctor_message)
@@ -83,8 +55,6 @@ def get_variant(
     except ValueError as exc:
         click.echo(str(exc), err=True)
         sys.exit(1)
-
-    return 'enterprise' if enterprise else 'oss'
 
 
 def set_logging(verbosity_level: int) -> None:

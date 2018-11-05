@@ -19,6 +19,8 @@ from dcos_e2e.node import Node
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
 VARIANT_DESCRIPTION_KEY = 'dcos_e2e.variant'
+VARIANT_ENTERPRISE_DESCRIPTION_VALUE = 'ee'
+VARIANT_OSS_DESCRIPTION_VALUE = 'oss'
 
 
 def _description_from_vm_name(vm_name: str) -> str:

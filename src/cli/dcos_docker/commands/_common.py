@@ -41,6 +41,8 @@ CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 SIDECAR_NAME_LABEL_KEY = 'dcos_e2e.sidecar_name'
 WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
 VARIANT_LABEL_KEY = 'dcos_e2e.variant'
+VARIANT_ENTERPRISE_LABEL_VALUE = 'ee'
+VARIANT_OSS_LABEL_VALUE = 'oss'
 NODE_TYPE_LABEL_KEY = 'dcos_e2e.node_type'
 NODE_TYPE_MASTER_LABEL_VALUE = 'master'
 NODE_TYPE_AGENT_LABEL_VALUE = 'agent'
@@ -222,7 +224,8 @@ class ClusterContainers:
         Return whether the cluster is a DC/OS Enterprise cluster.
         """
         master_container = next(iter(self.masters))
-        return bool(master_container.labels[VARIANT_LABEL_KEY] == 'ee')
+        container_variant_value = master_container.labels[VARIANT_LABEL_KEY]
+        return bool(container_variant_value == VARIANT_ENTERPRISE_LABEL_VALUE)
 
     @property
     def cluster(self) -> Cluster:
