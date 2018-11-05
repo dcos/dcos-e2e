@@ -41,11 +41,11 @@ def wait(
     """
     Wait for DC/OS to start.
     """
+    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
-    set_logging(verbosity_level=verbose)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     cluster_instances = ClusterInstances(
         cluster_id=cluster_id,

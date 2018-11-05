@@ -4,7 +4,8 @@ Download artifacts.
 
 import os
 from pathlib import Path
-from typing import Dict, Tuple  # noqa: F401
+from typing import Dict  # noqa: F401
+from typing import Tuple  # noqa: F401
 
 import click
 import requests

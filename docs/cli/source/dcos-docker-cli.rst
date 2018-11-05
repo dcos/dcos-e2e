@@ -361,6 +361,11 @@ CLI Reference
 .. click:: cli.dcos_docker:destroy_list
   :prog: dcos-docker destroy-list
 
+.. _dcos-docker-clean:
+
+.. click:: cli.dcos_docker:clean
+  :prog: dcos-docker clean
+
 .. _dcos-docker-doctor:
 
 .. click:: cli.dcos_docker:doctor

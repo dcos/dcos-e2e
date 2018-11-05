@@ -28,16 +28,17 @@ lint: \
 # Attempt to clean leftovers by the test suite.
 .PHONY: clean
 clean:
-	# Ignore errors in case there are no containers to remove.
-	- for sidecar in $$(dcos-docker list-loopback-sidecars); do dcos-docker destroy-loopback-sidecar $$sidecar; done
-	- docker stop $$(docker ps -a -q --filter="name=dcos-e2e") | :
-	- docker rm --volumes $$(docker ps -a -q --filter="name=dcos-e2e") | :
-	- docker network rm $$(docker network ls -q --filter="name=dcos-e2e") | :
 
 # Fix some linting errors.
 .PHONY: fix-lint
-fix-lint: autoflake fix-yapf
+fix-lint:
+	# Move imports to a single line so that autoflake can handle them.
+	# See https://github.com/myint/autoflake/issues/8.
+	# Then later we put them back.
+	isort --force-single-line --recursive --apply
+	$(MAKE) autoflake
 	isort --recursive --apply
+	$(MAKE) fix-yapf
 
 .PHONY: docs
 docs:
@@ -46,12 +47,8 @@ docs:
 
 .PHONY: open-docs
 open-docs:
-	xdg-open docs/library/build/html/index.html >/dev/null 2>&1 || \
-	open docs/library/build/html/index.html >/dev/null 2>&1 || \
-	echo "Requires 'xdg-open' or 'open' and the docs to be built."
-	xdg-open docs/cli/build/html/index.html >/dev/null 2>&1 || \
-	open docs/cli/build/html/index.html >/dev/null 2>&1 || \
-	echo "Requires 'xdg-open' or 'open' and the docs to be built."
+	python -c 'import os, webbrowser; webbrowser.open("file://" + os.path.abspath("docs/library/build/html/index.html"))'
+	python -c 'import os, webbrowser; webbrowser.open("file://" + os.path.abspath("docs/cli/build/html/index.html"))'
 
 # We pull Docker images before the tests start to catch any flakiness early.
 # See https://jira.mesosphere.com/browse/DCOS_OSS-2120 for details of

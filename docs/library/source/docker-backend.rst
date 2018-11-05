@@ -26,11 +26,7 @@ To remove these, run the following:
 
 .. smart-prompt:: bash
 
-    docker stop $(docker ps -a -q --filter="name=dcos-e2e")
-    docker rm --volumes $(docker ps -a -q --filter="name=dcos-e2e")
-    docker volume prune --force
-
-If this repository is available, run ``make clean``.
+    dcos-docker clean
 
 macOS File Sharing
 ~~~~~~~~~~~~~~~~~~
