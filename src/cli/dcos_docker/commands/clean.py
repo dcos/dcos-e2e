@@ -4,14 +4,15 @@ Clean all Docker artefacts from using the Docker backend.
 
 import click
 
+from cli.common.options import verbosity_option
+from cli.common.utils import set_logging
+from dcos_e2e.docker_utils import DockerLoopbackVolume
+
 from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
     docker_client,
 )
-
-from cli.common.options import verbosity_option
-from cli.common.utils import set_logging
 
 
 @click.command('clean')
