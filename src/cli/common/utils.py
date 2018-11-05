@@ -2,7 +2,6 @@
 Common utilities for making CLIs.
 """
 
-import json
 import logging
 import stat
 import subprocess
@@ -16,7 +15,8 @@ import click_spinner
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from dcos_artifact_tools import get_dcos_installer_details
+
+from cli.vendor.dcos_artifact_tools import get_dcos_installer_details
 
 
 def get_variant(

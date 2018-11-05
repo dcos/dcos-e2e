@@ -224,7 +224,10 @@ class ClusterContainers:
         Return whether the cluster is a DC/OS Enterprise cluster.
         """
         master_container = next(iter(self.masters))
-        return bool(master_container.labels[VARIANT_LABEL_KEY] == VARIANT_ENTERPRISE_LABEL_VALUE)
+        return bool(
+            master_container.labels[VARIANT_LABEL_KEY] ==
+            VARIANT_ENTERPRISE_LABEL_VALUE
+        )
 
     @property
     def cluster(self) -> Cluster:

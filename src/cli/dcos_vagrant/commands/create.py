@@ -14,6 +14,7 @@ import click
 import click_spinner
 from passlib.hash import sha512_crypt
 
+from cli._vendor.artifact_utils import DCOSVariant
 from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
@@ -37,6 +38,8 @@ from dcos_e2e.cluster import Cluster
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,
     VARIANT_DESCRIPTION_KEY,
+    VARIANT_ENTERPRISE_LABEL_VALUE,
+    VARIANT_OSS_LABEL_VALUE,
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
@@ -119,13 +122,16 @@ def create(
     artifact_path = Path(artifact).resolve()
 
     dcos_variant = {
-        'auto': get_variant(
+        'auto':
+        get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
             doctor_message=doctor_message,
         ),
-        'oss': DCOSVariant.OSS,
-        'enterprise': DCOSVariant.ENTERPRISE,
+        'oss':
+        DCOSVariant.OSS,
+        'enterprise':
+        DCOSVariant.ENTERPRISE,
     }[variant]
 
     variant_label_value = {

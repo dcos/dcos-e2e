@@ -16,6 +16,7 @@ from docker.models.networks import Network
 from docker.types import Mount
 from passlib.hash import sha512_crypt
 
+from cli._vendor.artifact_utils import DCOSVariant
 from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,
@@ -50,7 +51,9 @@ from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_MASTER_LABEL_VALUE,
     NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
+    VARIANT_ENTERPRISE_LABEL_VALUE,
     VARIANT_LABEL_KEY,
+    VARIANT_OSS_LABEL_VALUE,
     WORKSPACE_DIR_LABEL_KEY,
     docker_client,
     existing_cluster_ids,
@@ -399,13 +402,16 @@ def create(
     artifact_path = Path(artifact).resolve()
 
     dcos_variant = {
-        'auto': get_variant(
+        'auto':
+        get_variant(
             artifact_path=artifact_path,
             workspace_dir=workspace_dir,
             doctor_message=doctor_message,
         ),
-        'oss': DCOSVariant.OSS,
-        'enterprise': DCOSVariant.ENTERPRISE,
+        'oss':
+        DCOSVariant.OSS,
+        'enterprise':
+        DCOSVariant.ENTERPRISE,
     }[variant]
 
     if dcos_variant == DCOSVariant.ENTERPRISE:
