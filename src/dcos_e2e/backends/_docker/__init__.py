@@ -204,6 +204,9 @@ class Docker(ClusterBackend):
                 master only if there are multiple master nodes. See `ports` in
                 `Containers.run`_. Currently, only Transmission Control
                 Protocol is supported.
+            container_name_prefix: The prefix that all container names will
+                start with. This is useful, for example, for later finding all
+                containers started with this backend.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
@@ -224,11 +227,12 @@ class Docker(ClusterBackend):
         self.transport = transport
         self.network = network
         self.one_master_host_port_map = one_master_host_port_map or {}
+        self.container_name_prefix = 'dcos-e2e'
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
         """
-        Return the `ClusterManager` class to use to create and manage a
+        Return the ``ClusterManager`` class to use to create and manage a
         cluster.
         """
         return DockerCluster
@@ -270,9 +274,10 @@ class DockerCluster(ClusterManager):
         # We use the same random string for each container in a cluster so
         # that they can be associated easily.
         #
-        # Starting with "dcos-e2e" allows ``dcos-docker clean`` to remove these
-        # and only these containers.
-        self._cluster_id = 'dcos-e2e-{random}'.format(random=uuid.uuid4())
+        self._cluster_id = '{prefix}-{random}'.format(
+            prefix=cluster_backend.container_name_prefix,
+            random=uuid.uuid4(),
+        )
 
         # We work in a new directory.
         # This helps running tests in parallel without conflicts and it
