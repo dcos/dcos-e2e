@@ -18,10 +18,14 @@ import docker
 
 from ._common import docker_client
 
-# We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
-# with "dcos-docker clean".
-_PROXY_CONTAINER_NAME = 'e2e-proxy'
-_OPENVPN_CONTAINER_NAME = 'e2e-openvpn'
+# We start these names with "vpn" to avoid a conflict with "dcos-docker clean".
+prefix = Docker().container_name_prefix
+_PROXY_CONTAINER_NAME = 'vpn-{container_name_prefix}-proxy'.format(
+    container_name_prefix=prefix,
+)
+_OPENVPN_CONTAINER_NAME = 'vpn-{container_name_prefix}-openvpn'.format(
+    container_name_prefix=prefix,
+)
 
 
 def _validate_ovpn_file_does_not_exist(
