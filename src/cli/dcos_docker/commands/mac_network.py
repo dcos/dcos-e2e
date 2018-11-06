@@ -104,7 +104,9 @@ def _create_mac_network(configuration_dst: Path) -> None:
     docker_mac_network = openvpn_build_path / 'docker-mac-network-master'
     copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
-    proxy_image_tag = 'dcos-e2e/proxy'
+    proxy_image_tag = '{prefix}/proxy'.format(
+        prefix=Docker().container_name_prefix,
+    )
     client.images.build(
         path=str(docker_mac_network),
         rm=True,
@@ -112,7 +114,9 @@ def _create_mac_network(configuration_dst: Path) -> None:
         tag=proxy_image_tag,
     )
 
-    openvpn_image_tag = 'dcos-e2e/openvpn'
+    openvpn_image_tag = '{prefix}/openvpn'.format(
+        prefix=Docker().container_name_prefix,
+    )
     client.images.build(
         path=str(openvpn_build_path),
         rm=True,
