@@ -15,6 +15,7 @@ from typing import Union
 import click
 import click_spinner
 import docker
+from dcos_e2e.backends import Docker
 
 from ._common import docker_client
 
