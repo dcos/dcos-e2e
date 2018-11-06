@@ -14,7 +14,7 @@ import click
 import click_spinner
 from passlib.hash import sha512_crypt
 
-from cli._vendor.artifact_utils import DCOSVariant
+from cli._vendor.dcos_installer_tools import DCOSVariant
 from cli.common.arguments import artifact_argument
 from cli.common.options import (
     agents_option,

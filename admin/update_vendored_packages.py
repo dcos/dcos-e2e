@@ -72,7 +72,7 @@ def main() -> None:
         target_directory=dcos_cli_target_directory,
         package_name='dcos_installer_tools',
         https_address='https://github.com/adamtheturtle/dcos-installer-tools',
-        git_reference='c887a360514c1d00cd7c4064858f80bc0b2d2687',
+        git_reference='162a171714ec593ec45b96b9e9eebcaa1517bd0d',
     )
 
     requirements = [
