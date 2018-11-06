@@ -76,22 +76,43 @@ def get_dcos_installer_details(
 
     workspace_dir.mkdir(exist_ok=True, parents=True)
 
-    result = subprocess.check_output(
-        args=['bash', str(installer), '--version'],
+    # The installer interface is as follows:
+    #
+    # ```
+    # $ bash dcos_generate_config.sh --version
+    # Extracting image from this script and loading into docker daemon, this \
+    # step can take a few minutes
+    # x dcos-genconf.75af9b2571de95e074-c74aa914537fa9f81b.tar
+    # Loaded image: mesosphere/dcos-genconf: \
+    # 75af9b2571de95e074-c74aa914537fa9f81b
+    # {
+    #     "variant": "",
+    #     "version": "1.12.0-rc3"
+    # }
+    # $ bash dcos_generate_config.sh --version
+    # {
+    #     "variant": "",
+    #     "version": "1.12.0-rc3"
+    # }
+    # ```
+    #
+    # Therefore we use the installer twice to eliminate all non-JSON text.
+
+    version_args = ['bash', str(installer), '--version']
+
+    subprocess.check_output(
+        args=version_args,
         cwd=str(workspace_dir),
         stderr=subprocess.PIPE,
     )
 
-    result = result.decode()
-    result = ' '.join(
-        [
-            line for line in result.splitlines()
-            if not line.startswith('Extracting image')
-            and not line.startswith('Loaded image') and '.tar' not in line
-        ],
+    result = subprocess.check_output(
+        args=version_args,
+        cwd=str(workspace_dir),
+        stderr=subprocess.PIPE,
     )
 
-    version_info = json.loads(result)
+    version_info = json.loads(result.decode())
 
     version = version_info['version']
     variant = {
