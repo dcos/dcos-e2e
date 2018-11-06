@@ -6,6 +6,7 @@ import click
 
 from cli.common.options import verbosity_option
 from cli.common.utils import set_logging
+from dcos_e2e.backends import Docker
 from dcos_e2e.docker_utils import DockerLoopbackVolume
 
 from ._common import (
@@ -37,7 +38,8 @@ def clean(verbose: int) -> None:
     for loopback_sidecar in loopback_sidecars:
         DockerLoopbackVolume.destroy(container=loopback_sidecar)
 
-    node_filters = {'name': 'dcos-e2e'}
+    node_filters = {'name': Docker().container_name_prefix}
+    network_filters = {'name': Docker().container_name_prefix}
 
     node_containers = client.containers.list(filters=node_filters, all=True)
 
@@ -45,7 +47,6 @@ def clean(verbose: int) -> None:
         container.stop()
         container.remove(v=True)
 
-    network_filters = {'name': 'dcos-e2e'}
     networks = client.networks.list(filters=network_filters)
     for network in networks:
         network.remove()
