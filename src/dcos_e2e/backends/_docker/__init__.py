@@ -84,7 +84,15 @@ def _get_fallback_storage_driver() -> DockerStorageDriver:
         'overlay2': DockerStorageDriver.OVERLAY_2,
     }
 
-    client = docker.from_env(version='auto')
+    try:
+        client = docker.from_env(version='auto')
+    except docker.errors.DockerException:  # pragma: no cover
+        # If Docker is not available it does not matter what backend we choose.
+        #
+        # We choose one so that the documentation can build in environments
+        # such as Read The Docs which do not have Docker installed.
+        return DockerStorageDriver.AUFS
+
     host_driver = client.info()['Driver']
 
     try:
