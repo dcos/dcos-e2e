@@ -38,7 +38,7 @@ def main() -> None:
     vendored ``dcos_test_utils``.
     """
     dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
-    dcos_cli_target_directory = Path('src/cli/_vendor')
+    dcos_cli_target_directory = Path('src/dcos_e2e_cli/_vendor')
 
     dcos_launch = _Requirement(
         target_directory=dcos_e2e_target_directory,
