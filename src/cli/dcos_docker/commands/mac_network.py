@@ -21,12 +21,11 @@ from dcos_e2e.backends import Docker
 from ._common import docker_client
 
 # We start these names with "vpn" to avoid a conflict with "dcos-docker clean".
-prefix = Docker().container_name_prefix
 _PROXY_CONTAINER_NAME = 'vpn-{container_name_prefix}-proxy'.format(
-    container_name_prefix=prefix,
+    container_name_prefix=Docker().container_name_prefix,
 )
 _OPENVPN_CONTAINER_NAME = 'vpn-{container_name_prefix}-openvpn'.format(
-    container_name_prefix=prefix,
+    container_name_prefix=Docker().container_name_prefix,
 )
 
 
