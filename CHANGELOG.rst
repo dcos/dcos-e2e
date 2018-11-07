@@ -8,6 +8,7 @@ Next
 
 - Add ``dcos-docker create-loopback-sidecar`` and ``dcos-docker destroy-loopback-sidecar`` commands to provide unformatted block devices to DC/OS.
 - Add ``dcos-docker clean`` command to clean left over artifacts.
+- Backwards incompatible change: Changed names of VPN containers on macOS.
 
 2018.10.17.1
 ------------
