@@ -322,86 +322,86 @@ Loopback sidecars can be destroyed with :ref:`dcos-docker-destroy-loopback-sidec
 CLI Reference
 -------------
 
-.. click:: cli:dcos_docker
+.. click:: dcos_e2e_cli:dcos_docker
   :prog: dcos-docker
 
 .. _dcos-docker-create:
 
-.. click:: cli.dcos_docker:create
+.. click:: dcos_e2e_cli.dcos_docker:create
   :prog: dcos-docker create
 
-.. click:: cli.dcos_docker:list_clusters
+.. click:: dcos_e2e_cli.dcos_docker:list_clusters
   :prog: dcos-docker list
 
 .. _dcos-docker-wait:
 
-.. click:: cli.dcos_docker:wait
+.. click:: dcos_e2e_cli.dcos_docker:wait
   :prog: dcos-docker wait
 
 .. _dcos-docker-run:
 
-.. click:: cli.dcos_docker:run
+.. click:: dcos_e2e_cli.dcos_docker:run
   :prog: dcos-docker run
 
 .. _dcos-docker-inspect:
 
-.. click:: cli.dcos_docker:inspect_cluster
+.. click:: dcos_e2e_cli.dcos_docker:inspect_cluster
   :prog: dcos-docker inspect
 
-.. click:: cli.dcos_docker:sync_code
+.. click:: dcos_e2e_cli.dcos_docker:sync_code
   :prog: dcos-docker sync
 
 .. _dcos-docker-destroy:
 
-.. click:: cli.dcos_docker:destroy
+.. click:: dcos_e2e_cli.dcos_docker:destroy
   :prog: dcos-docker destroy
 
 .. _dcos-docker-destroy-list:
 
-.. click:: cli.dcos_docker:destroy_list
+.. click:: dcos_e2e_cli.dcos_docker:destroy_list
   :prog: dcos-docker destroy-list
 
 .. _dcos-docker-clean:
 
-.. click:: cli.dcos_docker:clean
+.. click:: dcos_e2e_cli.dcos_docker:clean
   :prog: dcos-docker clean
 
 .. _dcos-docker-doctor:
 
-.. click:: cli.dcos_docker:doctor
+.. click:: dcos_e2e_cli.dcos_docker:doctor
   :prog: dcos-docker doctor
 
 .. _dcos-docker-web:
 
-.. click:: cli.dcos_docker:web
+.. click:: dcos_e2e_cli.dcos_docker:web
   :prog: dcos-docker web
 
 .. _dcos-docker-setup-mac-network:
 
-.. click:: cli.dcos_docker:setup_mac_network
+.. click:: dcos_e2e_cli.dcos_docker:setup_mac_network
   :prog: dcos-docker setup-mac-network
 
 .. _dcos-docker-destroy-mac-network:
 
-.. click:: cli.dcos_docker:destroy_mac_network
+.. click:: dcos_e2e_cli.dcos_docker:destroy_mac_network
   :prog: dcos-docker destroy-mac-network
 
 .. _dcos-docker-download-artifact:
 
-.. click:: cli.dcos_docker:download_artifact
+.. click:: dcos_e2e_cli.dcos_docker:download_artifact
   :prog: dcos-docker download-artifact
 
 .. _dcos-docker-create-loopback-sidecar:
 
-.. click:: cli.dcos_docker:create_loopback_sidecar
+.. click:: dcos_e2e_cli.dcos_docker:create_loopback_sidecar
   :prog: dcos-docker create-loopback-sidecar
 
 .. _dcos-docker-destroy-loopback-sidecar:
 
-.. click:: cli.dcos_docker:destroy_loopback_sidecar
+.. click:: dcos_e2e_cli.dcos_docker:destroy_loopback_sidecar
   :prog: dcos-docker destroy-loopback-sidecar
 
 .. _dcos-docker-list-loopback-sidecars:
 
-.. click:: cli.dcos_docker:list_loopback_sidecars
+.. click:: dcos_e2e_cli.dcos_docker:list_loopback_sidecars
   :prog: dcos-docker list-loopback-sidecars

@@ -186,41 +186,41 @@ It is possible to use :ref:`dcos-aws-create` to create a cluster with a custom C
 CLI Reference
 -------------
 
-.. click:: cli:dcos_aws
+.. click:: dcos_e2e_cli:dcos_aws
   :prog: dcos-aws
 
 .. _dcos-aws-create:
 
-.. click:: cli.dcos_aws:create
+.. click:: dcos_e2e_cli.dcos_aws:create
   :prog: dcos-aws create
 
 .. _dcos-aws-doctor:
 
-.. click:: cli.dcos_aws:doctor
+.. click:: dcos_e2e_cli.dcos_aws:doctor
   :prog: dcos-aws doctor
 
-.. click:: cli.dcos_aws:list_clusters
+.. click:: dcos_e2e_cli.dcos_aws:list_clusters
   :prog: dcos-aws list
 
 .. _dcos-aws-run:
 
-.. click:: cli.dcos_aws:run
+.. click:: dcos_e2e_cli.dcos_aws:run
   :prog: dcos-aws run
 
 .. _dcos-aws-inspect:
 
-.. click:: cli.dcos_aws:inspect_cluster
+.. click:: dcos_e2e_cli.dcos_aws:inspect_cluster
   :prog: dcos-aws inspect
 
-.. click:: cli.dcos_aws:sync_code
+.. click:: dcos_e2e_cli.dcos_aws:sync_code
   :prog: dcos-aws sync
 
 .. _dcos-aws-wait:
 
-.. click:: cli.dcos_aws:wait
+.. click:: dcos_e2e_cli.dcos_aws:wait
   :prog: dcos-aws wait
 
 .. _dcos-aws-web:
 
-.. click:: cli.dcos_aws:web
+.. click:: dcos_e2e_cli.dcos_aws:web
   :prog: dcos-aws web
