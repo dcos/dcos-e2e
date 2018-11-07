@@ -210,56 +210,56 @@ It is possible to use :ref:`dcos-vagrant-create` to create a cluster with a cust
 CLI Reference
 -------------
 
-.. click:: cli:dcos_vagrant
+.. click:: dcos_e2e_cli:dcos_vagrant
   :prog: dcos-vagrant
 
 .. _dcos-vagrant-create:
 
-.. click:: cli.dcos_vagrant:create
+.. click:: dcos_e2e_cli.dcos_vagrant:create
   :prog: dcos-vagrant create
 
-.. click:: cli.dcos_vagrant:list_clusters
+.. click:: dcos_e2e_cli.dcos_vagrant:list_clusters
   :prog: dcos-vagrant list
 
 .. _dcos-vagrant-wait:
 
-.. click:: cli.dcos_vagrant:wait
+.. click:: dcos_e2e_cli.dcos_vagrant:wait
   :prog: dcos-vagrant wait
 
 .. _dcos-vagrant-run:
 
-.. click:: cli.dcos_vagrant:run
+.. click:: dcos_e2e_cli.dcos_vagrant:run
   :prog: dcos-vagrant run
 
 .. _dcos-vagrant-inspect:
 
-.. click:: cli.dcos_vagrant:inspect_cluster
+.. click:: dcos_e2e_cli.dcos_vagrant:inspect_cluster
   :prog: dcos-vagrant inspect
 
-.. click:: cli.dcos_vagrant:sync_code
+.. click:: dcos_e2e_cli.dcos_vagrant:sync_code
   :prog: dcos-vagrant sync
 
 .. _dcos-vagrant-destroy:
 
-.. click:: cli.dcos_vagrant:destroy
+.. click:: dcos_e2e_cli.dcos_vagrant:destroy
   :prog: dcos-vagrant destroy
 
 .. _dcos-vagrant-destroy-list:
 
-.. click:: cli.dcos_vagrant:destroy_list
+.. click:: dcos_e2e_cli.dcos_vagrant:destroy_list
   :prog: dcos-vagrant destroy-list
 
 .. _dcos-vagrant-doctor:
 
-.. click:: cli.dcos_vagrant:doctor
+.. click:: dcos_e2e_cli.dcos_vagrant:doctor
   :prog: dcos-vagrant doctor
 
 .. _dcos-vagrant-web:
 
-.. click:: cli.dcos_vagrant:web
+.. click:: dcos_e2e_cli.dcos_vagrant:web
   :prog: dcos-vagrant web
 
 .. _dcos-vagrant-download-artifact:
 
-.. click:: cli.dcos_vagrant:download_artifact
+.. click:: dcos_e2e_cli.dcos_vagrant:download_artifact
   :prog: dcos-vagrant download-artifact
