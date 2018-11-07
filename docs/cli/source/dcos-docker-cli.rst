@@ -53,7 +53,7 @@ Using a custom Docker network
 By default DC/OS clusters are launched on the ``docker0`` network.
 
 To launch a DC/OS cluster on a custom Docker network the network must first be created using the standard Docker CLI.
-During :ref:`dcos-docker create <dcos-docker-create>` the command line option ``--network`` then takes the name of the Docker network as a parameter.
+During :ref:`dcos-docker-create` the command line option ``--network`` then takes the name of the Docker network as a parameter.
 
 DC/OS nodes utilize an environment-specific ``ip-detect`` script to detect their current private IP address.
 The default ``ip-detect`` script used by ``dcos-docker`` does only account for the ``docker0`` network case.
@@ -71,7 +71,7 @@ The following IP detect script works for any custom Docker network:
     fi
     $IP_CMD -4 -o addr show dev eth1 | awk '{split($4,a,"/");print a[1]}'
 
-The :ref:`dcos-docker create <dcos-docker-create>` command supports overwriting the default ``genconf`` directory with the
+The :ref:`dcos-docker-create` command supports overwriting the default ``genconf`` directory with the
 contents of the directory supplied through the command line option ``--genconf-dir``.
 
 .. code-block:: console
