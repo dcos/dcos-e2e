@@ -10,8 +10,7 @@ import os
 import sys
 
 import dcos_e2e
-
-sys.path.insert(0, os.path.abspath('.'))
+from dcos_e2e_cli import dcos_aws
 
 extensions = [
     'dcos_e2e._sphinx_extensions',

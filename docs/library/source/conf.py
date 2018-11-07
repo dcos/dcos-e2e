@@ -11,8 +11,6 @@ import sys
 
 import dcos_e2e
 
-sys.path.insert(0, os.path.abspath('.'))
-
 extensions = [
     'dcos_e2e._sphinx_extensions',
     'sphinx-prompt',
