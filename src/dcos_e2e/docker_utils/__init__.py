@@ -7,6 +7,8 @@ from typing import Any, Dict, Optional
 
 import docker
 
+from dcos_e2e.backends import Docker
+
 
 class DockerLoopbackVolume():
     """
@@ -36,7 +38,8 @@ class DockerLoopbackVolume():
         # and might already be pulled as it is a distribution supported
         # by DC/OS.
         self._container = client.containers.create(
-            name='dcos-e2e-loopback-sidecar-{random}'.format(
+            name='{prefix}-loopback-sidecar-{random}'.format(
+                prefix=Docker().container_name_prefix,
                 random=uuid.uuid4().hex,
             ),
             privileged=True,

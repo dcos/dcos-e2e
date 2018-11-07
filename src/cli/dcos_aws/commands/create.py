@@ -184,7 +184,7 @@ def create(
     workspace_dir.mkdir(parents=True)
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
-    key_name = 'dcos-e2e-{random}'.format(random=uuid.uuid4().hex)
+    key_name = 'key-{random}'.format(random=uuid.uuid4().hex)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
     private_key_path = ssh_keypair_dir / 'id_rsa'
     write_key_pair(

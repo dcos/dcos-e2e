@@ -16,12 +16,17 @@ import click
 import click_spinner
 import docker
 
+from dcos_e2e.backends import Docker
+
 from ._common import docker_client
 
-# We start these names with "e2e" rather than "dcos-e2e" to avoid a conflict
-# with "dcos-docker clean".
-_PROXY_CONTAINER_NAME = 'e2e-proxy'
-_OPENVPN_CONTAINER_NAME = 'e2e-openvpn'
+# We start these names with "vpn" to avoid a conflict with "dcos-docker clean".
+_PROXY_CONTAINER_NAME = 'vpn-{container_name_prefix}-proxy'.format(
+    container_name_prefix=Docker().container_name_prefix,
+)
+_OPENVPN_CONTAINER_NAME = 'vpn-{container_name_prefix}-openvpn'.format(
+    container_name_prefix=Docker().container_name_prefix,
+)
 
 
 def _validate_ovpn_file_does_not_exist(
@@ -99,7 +104,9 @@ def _create_mac_network(configuration_dst: Path) -> None:
     docker_mac_network = openvpn_build_path / 'docker-mac-network-master'
     copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
 
-    proxy_image_tag = 'dcos-e2e/proxy'
+    proxy_image_tag = '{prefix}/proxy'.format(
+        prefix=Docker().container_name_prefix,
+    )
     client.images.build(
         path=str(docker_mac_network),
         rm=True,
@@ -107,7 +114,9 @@ def _create_mac_network(configuration_dst: Path) -> None:
         tag=proxy_image_tag,
     )
 
-    openvpn_image_tag = 'dcos-e2e/openvpn'
+    openvpn_image_tag = '{prefix}/openvpn'.format(
+        prefix=Docker().container_name_prefix,
+    )
     client.images.build(
         path=str(openvpn_build_path),
         rm=True,

@@ -290,9 +290,9 @@ class Node:
         Instead, the artifact is sent to this node and then extracted on this
         node, and then DC/OS is installed.
 
-        This creates a folder in ``/dcos-e2e`` on this node which contains the
-        DC/OS installation files that can be removed safely after the DC/OS
-        installation has finished.
+        This creates a folder in ``/dcos-install-dir`` on this node which
+        contains the DC/OS installation files that can be removed safely after
+        the DC/OS installation has finished.
 
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
@@ -313,7 +313,7 @@ class Node:
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        workspace_dir = Path('/dcos-e2e')
+        workspace_dir = Path('/dcos-install-dir')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
         mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
         self.run(
@@ -368,9 +368,9 @@ class Node:
         Run ``dcos-docker doctor`` to see if your host is incompatible with
         this method.
 
-        This creates a folder in ``/dcos-e2e`` on this node which contains the
-        DC/OS installation files that can be removed safely after the DC/OS
-        installation has finished.
+        This creates a folder in ``/dcos-install-dir`` on this node which
+        contains the DC/OS installation files that can be removed safely after
+        the DC/OS installation has finished.
 
         Args:
             build_artifact: The URL to a build artifact to be installed on the
@@ -389,7 +389,7 @@ class Node:
                 the installer node before installing DC/OS.
 
         """
-        workspace_dir = Path('/dcos-e2e')
+        workspace_dir = Path('/dcos-install-dir')
         node_artifact_parent = workspace_dir / uuid.uuid4().hex
         mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
         self.run(

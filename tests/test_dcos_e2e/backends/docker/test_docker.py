@@ -408,10 +408,13 @@ class TestNetworks:
             iprange='172.28.0.0/24',
             gateway='172.28.0.254',
         )
+        # We use the default container prefix so that the ``dcos-docker clean``
+        # command cleans this up.
+        prefix = Docker().container_name_prefix
+        random = uuid.uuid4()
+        name = '{prefix}-network-{random}'.format(prefix=prefix, random=random)
         network = client.networks.create(
-            # The container name prefix "dcos-e2e-" matches the prefix used in
-            # the "clean" Makefile target.
-            name='dcos-e2e-network-{random}'.format(random=uuid.uuid4()),
+            name=name,
             driver='bridge',
             ipam=docker.types.IPAMConfig(pool_configs=[ipam_pool]),
             attachable=False,
