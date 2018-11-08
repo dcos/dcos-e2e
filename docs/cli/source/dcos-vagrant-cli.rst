@@ -31,26 +31,26 @@ Creating a Cluster
 
 To create a cluster you first need to download a DC/OS release artifact.
 
-This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-vagrant-download-artifact` command.
+This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-vagrant-cli:download-artifact` command.
 
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
 
-Creating a cluster is possible with the :ref:`dcos-vagrant-create` command.
+Creating a cluster is possible with the :ref:`dcos-vagrant-cli:create` command.
 This command allows you to customize the cluster in many ways.
 
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-cli:wait` command.
 
-To use this cluster, it is useful to find details using the :ref:`dcos-vagrant-inspect` command.
+To use this cluster, it is useful to find details using the :ref:`dcos-vagrant-cli:inspect` command.
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~
 
-There are multiple DC/OS Enterprise-only features available in :ref:`dcos-vagrant-create`.
+There are multiple DC/OS Enterprise-only features available in :ref:`dcos-vagrant-cli:create`.
 
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
-See :ref:`dcos-vagrant-create` for details on how to provide a license key.
+See :ref:`dcos-vagrant-cli:create` for details on how to provide a license key.
 
 Ask your sales representative for DC/OS Enterprise release artifacts.
 
@@ -63,26 +63,26 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
         --security-mode strict
 
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-wait` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-vagrant-cli:wait` command.
 
-See :ref:`dcos-vagrant-create` for details on this command and its options.
+See :ref:`dcos-vagrant-cli:create` for details on this command and its options.
 
 Cluster IDs
 -----------
 
 Clusters have unique IDs.
 Multiple commands take ``--cluster-id`` options.
-Specify a cluster ID in :ref:`dcos-vagrant-create`, and then use it in other commands.
+Specify a cluster ID in :ref:`dcos-vagrant-cli:create`, and then use it in other commands.
 Any command which takes a ``--cluster-id`` option defaults to using "default" if no cluster ID is given.
 
 Running commands on Cluster Nodes
 ---------------------------------
 
 It is possible to run commands on a cluster node in multiple ways.
-These include using :ref:`dcos-vagrant-run` and ``ssh``.
+These include using :ref:`dcos-vagrant-cli:run` and ``ssh``.
 
-Running commands on a cluster node using :ref:`dcos-vagrant-run`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running commands on a cluster node using :ref:`dcos-vagrant-cli:run`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 It is possible to run the following to run a command on an arbitrary master node.
 
@@ -90,13 +90,13 @@ It is possible to run the following to run a command on an arbitrary master node
 
    $ dcos-vagrant run systemctl list-units
 
-See :ref:`dcos-vagrant-run` for more information on this command.
+See :ref:`dcos-vagrant-cli:run` for more information on this command.
 
 Running commands on a cluster node using ``ssh``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 One SSH key allows access to all nodes in the cluster.
-See this SSH key's path and the IP addresses of nodes using :ref:`dcos-vagrant-inspect`.
+See this SSH key's path and the IP addresses of nodes using :ref:`dcos-vagrant-cli:inspect`.
 
 Getting on to a Cluster Node
 ----------------------------
@@ -104,7 +104,7 @@ Getting on to a Cluster Node
 Sometimes it is useful to get onto a cluster node.
 To do this, you can use any of the ways of :ref:`running-commands`.
 
-For example, to use :ref:`dcos-vagrant-run` to run ``bash`` to get on to an arbitrary master node:
+For example, to use :ref:`dcos-vagrant-cli:run` to run ``bash`` to get on to an arbitrary master node:
 
 .. code-block:: console
 
@@ -114,9 +114,9 @@ Destroying Clusters
 -------------------
 
 There are two commands which can be used to destroy clusters.
-These are :ref:`dcos-vagrant-destroy` and :ref:`dcos-vagrant-destroy-list`.
+These are :ref:`dcos-vagrant-cli:destroy` and :ref:`dcos-vagrant-cli:destroy-list`.
 
-Either destroy a cluster with :ref:`dcos-vagrant-destroy`:
+Either destroy a cluster with :ref:`dcos-vagrant-cli:destroy`:
 
 .. code-block:: console
 
@@ -125,7 +125,7 @@ Either destroy a cluster with :ref:`dcos-vagrant-destroy`:
    $ dcos-vagrant destroy --cluster-id pr_4033_strict
    pr_4033_strict
 
-or use :ref:`dcos-vagrant-destroy-list` to destroy multiple clusters:
+or use :ref:`dcos-vagrant-cli:destroy-list` to destroy multiple clusters:
 
 .. code-block:: console
 
@@ -144,7 +144,7 @@ To destroy all clusters, run the following command:
 Running Integration Tests
 -------------------------
 
-The :ref:`dcos-vagrant-run` command is useful for running integration tests.
+The :ref:`dcos-vagrant-cli:run` command is useful for running integration tests.
 
 To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
 
@@ -155,13 +155,13 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
    $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
-See :ref:`dcos-vagrant-run` for more information on this command.
+See :ref:`dcos-vagrant-cli:run` for more information on this command.
 
 Viewing the Web UI
 ------------------
 
-To view the web UI of your cluster, use the :ref:`dcos-vagrant-web` command.
-To see the web UI URL of your cluster, use the :ref:`dcos-vagrant-inspect` command.
+To view the web UI of your cluster, use the :ref:`dcos-vagrant-cli:web` command.
+To see the web UI URL of your cluster, use the :ref:`dcos-vagrant-cli:inspect` command.
 
 Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
 
@@ -170,7 +170,7 @@ Using a Custom CA Certificate
 
 On DC/OS Enterprise clusters, it is possible to use a custom CA certificate.
 See `the Custom CA certificate documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
-It is possible to use :ref:`dcos-vagrant-create` to create a cluster with a custom CA certificate.
+It is possible to use :ref:`dcos-vagrant-cli:create` to create a cluster with a custom CA certificate.
 
 #. Create or obtain the necessary files:
 
@@ -180,7 +180,7 @@ It is possible to use :ref:`dcos-vagrant-create` to create a cluster with a cust
 
 #. Create a file containing the "extra" configuration.
 
-   :ref:`dcos-vagrant-create` takes an ``--extra-config`` option.
+   :ref:`dcos-vagrant-cli:create` takes an ``--extra-config`` option.
    This adds the contents of the specified YAML file to a minimal DC/OS configuration.
 
    Create a file with the following contents:
@@ -212,54 +212,4 @@ CLI Reference
 
 .. click:: dcos_e2e_cli:dcos_vagrant
   :prog: dcos-vagrant
-
-.. _dcos-vagrant-create:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:create
-  :prog: dcos-vagrant create
-
-.. click:: dcos_e2e_cli.dcos_vagrant:list_clusters
-  :prog: dcos-vagrant list
-
-.. _dcos-vagrant-wait:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:wait
-  :prog: dcos-vagrant wait
-
-.. _dcos-vagrant-run:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:run
-  :prog: dcos-vagrant run
-
-.. _dcos-vagrant-inspect:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:inspect_cluster
-  :prog: dcos-vagrant inspect
-
-.. click:: dcos_e2e_cli.dcos_vagrant:sync_code
-  :prog: dcos-vagrant sync
-
-.. _dcos-vagrant-destroy:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:destroy
-  :prog: dcos-vagrant destroy
-
-.. _dcos-vagrant-destroy-list:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:destroy_list
-  :prog: dcos-vagrant destroy-list
-
-.. _dcos-vagrant-doctor:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:doctor
-  :prog: dcos-vagrant doctor
-
-.. _dcos-vagrant-web:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:web
-  :prog: dcos-vagrant web
-
-.. _dcos-vagrant-download-artifact:
-
-.. click:: dcos_e2e_cli.dcos_vagrant:download_artifact
-  :prog: dcos-vagrant download-artifact
+  :show-nested:

@@ -21,6 +21,7 @@ extensions = [
     'sphinx_click.ext',
     'sphinx_paramlinks',
     'sphinxcontrib.spelling',
+    'sphinx.ext.autosectionlabel',
 ]
 
 templates_path = ['_templates']
@@ -36,6 +37,7 @@ author = 'Adam Dangoor'
 # built documents.
 version = dcos_e2e.__version__
 release = version.split('+')[0]
+autosectionlabel_prefix_document = True
 
 language = None
 

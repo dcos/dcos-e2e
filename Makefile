@@ -40,10 +40,16 @@ fix-lint:
 	isort --recursive --apply
 	$(MAKE) fix-yapf
 
-.PHONY: docs
-docs:
+.PHONY: docs-library
+docs-library:
 	make -C docs/library clean html SPHINXOPTS=$(SPHINXOPTS)
+
+.PHONY: docs-cli
+docs-cli:
 	make -C docs/cli clean html SPHINXOPTS=$(SPHINXOPTS)
+
+.PHONY: docs
+docs: docs-library docs-cli
 
 .PHONY: open-docs
 open-docs:
