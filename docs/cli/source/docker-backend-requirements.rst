@@ -16,7 +16,7 @@ IP Routing Set Up for Docker
 On macOS, hosts cannot connect to containers IP addresses by default.
 This is required, for example, to access the web UI, to SSH to nodes and to use the DC/OS CLI.
 
-Once the CLI is installed, run :ref:`dcos-docker-setup-mac-network` to set up IP routing.
+Once the CLI is installed, run :ref:`dcos-docker-cli:setup-mac-network` to set up IP routing.
 
 Without this, it is still possible to use some features.
 Specify the ``--transport docker-exec`` and ``--skip-http-checks`` options where available.
@@ -100,7 +100,7 @@ You can manually remove the route in PowerShell Run as Administrator using:
 ``dcos-docker doctor``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-|project| comes with the :ref:`dcos-docker-doctor` command.
+:ref:`dcos-docker-cli:dcos-docker` comes with the :ref:`dcos-docker-cli:doctor` command.
 Run this command to check your system for common causes of problems.
 
 .. _VirtualBox: https://www.virtualbox.org/wiki/Downloads
