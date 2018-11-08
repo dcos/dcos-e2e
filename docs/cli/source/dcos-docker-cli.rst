@@ -34,7 +34,7 @@ Creating a Cluster
 
 To create a cluster you first need to download a DC/OS release artifact.
 
-This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-docker-download-artifact` command.
+This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-docker-cli:download-artifact` command.
 
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
@@ -43,7 +43,7 @@ Creating a cluster is possible with the :ref:`dcos-docker-cli:create` command.
 This command allows you to customize the cluster in many ways.
 
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-docker-cli:wait` command.
 
 To use this cluster, it is useful to find details using the :ref:`dcos-docker-cli:inspect` command.
 
@@ -105,7 +105,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
         --security-mode strict
 
 The command returns when the DC/OS installation process has started.
-To wait until DC/OS has finished installing, use the :ref:`dcos-docker-wait` command.
+To wait until DC/OS has finished installing, use the :ref:`dcos-docker-cli:wait` command.
 
 See :ref:`dcos-docker-cli:create` for details on this command and its options.
 
@@ -186,9 +186,9 @@ Destroying Clusters
 -------------------
 
 There are two commands which can be used to destroy clusters.
-These are :ref:`dcos-docker-destroy` and :ref:`dcos-docker-destroy-list`.
+These are :ref:`dcos-docker-cli:destroy` and :ref:`dcos-docker-cli:destroy-list`.
 
-Either destroy a cluster with :ref:`dcos-docker-destroy`:
+Either destroy a cluster with :ref:`dcos-docker-cli:destroy`:
 
 .. code-block:: console
 
@@ -197,7 +197,7 @@ Either destroy a cluster with :ref:`dcos-docker-destroy`:
    $ dcos-docker destroy --cluster-id pr_4033_strict
    pr_4033_strict
 
-or use :ref:`dcos-docker-destroy-list` to destroy multiple clusters:
+or use :ref:`dcos-docker-cli:destroy-list` to destroy multiple clusters:
 
 .. code-block:: console
 
