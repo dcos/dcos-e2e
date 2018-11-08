@@ -188,39 +188,4 @@ CLI Reference
 
 .. click:: dcos_e2e_cli:dcos_aws
   :prog: dcos-aws
-
-.. _dcos-aws-create:
-
-.. click:: dcos_e2e_cli.dcos_aws:create
-  :prog: dcos-aws create
-
-.. _dcos-aws-doctor:
-
-.. click:: dcos_e2e_cli.dcos_aws:doctor
-  :prog: dcos-aws doctor
-
-.. click:: dcos_e2e_cli.dcos_aws:list_clusters
-  :prog: dcos-aws list
-
-.. _dcos-aws-run:
-
-.. click:: dcos_e2e_cli.dcos_aws:run
-  :prog: dcos-aws run
-
-.. _dcos-aws-inspect:
-
-.. click:: dcos_e2e_cli.dcos_aws:inspect_cluster
-  :prog: dcos-aws inspect
-
-.. click:: dcos_e2e_cli.dcos_aws:sync_code
-  :prog: dcos-aws sync
-
-.. _dcos-aws-wait:
-
-.. click:: dcos_e2e_cli.dcos_aws:wait
-  :prog: dcos-aws wait
-
-.. _dcos-aws-web:
-
-.. click:: dcos_e2e_cli.dcos_aws:web
-  :prog: dcos-aws web
+  :show-nested:
