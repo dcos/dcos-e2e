@@ -78,8 +78,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--copy-to-master',
@@ -107,8 +108,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--copy-to-master',
@@ -149,8 +151,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 option,
@@ -191,8 +194,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 option,
@@ -226,8 +230,9 @@ class TestCreate:
 
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--copy-to-master',
@@ -256,8 +261,8 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['create', '/not/a/path'],
+            minidcos,
+            ['docker', 'create', '/not/a/path'],
             catch_exceptions=False,
         )
         assert result.exit_code == 2
@@ -274,8 +279,9 @@ class TestCreate:
         runner = CliRunner()
         invalid_path = '/' + uuid.uuid4().hex
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--extra-config',
@@ -307,8 +313,9 @@ class TestCreate:
         invalid_file.write('@')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--extra-config',
@@ -339,8 +346,9 @@ class TestCreate:
         invalid_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--extra-config',
@@ -373,8 +381,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--cluster-id',
@@ -403,8 +412,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--genconf-dir',
@@ -432,8 +442,9 @@ class TestCreate:
 
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--genconf-dir',
@@ -454,8 +465,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--workspace-dir',
@@ -483,8 +495,9 @@ class TestCreate:
 
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--workspace-dir',
@@ -512,8 +525,8 @@ class TestDestroy:
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy', '--cluster-id', unique],
+            minidcos,
+            ['docker', 'destroy', '--cluster-id', unique],
         )
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
@@ -533,8 +546,8 @@ class TestDestroyList:
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy-list', unique],
+            minidcos,
+            ['docker', 'destroy-list', unique],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -550,8 +563,8 @@ class TestDestroyList:
         unique_2 = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy-list', unique, unique_2],
+            minidcos,
+            ['docker', 'destroy-list', unique, unique_2],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -574,8 +587,8 @@ class TestInspect:
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['inspect', '--cluster-id', unique],
+            minidcos,
+            ['docker', 'inspect', '--cluster-id', unique],
         )
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
@@ -594,7 +607,10 @@ class TestWait:
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['wait', '--cluster-id', unique])
+        result = runner.invoke(
+            minidcos,
+            ['docker', 'wait', '--cluster-id', unique],
+        )
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
@@ -611,7 +627,11 @@ class TestDoctor:
         No exception is raised by the ``doctor`` subcommand.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['doctor'], catch_exceptions=False)
+        result = runner.invoke(
+            minidcos,
+            ['docker', 'doctor'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
 
 
@@ -629,8 +649,9 @@ class TestSetupMacNetwork():
         configuration_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'setup-mac-network',
                 '--configuration-dst',
                 str(configuration_file),
@@ -662,8 +683,9 @@ class TestSetupMacNetwork():
         configuration_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'setup-mac-network',
                 '--configuration-dst',
                 str(configuration_file),
@@ -705,15 +727,15 @@ class TestCreateLoopbackSidecar:
         test_sidecar = 'test-sidecar'
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['create-loopback-sidecar', test_sidecar],
+            minidcos,
+            ['docker', 'create-loopback-sidecar', test_sidecar],
         )
         assert result.exit_code == 0
 
         try:
             result = runner.invoke(
-                dcos_docker,
-                ['create-loopback-sidecar', test_sidecar],
+                minidcos,
+                ['docker', 'create-loopback-sidecar', test_sidecar],
             )
             assert result.exit_code == 2
             expected_error = 'Loopback sidecar "{name}" already exists'
@@ -721,8 +743,8 @@ class TestCreateLoopbackSidecar:
             assert expected_error in result.output
         finally:
             result = runner.invoke(
-                dcos_docker,
-                ['destroy-loopback-sidecar', test_sidecar],
+                minidcos,
+                ['docker', 'destroy-loopback-sidecar', test_sidecar],
             )
             assert result.exit_code == 0
 
@@ -739,8 +761,8 @@ class TestDestroyLoopbackSidecar:
         does_not_exist = 'does-not-exist'
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy-loopback-sidecar', does_not_exist],
+            minidcos,
+            ['docker', 'destroy-loopback-sidecar', does_not_exist],
         )
         assert result.exit_code == 2
         expected_error = 'Loopback sidecar "{name}" does not exist'
@@ -759,8 +781,8 @@ class TestListLoopbackSidecars:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['list-loopback-sidecars'],
+            minidcos,
+            ['docker', 'list-loopback-sidecars'],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
