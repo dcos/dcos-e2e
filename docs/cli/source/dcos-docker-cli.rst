@@ -285,7 +285,7 @@ It is possible to use :ref:`dcos-docker-cli:create` to create a cluster with a c
 
    .. code:: console
 
-      minidcos docker create \
+      $ minidcos docker create \
           /path/to/dcos_generate_config.ee.sh \
           --variant enterprise \
           --genconf-dir /path/to/genconf/ \
