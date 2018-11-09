@@ -269,7 +269,7 @@ Install `Homebrew`_ or `Linuxbrew`_.
 
 .. smart-prompt:: bash
 
-   brew install dcose2e.rb
+   brew install minidcos.rb
    brew audit dcosdocker
    brew test dcosdocker
 

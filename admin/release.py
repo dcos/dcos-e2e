@@ -106,7 +106,7 @@ def commit_and_push(version: str, repository: Repository) -> None:
     Commit and push all changes.
     """
     local_repository = Repo('.')
-    paths = ['dcose2e.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
+    paths = ['minidcos.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
     _, ignored = add(paths=paths)
     assert not ignored
     message = b'Update for release ' + version.encode('utf-8')
@@ -128,7 +128,7 @@ def update_homebrew(version_str: str, repository: Repository) -> None:
         ref=version_str,
     )
 
-    homebrew_file = Path('dcose2e.rb')
+    homebrew_file = Path('minidcos.rb')
     homebrew_formula_contents = get_homebrew_formula(
         archive_url=archive_url,
         head_url=repository.clone_url,
