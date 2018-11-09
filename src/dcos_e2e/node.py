@@ -294,9 +294,6 @@ class Node:
         contains the DC/OS installation files that can be removed safely after
         the DC/OS installation has finished.
 
-        Run ``dcos-docker doctor`` to see if your host is incompatible with
-        this method.
-
         Args:
             build_artifact: The path to a build artifact to be installed on the
                 node.
@@ -364,9 +361,6 @@ class Node:
         as it does not use a bootstrap node.
         Instead, the artifact is downloaded to this node and then extracted on
         this node, and then DC/OS is installed.
-
-        Run ``dcos-docker doctor`` to see if your host is incompatible with
-        this method.
 
         This creates a folder in ``/dcos-install-dir`` on this node which
         contains the DC/OS installation files that can be removed safely after
