@@ -20,14 +20,14 @@ This has been tested with:
 * Vagrant 2.1.1
 * Vagrant 2.1.2
 
-VirtualBox
-~~~~~~~~~~
+Oracle VirtualBox
+~~~~~~~~~~~~~~~~~
 
 `VirtualBox`_ must be installed.
 This has been tested with VirtualBox 5.1.18.
 
-``vagrant-vbguest``
-~~~~~~~~~~~~~~~~~~~
+``vagrant-vbguest`` plugin
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `vagrant-vbguest`_ must be installed.
 
@@ -36,3 +36,7 @@ This has been tested with VirtualBox 5.1.18.
 
 |project| comes with the ``dcos-vagrant doctor`` command.
 Run this command to check your system for common causes of problems.
+
+.. _VirtualBox: https://www.virtualbox.org
+.. _Vagrant: https://www.vagrantup.com
+.. _vagrant-vbguest: https://github.com/dotless-de/vagrant-vbguest
