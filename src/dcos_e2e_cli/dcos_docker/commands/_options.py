@@ -25,7 +25,7 @@ def node_transport_option(command: Callable[..., None],
         callback=lambda ctx, param, value: transports[str(value)],
         default='docker-exec',
         show_default=True,
-        envvar='DCOS_DOCKER_TRANSPORT',
+        envvar='MINIDCOS_DOCKER_TRANSPORT',
         help=(
             'The communication transport to use. '
             'On macOS the SSH transport requires IP routing to be set up. '
