@@ -31,7 +31,8 @@ def destroy_list(
     """
     Destroy clusters.
 
-    To destroy all clusters, run ``minidcos docker destroy $(minidcos docker list)``.
+    To destroy all clusters, run
+    ``minidcos docker destroy $(minidcos docker list)``.
     """
     for cluster_id in cluster_ids:
         if cluster_id not in existing_cluster_ids():
