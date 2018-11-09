@@ -363,8 +363,7 @@ def verbosity_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def test_env_run_option(command: Callable[..., None],
-                           ) -> Callable[..., None]:
+def test_env_run_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     A decorator for choosing whether to run commands in a test environment.
     """
