@@ -160,7 +160,7 @@ def run(
         args=list(node_args),
         cluster=cluster,
         host=host,
-        test_env=test_env,
+        use_test_env=test_env,
         dcos_login_uname=dcos_login_uname,
         dcos_login_pw=dcos_login_pw,
         env=env,
