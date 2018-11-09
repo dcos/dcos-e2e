@@ -8,6 +8,9 @@ Next
 
 - Backwards incompatible change: Changed CLI commands from ``dcos-docker`` to ``minidcos docker`` and alike.
 
+2018.11.09.0
+------------
+
 2018.11.07.1
 ------------
 

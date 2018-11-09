@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.11.07.1"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.11.09.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -203,8 +203,8 @@ class Dcose2e < Formula
   end
 
   resource "keyring" do
-    url "https://files.pythonhosted.org/packages/6b/a4/d4e11968867e3def2056fc4cf090ae41a3625ed67376233fa9bcf2efbeba/keyring-16.0.1.tar.gz"
-    sha256 "a86499736e2e6555618606c2fbc98147e803fa276f990ddba7011eb29a01b5ad"
+    url "https://files.pythonhosted.org/packages/ee/79/744da3470d832b776a37ccf2b277339f165ff75827606b073dd653b26bba/keyring-16.0.2.tar.gz"
+    sha256 "95e4f1d0342d0bf5d137d1d2352d59f7abbebb1507bec1ac26831c411ac23150"
   end
 
   resource "MarkupSafe" do
