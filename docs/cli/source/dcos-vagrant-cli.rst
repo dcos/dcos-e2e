@@ -1,7 +1,7 @@
 .. _dcos-vagrant_cli:
 
-``dcos-vagrant``
-================
+Vagrant
+=======
 
 The ``dcos-vagrant`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Vagrant VMs.
 

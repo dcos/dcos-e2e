@@ -1,7 +1,7 @@
 .. _dcos-aws_cli:
 
-``dcos-aws``
-============
+AWS
+===
 
 The ``dcos-aws`` CLI allows you to create and manage open source DC/OS and DC/OS Enterprise clusters on AWS EC2 instances.
 
