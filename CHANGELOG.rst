@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.11.09.1
+------------
+
 - Backwards incompatible change: Change ``--no-test-env`` to ``--test-env`` on ``run`` commands, with the opposite default.
 
 2018.11.09.0
