@@ -56,11 +56,7 @@ To launch a DC/OS cluster on a custom Docker network the network must first be c
 During :ref:`dcos-docker-cli:create` the command line option ``--network`` then takes the name of the Docker network as a parameter.
 
 DC/OS nodes utilize an environment-specific ``ip-detect`` script to detect their current private IP address.
-<<<<<<< HEAD
 The default ``ip-detect`` script used by :ref:`dcos-docker-cli:minidcos docker` does only account for the ``docker0`` network case.
-=======
-The default ``ip-detect`` script used by :ref:`dcos-docker-cli:dcos-docker` does only account for the ``docker0`` network case.
->>>>>>> origin/master
 Therefore, in order for DC/OS to operate on a custom network a custom ``ip-detect`` script needs to be provided and put into the ``genconf`` directory before installing DC/OS.
 
 The following IP detect script works for any custom Docker network:
@@ -88,11 +84,7 @@ contents of the directory supplied through the command line option ``--genconf-d
         --network custom-bridge
         --genconf-dir ./custom-genconf
 
-<<<<<<< HEAD
 The custom Docker network is not cleaned up by the :ref:`dcos-docker-cli:minidcos docker` CLI.
-=======
-The custom Docker network is not cleaned up by the :ref:`dcos-docker-cli:dcos-docker` CLI.
->>>>>>> origin/master
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~
