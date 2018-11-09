@@ -17,7 +17,6 @@ from .commands.web import web
 
 
 @click.group(name='aws')
-@click.version_option(version=dcos_e2e.__version__)
 def dcos_aws() -> None:
     """
     Manage DC/OS clusters on AWS.
