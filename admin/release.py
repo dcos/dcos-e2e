@@ -76,8 +76,8 @@ def create_github_release(
     # We fetch all tags from GitHub and set our local HEAD to the latest master
     # from GitHub.
     #
-    # One symptom of this is that ``dcos-docker --version`` from the
-    # PyInstaller binaries shows the correct version.
+    # One symptom of this is that ``minidcos --version`` from the PyInstaller
+    # binary shows the correct version.
     local_repository = Repo('.')
     client = HttpGitClient(repository.owner.html_url)
     remote_refs = client.fetch(repository.name + '.git', local_repository)

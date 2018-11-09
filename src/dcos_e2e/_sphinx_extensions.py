@@ -22,8 +22,8 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
 
     .. smart-prompt:: bash $
 
-       $ dcos-docker --version
-       dcos-docker, version |release|
+       $ minidcos --version
+       minidcos, version |release|
     """
 
     def run(self) -> List:
