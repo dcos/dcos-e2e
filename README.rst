@@ -95,13 +95,13 @@ See the full `MiniDC/OS`_ documentation for information on other CLI tools provi
 .. |Library Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Library Documentation Status
-.. |CLI Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e-cli/badge/?version=latest
-   :target: http://dcos-e2e-cli.readthedocs.io/en/latest/?badge=latest
+.. |CLI Documentation Status| image:: https://readthedocs.org/projects/minidcos/badge/?version=latest
+   :target: http://minidcos.readthedocs.io/en/latest/?badge=latest
    :alt: CLI Documentation Status
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
-.. _MiniDC/OS: https://dcos-e2e-cli.readthedocs.io/en/latest/
-.. _minidcos docker CLI: https://dcos-e2e-cli.readthedocs.io/en/latest/dcos-docker-cli.html
+.. _MiniDC/OS: https://minidcos.readthedocs.io/en/latest/
+.. _minidcos docker CLI: https://minidcos.readthedocs.io/en/latest/dcos-docker-cli.html
 .. _library: https://dcos-e2e.readthedocs.io/en/latest/
 .. _backends: https://dcos-e2e.readthedocs.io/en/latest/backends.html
 .. |project| replace:: DC/OS E2E

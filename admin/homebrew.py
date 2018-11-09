@@ -71,7 +71,7 @@ def get_homebrew_formula(
 
     result = subprocess.run(args=args, stdout=subprocess.PIPE, check=True)
     resource_stanzas = str(result.stdout.decode())
-    homepage_url = 'http://dcos-e2e-cli.readthedocs.io/en/latest/'
+    homepage_url = 'http://minidcos.readthedocs.io/en/latest/'
 
     pattern = dedent(
         """\
