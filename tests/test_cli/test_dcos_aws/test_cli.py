@@ -16,27 +16,6 @@ from click.testing import CliRunner
 from dcos_e2e_cli import dcos_aws, minidcos
 
 
-class TestDcosAWS:
-    """
-    Tests for the top level `minidcos aws` command.
-    """
-
-    def test_version(self) -> None:
-        """
-        The CLI version is shown with ``minidcos aws --version``.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_aws,
-            ['--version'],
-            catch_exceptions=False,
-        )
-
-        assert result.exit_code == 0
-        expected = 'dcos-aws, version'
-        assert expected in result.output
-
-
 class TestDoctor:
     """
     Tests for the ``doctor`` subcommand.
