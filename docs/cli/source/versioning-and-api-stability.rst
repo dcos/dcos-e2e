@@ -24,7 +24,7 @@ DC/OS 1.9 and below
 -------------------
 
 Installers for DC/OS 1.9 and below require a version of ``sed`` that is not compatible with the BSD sed that ships with macOS.
-``dcos-docker-doctor`` includes a check for compatible ``sed`` versions.
+:ref:`dcos-docker-cli:dcos-docker`'s :ref:`dcos-docker-cli:doctor` command includes a check for compatible ``sed`` versions.
 
 Modify the installer
 ^^^^^^^^^^^^^^^^^^^^

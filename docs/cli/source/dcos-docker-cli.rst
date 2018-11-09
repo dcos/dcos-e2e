@@ -1,9 +1,9 @@
 .. _dcos-docker_cli:
 
-``dcos-docker``
-===============
+Docker
+======
 
-The ``dcos-docker`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
+The :ref:`dcos-docker-cli:dcos-docker` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
@@ -56,7 +56,7 @@ To launch a DC/OS cluster on a custom Docker network the network must first be c
 During :ref:`dcos-docker-cli:create` the command line option ``--network`` then takes the name of the Docker network as a parameter.
 
 DC/OS nodes utilize an environment-specific ``ip-detect`` script to detect their current private IP address.
-The default ``ip-detect`` script used by ``dcos-docker`` does only account for the ``docker0`` network case.
+The default ``ip-detect`` script used by :ref:`dcos-docker-cli:dcos-docker` does only account for the ``docker0`` network case.
 Therefore, in order for DC/OS to operate on a custom network a custom ``ip-detect`` script needs to be provided and put into the ``genconf`` directory before installing DC/OS.
 
 The following IP detect script works for any custom Docker network:
@@ -84,7 +84,7 @@ contents of the directory supplied through the command line option ``--genconf-d
         --network custom-bridge
         --genconf-dir ./custom-genconf
 
-The custom Docker network is not cleaned up by the ``dcos-docker`` CLI.
+The custom Docker network is not cleaned up by the :ref:`dcos-docker-cli:dcos-docker` CLI.
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~

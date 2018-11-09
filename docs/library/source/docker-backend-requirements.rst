@@ -1,8 +1,8 @@
 Requirements
 ------------
 
-Docker
-~~~~~~
+Docker 17.06+
+~~~~~~~~~~~~~
 
 Docker version 17.06 or later must be installed.
 
@@ -98,8 +98,8 @@ You can manually remove the route in PowerShell Run as Administrator using:
 
    route delete 172.17.0.0
 
-``dcos-docker doctor``
-~~~~~~~~~~~~~~~~~~~~~~
+``doctor`` command
+~~~~~~~~~~~~~~~~~~
 
 |project| comes with the ``dcos-docker doctor`` command.
 Run this command to check your system for common causes of problems.

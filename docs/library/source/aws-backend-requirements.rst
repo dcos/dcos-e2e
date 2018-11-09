@@ -38,8 +38,8 @@ It is not expected that it will work out of the box with Windows, see :issue:`QU
 
 If your operating system is not supported, it may be possible to use Vagrant, or another Linux virtual machine.
 
-``dcos-aws doctor``
-~~~~~~~~~~~~~~~~~~~
+``doctor`` command
+~~~~~~~~~~~~~~~~~~
 
 |project| comes with the ``dcos-aws doctor`` command.
 Run this command to check your system for common causes of problems.
