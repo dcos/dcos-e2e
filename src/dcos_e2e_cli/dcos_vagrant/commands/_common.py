@@ -1,5 +1,5 @@
 """
-Common code for dcos-docker CLI modules.
+Common code for minidcos docker CLI modules.
 """
 
 import json

@@ -27,7 +27,7 @@ def destroy_list(
     """
     Destroy clusters.
 
-    To destroy all clusters, run ``dcos-vagrant destroy $(dcos-vagrant list)``.
+    To destroy all clusters, run ``minidcos vagrant destroy $(dcos-vagrant list)``.
     """
     for cluster_id in cluster_ids:
         if cluster_id not in existing_cluster_ids():

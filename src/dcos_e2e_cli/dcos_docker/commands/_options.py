@@ -1,5 +1,5 @@
 """
-Common options for ``dcos-docker`` commands.
+Common options for ``minidcos docker`` commands.
 """
 
 from typing import Callable

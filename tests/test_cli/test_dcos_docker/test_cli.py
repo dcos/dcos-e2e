@@ -61,7 +61,7 @@ class TestHelp:
     )
     def test_help(self, command: List[str]) -> None:
         """
-        Expected help text is shown for ``dcos-docker`` commands.
+        Expected help text is shown for ``minidcos docker`` commands.
 
         This help text is defined in files.
         To update these files, run the command
@@ -313,7 +313,7 @@ class TestCreate:
         expected_message = dedent(
             """\
             Usage: minidcos docker create [OPTIONS] ARTIFACT
-            Try "dcos-docker create --help" for help.
+            Try "minidcos docker create --help" for help.
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
             """,# noqa: E501,E261
@@ -706,7 +706,7 @@ class TestSetupMacNetwork():
             1. Install an OpenVPN client such as Tunnelblick (https://tunnelblick.net/downloads.html) or Shimo (https://www.shimovpn.com).
             2. Run "open {value}".
             3. In your OpenVPN client, connect to the new "example" profile.
-            4. Run "dcos-docker doctor" to confirm that everything is working.
+            4. Run "minidcos docker doctor" to confirm that everything is working.
             """,# noqa: E501,E261
         ).format(
             value=str(configuration_file),
