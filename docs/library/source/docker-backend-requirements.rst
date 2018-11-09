@@ -1,8 +1,8 @@
 Requirements
 ------------
 
-Docker
-~~~~~~
+Docker 17.06+
+~~~~~~~~~~~~~
 
 Docker version 17.06 or later must be installed.
 
