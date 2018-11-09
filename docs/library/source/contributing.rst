@@ -262,18 +262,6 @@ The following creates a commit with changes to the vendored packages:
 
    admin/update_vendored_packages.sh
 
-Testing the Homebrew Recipe
-----------------------------
-
-Install `Homebrew`_ or `Linuxbrew`_.
-
-.. smart-prompt:: bash
-
-   brew install dcose2e.rb
-   brew audit dcosdocker
-   brew test dcosdocker
-
-
 .. _Homebrew: https://brew.sh/
 .. _Linuxbrew: http://linuxbrew.sh/
 .. _shellcheck: https://www.shellcheck.net
