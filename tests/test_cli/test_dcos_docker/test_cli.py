@@ -25,12 +25,12 @@ from dcos_e2e_cli import dcos_docker
 
 class TestDcosDocker:
     """
-    Tests for the top level ``dcos-docker`` command.
+    Tests for the top level ``minidcos docker`` command.
     """
 
     def test_version(self) -> None:
         """
-        The CLI version is shown with ``dcos-docker --version``.
+        The CLI version is shown with ``minidcos docker --version``.
         """
         runner = CliRunner()
         result = runner.invoke(

@@ -1,5 +1,5 @@
 """
-Common code for dcos-aws CLI modules.
+Common code for minidcos aws CLI modules.
 """
 
 from pathlib import Path
