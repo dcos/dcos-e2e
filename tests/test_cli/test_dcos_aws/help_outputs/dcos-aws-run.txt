@@ -22,8 +22,8 @@ Options:
   --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
                            will be synced to all master nodes before the command
                            is run.
-  --no-test-env            With this flag set, no environment variables are set
-                           and the command is run in the home directory.
+  --test-env               With this flag set, environment variables are set and
+                           the command is run in the integration test directory.
   --env TEXT               Set environment variables in the format
                            "<KEY>=<VALUE>"
   --aws-region TEXT        The AWS region to use.  [default: us-west-2]

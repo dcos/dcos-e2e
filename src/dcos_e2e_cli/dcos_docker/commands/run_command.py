@@ -14,7 +14,7 @@ from dcos_e2e_cli.common.options import (
     dcos_login_uname_option,
     environment_variables_option,
     existing_cluster_id_option,
-    no_test_env_run_option,
+    test_env_run_option,
     sync_dir_run_option,
     verbosity_option,
 )
@@ -93,7 +93,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 @dcos_login_uname_option
 @dcos_login_pw_option
 @sync_dir_run_option
-@no_test_env_run_option
+@test_env_run_option
 @click.option(
     '--node',
     type=str,
@@ -117,7 +117,7 @@ def run(
     sync_dir: Optional[Path],
     dcos_login_uname: str,
     dcos_login_pw: str,
-    no_test_env: bool,
+    test_env: bool,
     node: str,
     env: Dict[str, str],
     transport: Transport,
@@ -160,7 +160,7 @@ def run(
         args=list(node_args),
         cluster=cluster,
         host=host,
-        use_test_env=not no_test_env,
+        test_env=test_env,
         dcos_login_uname=dcos_login_uname,
         dcos_login_pw=dcos_login_pw,
         env=env,
