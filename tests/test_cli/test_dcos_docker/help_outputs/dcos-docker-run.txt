@@ -2,14 +2,6 @@ Usage: dcos-docker run [OPTIONS] NODE_ARGS...
 
   Run an arbitrary command on a node.
 
-  This command sets up the environment so that ``pytest`` can be run.
-
-  For example, run ``dcos-docker run --cluster-id 1231599 pytest -k
-  test_tls.py``.
-
-  Or, with sync: ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k
-  test_tls.py``.
-
   To use special characters such as single quotes in your command, wrap the
   whole command in double quotes.
 
@@ -25,7 +17,8 @@ Options:
                                  before the command is run.
   --test-env                     With this flag set, environment variables are
                                  set and the command is run in the integration
-                                 test directory.
+                                 test directory. This means that "pytest" will
+                                 run the integration tests.
   --node TEXT                    A reference to a particular node to run the
                                  command on. This can be one of: The node's IP
                                  address, the node's Docker container name, the

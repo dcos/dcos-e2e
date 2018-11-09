@@ -374,6 +374,7 @@ def test_env_run_option(command: Callable[..., None],
         help=(
             'With this flag set, environment variables are set and the '
             'command is run in the integration test directory. '
+            'This means that "pytest" will run the integration tests.'
         ),
     )(command)  # type: Callable[..., None]
     return function
