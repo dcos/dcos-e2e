@@ -5,6 +5,7 @@ A CLI for controlling DC/OS clusters on Docker.
 import click
 
 import dcos_e2e
+
 from ..dcos_aws import dcos_aws
 from ..dcos_docker import dcos_docker
 from ..dcos_vagrant import dcos_vagrant

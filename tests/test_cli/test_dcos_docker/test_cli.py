@@ -19,8 +19,7 @@ from click.testing import CliRunner
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
-from dcos_e2e_cli import minidcos
-from dcos_e2e_cli import dcos_docker
+from dcos_e2e_cli import dcos_docker, minidcos
 
 
 class TestDcosDocker:

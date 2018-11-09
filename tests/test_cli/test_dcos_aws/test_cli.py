@@ -13,8 +13,7 @@ from typing import List
 import pytest
 from click.testing import CliRunner
 
-from dcos_e2e_cli import minidcos
-from dcos_e2e_cli import dcos_aws
+from dcos_e2e_cli import dcos_aws, minidcos
 
 
 class TestDcosAWS:

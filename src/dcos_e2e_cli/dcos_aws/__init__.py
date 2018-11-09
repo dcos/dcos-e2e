@@ -4,8 +4,6 @@ A CLI for controlling DC/OS clusters on AWS.
 
 import click
 
-import dcos_e2e
-
 from .commands.create import create
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
