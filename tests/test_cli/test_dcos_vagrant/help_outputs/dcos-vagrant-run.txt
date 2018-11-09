@@ -4,11 +4,11 @@ Usage: minidcos vagrant run [OPTIONS] NODE_ARGS...
 
   This command sets up the environment so that ``pytest`` can be run.
 
-  For example, run ``dcos-vagrant run --cluster-id 1231599 pytest -k
+  For example, run ``minidcos vagran run --cluster-id 1231599 pytest -k
   test_tls.py``.
 
-  Or, with sync: ``dcos-vagrant run --sync-dir . --cluster-id 1231599 pytest
-  -k test_tls.py``.
+  Or, with sync: ``minidcos vagran run --sync-dir . --cluster-id 1231599
+  pytest -k test_tls.py``.
 
   To use special characters such as single quotes in your command, wrap the
   whole command in double quotes.
@@ -29,8 +29,8 @@ Options:
   --node TEXT              A reference to a particular node to run the command
                            on. This can be one of: The node's IP address, the
                            node's VM name, a reference in the format
-                           "<role>_<number>". These details be seen with ``dcos-
-                           vagrant inspect``.
+                           "<role>_<number>". These details be seen with
+                           ``minidcos vagrant inspect``.
   -v, --verbose            Use verbose output. Use this option multiple times
                            for more verbose output.
   --help                   Show this message and exit.

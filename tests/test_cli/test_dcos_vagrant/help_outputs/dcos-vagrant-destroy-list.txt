@@ -2,7 +2,8 @@ Usage: minidcos vagrant destroy-list [OPTIONS] [CLUSTER_IDS]...
 
   Destroy clusters.
 
-  To destroy all clusters, run ``dcos-vagrant destroy $(dcos-vagrant list)``.
+  To destroy all clusters, run ``minidcos vagrant destroy $(minidcos vagrant
+  list)``.
 
 Options:
   --help  Show this message and exit.

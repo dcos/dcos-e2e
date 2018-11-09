@@ -4,10 +4,10 @@ Usage: minidcos docker run [OPTIONS] NODE_ARGS...
 
   This command sets up the environment so that ``pytest`` can be run.
 
-  For example, run ``dcos-docker run --cluster-id 1231599 pytest -k
+  For example, run ``minidcos docker run --cluster-id 123 pytest -k
   test_tls.py``.
 
-  Or, with sync: ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k
+  Or, with sync: ``minidcos docker run --sync-dir . --cluster-id 123 pytest -k
   test_tls.py``.
 
   To use special characters such as single quotes in your command, wrap the
@@ -31,17 +31,18 @@ Options:
                                  address, the node's Docker container name, the
                                  node's Docker container ID, a reference in the
                                  format "<role>_<number>". These details be seen
-                                 with ``dcos-docker inspect``.
+                                 with ``minidcos docker inspect``.
   --env TEXT                     Set environment variables in the format
                                  "<KEY>=<VALUE>"
   --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                  the SSH transport requires IP routing to be set
-                                 up. See "dcos-docker setup-mac-network". It
+                                 up. See "minidcos docker setup-mac-network". It
                                  also requires the "ssh" command to be
                                  available. This can be provided by setting the
-                                 `DCOS_DOCKER_TRANSPORT` environment variable.
-                                 When using a TTY, different transports may use
-                                 different line endings.  [default: docker-exec]
+                                 `MINIDCOS_DOCKER_TRANSPORT` environment
+                                 variable. When using a TTY, different
+                                 transports may use different line endings.
+                                 [default: docker-exec]
   -v, --verbose                  Use verbose output. Use this option multiple
                                  times for more verbose output.
   --help                         Show this message and exit.

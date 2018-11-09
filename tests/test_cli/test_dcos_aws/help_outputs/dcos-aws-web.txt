@@ -2,8 +2,8 @@ Usage: minidcos aws web [OPTIONS]
 
   Open the browser at the web UI.
 
-  Note that the web UI may not be available at first. Consider using ``dcos-
-  aws wait`` before running this command.
+  Note that the web UI may not be available at first. Consider using
+  ``minidcos aws wait`` before running this command.
 
 Options:
   -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
