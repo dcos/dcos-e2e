@@ -187,5 +187,5 @@ CLI Reference
 -------------
 
 .. click:: dcos_e2e_cli:dcos_aws
-  :prog: dcos-aws
+  :prog: minidcos aws
   :show-nested:

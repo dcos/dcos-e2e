@@ -323,5 +323,5 @@ CLI Reference
 -------------
 
 .. click:: dcos_e2e_cli:dcos_docker
-  :prog: dcos-docker
+  :prog: minidcos docker
   :show-nested:

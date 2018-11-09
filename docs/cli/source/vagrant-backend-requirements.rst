@@ -34,5 +34,5 @@ This has been tested with VirtualBox 5.1.18.
 ``doctor`` command
 ~~~~~~~~~~~~~~~~~~
 
-:ref:`dcos-vagrant-cli:dcos-vagrant` comes with the :ref:`dcos-vagrant-cli:doctor` command.
+:ref:`dcos-vagrant-cli:minidcos vagrant` comes with the :ref:`dcos-vagrant-cli:doctor` command.
 Run this command to check your system for common causes of problems.

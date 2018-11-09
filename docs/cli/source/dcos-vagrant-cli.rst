@@ -211,5 +211,5 @@ CLI Reference
 -------------
 
 .. click:: dcos_e2e_cli:dcos_vagrant
-  :prog: dcos-vagrant
+  :prog: minidcos vagrant
   :show-nested:
