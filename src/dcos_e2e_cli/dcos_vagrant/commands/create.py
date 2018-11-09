@@ -121,7 +121,7 @@ def create(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
-    doctor_message = 'Try `minidcos vagran doctor` for troubleshooting help.'
+    doctor_message = 'Try `minidcos vagrant doctor` for troubleshooting help.'
 
     artifact_path = Path(artifact).resolve()
 

@@ -114,10 +114,10 @@ def run(
     This command sets up the environment so that ``pytest`` can be run.
 
     For example, run
-    ``minidcos vagran run --cluster-id 1231599 pytest -k test_tls.py``.
+    ``minidcos vagrant run --cluster-id 1231599 pytest -k test_tls.py``.
 
     Or, with sync:
-    ``minidcos vagran run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
+    ``minidcos vagrant run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
 
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
