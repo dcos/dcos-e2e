@@ -22,27 +22,6 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 from dcos_e2e_cli import dcos_docker, minidcos
 
 
-class TestDcosDocker:
-    """
-    Tests for the top level ``minidcos docker`` command.
-    """
-
-    def test_version(self) -> None:
-        """
-        The CLI version is shown with ``minidcos docker --version``.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['--version'],
-            catch_exceptions=False,
-        )
-
-        assert result.exit_code == 0
-        expected = 'dcos-docker, version'
-        assert expected in result.output
-
-
 _SUBCOMMANDS = [[item] for item in dcos_docker.commands.keys()]
 _BASE_COMMAND = [[]]  # type: List[List[str]]
 _COMMANDS = _BASE_COMMAND + _SUBCOMMANDS
