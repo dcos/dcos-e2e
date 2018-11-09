@@ -385,11 +385,12 @@ class TestNetworks:
     On macOS, by default, it is not possible to SSH to containers without
     forwarded ports.
 
-    We therefore recommend that people use ``dcos-docker setup-mac-network``.
-    This makes it possible to SSH to containers in the default network range.
+    We therefore recommend that people use ``minidcos docker
+    setup-mac-network``.  This makes it possible to SSH to containers in the
+    default network range.
 
     However, in these tests, we use custom networks.
-    Using the VPN created by ``dcos-docker setup-mac-network`` it is not
+    Using the VPN created by ``minidcos docker setup-mac-network`` it is not
     possible to SSH to containers on custom networks.
     See https://github.com/wojas/docker-mac-network#openvpn for details.
 
