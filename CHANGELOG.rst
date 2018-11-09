@@ -6,8 +6,12 @@ Changelog
 Next
 ----
 
+- Backwards incompatible change: Change ``--no-test-env`` to ``--test-env`` on ``run`` commands, with the opposite default.
+
 2018.11.09.0
 ------------
+
+- Fix an issue which caused incompatible version errors between ``keyring`` and ``SecretStore`` dependencies.
 
 2018.11.07.1
 ------------
