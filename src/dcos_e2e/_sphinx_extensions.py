@@ -36,6 +36,7 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
             ('|release|', release),
             ('|github-owner|', 'dcos'),
             ('|github-repository|', 'dcos-e2e'),
+            ('|brewfile-stem|', 'dcose2e'),
         )
         new_content = []
         self.content = (  # pylint: disable=attribute-defined-outside-init
