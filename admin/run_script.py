@@ -34,5 +34,5 @@ if __name__ == '__main__':
         run_test(test_pattern=CI_PATTERN)
     else:
         subprocess.check_call(['make', 'lint'])
-        subprocess.check_call(['dcos-docker', 'doctor'])
+        subprocess.check_call(['minidcos', 'docker', 'doctor'])
         subprocess.check_call(['make', 'docs'])
