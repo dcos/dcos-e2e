@@ -15,7 +15,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
    $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh --variant oss
    default
    $ dcos-aws wait
-   $ dcos-aws run --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ dcos-aws run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
 
 Each of these and more are described in detail below.
@@ -128,7 +128,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
         --variant oss \
         https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh
    $ dcos-aws wait
-   $ dcos-aws run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+   $ dcos-aws run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`dcos-aws-cli:run` for more information on this command.

@@ -363,17 +363,17 @@ def verbosity_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def no_test_env_run_option(command: Callable[..., None],
-                           ) -> Callable[..., None]:
+def test_env_run_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     A decorator for choosing whether to run commands in a test environment.
     """
     function = click.option(
-        '--no-test-env',
+        '--test-env',
         is_flag=True,
         help=(
-            'With this flag set, no environment variables are set and the '
-            'command is run in the home directory. '
+            'With this flag set, environment variables are set and the '
+            'command is run in the integration test directory. '
+            'This means that "pytest" will run the integration tests.'
         ),
     )(command)  # type: Callable[..., None]
     return function

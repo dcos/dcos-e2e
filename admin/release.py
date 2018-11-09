@@ -180,16 +180,16 @@ def release(github_token: str, github_owner: str) -> None:
     logging.basicConfig(level=logging.DEBUG)
     repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
-    update_changelog(version=version_str)
     homebrew_file = Path('dcose2e.rb')
     vagrantfile = Path('vagrant/Vagrantfile')
     changelog = Path('CHANGELOG.rst')
+    update_changelog(version=version_str, changelog=changelog)
     update_homebrew(
         homebrew_file=homebrew_file,
         version_str=version_str,
         repository=repository,
     )
-    update_vagrantfile(version=version_str)
+    update_vagrantfile(vagrantfile=vagrantfile, version=version_str)
     paths = [homebrew_file, changelog, vagrantfile]
     commit_and_push(version=version_str, repository=repository, paths=paths)
     create_github_release(repository=repository, version=version_str)

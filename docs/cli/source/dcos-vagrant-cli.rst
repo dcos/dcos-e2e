@@ -15,7 +15,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
    $ dcos-vagrant create ./dcos_generate_config.sh --agents 0
    default
    $ dcos-vagrant wait
-   $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ dcos-vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    $ dcos-vagrant destroy
 
@@ -152,7 +152,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
    $ dcos-vagrant create ./dcos_generate_config.sh
    $ dcos-vagrant wait
-   $ dcos-vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+   $ dcos-vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`dcos-vagrant-cli:run` for more information on this command.

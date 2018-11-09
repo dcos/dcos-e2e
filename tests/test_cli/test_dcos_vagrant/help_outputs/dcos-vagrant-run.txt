@@ -2,14 +2,6 @@ Usage: dcos-vagrant run [OPTIONS] NODE_ARGS...
 
   Run an arbitrary command on a node.
 
-  This command sets up the environment so that ``pytest`` can be run.
-
-  For example, run ``dcos-vagrant run --cluster-id 1231599 pytest -k
-  test_tls.py``.
-
-  Or, with sync: ``dcos-vagrant run --sync-dir . --cluster-id 1231599 pytest
-  -k test_tls.py``.
-
   To use special characters such as single quotes in your command, wrap the
   whole command in double quotes.
 
@@ -22,8 +14,10 @@ Options:
   --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
                            will be synced to all master nodes before the command
                            is run.
-  --no-test-env            With this flag set, no environment variables are set
-                           and the command is run in the home directory.
+  --test-env               With this flag set, environment variables are set and
+                           the command is run in the integration test directory.
+                           This means that "pytest" will run the integration
+                           tests.
   --env TEXT               Set environment variables in the format
                            "<KEY>=<VALUE>"
   --node TEXT              A reference to a particular node to run the command
