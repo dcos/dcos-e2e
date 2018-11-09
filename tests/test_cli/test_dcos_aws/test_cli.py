@@ -27,8 +27,8 @@ class TestDoctor:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_aws,
-            ['doctor'],
+            minidcos,
+            ['aws', 'doctor'],
             catch_exceptions=False,
         )
         assert result.exit_code == 0

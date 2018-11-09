@@ -15,7 +15,9 @@ from click.testing import CliRunner
 
 from dcos_e2e_cli import minidcos
 
-_SUBCOMMANDS = [[item] for item in minidcos.commands['vagrant'].commands.keys()]
+_SUBCOMMANDS = [
+    [item] for item in minidcos.commands['vagrant'].commands.keys()
+]
 _BASE_COMMAND = [[]]  # type: List[List[str]]
 _COMMANDS = _BASE_COMMAND + _SUBCOMMANDS
 
@@ -72,8 +74,8 @@ class TestDoctor:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_vagrant,
-            ['doctor'],
+            minidcos,
+            ['vagrant', 'doctor'],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
