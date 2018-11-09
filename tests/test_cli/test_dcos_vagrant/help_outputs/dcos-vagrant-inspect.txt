@@ -1,4 +1,4 @@
-Usage: dcos-vagrant inspect [OPTIONS]
+Usage: minidcos vagrant inspect [OPTIONS]
 
   Show cluster details.
 

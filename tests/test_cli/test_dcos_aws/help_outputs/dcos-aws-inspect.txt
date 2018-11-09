@@ -1,4 +1,4 @@
-Usage: dcos-aws inspect [OPTIONS]
+Usage: minidcos aws inspect [OPTIONS]
 
   Show cluster details.
 

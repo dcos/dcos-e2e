@@ -1,4 +1,4 @@
-Usage: dcos-docker wait [OPTIONS]
+Usage: minidcos docker wait [OPTIONS]
 
   Wait for DC/OS to start.
 

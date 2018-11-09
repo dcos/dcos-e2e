@@ -13,6 +13,7 @@ from typing import List
 import pytest
 from click.testing import CliRunner
 
+from dcos_e2e_cli import minidcos
 from dcos_e2e_cli import dcos_aws
 
 
@@ -79,8 +80,8 @@ class TestHelp:
         ``bash admin/update_cli_tests.sh``.
         """
         runner = CliRunner()
-        arguments = command + ['--help']
-        result = runner.invoke(dcos_aws, arguments, catch_exceptions=False)
+        arguments = ['aws'] + command + ['--help']
+        result = runner.invoke(minidcos, arguments, catch_exceptions=False)
         assert result.exit_code == 0
         help_output_filename = '-'.join(['dcos-aws'] + command) + '.txt'
         help_outputs_dir = Path(__file__).parent / 'help_outputs'

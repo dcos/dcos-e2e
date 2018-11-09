@@ -1,5 +1,5 @@
 """
-Tests for the CLI.
+Tests for the Docker CLI.
 
 This mostly provides error case coverage.
 We rely mostly on manual testing.
@@ -19,12 +19,13 @@ from click.testing import CliRunner
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
+from dcos_e2e_cli import minidcos
 from dcos_e2e_cli import dcos_docker
 
 
 class TestDcosDocker:
     """
-    Tests for the top level `dcos-docker` command.
+    Tests for the top level ``dcos-docker`` command.
     """
 
     def test_version(self) -> None:
@@ -67,8 +68,8 @@ class TestHelp:
         ``bash admin/update_cli_tests.sh``.
         """
         runner = CliRunner()
-        arguments = command + ['--help']
-        result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
+        arguments = ['docker'] + command + ['--help']
+        result = runner.invoke(minidcos, arguments, catch_exceptions=False)
         assert result.exit_code == 0
         help_output_filename = '-'.join(['dcos-docker'] + command) + '.txt'
         help_outputs_dir = Path(__file__).parent / 'help_outputs'

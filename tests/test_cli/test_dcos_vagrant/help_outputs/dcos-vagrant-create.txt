@@ -1,4 +1,4 @@
-Usage: dcos-vagrant create [OPTIONS] ARTIFACT
+Usage: minidcos vagrant create [OPTIONS] ARTIFACT
 
   Create a DC/OS cluster.
 

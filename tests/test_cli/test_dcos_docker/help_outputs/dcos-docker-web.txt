@@ -1,4 +1,4 @@
-Usage: dcos-docker web [OPTIONS]
+Usage: minidcos docker web [OPTIONS]
 
   Open the browser at the web UI.
 

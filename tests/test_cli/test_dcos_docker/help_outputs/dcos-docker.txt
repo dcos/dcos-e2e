@@ -1,10 +1,9 @@
-Usage: dcos-docker [OPTIONS] COMMAND [ARGS]...
+Usage: minidcos docker [OPTIONS] COMMAND [ARGS]...
 
   Manage DC/OS clusters on Docker.
 
 Options:
-  --version  Show the version and exit.
-  --help     Show this message and exit.
+  --help  Show this message and exit.
 
 Commands:
   clean                     Remove containers, volumes and networks created

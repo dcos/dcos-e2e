@@ -1,4 +1,4 @@
-Usage: dcos-docker create [OPTIONS] ARTIFACT
+Usage: minidcos docker create [OPTIONS] ARTIFACT
 
   Create a DC/OS cluster.
 

@@ -1,4 +1,4 @@
-Usage: dcos-docker list-loopback-sidecars [OPTIONS]
+Usage: minidcos docker list-loopback-sidecars [OPTIONS]
 
   List loopback sidecars.
 

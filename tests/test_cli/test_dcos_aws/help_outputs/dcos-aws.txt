@@ -1,10 +1,9 @@
-Usage: dcos-aws [OPTIONS] COMMAND [ARGS]...
+Usage: minidcos aws [OPTIONS] COMMAND [ARGS]...
 
   Manage DC/OS clusters on AWS.
 
 Options:
-  --version  Show the version and exit.
-  --help     Show this message and exit.
+  --help  Show this message and exit.
 
 Commands:
   create   Create a DC/OS cluster.

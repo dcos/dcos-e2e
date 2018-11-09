@@ -1,4 +1,4 @@
-Usage: dcos-aws web [OPTIONS]
+Usage: minidcos aws web [OPTIONS]
 
   Open the browser at the web UI.
 

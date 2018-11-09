@@ -1,4 +1,4 @@
-Usage: dcos-docker doctor [OPTIONS]
+Usage: minidcos docker doctor [OPTIONS]
 
   Diagnose common issues which stop this CLI from working correctly.
 

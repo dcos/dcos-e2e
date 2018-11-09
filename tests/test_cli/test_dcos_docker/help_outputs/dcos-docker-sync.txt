@@ -1,4 +1,4 @@
-Usage: dcos-docker sync [OPTIONS] [DCOS_CHECKOUT_DIR]
+Usage: minidcos docker sync [OPTIONS] [DCOS_CHECKOUT_DIR]
 
   Sync files from a DC/OS checkout to master nodes.
 

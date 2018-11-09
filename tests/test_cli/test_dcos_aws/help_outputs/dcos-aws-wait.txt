@@ -1,4 +1,4 @@
-Usage: dcos-aws wait [OPTIONS]
+Usage: minidcos aws wait [OPTIONS]
 
   Wait for DC/OS to start.
 

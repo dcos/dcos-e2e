@@ -13,6 +13,7 @@ from typing import List
 import pytest
 from click.testing import CliRunner
 
+from dcos_e2e_cli import minidcos
 from dcos_e2e_cli import dcos_vagrant
 
 _SUBCOMMANDS = [[item] for item in dcos_vagrant.commands.keys()]
@@ -39,8 +40,8 @@ class TestHelp:
         ``bash admin/update_cli_tests.sh``.
         """
         runner = CliRunner()
-        arguments = command + ['--help']
-        result = runner.invoke(dcos_vagrant, arguments, catch_exceptions=False)
+        arguments = ['vagrant'] + command + ['--help']
+        result = runner.invoke(minidcos, arguments, catch_exceptions=False)
         assert result.exit_code == 0
         help_output_filename = '-'.join(['dcos-vagrant'] + command) + '.txt'
         help_outputs_dir = Path(__file__).parent / 'help_outputs'

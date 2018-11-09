@@ -1,4 +1,4 @@
-Usage: dcos-vagrant destroy [OPTIONS]
+Usage: minidcos vagrant destroy [OPTIONS]
 
   Destroy a cluster.
 

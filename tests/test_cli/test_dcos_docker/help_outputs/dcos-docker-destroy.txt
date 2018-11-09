@@ -1,4 +1,4 @@
-Usage: dcos-docker destroy [OPTIONS]
+Usage: minidcos docker destroy [OPTIONS]
 
   Destroy a cluster.
 
