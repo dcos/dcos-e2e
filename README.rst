@@ -10,9 +10,9 @@
 =========
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
-It includes a Python library and miniDC/OS CLI tools.
+It includes a Python library and MiniDC/OS CLI tools.
 
-See the full documentation on Read the Docs for the `library`_ and `miniDC/OS`_.
+See the full documentation on Read the Docs for the `library`_ and `MiniDC/OS`_.
 
 .. contents::
    :local:
@@ -20,9 +20,9 @@ See the full documentation on Read the Docs for the `library`_ and `miniDC/OS`_.
 Installation
 ------------
 
-|project| consists of a Python `library`_ and `miniDC/OS`_.
+|project| consists of a Python `library`_ and `MiniDC/OS`_.
 
-See the full `miniDC/OS`_ documentation for CLI installation options.
+See the full `MiniDC/OS`_ documentation for CLI installation options.
 
 To install the library, follow the `library installation instructions`_.
 
@@ -86,7 +86,7 @@ A typical CLI workflow with the ``minidcos docker`` CLI may look like this:
 Each of these commands and more are described in detail in the full `minidcos docker CLI`_ documentation.
 Other CLI tools include ``minidcos aws`` and ``minidcos vagrant``.
 
-See the full `miniDC/OS`_ documentation for information on other CLI tools provided by |project|.
+See the full `MiniDC/OS`_ documentation for information on other CLI tools provided by |project|.
 
 .. |Build Status| image:: https://travis-ci.org/dcos/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/dcos/dcos-e2e
@@ -100,7 +100,7 @@ See the full `miniDC/OS`_ documentation for information on other CLI tools provi
    :alt: CLI Documentation Status
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
-.. _miniDC/OS: https://dcos-e2e-cli.readthedocs.io/en/latest/
+.. _MiniDC/OS: https://dcos-e2e-cli.readthedocs.io/en/latest/
 .. _minidcos docker CLI: https://dcos-e2e-cli.readthedocs.io/en/latest/dcos-docker-cli.html
 .. _library: https://dcos-e2e.readthedocs.io/en/latest/
 .. _backends: https://dcos-e2e.readthedocs.io/en/latest/backends.html
