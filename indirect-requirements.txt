@@ -8,7 +8,9 @@
 # See DCOS-40131.
 msrestazure==0.4.34
 # ``keyring`` is a requirement of ``msrestazure``.
-# We make sure that we get a version of keyring which is compatible with the # # version os SecretStorage on Python 3.5+.
+# We make sure that we get a version of keyring which is compatible with the
+# pinned version of SecretStorage on Python 3.5+ (compatibility is different
+# on different Python versions).
 keyring==16.0.2
 # Without the following, some users get:
 # The 'secretstorage' distribution was not found and is required by keyring
