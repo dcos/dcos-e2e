@@ -42,7 +42,7 @@ def _check_tmp_free_space() -> CheckLevels:
         'storage. '
         'If you encounter problems with disk space usage, set the ``TMPDIR`` '
         'environment variable to a suitable temporary directory or use the '
-        '``--workspace-dir`` option on the ``dcos-docker create`` command.'
+        '``--workspace-dir`` option on the ``minidcos docker create`` command.'
     ).format(
         tmp_prefix=Path('/') / gettempprefix(),
         free_space=free_space_gb,

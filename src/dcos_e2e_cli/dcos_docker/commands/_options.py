@@ -29,9 +29,9 @@ def node_transport_option(command: Callable[..., None],
         help=(
             'The communication transport to use. '
             'On macOS the SSH transport requires IP routing to be set up. '
-            'See "dcos-docker setup-mac-network". '
+            'See "minidcos docker setup-mac-network". '
             'It also requires the "ssh" command to be available. '
-            'This can be provided by setting the `DCOS_DOCKER_TRANSPORT` '
+            'This can be provided by setting the `MINIDCOS_DOCKER_TRANSPORT` '
             'environment variable. '
             'When using a TTY, different transports may use different line '
             'endings.'
