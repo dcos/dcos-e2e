@@ -11,8 +11,8 @@ A minimum of 2 GB of free memory is required per DC/OS node.
 
 The ``ssh`` command must be available to use the :py:class:`~dcos_e2e.node.Transport.SSH` transport.
 
-Vagrant
-~~~~~~~
+Vagrant by HashiCorp
+~~~~~~~~~~~~~~~~~~~~
 
 `Vagrant`_ must be installed.
 This has been tested with:
@@ -31,8 +31,8 @@ This has been tested with VirtualBox 5.1.18.
 
 `vagrant-vbguest`_ must be installed.
 
-``dcos-vagrant doctor``
-~~~~~~~~~~~~~~~~~~~~~~~
+``doctor`` command
+~~~~~~~~~~~~~~~~~~~
 
 |project| comes with the ``dcos-vagrant doctor`` command.
 Run this command to check your system for common causes of problems.

@@ -38,8 +38,8 @@ It is not expected that it will work out of the box with Windows, see :issue:`QU
 
 If your operating system is not supported, it may be possible to use Vagrant, or another Linux virtual machine.
 
-``dcos-vagrant doctor``
-~~~~~~~~~~~~~~~~~~~~~~~
+``doctor`` command
+~~~~~~~~~~~~~~~~~~
 
 :ref:`dcos-aws-cli:minidcos aws` comes with the :ref:`dcos-aws-cli:doctor` command.
 Run this command to check your system for common causes of problems.
