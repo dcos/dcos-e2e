@@ -76,7 +76,7 @@ A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
    $ dcos-docker create ./dcos_generate_config.sh --agents 0
    default
    $ dcos-docker wait
-   $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ dcos-docker run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    # Get onto a node
    $ dcos-docker run bash

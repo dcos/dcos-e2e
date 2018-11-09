@@ -130,14 +130,6 @@ def run(
     """
     Run an arbitrary command on a node.
 
-    This command sets up the environment so that ``pytest`` can be run.
-
-    For example, run
-    ``dcos-aws run --cluster-id 1231599 pytest -k test_tls.py``.
-
-    Or, with sync:
-    ``dcos-aws run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
-
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
     """  # noqa: E501
