@@ -200,7 +200,7 @@ def _check_networking() -> CheckLevels:
         if docker_for_mac:
             message += (
                 ' '
-                'We recommend using "dcos-docker setup-mac-network" to '
+                'We recommend using "minidcos docker setup-mac-network" to '
                 'resolve this issue.'
             )
         warn(message=message)
@@ -414,8 +414,8 @@ def _check_can_mount_in_docker() -> CheckLevels:
                 'a kernel parameter on your host.'
                 '\n* Use versions of Docker newer than 1.13.1 inside the '
                 'DC/OS nodes.'
-                ' To do this in the ``dcos-docker`` CLI, use the '
-                '``--docker-version`` option on ``dcos-docker create``.'
+                ' To do this in the ``minidcos docker`` CLI, use the '
+                '``--docker-version`` option on ``minidcos docker create``.'
                 ' To do this in the Python library, pass a '
                 '``docker_version`` parameter to the ``Docker`` backend class.'
             )

@@ -71,7 +71,7 @@ def _validate_ovpn_file_does_not_exist(
         '3. In your OpenVPN client, connect to the new "{profile_name}" '
         'profile.'
         '\n'
-        '4. Run "dcos-docker doctor" to confirm that everything is working.'
+        '4. Run "minidcos docker doctor" to confirm that everything is working.'
     ).format(
         value=value,
         profile_name=profile_name,
@@ -235,7 +235,7 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
         '4. In your OpenVPN client, connect to the new "docker-for-mac" '
         'profile.'
         '\n'
-        '5. Run "dcos-docker doctor" to confirm that everything is working.'
+        '5. Run "minidcos docker doctor" to confirm that everything is working.'
     ).format(configuration_dst=configuration_dst)
 
     click.echo(message=message)

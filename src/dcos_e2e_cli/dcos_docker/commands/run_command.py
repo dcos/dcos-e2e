@@ -79,7 +79,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     message = (
         'No such node in cluster "{cluster_id}" with IP address, Docker '
         'container ID or node reference "{node_reference}". '
-        'Node references can be seen with ``dcos-docker inspect``.'
+        'Node references can be seen with ``minidcos docker inspect``.'
     ).format(
         cluster_id=cluster_id,
         node_reference=node_reference,
@@ -105,7 +105,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         'the node\'s Docker container name, '
         'the node\'s Docker container ID, '
         'a reference in the format "<role>_<number>". '
-        'These details be seen with ``dcos-docker inspect``.'
+        'These details be seen with ``minidcos docker inspect``.'
     ),
 )
 @environment_variables_option
@@ -129,10 +129,10 @@ def run(
     This command sets up the environment so that ``pytest`` can be run.
 
     For example, run
-    ``dcos-docker run --cluster-id 1231599 pytest -k test_tls.py``.
+    ``minidcos docker run --cluster-id 123 pytest -k test_tls.py``.
 
     Or, with sync:
-    ``dcos-docker run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
+    ``minidcos docker run --sync-dir . --cluster-id 123 pytest -k test_tls.py``.
 
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.

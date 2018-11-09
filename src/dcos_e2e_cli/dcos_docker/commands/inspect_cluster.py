@@ -37,7 +37,7 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
     To quickly get environment variables to use with Docker tooling, use the
     ``--env`` flag.
 
-    Run ``eval $(dcos-docker inspect <CLUSTER_ID> --env)``, then run
+    Run ``eval $(minidcos docker inspect <CLUSTER_ID> --env)``, then run
     ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
     set_logging(verbosity_level=verbose)
