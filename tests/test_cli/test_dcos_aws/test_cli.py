@@ -13,7 +13,7 @@ from typing import List
 import pytest
 from click.testing import CliRunner
 
-from dcos_e2e_cli import dcos_aws, minidcos
+from dcos_e2e_cli import minidcos
 
 
 class TestDoctor:
@@ -34,7 +34,7 @@ class TestDoctor:
         assert result.exit_code == 0
 
 
-_SUBCOMMANDS = [[item] for item in dcos_aws.commands.keys()]
+_SUBCOMMANDS = [[item] for item in minidcos.commands['aws'].commands.keys()]
 _BASE_COMMAND = [[]]  # type: List[List[str]]
 _COMMANDS = _BASE_COMMAND + _SUBCOMMANDS
 

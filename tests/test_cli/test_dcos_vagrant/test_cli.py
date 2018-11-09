@@ -13,9 +13,9 @@ from typing import List
 import pytest
 from click.testing import CliRunner
 
-from dcos_e2e_cli import dcos_vagrant, minidcos
+from dcos_e2e_cli import minidcos
 
-_SUBCOMMANDS = [[item] for item in dcos_vagrant.commands.keys()]
+_SUBCOMMANDS = [[item] for item in minidcos.commands['vagrant'].commands.keys()]
 _BASE_COMMAND = [[]]  # type: List[List[str]]
 _COMMANDS = _BASE_COMMAND + _SUBCOMMANDS
 
