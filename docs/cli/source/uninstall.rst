@@ -13,8 +13,8 @@ For Homebrew or Linuxbrew installations:
 
 .. smart-prompt:: bash
 
-   # --force uninstalls all versions of DC/OS E2E which have been installed.
-   brew uninstall minidcos --force
+   # --force uninstalls all versions which have been installed.
+   brew uninstall |brewfile-stem| --force
 
 For installations from pre-built packages:
 
