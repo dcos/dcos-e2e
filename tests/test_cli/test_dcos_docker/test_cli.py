@@ -19,9 +19,9 @@ from click.testing import CliRunner
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
-from dcos_e2e_cli import dcos_docker, minidcos
+from dcos_e2e_cli import minidcos
 
-_SUBCOMMANDS = [[item] for item in dcos_docker.commands.keys()]
+_SUBCOMMANDS = [[item] for item in minidcos.commands['docker'].commands.keys()]
 _BASE_COMMAND = [[]]  # type: List[List[str]]
 _COMMANDS = _BASE_COMMAND + _SUBCOMMANDS
 
