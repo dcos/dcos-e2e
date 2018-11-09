@@ -115,7 +115,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" is not in the format /absolute/local/path:/remote/path.
             """,# noqa: E501,E261
@@ -144,7 +144,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" does not exist.
             """,# noqa: E501,E261
@@ -186,7 +186,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "{option}": Mode in "/opt:/opt:ab" is "ab". If given, the mode must be one of "ro", "rw".
             """,# noqa: E501,E261
@@ -228,7 +228,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "{option}": "/opt:/opt:/opt:rw" is not a valid volume definition. See https://docs.docker.com/engine/reference/run/#volume-shared-filesystems for the syntax to use.
             """,# noqa: E501,E261
@@ -264,7 +264,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "some/remote is not an absolute path.
             """,# noqa: E501,E261
@@ -311,7 +311,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
             Try "dcos-docker create --help" for help.
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
@@ -344,7 +344,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-           Usage: dcos-docker create [OPTIONS] ARTIFACT
+           Usage: minidcos docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "@" is not valid YAML
             """,# noqa: E501,E261
@@ -376,7 +376,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
            """\
-           Usage: dcos-docker create [OPTIONS] ARTIFACT
+           Usage: minidcos docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
             """,# noqa: E501,E261
@@ -411,7 +411,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
            """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "-c" / "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
             """,# noqa: E501,E261
@@ -664,7 +664,7 @@ class TestSetupMacNetwork():
         # yapf: disable
         expected_error = dedent(
             """\
-            Usage: dcos-docker setup-mac-network [OPTIONS]
+            Usage: minidcos docker setup-mac-network [OPTIONS]
 
             Error: Invalid value for "--configuration-dst": "{value}" does not have the suffix ".ovpn".
             """,# noqa: E501,E261
@@ -697,7 +697,7 @@ class TestSetupMacNetwork():
         # yapf: disable
         expected_error = dedent(
             """\
-            Usage: dcos-docker setup-mac-network [OPTIONS]
+            Usage: minidcos docker setup-mac-network [OPTIONS]
 
             Error: Invalid value for "--configuration-dst": "{value}" already exists so no new OpenVPN configuration was created.
 
