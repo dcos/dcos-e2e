@@ -20,6 +20,4 @@ For installations from pre-built packages:
 
 .. smart-prompt:: bash
 
-   rm -f /usr/local/bin/dcos-docker
-   rm -f /usr/local/bin/dcos-vagrant
-   rm -f /usr/local/bin/dcos-aws
+   rm -f /usr/local/bin/minidcos
