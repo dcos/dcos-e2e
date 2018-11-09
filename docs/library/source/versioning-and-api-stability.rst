@@ -24,7 +24,7 @@ DC/OS 1.9 and below
 -------------------
 
 Installers for DC/OS 1.9 and below require a version of ``sed`` that is not compatible with the BSD sed that ships with macOS.
-``dcos-docker doctor`` includes a check for compatible ``sed`` versions.
+``minidcos docker doctor`` includes a check for compatible ``sed`` versions.
 
 To use these versions of DC/OS with macOS and :paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_path`, we can either modify the installer or modify the local version of ``sed``.
 

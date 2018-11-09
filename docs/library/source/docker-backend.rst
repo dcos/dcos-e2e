@@ -26,7 +26,7 @@ To remove these, run the following:
 
 .. smart-prompt:: bash
 
-    dcos-docker clean
+    minidcos docker clean
 
 macOS File Sharing
 ~~~~~~~~~~~~~~~~~~

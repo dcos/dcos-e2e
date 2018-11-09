@@ -34,5 +34,5 @@ This has been tested with VirtualBox 5.1.18.
 ``doctor`` command
 ~~~~~~~~~~~~~~~~~~~
 
-|project| comes with the ``dcos-vagrant doctor`` command.
+|project| comes with the ``minidcos vagrant doctor`` command.
 Run this command to check your system for common causes of problems.
