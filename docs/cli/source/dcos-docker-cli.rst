@@ -1,26 +1,26 @@
 .. _dcos-docker_cli:
 
-``dcos-docker``
-===============
+``minidcos docker`` CLI
+=======================
 
-The ``dcos-docker`` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
+The :ref:`dcos-docker-cli:minidcos docker` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Docker nodes.
 
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
 .. code-block:: console
 
-   # Fix issues shown by dcos-docker doctor
-   $ dcos-docker doctor
-   $ dcos-docker download-artifact
-   $ dcos-docker create ./dcos_generate_config.sh --agents 0
+   # Fix issues shown by minidcos docker doctor
+   $ minidcos docker doctor
+   $ minidcos docker download-artifact
+   $ minidcos docker create ./dcos_generate_config.sh --agents 0
    default
-   $ dcos-docker wait
-   $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ minidcos docker wait
+   $ minidcos docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    # Get onto a node
-   $ dcos-docker run bash
-   $ dcos-docker destroy
+   $ minidcos docker run bash
+   $ minidcos docker destroy
 
 Each of these and more are described in detail below.
 
@@ -56,7 +56,7 @@ To launch a DC/OS cluster on a custom Docker network the network must first be c
 During :ref:`dcos-docker-cli:create` the command line option ``--network`` then takes the name of the Docker network as a parameter.
 
 DC/OS nodes utilize an environment-specific ``ip-detect`` script to detect their current private IP address.
-The default ``ip-detect`` script used by ``dcos-docker`` does only account for the ``docker0`` network case.
+The default ``ip-detect`` script used by :ref:`dcos-docker-cli:minidcos docker` does only account for the ``docker0`` network case.
 Therefore, in order for DC/OS to operate on a custom network a custom ``ip-detect`` script needs to be provided and put into the ``genconf`` directory before installing DC/OS.
 
 The following IP detect script works for any custom Docker network:
@@ -80,11 +80,11 @@ contents of the directory supplied through the command line option ``--genconf-d
     $ docker network create custom-bridge
     $ mkdir custom-genconf
     $ mv ip-detect custom-genconf/ip-detect
-    $ dcos-docker create /path/to/dcos_generate_config.sh
+    $ minidcos docker create /path/to/dcos_generate_config.sh
         --network custom-bridge
         --genconf-dir ./custom-genconf
 
-The custom Docker network is not cleaned up by the ``dcos-docker`` CLI.
+The custom Docker network is not cleaned up by the :ref:`dcos-docker-cli:minidcos docker` CLI.
 
 DC/OS Enterprise
 ~~~~~~~~~~~~~~~~
@@ -100,7 +100,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
 .. code-block:: console
 
-   $ dcos-docker create /path/to/dcos_generate_config.ee.sh \
+   $ minidcos docker create /path/to/dcos_generate_config.ee.sh \
         --license-key /path/to/license.txt \
         --security-mode strict
 
@@ -132,7 +132,7 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. code-block:: console
 
-   $ dcos-docker run systemctl list-units
+   $ minidcos docker run systemctl list-units
 
 See :ref:`dcos-docker-cli:run` for more information on this command.
 In particular see the ``--node`` option to choose a particular node to run the command on.
@@ -149,7 +149,7 @@ Alternatively, use the ``--env`` flag to output commands to be evaluated as such
 
 .. code-block:: console
 
-   $ eval $(dcos-docker inspect --env)
+   $ eval $(minidcos docker inspect --env)
    $ docker exec -it $MASTER_0 systemctl list-units
 
 Which environment variables are available depends on the size of your cluster.
@@ -171,13 +171,13 @@ For example, to use :ref:`dcos-docker-cli:run` to run ``bash`` to get on to an a
 
 .. code-block:: console
 
-   $ dcos-docker run example bash
+   $ minidcos docker run example bash
 
 or, similarly, to use ``docker exec`` to get on to a specific node:
 
 .. code-block:: console
 
-   $ eval $(dcos-docker inspect --env)
+   $ eval $(minidcos docker inspect --env)
    $ docker exec -it $MASTER_0 bash
 
 See :ref:`running-commands` for details on how to choose particular nodes.
@@ -192,16 +192,16 @@ Either destroy a cluster with :ref:`dcos-docker-cli:destroy`:
 
 .. code-block:: console
 
-   $ dcos-docker destroy
+   $ minidcos docker destroy
    default
-   $ dcos-docker destroy --cluster-id pr_4033_strict
+   $ minidcos docker destroy --cluster-id pr_4033_strict
    pr_4033_strict
 
 or use :ref:`dcos-docker-cli:destroy-list` to destroy multiple clusters:
 
 .. code-block:: console
 
-   $ dcos-docker destroy-list pr_4033_strict pr_4019_permissive
+   $ minidcos docker destroy-list pr_4033_strict pr_4019_permissive
    pr_4033_strict
    pr_4019_permissive
 
@@ -209,7 +209,7 @@ To destroy all clusters, run the following command:
 
 .. code-block:: console
 
-   $ dcos-docker destroy-list $(dcos-docker list)
+   $ minidcos docker destroy-list $(minidcos docker list)
    pr_4033_strict
    pr_4019_permissive
 
@@ -224,9 +224,9 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. code-block:: console
 
-   $ dcos-docker create ./dcos_generate_config.sh
-   $ dcos-docker wait
-   $ dcos-docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+   $ minidcos docker create ./dcos_generate_config.sh
+   $ minidcos docker wait
+   $ minidcos docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`dcos-docker-cli:run` for more information on this command.
@@ -251,8 +251,8 @@ For example:
 
 .. code-block:: console
 
-   $ dcos-docker create ./dcos_generate_config.sh --one-master-host-port-map 70:80
-   $ dcos-docker wait
+   $ minidcos docker create ./dcos_generate_config.sh --one-master-host-port-map 70:80
+   $ minidcos docker wait
    $ open localhost:70
 
 Using a Custom CA Certificate
@@ -285,7 +285,7 @@ It is possible to use :ref:`dcos-docker-cli:create` to create a cluster with a c
 
    .. code:: console
 
-      dcos-docker create \
+      minidcos docker create \
           /path/to/dcos_generate_config.ee.sh \
           --variant enterprise \
           --genconf-dir /path/to/genconf/ \
@@ -308,11 +308,11 @@ Therefore, care must be taken that only a single container has write-access to i
 
 .. code:: console
 
-   $ dcos-docker create-loopback-sidecar sidecar1
+   $ minidcos docker create-loopback-sidecar sidecar1
    /dev/loop0
-   $ dcos-docker create /tmp/dcos_generate_config.sh
-   $ dcos-docker wait
-   $ dcos-docker destroy-loopback-sidecar sidecar1
+   $ minidcos docker create /tmp/dcos_generate_config.sh
+   $ minidcos docker wait
+   $ minidcos docker destroy-loopback-sidecar sidecar1
 
 Loopback sidecars can be listed with :ref:`dcos-docker-cli:list-loopback-sidecars`.
 Loopback sidecars can be destroyed with :ref:`dcos-docker-cli:destroy-loopback-sidecar`.
