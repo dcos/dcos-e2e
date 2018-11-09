@@ -1,3 +1,3 @@
 """
-Commands for ``dcos-aws``.
+Commands for ``minidcos aws``.
 """

@@ -33,7 +33,7 @@ class TestHelp:
     )
     def test_help(self, command: List[str]) -> None:
         """
-        Expected help text is shown for ``dcos-vagrant`` commands.
+        Expected help text is shown for ``minidcos vagrant`` commands.
 
         This help text is defined in files.
         To update these files, run the command
@@ -60,12 +60,12 @@ class TestHelp:
 
 class TestDcosVagrant:
     """
-    Tests for the top level `dcos-vagrant` command.
+    Tests for the top level `minidcos vagrant` command.
     """
 
     def test_version(self) -> None:
         """
-        The CLI version is shown with ``dcos-vagrant --version``.
+        The CLI version is shown with ``minidcos vagran --version``.
         """
         runner = CliRunner()
         result = runner.invoke(

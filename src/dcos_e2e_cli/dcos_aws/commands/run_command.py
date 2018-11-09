@@ -112,7 +112,7 @@ def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
         'The node\'s private IP address, '
         'the node\'s EC2 instance ID, '
         'a reference in the format "<role>_<number>". '
-        'These details be seen with ``dcos-aws inspect``.'
+        'These details be seen with ``minidcos aws inspect``.'
     ),
 )
 def run(
@@ -133,10 +133,10 @@ def run(
     This command sets up the environment so that ``pytest`` can be run.
 
     For example, run
-    ``dcos-aws run --cluster-id 1231599 pytest -k test_tls.py``.
+    ``minidcos aws run --cluster-id 1231599 pytest -k test_tls.py``.
 
     Or, with sync:
-    ``dcos-aws run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
+    ``minidcos aws run --sync-dir . --cluster-id 1231599 pytest -k test_tls.py``.
 
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.

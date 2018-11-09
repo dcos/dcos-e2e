@@ -1,5 +1,5 @@
 """
-Common options for ``dcos-aws`` commands.
+Common options for ``minidcos aws`` commands.
 """
 
 from typing import Callable

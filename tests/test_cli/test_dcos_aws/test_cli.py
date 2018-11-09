@@ -19,12 +19,12 @@ from dcos_e2e_cli import dcos_aws
 
 class TestDcosAWS:
     """
-    Tests for the top level `dcos-aws` command.
+    Tests for the top level `minidcos aws` command.
     """
 
     def test_version(self) -> None:
         """
-        The CLI version is shown with ``dcos-aws --version``.
+        The CLI version is shown with ``minidcos aws --version``.
         """
         runner = CliRunner()
         result = runner.invoke(
@@ -73,7 +73,7 @@ class TestHelp:
     )
     def test_help(self, command: List[str]) -> None:
         """
-        Expected help text is shown for ``dcos-aws`` commands.
+        Expected help text is shown for ``minidcos aws`` commands.
 
         This help text is defined in files.
         To update these files, run the command

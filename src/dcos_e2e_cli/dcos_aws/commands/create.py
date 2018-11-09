@@ -198,7 +198,7 @@ def create(
         PublicKeyMaterial=public_key_path.read_bytes(),
     )
 
-    doctor_message = 'Try `dcos-aws doctor` for troubleshooting help.'
+    doctor_message = 'Try `minidcos aws doctor` for troubleshooting help.'
     enterprise = bool(variant == 'enterprise')
 
     ssh_user = {
