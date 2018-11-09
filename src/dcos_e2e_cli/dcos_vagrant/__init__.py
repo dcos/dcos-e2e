@@ -18,12 +18,7 @@ from .commands.wait import wait
 from .commands.web import web
 
 
-@click.group(name='dcos-vagrant')
-# We set the ``version`` parameter because in PyInstaller binaries,
-# ``pkg_resources`` is not available.
-#
-# Click uses ``pkg_resources`` to determine the version if it is not given.
-@click.version_option(version=dcos_e2e.__version__)
+@click.group(name='vagrant')
 def dcos_vagrant() -> None:
     """
     Manage DC/OS clusters on Vagrant.
