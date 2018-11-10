@@ -283,9 +283,9 @@ It is possible to use :ref:`dcos-docker-cli:create` to create a cluster with a c
 
 #. Create a cluster.
 
-   .. code:: console
+   .. smart-prompt:: bash $,# auto
 
-      dcos-docker create \
+      $ dcos-docker create \
           /path/to/dcos_generate_config.ee.sh \
           --variant enterprise \
           --genconf-dir /path/to/genconf/ \
@@ -306,7 +306,7 @@ This will provide all containers with a unformatted block device, mounted as a l
 All containers have access to this loopback device.
 Therefore, care must be taken that only a single container has write-access to it.
 
-.. code:: console
+.. smart-prompt:: bash $,# auto
 
    $ dcos-docker create-loopback-sidecar sidecar1
    /dev/loop0
