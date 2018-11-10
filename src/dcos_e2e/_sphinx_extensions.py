@@ -13,15 +13,25 @@ _SPHINX_PROMPT = __import__('sphinx-prompt')
 
 class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
     """
-    Similar to PromptDirective but replaces a placeholder with the
-    latest release and other variables.
+    Similar to PromptDirective but replaces placeholders with variables.
 
-    Usage example:
+    Set the ``conf.py`` variable ``smart_prompt_placeholder_replace_pairs`` to
+    a tuple of pairs, such as:
 
-    .. smart-prompt:: bash $
+    .. code:: python
 
-       $ minidcos --version
-       minidcos, version |release|
+       smart_prompt_placeholder_replace_pairs = (
+           ('|release|', release),
+           ('|author|', 'Eleanor'),
+       )
+
+    Then use:
+
+    .. code:: rst
+
+       .. smart-prompt:: bash
+
+          echo "|author| released version |release|"
     """
 
     def run(self) -> List:
