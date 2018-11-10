@@ -6,8 +6,6 @@ from typing import List
 
 from sphinx.application import Sphinx
 
-import dcos_e2e
-
 # Due to the dash in the name, we cannot import sphinx-prompt using a normal
 # import.
 _SPHINX_PROMPT = __import__('sphinx-prompt')
