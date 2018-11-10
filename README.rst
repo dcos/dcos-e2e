@@ -68,7 +68,7 @@ These allow you to create, manage and destroy DC/OS clusters on various backends
 
 A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
 
-.. code-block:: console
+.. code-block:: bash
 
    # Fix issues shown by dcos-docker doctor
    $ dcos-docker doctor

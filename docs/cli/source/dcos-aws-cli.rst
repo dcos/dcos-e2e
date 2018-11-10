@@ -8,7 +8,7 @@ The :ref:`dcos-aws-cli:dcos-aws` CLI allows you to create and manage open source
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
-.. code-block:: console
+.. smart-prompt:: bash $,# auto
 
    # Fix issues shown by dcos-aws doctor
    $ dcos-aws doctor
@@ -55,7 +55,7 @@ Ask your sales representative for DC/OS Enterprise release artifacts.
 
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 
-.. code-block:: console
+.. smart-prompt:: bash $,# auto
 
    $ dcos-aws create $DCOS_ENTERPRISE_URL \
         --variant enterprise \
@@ -86,7 +86,7 @@ Running commands on a cluster node using :ref:`dcos-aws-cli:run`
 
 It is possible to run the following to run a command on an arbitrary master node.
 
-.. code-block:: console
+.. smart-prompt:: bash $,# auto
 
    $ dcos-aws run systemctl list-units
 
@@ -106,7 +106,7 @@ To do this, you can use any of the ways of :ref:`running-commands`.
 
 For example, to use :ref:`dcos-aws-cli:run` to run ``bash`` to get on to an arbitrary master node:
 
-.. code-block:: console
+.. smart-prompt:: bash $,# auto
 
    $ dcos-aws run bash
 
@@ -122,7 +122,7 @@ The :ref:`dcos-aws-cli:run` command is useful for running integration tests.
 
 To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
 
-.. code-block:: console
+.. smart-prompt:: bash $,# auto
 
    $ dcos-aws create \
         --variant oss \
