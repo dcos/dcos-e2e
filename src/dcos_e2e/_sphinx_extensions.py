@@ -30,21 +30,14 @@ class SmartPrompt(_SPHINX_PROMPT.PromptDirective):  # type: ignore
         """
         Replace the release placeholder with the release version.
         """
-        version = dcos_e2e.__version__
-        release = version.split('+')[0]
-        placeholder_replace_pairs = (
-            ('|release|', release),
-            ('|github-owner|', 'dcos'),
-            ('|github-repository|', 'dcos-e2e'),
-            ('|brewfile-stem|', 'minidcos'),
-        )
+        app = self.state.document.settings.env.app
         new_content = []
         self.content = (  # pylint: disable=attribute-defined-outside-init
             self.content
         )  # type: List[str]
         existing_content = self.content
         for item in existing_content:
-            for pair in placeholder_replace_pairs:
+            for pair in app.config.smart_prompt_placeholder_replace_pairs:
                 original, replacement = pair
                 item = item.replace(original, replacement)
             new_content.append(item)
@@ -59,4 +52,5 @@ def setup(app: Sphinx) -> None:
     """
     Add the custom directives to Sphinx.
     """
+    app.add_config_value('smart_prompt_placeholder_replace_pairs', (), 'html')
     app.add_directive('smart-prompt', SmartPrompt)
