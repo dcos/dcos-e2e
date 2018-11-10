@@ -169,9 +169,9 @@ It is possible to use :ref:`dcos-aws-cli:create` to create a cluster with a cust
 
 #. Create a cluster.
 
-   .. code:: console
+   .. smart-prompt:: bash $,# auto
 
-      dcos-aws create \
+      $ dcos-aws create \
           $DCOS_ENTERPRISE_URL \
           --variant enterprise \
           --genconf-dir /path/to/genconf/ \

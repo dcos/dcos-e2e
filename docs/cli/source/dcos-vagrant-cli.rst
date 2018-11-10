@@ -193,9 +193,9 @@ It is possible to use :ref:`dcos-vagrant-cli:create` to create a cluster with a 
 
 #. Create a cluster.
 
-   .. code:: console
+   .. smart-prompt:: bash $,# auto
 
-      dcos-vagrant create \
+      $ dcos-vagrant create \
           /path/to/dcos_generate_config.ee.sh \
           --variant enterprise \
           --genconf-dir /path/to/genconf/ \
