@@ -51,7 +51,7 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
 
     In the following instructions, running a test might look like:
 
-    `minidcos docker run pytest <test_filename>`
+    `minidcos docker run --test-env pytest <test_filename>`
 
     The manual test cases we want to work are:
     * Sync a DC/OS Enterprise checkout and run a test - it should work.

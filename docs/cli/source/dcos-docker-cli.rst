@@ -16,7 +16,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
    $ minidcos docker create ./dcos_generate_config.sh --agents 0
    default
    $ minidcos docker wait
-   $ minidcos docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ minidcos docker run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    # Get onto a node
    $ minidcos docker run bash
@@ -226,7 +226,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
    $ minidcos docker create ./dcos_generate_config.sh
    $ minidcos docker wait
-   $ minidcos docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+   $ minidcos docker run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`dcos-docker-cli:run` for more information on this command.

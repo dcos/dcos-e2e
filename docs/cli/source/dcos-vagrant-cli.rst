@@ -10,13 +10,15 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
 .. code-block:: console
 
-   # Fix issues shown by dcos-vagrant doctor
+   # Fix issues shown by minidcos vagrant doctor
    $ minidcos vagrant doctor
    $ minidcos vagrant create ./dcos_generate_config.sh --agents 0
    default
    $ minidcos vagrant wait
-   $ minidcos vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ minidcos vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
+   # Get onto a node
+   $ minidcos vagrant run bash
    $ minidcos vagrant destroy
 
 Each of these and more are described in detail below.
@@ -152,7 +154,7 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
    $ minidcos vagrant create ./dcos_generate_config.sh
    $ minidcos vagrant wait
-   $ minidcos vagrant run --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+   $ minidcos vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`dcos-vagrant-cli:run` for more information on this command.

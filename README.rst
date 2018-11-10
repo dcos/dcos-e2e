@@ -76,7 +76,9 @@ A typical CLI workflow with the ``minidcos docker`` CLI may look like this:
    $ minidcos docker create ./dcos_generate_config.sh --agents 0
    default
    $ minidcos docker wait
-   $ minidcos docker run --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ minidcos docker run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ dcos-docker wait
+   $ dcos-docker run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    # Get onto a node
    $ minidcos docker run bash
