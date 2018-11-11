@@ -21,6 +21,7 @@ changelog
 ci
 cli
 completedprocess
+conf
 config
 customizable
 cwd
@@ -96,6 +97,7 @@ reachability
 refactor
 ro
 rsa
+rst
 rtype
 rw
 secretstorage
