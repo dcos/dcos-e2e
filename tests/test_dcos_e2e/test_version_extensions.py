@@ -29,7 +29,7 @@ def test_version_prompt(tmpdir: local) -> None:
         smart_prompt_placeholder_replace_pairs = (
             ('|a|', 'example_substitution'),
         )
-        """
+        """,
     )
     conf_py.write(conf_py_content)
     source_file_content = dedent(
