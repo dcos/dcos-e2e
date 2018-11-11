@@ -25,10 +25,6 @@ lint: \
     vulture \
     yapf
 
-# Attempt to clean leftovers by the test suite.
-.PHONY: clean
-clean:
-
 # Fix some linting errors.
 .PHONY: fix-lint
 fix-lint:
