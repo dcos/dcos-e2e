@@ -10,7 +10,6 @@ import os
 import sys
 
 import dcos_e2e
-import sphinx_substitution_extensions
 
 sys.path.insert(0, os.path.abspath('.'))
 
