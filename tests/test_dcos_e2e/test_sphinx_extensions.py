@@ -1,5 +1,5 @@
 """
-Tests for Sphinx version extensions.
+Tests for Sphinx extensions.
 """
 
 import subprocess
@@ -13,7 +13,7 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 import dcos_e2e
 
 
-def test_version_prompt(tmpdir: local) -> None:
+def test_smart_prompt(tmpdir: local) -> None:
     """
     The ``smart-prompt`` directive replaces the placeholders defined in
     ``conf.py`` as specified.
