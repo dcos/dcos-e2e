@@ -20,7 +20,7 @@ pyroma==2.4
 pytest-cov==2.6.0  # Measure code coverage
 pytest-timeout==1.3.2
 requests-mock==1.5.2
-sphinx-autodoc-typehints==1.4.0
+sphinx-autodoc-typehints==1.3.0
 sphinx-click==1.4.1
 sphinx-paramlinks==0.3.5
 sphinx-prompt==1.0.0
