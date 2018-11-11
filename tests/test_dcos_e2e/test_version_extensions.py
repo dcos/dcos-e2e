@@ -15,19 +15,28 @@ import dcos_e2e
 
 def test_version_prompt(tmpdir: local) -> None:
     """
-    The ``smart-prompt`` directive replaces the placeholder
-    ``|release|`` in a source file with the current installable version in
-    the output file.
+    The ``smart-prompt`` directive replaces the placeholders defined in
+    ``conf.py`` as specified.
     """
     version = dcos_e2e.__version__
     release = version.split('+')[0]
     source_directory = tmpdir.mkdir('source')
     source_file = source_directory.join('contents.rst')
+    conf_py = source_directory.join('conf.py')
+    conf_py_content = dedent(
+        """\
+        extensions = ['dcos_e2e._sphinx_extensions']
+        smart_prompt_placeholder_replace_pairs = (
+            ('|a|', 'example_substitution'),
+        )
+        """,
+    )
+    conf_py.write(conf_py_content)
     source_file_content = dedent(
         """\
         .. smart-prompt:: bash $
 
-           $ PRE-|release|-POST
+           $ PRE-|a|-POST
         """,
     )
     source_file.write(source_file_content)
@@ -36,10 +45,6 @@ def test_version_prompt(tmpdir: local) -> None:
         'sphinx-build',
         '-b',
         'html',
-        # Do not look for config file, use -D flags instead.
-        '-C',
-        '-D',
-        'extensions=dcos_e2e._sphinx_extensions',
         # Directory containing source and config files.
         str(source_directory),
         # Directory containing build files.
@@ -48,6 +53,6 @@ def test_version_prompt(tmpdir: local) -> None:
         str(source_file),
     ]
     subprocess.check_output(args=args)
-    expected = 'PRE-{release}-POST'.format(release=release)
+    expected = 'PRE-example_substitution-POST'.format(release=release)
     content_html = Path(str(destination_directory)) / 'contents.html'
     assert expected in content_html.read_text()
