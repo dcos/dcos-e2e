@@ -23,7 +23,7 @@ requests-mock==1.5.2
 sphinx-autodoc-typehints==1.3.0
 sphinx-click==1.4.1
 sphinx-paramlinks==0.3.5
-sphinx-prompt==1.0.0
+Sphinx-Substitution-Extensions==2018.11.12.1
 sphinxcontrib-spelling==4.2.0
 vendorize==0.1.0
 vulture==1.0
