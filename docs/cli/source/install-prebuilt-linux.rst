@@ -1,7 +1,7 @@
 Linux Packages
 ~~~~~~~~~~~~~~
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    # Install dcos-docker
    curl --fail -L https://github.com/|github-owner|/|github-repository|/releases/download/|release|/dcos-docker -o /usr/local/bin/dcos-docker && \

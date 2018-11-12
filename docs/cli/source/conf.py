@@ -38,7 +38,7 @@ version = dcos_e2e.__version__
 release = version.split('+')[0]
 autosectionlabel_prefix_document = True
 
-smart_prompt_placeholder_replace_pairs = (
+substitutions = (
     ('|release|', release),
     ('|github-owner|', 'dcos'),
     ('|github-repository|', 'dcos-e2e'),

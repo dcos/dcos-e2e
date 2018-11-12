@@ -15,7 +15,6 @@ env:
   - CI_PATTERN=tests/test_admin/test_brew.py
   - CI_PATTERN=tests/test_admin/test_binaries.py
   - CI_PATTERN=tests/test_cli
-  - CI_PATTERN=tests/test_dcos_e2e/test_sphinx_extensions.py
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported

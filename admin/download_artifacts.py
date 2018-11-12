@@ -55,8 +55,6 @@ PATTERNS = {
     (),
     'tests/test_admin/test_binaries.py':
     (),
-    'tests/test_dcos_e2e/test_sphinx_extensions.py':
-    (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults':
     (),
     'tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest':
