@@ -352,6 +352,39 @@ def _check_docker_supports_mounts() -> CheckLevels:
     return CheckLevels.NONE
 
 
+def _check_systemd() -> CheckLevels:
+    """
+    Check that the host supports systemd.
+
+    See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for removing the need
+    for this.
+    """
+    client = docker_client()
+    tiny_image = 'luca3m/sleep'
+    cgroup_mount = docker.types.Mount(
+        source='/sys/fs/cgroup/systemd',
+        target='/sys/fs/cgroup/systemd',
+        read_only=True,
+        type='bind',
+    )
+    try:
+        client.containers.run(
+            image=tiny_image,
+            mounts=[cgroup_mount],
+            detach=True,
+        )
+    except docker.errors.APIError as exc:
+        expected = (
+            'bind mount source path does not exist: /sys/fs/cgroup/systemd"'
+        )
+        if expected in str(exc):
+            message = 'systemd is required.'
+            error(message=message)
+            return CheckLevels.ERROR
+        raise
+    return CheckLevels.NONE
+
+
 def _check_can_build() -> CheckLevels:
     """
     Check that the default cluster images can be built.
@@ -432,7 +465,7 @@ def doctor(verbose: int) -> None:
     Diagnose common issues which stop this CLI from working correctly.
     """
     set_logging(verbosity_level=verbose)
-    check_functions = [
+    check_functions_no_cluster = [
         check_1_9_sed,
         _check_docker_root_free_space,
         _check_docker_supports_mounts,
@@ -443,11 +476,21 @@ def doctor(verbose: int) -> None:
         check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
-        # These two start ``Cluster``s, and so they come last.
+        _check_systemd,
+    ]
+
+    # Ideally no checks would create ``Cluster``s.
+    # Checks which do risk showing issues unrelated to what they mean to.
+    # We therefore run these last.
+    check_functions_cluster_needed = [
         _check_can_build,
         # This comes last because it depends on ``_check_can_build``.
         _check_can_mount_in_docker,
     ]
+
+    check_functions = (
+        check_functions_no_cluster + check_functions_cluster_needed
+    )
 
     run_doctor_commands(check_functions=check_functions)
     _link_to_troubleshooting()

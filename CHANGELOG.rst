@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Add a ``dcos-docker doctor`` check for systemd.
+
 2018.11.09.1
 ------------
 
