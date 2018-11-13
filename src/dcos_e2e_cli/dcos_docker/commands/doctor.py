@@ -382,6 +382,7 @@ def _check_systemd() -> CheckLevels:
             error(message=message)
             return CheckLevels.ERROR
         raise
+    return CheckLevels.NONE
 
 
 def _check_can_build() -> CheckLevels:
