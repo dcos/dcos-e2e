@@ -5,7 +5,7 @@ installer_url: https://downloads.dcos.io/dcos/testing/master/dcos_generate_confi
 platform: aws
 provider: onprem
 aws_region: us-west-2
-os_name: cent-os-7
+os_name: cent-os-7.4
 instance_type: m4.xlarge
 bootstrap_os_name: cent-os-7-dcos-prereqs
 bootstrap_instance_type: m4.xlarge
