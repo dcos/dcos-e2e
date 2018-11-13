@@ -89,20 +89,26 @@ def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
     """
     Run doctor commands.
     """
-    for function in check_functions:
-        try:
-            level = function()
-        except Exception as exc:  # pylint: disable=broad-except
-            message = (
-                'There was an unknown error when performing a doctor check.\n'
-                'The doctor function was "{doctor_function}".\n'
-                'The error was: "{exception}".'
-            ).format(
-                doctor_function=function.__name__,
-                exception=exc,
-            )
-            error(message=message)
-            sys.exit(1)
+    with click.progressbar(
+        iterable=check_functions,
+        show_pos=True,
+        show_eta=False,
+    ) as functions:
+        for function in functions:
+            try:
+                level = function()
+            except Exception as exc:  # pylint: disable=broad-except
+                message = (
+                    'There was an unknown error when performing a doctor '
+                    'check.\n'
+                    'The doctor function was "{doctor_function}".\n'
+                    'The error was: "{exception}".'
+                ).format(
+                    doctor_function=function.__name__,
+                    exception=exc,
+                )
+                error(message=message)
+                sys.exit(1)
 
-        if level == CheckLevels.ERROR:
-            sys.exit(1)
+            if level == CheckLevels.ERROR:
+                sys.exit(1)
