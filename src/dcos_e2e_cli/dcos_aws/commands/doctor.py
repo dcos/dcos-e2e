@@ -17,4 +17,4 @@ def doctor(verbose: int) -> None:
     """
     set_logging(verbosity_level=verbose)
     check_functions = [check_ssh]
-    run_doctor_commands(commands=check_functions)
+    run_doctor_commands(check_functions=check_functions)

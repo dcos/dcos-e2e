@@ -84,4 +84,4 @@ def doctor(verbose: int) -> None:
         check_vagrant_plugins,
     ]
 
-    run_doctor_commands(commands=check_functions)
+    run_doctor_commands(check_functions=check_functions)
