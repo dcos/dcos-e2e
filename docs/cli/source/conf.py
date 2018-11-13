@@ -38,12 +38,12 @@ version = dcos_e2e.__version__
 release = version.split('+')[0]
 autosectionlabel_prefix_document = True
 
-substitutions = (
+substitutions = [
     ('|release|', release),
     ('|github-owner|', 'dcos'),
     ('|github-repository|', 'dcos-e2e'),
     ('|brewfile-stem|', 'dcose2e'),
-)
+]
 
 language = None
 
