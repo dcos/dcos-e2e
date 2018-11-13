@@ -359,6 +359,27 @@ def _check_systemd() -> CheckLevels:
     See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for removing the need
     for this.
     """
+    client = docker_client()
+    tiny_image = 'luca3m/sleep'
+    cgroup_mount = docker.types.Mount(
+        source='/sys/fs/cgroup/systemd',
+        target='/sys/fs/cgroup/systemd',
+        read_only=True,
+        type='bind',
+    )
+    try:
+        container = client.containers.run(
+            image=tiny_image,
+            mounts=[cgroup_mount],
+            detach=True,
+        )
+    except docker.errors.APIError as exc:
+        print(exc.response.text)
+
+        import pdb; pdb.set_trace()
+        message = 'a'
+        error(message=message)
+        return CheckLevels.ERROR
 
 
 def _check_can_build() -> CheckLevels:
@@ -442,21 +463,21 @@ def doctor(verbose: int) -> None:
     """
     set_logging(verbosity_level=verbose)
     check_functions = [
-        check_1_9_sed,
-        _check_docker_root_free_space,
-        _check_docker_supports_mounts,
-        _check_memory,
-        _check_mount_tmp,
-        _check_networking,
-        _check_selinux,
-        check_ssh,
-        _check_storage_driver,
-        _check_tmp_free_space,
+        # check_1_9_sed,
+        # _check_docker_root_free_space,
+        # _check_docker_supports_mounts,
+        # _check_memory,
+        # _check_mount_tmp,
+        # _check_networking,
+        # _check_selinux,
+        # check_ssh,
+        # _check_storage_driver,
+        # _check_tmp_free_space,
         _check_systemd,
         # These two start ``Cluster``s, and so they come last.
-        _check_can_build,
-        # This comes last because it depends on ``_check_can_build``.
-        _check_can_mount_in_docker,
+        # _check_can_build,
+        # # This comes last because it depends on ``_check_can_build``.
+        # _check_can_mount_in_docker,
     ]
 
     run_doctor_commands(check_functions=check_functions)
