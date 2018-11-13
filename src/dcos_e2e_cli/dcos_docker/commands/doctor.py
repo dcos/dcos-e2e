@@ -368,7 +368,7 @@ def _check_systemd() -> CheckLevels:
         type='bind',
     )
     try:
-        container = client.containers.run(
+        client.containers.run(
             image=tiny_image,
             mounts=[cgroup_mount],
             detach=True,
@@ -464,23 +464,32 @@ def doctor(verbose: int) -> None:
     Diagnose common issues which stop this CLI from working correctly.
     """
     set_logging(verbosity_level=verbose)
-    check_functions = [
-        # check_1_9_sed,
-        # _check_docker_root_free_space,
-        # _check_docker_supports_mounts,
-        # _check_memory,
-        # _check_mount_tmp,
-        # _check_networking,
-        # _check_selinux,
-        # check_ssh,
-        # _check_storage_driver,
-        # _check_tmp_free_space,
+    check_functions_no_cluster = [
+        check_1_9_sed,
+        _check_docker_root_free_space,
+        _check_docker_supports_mounts,
+        _check_memory,
+        _check_mount_tmp,
+        _check_networking,
+        _check_selinux,
+        check_ssh,
+        _check_storage_driver,
+        _check_tmp_free_space,
         _check_systemd,
-        # These two start ``Cluster``s, and so they come last.
-        # _check_can_build,
-        # # This comes last because it depends on ``_check_can_build``.
-        # _check_can_mount_in_docker,
     ]
+
+    # Ideally no checks would create ``Cluster``s.
+    # Checks which do risk showing issues unrelated to what they mean to.
+    # We therefore run these last.
+    check_functions_cluster_needed = [
+        _check_can_build,
+        # This comes last because it depends on ``_check_can_build``.
+        _check_can_mount_in_docker,
+    ]
+
+    check_functions = (
+        check_functions_no_cluster + check_functions_cluster_needed
+    )
 
     run_doctor_commands(check_functions=check_functions)
     _link_to_troubleshooting()
