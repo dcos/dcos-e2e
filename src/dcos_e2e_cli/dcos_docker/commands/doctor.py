@@ -374,12 +374,14 @@ def _check_systemd() -> CheckLevels:
             detach=True,
         )
     except docker.errors.APIError as exc:
-        print(exc.response.text)
-
-        import pdb; pdb.set_trace()
-        message = 'a'
-        error(message=message)
-        return CheckLevels.ERROR
+        expected = (
+            'bind mount source path does not exist: /sys/fs/cgroup/systemd"'
+        )
+        if expected in str(exc):
+            message = 'systemd is required.'
+            error(message=message)
+            return CheckLevels.ERROR
+        raise
 
 
 def _check_can_build() -> CheckLevels:
