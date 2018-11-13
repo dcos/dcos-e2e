@@ -450,5 +450,5 @@ def doctor(verbose: int) -> None:
         _check_can_mount_in_docker,
     ]
 
-    run_doctor_commands(commands=check_functions)
+    run_doctor_commands(check_functions=check_functions)
     _link_to_troubleshooting()
