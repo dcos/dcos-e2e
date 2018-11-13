@@ -4,7 +4,6 @@ Checks for showing up common sources of errors with the Docker backend.
 
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
@@ -20,6 +19,7 @@ from dcos_e2e_cli.common.doctor import (
     check_ssh,
     error,
     info,
+    run_doctor_commands,
     warn,
 )
 from dcos_e2e_cli.common.options import verbosity_option
@@ -61,6 +61,7 @@ def _check_docker_root_free_space() -> CheckLevels:
     """
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
+    raise Exception('foo')
     tiny_image = 'luca3m/sleep'
     client = docker_client()
     container = client.containers.run(
@@ -449,9 +450,5 @@ def doctor(verbose: int) -> None:
         _check_can_mount_in_docker,
     ]
 
-    for function in check_functions:
-        level = function()
-        if level == CheckLevels.ERROR:
-            sys.exit(1)
-
+    run_doctor_commands(commands=check_functions)
     _link_to_troubleshooting()
