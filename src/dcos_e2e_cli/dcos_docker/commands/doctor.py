@@ -352,6 +352,15 @@ def _check_docker_supports_mounts() -> CheckLevels:
     return CheckLevels.NONE
 
 
+def _check_systemd() -> CheckLevels:
+    """
+    Check that the host supports systemd.
+
+    See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for removing the need
+    for this.
+    """
+
+
 def _check_can_build() -> CheckLevels:
     """
     Check that the default cluster images can be built.
@@ -443,6 +452,7 @@ def doctor(verbose: int) -> None:
         check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
+        _check_systemd,
         # These two start ``Cluster``s, and so they come last.
         _check_can_build,
         # This comes last because it depends on ``_check_can_build``.
