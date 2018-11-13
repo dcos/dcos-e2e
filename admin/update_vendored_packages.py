@@ -44,14 +44,14 @@ def main() -> None:
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
         https_address='https://github.com/dcos/dcos-launch',
-        git_reference='2442b5246684c0663162e51136b2fe7a5c7ef3e1',
+        git_reference='5bd3142061b774b5b17340a65150b19cea87d6a4',
     )
 
     test_utils = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_test_utils',
         https_address='https://github.com/dcos/dcos-test-utils',
-        git_reference='5361c8623cd0751f9312cf79b66dde6f09da1e74',
+        git_reference='431c33756ab2959b2fcb658bca861314497f7c0d',
     )
 
     vertigo_e2e = _Requirement(
