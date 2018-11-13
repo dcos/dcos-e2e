@@ -61,7 +61,6 @@ def _check_docker_root_free_space() -> CheckLevels:
     """
     # Any image will do, we use this for another test so using it here saves
     # pulling another image.
-    raise Exception('foo')
     tiny_image = 'luca3m/sleep'
     client = docker_client()
     container = client.containers.run(
