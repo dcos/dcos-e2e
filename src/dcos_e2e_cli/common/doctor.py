@@ -92,7 +92,7 @@ def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
     for function in check_functions:
         try:
             level = function()
-        except Exception as exc:
+        except Exception as exc:  # pylint: disable=broad-except
             message = (
                 'There was an unknown error when performing a doctor check.\n'
                 'The doctor function was "{doctor_function}".\n'
