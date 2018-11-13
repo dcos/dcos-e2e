@@ -39,11 +39,11 @@ author = 'Adam Dangoor'
 version = dcos_e2e.__version__
 release = version.split('+')[0]
 
-substitutions = (
+substitutions = [
     ('|release|', release),
     ('|github-owner|', 'dcos'),
     ('|github-repository|', 'dcos-e2e'),
-)
+]
 
 language = None
 
