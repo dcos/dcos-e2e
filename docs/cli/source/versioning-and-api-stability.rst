@@ -31,7 +31,7 @@ Modify the installer
 
 The following command replaces an installer named :file:`dcos_generate_config.sh` with a slightly different installer that works with the default ``sed`` on macOS.
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    sed \
        -e 'H;1h;$!d;x' \
@@ -46,7 +46,7 @@ It is possible to use unmodified installers if we use ``GNU sed`` as the system'
 This may have unforeseen side-effects.
 This requires `Homebrew`_ to be installed.
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    brew install gnu-sed --with-default-names
 

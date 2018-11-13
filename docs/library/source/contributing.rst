@@ -13,45 +13,45 @@ Install Contribution Dependencies
 
 On Ubuntu, install system requirements:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    apt install -y gcc python3-dev
 
 Install dependencies in a virtual environment.
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     pip3 install --editable .[dev]
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     gem install travis --no-rdoc --no-ri
 
 Spell checking requires ``enchant``.
 This can be installed on macOS, for example, with `Homebrew`_:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     brew install enchant
 
 and on Ubuntu with ``apt``:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     apt install -y enchant
 
 Linting Bash requires `shellcheck`_:
 This can be installed on macOS, for example, with `Homebrew`_:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     brew install shellcheck
 
 and on Ubuntu with ``apt``:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     apt-get install -y shellcheck
 
@@ -62,19 +62,19 @@ Linting
 
 Run lint tools:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     make lint
 
 These can be run in parallel with:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    make lint --jobs --output-sync=target
 
 To fix some lint errors, run the following:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     make fix-lint
 
@@ -87,7 +87,7 @@ See the :doc:`AWS backend documentation <aws-backend>` for details of what is ne
 
 To run the full test suite, set environment variables for DC/OS Enterprise artifact URLs:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    export EE_MASTER_ARTIFACT_URL=https://...
    export EE_1_9_ARTIFACT_URL=https://...
@@ -96,26 +96,26 @@ To run the full test suite, set environment variables for DC/OS Enterprise artif
 
 Download dependencies which are used by the tests:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    python admin/download_artifacts.py
 
 A license key is required for some tests:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     cp /path/to/license-key.txt /tmp/license-key.txt
 
 Run ``pytest``:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     pytest
 
 To run the tests concurrently, use `pytest-xdist <https://github.com/pytest-dev/pytest-xdist>`__.
 For example:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     pytest -n 2
 
@@ -124,7 +124,7 @@ Documentation
 
 Run the following commands to build and open the documentation:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     make docs
     make open-docs
@@ -159,7 +159,7 @@ We do not use `encrypted secret files <https://docs.travis-ci.com/user/encryptin
 
 We do not add an encrypted environment variable to ``.travis.yml`` because the license is too large.
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     travis env set --repo |github-owner|/|github-repository| LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
 
@@ -175,7 +175,7 @@ To update these links use the following commands, after setting the following en
 * ``EE_1_10_ARTIFACT_URL``
 * ``EE_1_11_ARTIFACT_URL``
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     travis env set --repo |github-owner|/|github-repository| EE_MASTER_ARTIFACT_URL $EE_MASTER_ARTIFACT_URL
     travis env set --repo |github-owner|/|github-repository| EE_1_9_ARTIFACT_URL $EE_1_9_ARTIFACT_URL
@@ -192,7 +192,7 @@ To update the credentials use the following commands, after setting the followin
 * ``AWS_ACCESS_KEY_ID``
 * ``AWS_SECRET_ACCESS_KEY``
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     travis env set --repo |github-owner|/|github-repository| AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
     travis env set --repo |github-owner|/|github-repository| AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
@@ -258,7 +258,7 @@ Update the SHAs in ``admin/update_vendored_packages.py``.
 
 The following creates a commit with changes to the vendored packages:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    admin/update_vendored_packages.sh
 

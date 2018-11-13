@@ -16,7 +16,7 @@ It is recommended to use the environment variables method for AWS credentials in
 
 The environment variables are set as follows:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    export AWS_ACCESS_KEY_ID=<aws_access_key_id>
    export AWS_SECRET_ACCESS_KEY=<aws_secret_access_key>

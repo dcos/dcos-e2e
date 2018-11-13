@@ -6,24 +6,24 @@ To avoid interfering with your system's Python, we recommend using a `virtualenv
 
 Check the Python version:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    python3 --version
 
 On Fedora, install Python development requirements:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    sudo dnf install -y git python3-devel
 
 On Ubuntu, install Python development requirements:
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
    apt install -y gcc python3-dev
 
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
-.. smart-prompt:: bash
+.. substitution-prompt:: bash
 
     pip3 install --upgrade git+https://github.com/|github-owner|/|github-repository|.git@|release|

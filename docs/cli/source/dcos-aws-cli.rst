@@ -8,7 +8,7 @@ The :ref:`dcos-aws-cli:minidcos aws` CLI allows you to create and manage open so
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
-.. smart-prompt:: bash $,# auto
+.. substitution-prompt:: bash $,# auto
 
    # Fix issues shown by minidcos aws doctor
    $ minidcos aws doctor
@@ -58,7 +58,7 @@ Ask your sales representative for DC/OS Enterprise release artifacts.
 
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 
-.. smart-prompt:: bash $,# auto
+.. substitution-prompt:: bash $,# auto
 
    $ minidcos aws create $DCOS_ENTERPRISE_URL \
         --variant enterprise \
@@ -89,7 +89,7 @@ Running commands on a cluster node using :ref:`dcos-aws-cli:run`
 
 It is possible to run the following to run a command on an arbitrary master node.
 
-.. smart-prompt:: bash $,# auto
+.. substitution-prompt:: bash $,# auto
 
    $ minidcos aws run systemctl list-units
 
@@ -109,7 +109,7 @@ To do this, you can use any of the ways of :ref:`running-commands`.
 
 For example, to use :ref:`dcos-aws-cli:run` to run ``bash`` to get on to an arbitrary master node:
 
-.. smart-prompt:: bash $,# auto
+.. substitution-prompt:: bash $,# auto
 
    $ minidcos aws run bash
 
@@ -125,7 +125,7 @@ The :ref:`dcos-aws-cli:run` command is useful for running integration tests.
 
 To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
 
-.. smart-prompt:: bash $,# auto
+.. substitution-prompt:: bash $,# auto
 
    $ minidcos aws create \
         --variant oss \
@@ -172,7 +172,7 @@ It is possible to use :ref:`dcos-aws-cli:create` to create a cluster with a cust
 
 #. Create a cluster.
 
-   .. smart-prompt:: bash $,# auto
+   .. substitution-prompt:: bash $,# auto
 
       $ minidcos aws create \
           $DCOS_ENTERPRISE_URL \

@@ -14,8 +14,7 @@ import dcos_e2e
 sys.path.insert(0, os.path.abspath('.'))
 
 extensions = [
-    'dcos_e2e._sphinx_extensions',
-    'sphinx-prompt',
+    'sphinx_substitution_extensions',
     'sphinx.ext.autodoc',
     'sphinx.ext.extlinks',
     'sphinx_click.ext',
@@ -39,7 +38,7 @@ version = dcos_e2e.__version__
 release = version.split('+')[0]
 autosectionlabel_prefix_document = True
 
-smart_prompt_placeholder_replace_pairs = (
+substitutions = (
     ('|release|', release),
     ('|github-owner|', 'dcos'),
     ('|github-repository|', 'dcos-e2e'),
