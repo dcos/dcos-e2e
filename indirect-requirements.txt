@@ -18,3 +18,7 @@ SecretStorage==3.1.0
 # Requirements from DC/OS Launch
 azure-mgmt-network==2.2.1
 azure-mgmt-resource==2.0.0
+# Pin requirement for ``msrest`` to avoid
+# https://github.com/Azure/msrest-for-python/issues/128
+# which interferes with documentation building, at least.
+msrest==0.4.29
