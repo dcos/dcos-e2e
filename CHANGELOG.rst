@@ -7,6 +7,7 @@ Next
 ----
 
 - Add a ``dcos-docker doctor`` check for systemd.
+- Add a progress bar for ``doctor`` commands.
 
 2018.11.09.1
 ------------

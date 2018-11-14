@@ -28,27 +28,27 @@ def info(message: str) -> None:
     """
     Show an info message.
     """
-    click.echo()
-    click.echo(click.style('Note: ', fg='blue'), nl=False)
-    click.echo(message)
+    tqdm.write(s='')
+    string = click.style('Note: ', fg='bright_green', bold=True) + message
+    tqdm.write(s=string)
 
 
 def warn(message: str) -> None:
     """
     Show a warning message.
     """
-    click.echo()
-    click.echo(click.style('Warning: ', fg='yellow'), nl=False)
-    click.echo(message)
+    tqdm.write(s='')
+    string = click.style('Warning: ', fg='yellow', bold=True) + message
+    tqdm.write(s=string)
 
 
 def error(message: str) -> None:
     """
     Show an error message.
     """
-    click.echo()
-    click.echo(click.style('Error: ', fg='red'), nl=False)
-    click.echo(message)
+    tqdm.write(s='')
+    string = click.style('Error: ', fg='red', bold=True) + message
+    tqdm.write(s=string)
 
 
 def check_1_9_sed() -> CheckLevels:
