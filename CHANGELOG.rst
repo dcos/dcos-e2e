@@ -8,6 +8,7 @@ Next
 
 - Backwards incompatible change: Changed CLI commands from ``dcos-docker`` to ``minidcos docker`` and alike.
 - Add a ``dcos-docker doctor`` check for systemd.
+- Add a progress bar for ``doctor`` commands.
 
 2018.11.09.1
 ------------
