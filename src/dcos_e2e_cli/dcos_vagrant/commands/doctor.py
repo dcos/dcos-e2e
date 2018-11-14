@@ -3,7 +3,6 @@ Checks for showing up common sources of errors with the Vagrant backend.
 """
 
 import shutil
-import sys
 
 import click
 import docker
@@ -13,6 +12,7 @@ from dcos_e2e_cli.common.doctor import (
     check_1_9_sed,
     check_ssh,
     error,
+    run_doctor_commands,
     warn,
 )
 from dcos_e2e_cli.common.options import verbosity_option
@@ -84,7 +84,4 @@ def doctor(verbose: int) -> None:
         check_vagrant_plugins,
     ]
 
-    for function in check_functions:
-        level = function()
-        if level == CheckLevels.ERROR:
-            sys.exit(1)
+    run_doctor_commands(check_functions=check_functions)

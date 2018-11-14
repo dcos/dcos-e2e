@@ -4,9 +4,11 @@ Common helpers for doctor commands.
 
 import shutil
 import subprocess
+import sys
 import tempfile
 from enum import IntEnum
 from pathlib import Path
+from typing import Callable, List
 
 import click
 
@@ -80,3 +82,33 @@ def check_ssh() -> CheckLevels:
         error(message='`ssh` must be available on the PATH.')
         return CheckLevels.ERROR
     return CheckLevels.NONE
+
+
+def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
+                        ) -> None:
+    """
+    Run doctor commands.
+    """
+    with click.progressbar(
+        iterable=check_functions,
+        show_pos=True,
+        show_eta=False,
+    ) as functions:
+        for function in functions:
+            try:
+                level = function()
+            except Exception as exc:  # pylint: disable=broad-except
+                message = (
+                    'There was an unknown error when performing a doctor '
+                    'check.\n'
+                    'The doctor function was "{doctor_function}".\n'
+                    'The error was: "{exception}".'
+                ).format(
+                    doctor_function=function.__name__,
+                    exception=exc,
+                )
+                error(message=message)
+                sys.exit(1)
+
+            if level == CheckLevels.ERROR:
+                sys.exit(1)
