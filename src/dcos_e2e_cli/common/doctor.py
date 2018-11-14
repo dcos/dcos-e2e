@@ -10,7 +10,6 @@ from enum import IntEnum
 from pathlib import Path
 from typing import Callable, List
 
-import click
 from tqdm import tqdm
 
 
@@ -28,27 +27,24 @@ def info(message: str) -> None:
     """
     Show an info message.
     """
-    click.echo()
-    click.echo(click.style('Note: ', fg='blue'), nl=False)
-    click.echo(message)
+    tqdm.write(s='')
+    tqdm.write(s='Note: ' + message)
 
 
 def warn(message: str) -> None:
     """
     Show a warning message.
     """
-    click.echo()
-    click.echo(click.style('Warning: ', fg='yellow'), nl=False)
-    click.echo(message)
+    tqdm.write(s='')
+    tqdm.write(s='Warning: ' + message)
 
 
 def error(message: str) -> None:
     """
     Show an error message.
     """
-    click.echo()
-    click.echo(click.style('Error: ', fg='red'), nl=False)
-    click.echo(message)
+    tqdm.write(s='')
+    tqdm.write(s='Error: ' + message)
 
 
 def check_1_9_sed() -> CheckLevels:
