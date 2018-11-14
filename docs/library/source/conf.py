@@ -8,6 +8,9 @@ Configuration for Sphinx.
 
 import os
 import sys
+import typing
+
+from sphinx.application import Sphinx
 
 import dcos_e2e
 
@@ -119,3 +122,19 @@ rst_epilog = """
 .. |github-owner| replace:: dcos
 .. |github-repository| replace:: dcos-e2e
 """.format(project=project)
+
+
+def setup(app: Sphinx) -> None:
+    """
+    Set TYPE_CHECKING to False.
+    This works around https://github.com/Azure/msrest-for-python/issues/128.
+    ``sphinx_autodoc_typehints`` sets this variable to ``True``.
+    """
+    typing.TYPE_CHECKING = True
+    try:
+        pass
+    except ImportError:
+        typing.TYPE_CHECKING = False
+    else:
+        message = 'Remove workaround here for issue which no longer exists.'
+        raise Exception(message)
