@@ -161,7 +161,7 @@ def _download_file(url: str, path: Path) -> None:
     """
     Download a file to a given path.
     """
-    label = 'Downloading to ' + str(path)
+    print('Downloading to {path}.'.format(path=path))
     stream = requests.get(url, stream=True)
     assert stream.ok
     content_length = int(stream.headers['Content-Length'])
