@@ -69,24 +69,30 @@ def download_artifact(
     chunk_size = 1024
     # See http://click.pocoo.org/7/arguments/#file-args for parameter
     # information.
+    content_iter = stream.iter_content(chunk_size=chunk_size)
+    bar_format = '{l_bar}{bar}'
+    progress_bar = tqdm(
+        iterable=content_iter,
+        total=content_length / chunk_size,
+        dynamic_ncols=True,
+        bar_format=bar_format,
+        unit_scale=None,
+    )
     with click.open_file(
         filename=str(path),
         mode='wb',
         atomic=True,
         lazy=True,
     ) as file_descriptor:
-        content_iter = stream.iter_content(chunk_size=chunk_size)
-        bar_format = '{l_bar}{bar}'
-        for chunk in tqdm(
-            iterable=content_iter,
-            total=content_length / chunk_size,
-            ncols=30,
-            bar_format=bar_format,
-        ):
+        for chunk in progress_bar:
+            # Enable at the start of each chunk, disable at the end, to avoid
+            # showing statistics at the end.
+            progress_bar.disable = False
             # Filter out keep-alive new chunks.
             if chunk:
                 total_written += len(chunk)
                 file_descriptor.write(chunk)  # type: ignore
+            progress_bar.disable = True
 
     message = (
         'Downloaded {total_written} bytes. '
