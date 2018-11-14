@@ -1,5 +1,5 @@
 """
-Tests for the MiniDC/OS CLI.
+Tests for the miniDC/OS CLI.
 """
 
 import os

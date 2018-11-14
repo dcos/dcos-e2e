@@ -30,7 +30,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 
-project = 'MiniDC/OS'
+project = 'miniDC/OS'
 copyright = '2018, Adam Dangoor'  # pylint: disable=redefined-builtin
 author = 'Adam Dangoor'
 
