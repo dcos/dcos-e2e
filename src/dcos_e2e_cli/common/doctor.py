@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Callable, List
 
 import click
+from tqdm import tqdm
 
 
 class CheckLevels(IntEnum):
@@ -89,26 +90,32 @@ def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
     """
     Run doctor commands.
     """
-    with click.progressbar(
+    progress_bar = tqdm(
         iterable=check_functions,
-        show_pos=True,
-        show_eta=False,
-    ) as functions:
-        for function in functions:
-            try:
-                level = function()
-            except Exception as exc:  # pylint: disable=broad-except
-                message = (
-                    'There was an unknown error when performing a doctor '
-                    'check.\n'
-                    'The doctor function was "{doctor_function}".\n'
-                    'The error was: "{exception}".'
-                ).format(
-                    doctor_function=function.__name__,
-                    exception=exc,
-                )
-                error(message=message)
-                sys.exit(1)
+        dynamic_ncols=True,
+        bar_format='{l_bar}{bar}',
+        unit_scale=None,
+    )
 
-            if level == CheckLevels.ERROR:
-                sys.exit(1)
+    for function in progress_bar:
+        # Enable at the start of each chunk, disable at the end, to avoid
+        # showing statistics at the end.
+        progress_bar.disable = False
+        try:
+            level = function()
+        except Exception as exc:  # pylint: disable=broad-except
+            message = (
+                'There was an unknown error when performing a doctor '
+                'check.\n'
+                'The doctor function was "{doctor_function}".\n'
+                'The error was: "{exception}".'
+            ).format(
+                doctor_function=function.__name__,
+                exception=exc,
+            )
+            error(message=message)
+            sys.exit(1)
+
+        if level == CheckLevels.ERROR:
+            sys.exit(1)
+        progress_bar.disable = True
