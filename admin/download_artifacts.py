@@ -9,6 +9,7 @@ from typing import Tuple  # noqa: F401
 
 import click
 import requests
+from tqdm import tqdm
 
 OSS_PATTERN = (
     'https://downloads.dcos.io/dcos/testing/{version}/dcos_generate_config.sh'
@@ -168,23 +169,29 @@ def _download_file(url: str, path: Path) -> None:
     chunk_size = 1024
     # See http://click.pocoo.org/6/arguments/#file-args for parameter
     # information
+    content_iter = stream.iter_content(chunk_size=chunk_size)
+    progress_bar = tqdm(
+        iterable=content_iter,
+        total=content_length / chunk_size,
+        dynamic_ncols=True,
+        bar_format='{l_bar}{bar}',
+        unit_scale=None,
+    )
     with click.open_file(
         filename=str(path),
         mode='wb',
         atomic=True,
         lazy=True,
     ) as file_descriptor:
-        content_iter = stream.iter_content(chunk_size=chunk_size)
-        with click.progressbar(  # type: ignore
-            content_iter,
-            length=content_length / chunk_size,
-            label=label,
-        ) as progress_bar:
-            for chunk in progress_bar:
-                # Filter out keep-alive new chunks.
-                if chunk:
-                    total_written += len(chunk)
-                    file_descriptor.write(chunk)  # type: ignore
+        for chunk in progress_bar:
+            # Enable at the start of each chunk, disable at the end, to avoid
+            # showing statistics at the end.
+            progress_bar.disable = False
+            # Filter out keep-alive new chunks.
+            if chunk:
+                total_written += len(chunk)
+                file_descriptor.write(chunk)  # type: ignore
+            progress_bar.disable = True
 
     message = (
         'Downloaded {total_written} bytes. '
