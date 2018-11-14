@@ -70,12 +70,11 @@ def download_artifact(
     # See http://click.pocoo.org/7/arguments/#file-args for parameter
     # information.
     content_iter = stream.iter_content(chunk_size=chunk_size)
-    bar_format = '{l_bar}{bar}'
     progress_bar = tqdm(
         iterable=content_iter,
         total=content_length / chunk_size,
         dynamic_ncols=True,
-        bar_format=bar_format,
+        bar_format='{l_bar}{bar}',
         unit_scale=None,
     )
     with click.open_file(
