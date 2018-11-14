@@ -130,9 +130,16 @@ def setup(app: Sphinx) -> None:
     This works around https://github.com/Azure/msrest-for-python/issues/128.
     ``sphinx_autodoc_typehints`` sets this variable to ``True``.
     """
+    # We "use" the "app" variable to satisfy linting tools.
+    for _ in (app, ):
+        pass
+
     typing.TYPE_CHECKING = True
     try:
-        pass
+        import msrest
+        # We "use" the msrest variable so it is not removed by linters.
+        for _ in (msrest, ):
+            pass
     except ImportError:
         typing.TYPE_CHECKING = False
     else:
