@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 import requests
+from tqdm import tqdm
 
 
 @click.command('download-artifact')
@@ -44,7 +45,7 @@ def download_artifact(
     For DC/OS Enterprise release artifacts, contact your sales representative.
     """
     path = Path(download_path).resolve()
-    label = 'Downloading to ' + str(path)
+    click.echo('Downloading to {path}.'.format(path=path))
     base_url = 'https://downloads.dcos.io/dcos/'
     url = base_url + dcos_version + '/dcos_generate_config.sh'
     head_resp = requests.head(url)
@@ -75,16 +76,17 @@ def download_artifact(
         lazy=True,
     ) as file_descriptor:
         content_iter = stream.iter_content(chunk_size=chunk_size)
-        with click.progressbar(  # type: ignore
-            content_iter,
-            length=content_length / chunk_size,
-            label=label,
-        ) as progress_bar:
-            for chunk in progress_bar:
-                # Filter out keep-alive new chunks.
-                if chunk:
-                    total_written += len(chunk)
-                    file_descriptor.write(chunk)  # type: ignore
+        bar_format = '{l_bar}{bar}'
+        for chunk in tqdm(
+            iterable=content_iter,
+            total=content_length / chunk_size,
+            ncols=30,
+            bar_format=bar_format,
+        ):
+            # Filter out keep-alive new chunks.
+            if chunk:
+                total_written += len(chunk)
+                file_descriptor.write(chunk)  # type: ignore
 
     message = (
         'Downloaded {total_written} bytes. '
