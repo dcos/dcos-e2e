@@ -791,6 +791,9 @@ class TestOutput:
         messages = set([first_log.message, second_log.message])
         assert messages == expected_messages
 
+    def test_not_utf_8():
+        pass
+
     def test_no_capture(
         self,
         capfd: CaptureFixture,
