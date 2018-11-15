@@ -5,6 +5,7 @@ See ``test_node_install.py`` for more, related tests.
 """
 
 import logging
+import os
 import subprocess
 import sys
 import textwrap
@@ -29,8 +30,14 @@ from dcos_e2e.node import Node, Output, Transport
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
 
+# Set TEST_ONE_TRANSPORT=1 to run these tests with just one transport.
+# This can be useful during development for transport-agnostic testing.
+_TRANSPORTS = [
+    Transport.DOCKER_EXEC
+] if os.getenv('TEST_ONE_TRANSPORT') == '1' else list(Transport)
 
-@pytest.fixture(scope='module', params=list(Transport))
+
+@pytest.fixture(scope='module', params=_TRANSPORTS)
 def dcos_node(request: SubRequest) -> Iterator[Node]:
     """
     Return a ``Node``.
