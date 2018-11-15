@@ -43,6 +43,21 @@ def get_logger(name: str) -> logging.Logger:
 LOGGER = get_logger(__name__)
 
 
+def _safe_decode(output_bytes: bytes) -> str:
+    """
+    XXX
+    """
+    try:
+        return output_bytes.decode(
+            encoding='utf-8',
+            errors='strict',
+        )
+    except UnicodeDecodeError:
+        return output_bytes.decode(
+            encoding='ascii',
+            errors='backslashreplace',
+        )
+
 def run_subprocess(
     args: List[str],
     log_output_live: bool,
@@ -94,10 +109,7 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    log_message = line.rstrip().decode(
-                        encoding='utf-8',
-                        errors='strict',
-                    )
+                    pass
                     LOGGER.debug(log_message)
                     stdout += line
                 # stderr/stdout are not readable anymore which usually means
@@ -121,10 +133,16 @@ def run_subprocess(
             else:
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
-                log_message = line.rstrip().decode(
-                    encoding='utf-8',
-                    errors='strict',
-                )
+                try:
+                    log_message = line.rstrip().decode(
+                        encoding='utf-8',
+                        errors='strict',
+                    )
+                except:
+                    log_message = line.rstrip().decode(
+                        encoding='ascii',
+                        errors='backslashreplace',
+                    )
                 log(log_message)
         if process.returncode != 0:
             raise subprocess.CalledProcessError(

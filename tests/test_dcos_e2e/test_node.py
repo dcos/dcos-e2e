@@ -15,6 +15,7 @@ from pathlib import Path
 from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
 
+import chardet
 import pytest
 from _pytest.capture import CaptureFixture
 from _pytest.fixtures import SubRequest
@@ -791,8 +792,38 @@ class TestOutput:
         messages = set([first_log.message, second_log.message])
         assert messages == expected_messages
 
-    def test_not_utf_8():
-        pass
+    def test_not_utf_8_log_and_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+    ) -> None:
+        """
+        """
+        # We expect that this will trigger a UnicodeDecodeError when run on a
+        # node, if the result is meant to be decoded with utf-8.
+        # It also is not so long that it will kill our terminal.
+        args = ['head', '-c', '100', '/bin/cat']
+        result = dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
+        # We do not test the output, but we at least test its length for now.
+        [log] = caplog.records
+        assert len(log.message) >= 100
+
+    def test_not_utf_8_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+    ) -> None:
+        """
+        """
+        # We expect that this will trigger a UnicodeDecodeError when run on a
+        # node, if the result is meant to be decoded with utf-8.
+        # It also is not so long that it will kill our terminal.
+        args = ['head', '-c', '100', '/bin/cat']
+        args = ['>&2'] + args
+        result = dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
+        args_log, result_log = caplog.records
+        # We do not test the output, but we at least test its length for now.
+        assert len(result_log.message) >= 100
 
     def test_no_capture(
         self,
