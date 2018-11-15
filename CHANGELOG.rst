@@ -8,6 +8,7 @@ Next
 
 - Add a ``dcos-docker doctor`` check for systemd.
 - Add a progress bar for ``doctor`` commands.
+- Log subprocess output unicode characters where possible.
 
 2018.11.09.1
 ------------
