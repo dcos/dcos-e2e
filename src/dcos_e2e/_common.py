@@ -45,7 +45,7 @@ LOGGER = get_logger(__name__)
 
 def _safe_decode(output_bytes: bytes) -> str:
     """
-    XXX
+    Decode a bytestring to Unicode with a safe fallback.
     """
     try:
         return output_bytes.decode(
@@ -109,7 +109,7 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    pass
+                    log_message = _safe_decode(line.rstrip())
                     LOGGER.debug(log_message)
                     stdout += line
                 # stderr/stdout are not readable anymore which usually means
@@ -133,16 +133,7 @@ def run_subprocess(
             else:
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
-                try:
-                    log_message = line.rstrip().decode(
-                        encoding='utf-8',
-                        errors='strict',
-                    )
-                except:
-                    log_message = line.rstrip().decode(
-                        encoding='ascii',
-                        errors='backslashreplace',
-                    )
+                log_message = _safe_decode(line.rstrip())
                 log(log_message)
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
