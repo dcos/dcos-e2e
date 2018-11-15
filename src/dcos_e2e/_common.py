@@ -58,6 +58,7 @@ def _safe_decode(output_bytes: bytes) -> str:
             errors='backslashreplace',
         )
 
+
 def run_subprocess(
     args: List[str],
     log_output_live: bool,

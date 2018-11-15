@@ -14,6 +14,7 @@ badparameter
 bilal
 bootstrap
 breakpoint
+bytestring
 calledprocesserror
 centos
 cgroups
