@@ -95,8 +95,8 @@ def run_subprocess(
                 stderr = b''
                 for line in process.stdout:
                     log_message = line.rstrip().decode(
-                        encoding='ascii',
-                        errors='backslashreplace',
+                        encoding='utf-8',
+                        errors='strict',
                     )
                     LOGGER.debug(log_message)
                     stdout += line
