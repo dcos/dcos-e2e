@@ -94,9 +94,11 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    LOGGER.debug(
-                        line.rstrip().decode('ascii', 'backslashreplace'),
+                    log_message = line.rstrip().decode(
+                        encoding='ascii',
+                        errors='backslashreplace',
                     )
+                    LOGGER.debug(log_message)
                     stdout += line
                 # stderr/stdout are not readable anymore which usually means
                 # that the child process has exited. However, the child
@@ -119,7 +121,11 @@ def run_subprocess(
             else:
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
-                log(line.rstrip().decode('ascii', 'backslashreplace'))
+                log_message = line.rstrip().decode(
+                    encoding='ascii',
+                    errors='backslashreplace',
+                )
+                log(log_message)
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
                 returncode=process.returncode,
