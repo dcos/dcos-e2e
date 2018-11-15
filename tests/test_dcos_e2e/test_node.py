@@ -725,10 +725,14 @@ class TestOutput:
         assert result_log.levelno == logging.WARNING
         assert result_log.message == stderr_message
 
+    @pytest.mark.parametrize('stdout_message', [uuid.uuid4().hex, 'å'], ids=['ascii', 'unicode'])
+    @pytest.mark.parametrize('stderr_message', [uuid.uuid4().hex, 'å'], ids=['ascii', 'unicode'])
     def test_capture(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
+        stdout_message: str,
+        stderr_message: str,
     ) -> None:
         """
         When given ``Output.CAPTURE``, stderr and stdout are captured in the
@@ -736,8 +740,6 @@ class TestOutput:
 
         stderr is logged.
         """
-        stdout_message = uuid.uuid4().hex
-        stderr_message = uuid.uuid4().hex
         args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
         result = dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
         assert result.stdout.strip().decode() == stdout_message

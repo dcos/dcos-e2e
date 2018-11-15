@@ -122,8 +122,8 @@ def run_subprocess(
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
                 log_message = line.rstrip().decode(
-                    encoding='ascii',
-                    errors='backslashreplace',
+                    encoding='utf-8',
+                    errors='strict',
                 )
                 log(log_message)
         if process.returncode != 0:
