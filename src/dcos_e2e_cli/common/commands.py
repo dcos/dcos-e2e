@@ -48,7 +48,7 @@ def download_artifact(
     """
     path = Path(download_path)
     path.parent.mkdir(exist_ok=True, parents=True)
-    path = path.resolve()
+    path = path.parent.resolve() / path.name
 
     click.echo('Downloading to {path}.'.format(path=path))
 
