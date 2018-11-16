@@ -124,8 +124,14 @@ def run_subprocess(
         except Exception:  # pragma: no cover
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
-            process.kill()
-            process.wait()
+
+            # Attempt to give the subprocess(es) a chance to terminate.
+            process.terminate()
+            try:
+                process.wait(1)
+            except subprocess.TimeoutExpired:
+                # If the process cannot terminate cleanly, we just kill it.
+                process.kill()
             raise
         if stderr:
             if process.returncode == 0:
