@@ -16,6 +16,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
     get_dcos_installer_details,
@@ -140,6 +142,12 @@ def show_wait_help(is_enterprise: bool, doctor_command_name: str) -> None:
     """
     Show a message useful for "wait" commands to warn the user of potential
     issues.
+
+    Args:
+        is_enterprise: Whether or not the cluster is a DC/OS Enterprise
+            cluster.
+        doctor_command_name: The full command path to a ``doctor`` command to
+            advise a user to use.
     """
     message = (
         'A cluster may take some time to be ready.\n'
@@ -158,3 +166,40 @@ def show_wait_help(is_enterprise: bool, doctor_command_name: str) -> None:
 
     if not is_enterprise:
         click.echo(no_login_message)
+
+
+def wait_for_dcos(
+    is_enterprise: bool,
+    cluster: Cluster,
+    superuser_username: str,
+    superuser_password: str,
+    http_checks: bool,
+) -> None:
+    """
+    Wait for DC/OS to start.
+
+    Args:
+        is_enterprise: Whether or not the cluster is a DC/OS Enterprise
+            cluster.
+        cluster: The cluster to wait for.
+        superuser_username: If the cluster is a DC/OS Enterprise cluster, use
+            this username to wait for DC/OS.
+        superuser_password: If the cluster is a DC/OS Enterprise cluster, use
+            this password to wait for DC/OS.
+        http_checks: Whether or not to wait for checks which require an HTTP
+            connection to the cluster.
+    """
+    with click_spinner.spinner():
+        try:
+            if is_enterprise:
+                cluster.wait_for_dcos_ee(
+                    superuser_username=superuser_username,
+                    superuser_password=superuser_password,
+                    http_checks=http_checks,
+                )
+                return
+
+            cluster.wait_for_dcos_oss(http_checks=http_checks)
+        except DCOSTimeoutError:
+            click.echo('Waiting for DC/OS to start timed out.', err=True)
+            sys.exit(1)

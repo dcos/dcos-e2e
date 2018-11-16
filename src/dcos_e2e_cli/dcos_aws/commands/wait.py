@@ -3,7 +3,6 @@ Tools for waiting for a cluster.
 """
 
 import click
-import click_spinner
 import urllib3
 
 from dcos_e2e_cli.common.options import (
@@ -16,6 +15,7 @@ from dcos_e2e_cli.common.utils import (
     check_cluster_id_exists,
     set_logging,
     show_wait_help,
+    wait_for_dcos,
 )
 
 from ._common import ClusterInstances, existing_cluster_ids
@@ -60,13 +60,10 @@ def wait(
         is_enterprise=cluster_instances.is_enterprise,
         doctor_command_name=doctor_command_name,
     )
-    with click_spinner.spinner():
-        if cluster_instances.is_enterprise:
-            cluster_instances.cluster.wait_for_dcos_ee(
-                superuser_username=superuser_username,
-                superuser_password=superuser_password,
-                http_checks=True,
-            )
-            return
-
-        cluster_instances.cluster.wait_for_dcos_oss(http_checks=True)
+    wait_for_dcos(
+        is_enterprise=cluster_instances.is_enterprise,
+        cluster=cluster_instances.cluster,
+        superuser_username=superuser_username,
+        superuser_password=superuser_password,
+        http_checks=True,
+    )
