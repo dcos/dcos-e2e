@@ -5,6 +5,7 @@ See ``test_node_install.py`` for more, related tests.
 """
 
 import logging
+import os
 import subprocess
 import sys
 import textwrap
@@ -29,8 +30,14 @@ from dcos_e2e.node import Node, Output, Transport
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
 
+# Set TEST_ONE_TRANSPORT=1 to run these tests with just one transport.
+# This can be useful during development for transport-agnostic testing.
+_TRANSPORTS = [
+    Transport.DOCKER_EXEC,
+] if os.getenv('TEST_ONE_TRANSPORT') == '1' else list(Transport)
 
-@pytest.fixture(scope='module', params=list(Transport))
+
+@pytest.fixture(scope='module', params=_TRANSPORTS)
 def dcos_node(request: SubRequest) -> Iterator[Node]:
     """
     Return a ``Node``.
@@ -718,10 +725,22 @@ class TestOutput:
         assert result_log.levelno == logging.WARNING
         assert result_log.message == stderr_message
 
+    @pytest.mark.parametrize(
+        'stdout_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    @pytest.mark.parametrize(
+        'stderr_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
     def test_capture(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
+        stdout_message: str,
+        stderr_message: str,
     ) -> None:
         """
         When given ``Output.CAPTURE``, stderr and stdout are captured in the
@@ -729,8 +748,6 @@ class TestOutput:
 
         stderr is logged.
         """
-        stdout_message = uuid.uuid4().hex
-        stderr_message = uuid.uuid4().hex
         args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
         result = dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
         assert result.stdout.strip().decode() == stdout_message
@@ -746,10 +763,22 @@ class TestOutput:
         assert result_log.levelno == logging.WARNING
         assert result_log.message == stderr_message
 
+    @pytest.mark.parametrize(
+        'stdout_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    @pytest.mark.parametrize(
+        'stderr_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
     def test_log_and_capture(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
+        stdout_message: str,
+        stderr_message: str,
     ) -> None:
         """
         When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
@@ -757,8 +786,6 @@ class TestOutput:
 
         stdout and stderr are logged.
         """
-        stdout_message = uuid.uuid4().hex
-        stderr_message = uuid.uuid4().hex
         args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
         result = dcos_node.run(
             args=args,
@@ -779,6 +806,43 @@ class TestOutput:
 
         messages = set([first_log.message, second_log.message])
         assert messages == expected_messages
+
+    def test_not_utf_8_log_and_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+    ) -> None:
+        """
+        It is possible to see output of commands which output non-utf-8
+        bytes using ``output.LOG_AND_CAPTURE``.
+        """
+        # We expect that this will trigger a UnicodeDecodeError when run on a
+        # node, if the result is meant to be decoded with utf-8.
+        # It also is not so long that it will kill our terminal.
+        args = ['head', '-c', '100', '/bin/cat']
+        dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
+        # We do not test the output, but we at least test its length for now.
+        [log] = caplog.records
+        assert len(log.message) >= 100
+
+    def test_not_utf_8_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+    ) -> None:
+        """
+        It is possible to capture output of commands which output non-utf-8
+        bytes using ``output.CAPTURE``.
+        """
+        # We expect that this will trigger a UnicodeDecodeError when run on a
+        # node, if the result is meant to be decoded with utf-8.
+        # It also is not so long that it will kill our terminal.
+        args = ['head', '-c', '100', '/bin/cat']
+        args = ['>&2'] + args
+        dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
+        _, result_log = caplog.records
+        # We do not test the output, but we at least test its length for now.
+        assert len(result_log.message) >= 100
 
     def test_no_capture(
         self,

@@ -43,6 +43,22 @@ def get_logger(name: str) -> logging.Logger:
 LOGGER = get_logger(__name__)
 
 
+def _safe_decode(output_bytes: bytes) -> str:
+    """
+    Decode a bytestring to Unicode with a safe fallback.
+    """
+    try:
+        return output_bytes.decode(
+            encoding='utf-8',
+            errors='strict',
+        )
+    except UnicodeDecodeError:
+        return output_bytes.decode(
+            encoding='ascii',
+            errors='backslashreplace',
+        )
+
+
 def run_subprocess(
     args: List[str],
     log_output_live: bool,
@@ -94,9 +110,8 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    LOGGER.debug(
-                        line.rstrip().decode('ascii', 'backslashreplace'),
-                    )
+                    log_message = _safe_decode(line.rstrip())
+                    LOGGER.debug(log_message)
                     stdout += line
                 # stderr/stdout are not readable anymore which usually means
                 # that the child process has exited. However, the child
@@ -119,7 +134,8 @@ def run_subprocess(
             else:
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
-                log(line.rstrip().decode('ascii', 'backslashreplace'))
+                log_message = _safe_decode(line.rstrip())
+                log(log_message)
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
                 returncode=process.returncode,

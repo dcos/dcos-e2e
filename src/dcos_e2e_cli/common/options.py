@@ -369,6 +369,7 @@ def test_env_run_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--test-env',
+        '-te',
         is_flag=True,
         help=(
             'With this flag set, environment variables are set and the '

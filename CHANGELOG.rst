@@ -9,6 +9,7 @@ Next
 - Backwards incompatible change: Changed CLI commands from ``dcos-docker`` to ``minidcos docker`` and alike.
 - Add a ``dcos-docker doctor`` check for systemd.
 - Add a progress bar for ``doctor`` commands.
+- Log subprocess output unicode characters where possible.
 
 2018.11.09.1
 ------------
