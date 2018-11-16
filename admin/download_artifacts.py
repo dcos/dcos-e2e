@@ -3,6 +3,7 @@ Download artifacts.
 """
 
 import os
+import subprocess
 from pathlib import Path
 from typing import Dict  # noqa: F401
 from typing import Tuple  # noqa: F401
@@ -168,7 +169,7 @@ def download_artifacts(test_pattern: str) -> None:
             '--dcos-version',
             url,
         ]
-        _download_file(url=url, path=path)
+        subprocess.check_output(args=args)
 
 
 if __name__ == '__main__':
