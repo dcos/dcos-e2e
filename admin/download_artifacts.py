@@ -157,59 +157,21 @@ PATTERNS = {
 }  # type: Dict[str, Tuple]
 
 
-def _download_file(url: str, path: Path) -> None:
-    """
-    Download a file to a given path.
-    """
-    print('Downloading to {path}.'.format(path=path))
-    stream = requests.get(url, stream=True)
-    assert stream.ok
-    content_length = int(stream.headers['Content-Length'])
-    total_written = 0
-    chunk_size = 1024
-    # See http://click.pocoo.org/6/arguments/#file-args for parameter
-    # information
-    content_iter = stream.iter_content(chunk_size=chunk_size)
-    progress_bar = tqdm(
-        iterable=content_iter,
-        total=content_length / chunk_size,
-        dynamic_ncols=True,
-        bar_format='{l_bar}{bar}',
-        unit_scale=None,
-    )
-    with click.open_file(
-        filename=str(path),
-        mode='wb',
-        atomic=True,
-        lazy=True,
-    ) as file_descriptor:
-        for chunk in progress_bar:
-            # Enable at the start of each chunk, disable at the end, to avoid
-            # showing statistics at the end.
-            progress_bar.disable = False
-            # Filter out keep-alive new chunks.
-            if chunk:
-                total_written += len(chunk)
-                file_descriptor.write(chunk)  # type: ignore
-            progress_bar.disable = True
-
-    message = (
-        'Downloaded {total_written} bytes. '
-        'Expected {content_length} bytes.'
-    ).format(
-        total_written=total_written,
-        content_length=content_length,
-    )
-
-    assert total_written == content_length, message
-
-
 def download_artifacts(test_pattern: str) -> None:
     """
     Download artifacts.
     """
     downloads = PATTERNS[test_pattern]
     for url, path in downloads:
+        args = [
+            'minidcos',
+            'docker',
+            'download-artifact',
+            '--download-path',
+            str(path),
+            '--dcos-version',
+            url,
+        ]
         _download_file(url=url, path=path)
 
 
