@@ -48,6 +48,8 @@ from ._common import (
     existing_cluster_ids,
 )
 
+from .wait import wait
+
 
 @click.command('create')
 @artifact_argument
@@ -218,3 +220,18 @@ def create(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+    # We work on the assumption that the ``wait`` command is a sibling
+    # command of this one.
+    command_path_list = ctx.command_path.split()
+    command_path_list[-1] = wait.name
+    wait_command_name = ' '.join(command_path_list)
+    started_message = (
+        'Cluster "{cluster_id}" has started. '
+        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
+        'DC/OS to become ready.'
+    ).format(
+        cluster_id=cluster_id,
+        wait_command_name=wait_command_name,
+    )
+    click.echo(started_message, err=True)
