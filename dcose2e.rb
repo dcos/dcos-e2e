@@ -1,7 +1,7 @@
 class Dcose2e < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.11.09.1"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.11.16.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -10,11 +10,6 @@ class Dcose2e < Formula
   resource "adal" do
     url "https://files.pythonhosted.org/packages/0f/ba/07dbea5f63937c4a9a10946107d72b03354f65a51f9e0602314193fc2bae/adal-1.2.0.tar.gz"
     sha256 "ba52913c38d76b4a4d88eaab41a5763d056ab6d073f106e0605b051ab930f5c1"
-  end
-
-  resource "alabaster" do
-    url "https://files.pythonhosted.org/packages/cc/b4/ed8dcb0d67d5cfb7f83c4d5463a7614cb1d078ad7ae890c9143edebbf072/alabaster-0.7.12.tar.gz"
-    sha256 "a661d72d58e6ea8a57f7a86e37d86716863ee5e92788398526d58b26a4e4dc02"
   end
 
   resource "asn1crypto" do
@@ -33,8 +28,13 @@ class Dcose2e < Formula
   end
 
   resource "azure-common" do
-    url "https://files.pythonhosted.org/packages/35/46/1cc91b5b6d3ea4ba239e202414102f196cd611f85afa77300432244b8902/azure-common-1.1.15.zip"
-    sha256 "8139e399d8c15f1dfcbc6254ccf98a835888cdaf500487b58d6af3e4bb3726a2"
+    url "https://files.pythonhosted.org/packages/39/ca/2bdd67243ae7a45281acbbfc139db273868e99fc219e46724dac68094e69/azure-common-1.1.16.zip"
+    sha256 "2606ae77ff81c0036965b92ec2efe03eaec02a66714140ca0f7aa401b8b9bbb0"
+  end
+
+  resource "azure-datalake-store" do
+    url "https://files.pythonhosted.org/packages/44/9b/927bb6840ef85fb7650bc2f0955b280b51736b1cb979a83bd8d06e94074e/azure-datalake-store-0.0.37.tar.gz"
+    sha256 "c72c6d79a875221a10669bf0546a6c7a788feee9b9921f024578f53223fed6e0"
   end
 
   resource "azure-mgmt-network" do
@@ -62,24 +62,19 @@ class Dcose2e < Formula
     sha256 "e7d3cea6af63e667d87ba1ca4f8cd7cb4dfca678e4c55fc1cedb320760e39dd0"
   end
 
-  resource "Babel" do
-    url "https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-2.6.0.tar.gz"
-    sha256 "8cba50f48c529ca3fa18cf81fa9403be176d374ac4d60738b839122dfaaa3d23"
-  end
-
   resource "bcrypt" do
     url "https://files.pythonhosted.org/packages/f3/ec/bb6b384b5134fd881b91b6aa3a88ccddaad0103857760711a5ab8c799358/bcrypt-3.1.4.tar.gz"
     sha256 "67ed1a374c9155ec0840214ce804616de49c3df9c5bc66740687c1c9b1cd9e8d"
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/c6/c1/c0bd1996bbdd7042c5611887b7e7daf836635f8814f382d7951aba2ff09e/boto3-1.9.30.tar.gz"
-    sha256 "3b782268ebf09ae6ea811ba8b8bdfc38a58d27f4f7fc554658f07c11ddc4165d"
+    url "https://files.pythonhosted.org/packages/18/89/fb6dec1de25c1e446bc11da7d43dab967d8b948bda734140a6b3fb7dcc4a/boto3-1.9.42.tar.gz"
+    sha256 "02e5c1b85a8b22a92f612daf2d1eea305818076b24ce02878b85e92d9ae0082e"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/2f/16/f11604f387ac1a1dd739e14bbee0cd0e7a0e359be7557fc66efe96acbc6e/botocore-1.12.30.tar.gz"
-    sha256 "5e1210f096637479061ebeb3640d0ba5bcdbfe385e36bd3132289d2d26ae83f6"
+    url "https://files.pythonhosted.org/packages/80/ac/518d1fa4b0ec896cc564742e5ce4e4b4d8ce1f8d3f9b6bb29409d1db97ca/botocore-1.12.42.tar.gz"
+    sha256 "0e495bcf2e474b82da7938b35ad2f71e28384c246b47ca131779f736621da504"
   end
 
   resource "cachetools" do
@@ -158,8 +153,8 @@ class Dcose2e < Formula
   end
 
   resource "google-auth" do
-    url "https://files.pythonhosted.org/packages/42/56/125f8006877fa3158b393478ace3660bea84a1e3df8ccd60f10a6fbfad6b/google-auth-1.6.0.tar.gz"
-    sha256 "afd71b88f3ba873d86fe52aa2d352915ed579ca6b9fa3d3750c2e55656ae5aff"
+    url "https://files.pythonhosted.org/packages/17/07/3d60e212bff8d734fcf5dd400eee751b8652eaefd0c4d90cd50af92e1d96/google-auth-1.6.1.tar.gz"
+    sha256 "b08a27888e9d1c17a891b3688aacc9c6f2019d7f6c5a2e73588e6bb9a2c0fa98"
   end
 
   resource "google-auth-httplib2" do
@@ -168,18 +163,13 @@ class Dcose2e < Formula
   end
 
   resource "httplib2" do
-    url "https://files.pythonhosted.org/packages/fd/ce/aa4a385e3e9fd351737fd2b07edaa56e7a730448465aceda6b35086a0d9b/httplib2-0.11.3.tar.gz"
-    sha256 "e71daed9a0e6373642db61166fa70beecc9bf04383477f84671348c02a04cbdf"
+    url "https://files.pythonhosted.org/packages/ce/ed/803905d670b52fa0edfdd135337e545b4496c2ab3a222f1449b7256eb99f/httplib2-0.12.0.tar.gz"
+    sha256 "f61fb838a94ce3b349aa32c92fd8430f7e3511afdb18bf9640d647e30c90a6d6"
   end
 
   resource "idna" do
     url "https://files.pythonhosted.org/packages/65/c4/80f97e9c9628f3cac9b98bfca0402ede54e0563b56482e3e6e45c43c4935/idna-2.7.tar.gz"
     sha256 "684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16"
-  end
-
-  resource "imagesize" do
-    url "https://files.pythonhosted.org/packages/41/f5/3cf63735d54aa9974e544aa25858d8f9670ac5b4da51020bbfc6aaade741/imagesize-1.1.0.tar.gz"
-    sha256 "f3832918bc3c66617f92e35f5d70729187676313caa60c187eb0f28b8fe5e3b5"
   end
 
   resource "isodate" do
@@ -192,11 +182,6 @@ class Dcose2e < Formula
     sha256 "6089412a5de162c04747f0220f6b2223b8ba660acd041e52a76426ca550e3c70"
   end
 
-  resource "Jinja2" do
-    url "https://files.pythonhosted.org/packages/56/e6/332789f295cf22308386cf5bbd1f4e00ed11484299c5d7383378cf48ba47/Jinja2-2.10.tar.gz"
-    sha256 "f84be1bb0040caca4cea721fcbbbbd61f9be9464ca236387158b0feea01914a4"
-  end
-
   resource "jmespath" do
     url "https://files.pythonhosted.org/packages/e5/21/795b7549397735e911b032f255cff5fb0de58f96da794274660bca4f58ef/jmespath-0.9.3.tar.gz"
     sha256 "6a81d4c9aa62caf061cb517b4d9ad1dd300374cd4706997aff9cd6aedd61fc64"
@@ -205,11 +190,6 @@ class Dcose2e < Formula
   resource "keyring" do
     url "https://files.pythonhosted.org/packages/ee/79/744da3470d832b776a37ccf2b277339f165ff75827606b073dd653b26bba/keyring-16.0.2.tar.gz"
     sha256 "95e4f1d0342d0bf5d137d1d2352d59f7abbebb1507bec1ac26831c411ac23150"
-  end
-
-  resource "MarkupSafe" do
-    url "https://files.pythonhosted.org/packages/ac/7e/1b4c2e05809a4414ebce0892fe1e32c14ace86ca7d50c70f00979ca9b3a3/MarkupSafe-1.1.0.tar.gz"
-    sha256 "4e97332c9ce444b0c2c38dd22ddc61c743eb208d916e4265a2a3b575bdccb1d3"
   end
 
   resource "more-itertools" do
@@ -235,11 +215,6 @@ class Dcose2e < Formula
   resource "oauthlib" do
     url "https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-2.1.0.tar.gz"
     sha256 "ac35665a61c1685c56336bda97d5eefa246f1202618a1d6f34fccb1bdd404162"
-  end
-
-  resource "packaging" do
-    url "https://files.pythonhosted.org/packages/cf/50/1f10d2626df0aa97ce6b62cf6ebe14f605f4e101234f7748b8da4138a8ed/packaging-18.0.tar.gz"
-    sha256 "0886227f54515e592aaa2e5a553332c73962917f2831f1b0f9b9f4380a4b9807"
   end
 
   resource "paramiko" do
@@ -277,11 +252,6 @@ class Dcose2e < Formula
     sha256 "a988718abfad80b6b157acce7bf130a30876d27603738ac39f140993246b25b3"
   end
 
-  resource "Pygments" do
-    url "https://files.pythonhosted.org/packages/71/2a/2e4e77803a8bd6408a2903340ac498cb0a2181811af7c9ec92cb70b0308a/Pygments-2.2.0.tar.gz"
-    sha256 "dbae1046def0efb574852fab9e90209b23f556367b5a320c0bcb871c77c3e8cc"
-  end
-
   resource "PyJWT" do
     url "https://files.pythonhosted.org/packages/00/5e/b358c9bb24421e6155799d995b4aa3aa3307ffc7ecae4ad9d29fd7e07a73/PyJWT-1.6.4.tar.gz"
     sha256 "4ee413b357d53fd3fb44704577afac88e72e878716116270d722723d65b42176"
@@ -292,14 +262,9 @@ class Dcose2e < Formula
     sha256 "0c6100edd16fefd1557da078c7a31e7b7d7a52ce39fdca2bec29d4f7b6e7600c"
   end
 
-  resource "pyparsing" do
-    url "https://files.pythonhosted.org/packages/d0/09/3e6a5eeb6e04467b737d55f8bba15247ac0876f98fae659e58cd744430c6/pyparsing-2.3.0.tar.gz"
-    sha256 "f353aab21fd474459d97b709e527b5571314ee5f067441dc9f88e33eecd96592"
-  end
-
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/cf/66/773433f0e8cc2583c4e241e8ae9727e576cde2dd88949bb8811ffc8c3080/pytest-3.9.2.tar.gz"
-    sha256 "212be78a6fa5352c392738a49b18f74ae9aeec1040f47c81cadbfd8d1233c310"
+    url "https://files.pythonhosted.org/packages/b5/96/37011e484665fab8b51add4f707d2aa28f1a06c68dd1c8a50e03551693b3/pytest-3.10.1.tar.gz"
+    sha256 "e246cf173c01169b9617fc07264b7b1316e78d7a650055235d6d897bc80d9660"
   end
 
   resource "python-dateutil" do
@@ -312,19 +277,14 @@ class Dcose2e < Formula
     sha256 "af9a8a9802d382d45dbea96aa3cfbe77c6e6ad65b3fe7b7c799d41ab988179c6"
   end
 
-  resource "pytz" do
-    url "https://files.pythonhosted.org/packages/cd/71/ae99fc3df1b1c5267d37ef2c51b7d79c44ba8a5e37b48e3ca93b4d74d98b/pytz-2018.7.tar.gz"
-    sha256 "31cb35c89bd7d333cd32c5f278fca91b523b0834369e757f4c5641ea252236ca"
-  end
-
   resource "PyYAML" do
     url "https://files.pythonhosted.org/packages/a8/c6/a8d1555e795dbd0375c3c93b576ca13bbf139db51ea604afa19a2c35fc03/PyYAML-4.2b4.tar.gz"
     sha256 "3c17fb92c8ba2f525e4b5f7941d850e7a48c3a59b32d331e2502a3cdc6648e76"
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/97/10/92d25b93e9c266c94b76a5548f020f3f1dd0eb40649cb1993532c0af8f4c/requests-2.20.0.tar.gz"
-    sha256 "99dcfdaaeb17caf6e526f32b6a7b780461512ab3f1d992187801694cba42770c"
+    url "https://files.pythonhosted.org/packages/40/35/298c36d839547b50822985a2cf0611b3b978a5ab7a5af5562b8ebe3e1369/requests-2.20.1.tar.gz"
+    sha256 "ea881206e59f41dbd0bd445437d792e43906703fff75ca8ff43ccdb11f33f263"
   end
 
   resource "requests-oauthlib" do
@@ -362,24 +322,14 @@ class Dcose2e < Formula
     sha256 "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
   end
 
-  resource "snowballstemmer" do
-    url "https://files.pythonhosted.org/packages/20/6b/d2a7cb176d4d664d94a6debf52cd8dbae1f7203c8e42426daa077051d59c/snowballstemmer-1.2.1.tar.gz"
-    sha256 "919f26a68b2c17a7634da993d91339e288964f93c274f1343e3bbbe2096e1128"
-  end
-
-  resource "Sphinx" do
-    url "https://files.pythonhosted.org/packages/c7/e9/b1bed881847680cecc70159b8b9d5fd1cd4e85627c534712c2c7b339f8b6/Sphinx-1.8.1.tar.gz"
-    sha256 "652eb8c566f18823a022bb4b6dbc868d366df332a11a0226b5bc3a798a479f17"
-  end
-
-  resource "sphinxcontrib-websupport" do
-    url "https://files.pythonhosted.org/packages/07/7a/e74b06dce85555ffee33e1d6b7381314169ebf7e31b62c18fcb2815626b7/sphinxcontrib-websupport-1.1.0.tar.gz"
-    sha256 "9de47f375baf1ea07cdb3436ff39d7a9c76042c10a769c52353ec46e4e8fc3b9"
-  end
-
   resource "timeout-decorator" do
     url "https://files.pythonhosted.org/packages/a2/bc/bc7395efa9212c5507c489cd348ad50ac437dbfc94fa5d88f87e58f9fa3c/timeout-decorator-0.4.0.tar.gz"
     sha256 "e49d214b17a096ca5162865ccb79f516840e5ba21b394f531f1f1d50e2e293ad"
+  end
+
+  resource "tqdm" do
+    url "https://files.pythonhosted.org/packages/b0/9b/0b2f9dd0e42da42e17c79883021b21cda31dd3216aa2538205ccdd10cc7a/tqdm-4.28.1.tar.gz"
+    sha256 "5b4d5549984503050883bc126280b386f5f4ca87e6c023c5d015655ad75bdebb"
   end
 
   resource "uritemplate" do
@@ -388,8 +338,8 @@ class Dcose2e < Formula
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/a5/74/05ffd00b4b5c08306939c485869f5dc40cbc27357195b0a98b18e4c48893/urllib3-1.24.tar.gz"
-    sha256 "41c3db2fc01e5b907288010dec72f9d0a74e37d6994e6eb56849f59fea2265ae"
+    url "https://files.pythonhosted.org/packages/b1/53/37d82ab391393565f2f831b8eedbffd57db5a718216f82f1a8b4d381a1c1/urllib3-1.24.1.tar.gz"
+    sha256 "de9529817c93f27c8ccbfead6985011db27bd0ddfcdb2d86f3f663385c6a9c22"
   end
 
   resource "websocket-client" do

@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.11.16.0
+------------
+
 - Add a ``dcos-docker doctor`` check for systemd.
 - Add a progress bar for ``doctor`` commands.
 - Log subprocess output unicode characters where possible.
