@@ -20,6 +20,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
    ...
    # Get onto a node
    $ minidcos docker run bash
+   [master-0]# exit
    $ minidcos docker destroy
 
 Each of these and more are described in detail below.

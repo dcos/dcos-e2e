@@ -80,6 +80,7 @@ A typical CLI workflow with the ``minidcos docker`` CLI may look like this:
    ...
    # Get onto a node
    $ minidcos docker run bash
+   [master-0]# exit
    $ minidcos docker destroy
 
 
