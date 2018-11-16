@@ -51,7 +51,7 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
 
     In the following instructions, running a test might look like:
 
-    `dcos-docker run --test-env pytest <test_filename>`
+    `minidcos docker run --test-env pytest <test_filename>`
 
     The manual test cases we want to work are:
     * Sync a DC/OS Enterprise checkout and run a test - it should work.
@@ -63,14 +63,14 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
     * Test bootstrap sync with no changes (a partial test that nothing
       breaks):
       - Sync
-      - `dcos-docker run systemctl restart dcos-mesos-master`
-      - `dcos-docker run journalctl -f -u dcos-mesos-master`
+      - `minidcos docker run systemctl restart dcos-mesos-master`
+      - `minidcos docker run journalctl -f -u dcos-mesos-master`
       - We expect to see no assertion error.
     * Test bootstrap sync with some changes
       - Add `assert False` to
         `packages/bootstrap/extra/dcos_internal_utils/bootstrap.py`
-      - `dcos-docker run systemctl restart dcos-mesos-master`
-      - `dcos-docker run journalctl -f -u dcos-mesos-master`
+      - `minidcos docker run systemctl restart dcos-mesos-master`
+      - `minidcos docker run journalctl -f -u dcos-mesos-master`
       - We expect to see the assertion error.
 
     Args:

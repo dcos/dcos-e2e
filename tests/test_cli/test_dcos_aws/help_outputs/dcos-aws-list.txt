@@ -1,4 +1,4 @@
-Usage: dcos-aws list [OPTIONS]
+Usage: minidcos aws list [OPTIONS]
 
   List all clusters.
 

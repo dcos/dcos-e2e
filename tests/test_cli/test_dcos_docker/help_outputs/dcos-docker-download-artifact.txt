@@ -1,4 +1,4 @@
-Usage: dcos-docker download-artifact [OPTIONS]
+Usage: minidcos docker download-artifact [OPTIONS]
 
   Download a DC/OS Open Source artifact.
 

@@ -35,6 +35,7 @@ diff
 dir
 dockerfile
 drf
+miniDC
 dulwich
 enum
 env
@@ -44,6 +45,7 @@ filename
 func
 genconf
 gzip
+minidc
 homebrew
 hwclock
 idna

@@ -3,7 +3,7 @@ class Dcose2e < Formula
 
   url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.11.16.0"
   head "https://github.com/dcos/dcos-e2e.git"
-  homepage "http://dcos-e2e-cli.readthedocs.io/en/latest/"
+  homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
   depends_on "pkg-config"
 

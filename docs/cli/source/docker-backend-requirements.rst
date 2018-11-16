@@ -100,7 +100,7 @@ You can manually remove the route in PowerShell Run as Administrator using:
 ``doctor`` command
 ~~~~~~~~~~~~~~~~~~
 
-:ref:`dcos-docker-cli:dcos-docker` comes with the :ref:`dcos-docker-cli:doctor` command.
+:ref:`dcos-docker-cli:minidcos docker` comes with the :ref:`dcos-docker-cli:doctor` command.
 Run this command to check your system for common causes of problems.
 
 .. _VirtualBox: https://www.virtualbox.org/wiki/Downloads

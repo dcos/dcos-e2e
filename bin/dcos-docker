@@ -1,4 +1,0 @@
-#!/usr/bin/env python3
-from dcos_e2e_cli.dcos_docker import dcos_docker
-
-dcos_docker()

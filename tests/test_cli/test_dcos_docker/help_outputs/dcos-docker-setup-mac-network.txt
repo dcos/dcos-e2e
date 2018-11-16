@@ -1,4 +1,4 @@
-Usage: dcos-docker setup-mac-network [OPTIONS]
+Usage: minidcos docker setup-mac-network [OPTIONS]
 
   Set up a network to connect to nodes on macOS.
 

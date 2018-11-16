@@ -1,4 +1,4 @@
-Usage: dcos-aws run [OPTIONS] NODE_ARGS...
+Usage: minidcos aws run [OPTIONS] NODE_ARGS...
 
   Run an arbitrary command on a node.
 
@@ -27,6 +27,6 @@ Options:
                            on. This can be one of: The node's public IP address,
                            The node's private IP address, the node's EC2
                            instance ID, a reference in the format
-                           "<role>_<number>". These details be seen with ``dcos-
-                           aws inspect``.
+                           "<role>_<number>". These details be seen with
+                           ``minidcos aws inspect``.
   --help                   Show this message and exit.

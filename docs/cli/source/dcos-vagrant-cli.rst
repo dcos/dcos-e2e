@@ -3,21 +3,23 @@
 Vagrant
 =======
 
-The :ref:`dcos-vagrant-cli:dcos-vagrant` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Vagrant VMs.
+The :ref:`dcos-vagrant-cli:minidcos vagrant` CLI allows you to create, manage and destroy open source DC/OS and DC/OS Enterprise clusters on Vagrant VMs.
 
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
 .. substitution-prompt:: bash $,# auto
 
-   # Fix issues shown by dcos-vagrant doctor
-   $ dcos-vagrant doctor
-   $ dcos-vagrant create ./dcos_generate_config.sh --agents 0
+   # Fix issues shown by minidcos vagrant doctor
+   $ minidcos vagrant doctor
+   $ minidcos vagrant create ./dcos_generate_config.sh --agents 0
    default
-   $ dcos-vagrant wait
-   $ dcos-vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ minidcos vagrant wait
+   $ minidcos vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
-   $ dcos-vagrant destroy
+   # Get onto a node
+   $ minidcos vagrant run bash
+   $ minidcos vagrant destroy
 
 Each of these and more are described in detail below.
 
@@ -58,7 +60,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-vagrant create /path/to/dcos_generate_config.ee.sh \
+   $ minidcos vagrant create /path/to/dcos_generate_config.ee.sh \
         --license-key /path/to/license.txt \
         --security-mode strict
 
@@ -88,7 +90,7 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-vagrant run systemctl list-units
+   $ minidcos vagrant run systemctl list-units
 
 See :ref:`dcos-vagrant-cli:run` for more information on this command.
 
@@ -108,7 +110,7 @@ For example, to use :ref:`dcos-vagrant-cli:run` to run ``bash`` to get on to an 
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-vagrant run bash
+   $ minidcos vagrant run bash
 
 Destroying Clusters
 -------------------
@@ -120,16 +122,16 @@ Either destroy a cluster with :ref:`dcos-vagrant-cli:destroy`:
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-vagrant destroy
+   $ minidcos vagrant destroy
    default
-   $ dcos-vagrant destroy --cluster-id pr_4033_strict
+   $ minidcos vagrant destroy --cluster-id pr_4033_strict
    pr_4033_strict
 
 or use :ref:`dcos-vagrant-cli:destroy-list` to destroy multiple clusters:
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-vagrant destroy-list pr_4033_strict pr_4019_permissive
+   $ minidcos vagrant destroy-list pr_4033_strict pr_4019_permissive
    pr_4033_strict
    pr_4019_permissive
 
@@ -137,7 +139,7 @@ To destroy all clusters, run the following command:
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-vagrant destroy-list $(dcos-vagrant list)
+   $ minidcos vagrant destroy-list $(dcos-vagrant list)
    pr_4033_strict
    pr_4019_permissive
 
@@ -150,9 +152,9 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-vagrant create ./dcos_generate_config.sh
-   $ dcos-vagrant wait
-   $ dcos-vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+   $ minidcos vagrant create ./dcos_generate_config.sh
+   $ minidcos vagrant wait
+   $ minidcos vagrant run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`dcos-vagrant-cli:run` for more information on this command.
@@ -195,7 +197,7 @@ It is possible to use :ref:`dcos-vagrant-cli:create` to create a cluster with a 
 
    .. substitution-prompt:: bash $,# auto
 
-      $ dcos-vagrant create \
+      $ minidcos vagrant create \
           /path/to/dcos_generate_config.ee.sh \
           --variant enterprise \
           --genconf-dir /path/to/genconf/ \
@@ -211,5 +213,5 @@ CLI Reference
 -------------
 
 .. click:: dcos_e2e_cli:dcos_vagrant
-  :prog: dcos-vagrant
+  :prog: minidcos vagrant
   :show-nested:

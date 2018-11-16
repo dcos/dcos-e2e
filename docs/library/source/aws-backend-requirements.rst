@@ -41,7 +41,7 @@ If your operating system is not supported, it may be possible to use Vagrant, or
 ``doctor`` command
 ~~~~~~~~~~~~~~~~~~
 
-|project| comes with the ``dcos-aws doctor`` command.
+|project| comes with the ``minidcos aws doctor`` command.
 Run this command to check your system for common causes of problems.
 
 .. _maws: https://github.com/mesosphere/maws

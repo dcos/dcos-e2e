@@ -1,4 +1,4 @@
-Usage: dcos-docker list [OPTIONS]
+Usage: minidcos docker list [OPTIONS]
 
   List all clusters.
 

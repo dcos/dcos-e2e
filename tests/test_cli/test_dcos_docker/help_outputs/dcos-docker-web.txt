@@ -1,9 +1,9 @@
-Usage: dcos-docker web [OPTIONS]
+Usage: minidcos docker web [OPTIONS]
 
   Open the browser at the web UI.
 
-  Note that the web UI may not be available at first. Consider using ``dcos-
-  docker wait`` before running this command.
+  Note that the web UI may not be available at first. Consider using
+  ``minidcos docker wait`` before running this command.
 
 Options:
   -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]

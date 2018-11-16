@@ -1,4 +1,4 @@
-Usage: dcos-vagrant wait [OPTIONS]
+Usage: minidcos vagrant wait [OPTIONS]
 
   Wait for DC/OS to start.
 

@@ -68,8 +68,6 @@ setup(
     dependency_links=[],
     entry_points="""
         [console_scripts]
-        dcos-docker=dcos_e2e_cli.dcos_docker:dcos_docker
-        dcos-vagrant=dcos_e2e_cli.dcos_vagrant:dcos_vagrant
-        dcos-aws=dcos_e2e_cli.dcos_aws:dcos_aws
+        minidcos=dcos_e2e_cli.minidcos:minidcos
     """,
 )

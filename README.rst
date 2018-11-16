@@ -4,15 +4,15 @@
 
 |Library Documentation Status| **: Library**
 
-|CLI Documentation Status| **: CLI**
+|CLI Documentation Status| **: miniDC/OS**
 
 |project|
 =========
 
 |project| is a tool for spinning up and managing DC/OS clusters in test environments.
-It includes a Python library and various CLI tools.
+It includes a Python library and miniDC/OS CLI tools.
 
-See the full documentation on Read the Docs for the `library`_ and `CLI`_.
+See the full documentation on Read the Docs for the `library`_ and `miniDC/OS`_.
 
 .. contents::
    :local:
@@ -20,9 +20,9 @@ See the full documentation on Read the Docs for the `library`_ and `CLI`_.
 Installation
 ------------
 
-|project| consists of a Python `library`_ and various `CLI`_ tools.
+|project| consists of a Python `library`_ and `miniDC/OS`_.
 
-See the full `CLI`_ documentation for CLI installation options.
+See the full `miniDC/OS`_ documentation for CLI installation options.
 
 To install the library, follow the `library installation instructions`_.
 
@@ -60,33 +60,35 @@ See the `library`_ documentation for more details on these and other features.
         cluster.wait_for_dcos_oss()
         cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
 
-CLI
----
+miniDC/OS CLI
+-------------
 
 |project| also provides multiple command line interface tools.
 These allow you to create, manage and destroy DC/OS clusters on various backends, such as Docker, Vagrant and AWS.
 
-A typical CLI workflow with the ``dcos-docker`` CLI may look like this:
+A typical CLI workflow with the ``minidcos docker`` CLI may look like this:
 
 .. code-block:: bash
 
-   # Fix issues shown by dcos-docker doctor
-   $ dcos-docker doctor
-   $ dcos-docker download-artifact
-   $ dcos-docker create ./dcos_generate_config.sh --agents 0
+   # Fix issues shown by ``minidcos docker doctor``
+   $ minidcos docker doctor
+   $ minidcos docker download-artifact
+   $ minidcos docker create ./dcos_generate_config.sh --agents 0
    default
+   $ minidcos docker wait
+   $ minidcos docker run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    $ dcos-docker wait
    $ dcos-docker run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
    # Get onto a node
-   $ dcos-docker run bash
-   $ dcos-docker destroy
+   $ minidcos docker run bash
+   $ minidcos docker destroy
 
 
-Each of these commands and more are described in detail in the full `dcos-docker CLI`_ documentation.
-Other CLI tools include ``dcos-aws`` and ``dcos-vagrant``.
+Each of these commands and more are described in detail in the full `minidcos docker CLI`_ documentation.
+Other CLI tools include ``minidcos aws`` and ``minidcos vagrant``.
 
-See the full `CLI`_ documentation for information on other CLI tools provided by |project|.
+See the full `miniDC/OS`_ documentation for information on other CLI tools provided by |project|.
 
 .. |Build Status| image:: https://travis-ci.org/dcos/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/dcos/dcos-e2e
@@ -95,13 +97,13 @@ See the full `CLI`_ documentation for information on other CLI tools provided by
 .. |Library Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e/badge/?version=latest
    :target: http://dcos-e2e.readthedocs.io/en/latest/?badge=latest
    :alt: Library Documentation Status
-.. |CLI Documentation Status| image:: https://readthedocs.org/projects/dcos-e2e-cli/badge/?version=latest
-   :target: http://dcos-e2e-cli.readthedocs.io/en/latest/?badge=latest
+.. |CLI Documentation Status| image:: https://readthedocs.org/projects/minidcos/badge/?version=latest
+   :target: http://minidcos.readthedocs.io/en/latest/?badge=latest
    :alt: CLI Documentation Status
 .. _Homebrew: https://brew.sh
 .. _Linuxbrew: https://linuxbrew.sh
-.. _CLI: https://dcos-e2e-cli.readthedocs.io/en/latest/
-.. _dcos-docker CLI: https://dcos-e2e-cli.readthedocs.io/en/latest/dcos-docker-cli.html
+.. _miniDC/OS: https://minidcos.readthedocs.io/en/latest/
+.. _minidcos docker CLI: https://minidcos.readthedocs.io/en/latest/dcos-docker-cli.html
 .. _library: https://dcos-e2e.readthedocs.io/en/latest/
 .. _backends: https://dcos-e2e.readthedocs.io/en/latest/backends.html
 .. |project| replace:: DC/OS E2E

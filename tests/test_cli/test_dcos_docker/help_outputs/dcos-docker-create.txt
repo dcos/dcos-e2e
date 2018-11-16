@@ -1,4 +1,4 @@
-Usage: dcos-docker create [OPTIONS] ARTIFACT
+Usage: minidcos docker create [OPTIONS] ARTIFACT
 
   Create a DC/OS cluster.
 
@@ -96,25 +96,25 @@ Options:
                                   from the artifact takes some time and so using
                                   another option is a performance optimization.
   --wait-for-dcos                 Wait for DC/OS after creating the cluster.
-                                  This is equivalent to using "dcos-docker wait"
-                                  after this command. "dcos-docker wait" has
-                                  various options available and so may be more
-                                  appropriate for your use case. If the chosen
-                                  transport is "docker-exec", this will skip
-                                  HTTP checks and so the cluster may not be
+                                  This is equivalent to using "minidcos docker
+                                  wait" after this command. "minidcos docker
+                                  wait" has various options available and so may
+                                  be more appropriate for your use case. If the
+                                  chosen transport is "docker-exec", this will
+                                  skip HTTP checks and so the cluster may not be
                                   fully ready.
   --network TEXT                  The Docker network containers will be
                                   connected to.It may not be possible to SSH to
                                   containers on a custom network on macOS.
   --transport [docker-exec|ssh]   The communication transport to use. On macOS
                                   the SSH transport requires IP routing to be
-                                  set up. See "dcos-docker setup-mac-network".
-                                  It also requires the "ssh" command to be
-                                  available. This can be provided by setting the
-                                  `DCOS_DOCKER_TRANSPORT` environment variable.
-                                  When using a TTY, different transports may use
-                                  different line endings.  [default: docker-
-                                  exec]
+                                  set up. See "minidcos docker setup-mac-
+                                  network". It also requires the "ssh" command
+                                  to be available. This can be provided by
+                                  setting the `MINIDCOS_DOCKER_TRANSPORT`
+                                  environment variable. When using a TTY,
+                                  different transports may use different line
+                                  endings.  [default: docker-exec]
   --one-master-host-port-map TEXT
                                   Publish a container port of one master node to
                                   the host. Only Transmission Control Protocol

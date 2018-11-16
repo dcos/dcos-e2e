@@ -1,4 +1,4 @@
-Usage: dcos-vagrant list [OPTIONS]
+Usage: minidcos vagrant list [OPTIONS]
 
   List all clusters.
 

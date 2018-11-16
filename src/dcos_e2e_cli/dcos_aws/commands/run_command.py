@@ -83,7 +83,7 @@ def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
     message = (
         'No such node in cluster "{cluster_id}" with IP address, VM name or '
         'node reference "{node_reference}". '
-        'Node references can be seen with ``dcos-vagrant inspect``.'
+        'Node references can be seen with ``minidcos vagrant inspect``.'
     ).format(
         cluster_id=cluster_id,
         node_reference=node_reference,
@@ -112,7 +112,7 @@ def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
         'The node\'s private IP address, '
         'the node\'s EC2 instance ID, '
         'a reference in the format "<role>_<number>". '
-        'These details be seen with ``dcos-aws inspect``.'
+        'These details be seen with ``minidcos aws inspect``.'
     ),
 )
 def run(

@@ -1,4 +1,4 @@
-Usage: dcos-docker destroy-loopback-sidecar [OPTIONS] NAME
+Usage: minidcos docker destroy-loopback-sidecar [OPTIONS] NAME
 
   Destroy a loopback sidecar.
 

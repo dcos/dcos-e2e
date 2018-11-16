@@ -1,4 +1,4 @@
-Usage: dcos-vagrant run [OPTIONS] NODE_ARGS...
+Usage: minidcos vagrant run [OPTIONS] NODE_ARGS...
 
   Run an arbitrary command on a node.
 
@@ -23,8 +23,8 @@ Options:
   --node TEXT              A reference to a particular node to run the command
                            on. This can be one of: The node's IP address, the
                            node's VM name, a reference in the format
-                           "<role>_<number>". These details be seen with ``dcos-
-                           vagrant inspect``.
+                           "<role>_<number>". These details be seen with
+                           ``minidcos vagrant inspect``.
   -v, --verbose            Use verbose output. Use this option multiple times
                            for more verbose output.
   --help                   Show this message and exit.

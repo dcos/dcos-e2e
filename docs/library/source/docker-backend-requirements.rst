@@ -16,7 +16,7 @@ IP Routing Set Up for Docker
 On macOS, hosts cannot connect to containers IP addresses by default.
 This is required, for example, to access the web UI, to SSH to nodes and to use the DC/OS CLI.
 
-Once the CLI is installed, run ``dcos-docker setup-mac-network`` to set up IP routing.
+Once the CLI is installed, run ``minidcos docker setup-mac-network`` to set up IP routing.
 
 Without this, it is still possible to use some features.
 In the library, specify :paramref:`~dcos_e2e.backends.Docker.transport` as :py:class:`dcos_e2e.node.Transport.DOCKER_EXEC`.
@@ -77,7 +77,7 @@ The only supported way to use the Docker backend on Windows is using Vagrant and
     vagrant up
     vagrant ssh
 
-You can now run ``dcos-docker`` commands or use the library.
+You can now run ``minidcos docker`` commands or use the library.
 
 To connect to the cluster nodes from the Windows host (e.g. to use the DC/OS web interface), in PowerShell Run as Administrator, and add the Virtual Machine as a gateway:
 
@@ -101,7 +101,7 @@ You can manually remove the route in PowerShell Run as Administrator using:
 ``doctor`` command
 ~~~~~~~~~~~~~~~~~~
 
-|project| comes with the ``dcos-docker doctor`` command.
+|project| comes with the ``minidcos docker doctor`` command.
 Run this command to check your system for common causes of problems.
 
 .. _VirtualBox: https://www.virtualbox.org/wiki/Downloads

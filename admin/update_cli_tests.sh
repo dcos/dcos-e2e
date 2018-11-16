@@ -16,6 +16,11 @@ set -ex
 
 export FIX_CLI_TESTS=1
 
+mkdir -p tests/test_cli/test_minidcos/help_outputs
+git rm -f tests/test_cli/test_minidcos/help_outputs/*.txt || true
+pytest tests/test_cli/test_minidcos/test_cli.py::TestHelp::test_help || true
+git add tests/test_cli/test_minidcos/help_outputs/*.txt
+
 mkdir -p tests/test_cli/test_dcos_docker/help_outputs
 git rm -f tests/test_cli/test_dcos_docker/help_outputs/*.txt || true
 pytest tests/test_cli/test_dcos_docker/test_cli.py::TestHelp::test_help || true

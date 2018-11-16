@@ -1,4 +1,4 @@
-Usage: dcos-docker clean [OPTIONS]
+Usage: minidcos docker clean [OPTIONS]
 
   Remove containers, volumes and networks created by this tool.
 

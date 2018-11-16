@@ -1,4 +1,4 @@
-Usage: dcos-docker run [OPTIONS] NODE_ARGS...
+Usage: minidcos docker run [OPTIONS] NODE_ARGS...
 
   Run an arbitrary command on a node.
 
@@ -24,17 +24,18 @@ Options:
                                  address, the node's Docker container name, the
                                  node's Docker container ID, a reference in the
                                  format "<role>_<number>". These details be seen
-                                 with ``dcos-docker inspect``.
+                                 with ``minidcos docker inspect``.
   --env TEXT                     Set environment variables in the format
                                  "<KEY>=<VALUE>"
   --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                  the SSH transport requires IP routing to be set
-                                 up. See "dcos-docker setup-mac-network". It
+                                 up. See "minidcos docker setup-mac-network". It
                                  also requires the "ssh" command to be
                                  available. This can be provided by setting the
-                                 `DCOS_DOCKER_TRANSPORT` environment variable.
-                                 When using a TTY, different transports may use
-                                 different line endings.  [default: docker-exec]
+                                 `MINIDCOS_DOCKER_TRANSPORT` environment
+                                 variable. When using a TTY, different
+                                 transports may use different line endings.
+                                 [default: docker-exec]
   -v, --verbose                  Use verbose output. Use this option multiple
                                  times for more verbose output.
   --help                         Show this message and exit.

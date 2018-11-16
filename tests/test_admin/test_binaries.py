@@ -15,14 +15,14 @@ LOGGER = logging.getLogger(__name__)
 
 def test_linux_binaries() -> None:
     """
-    ``make_linux_binaries`` creates binaries which can be run on Linux.
+    ``make_linux_binaries`` creates a binary which can be run on Linux.
     """
 
     binary_paths = make_linux_binaries(
         repo_root=Path(__file__).parent.parent.parent,
     )
     binary_path_names = set(path.name for path in binary_paths)
-    assert binary_path_names == {'dcos-docker', 'dcos-aws', 'dcos-vagrant'}
+    assert binary_path_names == {'minidcos'}
 
     mounts = []
     remote_binaries_dir = Path('/binaries')

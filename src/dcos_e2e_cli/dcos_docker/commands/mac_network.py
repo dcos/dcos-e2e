@@ -20,7 +20,8 @@ from dcos_e2e.backends import Docker
 
 from ._common import docker_client
 
-# We start these names with "vpn" to avoid a conflict with "dcos-docker clean".
+# We start these names with "vpn" to avoid a conflict with
+# "minidcos docker clean".
 _PROXY_CONTAINER_NAME = 'vpn-{container_name_prefix}-proxy'.format(
     container_name_prefix=Docker().container_name_prefix,
 )
@@ -70,7 +71,8 @@ def _validate_ovpn_file_does_not_exist(
         '3. In your OpenVPN client, connect to the new "{profile_name}" '
         'profile.'
         '\n'
-        '4. Run "dcos-docker doctor" to confirm that everything is working.'
+        '4. Run "minidcos docker doctor" to confirm that everything is '
+        'working.'
     ).format(
         value=value,
         profile_name=profile_name,
@@ -170,7 +172,7 @@ def _create_mac_network(configuration_dst: Path) -> None:
 
 def _destroy_mac_network_containers() -> None:
     """
-    Destroy containers created by ``dcos-docker setup-mac-network``.
+    Destroy containers created by ``minidcos docker setup-mac-network``.
     """
     client = docker_client()
     for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
@@ -234,7 +236,8 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
         '4. In your OpenVPN client, connect to the new "docker-for-mac" '
         'profile.'
         '\n'
-        '5. Run "dcos-docker doctor" to confirm that everything is working.'
+        '5. Run "minidcos docker doctor" to confirm that everything is '
+        'working.'
     ).format(configuration_dst=configuration_dst)
 
     click.echo(message=message)
@@ -243,7 +246,7 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
 @click.command('destroy-mac-network')
 def destroy_mac_network() -> None:
     """
-    Destroy containers created by "dcos-docker setup-mac-network".
+    Destroy containers created by "minidcos docker setup-mac-network".
     """
     _destroy_mac_network_containers()
     message = (

@@ -4,8 +4,6 @@ A CLI for controlling DC/OS clusters on AWS.
 
 import click
 
-import dcos_e2e
-
 from .commands.create import create
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
@@ -16,12 +14,7 @@ from .commands.wait import wait
 from .commands.web import web
 
 
-@click.group(name='dcos-aws')
-# We set the ``version`` parameter because in PyInstaller binaries,
-# ``pkg_resources`` is not available.
-#
-# Click uses ``pkg_resources`` to determine the version if it is not given.
-@click.version_option(version=dcos_e2e.__version__)
+@click.group(name='aws')
 def dcos_aws() -> None:
     """
     Manage DC/OS clusters on AWS.

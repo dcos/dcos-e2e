@@ -3,20 +3,23 @@
 AWS
 ===
 
-The :ref:`dcos-aws-cli:dcos-aws` CLI allows you to create and manage open source DC/OS and DC/OS Enterprise clusters on AWS EC2 instances.
+The :ref:`dcos-aws-cli:minidcos aws` CLI allows you to create and manage open source DC/OS and DC/OS Enterprise clusters on AWS EC2 instances.
 
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
 .. substitution-prompt:: bash $,# auto
 
-   # Fix issues shown by dcos-aws doctor
-   $ dcos-aws doctor
-   $ dcos-aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh --variant oss
+   # Fix issues shown by minidcos aws doctor
+   $ minidcos aws doctor
+   $ minidcos aws create https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh --variant oss
    default
-   $ dcos-aws wait
-   $ dcos-aws run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
+   $ minidcos aws wait
+   $ minidcos aws run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls
    ...
+   # Get onto a node
+   $ minidcos aws run bash
+   $ minidcos aws destroy
 
 Each of these and more are described in detail below.
 
@@ -57,7 +60,7 @@ For, example, run the following to create a DC/OS Enterprise cluster in strict m
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-aws create $DCOS_ENTERPRISE_URL \
+   $ minidcos aws create $DCOS_ENTERPRISE_URL \
         --variant enterprise \
         --license-key /path/to/license.txt \
         --security-mode strict
@@ -88,7 +91,7 @@ It is possible to run the following to run a command on an arbitrary master node
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-aws run systemctl list-units
+   $ minidcos aws run systemctl list-units
 
 See :ref:`dcos-aws-cli:run` for more information on this command.
 
@@ -108,7 +111,7 @@ For example, to use :ref:`dcos-aws-cli:run` to run ``bash`` to get on to an arbi
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-aws run bash
+   $ minidcos aws run bash
 
 Destroying Clusters
 -------------------
@@ -124,11 +127,11 @@ To run integration tests which are developed in the a DC/OS checkout at :file:`/
 
 .. substitution-prompt:: bash $,# auto
 
-   $ dcos-aws create \
+   $ minidcos aws create \
         --variant oss \
         https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh
-   $ dcos-aws wait
-   $ dcos-aws run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
+   $ minidcos aws wait
+   $ minidcos aws run --test-env --sync-dir /path/to/dcos/checkout pytest -k test_tls.py
 
 There are multiple options and shortcuts for using these commands.
 See :ref:`dcos-aws-cli:run` for more information on this command.
@@ -171,7 +174,7 @@ It is possible to use :ref:`dcos-aws-cli:create` to create a cluster with a cust
 
    .. substitution-prompt:: bash $,# auto
 
-      $ dcos-aws create \
+      $ minidcos aws create \
           $DCOS_ENTERPRISE_URL \
           --variant enterprise \
           --genconf-dir /path/to/genconf/ \
@@ -187,5 +190,5 @@ CLI Reference
 -------------
 
 .. click:: dcos_e2e_cli:dcos_aws
-  :prog: dcos-aws
+  :prog: minidcos aws
   :show-nested:

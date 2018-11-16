@@ -1,4 +1,4 @@
-Usage: dcos-vagrant download-artifact [OPTIONS]
+Usage: minidcos vagrant download-artifact [OPTIONS]
 
   Download a DC/OS Open Source artifact.
 

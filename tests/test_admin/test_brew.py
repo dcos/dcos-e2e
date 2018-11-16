@@ -75,13 +75,7 @@ def test_brew(tmpdir: local) -> None:
         'install',
         container_homebrew_file_path,
         '&&',
-        'dcos-docker',
-        '--version',
-        '&&',
-        'dcos-aws',
-        '--version',
-        '&&',
-        'dcos-vagrant',
+        'minidcos',
         '--version',
     ]
 

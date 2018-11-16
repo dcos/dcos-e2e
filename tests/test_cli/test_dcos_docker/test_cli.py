@@ -1,5 +1,5 @@
 """
-Tests for the CLI.
+Tests for the Docker CLI.
 
 This mostly provides error case coverage.
 We rely mostly on manual testing.
@@ -19,29 +19,7 @@ from click.testing import CliRunner
 # are disabled.
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
-from dcos_e2e_cli import dcos_docker
-
-
-class TestDcosDocker:
-    """
-    Tests for the top level `dcos-docker` command.
-    """
-
-    def test_version(self) -> None:
-        """
-        The CLI version is shown with ``dcos-docker --version``.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_docker,
-            ['--version'],
-            catch_exceptions=False,
-        )
-
-        assert result.exit_code == 0
-        expected = 'dcos-docker, version'
-        assert expected in result.output
-
+from dcos_e2e_cli import dcos_docker, minidcos
 
 _SUBCOMMANDS = [[item] for item in dcos_docker.commands.keys()]
 _BASE_COMMAND = [[]]  # type: List[List[str]]
@@ -60,15 +38,15 @@ class TestHelp:
     )
     def test_help(self, command: List[str]) -> None:
         """
-        Expected help text is shown for ``dcos-docker`` commands.
+        Expected help text is shown for ``minidcos docker`` commands.
 
         This help text is defined in files.
         To update these files, run the command
         ``bash admin/update_cli_tests.sh``.
         """
         runner = CliRunner()
-        arguments = command + ['--help']
-        result = runner.invoke(dcos_docker, arguments, catch_exceptions=False)
+        arguments = ['docker'] + command + ['--help']
+        result = runner.invoke(minidcos, arguments, catch_exceptions=False)
         assert result.exit_code == 0
         help_output_filename = '-'.join(['dcos-docker'] + command) + '.txt'
         help_outputs_dir = Path(__file__).parent / 'help_outputs'
@@ -100,8 +78,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--copy-to-master',
@@ -115,7 +94,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" is not in the format /absolute/local/path:/remote/path.
             """,# noqa: E501,E261
@@ -129,8 +108,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--copy-to-master',
@@ -144,7 +124,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "/some/path" does not exist.
             """,# noqa: E501,E261
@@ -171,8 +151,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 option,
@@ -186,7 +167,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "{option}": Mode in "/opt:/opt:ab" is "ab". If given, the mode must be one of "ro", "rw".
             """,# noqa: E501,E261
@@ -213,8 +194,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 option,
@@ -228,7 +210,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "{option}": "/opt:/opt:/opt:rw" is not a valid volume definition. See https://docs.docker.com/engine/reference/run/#volume-shared-filesystems for the syntax to use.
             """,# noqa: E501,E261
@@ -248,8 +230,9 @@ class TestCreate:
 
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--copy-to-master',
@@ -264,7 +247,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "--copy-to-master": "some/remote is not an absolute path.
             """,# noqa: E501,E261
@@ -278,8 +261,8 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['create', '/not/a/path'],
+            minidcos,
+            ['docker', 'create', '/not/a/path'],
             catch_exceptions=False,
         )
         assert result.exit_code == 2
@@ -296,8 +279,9 @@ class TestCreate:
         runner = CliRunner()
         invalid_path = '/' + uuid.uuid4().hex
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--extra-config',
@@ -311,8 +295,8 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
-            Try "dcos-docker create --help" for help.
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
+            Try "minidcos docker create --help" for help.
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
             """,# noqa: E501,E261
@@ -329,8 +313,9 @@ class TestCreate:
         invalid_file.write('@')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--extra-config',
@@ -344,7 +329,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
             """\
-           Usage: dcos-docker create [OPTIONS] ARTIFACT
+           Usage: minidcos docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "@" is not valid YAML
             """,# noqa: E501,E261
@@ -361,8 +346,9 @@ class TestCreate:
         invalid_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--extra-config',
@@ -376,7 +362,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
            """\
-           Usage: dcos-docker create [OPTIONS] ARTIFACT
+           Usage: minidcos docker create [OPTIONS] ARTIFACT
 
            Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
             """,# noqa: E501,E261
@@ -395,8 +381,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--cluster-id',
@@ -411,7 +398,7 @@ class TestCreate:
         # yapf: disable
         expected_message = dedent(
            """\
-            Usage: dcos-docker create [OPTIONS] ARTIFACT
+            Usage: minidcos docker create [OPTIONS] ARTIFACT
 
             Error: Invalid value for "-c" / "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
             """,# noqa: E501,E261
@@ -425,8 +412,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--genconf-dir',
@@ -454,8 +442,9 @@ class TestCreate:
 
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--genconf-dir',
@@ -476,8 +465,9 @@ class TestCreate:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--workspace-dir',
@@ -505,8 +495,9 @@ class TestCreate:
 
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'create',
                 str(oss_artifact),
                 '--workspace-dir',
@@ -534,8 +525,8 @@ class TestDestroy:
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy', '--cluster-id', unique],
+            minidcos,
+            ['docker', 'destroy', '--cluster-id', unique],
         )
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
@@ -555,8 +546,8 @@ class TestDestroyList:
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy-list', unique],
+            minidcos,
+            ['docker', 'destroy-list', unique],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -572,8 +563,8 @@ class TestDestroyList:
         unique_2 = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy-list', unique, unique_2],
+            minidcos,
+            ['docker', 'destroy-list', unique, unique_2],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -596,8 +587,8 @@ class TestInspect:
         unique = uuid.uuid4().hex
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['inspect', '--cluster-id', unique],
+            minidcos,
+            ['docker', 'inspect', '--cluster-id', unique],
         )
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
@@ -616,7 +607,10 @@ class TestWait:
         """
         unique = uuid.uuid4().hex
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['wait', '--cluster-id', unique])
+        result = runner.invoke(
+            minidcos,
+            ['docker', 'wait', '--cluster-id', unique],
+        )
         assert result.exit_code == 2
         expected_error = 'Cluster "{unique}" does not exist'
         expected_error = expected_error.format(unique=unique)
@@ -633,7 +627,11 @@ class TestDoctor:
         No exception is raised by the ``doctor`` subcommand.
         """
         runner = CliRunner()
-        result = runner.invoke(dcos_docker, ['doctor'], catch_exceptions=False)
+        result = runner.invoke(
+            minidcos,
+            ['docker', 'doctor'],
+            catch_exceptions=False,
+        )
         assert result.exit_code == 0
 
 
@@ -651,8 +649,9 @@ class TestSetupMacNetwork():
         configuration_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'setup-mac-network',
                 '--configuration-dst',
                 str(configuration_file),
@@ -664,7 +663,7 @@ class TestSetupMacNetwork():
         # yapf: disable
         expected_error = dedent(
             """\
-            Usage: dcos-docker setup-mac-network [OPTIONS]
+            Usage: minidcos docker setup-mac-network [OPTIONS]
 
             Error: Invalid value for "--configuration-dst": "{value}" does not have the suffix ".ovpn".
             """,# noqa: E501,E261
@@ -684,8 +683,9 @@ class TestSetupMacNetwork():
         configuration_file.write('example')
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
+            minidcos,
             [
+                'docker',
                 'setup-mac-network',
                 '--configuration-dst',
                 str(configuration_file),
@@ -697,7 +697,7 @@ class TestSetupMacNetwork():
         # yapf: disable
         expected_error = dedent(
             """\
-            Usage: dcos-docker setup-mac-network [OPTIONS]
+            Usage: minidcos docker setup-mac-network [OPTIONS]
 
             Error: Invalid value for "--configuration-dst": "{value}" already exists so no new OpenVPN configuration was created.
 
@@ -705,7 +705,7 @@ class TestSetupMacNetwork():
             1. Install an OpenVPN client such as Tunnelblick (https://tunnelblick.net/downloads.html) or Shimo (https://www.shimovpn.com).
             2. Run "open {value}".
             3. In your OpenVPN client, connect to the new "example" profile.
-            4. Run "dcos-docker doctor" to confirm that everything is working.
+            4. Run "minidcos docker doctor" to confirm that everything is working.
             """,# noqa: E501,E261
         ).format(
             value=str(configuration_file),
@@ -727,15 +727,15 @@ class TestCreateLoopbackSidecar:
         test_sidecar = 'test-sidecar'
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['create-loopback-sidecar', test_sidecar],
+            minidcos,
+            ['docker', 'create-loopback-sidecar', test_sidecar],
         )
         assert result.exit_code == 0
 
         try:
             result = runner.invoke(
-                dcos_docker,
-                ['create-loopback-sidecar', test_sidecar],
+                minidcos,
+                ['docker', 'create-loopback-sidecar', test_sidecar],
             )
             assert result.exit_code == 2
             expected_error = 'Loopback sidecar "{name}" already exists'
@@ -743,8 +743,8 @@ class TestCreateLoopbackSidecar:
             assert expected_error in result.output
         finally:
             result = runner.invoke(
-                dcos_docker,
-                ['destroy-loopback-sidecar', test_sidecar],
+                minidcos,
+                ['docker', 'destroy-loopback-sidecar', test_sidecar],
             )
             assert result.exit_code == 0
 
@@ -761,8 +761,8 @@ class TestDestroyLoopbackSidecar:
         does_not_exist = 'does-not-exist'
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['destroy-loopback-sidecar', does_not_exist],
+            minidcos,
+            ['docker', 'destroy-loopback-sidecar', does_not_exist],
         )
         assert result.exit_code == 2
         expected_error = 'Loopback sidecar "{name}" does not exist'
@@ -781,8 +781,8 @@ class TestListLoopbackSidecars:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_docker,
-            ['list-loopback-sidecars'],
+            minidcos,
+            ['docker', 'list-loopback-sidecars'],
             catch_exceptions=False,
         )
         assert result.exit_code == 0

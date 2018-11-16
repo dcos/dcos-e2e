@@ -1,4 +1,4 @@
-Usage: dcos-aws doctor [OPTIONS]
+Usage: minidcos aws doctor [OPTIONS]
 
   Diagnose common issues which stop this CLI from working correctly.
 

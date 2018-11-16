@@ -1,4 +1,4 @@
-Usage: dcos-vagrant doctor [OPTIONS]
+Usage: minidcos vagrant doctor [OPTIONS]
 
   Diagnose common issues which stop this CLI from working correctly.
 

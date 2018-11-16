@@ -21,7 +21,7 @@ def web(cluster_id: str, verbose: int) -> None:
     Open the browser at the web UI.
 
     Note that the web UI may not be available at first.
-    Consider using ``dcos-vagrant wait`` before running this command.
+    Consider using ``minidcos vagrant wait`` before running this command.
     """
     set_logging(verbosity_level=verbose)
     check_cluster_id_exists(

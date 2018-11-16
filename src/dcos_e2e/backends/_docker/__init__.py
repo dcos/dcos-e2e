@@ -101,7 +101,7 @@ def _get_fallback_storage_driver() -> DockerStorageDriver:
         # This chooses the aufs driver if the host's driver is not
         # supported because this is widely supported.
         #
-        # This is encoded in a `dcos-docker doctor` check.
+        # This is encoded in a `minidcos docker doctor` check.
         return DockerStorageDriver.AUFS
 
 

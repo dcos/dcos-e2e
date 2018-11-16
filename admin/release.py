@@ -76,8 +76,8 @@ def create_github_release(
     # We fetch all tags from GitHub and set our local HEAD to the latest master
     # from GitHub.
     #
-    # One symptom of this is that ``dcos-docker --version`` from the
-    # PyInstaller binaries shows the correct version.
+    # One symptom of this is that ``minidcos --version`` from the PyInstaller
+    # binary shows the correct version.
     local_repository = Repo('.')
     client = HttpGitClient(repository.owner.html_url)
     remote_refs = client.fetch(repository.name + '.git', local_repository)
@@ -180,7 +180,7 @@ def release(github_token: str, github_owner: str) -> None:
     logging.basicConfig(level=logging.DEBUG)
     repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
-    homebrew_file = Path('dcose2e.rb')
+    homebrew_file = Path('minidcos.rb')
     vagrantfile = Path('vagrant/Vagrantfile')
     changelog = Path('CHANGELOG.rst')
     update_changelog(version=version_str, changelog=changelog)

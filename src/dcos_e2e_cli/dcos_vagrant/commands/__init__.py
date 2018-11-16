@@ -1,3 +1,3 @@
 """
-Commands for ``dcos-vagrant``.
+Commands for ``minidcos vagrant``.
 """

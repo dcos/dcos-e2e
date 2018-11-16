@@ -13,28 +13,7 @@ from typing import List
 import pytest
 from click.testing import CliRunner
 
-from dcos_e2e_cli import dcos_aws
-
-
-class TestDcosAWS:
-    """
-    Tests for the top level `dcos-aws` command.
-    """
-
-    def test_version(self) -> None:
-        """
-        The CLI version is shown with ``dcos-aws --version``.
-        """
-        runner = CliRunner()
-        result = runner.invoke(
-            dcos_aws,
-            ['--version'],
-            catch_exceptions=False,
-        )
-
-        assert result.exit_code == 0
-        expected = 'dcos-aws, version'
-        assert expected in result.output
+from dcos_e2e_cli import dcos_aws, minidcos
 
 
 class TestDoctor:
@@ -48,8 +27,8 @@ class TestDoctor:
         """
         runner = CliRunner()
         result = runner.invoke(
-            dcos_aws,
-            ['doctor'],
+            minidcos,
+            ['aws', 'doctor'],
             catch_exceptions=False,
         )
         assert result.exit_code == 0
@@ -72,15 +51,15 @@ class TestHelp:
     )
     def test_help(self, command: List[str]) -> None:
         """
-        Expected help text is shown for ``dcos-aws`` commands.
+        Expected help text is shown for ``minidcos aws`` commands.
 
         This help text is defined in files.
         To update these files, run the command
         ``bash admin/update_cli_tests.sh``.
         """
         runner = CliRunner()
-        arguments = command + ['--help']
-        result = runner.invoke(dcos_aws, arguments, catch_exceptions=False)
+        arguments = ['aws'] + command + ['--help']
+        result = runner.invoke(minidcos, arguments, catch_exceptions=False)
         assert result.exit_code == 0
         help_output_filename = '-'.join(['dcos-aws'] + command) + '.txt'
         help_outputs_dir = Path(__file__).parent / 'help_outputs'
