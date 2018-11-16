@@ -45,12 +45,11 @@ def wait(
     set_logging(verbosity_level=verbose)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
-    parent = ctx.parent
-    assert parent is not None
-    doctor_command_name = '{info_name} {doctor_name}'.format(
-        info_name=parent.info_name,
-        doctor_name=doctor.name,
-    )
+    # We work on the assumption that the ``doctor`` command is a sibling
+    # command of this one.
+    command_path_list = ctx.command_path.split()
+    command_path_list[-1] = doctor.name
+    doctor_command_name = ' '.join(command_path_list)
     show_wait_help(
         is_enterprise=cluster_vms.is_enterprise,
         doctor_command_name=doctor_command_name,
