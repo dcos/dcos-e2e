@@ -550,5 +550,8 @@ def create(
         'Cluster "{cluster_id}" has started. '
         'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
         'DC/OS to become ready.'
-    ).format(cluster_id=cluster_id, wait_command_name=wait_command_name)
+    ).format(
+        cluster_id=cluster_id,
+        wait_command_name=wait_command_name,
+    )
     click.echo(started_message, err=True)
