@@ -10,7 +10,6 @@ from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
-import click_spinner
 import docker
 from docker.models.networks import Network
 from docker.types import Mount
@@ -38,6 +37,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     get_variant,
+    install_dcos_from_path,
     set_logging,
     write_key_pair,
 )
@@ -512,23 +512,15 @@ def create(
                 remote_path=remote_path,
             )
 
-    try:
-        with click_spinner.spinner():
-            cluster.install_dcos_from_path(
-                build_artifact=artifact_path,
-                dcos_config={
-                    **cluster.base_config,
-                    **extra_config,
-                },
-                ip_detect_path=cluster_backend.ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            )
-    except CalledProcessError as exc:
-        click.echo('Error installing DC/OS.', err=True)
-        click.echo(doctor_message)
-        cluster.destroy()
-        sys.exit(exc.returncode)
-
+    install_dcos_from_path(
+        cluster=cluster,
+        dcos_config={
+            **cluster.base_config,
+            **extra_config,
+        },
+        ip_detect_path=ip_detect_path,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+    )
     click.echo(cluster_id)
 
     if wait_for_dcos:
