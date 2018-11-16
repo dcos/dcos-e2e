@@ -19,6 +19,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
    ...
    # Get onto a node
    $ minidcos vagrant run bash
+   [master-0]# exit
    $ minidcos vagrant destroy
 
 Each of these and more are described in detail below.
