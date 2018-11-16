@@ -17,6 +17,7 @@ import dcos_e2e
 sys.path.insert(0, os.path.abspath('.'))
 
 extensions = [
+    'sphinx-prompt',
     'sphinx_substitution_extensions',
     'sphinx.ext.autodoc',
     'sphinx.ext.extlinks',
