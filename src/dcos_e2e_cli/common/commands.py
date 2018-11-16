@@ -46,7 +46,10 @@ def download_artifact(
 
     For DC/OS Enterprise release artifacts, contact your sales representative.
     """
+    path = Path(download_path)
+    path.parent.mkdir(exist_ok=True, parents=True)
     path = Path(download_path).resolve()
+
     click.echo('Downloading to {path}.'.format(path=path))
 
     if dcos_version.startswith('http'):
