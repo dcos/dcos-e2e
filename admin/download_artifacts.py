@@ -7,10 +7,6 @@ from pathlib import Path
 from typing import Dict  # noqa: F401
 from typing import Tuple  # noqa: F401
 
-import click
-import requests
-from tqdm import tqdm
-
 OSS_PATTERN = (
     'https://downloads.dcos.io/dcos/testing/{version}/dcos_generate_config.sh'
 )
