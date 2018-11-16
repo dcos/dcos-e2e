@@ -12,6 +12,8 @@ Options:
                         ``testing/pull/<GITHUB-PR-NUMBER>``.
                         See
                         https://dcos.io/releases/ for available releases.
+                        If an
+                        HTTP or HTTPS URL is given, that is downloaded.
                         [default: stable]
   --download-path TEXT  The path to download a release artifact to.  [default:
                         ./dcos_generate_config.sh]

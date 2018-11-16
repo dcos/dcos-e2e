@@ -24,6 +24,8 @@ from tqdm import tqdm
         '``stable/<DC/OS MINOR RELEASE>``, '
         '``testing/pull/<GITHUB-PR-NUMBER>``.\n'
         'See https://dcos.io/releases/ for available releases.'
+        '\n'
+        'If an HTTP or HTTPS URL is given, that is downloaded.'
     ),
 )
 @click.option(
@@ -46,8 +48,13 @@ def download_artifact(
     """
     path = Path(download_path).resolve()
     click.echo('Downloading to {path}.'.format(path=path))
-    base_url = 'https://downloads.dcos.io/dcos/'
-    url = base_url + dcos_version + '/dcos_generate_config.sh'
+
+    if dcos_version.startswith('http'):
+        url = dcos_version
+    else:
+        base_url = 'https://downloads.dcos.io/dcos/'
+        url = base_url + dcos_version + '/dcos_generate_config.sh'
+
     head_resp = requests.head(url)
     if not head_resp.ok:
         message = 'Cannot download artifact from {url}.'.format(url=url)
