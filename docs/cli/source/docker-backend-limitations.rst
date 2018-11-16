@@ -2,7 +2,7 @@ Limitations
 -----------
 
 Docker does not represent a real DC/OS environment with complete accuracy.
-This section describes the currently known differences between clusters created with :ref:`dcos-docker-cli:dcos-docker` and a real DC/OS environment.
+This section describes the currently known differences between clusters created with :ref:`dcos-docker-cli:minidcos docker` and a real DC/OS environment.
 
 SELinux
 ~~~~~~~
