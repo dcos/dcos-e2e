@@ -69,7 +69,7 @@ from .wait import wait
 def create(
     ctx: click.core.Context,
     agents: int,
-    artifact: str,
+    installer: str,
     extra_config: Dict[str, Any],
     masters: int,
     public_agents: int,

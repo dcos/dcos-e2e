@@ -353,7 +353,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 def create(
     ctx: click.core.Context,
     agents: int,
-    artifact: str,
+    installer: str,
     cluster_id: str,
     docker_storage_driver: str,
     docker_version: str,

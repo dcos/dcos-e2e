@@ -65,7 +65,7 @@ def get_doctor_message(
 
 def get_variant(
     given_variant: str,
-    artifact_path: Optional[Path],
+    installer_path: Optional[Path],
     doctor_message: str,
     workspace_dir: Path,
 ) -> DCOSVariant:
@@ -76,7 +76,7 @@ def get_variant(
         given_variant: The variant string given by the user to the
             ``variant_option``. One of "auto", "enterprise" and "oss". If
             "auto" is given, use the DC/OS installer to find the variant.
-        artifact_path: The path to a DC/OS installer, if available.
+        installer_path: The path to a DC/OS installer, if available.
         workspace_dir: A directory to work in, given that this function uses
             large files.
         doctor_message: The message to show if something goes wrong.
@@ -88,11 +88,11 @@ def get_variant(
         CalledProcessError: There was an error unpacking the installer.
     """
     if given_variant == 'auto':
-        assert artifact_path is not None
+        assert installer_path is not None
         try:
             with click_spinner.spinner():
                 return get_dcos_installer_details(
-                    installer=artifact_path,
+                    installer=installer_path,
                     workspace_dir=workspace_dir,
                 ).variant
         except subprocess.CalledProcessError as exc:
