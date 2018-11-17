@@ -20,7 +20,7 @@ class TestAdvancedInstallationMethod:
     Test installing DC/OS on a node.
     """
 
-    def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
+    def test_install_dcos_from_url(self, oss_installer_url: str) -> None:
         """
         It is possible to install DC/OS on a node from a URL.
         """
@@ -35,7 +35,7 @@ class TestAdvancedInstallationMethod:
             ):
                 for node in nodes:
                     node.install_dcos_from_url(
-                        dcos_installer=oss_artifact_url,
+                        dcos_installer=oss_installer_url,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,

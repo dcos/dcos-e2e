@@ -92,7 +92,7 @@ class TestRunIntegrationTest:
     @pytest.mark.parametrize('linux_distribution', [Distribution.CENTOS_7])
     def test_run_enterprise_integration_test(
         self,
-        ee_artifact_url: str,
+        ee_installer_url: str,
         license_key_contents: str,
         linux_distribution: Distribution,
     ) -> None:
@@ -118,7 +118,7 @@ class TestRunIntegrationTest:
         ) as cluster:
 
             cluster.install_dcos_from_url(
-                dcos_installer=ee_artifact_url,
+                dcos_installer=ee_installer_url,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -238,7 +238,7 @@ class TestDCOSInstallation:
 
     def test_install_dcos_from_node(
         self,
-        oss_artifact_url: str,
+        oss_installer_url: str,
     ) -> None:
         """
         It is possible to install DC/OS on an AWS cluster node by node.
@@ -251,7 +251,7 @@ class TestDCOSInstallation:
         ) as cluster:
             (master, ) = cluster.masters
             master.install_dcos_from_url(
-                dcos_installer=oss_artifact_url,
+                dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
                 output=Output.CAPTURE,
@@ -261,7 +261,7 @@ class TestDCOSInstallation:
 
     def test_install_dcos_with_custom_ip_detect(
         self,
-        oss_artifact_url: str,
+        oss_installer_url: str,
         tmpdir: local,
     ) -> None:
         """
@@ -285,7 +285,7 @@ class TestDCOSInstallation:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_url(
-                dcos_installer=oss_artifact_url,
+                dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=Path(str(ip_detect_file)),
@@ -302,7 +302,7 @@ class TestDCOSInstallation:
 
     def test_install_dcos_with_custom_genconf(
         self,
-        oss_artifact_url: str,
+        oss_installer_url: str,
         tmpdir: local,
     ) -> None:
         """
@@ -326,7 +326,7 @@ class TestDCOSInstallation:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_url(
-                dcos_installer=oss_artifact_url,
+                dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
