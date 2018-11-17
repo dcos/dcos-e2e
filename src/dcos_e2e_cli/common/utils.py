@@ -156,17 +156,35 @@ def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.chmod(mode=stat.S_IRUSR)
 
 
-def show_wait_help(is_enterprise: bool, doctor_command_name: str) -> None:
+def wait_for_dcos(
+    is_enterprise: bool,
+    cluster: Cluster,
+    superuser_username: str,
+    superuser_password: str,
+    http_checks: bool,
+    sibling_ctx: click.core.Context,
+    doctor_command: click.core.Command,
+) -> None:
     """
-    Show a message useful for "wait" commands to warn the user of potential
-    issues.
+    Wait for DC/OS to start.
 
     Args:
         is_enterprise: Whether or not the cluster is a DC/OS Enterprise
             cluster.
-        doctor_command_name: The full command path to a ``doctor`` command to
-            advise a user to use.
+        cluster: The cluster to wait for.
+        superuser_username: If the cluster is a DC/OS Enterprise cluster, use
+            this username to wait for DC/OS.
+        superuser_password: If the cluster is a DC/OS Enterprise cluster, use
+            this password to wait for DC/OS.
+        http_checks: Whether or not to wait for checks which require an HTTP
+            connection to the cluster.
+        doctor_command: A ``doctor`` command to advise a user to use.
+        sibling_ctx: A context associated with a call to a sibling of
+            ``doctor_command``.
     """
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    doctor_command_name = _command_path(
+    )
     message = (
         'A cluster may take some time to be ready.\n'
         'The amount of time it takes to start a cluster depends on a variety '
@@ -184,29 +202,6 @@ def show_wait_help(is_enterprise: bool, doctor_command_name: str) -> None:
 
     if not is_enterprise:
         click.echo(no_login_message)
-
-
-def wait_for_dcos(
-    is_enterprise: bool,
-    cluster: Cluster,
-    superuser_username: str,
-    superuser_password: str,
-    http_checks: bool,
-) -> None:
-    """
-    Wait for DC/OS to start.
-
-    Args:
-        is_enterprise: Whether or not the cluster is a DC/OS Enterprise
-            cluster.
-        cluster: The cluster to wait for.
-        superuser_username: If the cluster is a DC/OS Enterprise cluster, use
-            this username to wait for DC/OS.
-        superuser_password: If the cluster is a DC/OS Enterprise cluster, use
-            this password to wait for DC/OS.
-        http_checks: Whether or not to wait for checks which require an HTTP
-            connection to the cluster.
-    """
     with click_spinner.spinner():
         try:
             if is_enterprise:
