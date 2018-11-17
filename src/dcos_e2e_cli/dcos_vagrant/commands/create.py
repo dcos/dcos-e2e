@@ -212,7 +212,7 @@ def create(
             **cluster.base_config,
             **extra_config,
         },
-        ip_detect_path=ip_detect_path,
+        ip_detect_path=cluster.ip_detect_path,
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
     )
 
