@@ -202,6 +202,32 @@ def _validate_volumes(
     return mounts
 
 
+def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
+    """
+    Add an authorized key to all nodes in the given cluster.
+    """
+    nodes = {
+        *cluster.masters,
+        *cluster.agents,
+        *cluster.public_agents,
+    }
+
+    for node in nodes:
+        node.run(
+            args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
+            shell=True,
+        )
+        node.run(
+            args=[
+                'echo',
+                public_key_path.read_text(),
+                '>>',
+                '/root/.ssh/authorized_keys',
+            ],
+            shell=True,
+        )
+
+
 @click.command('create')
 @artifact_argument
 @click.option(
@@ -491,20 +517,7 @@ def create(
         *cluster.public_agents,
     }
 
-    for node in nodes:
-        node.run(
-            args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
-            shell=True,
-        )
-        node.run(
-            args=[
-                'echo',
-                public_key_path.read_text(),
-                '>>',
-                '/root/.ssh/authorized_keys',
-            ],
-            shell=True,
-        )
+    _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
