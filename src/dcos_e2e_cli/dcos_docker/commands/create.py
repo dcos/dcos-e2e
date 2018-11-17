@@ -494,12 +494,10 @@ def create(
                 remote_path=remote_path,
             )
 
-    is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
-
     dcos_config = get_config(
         cluster=cluster,
         extra_config=extra_config,
-        is_enterprise=is_enterprise,
+        dcos_variant=dcos_variant,
         security_mode=security_mode,
         license_key=license_key,
     )
