@@ -34,6 +34,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     set_logging,
+    show_cluster_started_message,
     write_key_pair,
 )
 
@@ -51,6 +52,7 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._options import aws_region_option, linux_distribution_option
+from .wait import wait
 
 
 def _validate_tags(
@@ -123,7 +125,9 @@ def _validate_tags(
 @verbosity_option
 @cluster_id_option
 @enable_selinux_enforcing_option
+@click.pass_context
 def create(
+    ctx: click.core.Context,
     agents: int,
     artifact_url: str,
     extra_config: Dict[str, Any],
@@ -302,3 +306,13 @@ def create(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+    show_cluster_started_message(
+        # We work on the assumption that the ``wait`` command is a sibling
+        # command of this one.
+        sibling_ctx=ctx,
+        wait_command=wait,
+        cluster_id=cluster_id,
+    )
+
+    click.echo(cluster_id)

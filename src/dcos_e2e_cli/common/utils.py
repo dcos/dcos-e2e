@@ -205,6 +205,7 @@ def wait_for_dcos(
             sys.exit(1)
 
 
+<<<<<<< HEAD
 def install_dcos_from_path(
     cluster: Cluster,
     ip_detect_path: Path,
@@ -237,3 +238,33 @@ def install_dcos_from_path(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+
+def show_cluster_started_message(
+    sibling_ctx: click.core.Context,
+    wait_command: click.core.Command,
+    cluster_id: str,
+) -> None:
+    """
+    Show a message which says that the cluster has started.
+    Point the user towards a ``wait`` command.
+
+    Args:
+        sibling_ctx: A context associated with a call to a sibling of
+            ``wait_command``.
+        wait_command: A command which can take a ``--cluster-id`` option to
+            wait for a cluster.
+        cluster_id: The ID of a cluster which has just been created.
+    """
+    command_path_list = sibling_ctx.command_path.split()
+    command_path_list[-1] = wait_command.name
+    wait_command_name = ' '.join(command_path_list)
+    cluster_started_message = (
+        'Cluster "{cluster_id}" has started. '
+        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
+        'DC/OS to become ready.'
+    ).format(
+        cluster_id=cluster_id,
+        wait_command_name=wait_command_name,
+    )
+    click.echo(cluster_started_message, err=True)

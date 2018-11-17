@@ -37,6 +37,7 @@ from dcos_e2e_cli.common.utils import (
     get_variant,
     install_dcos_from_path,
     set_logging,
+    show_cluster_started_message,
 )
 
 from ._common import (
@@ -47,6 +48,7 @@ from ._common import (
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
+from .wait import wait
 
 
 @click.command('create')
@@ -64,7 +66,9 @@ from ._common import (
 @cluster_id_option
 @verbosity_option
 @enable_selinux_enforcing_option
+@click.pass_context
 def create(
+    ctx: click.core.Context,
     agents: int,
     artifact: str,
     extra_config: Dict[str, Any],
@@ -212,4 +216,13 @@ def create(
         ip_detect_path=ip_detect_path,
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
     )
+
+    show_cluster_started_message(
+        # We work on the assumption that the ``wait`` command is a sibling
+        # command of this one.
+        sibling_ctx=ctx,
+        wait_command=wait,
+        cluster_id=cluster_id,
+    )
+
     click.echo(cluster_id)
