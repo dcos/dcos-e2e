@@ -89,10 +89,10 @@ To run the full test suite, set environment variables for DC/OS Enterprise artif
 
 .. substitution-prompt:: bash
 
-   export EE_MASTER_ARTIFACT_URL=https://...
-   export EE_1_9_ARTIFACT_URL=https://...
-   export EE_1_10_ARTIFACT_URL=https://...
-   export EE_1_11_ARTIFACT_URL=https://...
+   export EE_MASTER_INSTALLER_URL=https://...
+   export EE_1_9_INSTALLER_URL=https://...
+   export EE_1_10_INSTALLER_URL=https://...
+   export EE_1_11_INSTALLER_URL=https://...
 
 Download dependencies which are used by the tests:
 
@@ -170,17 +170,17 @@ Private links to DC/OS Enterprise artifacts are used by Travis CI.
 
 To update these links use the following commands, after setting the following environment variables:
 
-* ``EE_MASTER_ARTIFACT_URL``
-* ``EE_1_9_ARTIFACT_URL``
-* ``EE_1_10_ARTIFACT_URL``
-* ``EE_1_11_ARTIFACT_URL``
+* ``EE_MASTER_INSTALLER_URL``
+* ``EE_1_9_INSTALLER_URL``
+* ``EE_1_10_INSTALLER_URL``
+* ``EE_1_11_INSTALLER_URL``
 
 .. substitution-prompt:: bash
 
-    travis env set --repo |github-owner|/|github-repository| EE_MASTER_ARTIFACT_URL $EE_MASTER_ARTIFACT_URL
-    travis env set --repo |github-owner|/|github-repository| EE_1_9_ARTIFACT_URL $EE_1_9_ARTIFACT_URL
-    travis env set --repo |github-owner|/|github-repository| EE_1_10_ARTIFACT_URL $EE_1_10_ARTIFACT_URL
-    travis env set --repo |github-owner|/|github-repository| EE_1_11_ARTIFACT_URL $EE_1_11_ARTIFACT_URL
+    travis env set --repo |github-owner|/|github-repository| EE_MASTER_INSTALLER_URL $EE_MASTER_INSTALLER_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_9_INSTALLER_URL $EE_1_9_INSTALLER_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_10_INSTALLER_URL $EE_1_10_INSTALLER_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_11_INSTALLER_URL $EE_1_11_INSTALLER_URL
 
 Updating the Amazon Web Services credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

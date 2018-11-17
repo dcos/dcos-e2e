@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Rename ``build_artifact`` and related variables to "installer".
+
 2018.11.16.2
 ------------
 
