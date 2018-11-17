@@ -60,6 +60,7 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._options import node_transport_option
+from .doctor import doctor
 from .wait import wait
 
 
@@ -391,7 +392,7 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
-    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
+    doctor_message = 'Try `minidcos docker doctor` for troubleshooting help.'
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
@@ -519,8 +520,11 @@ def create(
             **cluster.base_config,
             **extra_config,
         },
-        ip_detect_path=cluster.ip_detect_path,
+        ip_detect_path=cluster_backend.ip_detect_path,
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        doctor_command=doctor,
+        sibling_ctx=ctx,
+        installer=artifact_path,
     )
 
     if wait_for_dcos:

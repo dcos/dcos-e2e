@@ -48,6 +48,7 @@ from ._common import (
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
+from .doctor import doctor
 from .wait import wait
 
 
@@ -212,8 +213,11 @@ def create(
             **cluster.base_config,
             **extra_config,
         },
-        ip_detect_path=cluster.ip_detect_path,
+        ip_detect_path=cluster_backend.ip_detect_path,
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        doctor_command=doctor,
+        sibling_ctx=ctx,
+        installer=artifact_path,
     )
 
     show_cluster_started_message(
