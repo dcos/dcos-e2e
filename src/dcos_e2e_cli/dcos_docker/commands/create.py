@@ -443,22 +443,11 @@ def create(
         DCOSVariant.ENTERPRISE,
     }[variant]
 
-    if dcos_variant == DCOSVariant.ENTERPRISE:
-        superuser_username = 'admin'
-        superuser_password = 'admin'
-
-        enterprise_extra_config = {
-            'superuser_username': superuser_username,
-            'superuser_password_hash': sha512_crypt.hash(superuser_password),
-            'fault_domain_enabled': False,
-        }
-        if license_key is not None:
-            key_contents = Path(license_key).read_text()
-            enterprise_extra_config['license_key_contents'] = key_contents
-
-        extra_config = {**enterprise_extra_config, **extra_config}
-        if security_mode is not None:
-            extra_config['security'] = security_mode
+    dcos_config = get_config(
+        cluster=cluster,
+        extra_config=extra_config,
+        is_enterprise=bool(dcos_variant == DCOSVariant.ENTERPRISE),
+    )
 
     files_to_copy_to_genconf_dir = []
     if genconf_dir is not None:
