@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, Iterable, Set, Tuple
+from typing import Any, Dict, Iterable, Optional, Set, Tuple
 
 import click
 import click_spinner
@@ -58,48 +58,57 @@ def get_doctor_message(
         sibling_ctx=sibling_ctx,
         command=doctor_command,
     )
-    doctor_message = (
-        'Try "{doctor_command_name}" for troubleshooting help.'
-    ).format(doctor_command_name=doctor_command_name)
+    doctor_message = ('Try "{doctor_command_name}" for troubleshooting help.'
+                      ).format(doctor_command_name=doctor_command_name)
     return doctor_message
 
 
 def get_variant(
-    artifact_path: Path,
+    given_variant: str,
+    artifact_path: Optional[Path],
     doctor_message: str,
     workspace_dir: Path,
 ) -> DCOSVariant:
     """
-    Get the variant of a DC/OS artifact.
+    Get the variant of DC/OS to install.
 
     Args:
-        artifact_path: The path to an artifact to get the DC/OS variant of.
+        given_variant: The variant string given by the user to the
+            ``variant_option``. One of "auto", "enterprise" and "oss". If
+            "auto" is given, use the DC/OS installer to find the variant.
+        artifact_path: The path to a DC/OS installer, if available.
         workspace_dir: A directory to work in, given that this function uses
             large files.
         doctor_message: The message to show if something goes wrong.
 
     Returns:
-        "oss" or "enterprise" as appropriate.
+        The variant of DC/OS to install.
 
     Raises:
         CalledProcessError: There was an error unpacking the artifact.
     """
-    try:
-        with click_spinner.spinner():
-            return get_dcos_installer_details(
-                installer=artifact_path,
-                workspace_dir=workspace_dir,
-            ).variant
-    except subprocess.CalledProcessError as exc:
-        rmtree(path=str(workspace_dir), ignore_errors=True)
-        click.echo(doctor_message)
-        click.echo()
-        click.echo('Original error:', err=True)
-        click.echo(exc.stderr, err=True)
-        raise
-    except ValueError as exc:
-        click.echo(str(exc), err=True)
-        sys.exit(1)
+    if given_variant == 'auto':
+        try:
+            with click_spinner.spinner():
+                return get_dcos_installer_details(
+                    installer=artifact_path,
+                    workspace_dir=workspace_dir,
+                ).variant
+        except subprocess.CalledProcessError as exc:
+            rmtree(path=str(workspace_dir), ignore_errors=True)
+            click.echo(doctor_message)
+            click.echo()
+            click.echo('Original error:', err=True)
+            click.echo(exc.stderr, err=True)
+            raise
+        except ValueError as exc:
+            click.echo(str(exc), err=True)
+            sys.exit(1)
+
+    return {
+        'oss': DCOSVariant.OSS,
+        'enterprise': DCOSVariant.ENTERPRISE,
+    }[given_variant]
 
 
 def set_logging(verbosity_level: int) -> None:

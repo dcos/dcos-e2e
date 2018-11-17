@@ -431,18 +431,12 @@ def create(
 
     artifact_path = Path(artifact).resolve()
 
-    dcos_variant = {
-        'auto':
-        get_variant(
-            artifact_path=artifact_path,
-            workspace_dir=workspace_dir,
-            doctor_message=doctor_message,
-        ),
-        'oss':
-        DCOSVariant.OSS,
-        'enterprise':
-        DCOSVariant.ENTERPRISE,
-    }[variant]
+    dcos_variant = get_variant(
+        given_variant=variant,
+        artifact_path=artifact_path,
+        workspace_dir=workspace_dir,
+        doctor_message=doctor_message,
+    )
 
     files_to_copy_to_genconf_dir = []
     if genconf_dir is not None:

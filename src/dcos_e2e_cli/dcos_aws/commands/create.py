@@ -16,6 +16,7 @@ import click_spinner
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
@@ -34,6 +35,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     get_doctor_message,
+    get_variant,
     set_logging,
     show_cluster_started_message,
     write_key_pair,
@@ -205,7 +207,13 @@ def create(
     )
 
     doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
-    is_enterprise = bool(variant == 'enterprise')
+    dcos_variant = get_variant(
+        given_variant=variant,
+        artifact_path=None,
+        workspace_dir=workspace_dir,
+        doctor_message=doctor_message,
+    )
+    is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
 
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
