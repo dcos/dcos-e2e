@@ -38,9 +38,16 @@ def _command_path(
         command: A command.
     """
     command_path_list = sibling_ctx.command_path.split()
+<<<<<<< HEAD
     command_path_list[-1] = wait_command.name
     return ' '.join(command_path_list)
 
+=======
+    command_path_list[-1] = command.name
+    return ' '.join(command_path_list)
+
+
+>>>>>>> origin/master
 def get_variant(
     artifact_path: Path,
     doctor_message: str,
@@ -274,7 +281,10 @@ def show_cluster_started_message(
             wait for a cluster.
         cluster_id: The ID of a cluster which has just been created.
     """
-    wait_command_name = _command_path(sibling_ctx=sibling_ctx, command=wait)
+    wait_command_name = _command_path(
+        sibling_ctx=sibling_ctx,
+        command=wait_command,
+    )
     cluster_started_message = (
         'Cluster "{cluster_id}" has started. '
         'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
