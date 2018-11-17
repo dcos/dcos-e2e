@@ -113,8 +113,7 @@ def create(
             * The ``license_key_contents`` set in ``--extra-config``.
             * The contents of the path given with ``--license-key``.
             * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
- for a cluster.
-cluster_id: The ID of a cluster which has just been created.
+
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
