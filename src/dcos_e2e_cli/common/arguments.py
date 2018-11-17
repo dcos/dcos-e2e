@@ -39,7 +39,7 @@ def installer_argument(command: Callable[..., None]) -> Callable[..., None]:
     Decorate a function to allow choosing a DC/OS installer.
     """
     function = click.argument(
-        'artifact',
+        'installer',
         type=click.Path(exists=True),
     )(command)  # type: Callable[..., None]
     return function
