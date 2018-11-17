@@ -88,6 +88,7 @@ def get_variant(
         CalledProcessError: There was an error unpacking the artifact.
     """
     if given_variant == 'auto':
+        assert artifact_path is not None
         try:
             with click_spinner.spinner():
                 return get_dcos_installer_details(
