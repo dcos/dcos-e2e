@@ -50,7 +50,7 @@ def enterprise_1_9_artifact() -> Path:
 
 
 @pytest.fixture(scope='session')
-def oss_1_10_artifact() -> Path:
+def oss_1_10_installer() -> Path:
     """
     Return the path to an installer for DC/OS OSS 1.10.
     """
@@ -58,7 +58,7 @@ def oss_1_10_artifact() -> Path:
 
 
 @pytest.fixture(scope='session')
-def enterprise_1_10_artifact() -> Path:
+def enterprise_1_10_installer() -> Path:
     """
     Return the path to an installer for DC/OS Enterprise 1.10.
     """
@@ -66,7 +66,7 @@ def enterprise_1_10_artifact() -> Path:
 
 
 @pytest.fixture(scope='session')
-def oss_1_11_artifact() -> Path:
+def oss_1_11_installer() -> Path:
     """
     Return the path to an installer for DC/OS OSS 1.11.
     """
