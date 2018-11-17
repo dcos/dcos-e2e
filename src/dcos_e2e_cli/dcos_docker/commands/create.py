@@ -2,11 +2,9 @@
 Tools for creating a DC/OS cluster.
 """
 
-import sys
 import tempfile
 import uuid
 from pathlib import Path
-from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
@@ -19,7 +17,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import artifact_argument
-from dcos_e2e_cli.common.create import get_config
+from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -477,17 +475,14 @@ def create(
         one_master_host_port_map=one_master_host_port_map,
     )
 
-    try:
-        cluster = Cluster(
-            cluster_backend=cluster_backend,
-            masters=masters,
-            agents=agents,
-            public_agents=public_agents,
-        )
-    except CalledProcessError as exc:
-        click.echo('Error creating cluster.', err=True)
-        click.echo(doctor_message)
-        sys.exit(exc.returncode)
+    cluster = create_cluster(
+        cluster_backend=cluster_backend,
+        masters=masters,
+        agents=agents,
+        public_agents=public_agents,
+        sibling_ctx=ctx,
+        doctor_command=doctor,
+    )
 
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
 
