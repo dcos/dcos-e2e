@@ -61,6 +61,7 @@ def get_doctor_message(
     doctor_message = (
         'Try "{doctor_command_name}" for troubleshooting help.'
     ).format(doctor_command_name=doctor_command_name)
+    return doctor_message
 
 
 def get_variant(
