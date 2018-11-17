@@ -17,7 +17,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import artifact_argument
-from dcos_e2e_cli.common.create import get_config
+from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -482,12 +482,6 @@ def create(
         public_agents=public_agents,
         sibling_ctx=ctx,
         doctor_command=doctor_command,
-    )
-
-    dcos_config = get_config(
-        cluster=cluster,
-        extra_config=extra_config,
-        is_enterprise=bool(dcos_variant == DCOSVariant.ENTERPRISE),
     )
 
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)

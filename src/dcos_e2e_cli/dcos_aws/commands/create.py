@@ -17,7 +17,7 @@ from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.create import get_config
+from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -249,17 +249,14 @@ def create(
         public_agent_ec2_instance_tags=public_agent_tags,
     )
 
-    try:
-        cluster = Cluster(
-            cluster_backend=cluster_backend,
-            masters=masters,
-            agents=agents,
-            public_agents=public_agents,
-        )
-    except CalledProcessError as exc:
-        click.echo('Error creating cluster.', err=True)
-        click.echo(doctor_message)
-        sys.exit(exc.returncode)
+    cluster = create_cluster(
+        cluster_backend=cluster_backend,
+        masters=masters,
+        agents=agents,
+        public_agents=public_agents,
+        sibling_ctx=ctx,
+        doctor_command=doctor_command,
+    )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
     for node in nodes:
