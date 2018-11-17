@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, Iterable, Set, Tuple
+from typing import Any, Dict, Iterable, Optional, Set, Tuple
 
 import click
 import click_spinner
@@ -58,9 +58,8 @@ def get_doctor_message(
         sibling_ctx=sibling_ctx,
         command=doctor_command,
     )
-    doctor_message = (
-        'Try "{doctor_command_name}" for troubleshooting help.'
-    ).format(doctor_command_name=doctor_command_name)
+    doctor_message = ('Try "{doctor_command_name}" for troubleshooting help.'
+                      ).format(doctor_command_name=doctor_command_name)
     return doctor_message
 
 
