@@ -473,15 +473,6 @@ def create(
         one_master_host_port_map=one_master_host_port_map,
     )
 
-    cluster = Cluster(
-        cluster_backend=cluster_backend,
-        masters=masters,
-        agents=agents,
-        public_agents=public_agents,
-        sibling_ctx=ctx,
-        doctor_command=doctor_command,
-    )
-
     try:
         cluster = Cluster(
             cluster_backend=cluster_backend,
