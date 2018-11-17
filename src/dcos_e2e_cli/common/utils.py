@@ -12,20 +12,18 @@ from typing import Any, Dict, Iterable, Set, Tuple
 
 import click
 import click_spinner
-import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
     get_dcos_installer_details,
 )
 
 
-def _command_path(
+def command_path(
     sibling_ctx: click.core.Context,
     command: click.core.Command,
 ) -> str:
@@ -157,69 +155,35 @@ def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.chmod(mode=stat.S_IRUSR)
 
 
-def wait_for_dcos(
-    is_enterprise: bool,
-    cluster: Cluster,
-    superuser_username: str,
-    superuser_password: str,
-    http_checks: bool,
+def show_cluster_started_message(
     sibling_ctx: click.core.Context,
-    doctor_command: click.core.Command,
+    wait_command: click.core.Command,
+    cluster_id: str,
 ) -> None:
     """
-    Wait for DC/OS to start.
+    Show a message which says that the cluster has started.
+    Point the user towards a ``wait`` command.
 
     Args:
-        is_enterprise: Whether or not the cluster is a DC/OS Enterprise
-            cluster.
-        cluster: The cluster to wait for.
-        superuser_username: If the cluster is a DC/OS Enterprise cluster, use
-            this username to wait for DC/OS.
-        superuser_password: If the cluster is a DC/OS Enterprise cluster, use
-            this password to wait for DC/OS.
-        http_checks: Whether or not to wait for checks which require an HTTP
-            connection to the cluster.
-        doctor_command: A ``doctor`` command to advise a user to use.
         sibling_ctx: A context associated with a call to a sibling of
-            ``doctor_command``.
+            ``wait_command``.
+        wait_command: A command which can take a ``--cluster-id`` option to
+            wait for a cluster.
+        cluster_id: The ID of a cluster which has just been created.
     """
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    doctor_command_name = _command_path(
+    waitcommand_name = command_path(
         sibling_ctx=sibling_ctx,
-        command=doctor_command,
+        command=wait_command,
     )
-    message = (
-        'A cluster may take some time to be ready.\n'
-        'The amount of time it takes to start a cluster depends on a variety '
-        'of factors.\n'
-        'If you are concerned that this is hanging, try '
-        '"{doctor_command_name}" to diagnose common issues.'
-    ).format(doctor_command_name=doctor_command_name)
-    click.echo(message)
-
-    no_login_message = (
-        'If you cancel this command while it is running, '
-        'you may not be able to log in. '
-        'To resolve that, run this command again.'
+    cluster_started_message = (
+        'Cluster "{cluster_id}" has started. '
+        'Run "{waitcommand_name} --cluster-id {cluster_id}" to wait for '
+        'DC/OS to become ready.'
+    ).format(
+        cluster_id=cluster_id,
+        waitcommand_name=waitcommand_name,
     )
-
-    if not is_enterprise:
-        click.echo(no_login_message)
-
-    with click_spinner.spinner():
-        try:
-            if is_enterprise:
-                cluster.wait_for_dcos_ee(
-                    superuser_username=superuser_username,
-                    superuser_password=superuser_password,
-                    http_checks=http_checks,
-                )
-                return
-
-            cluster.wait_for_dcos_oss(http_checks=http_checks)
-        except DCOSTimeoutError:
-            click.echo('Waiting for DC/OS to start timed out.', err=True)
-            sys.exit(1)
+    click.echo(cluster_started_message, err=True)
 
 
 def install_dcos_from_path(
@@ -246,7 +210,7 @@ def install_dcos_from_path(
         sibling_ctx: A context associated with a call to a sibling of
             ``doctor_command``.
     """
-    doctor_path = _command_path(
+    doctor_path = command_path(
         sibling_ctx=sibling_ctx,
         command=doctor_command,
     )
@@ -266,34 +230,3 @@ def install_dcos_from_path(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
-
-
-def show_cluster_started_message(
-    sibling_ctx: click.core.Context,
-    wait_command: click.core.Command,
-    cluster_id: str,
-) -> None:
-    """
-    Show a message which says that the cluster has started.
-    Point the user towards a ``wait`` command.
-
-    Args:
-        sibling_ctx: A context associated with a call to a sibling of
-            ``wait_command``.
-        wait_command: A command which can take a ``--cluster-id`` option to
-            wait for a cluster.
-        cluster_id: The ID of a cluster which has just been created.
-    """
-    wait_command_name = _command_path(
-        sibling_ctx=sibling_ctx,
-        command=wait_command,
-    )
-    cluster_started_message = (
-        'Cluster "{cluster_id}" has started. '
-        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
-        'DC/OS to become ready.'
-    ).format(
-        cluster_id=cluster_id,
-        wait_command_name=wait_command_name,
-    )
-    click.echo(cluster_started_message, err=True)
