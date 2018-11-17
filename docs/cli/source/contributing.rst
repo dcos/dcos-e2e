@@ -94,7 +94,7 @@ Download dependencies which are used by the tests:
 
 .. substitution-prompt:: bash
 
-   python admin/download_artifacts.py
+   python admin/download_installers.py
 
 A license key is required for some tests:
 
@@ -159,8 +159,8 @@ We do not add an encrypted environment variable to ``.travis.yml`` because the l
 
     travis env set --repo |github-owner|/|github-repository| LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
 
-Updating the DC/OS Enterprise build artifact links
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Updating the DC/OS Enterprise installer links
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Private links to DC/OS Enterprise artifacts are used by Travis CI.
 

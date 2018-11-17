@@ -4,7 +4,7 @@ A CLI for controlling DC/OS clusters on Vagrant.
 
 import click
 
-from dcos_e2e_cli.common.commands import download_artifact
+from dcos_e2e_cli.common.commands import download_installer
 
 from .commands.create import create
 from .commands.destroy import destroy, destroy_list
@@ -28,7 +28,7 @@ dcos_vagrant.add_command(create)
 dcos_vagrant.add_command(destroy)
 dcos_vagrant.add_command(destroy_list)
 dcos_vagrant.add_command(doctor)
-dcos_vagrant.add_command(download_artifact)
+dcos_vagrant.add_command(download_installer)
 dcos_vagrant.add_command(inspect_cluster)
 dcos_vagrant.add_command(list_clusters)
 dcos_vagrant.add_command(run)

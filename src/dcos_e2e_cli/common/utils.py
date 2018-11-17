@@ -85,7 +85,7 @@ def get_variant(
         The variant of DC/OS to install.
 
     Raises:
-        CalledProcessError: There was an error unpacking the artifact.
+        CalledProcessError: There was an error unpacking the installer.
     """
     if given_variant == 'auto':
         assert artifact_path is not None

@@ -152,10 +152,10 @@ class Node:
         https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
 
         The documentation describes using a "bootstrap" node, so that only
-        one node downloads and extracts the artifact.
+        one node downloads and extracts the installer.
         This method is less efficient on a multi-node cluster,
         as it does not use a bootstrap node.
-        Instead, the artifact is extracted on this node, and then DC/OS is
+        Instead, the installer is extracted on this node, and then DC/OS is
         installed.
 
         Args:
@@ -284,10 +284,10 @@ class Node:
         https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
 
         The documentation describes using a "bootstrap" node, so that only
-        one node downloads and extracts the artifact.
+        one node downloads and extracts the installer.
         This method is less efficient on a multi-node cluster,
         as it does not use a bootstrap node.
-        Instead, the artifact is sent to this node and then extracted on this
+        Instead, the installer is sent to this node and then extracted on this
         node, and then DC/OS is installed.
 
         This creates a folder in ``/dcos-install-dir`` on this node which
@@ -356,10 +356,10 @@ class Node:
         https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
 
         The documentation describes using a "bootstrap" node, so that only
-        one node downloads and extracts the artifact.
+        one node downloads and extracts the installer.
         This method is less efficient on a multi-node cluster,
         as it does not use a bootstrap node.
-        Instead, the artifact is downloaded to this node and then extracted on
+        Instead, the installer is downloaded to this node and then extracted on
         this node, and then DC/OS is installed.
 
         This creates a folder in ``/dcos-install-dir`` on this node which

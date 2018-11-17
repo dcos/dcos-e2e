@@ -235,8 +235,8 @@ def variant_option(command: Callable[..., None]) -> Callable[..., None]:
             'Choose the DC/OS variant. '
             'If the variant does not match the variant of the given artifact, '
             'an error will occur. '
-            'Using "auto" finds the variant from the artifact. '
-            'Finding the variant from the artifact takes some time and so '
+            'Using "auto" finds the variant from the installer. '
+            'Finding the variant from the installer takes some time and so '
             'using another option is a performance optimization.'
         ),
     )(command)  # type: Callable[..., None]
