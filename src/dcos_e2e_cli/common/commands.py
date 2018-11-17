@@ -9,7 +9,7 @@ import requests
 from tqdm import tqdm
 
 
-@click.command('download-artifact')
+@click.command('download-installer')
 @click.option(
     '--dcos-version',
     type=str,

@@ -37,7 +37,7 @@ To create a cluster you first need the link to a DC/OS release artifact.
 These can be found on `the releases page <https://dcos.io/releases/>`__.
 
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
-Ask your sales representative for release artifacts.
+Ask your sales representative for installers.
 
 Creating a cluster is possible with the :ref:`dcos-aws-cli:create` command.
 This command allows you to customize the cluster in many ways.
@@ -55,7 +55,7 @@ There are multiple DC/OS Enterprise-only features available in :ref:`dcos-aws-cl
 The only extra requirement is to give a valid license key, for DC/OS 1.11+.
 See :ref:`dcos-aws-cli:create` for details on how to provide a license key.
 
-Ask your sales representative for DC/OS Enterprise release artifacts.
+Ask your sales representative for DC/OS Enterprise installers.
 
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 

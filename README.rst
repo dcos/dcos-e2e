@@ -72,7 +72,7 @@ A typical CLI workflow with the ``minidcos docker`` CLI may look like this:
 
    # Fix issues shown by ``minidcos docker doctor``
    $ minidcos docker doctor
-   $ minidcos docker download-artifact
+   $ minidcos docker download-installer
    $ minidcos docker create ./dcos_generate_config.sh --agents 0
    default
    $ minidcos docker wait

@@ -85,7 +85,7 @@ Some tests require the Docker backend and some tests require the AWS backend.
 See the :doc:`Docker backend documentation <docker-backend>` for details of what is needed for the Docker backend.
 See the :doc:`AWS backend documentation <aws-backend>` for details of what is needed for the AWS backend.
 
-To run the full test suite, set environment variables for DC/OS Enterprise artifact URLs:
+To run the full test suite, set environment variables for DC/OS Enterprise installer URLs:
 
 .. substitution-prompt:: bash
 
@@ -98,7 +98,7 @@ Download dependencies which are used by the tests:
 
 .. substitution-prompt:: bash
 
-   python admin/download_artifacts.py
+   python admin/download_installers.py
 
 A license key is required for some tests:
 
@@ -163,10 +163,10 @@ We do not add an encrypted environment variable to ``.travis.yml`` because the l
 
     travis env set --repo |github-owner|/|github-repository| LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
 
-Updating the DC/OS Enterprise build artifact links
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Updating the DC/OS Enterprise build installer links
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Private links to DC/OS Enterprise artifacts are used by Travis CI.
+Private links to DC/OS Enterprise installers are used by Travis CI.
 
 To update these links use the following commands, after setting the following environment variables:
 

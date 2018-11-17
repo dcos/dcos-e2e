@@ -163,7 +163,7 @@ def download_installers(test_pattern: str) -> None:
         args = [
             'minidcos',
             'docker',
-            'download-artifact',
+            'download-installer',
             '--download-path',
             str(path),
             '--dcos-version',
