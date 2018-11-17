@@ -10,9 +10,9 @@ from typing import Any, Dict, Optional
 import click
 from passlib.hash import sha512_crypt
 
-from dcos_e2e._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 from .utils import get_doctor_message
 
