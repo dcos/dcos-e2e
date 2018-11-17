@@ -1,4 +1,4 @@
-Usage: minidcos vagrant create [OPTIONS] ARTIFACT
+Usage: minidcos vagrant create [OPTIONS] INSTALLER
 
   Create a DC/OS cluster.
 
@@ -46,9 +46,10 @@ Options:
                                   Choose the DC/OS variant. If the variant does
                                   not match the variant of the given artifact,
                                   an error will occur. Using "auto" finds the
-                                  variant from the artifact. Finding the variant
-                                  from the artifact takes some time and so using
-                                  another option is a performance optimization.
+                                  variant from the installer. Finding the
+                                  variant from the installer takes some time and
+                                  so using another option is a performance
+                                  optimization.
   --license-key PATH              This is ignored if using open source DC/OS. If
                                   using DC/OS Enterprise, this defaults to the
                                   value of the `DCOS_LICENSE_KEY_PATH`

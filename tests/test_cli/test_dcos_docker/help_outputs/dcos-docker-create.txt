@@ -1,4 +1,4 @@
-Usage: minidcos docker create [OPTIONS] ARTIFACT
+Usage: minidcos docker create [OPTIONS] INSTALLER
 
   Create a DC/OS cluster.
 
@@ -92,9 +92,10 @@ Options:
                                   Choose the DC/OS variant. If the variant does
                                   not match the variant of the given artifact,
                                   an error will occur. Using "auto" finds the
-                                  variant from the artifact. Finding the variant
-                                  from the artifact takes some time and so using
-                                  another option is a performance optimization.
+                                  variant from the installer. Finding the
+                                  variant from the installer takes some time and
+                                  so using another option is a performance
+                                  optimization.
   --wait-for-dcos                 Wait for DC/OS after creating the cluster.
                                   This is equivalent to using "minidcos docker
                                   wait" after this command. "minidcos docker

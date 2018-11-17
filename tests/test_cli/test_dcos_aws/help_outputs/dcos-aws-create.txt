@@ -1,4 +1,4 @@
-Usage: minidcos aws create [OPTIONS] ARTIFACT_URL
+Usage: minidcos aws create [OPTIONS] INSTALLER_URL
 
   Create a DC/OS cluster.
 

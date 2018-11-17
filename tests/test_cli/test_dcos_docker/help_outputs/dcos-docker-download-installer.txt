@@ -1,12 +1,12 @@
-Usage: minidcos vagrant download-artifact [OPTIONS]
+Usage: minidcos docker download-installer [OPTIONS]
 
-  Download a DC/OS Open Source artifact.
+  Download a DC/OS Open Source installer.
 
-  For DC/OS Enterprise release artifacts, contact your sales representative.
+  For DC/OS Enterprise installers, contact your sales representative.
 
 Options:
-  --dcos-version TEXT   The DC/OS Open Source artifact version to download. This
-                        can be in one of the following formats: ``stable``,
+  --dcos-version TEXT   The DC/OS Open Source installer version to download.
+                        This can be in one of the following formats: ``stable``,
                         ``testing/master``, ``testing/<DC/OS MAJOR RELEASE>``,
                         ``stable/<DC/OS MINOR RELEASE>``,
                         ``testing/pull/<GITHUB-PR-NUMBER>``.
@@ -15,6 +15,6 @@ Options:
                         If an
                         HTTP or HTTPS URL is given, that is downloaded.
                         [default: stable]
-  --download-path TEXT  The path to download a release artifact to.  [default:
+  --download-path TEXT  The path to download an installer to.  [default:
                         ./dcos_generate_config.sh]
   --help                Show this message and exit.
