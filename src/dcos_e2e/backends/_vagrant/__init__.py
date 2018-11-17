@@ -131,17 +131,17 @@ class VagrantCluster(ClusterManager):
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
-        Install DC/OS from a build artifact passed as an URL string.
+        Install DC/OS from an installer passed as an URL string.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
+            dcos_installer: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for
@@ -155,17 +155,17 @@ class VagrantCluster(ClusterManager):
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
-        Install DC/OS from a build artifact passed as a file system `Path`.
+        Install DC/OS from an installer passed as a file system `Path`.
 
         Args:
-            build_artifact: The path to a build artifact to install DC/OS from.
+            dcos_installer: The path to an installer to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for
                 installing DC/OS.

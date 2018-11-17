@@ -58,7 +58,7 @@ def _oss_distribution_test(
         public_agents=0,
     ) as cluster:
         cluster.install_dcos_from_url(
-            build_artifact=oss_artifact_url,
+            dcos_installer=oss_artifact_url,
             dcos_config=cluster.base_config,
             output=Output.CAPTURE,
             ip_detect_path=cluster_backend.ip_detect_path,
@@ -99,7 +99,7 @@ def _enterprise_distribution_test(
         public_agents=0,
     ) as cluster:
         cluster.install_dcos_from_url(
-            build_artifact=ee_artifact_url,
+            dcos_installer=ee_artifact_url,
             dcos_config={
                 **cluster.base_config,
                 **config,

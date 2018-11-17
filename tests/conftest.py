@@ -20,7 +20,7 @@ def cluster_backend() -> ClusterBackend:
 @pytest.fixture(scope='session')
 def oss_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS OSS master.
+    Return the path to an installer for DC/OS OSS master.
     """
     return Path('/tmp/dcos_generate_config.sh')
 
@@ -28,7 +28,7 @@ def oss_artifact() -> Path:
 @pytest.fixture(scope='session')
 def enterprise_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS Enterprise master.
+    Return the path to an installer for DC/OS Enterprise master.
     """
     return Path('/tmp/dcos_generate_config.ee.sh')
 
@@ -36,7 +36,7 @@ def enterprise_artifact() -> Path:
 @pytest.fixture(scope='session')
 def oss_1_9_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS OSS 1.9.
+    Return the path to an installer for DC/OS OSS 1.9.
     """
     return Path('/tmp/dcos_generate_config_1_9.sh')
 
@@ -44,7 +44,7 @@ def oss_1_9_artifact() -> Path:
 @pytest.fixture(scope='session')
 def enterprise_1_9_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS Enterprise 1.9.
+    Return the path to an installer for DC/OS Enterprise 1.9.
     """
     return Path('/tmp/dcos_generate_config_1_9.ee.sh')
 
@@ -52,7 +52,7 @@ def enterprise_1_9_artifact() -> Path:
 @pytest.fixture(scope='session')
 def oss_1_10_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS OSS 1.10.
+    Return the path to an installer for DC/OS OSS 1.10.
     """
     return Path('/tmp/dcos_generate_config_1_10.sh')
 
@@ -60,7 +60,7 @@ def oss_1_10_artifact() -> Path:
 @pytest.fixture(scope='session')
 def enterprise_1_10_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS Enterprise 1.10.
+    Return the path to an installer for DC/OS Enterprise 1.10.
     """
     return Path('/tmp/dcos_generate_config_1_10.ee.sh')
 
@@ -68,7 +68,7 @@ def enterprise_1_10_artifact() -> Path:
 @pytest.fixture(scope='session')
 def oss_1_11_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS OSS 1.11.
+    Return the path to an installer for DC/OS OSS 1.11.
     """
     return Path('/tmp/dcos_generate_config_1_11.sh')
 
@@ -76,7 +76,7 @@ def oss_1_11_artifact() -> Path:
 @pytest.fixture(scope='session')
 def enterprise_1_11_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS Enterprise 1.11.
+    Return the path to an installer for DC/OS Enterprise 1.11.
     """
     return Path('/tmp/dcos_generate_config_1_11.ee.sh')
 
@@ -84,7 +84,7 @@ def enterprise_1_11_artifact() -> Path:
 @pytest.fixture(scope='session')
 def oss_1_12_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS OSS 1.12.
+    Return the path to an installer for DC/OS OSS 1.12.
     """
     return Path('/tmp/dcos_generate_config_1_12.sh')
 
@@ -92,7 +92,7 @@ def oss_1_12_artifact() -> Path:
 @pytest.fixture(scope='session')
 def enterprise_1_12_artifact() -> Path:
     """
-    Return the path to a build artifact for DC/OS Enterprise 1.12.
+    Return the path to an installer for DC/OS Enterprise 1.12.
     """
     return Path('/tmp/dcos_generate_config_1_12.ee.sh')
 
@@ -100,7 +100,7 @@ def enterprise_1_12_artifact() -> Path:
 @pytest.fixture(scope='session')
 def oss_artifact_url() -> str:
     """
-    Return the url to a build artifact for DC/OS OSS.
+    Return the url to an installer for DC/OS OSS.
     """
     return 'https://downloads.dcos.io/dcos/stable/dcos_generate_config.sh'
 
@@ -108,7 +108,7 @@ def oss_artifact_url() -> str:
 @pytest.fixture(scope='session')
 def ee_artifact_url() -> str:
     """
-    Return the url to a build artifact for Enterprise DC/OS.
+    Return the url to an installer for Enterprise DC/OS.
     """
     return os.environ['EE_MASTER_ARTIFACT_URL']
 

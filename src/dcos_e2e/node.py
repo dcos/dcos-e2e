@@ -137,7 +137,7 @@ class Node:
 
     def _install_dcos_from_node_path(
         self,
-        remote_build_artifact: Path,
+        remote_dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
@@ -159,7 +159,7 @@ class Node:
         installed.
 
         Args:
-            remote_build_artifact: The path on the node to a build artifact to
+            remote_dcos_installer: The path on the node to an installer to
                 be installed on the node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
@@ -177,7 +177,7 @@ class Node:
         tempdir = Path(gettempdir())
 
         remote_genconf_dir = 'genconf'
-        remote_genconf_path = remote_build_artifact.parent / remote_genconf_dir
+        remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
 
         self.send_file(
             local_path=ip_detect_path,
@@ -222,10 +222,10 @@ class Node:
 
         genconf_args = [
             'cd',
-            str(remote_build_artifact.parent),
+            str(remote_dcos_installer.parent),
             '&&',
             'bash',
-            str(remote_build_artifact),
+            str(remote_dcos_installer),
             '--offline',
             '-v',
             '--genconf',
@@ -241,7 +241,7 @@ class Node:
         )
 
         self.run(
-            args=['rm', str(remote_build_artifact)],
+            args=['rm', str(remote_dcos_installer)],
             output=output,
             transport=transport,
             user=user,
@@ -250,7 +250,7 @@ class Node:
 
         setup_args = [
             'cd',
-            str(remote_build_artifact.parent),
+            str(remote_dcos_installer.parent),
             '&&',
             'bash',
             'genconf/serve/dcos_install.sh',
@@ -269,7 +269,7 @@ class Node:
 
     def install_dcos_from_path(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
@@ -295,7 +295,7 @@ class Node:
         the DC/OS installation has finished.
 
         Args:
-            build_artifact: The path to a build artifact to be installed on the
+            dcos_installer: The path to an installer to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
@@ -320,16 +320,16 @@ class Node:
             sudo=True,
             output=Output.CAPTURE,
         )
-        node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
+        node_dcos_installer = node_artifact_parent / 'dcos_generate_config.sh'
         self.send_file(
-            local_path=build_artifact,
-            remote_path=node_build_artifact,
+            local_path=dcos_installer,
+            remote_path=node_dcos_installer,
             transport=transport,
             user=user,
             sudo=True,
         )
         self._install_dcos_from_node_path(
-            remote_build_artifact=node_build_artifact,
+            remote_dcos_installer=node_dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
             user=user,
@@ -341,7 +341,7 @@ class Node:
 
     def install_dcos_from_url(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
@@ -367,7 +367,7 @@ class Node:
         the DC/OS installation has finished.
 
         Args:
-            build_artifact: The URL to a build artifact to be installed on the
+            dcos_installer: The URL to an installer to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
@@ -392,14 +392,14 @@ class Node:
             transport=transport,
             sudo=True,
         )
-        node_build_artifact = node_artifact_parent / 'dcos_generate_config.sh'
+        node_dcos_installer = node_artifact_parent / 'dcos_generate_config.sh'
         self.run(
             args=[
                 'curl',
                 '-f',
-                build_artifact,
+                dcos_installer,
                 '-o',
-                str(node_build_artifact),
+                str(node_dcos_installer),
             ],
             output=output,
             transport=transport,
@@ -407,7 +407,7 @@ class Node:
             sudo=True,
         )
         self._install_dcos_from_node_path(
-            remote_build_artifact=node_build_artifact,
+            remote_dcos_installer=node_dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,

@@ -42,7 +42,7 @@ class TestIntegrationTests:
             dcos_cluster.install_dcos_from_path(
                 dcos_config=dcos_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
-                build_artifact=oss_artifact,
+                dcos_installer=oss_artifact,
                 output=Output.CAPTURE,
             )
             dcos_cluster.wait_for_dcos_oss()
@@ -201,7 +201,7 @@ class TestCopyFiles:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_path(
-                build_artifact=oss_artifact,
+                dcos_installer=oss_artifact,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
@@ -241,7 +241,7 @@ class TestCopyFiles:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_url(
-                build_artifact=oss_artifact_url,
+                dcos_installer=oss_artifact_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
@@ -306,7 +306,7 @@ class TestInstallDcosFromPathLogging:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 cluster.install_dcos_from_path(
-                    build_artifact=oss_artifact,
+                    dcos_installer=oss_artifact,
                     ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,
                     output=Output.LOG_AND_CAPTURE,
@@ -330,7 +330,7 @@ class TestInstallDcosFromPathLogging:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 cluster.install_dcos_from_path(
-                    build_artifact=oss_artifact,
+                    dcos_installer=oss_artifact,
                     dcos_config=cluster.base_config,
                     ip_detect_path=cluster_backend.ip_detect_path,
                 )
@@ -426,7 +426,7 @@ class TestClusterFromNodes:
             )
 
             cluster.install_dcos_from_url(
-                build_artifact=oss_artifact_url,
+                dcos_installer=oss_artifact_url,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
@@ -454,7 +454,7 @@ class TestClusterFromNodes:
             )
 
             cluster.install_dcos_from_path(
-                build_artifact=oss_artifact,
+                dcos_installer=oss_artifact,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )

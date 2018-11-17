@@ -35,7 +35,7 @@ class TestAdvancedInstallationMethod:
             ):
                 for node in nodes:
                     node.install_dcos_from_url(
-                        build_artifact=oss_artifact_url,
+                        dcos_installer=oss_artifact_url,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
@@ -57,7 +57,7 @@ class TestAdvancedInstallationMethod:
             ):
                 for node in nodes:
                     node.install_dcos_from_path(
-                        build_artifact=oss_artifact,
+                        dcos_installer=oss_artifact,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
@@ -98,7 +98,7 @@ class TestCopyFiles:
             ip_detect_file.write(ip_detect_contents)
 
             master.install_dcos_from_path(
-                build_artifact=oss_artifact,
+                dcos_installer=oss_artifact,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 # Test that this overwrites the ``ip-detect`` script given

@@ -293,7 +293,7 @@ def create(
     try:
         with click_spinner.spinner():
             cluster.install_dcos_from_url(
-                build_artifact=artifact_url,
+                dcos_installer=artifact_url,
                 dcos_config=dcos_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
