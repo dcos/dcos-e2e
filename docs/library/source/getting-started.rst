@@ -17,9 +17,9 @@ See the :doc:`Docker backend documentation <docker-backend>` for details of what
 It is also possible to use :py:class:`~dcos_e2e.cluster.Cluster` as a context manager.
 Doing this means that the cluster is destroyed on exit.
 
-To install DC/OS on a cluster, you need a DC/OS build artifact.
+To install DC/OS on a cluster, you need a DC/OS installer.
 You can download one from `the DC/OS releases page <https://dcos.io/releases/>`_.
-In this example we will use a open source DC/OS artifact downloaded to :file:`/tmp/dcos_generate_config.sh`.
+In this example we will use a open source DC/OS installer downloaded to :file:`/tmp/dcos_generate_config.sh`.
 
 .. code:: python
 
