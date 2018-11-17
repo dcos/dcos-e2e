@@ -1,3 +1,7 @@
+"""
+Tools for creating a DC/OS cluster.
+"""
+
 import sys
 import tempfile
 import uuid
