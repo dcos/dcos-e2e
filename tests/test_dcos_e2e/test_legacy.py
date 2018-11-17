@@ -23,14 +23,14 @@ class Test19:
     def test_oss(
         self,
         cluster_backend: ClusterBackend,
-        oss_1_9_artifact: Path,
+        oss_1_9_installer: Path,
     ) -> None:
         """
         An open source DC/OS 1.9 cluster can be started.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=oss_1_9_artifact,
+                dcos_installer=oss_1_9_installer,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -40,7 +40,7 @@ class Test19:
     def test_enterprise(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_1_9_artifact: Path,
+        enterprise_1_9_installer: Path,
     ) -> None:
         """
         A DC/OS Enterprise 1.9 cluster can be started.
@@ -54,7 +54,7 @@ class Test19:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=enterprise_1_9_artifact,
+                dcos_installer=enterprise_1_9_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
