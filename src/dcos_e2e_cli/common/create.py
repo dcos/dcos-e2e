@@ -24,7 +24,7 @@ def create_cluster(
     doctor_command: click.core.Command,
 ) -> Cluster:
     """
-    XXX
+    Create a cluster.
     """
     doctor_message = get_doctor_message(
         sibling_ctx=sibling_ctx,
