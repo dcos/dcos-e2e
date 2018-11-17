@@ -37,6 +37,7 @@ from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     get_variant,
     set_logging,
+    show_cluster_started_message,
 )
 
 from ._common import (
@@ -66,7 +67,9 @@ from .wait import wait
 @cluster_id_option
 @verbosity_option
 @enable_selinux_enforcing_option
+@click.pass_context
 def create(
+    ctx: click.core.Context,
     agents: int,
     artifact: str,
     extra_config: Dict[str, Any],
@@ -110,7 +113,8 @@ def create(
             * The ``license_key_contents`` set in ``--extra-config``.
             * The contents of the path given with ``--license-key``.
             * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
-
+ for a cluster.
+cluster_id: The ID of a cluster which has just been created.
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
@@ -221,17 +225,12 @@ def create(
         cluster.destroy()
         sys.exit(exc.returncode)
 
-    # We work on the assumption that the ``wait`` command is a sibling
-    # command of this one.
-    command_path_list = ctx.command_path.split()
-    command_path_list[-1] = wait.name
-    wait_command_name = ' '.join(command_path_list)
-    started_message = (
-        'Cluster "{cluster_id}" has started. '
-        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
-        'DC/OS to become ready.'
-    ).format(
+    show_cluster_started_message(
+        # We work on the assumption that the ``wait`` command is a sibling
+        # command of this one.
+        sibling_ctx=ctx,
+        wait_command=wait,
         cluster_id=cluster_id,
-        wait_command_name=wait_command_name,
     )
-    click.echo(started_message, err=True)
+
+    click.echo(cluster_id)
