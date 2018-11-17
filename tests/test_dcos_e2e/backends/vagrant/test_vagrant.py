@@ -28,7 +28,7 @@ class TestRunIntegrationTest:  # pragma: no cover
 
     def test_run_integration_test(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         It is possible to run DC/OS integration tests on Vagrant.
@@ -42,7 +42,7 @@ class TestRunIntegrationTest:  # pragma: no cover
             public_agents=1,
         ) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=oss_artifact,
+                dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,

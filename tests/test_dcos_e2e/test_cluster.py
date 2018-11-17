@@ -29,7 +29,7 @@ class TestIntegrationTests:
     @pytest.fixture(scope='class')
     def cluster(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
         cluster_backend: ClusterBackend,
     ) -> Iterator[Cluster]:
         """
@@ -42,7 +42,7 @@ class TestIntegrationTests:
             dcos_cluster.install_dcos_from_path(
                 dcos_config=dcos_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
-                dcos_installer=oss_artifact,
+                dcos_installer=oss_installer,
                 output=Output.CAPTURE,
             )
             dcos_cluster.wait_for_dcos_oss()
@@ -177,7 +177,7 @@ class TestCopyFiles:
     def test_install_cluster_from_path(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_installer: Path,
         tmpdir: local,
     ) -> None:
         """
@@ -201,7 +201,7 @@ class TestCopyFiles:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_path(
-                dcos_installer=oss_artifact,
+                dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
@@ -293,7 +293,7 @@ class TestInstallDcosFromPathLogging:
         self,
         caplog: LogCaptureFixture,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         If ``output`` is given as ``Output.LOG_AND_CAPTURE``, the installation
@@ -306,7 +306,7 @@ class TestInstallDcosFromPathLogging:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 cluster.install_dcos_from_path(
-                    dcos_installer=oss_artifact,
+                    dcos_installer=oss_installer,
                     ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,
                     output=Output.LOG_AND_CAPTURE,
@@ -318,7 +318,7 @@ class TestInstallDcosFromPathLogging:
         self,
         caplog: LogCaptureFixture,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         By default, subprocess output is not logged during DC/OS installation.
@@ -330,7 +330,7 @@ class TestInstallDcosFromPathLogging:
                 cluster_backend=cluster_backend,
             ) as cluster:
                 cluster.install_dcos_from_path(
-                    dcos_installer=oss_artifact,
+                    dcos_installer=oss_installer,
                     dcos_config=cluster.base_config,
                     ip_detect_path=cluster_backend.ip_detect_path,
                 )
@@ -435,7 +435,7 @@ class TestClusterFromNodes:
 
     def test_install_dcos_from_path(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
@@ -454,7 +454,7 @@ class TestClusterFromNodes:
             )
 
             cluster.install_dcos_from_path(
-                dcos_installer=oss_artifact,
+                dcos_installer=oss_installer,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )

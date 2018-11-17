@@ -18,7 +18,7 @@ def cluster_backend() -> ClusterBackend:
 
 
 @pytest.fixture(scope='session')
-def oss_artifact() -> Path:
+def oss_installer() -> Path:
     """
     Return the path to an installer for DC/OS OSS master.
     """
