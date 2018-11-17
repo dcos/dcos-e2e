@@ -11,7 +11,6 @@ from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple
 
 import click
-from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
@@ -32,6 +31,7 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
+from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     get_variant,
@@ -157,22 +157,6 @@ def create(
         workspace_dir=workspace_dir,
         virtualbox_description=json.dumps(obj=description),
     )
-    if dcos_variant == DCOSVariant.ENTERPRISE:
-        superuser_username = 'admin'
-        superuser_password = 'admin'
-
-        enterprise_extra_config = {
-            'superuser_username': superuser_username,
-            'superuser_password_hash': sha512_crypt.hash(superuser_password),
-            'fault_domain_enabled': False,
-        }
-        if license_key is not None:
-            key_contents = Path(license_key).read_text()
-            enterprise_extra_config['license_key_contents'] = key_contents
-
-        extra_config = {**enterprise_extra_config, **extra_config}
-        if security_mode is not None:
-            extra_config['security'] = security_mode
 
     try:
         cluster = Cluster(
@@ -207,12 +191,19 @@ def create(
             relative_path = container_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
+    is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
+
+    dcos_config = get_config(
+        cluster=cluster,
+        extra_config=extra_config,
+        is_enterprise=is_enterprise,
+        security_mode=security_mode,
+        license_key=license_key,
+    )
+
     install_dcos_from_path(
         cluster=cluster,
-        dcos_config={
-            **cluster.base_config,
-            **extra_config,
-        },
+        dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         doctor_command=doctor,
