@@ -33,7 +33,7 @@ from tqdm import tqdm
     type=str,
     default='./dcos_generate_config.sh',
     show_default=True,
-    help='The path to download a release artifact to.',
+    help='The path to download an installer to.',
 )
 @click.pass_context
 def download_installer(
@@ -44,7 +44,7 @@ def download_installer(
     """
     Download a DC/OS Open Source artifact.
 
-    For DC/OS Enterprise release artifacts, contact your sales representative.
+    For DC/OS Enterprise installers, contact your sales representative.
     """
     path = Path(download_path)
     path.parent.mkdir(exist_ok=True, parents=True)

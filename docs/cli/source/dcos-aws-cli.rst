@@ -32,7 +32,7 @@ Each of these and more are described in detail below.
 Creating a Cluster
 ------------------
 
-To create a cluster you first need the link to a DC/OS release artifact.
+To create a cluster you first need the link to a DC/OS installer.
 
 These can be found on `the releases page <https://dcos.io/releases/>`__.
 
