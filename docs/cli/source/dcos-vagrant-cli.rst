@@ -34,7 +34,7 @@ Creating a Cluster
 
 To create a cluster you first need to download a DC/OS release artifact.
 
-This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-vagrant-cli:download-artifact` command.
+This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-vagrant-cli:download-installer` command.
 
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.
