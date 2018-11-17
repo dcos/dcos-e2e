@@ -205,7 +205,13 @@ def create(
     )
 
     doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
-    is_enterprise = bool(variant == 'enterprise')
+    dcos_variant = get_variant(
+        given_variant=variant,
+        artifact_path=None,
+        workspace_dir=workspace_dir,
+        doctor_message=doctor_message,
+    )
+    is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
 
     ssh_user = {
         Distribution.CENTOS_7: 'centos',

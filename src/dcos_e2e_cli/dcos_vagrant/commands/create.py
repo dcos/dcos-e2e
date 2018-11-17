@@ -130,18 +130,12 @@ def create(
     doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
     artifact_path = Path(artifact).resolve()
 
-    dcos_variant = {
-        'auto':
-        get_variant(
-            artifact_path=artifact_path,
-            workspace_dir=workspace_dir,
-            doctor_message=doctor_message,
-        ),
-        'oss':
-        DCOSVariant.OSS,
-        'enterprise':
-        DCOSVariant.ENTERPRISE,
-    }[variant]
+    dcos_variant = get_variant(
+        given_variant=variant,
+        artifact_path=artifact_path,
+        workspace_dir=workspace_dir,
+        doctor_message=doctor_message,
+    )
 
     variant_label_value = {
         DCOSVariant.OSS: VARIANT_OSS_DESCRIPTION_VALUE,
