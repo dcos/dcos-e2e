@@ -73,7 +73,7 @@ install:
 cache: pip
 before_script:
 - travis_retry make pull-images
-- travis_retry python admin/download_artifacts.py
+- travis_retry python admin/download_installers.py
 script:
 - python admin/run_script.py
 after_success:

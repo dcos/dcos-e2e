@@ -11,40 +11,40 @@ from typing import Tuple  # noqa: F401
 OSS_PATTERN = (
     'https://downloads.dcos.io/dcos/testing/{version}/dcos_generate_config.sh'
 )
-OSS_MASTER_ARTIFACT_URL = OSS_PATTERN.format(version='master')
-OSS_1_9_ARTIFACT_URL = OSS_PATTERN.format(version='1.9')
-OSS_1_10_ARTIFACT_URL = OSS_PATTERN.format(version='1.10')
-OSS_1_11_ARTIFACT_URL = OSS_PATTERN.format(version='1.11')
-OSS_1_12_ARTIFACT_URL = OSS_PATTERN.format(version='1.12')
+OSS_MASTER_INSTALLER_URL = OSS_PATTERN.format(version='master')
+OSS_1_9_INSTALLER_URL = OSS_PATTERN.format(version='1.9')
+OSS_1_10_INSTALLER_URL = OSS_PATTERN.format(version='1.10')
+OSS_1_11_INSTALLER_URL = OSS_PATTERN.format(version='1.11')
+OSS_1_12_INSTALLER_URL = OSS_PATTERN.format(version='1.12')
 
-EE_MASTER_ARTIFACT_URL = os.environ.get('EE_MASTER_ARTIFACT_URL')
-EE_1_9_ARTIFACT_URL = os.environ.get('EE_1_9_ARTIFACT_URL')
-EE_1_10_ARTIFACT_URL = os.environ.get('EE_1_10_ARTIFACT_URL')
-EE_1_11_ARTIFACT_URL = os.environ.get('EE_1_11_ARTIFACT_URL')
-EE_1_12_ARTIFACT_URL = os.environ.get('EE_1_12_ARTIFACT_URL')
+EE_MASTER_INSTALLER_URL = os.environ.get('EE_MASTER_INSTALLER_URL')
+EE_1_9_INSTALLER_URL = os.environ.get('EE_1_9_INSTALLER_URL')
+EE_1_10_INSTALLER_URL = os.environ.get('EE_1_10_INSTALLER_URL')
+EE_1_11_INSTALLER_URL = os.environ.get('EE_1_11_INSTALLER_URL')
+EE_1_12_INSTALLER_URL = os.environ.get('EE_1_12_INSTALLER_URL')
 
-OSS_MASTER_ARTIFACT_PATH = Path('/tmp/dcos_generate_config.sh')
-OSS_1_9_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_9.sh')
-OSS_1_10_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_10.sh')
-OSS_1_11_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_11.sh')
-OSS_1_12_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_12.sh')
+OSS_MASTER_INSTALLER_PATH = Path('/tmp/dcos_generate_config.sh')
+OSS_1_9_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_9.sh')
+OSS_1_10_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_10.sh')
+OSS_1_11_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_11.sh')
+OSS_1_12_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_12.sh')
 
-EE_MASTER_ARTIFACT_PATH = Path('/tmp/dcos_generate_config.ee.sh')
-EE_1_9_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_9.ee.sh')
-EE_1_10_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_10.ee.sh')
-EE_1_11_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_11.ee.sh')
-EE_1_12_ARTIFACT_PATH = Path('/tmp/dcos_generate_config_1_12.ee.sh')
+EE_MASTER_INSTALLER_PATH = Path('/tmp/dcos_generate_config.ee.sh')
+EE_1_9_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_9.ee.sh')
+EE_1_10_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_10.ee.sh')
+EE_1_11_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_11.ee.sh')
+EE_1_12_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_12.ee.sh')
 
-OSS_MASTER = (OSS_MASTER_ARTIFACT_URL, OSS_MASTER_ARTIFACT_PATH)
-OSS_1_9 = (OSS_1_9_ARTIFACT_URL, OSS_1_9_ARTIFACT_PATH)
-OSS_1_10 = (OSS_1_10_ARTIFACT_URL, OSS_1_10_ARTIFACT_PATH)
-OSS_1_11 = (OSS_1_11_ARTIFACT_URL, OSS_1_11_ARTIFACT_PATH)
-OSS_1_12 = (OSS_1_12_ARTIFACT_URL, OSS_1_12_ARTIFACT_PATH)
-EE_MASTER = (EE_MASTER_ARTIFACT_URL, EE_MASTER_ARTIFACT_PATH)
-EE_1_9 = (EE_1_9_ARTIFACT_URL, EE_1_9_ARTIFACT_PATH)
-EE_1_10 = (EE_1_10_ARTIFACT_URL, EE_1_10_ARTIFACT_PATH)
-EE_1_11 = (EE_1_11_ARTIFACT_URL, EE_1_11_ARTIFACT_PATH)
-EE_1_12 = (EE_1_12_ARTIFACT_URL, EE_1_12_ARTIFACT_PATH)
+OSS_MASTER = (OSS_MASTER_INSTALLER_URL, OSS_MASTER_INSTALLER_PATH)
+OSS_1_9 = (OSS_1_9_INSTALLER_URL, OSS_1_9_INSTALLER_PATH)
+OSS_1_10 = (OSS_1_10_INSTALLER_URL, OSS_1_10_INSTALLER_PATH)
+OSS_1_11 = (OSS_1_11_INSTALLER_URL, OSS_1_11_INSTALLER_PATH)
+OSS_1_12 = (OSS_1_12_INSTALLER_URL, OSS_1_12_INSTALLER_PATH)
+EE_MASTER = (EE_MASTER_INSTALLER_URL, EE_MASTER_INSTALLER_PATH)
+EE_1_9 = (EE_1_9_INSTALLER_URL, EE_1_9_INSTALLER_PATH)
+EE_1_10 = (EE_1_10_INSTALLER_URL, EE_1_10_INSTALLER_PATH)
+EE_1_11 = (EE_1_11_INSTALLER_URL, EE_1_11_INSTALLER_PATH)
+EE_1_12 = (EE_1_12_INSTALLER_URL, EE_1_12_INSTALLER_PATH)
 
 
 PATTERNS = {
@@ -154,9 +154,9 @@ PATTERNS = {
 }  # type: Dict[str, Tuple]
 
 
-def download_artifacts(test_pattern: str) -> None:
+def download_installers(test_pattern: str) -> None:
     """
-    Download artifacts.
+    Download installers.
     """
     downloads = PATTERNS[test_pattern]
     for url, path in downloads:
@@ -175,4 +175,4 @@ def download_artifacts(test_pattern: str) -> None:
 if __name__ == '__main__':
     CI_PATTERN = os.environ.get('CI_PATTERN')
     if CI_PATTERN:
-        download_artifacts(test_pattern=CI_PATTERN)
+        download_installers(test_pattern=CI_PATTERN)
