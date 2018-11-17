@@ -205,7 +205,6 @@ def wait_for_dcos(
             sys.exit(1)
 
 
-<<<<<<< HEAD
 def install_dcos_from_path(
     cluster: Cluster,
     ip_detect_path: Path,
