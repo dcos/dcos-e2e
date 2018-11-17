@@ -174,6 +174,7 @@ To update these links use the following commands, after setting the following en
 * ``EE_1_9_INSTALLER_URL``
 * ``EE_1_10_INSTALLER_URL``
 * ``EE_1_11_INSTALLER_URL``
+* ``EE_1_12_INSTALLER_URL``
 
 .. substitution-prompt:: bash
 
@@ -181,6 +182,7 @@ To update these links use the following commands, after setting the following en
     travis env set --repo |github-owner|/|github-repository| EE_1_9_INSTALLER_URL $EE_1_9_INSTALLER_URL
     travis env set --repo |github-owner|/|github-repository| EE_1_10_INSTALLER_URL $EE_1_10_INSTALLER_URL
     travis env set --repo |github-owner|/|github-repository| EE_1_11_INSTALLER_URL $EE_1_11_INSTALLER_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_12_INSTALLER_URL $EE_1_12_INSTALLER_URL
 
 Updating the Amazon Web Services credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
