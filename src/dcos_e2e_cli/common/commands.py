@@ -60,7 +60,7 @@ def download_installer(
 
     head_resp = requests.head(url)
     if not head_resp.ok:
-        message = 'Cannot download artifact from {url}.'.format(url=url)
+        message = 'Cannot download installer from {url}.'.format(url=url)
         ctx.fail(message=message)
 
     if path.is_dir():
