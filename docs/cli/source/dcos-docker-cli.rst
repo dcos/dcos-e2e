@@ -12,7 +12,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
    # Fix issues shown by minidcos docker doctor
    $ minidcos docker doctor
-   $ minidcos docker download-artifact
+   $ minidcos docker download-installer
    $ minidcos docker create ./dcos_generate_config.sh --agents 0
    default
    $ minidcos docker wait
@@ -35,7 +35,7 @@ Creating a Cluster
 
 To create a cluster you first need to download a DC/OS release artifact.
 
-This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-docker-cli:download-artifact` command.
+This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-docker-cli:download-installer` command.
 
 `DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
 Ask your sales representative for release artifacts.

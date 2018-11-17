@@ -98,7 +98,7 @@ Download dependencies which are used by the tests:
 
 .. substitution-prompt:: bash
 
-   python admin/download_artifacts.py
+   python admin/download_installers.py
 
 A license key is required for some tests:
 
