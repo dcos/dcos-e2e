@@ -3,7 +3,6 @@ Tools for waiting for a cluster.
 """
 
 import click
-import urllib3
 
 from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
@@ -45,7 +44,6 @@ def wait(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     cluster_instances = ClusterInstances(
         cluster_id=cluster_id,
         aws_region=aws_region,

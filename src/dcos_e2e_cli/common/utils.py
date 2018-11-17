@@ -12,6 +12,7 @@ from typing import Any, Dict, Iterable, Set, Tuple
 
 import click
 import click_spinner
+import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -180,6 +181,7 @@ def wait_for_dcos(
         doctor_command_name: The full command path to a ``doctor`` command to
             advise a user to use.
     """
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     message = (
         'A cluster may take some time to be ready.\n'
         'The amount of time it takes to start a cluster depends on a variety '

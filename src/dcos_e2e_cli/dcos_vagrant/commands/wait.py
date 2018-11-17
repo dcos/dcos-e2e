@@ -3,7 +3,6 @@ Tools for waiting for a cluster.
 """
 
 import click
-import urllib3
 
 from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
@@ -42,7 +41,6 @@ def wait(
         existing_cluster_ids=existing_cluster_ids(),
     )
     set_logging(verbosity_level=verbose)
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
     # We work on the assumption that the ``doctor`` command is a sibling
     # command of this one.

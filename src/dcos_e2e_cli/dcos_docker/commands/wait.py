@@ -3,7 +3,6 @@ Tools for waiting for a cluster.
 """
 
 import click
-import urllib3
 
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.options import (
@@ -60,7 +59,6 @@ def wait(
         existing_cluster_ids=existing_cluster_ids(),
     )
     set_logging(verbosity_level=verbose)
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,
