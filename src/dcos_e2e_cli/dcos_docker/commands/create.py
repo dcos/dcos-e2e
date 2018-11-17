@@ -62,9 +62,6 @@ from ._common import (
 from ._options import node_transport_option
 from .doctor import doctor
 from .wait import wait
-"""
-Tools for creating a DC/OS cluster.
-"""
 
 
 def _validate_docker_network(
