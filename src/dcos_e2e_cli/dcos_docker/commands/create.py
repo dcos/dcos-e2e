@@ -511,12 +511,6 @@ def create(
         click.echo(doctor_message)
         sys.exit(exc.returncode)
 
-    nodes = {
-        *cluster.masters,
-        *cluster.agents,
-        *cluster.public_agents,
-    }
-
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
 
     for node in cluster.masters:
