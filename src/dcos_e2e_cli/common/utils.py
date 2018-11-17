@@ -24,6 +24,23 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import (
 )
 
 
+def _command_path(
+    sibling_ctx: click.core.Context,
+    command: click.core.Command,
+) -> str:
+    """
+    Return the full path to a command, given the context of a sibling of the
+    command.
+
+    Args:
+        sibling_ctx: A context associated with a call to a sibling of
+            ``command``.
+        command: A command.
+    """
+    command_path_list = sibling_ctx.command_path.split()
+    command_path_list[-1] = wait_command.name
+    return ' '.join(command_path_list)
+
 def get_variant(
     artifact_path: Path,
     doctor_message: str,
@@ -211,6 +228,7 @@ def install_dcos_from_path(
     dcos_config: Dict[str, Any],
     files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     installer: Path,
+    doctor_command: click.core.Command,
 ) -> None:
     """
     Install DC/OS on a cluster.
@@ -223,6 +241,7 @@ def install_dcos_from_path(
             installer node before installing DC/OS.
         dcos_config: The DC/OS configuration to use.
         installer: The path to a DC/OS installer.
+        doctor_command: A doctor command to suggest if the installation fails.
     """
     try:
         with click_spinner.spinner():
@@ -255,15 +274,13 @@ def show_cluster_started_message(
             wait for a cluster.
         cluster_id: The ID of a cluster which has just been created.
     """
-    command_path_list = sibling_ctx.command_path.split()
-    command_path_list[-1] = wait_command.name
-    wait_command_name = ' '.join(command_path_list)
+    wait_command_name = _command_path(sibling_ctx=sibling_ctx, command=wait)
     cluster_started_message = (
         'Cluster "{cluster_id}" has started. '
         'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
         'DC/OS to become ready.'
     ).format(
         cluster_id=cluster_id,
-        wait_command_name=wait_command_name,
+        wait_command_name=, command=wait),
     )
     click.echo(cluster_started_message, err=True)
