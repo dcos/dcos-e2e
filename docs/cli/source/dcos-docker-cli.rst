@@ -33,7 +33,7 @@ Each of these and more are described in detail below.
 Creating a Cluster
 ------------------
 
-To create a cluster you first need to download a DC/OS release artifact.
+To create a cluster you first need to download a DC/OS installer.
 
 This can be done via `the releases page <https://dcos.io/releases/>`__ or with the :ref:`dcos-docker-cli:download-installer` command.
 
