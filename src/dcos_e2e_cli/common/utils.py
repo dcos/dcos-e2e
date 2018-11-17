@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 from shutil import rmtree
-from typing import Set
+from typing import Any, Dict, Iterable, Set, Tuple
 
 import click
 import click_spinner
@@ -221,6 +221,52 @@ def wait_for_dcos(
         except DCOSTimeoutError:
             click.echo('Waiting for DC/OS to start timed out.', err=True)
             sys.exit(1)
+
+
+def install_dcos_from_path(
+    cluster: Cluster,
+    ip_detect_path: Path,
+    dcos_config: Dict[str, Any],
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+    installer: Path,
+    doctor_command: click.core.Command,
+    sibling_ctx: click.core.Context,
+) -> None:
+    """
+    Install DC/OS on a cluster.
+
+    Args:
+        cluster: The cluster to install DC/OS on.
+        ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
+        files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+            installer node. These are files to copy from the host to the
+            installer node before installing DC/OS.
+        dcos_config: The DC/OS configuration to use.
+        installer: The path to a DC/OS installer.
+        doctor_command: A doctor command to suggest if the installation fails.
+        sibling_ctx: A context associated with a call to a sibling of
+            ``doctor_command``.
+    """
+    doctor_path = _command_path(
+        sibling_ctx=sibling_ctx,
+        command=doctor_command,
+    )
+    doctor_message = 'Try `{doctor_path}` for troubleshooting help.'.format(
+        doctor_path=doctor_path,
+    )
+    try:
+        with click_spinner.spinner():
+            cluster.install_dcos_from_path(
+                build_artifact=installer,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            )
+    except subprocess.CalledProcessError as exc:
+        click.echo('Error installing DC/OS.', err=True)
+        click.echo(doctor_message)
+        cluster.destroy()
+        sys.exit(exc.returncode)
 
 
 def show_cluster_started_message(

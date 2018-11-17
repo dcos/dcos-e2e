@@ -11,7 +11,6 @@ from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple
 
 import click
-import click_spinner
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Vagrant
@@ -36,6 +35,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     get_variant,
+    install_dcos_from_path,
     set_logging,
     show_cluster_started_message,
 )
@@ -48,6 +48,7 @@ from ._common import (
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
+from .doctor import doctor
 from .wait import wait
 
 
@@ -206,22 +207,18 @@ def create(
             relative_path = container_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
-    try:
-        with click_spinner.spinner():
-            cluster.install_dcos_from_path(
-                build_artifact=artifact_path,
-                dcos_config={
-                    **cluster.base_config,
-                    **extra_config,
-                },
-                ip_detect_path=cluster_backend.ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            )
-    except CalledProcessError as exc:
-        click.echo('Error installing DC/OS.', err=True)
-        click.echo(doctor_message)
-        cluster.destroy()
-        sys.exit(exc.returncode)
+    install_dcos_from_path(
+        cluster=cluster,
+        dcos_config={
+            **cluster.base_config,
+            **extra_config,
+        },
+        ip_detect_path=cluster_backend.ip_detect_path,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        doctor_command=doctor,
+        sibling_ctx=ctx,
+        installer=artifact_path,
+    )
 
     show_cluster_started_message(
         # We work on the assumption that the ``wait`` command is a sibling

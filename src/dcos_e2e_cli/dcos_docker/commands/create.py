@@ -10,7 +10,6 @@ from subprocess import CalledProcessError
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import click
-import click_spinner
 import docker
 from docker.models.networks import Network
 from docker.types import Mount
@@ -38,6 +37,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     get_variant,
+    install_dcos_from_path,
     set_logging,
     show_cluster_started_message,
     write_key_pair,
@@ -60,6 +60,7 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._options import node_transport_option
+from .doctor import doctor
 from .wait import wait
 
 
@@ -391,7 +392,7 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
-    doctor_message = 'Try `dcos-docker doctor` for troubleshooting help.'
+    doctor_message = 'Try `minidcos docker doctor` for troubleshooting help.'
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
@@ -513,22 +514,18 @@ def create(
                 remote_path=remote_path,
             )
 
-    try:
-        with click_spinner.spinner():
-            cluster.install_dcos_from_path(
-                build_artifact=artifact_path,
-                dcos_config={
-                    **cluster.base_config,
-                    **extra_config,
-                },
-                ip_detect_path=cluster_backend.ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            )
-    except CalledProcessError as exc:
-        click.echo('Error installing DC/OS.', err=True)
-        click.echo(doctor_message)
-        cluster.destroy()
-        sys.exit(exc.returncode)
+    install_dcos_from_path(
+        cluster=cluster,
+        dcos_config={
+            **cluster.base_config,
+            **extra_config,
+        },
+        ip_detect_path=cluster_backend.ip_detect_path,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        doctor_command=doctor,
+        sibling_ctx=ctx,
+        installer=artifact_path,
+    )
 
     if wait_for_dcos:
         ctx.invoke(
