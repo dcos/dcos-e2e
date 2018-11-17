@@ -12,6 +12,7 @@ from typing import Any, Dict, Iterable, Set, Tuple
 
 import click
 import click_spinner
+import urllib3
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa

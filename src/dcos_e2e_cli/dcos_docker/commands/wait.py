@@ -3,7 +3,6 @@ Tools for waiting for a cluster.
 """
 
 import click
-import urllib3
 
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.options import (
