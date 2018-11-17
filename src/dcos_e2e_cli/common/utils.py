@@ -203,3 +203,33 @@ def wait_for_dcos(
         except DCOSTimeoutError:
             click.echo('Waiting for DC/OS to start timed out.', err=True)
             sys.exit(1)
+
+
+def show_cluster_started_message(
+    sibling_ctx: click.core.Context,
+    wait_command: click.core.Command,
+    cluster_id: str,
+) -> None:
+    """
+    Show a message which says that the cluster has started.
+    Point the user towards a ``wait`` command.
+
+    Args:
+        sibling_ctx: A context associated with a call to a sibling of
+            ``wait_command``.
+        wait_command: A command which can take a ``--cluster-id`` option to
+            wait for a cluster.
+        cluster_id: The ID of a cluster which has just been created.
+    """
+    command_path_list = sibling_ctx.command_path.split()
+    command_path_list[-1] = wait_command.name
+    wait_command_name = ' '.join(command_path_list)
+    cluster_started_message = (
+        'Cluster "{cluster_id}" has started. '
+        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
+        'DC/OS to become ready.'
+    ).format(
+        cluster_id=cluster_id,
+        wait_command_name=wait_command_name,
+    )
+    click.echo(cluster_started_message, err=True)
