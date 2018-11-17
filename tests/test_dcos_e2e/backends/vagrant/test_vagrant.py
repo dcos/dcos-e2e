@@ -42,7 +42,7 @@ class TestRunIntegrationTest:  # pragma: no cover
             public_agents=1,
         ) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=oss_artifact,
+                dcos_installer=oss_artifact,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,

@@ -383,7 +383,7 @@ class AWSCluster(ClusterManager):
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
-        Install DC/OS from a given build artifact with a bootstrap node.
+        Install DC/OS from a given installer with a bootstrap node.
         This is not supported and simply raises a his is not supported and
         simply raises a ``NotImplementedError``.
 

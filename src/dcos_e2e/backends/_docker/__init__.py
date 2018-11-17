@@ -515,7 +515,7 @@ class DockerCluster(ClusterManager):
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
-        Install DC/OS from a given build artifact.
+        Install DC/OS from a given installer.
 
         Args:
             build_artifact: The ``Path`` to an installer to install DC/OS

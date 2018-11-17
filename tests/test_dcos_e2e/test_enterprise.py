@@ -41,7 +41,7 @@ class TestEnterpriseIntegrationTests:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -131,7 +131,7 @@ class TestCopyFiles:
             )
 
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -216,7 +216,7 @@ class TestCopyFiles:
             )
 
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -288,7 +288,7 @@ class TestCopyFiles:
                 remote_path=master_key_path,
             )
             master.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -338,7 +338,7 @@ class TestSSLDisabled:
             public_agents=0,
         ) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_1_11_artifact,
+                dcos_installer=enterprise_1_11_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -387,7 +387,7 @@ class TestWaitForDCOS:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,

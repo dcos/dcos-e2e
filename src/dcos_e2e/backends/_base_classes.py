@@ -36,7 +36,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def install_dcos_from_url_with_bootstrap_node(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
@@ -50,7 +50,7 @@ class ClusterManager(abc.ABC):
         from a URL in an inefficient manner.
 
         Args:
-            build_artifact: The URL string to an installer to install DC/OS
+            dcos_installer: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script to use for installing
@@ -64,7 +64,7 @@ class ClusterManager(abc.ABC):
     @abc.abstractmethod
     def install_dcos_from_path_with_bootstrap_node(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
@@ -78,7 +78,7 @@ class ClusterManager(abc.ABC):
         from a path in an inefficient manner.
 
         Args:
-            build_artifact: The path to an installer to install DC/OS from.
+            dcos_installer: The path to an installer to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script to use for installing
                 DC/OS.

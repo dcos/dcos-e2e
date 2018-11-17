@@ -118,7 +118,7 @@ class TestRunIntegrationTest:
         ) as cluster:
 
             cluster.install_dcos_from_url(
-                build_artifact=ee_artifact_url,
+                dcos_installer=ee_artifact_url,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -229,7 +229,7 @@ class TestDCOSInstallation:
         cluster_backend = AWS()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=oss_artifact,
+                dcos_installer=oss_artifact,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 output=Output.CAPTURE,
@@ -251,7 +251,7 @@ class TestDCOSInstallation:
         ) as cluster:
             (master, ) = cluster.masters
             master.install_dcos_from_url(
-                build_artifact=oss_artifact_url,
+                dcos_installer=oss_artifact_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
                 output=Output.CAPTURE,
@@ -285,7 +285,7 @@ class TestDCOSInstallation:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_url(
-                build_artifact=oss_artifact_url,
+                dcos_installer=oss_artifact_url,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=Path(str(ip_detect_file)),
@@ -326,7 +326,7 @@ class TestDCOSInstallation:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_url(
-                build_artifact=oss_artifact_url,
+                dcos_installer=oss_artifact_url,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,

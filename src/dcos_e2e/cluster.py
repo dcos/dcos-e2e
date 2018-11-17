@@ -448,7 +448,7 @@ class Cluster(ContextDecorator):
 
     def install_dcos_from_url(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output = Output.CAPTURE,
@@ -462,16 +462,16 @@ class Cluster(ContextDecorator):
         necessary installation files.
 
         Since the bootstrap host is different from the host initiating the
-        cluster creation passing the ``build_artifact`` via URL string
-        saves the time of copying the ``build_artifact`` to the bootstrap host.
+        cluster creation passing the ``dcos_installer`` via URL string
+        saves the time of copying the ``dcos_installer`` to the bootstrap host.
 
         However, some backends may not support using a bootstrap node. For
         these backends, each node will download and extract the build
-        artifact. This may be very slow, as the build artifact is downloaded to
+        artifact. This may be very slow, as the installer is downloaded to
         and extracted on each node, one at a time.
 
         Args:
-            build_artifact: The URL string to an installer to install DC/OS
+            dcos_installer: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to a ``ip-detect`` script that will be
@@ -483,7 +483,7 @@ class Cluster(ContextDecorator):
         """
         try:
             self._cluster.install_dcos_from_url_with_bootstrap_node(
-                build_artifact=build_artifact,
+                dcos_installer=dcos_installer,
                 dcos_config=dcos_config,
                 ip_detect_path=ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
@@ -497,7 +497,7 @@ class Cluster(ContextDecorator):
             ):
                 for node in nodes:
                     node.install_dcos_from_url(
-                        build_artifact=build_artifact,
+                        dcos_installer=dcos_installer,
                         dcos_config=dcos_config,
                         ip_detect_path=ip_detect_path,
                         files_to_copy_to_genconf_dir=(
@@ -509,7 +509,7 @@ class Cluster(ContextDecorator):
 
     def install_dcos_from_path(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
@@ -517,7 +517,7 @@ class Cluster(ContextDecorator):
     ) -> None:
         """
         Args:
-            build_artifact: The `Path` to an installer to install DC/OS
+            dcos_installer: The `Path` to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to a ``ip-detect`` script that will be
@@ -530,11 +530,11 @@ class Cluster(ContextDecorator):
         Raises:
             NotImplementedError: `NotImplementedError` because it is more
                 efficient for the given backend to use the DC/OS advanced
-                installation method that takes build artifacts by URL string.
+                installation method that takes installers by URL string.
         """
         try:
             self._cluster.install_dcos_from_path_with_bootstrap_node(
-                build_artifact=build_artifact,
+                dcos_installer=dcos_installer,
                 dcos_config=dcos_config,
                 ip_detect_path=ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
@@ -548,7 +548,7 @@ class Cluster(ContextDecorator):
             ):
                 for node in nodes:
                     node.install_dcos_from_path(
-                        build_artifact=build_artifact,
+                        dcos_installer=dcos_installer,
                         dcos_config=dcos_config,
                         ip_detect_path=ip_detect_path,
                         role=role,

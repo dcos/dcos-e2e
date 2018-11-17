@@ -30,7 +30,7 @@ class Test19:
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=oss_1_9_artifact,
+                dcos_installer=oss_1_9_artifact,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -54,7 +54,7 @@ class Test19:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_1_9_artifact,
+                dcos_installer=enterprise_1_9_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -83,7 +83,7 @@ class Test110:
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=oss_1_10_artifact,
+                dcos_installer=oss_1_10_artifact,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -110,7 +110,7 @@ class Test110:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_1_10_artifact,
+                dcos_installer=enterprise_1_10_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -139,7 +139,7 @@ class Test111:
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=oss_1_11_artifact,
+                dcos_installer=oss_1_11_artifact,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -166,7 +166,7 @@ class Test111:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_1_11_artifact,
+                dcos_installer=enterprise_1_11_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -195,7 +195,7 @@ class Test112:
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=oss_1_12_artifact,
+                dcos_installer=oss_1_12_artifact,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -222,7 +222,7 @@ class Test112:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_1_12_artifact,
+                dcos_installer=enterprise_1_12_artifact,
                 dcos_config={
                     **cluster.base_config,
                     **config,

@@ -81,7 +81,7 @@ class ExistingClusterManager(ClusterManager):
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
@@ -97,7 +97,7 @@ class ExistingClusterManager(ClusterManager):
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
