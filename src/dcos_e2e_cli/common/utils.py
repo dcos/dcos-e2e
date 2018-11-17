@@ -38,16 +38,10 @@ def _command_path(
         command: A command.
     """
     command_path_list = sibling_ctx.command_path.split()
-<<<<<<< HEAD
-    command_path_list[-1] = wait_command.name
-    return ' '.join(command_path_list)
-
-=======
     command_path_list[-1] = command.name
     return ' '.join(command_path_list)
 
 
->>>>>>> origin/master
 def get_variant(
     artifact_path: Path,
     doctor_message: str,
