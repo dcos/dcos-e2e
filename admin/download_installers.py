@@ -1,5 +1,5 @@
 """
-Download artifacts.
+Download installers.
 """
 
 import os
