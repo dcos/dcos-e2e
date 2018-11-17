@@ -40,12 +40,12 @@ See the `library`_ documentation for more details on these and other features.
     from dcos_e2e.backends import Docker
     from dcos_e2e.cluster import Cluster
 
-    oss_artifact = Path('/tmp/dcos_generate_config.sh')
+    oss_installer = Path('/tmp/dcos_generate_config.sh')
 
     cluster_backend = Docker()
     with Cluster(cluster_backend=cluster_backend) as cluster:
         cluster.install_dcos_from_path(
-            build_artifact=oss_artifact,
+            build_artifact=oss_installer,
             dcos_config={
                 **cluster.base_config,
                 **{
