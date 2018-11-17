@@ -202,6 +202,7 @@ def wait_for_dcos(
 
     if not is_enterprise:
         click.echo(no_login_message)
+
     with click_spinner.spinner():
         try:
             if is_enterprise:
