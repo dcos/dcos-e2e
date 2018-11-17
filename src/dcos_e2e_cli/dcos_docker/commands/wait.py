@@ -15,7 +15,6 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_exists,
     set_logging,
-    show_wait_help,
     wait_for_dcos,
 )
 
@@ -73,10 +72,6 @@ def wait(
     command_path_list = ctx.command_path.split()
     command_path_list[-1] = doctor.name
     doctor_command_name = ' '.join(command_path_list)
-    show_wait_help(
-        is_enterprise=cluster_containers.is_enterprise,
-        doctor_command_name=doctor_command_name,
-    )
 
     wait_for_dcos(
         is_enterprise=cluster_containers.is_enterprise,
@@ -84,4 +79,5 @@ def wait(
         superuser_username=superuser_username,
         superuser_password=superuser_password,
         http_checks=http_checks,
+        doctor_command_name=doctor_command_name,
     )
