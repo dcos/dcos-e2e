@@ -11,7 +11,7 @@ from typing import Set
 import pytest
 import yaml
 
-from admin.download_artifacts import PATTERNS
+from admin.download_installers import PATTERNS
 
 
 def _travis_ci_patterns() -> Set[str]:
@@ -53,7 +53,7 @@ def _tests_from_pattern(ci_pattern: str) -> Set[str]:
 def test_ci_patterns_match() -> None:
     """
     The patterns in ``.travis.yml`` must match the patterns in
-    ``admin/download_artifacts.py``.
+    ``admin/download_installers.py``.
     """
     ci_patterns = _travis_ci_patterns()
     assert ci_patterns - PATTERNS.keys() == set()
