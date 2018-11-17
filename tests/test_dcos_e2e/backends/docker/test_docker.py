@@ -136,7 +136,7 @@ class TestDockerBackend:
                     result = node.run(args=args)
                     assert result.stdout.decode() == content
 
-    def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
+    def test_install_dcos_from_url(self, oss_installer_url: str) -> None:
         """
         It is possible to install DC/OS on a cluster with a Docker backend.
         """
@@ -145,7 +145,7 @@ class TestDockerBackend:
         cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_url(
-                dcos_installer=oss_artifact_url,
+                dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )

@@ -98,7 +98,7 @@ def enterprise_1_12_artifact() -> Path:
 
 
 @pytest.fixture(scope='session')
-def oss_artifact_url() -> str:
+def oss_installer_url() -> str:
     """
     Return the url to an installer for DC/OS OSS.
     """
@@ -106,11 +106,11 @@ def oss_artifact_url() -> str:
 
 
 @pytest.fixture(scope='session')
-def ee_artifact_url() -> str:
+def ee_installer_url() -> str:
     """
     Return the url to an installer for Enterprise DC/OS.
     """
-    return os.environ['EE_MASTER_ARTIFACT_URL']
+    return os.environ['EE_MASTER_installer_url']
 
 
 @pytest.fixture(scope='session')

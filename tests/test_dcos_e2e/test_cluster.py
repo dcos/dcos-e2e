@@ -217,7 +217,7 @@ class TestCopyFiles:
     def test_install_cluster_from_url(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact_url: str,
+        oss_installer_url: str,
         tmpdir: local,
     ) -> None:
         """
@@ -241,7 +241,7 @@ class TestCopyFiles:
             ip_detect_file.write(ip_detect_contents)
 
             cluster.install_dcos_from_url(
-                dcos_installer=oss_artifact_url,
+                dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
@@ -407,7 +407,7 @@ class TestClusterFromNodes:
 
     def test_install_dcos_from_url(
         self,
-        oss_artifact_url: str,
+        oss_installer_url: str,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
@@ -426,7 +426,7 @@ class TestClusterFromNodes:
             )
 
             cluster.install_dcos_from_url(
-                dcos_installer=oss_artifact_url,
+                dcos_installer=oss_installer_url,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )

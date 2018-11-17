@@ -311,8 +311,8 @@ class Node:
                 the installer node before installing DC/OS.
         """
         workspace_dir = Path('/dcos-install-dir')
-        node_artifact_parent = workspace_dir / uuid.uuid4().hex
-        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        node_installer_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
         self.run(
             args=mkdir_args,
             user=user,
@@ -320,7 +320,7 @@ class Node:
             sudo=True,
             output=Output.CAPTURE,
         )
-        node_dcos_installer = node_artifact_parent / 'dcos_generate_config.sh'
+        node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
         self.send_file(
             local_path=dcos_installer,
             remote_path=node_dcos_installer,
@@ -384,15 +384,15 @@ class Node:
 
         """
         workspace_dir = Path('/dcos-install-dir')
-        node_artifact_parent = workspace_dir / uuid.uuid4().hex
-        mkdir_args = ['mkdir', '--parents', str(node_artifact_parent)]
+        node_installer_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
         self.run(
             args=mkdir_args,
             user=user,
             transport=transport,
             sudo=True,
         )
-        node_dcos_installer = node_artifact_parent / 'dcos_generate_config.sh'
+        node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
         self.run(
             args=[
                 'curl',
