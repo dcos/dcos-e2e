@@ -255,7 +255,7 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_invalid_artifact_path(self) -> None:
+    def test_invalid_installer_path(self) -> None:
         """
         An error is shown if an invalid artifact path is given.
         """

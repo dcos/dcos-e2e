@@ -125,11 +125,11 @@ def create(
     workspace_dir.mkdir(parents=True)
 
     doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
-    artifact_path = Path(artifact).resolve()
+    installer_path = Path(artifact).resolve()
 
     dcos_variant = get_variant(
         given_variant=variant,
-        artifact_path=artifact_path,
+        installer_path=installer_path,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
@@ -194,7 +194,7 @@ def create(
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         doctor_command=doctor,
         sibling_ctx=ctx,
-        installer=artifact_path,
+        installer=installer_path,
     )
 
     show_cluster_started_message(

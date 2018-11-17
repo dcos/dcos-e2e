@@ -94,10 +94,10 @@ def create_github_release(
     # No tag exists when the GitHub release is a draft.
     # This means that temporarily we have a release without binaries.
     linux_artifacts = make_linux_binaries(repo_root=Path('.'))
-    for artifact_path in linux_artifacts:
+    for installer_path in linux_artifacts:
         github_release.upload_asset(
-            path=str(artifact_path),
-            label=artifact_path.name,
+            path=str(installer_path),
+            label=installer_path.name,
         )
 
 

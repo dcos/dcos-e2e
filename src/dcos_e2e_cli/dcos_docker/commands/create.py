@@ -427,11 +427,11 @@ def create(
         private_key_path=private_key_path,
     )
 
-    artifact_path = Path(artifact).resolve()
+    installer_path = Path(artifact).resolve()
 
     dcos_variant = get_variant(
         given_variant=variant,
-        artifact_path=artifact_path,
+        installer_path=installer_path,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
@@ -508,7 +508,7 @@ def create(
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         doctor_command=doctor,
         sibling_ctx=ctx,
-        installer=artifact_path,
+        installer=installer_path,
     )
 
     if wait_for_dcos:

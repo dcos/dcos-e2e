@@ -208,7 +208,7 @@ def create(
     doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
     dcos_variant = get_variant(
         given_variant=variant,
-        artifact_path=None,
+        installer_path=None,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
