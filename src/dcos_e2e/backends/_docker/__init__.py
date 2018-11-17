@@ -464,7 +464,7 @@ class DockerCluster(ClusterManager):
         This is not supported and simply raises a ``NotImplementedError``.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
+            build_artifact: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for
@@ -518,7 +518,7 @@ class DockerCluster(ClusterManager):
         Install DC/OS from a given build artifact.
 
         Args:
-            build_artifact: The ``Path`` to a build artifact to install DC/OS
+            build_artifact: The ``Path`` to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for

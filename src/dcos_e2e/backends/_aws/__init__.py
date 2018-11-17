@@ -346,7 +346,7 @@ class AWSCluster(ClusterManager):
         Install DC/OS from a URL.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
+            build_artifact: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to an ``ip-detect`` script to be used
@@ -388,7 +388,7 @@ class AWSCluster(ClusterManager):
         simply raises a ``NotImplementedError``.
 
         Args:
-            build_artifact: The ``Path`` to a build artifact to install DC/OS
+            build_artifact: The ``Path`` to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to an ``ip-detect`` script to be used

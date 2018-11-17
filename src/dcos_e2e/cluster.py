@@ -471,7 +471,7 @@ class Cluster(ContextDecorator):
         and extracted on each node, one at a time.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
+            build_artifact: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to a ``ip-detect`` script that will be
@@ -517,7 +517,7 @@ class Cluster(ContextDecorator):
     ) -> None:
         """
         Args:
-            build_artifact: The `Path` to a build artifact to install DC/OS
+            build_artifact: The `Path` to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to a ``ip-detect`` script that will be

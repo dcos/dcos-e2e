@@ -159,7 +159,7 @@ class Node:
         installed.
 
         Args:
-            remote_build_artifact: The path on the node to a build artifact to
+            remote_build_artifact: The path on the node to an installer to
                 be installed on the node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
@@ -295,7 +295,7 @@ class Node:
         the DC/OS installation has finished.
 
         Args:
-            build_artifact: The path to a build artifact to be installed on the
+            build_artifact: The path to an installer to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
@@ -367,7 +367,7 @@ class Node:
         the DC/OS installation has finished.
 
         Args:
-            build_artifact: The URL to a build artifact to be installed on the
+            build_artifact: The URL to an installer to be installed on the
                 node.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
