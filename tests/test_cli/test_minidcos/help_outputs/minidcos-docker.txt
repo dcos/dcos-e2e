@@ -15,7 +15,7 @@ Commands:
   destroy-loopback-sidecar  Destroy a loopback sidecar.
   destroy-mac-network       Destroy containers created by "minidcos docker...
   doctor                    Diagnose common issues which stop this CLI from...
-  download-artifact         Download a DC/OS Open Source artifact.
+  download-installer        Download a DC/OS Open Source installer.
   inspect                   Show cluster details.
   list                      List all clusters.
   list-loopback-sidecars    List loopback sidecars.
