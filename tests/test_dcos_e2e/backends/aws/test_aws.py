@@ -222,14 +222,14 @@ class TestDCOSInstallation:
     Test installing DC/OS.
     """
 
-    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
+    def test_install_dcos_from_path(self, oss_installer: Path) -> None:
         """
         It is possible to install DC/OS on an AWS cluster from a local path.
         """
         cluster_backend = AWS()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=oss_artifact,
+                dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 output=Output.CAPTURE,

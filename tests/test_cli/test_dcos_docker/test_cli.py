@@ -70,7 +70,7 @@ class TestCreate:
 
     def test_copy_to_master_bad_format(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         An error is shown if ``--copy-to-master`` is given a value in an
@@ -82,7 +82,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--copy-to-master',
                 '/some/path',
             ],
@@ -102,7 +102,7 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_copy_to_master_no_local(self, oss_artifact: Path) -> None:
+    def test_copy_to_master_no_local(self, oss_installer: Path) -> None:
         """
         An error is shown if the given local path does not exist.
         """
@@ -112,7 +112,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--copy-to-master',
                 '/some/path:some/remote',
             ],
@@ -143,7 +143,7 @@ class TestCreate:
     )
     def test_custom_volume_bad_mode(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
         option: str,
     ) -> None:
         """
@@ -155,7 +155,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 option,
                 '/opt:/opt:ab',
             ],
@@ -186,7 +186,7 @@ class TestCreate:
     )
     def test_custom_volume_bad_format(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
         option: str,
     ) -> None:
         """
@@ -198,7 +198,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 option,
                 '/opt:/opt:/opt:rw',
             ],
@@ -220,7 +220,7 @@ class TestCreate:
 
     def test_copy_to_master_relative(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         An error is shown if the given local path is not an absolute path.
@@ -234,7 +234,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--copy-to-master',
                 '{relative}:some/remote'.format(relative=relative_path),
             ],
@@ -272,7 +272,7 @@ class TestCreate:
         )
         assert expected_error in result.output
 
-    def test_config_does_not_exist(self, oss_artifact: Path) -> None:
+    def test_config_does_not_exist(self, oss_installer: Path) -> None:
         """
         An error is shown if the ``--extra-config`` file does not exist.
         """
@@ -283,7 +283,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--extra-config',
                 invalid_path,
             ],
@@ -304,7 +304,7 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_invalid_yaml(self, oss_artifact: Path, tmpdir: local) -> None:
+    def test_invalid_yaml(self, oss_installer: Path, tmpdir: local) -> None:
         """
         An error is shown if invalid YAML is given in the file given to
         ``--extra-config``.
@@ -317,7 +317,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--extra-config',
                 str(invalid_file),
             ],
@@ -337,7 +337,7 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_not_key_value(self, oss_artifact: Path, tmpdir: local) -> None:
+    def test_not_key_value(self, oss_installer: Path, tmpdir: local) -> None:
         """
         An error is shown if YAML is given for ``--extra-config`` which is not
         a key-value mapping.
@@ -350,7 +350,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--extra-config',
                 str(invalid_file),
             ],
@@ -373,7 +373,7 @@ class TestCreate:
     @pytest.mark.parametrize('invalid_id', ['@', ''])
     def test_invalid_cluster_id(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
         invalid_id: str,
     ) -> None:
         """
@@ -385,7 +385,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--cluster-id',
                 invalid_id,
             ],
@@ -406,7 +406,7 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_genconf_path_not_exist(self, oss_artifact: Path) -> None:
+    def test_genconf_path_not_exist(self, oss_installer: Path) -> None:
         """
         Genconf path must exist.
         """
@@ -416,7 +416,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--genconf-dir',
                 'non-existing',
             ],
@@ -431,7 +431,7 @@ class TestCreate:
 
     def test_genconf_path_is_file(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
         tmpdir: local,
     ) -> None:
         """
@@ -446,7 +446,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--genconf-dir',
                 str(genconf_file),
             ],
@@ -459,7 +459,7 @@ class TestCreate:
         ).format(path=str(genconf_file))
         assert expected_error in result.output
 
-    def test_workdir_path_not_exist(self, oss_artifact: Path) -> None:
+    def test_workdir_path_not_exist(self, oss_installer: Path) -> None:
         """
         ``--workspace-dir`` must exist.
         """
@@ -469,7 +469,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--workspace-dir',
                 'non-existing',
             ],
@@ -484,7 +484,7 @@ class TestCreate:
 
     def test_workspace_path_is_file(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
         tmpdir: local,
     ) -> None:
         """
@@ -499,7 +499,7 @@ class TestCreate:
             [
                 'docker',
                 'create',
-                str(oss_artifact),
+                str(oss_installer),
                 '--workspace-dir',
                 str(workspace_file),
             ],

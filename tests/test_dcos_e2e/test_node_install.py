@@ -42,7 +42,7 @@ class TestAdvancedInstallationMethod:
                     )
             cluster.wait_for_dcos_oss()
 
-    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
+    def test_install_dcos_from_path(self, oss_installer: Path) -> None:
         """
         It is possible to install DC/OS on a node from a path.
         """
@@ -57,7 +57,7 @@ class TestAdvancedInstallationMethod:
             ):
                 for node in nodes:
                     node.install_dcos_from_path(
-                        dcos_installer=oss_artifact,
+                        dcos_installer=oss_installer,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
@@ -74,7 +74,7 @@ class TestCopyFiles:
     def test_install_from_path_with_genconf_files(
         self,
         cluster_backend: ClusterBackend,
-        oss_artifact: Path,
+        oss_installer: Path,
         tmpdir: local,
     ) -> None:
         """
@@ -98,7 +98,7 @@ class TestCopyFiles:
             ip_detect_file.write(ip_detect_contents)
 
             master.install_dcos_from_path(
-                dcos_installer=oss_artifact,
+                dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 # Test that this overwrites the ``ip-detect`` script given

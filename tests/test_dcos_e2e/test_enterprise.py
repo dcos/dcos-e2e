@@ -316,7 +316,7 @@ class TestSSLDisabled:
     def test_wait_for_dcos_ee(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_1_11_artifact: Path,
+        enterprise_1_11_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -338,7 +338,7 @@ class TestSSLDisabled:
             public_agents=0,
         ) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=enterprise_1_11_artifact,
+                dcos_installer=enterprise_1_11_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,

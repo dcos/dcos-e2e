@@ -18,7 +18,7 @@ def cluster_backend() -> ClusterBackend:
 
 
 @pytest.fixture(scope='session')
-def oss_artifact() -> Path:
+def oss_installer() -> Path:
     """
     Return the path to an installer for DC/OS OSS master.
     """
@@ -26,7 +26,7 @@ def oss_artifact() -> Path:
 
 
 @pytest.fixture(scope='session')
-def enterprise_artifact() -> Path:
+def enterprise_installer() -> Path:
     """
     Return the path to an installer for DC/OS Enterprise master.
     """
@@ -74,7 +74,7 @@ def oss_1_11_artifact() -> Path:
 
 
 @pytest.fixture(scope='session')
-def enterprise_1_11_artifact() -> Path:
+def enterprise_1_11_installer() -> Path:
     """
     Return the path to an installer for DC/OS Enterprise 1.11.
     """

@@ -42,7 +42,7 @@ def _get_node_distribution(node: Node) -> Distribution:
 
 def _oss_distribution_test(
     distribution: Distribution,
-    oss_artifact: Path,
+    oss_installer: Path,
 ) -> None:
     """
     Assert that given a ``linux_distribution``, an open source DC/OS
@@ -59,7 +59,7 @@ def _oss_distribution_test(
         public_agents=0,
     ) as cluster:
         cluster.install_dcos_from_path(
-            dcos_installer=oss_artifact,
+            dcos_installer=oss_installer,
             dcos_config=cluster.base_config,
             output=Output.CAPTURE,
             ip_detect_path=cluster_backend.ip_detect_path,
@@ -162,14 +162,14 @@ class TestCoreOS:
 
     def test_oss(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         DC/OS OSS can start up on CoreOS.
         """
         _oss_distribution_test(
             distribution=Distribution.COREOS,
-            oss_artifact=oss_artifact,
+            oss_installer=oss_installer,
         )
 
     def test_enterprise(
@@ -194,14 +194,14 @@ class TestUbuntu1604:
 
     def test_oss(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         DC/OS OSS can start up on Ubuntu 16.04.
         """
         _oss_distribution_test(
             distribution=Distribution.UBUNTU_16_04,
-            oss_artifact=oss_artifact,
+            oss_installer=oss_installer,
         )
 
     def test_enterprise(
