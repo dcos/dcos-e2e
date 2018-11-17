@@ -481,7 +481,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         sibling_ctx=ctx,
-        doctor_command=doctor_command,
+        doctor_command=doctor,
     )
 
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)

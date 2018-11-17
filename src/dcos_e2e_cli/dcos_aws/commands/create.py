@@ -14,7 +14,6 @@ import click
 import click_spinner
 
 from dcos_e2e.backends import AWS
-from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.create import create_cluster, get_config
@@ -255,7 +254,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         sibling_ctx=ctx,
-        doctor_command=doctor_command,
+        doctor_command=doctor,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}

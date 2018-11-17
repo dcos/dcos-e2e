@@ -4,6 +4,7 @@ Tools for creating DC/OS clusters.
 
 import sys
 from pathlib import Path
+from subprocess import CalledProcessError
 from typing import Any, Dict, Optional
 
 import click
