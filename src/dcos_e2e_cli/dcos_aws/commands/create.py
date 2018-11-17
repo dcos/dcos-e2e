@@ -52,7 +52,6 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._options import aws_region_option, linux_distribution_option
-
 from .wait import wait
 
 
