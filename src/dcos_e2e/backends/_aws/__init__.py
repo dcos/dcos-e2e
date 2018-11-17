@@ -336,7 +336,7 @@ class AWSCluster(ClusterManager):
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
@@ -346,7 +346,7 @@ class AWSCluster(ClusterManager):
         Install DC/OS from a URL.
 
         Args:
-            build_artifact: The URL string to an installer to install DC/OS
+            dcos_installer: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to an ``ip-detect`` script to be used
@@ -369,14 +369,14 @@ class AWSCluster(ClusterManager):
             raise NotImplementedError
 
         # In order to install DC/OS with the preliminary dcos-launch
-        # config the ``build_artifact`` URL is overwritten.
-        self.launcher.config['installer_url'] = build_artifact
+        # config the ``dcos_installer`` URL is overwritten.
+        self.launcher.config['installer_url'] = dcos_installer
         self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
@@ -388,7 +388,15 @@ class AWSCluster(ClusterManager):
         simply raises a ``NotImplementedError``.
 
         Args:
+<<<<<<< Local Changes
+<<<<<<< Local Changes
+            dcos_installer: The ``Path`` to an installer to install DC/OS
+=======
+            build_artifact: The ``Path`` to a build artifact to install DC/OS
+>>>>>>> External Changes
+=======
             build_artifact: The ``Path`` to an installer to install DC/OS
+>>>>>>> External Changes
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to an ``ip-detect`` script to be used

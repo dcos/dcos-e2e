@@ -73,7 +73,7 @@ def _oss_distribution_test(
 
 def _enterprise_distribution_test(
     distribution: Distribution,
-    enterprise_artifact: Path,
+    enterprise_installer: Path,
     license_key_contents: str,
 ) -> None:
     """
@@ -100,7 +100,7 @@ def _enterprise_distribution_test(
         public_agents=0,
     ) as cluster:
         cluster.install_dcos_from_path(
-            dcos_installer=enterprise_artifact,
+            dcos_installer=enterprise_installer,
             dcos_config={
                 **cluster.base_config,
                 **config,
@@ -174,7 +174,7 @@ class TestCoreOS:
 
     def test_enterprise(
         self,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -182,7 +182,7 @@ class TestCoreOS:
         """
         _enterprise_distribution_test(
             distribution=Distribution.COREOS,
-            enterprise_artifact=enterprise_artifact,
+            enterprise_installer=enterprise_installer,
             license_key_contents=license_key_contents,
         )
 
@@ -206,7 +206,7 @@ class TestUbuntu1604:
 
     def test_enterprise(
         self,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -214,6 +214,6 @@ class TestUbuntu1604:
         """
         _enterprise_distribution_test(
             distribution=Distribution.UBUNTU_16_04,
-            enterprise_artifact=enterprise_artifact,
+            enterprise_installer=enterprise_installer,
             license_key_contents=license_key_contents,
         )

@@ -466,8 +466,8 @@ class Cluster(ContextDecorator):
         saves the time of copying the ``dcos_installer`` to the bootstrap host.
 
         However, some backends may not support using a bootstrap node. For
-        these backends, each node will download and extract the build
-        artifact. This may be very slow, as the installer is downloaded to
+        these backends, each node will download and extract the installer.
+        This may be very slow, as the installer is downloaded to
         and extracted on each node, one at a time.
 
         Args:

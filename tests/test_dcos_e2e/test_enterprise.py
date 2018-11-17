@@ -23,7 +23,7 @@ class TestEnterpriseIntegrationTests:
     def test_run_pytest(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -41,7 +41,7 @@ class TestEnterpriseIntegrationTests:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -72,7 +72,7 @@ class TestCopyFiles:
     def test_copy_files_to_installer(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -131,7 +131,7 @@ class TestCopyFiles:
             )
 
             cluster.install_dcos_from_path(
-                dcos_installer=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -160,7 +160,7 @@ class TestCopyFiles:
     def test_copy_directory_to_installer(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -216,7 +216,7 @@ class TestCopyFiles:
             )
 
             cluster.install_dcos_from_path(
-                dcos_installer=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -237,7 +237,7 @@ class TestCopyFiles:
     def test_copy_directory_to_node_installer_genconf_dir(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -288,7 +288,7 @@ class TestCopyFiles:
                 remote_path=master_key_path,
             )
             master.install_dcos_from_path(
-                dcos_installer=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
@@ -369,7 +369,7 @@ class TestWaitForDCOS:
     def test_auth_with_cli(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -387,7 +387,7 @@ class TestWaitForDCOS:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
