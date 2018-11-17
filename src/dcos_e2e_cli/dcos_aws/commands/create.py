@@ -12,11 +12,11 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import boto3
 import click
 import click_spinner
-from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -203,7 +203,7 @@ def create(
     )
 
     doctor_message = 'Try `minidcos aws doctor` for troubleshooting help.'
-    enterprise = bool(variant == 'enterprise')
+    is_enterprise = bool(variant == 'enterprise')
 
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
@@ -221,7 +221,7 @@ def create(
         CLUSTER_ID_TAG_KEY: cluster_id,
         WORKSPACE_DIR_TAG_KEY: str(workspace_dir),
         KEY_NAME_TAG_KEY: key_name,
-        VARIANT_TAG_KEY: 'ee' if enterprise else '',
+        VARIANT_TAG_KEY: 'ee' if is_enterprise else '',
         **custom_tag,
     }
 
@@ -238,23 +238,6 @@ def create(
         agent_ec2_instance_tags=agent_tags,
         public_agent_ec2_instance_tags=public_agent_tags,
     )
-
-    if enterprise:
-        superuser_username = 'admin'
-        superuser_password = 'admin'
-
-        enterprise_extra_config = {
-            'superuser_username': superuser_username,
-            'superuser_password_hash': sha512_crypt.hash(superuser_password),
-            'fault_domain_enabled': False,
-        }
-        if license_key is not None:
-            key_contents = Path(license_key).read_text()
-            enterprise_extra_config['license_key_contents'] = key_contents
-
-        extra_config = {**enterprise_extra_config, **extra_config}
-        if security_mode is not None:
-            extra_config['security'] = security_mode
 
     try:
         cluster = Cluster(
@@ -290,14 +273,19 @@ def create(
             relative_path = container_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
+    dcos_config = get_config(
+        cluster=cluster,
+        extra_config=extra_config,
+        is_enterprise=is_enterprise,
+        security_mode=security_mode,
+        license_key=license_key,
+    )
+
     try:
         with click_spinner.spinner():
             cluster.install_dcos_from_url(
                 build_artifact=artifact_url,
-                dcos_config={
-                    **cluster.base_config,
-                    **extra_config,
-                },
+                dcos_config=dcos_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )

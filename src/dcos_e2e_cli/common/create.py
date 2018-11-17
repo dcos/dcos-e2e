@@ -8,6 +8,12 @@ import click
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+from passlib.hash import sha512_crypt
+
+from dcos_e2e.cluster import Cluster
 from .utils import get_doctor_message
 
 
@@ -43,6 +49,7 @@ def get_config(
     extra_config: Dict[str, Any],
     is_enterprise: bool,
     security_mode: Optional[str],
+    license_key: Optional[str],
 ) -> Dict[str, Any]:
     """
     Get a DC/OS configuration to use for the given cluster.

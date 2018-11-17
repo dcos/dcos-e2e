@@ -13,13 +13,13 @@ import click
 import docker
 from docker.models.networks import Network
 from docker.types import Mount
-from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import artifact_argument
+from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -507,6 +507,15 @@ def create(
                 remote_path=remote_path,
             )
 
+    is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
+
+    dcos_config = get_config(
+        cluster=cluster,
+        extra_config=extra_config,
+        is_enterprise=is_enterprise,
+        security_mode=security_mode,
+        license_key=license_key,
+    )
     install_dcos_from_path(
         cluster=cluster,
         dcos_config=dcos_config,
