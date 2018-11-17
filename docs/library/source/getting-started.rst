@@ -28,7 +28,7 @@ In this example we will use a open source DC/OS artifact downloaded to :file:`/t
    oss_installer = Path('/tmp/dcos_generate_config.sh')
 
    cluster.install_dcos_from_path(
-       build_artifact=oss_installer,
+       installer=oss_installer,
        dcos_config={
             **cluster.base_config,
             **{
