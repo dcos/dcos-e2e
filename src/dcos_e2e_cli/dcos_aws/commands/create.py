@@ -16,6 +16,7 @@ import click_spinner
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
+from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -30,7 +31,6 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     set_logging,

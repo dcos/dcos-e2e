@@ -19,6 +19,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import artifact_argument
+from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -33,7 +34,6 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
     workspace_dir_option,
 )
-from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     get_variant,
