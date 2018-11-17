@@ -36,6 +36,7 @@ from dcos_e2e_cli.common.options import (
 )
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
+    get_doctor_message,
     get_variant,
     install_dcos_from_path,
     set_logging,
@@ -418,7 +419,10 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
-    doctor_message = 'Try `minidcos docker doctor` for troubleshooting help.'
+    doctor_message = get_doctor_message(
+        sibling_ctx=sibling_ctx,
+        doctor_command=doctor,
+    )
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'

@@ -41,6 +41,28 @@ def command_path(
     return ' '.join(command_path_list)
 
 
+def get_doctor_message(
+    sibling_ctx: click.core.Context,
+    doctor_command: click.core.Command,
+) -> str:
+    """
+    Return a message which instructs the user to use a given doctor command for
+    troubleshooting help.
+
+    Args:
+        sibling_ctx: A context associated with a call to a sibling of
+            ``doctor_command``.
+        doctor_command: A command which will give troubleshooting help.
+    """
+    doctor_command_name = command_path(
+        sibling_ctx=sibling_ctx,
+        command=doctor_command,
+    )
+    doctor_message = (
+        'Try "{doctor_command_name}" for troubleshooting help.'
+    ).format(doctor_command_name=doctor_command_name)
+
+
 def get_variant(
     artifact_path: Path,
     doctor_message: str,

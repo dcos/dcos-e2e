@@ -34,6 +34,7 @@ from dcos_e2e_cli.common.options import (
 )
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
+    get_doctor_message,
     get_variant,
     install_dcos_from_path,
     set_logging,
@@ -126,7 +127,10 @@ def create(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
-    doctor_message = 'Try `minidcos vagrant doctor` for troubleshooting help.'
+    doctor_message = get_doctor_message(
+        sibling_ctx=sibling_ctx,
+        doctor_command=doctor,
+    )
 
     artifact_path = Path(artifact).resolve()
 

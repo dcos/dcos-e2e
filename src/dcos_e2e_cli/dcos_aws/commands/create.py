@@ -202,7 +202,10 @@ def create(
         PublicKeyMaterial=public_key_path.read_bytes(),
     )
 
-    doctor_message = 'Try `minidcos aws doctor` for troubleshooting help.'
+    doctor_message = get_doctor_message(
+        sibling_ctx=sibling_ctx,
+        doctor_command=doctor,
+    )
     is_enterprise = bool(variant == 'enterprise')
 
     ssh_user = {
