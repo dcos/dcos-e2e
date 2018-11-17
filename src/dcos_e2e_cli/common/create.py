@@ -3,17 +3,15 @@ Tools for creating DC/OS clusters.
 """
 
 import sys
+from pathlib import Path
+from typing import Any, Dict, Optional
+
 import click
+from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
-from pathlib import Path
-from typing import Any, Dict, Optional
-
-from passlib.hash import sha512_crypt
-
-from dcos_e2e.cluster import Cluster
 from .utils import get_doctor_message
 
 
@@ -43,6 +41,7 @@ def create_cluster(
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
         sys.exit(exc.returncode)
+
 
 def get_config(
     cluster: Cluster,
