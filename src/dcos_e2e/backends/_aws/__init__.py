@@ -374,116 +374,108 @@ class AWSCluster(ClusterManager):
         self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
-    def install_dcos_from_path_with_bootstrap_node(
-        self,
-        dcos_installer: Path,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        output: Output,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-    ) -> None:
-        """
-        Install DC/OS from a given installer with a bootstrap node.
-        This is not supported and simply raises a his is not supported and
-        simply raises a ``NotImplementedError``.
+def install_dcos_from_path_with_bootstrap_node(
+    self,
+    dcos_installer: Path,
+    dcos_config: Dict[str, Any],
+    ip_detect_path: Path,
+    output: Output,
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+) -> None:
+    """
+    Install DC/OS from a given installer with a bootstrap node.
+    This is not supported and simply raises a his is not supported and
+    simply raises a ``NotImplementedError``.
 
-        Args:
-<<<<<<< Local Changes
-<<<<<<< Local Changes
-            dcos_installer: The ``Path`` to an installer to install DC/OS
-=======
-            build_artifact: The ``Path`` to a build artifact to install DC/OS
->>>>>>> External Changes
-=======
-            build_artifact: The ``Path`` to an installer to install DC/OS
->>>>>>> External Changes
-                from.
-            dcos_config: The DC/OS configuration to use.
-            ip_detect_path: The path to an ``ip-detect`` script to be used
-                during the DC/OS installation.
-            output: What happens with stdout and stderr.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
-                installer node. This must be empty as it is not currently
-                supported.
+    Args:
+        dcos_installer: The ``Path`` to an installer to install DC/OS
+            from.
+        dcos_config: The DC/OS configuration to use.
+        ip_detect_path: The path to an ``ip-detect`` script to be used
+            during the DC/OS installation.
+        output: What happens with stdout and stderr.
+        files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+            installer node. This must be empty as it is not currently
+            supported.
 
-        Raises:
-            NotImplementedError: ``NotImplementedError`` because the AWS
-                backend does not support the DC/OS advanced installation
-                method.
-        """
-        raise NotImplementedError
+    Raises:
+        NotImplementedError: ``NotImplementedError`` because the AWS
+            backend does not support the DC/OS advanced installation
+            method.
+    """
+    raise NotImplementedError
 
-    def destroy_node(self, node: Node) -> None:
-        """
-        Destroy a nodes in the cluster. This is not implemented.
+def destroy_node(self, node: Node) -> None:
+    """
+    Destroy a nodes in the cluster. This is not implemented.
 
-        Raises:
-            NotImplementedError
-        """
-        raise NotImplementedError
+    Raises:
+        NotImplementedError
+    """
+    raise NotImplementedError
 
-    def destroy(self) -> None:
-        """
-        Destroy all nodes in the cluster.
-        """
-        # Deletion only works if valid AWS credentials are present. This
-        # a problem if temporary credentials become invalid before
-        # destroying a cluster because the generated AWS KeyPair persists.
-        # https://jira.mesosphere.com/browse/DCOS-21893
-        self.launcher.delete()
+def destroy(self) -> None:
+    """
+    Destroy all nodes in the cluster.
+    """
+    # Deletion only works if valid AWS credentials are present. This
+    # a problem if temporary credentials become invalid before
+    # destroying a cluster because the generated AWS KeyPair persists.
+    # https://jira.mesosphere.com/browse/DCOS-21893
+    self.launcher.delete()
 
-        rmtree(path=str(self._path), ignore_errors=True)
+    rmtree(path=str(self._path), ignore_errors=True)
 
-    @property
-    def masters(self) -> Set[Node]:
-        """
-        Return all DC/OS master :class:`.node.Node` s.
-        """
-        nodes = set([])
-        cluster_masters = list(self.cluster_info['masters'])
-        for master in cluster_masters:
-            node = Node(
-                public_ip_address=IPv4Address(master.get('public_ip')),
-                private_ip_address=IPv4Address(master.get('private_ip')),
-                default_user=self._default_user,
-                ssh_key_path=self._ssh_key_path,
-            )
-            nodes.add(node)
+@property
+def masters(self) -> Set[Node]:
+    """
+    Return all DC/OS master :class:`.node.Node` s.
+    """
+    nodes = set([])
+    cluster_masters = list(self.cluster_info['masters'])
+    for master in cluster_masters:
+        node = Node(
+            public_ip_address=IPv4Address(master.get('public_ip')),
+            private_ip_address=IPv4Address(master.get('private_ip')),
+            default_user=self._default_user,
+            ssh_key_path=self._ssh_key_path,
+        )
+        nodes.add(node)
 
-        return nodes
+    return nodes
 
-    @property
-    def agents(self) -> Set[Node]:
-        """
-        Return all DC/OS agent :class:`.node.Node` s.
-        """
-        nodes = set([])
-        cluster_agents = list(self.cluster_info['private_agents'])
-        for priv_agent in cluster_agents:
-            node = Node(
-                public_ip_address=IPv4Address(priv_agent.get('public_ip')),
-                private_ip_address=IPv4Address(priv_agent.get('private_ip')),
-                default_user=self._default_user,
-                ssh_key_path=self._ssh_key_path,
-            )
-            nodes.add(node)
+@property
+def agents(self) -> Set[Node]:
+    """
+    Return all DC/OS agent :class:`.node.Node` s.
+    """
+    nodes = set([])
+    cluster_agents = list(self.cluster_info['private_agents'])
+    for priv_agent in cluster_agents:
+        node = Node(
+            public_ip_address=IPv4Address(priv_agent.get('public_ip')),
+            private_ip_address=IPv4Address(priv_agent.get('private_ip')),
+            default_user=self._default_user,
+            ssh_key_path=self._ssh_key_path,
+        )
+        nodes.add(node)
 
-        return nodes
+    return nodes
 
-    @property
-    def public_agents(self) -> Set[Node]:
-        """
-        Return all DC/OS public agent :class:`.node.Node` s.
-        """
-        nodes = set([])
-        cluster_public_agents = list(self.cluster_info['public_agents'])
-        for pub_agent in cluster_public_agents:
-            node = Node(
-                public_ip_address=IPv4Address(pub_agent.get('public_ip')),
-                private_ip_address=IPv4Address(pub_agent.get('private_ip')),
-                default_user=self._default_user,
-                ssh_key_path=self._ssh_key_path,
-            )
-            nodes.add(node)
+@property
+def public_agents(self) -> Set[Node]:
+    """
+    Return all DC/OS public agent :class:`.node.Node` s.
+    """
+    nodes = set([])
+    cluster_public_agents = list(self.cluster_info['public_agents'])
+    for pub_agent in cluster_public_agents:
+        node = Node(
+            public_ip_address=IPv4Address(pub_agent.get('public_ip')),
+            private_ip_address=IPv4Address(pub_agent.get('private_ip')),
+            default_user=self._default_user,
+            ssh_key_path=self._ssh_key_path,
+        )
+        nodes.add(node)
 
-        return nodes
+    return nodes
