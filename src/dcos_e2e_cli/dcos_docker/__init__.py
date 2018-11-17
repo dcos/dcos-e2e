@@ -4,7 +4,7 @@ A CLI for controlling DC/OS clusters on Docker.
 
 import click
 
-from dcos_e2e_cli.common.commands import download_artifact
+from dcos_e2e_cli.common.commands import download_installer
 
 from .commands.clean import clean
 from .commands.create import create
@@ -37,7 +37,7 @@ dcos_docker.add_command(destroy_list)
 dcos_docker.add_command(destroy_loopback_sidecar)
 dcos_docker.add_command(destroy_mac_network)
 dcos_docker.add_command(doctor)
-dcos_docker.add_command(download_artifact)
+dcos_docker.add_command(download_installer)
 dcos_docker.add_command(inspect_cluster)
 dcos_docker.add_command(list_clusters)
 dcos_docker.add_command(list_loopback_sidecars)

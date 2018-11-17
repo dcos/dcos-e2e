@@ -36,7 +36,7 @@ from tqdm import tqdm
     help='The path to download a release artifact to.',
 )
 @click.pass_context
-def download_artifact(
+def download_installer(
     ctx: click.core.Context,
     dcos_version: str,
     download_path: str,
