@@ -13,7 +13,7 @@ The following example shows how to use DC/OS Enterprise with |project|.
     from dcos_e2e.cluster import Cluster
     from passlib.hash import sha512_crypt
 
-    ee_artifact = Path('/tmp/dcos_generate_config.ee.sh')
+    ee_installer = Path('/tmp/dcos_generate_config.ee.sh')
     license_key_contents = Path('/tmp/license-key.txt').read_text()
 
     superuser_username = 'my_username'
@@ -28,7 +28,7 @@ The following example shows how to use DC/OS Enterprise with |project|.
 
     with Cluster(cluster_backend=Docker()) as cluster:
         cluster.install_dcos_from_path(
-            installer=ee_artifact,
+            dcos_installer=ee_installer,
             dcos_config={
                 **cluster.base_config,
                 **extra_config,

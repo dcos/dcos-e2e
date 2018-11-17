@@ -28,8 +28,8 @@ It is assumed that DC/OS is already up and running on the given :py:class:`~dcos
 Installing DC/OS
 ----------------
 
-Some backends support installing DC/OS from a path to a build artifact.
-Some backends support installing DC/OS from a URL pointing to a build artifact.
+Some backends support installing DC/OS from a path to an installer.
+Some backends support installing DC/OS from a URL pointing to an installer.
 See :doc:`how to use DC/OS Enterprise <enterprise>` with |project|.
 
 .. automethod:: dcos_e2e.cluster.Cluster.install_dcos_from_path

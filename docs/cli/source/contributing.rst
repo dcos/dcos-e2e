@@ -81,7 +81,7 @@ To fix some lint errors, run the following:
 Tests for this package
 ----------------------
 
-To run the full test suite, set environment variables for DC/OS Enterprise artifact URLs:
+To run the full test suite, set environment variables for DC/OS Enterprise installer URLs:
 
 .. substitution-prompt:: bash
 
