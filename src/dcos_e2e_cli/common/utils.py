@@ -24,6 +24,24 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import (
 )
 
 
+def _command_path(
+    sibling_ctx: click.core.Context,
+    command: click.core.Command,
+) -> str:
+    """
+    Return the full path to a command, given the context of a sibling of the
+    command.
+
+    Args:
+        sibling_ctx: A context associated with a call to a sibling of
+            ``command``.
+        command: A command.
+    """
+    command_path_list = sibling_ctx.command_path.split()
+    command_path_list[-1] = wait_command.name
+    return ' '.join(command_path_list)
+
+
 def get_variant(
     artifact_path: Path,
     doctor_message: str,
@@ -221,9 +239,7 @@ def show_cluster_started_message(
             wait for a cluster.
         cluster_id: The ID of a cluster which has just been created.
     """
-    command_path_list = sibling_ctx.command_path.split()
-    command_path_list[-1] = wait_command.name
-    wait_command_name = ' '.join(command_path_list)
+    wait_command_name = _command_path(sibling_ctx=sibling_ctx, command=wait)
     cluster_started_message = (
         'Cluster "{cluster_id}" has started. '
         'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
