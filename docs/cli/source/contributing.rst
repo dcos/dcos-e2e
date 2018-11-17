@@ -162,7 +162,7 @@ We do not add an encrypted environment variable to ``.travis.yml`` because the l
 Updating the DC/OS Enterprise installer links
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Private links to DC/OS Enterprise artifacts are used by Travis CI.
+Private links to DC/OS Enterprise installers are used by Travis CI.
 
 To update these links use the following commands, after setting the following environment variables:
 
