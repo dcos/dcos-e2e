@@ -33,6 +33,7 @@ from dcos_e2e_cli.common.options import (
 )
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
+    get_doctor_message,
     set_logging,
     show_cluster_started_message,
     write_key_pair,
@@ -52,6 +53,7 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._options import aws_region_option, linux_distribution_option
+from .doctor import doctor
 from .wait import wait
 
 
@@ -202,10 +204,7 @@ def create(
         PublicKeyMaterial=public_key_path.read_bytes(),
     )
 
-    doctor_message = get_doctor_message(
-        sibling_ctx=sibling_ctx,
-        doctor_command=doctor,
-    )
+    doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
     is_enterprise = bool(variant == 'enterprise')
 
     ssh_user = {

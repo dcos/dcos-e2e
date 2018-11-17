@@ -127,11 +127,7 @@ def create(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
-    doctor_message = get_doctor_message(
-        sibling_ctx=sibling_ctx,
-        doctor_command=doctor,
-    )
-
+    doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
     artifact_path = Path(artifact).resolve()
 
     dcos_variant = {

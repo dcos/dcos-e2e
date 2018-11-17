@@ -419,10 +419,7 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
-    doctor_message = get_doctor_message(
-        sibling_ctx=sibling_ctx,
-        doctor_command=doctor,
-    )
+    doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
