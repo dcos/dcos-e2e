@@ -443,12 +443,6 @@ def create(
         DCOSVariant.ENTERPRISE,
     }[variant]
 
-    dcos_config = get_config(
-        cluster=cluster,
-        extra_config=extra_config,
-        is_enterprise=bool(dcos_variant == DCOSVariant.ENTERPRISE),
-    )
-
     files_to_copy_to_genconf_dir = []
     if genconf_dir is not None:
         container_genconf_path = Path('/genconf')
@@ -497,6 +491,13 @@ def create(
         doctor_command=doctor_command,
     )
 
+    dcos_config = get_config(
+        cluster=cluster,
+        extra_config=extra_config,
+        is_enterprise=bool(dcos_variant == DCOSVariant.ENTERPRISE),
+    )
+
+
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
 
     for node in cluster.masters:
@@ -509,10 +510,7 @@ def create(
 
     install_dcos_from_path(
         cluster=cluster,
-        dcos_config={
-            **cluster.base_config,
-            **extra_config,
-        },
+        dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         doctor_command=doctor,
