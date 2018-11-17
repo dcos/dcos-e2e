@@ -37,3 +37,12 @@ def create_cluster(
         click.echo('Error creating cluster.', err=True)
         click.echo(doctor_message)
         sys.exit(exc.returncode)
+
+def get_config(
+    cluster: Cluster,
+    extra_config: Dict[str, Any],
+    is_enterprise: bool,
+) -> Dict[str, Any]:
+    """
+    XXX
+    """
