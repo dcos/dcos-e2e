@@ -285,6 +285,6 @@ def show_cluster_started_message(
         'DC/OS to become ready.'
     ).format(
         cluster_id=cluster_id,
-        wait_command_name=, command=wait),
+        wait_command_name=wait_command_name,
     )
     click.echo(cluster_started_message, err=True)
