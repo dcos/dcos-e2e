@@ -10,6 +10,7 @@ from typing import Any, Dict, Optional
 import click
 from passlib.hash import sha512_crypt
 
+from dcos_e2e._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e.backends import ClusterBackend
 from dcos_e2e.cluster import Cluster
 
@@ -47,13 +48,15 @@ def create_cluster(
 def get_config(
     cluster: Cluster,
     extra_config: Dict[str, Any],
-    is_enterprise: bool,
+    dcos_variant: DCOSVariant,
     security_mode: Optional[str],
     license_key: Optional[str],
 ) -> Dict[str, Any]:
     """
     Get a DC/OS configuration to use for the given cluster.
     """
+    is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
+
     if is_enterprise:
         superuser_username = 'admin'
         superuser_password = 'admin'

@@ -212,7 +212,10 @@ def create(
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
-    is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
+    variant_tag_value = {
+        DCOSVariant.OSS: '',
+        DCOSVariant.ENTERPRISE: 'ee',
+    }[dcos_variant]
 
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
@@ -230,7 +233,7 @@ def create(
         CLUSTER_ID_TAG_KEY: cluster_id,
         WORKSPACE_DIR_TAG_KEY: str(workspace_dir),
         KEY_NAME_TAG_KEY: key_name,
-        VARIANT_TAG_KEY: 'ee' if is_enterprise else '',
+        VARIANT_TAG_KEY: variant_tag_value,
         **custom_tag,
     }
 
@@ -282,7 +285,7 @@ def create(
     dcos_config = get_config(
         cluster=cluster,
         extra_config=extra_config,
-        is_enterprise=is_enterprise,
+        dcos_variant=dcos_variant,
         security_mode=security_mode,
         license_key=license_key,
     )
