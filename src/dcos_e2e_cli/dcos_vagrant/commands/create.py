@@ -125,7 +125,7 @@ def create(
     workspace_dir.mkdir(parents=True)
 
     doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
-    installer_path = Path(artifact).resolve()
+    installer_path = Path(installer).resolve()
 
     dcos_variant = get_variant(
         given_variant=variant,

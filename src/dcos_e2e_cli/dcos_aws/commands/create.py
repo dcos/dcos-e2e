@@ -110,7 +110,7 @@ def _validate_tags(
     required=True,
     help=(
         'Choose the DC/OS variant. '
-        'If the variant does not match the variant of the given artifact URL, '
+        'If the variant does not match the variant of the given installer URL, '
         'an error will occur. '
     ),
 )

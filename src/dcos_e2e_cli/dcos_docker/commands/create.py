@@ -427,7 +427,7 @@ def create(
         private_key_path=private_key_path,
     )
 
-    installer_path = Path(artifact).resolve()
+    installer_path = Path(installer).resolve()
 
     dcos_variant = get_variant(
         given_variant=variant,
