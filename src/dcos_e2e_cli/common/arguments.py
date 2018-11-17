@@ -34,7 +34,7 @@ def node_args_argument(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def artifact_argument(command: Callable[..., None]) -> Callable[..., None]:
+def installer_argument(command: Callable[..., None]) -> Callable[..., None]:
     """
     Decorate a function to allow choosing a DC/OS artifact.
     """

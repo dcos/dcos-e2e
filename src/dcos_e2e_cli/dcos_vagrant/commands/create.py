@@ -12,7 +12,7 @@ import click
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.arguments import artifact_argument
+from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
@@ -51,7 +51,7 @@ from .wait import wait
 
 
 @click.command('create')
-@artifact_argument
+@installer_argument
 @masters_option
 @agents_option
 @extra_config_option

@@ -16,7 +16,7 @@ from tqdm import tqdm
     default='stable',
     show_default=True,
     help=(
-        'The DC/OS Open Source artifact version to download. '
+        'The DC/OS Open Source installer version to download. '
         'This can be in one of the following formats: '
         '``stable``, '
         '``testing/master``, '
@@ -42,7 +42,7 @@ def download_installer(
     download_path: str,
 ) -> None:
     """
-    Download a DC/OS Open Source artifact.
+    Download a DC/OS Open Source installer.
 
     For DC/OS Enterprise installers, contact your sales representative.
     """
