@@ -12,7 +12,7 @@ import click
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.arguments import artifact_argument
+from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
@@ -51,7 +51,7 @@ from .wait import wait
 
 
 @click.command('create')
-@artifact_argument
+@installer_argument
 @masters_option
 @agents_option
 @extra_config_option
@@ -69,7 +69,7 @@ from .wait import wait
 def create(
     ctx: click.core.Context,
     agents: int,
-    artifact: str,
+    installer: str,
     extra_config: Dict[str, Any],
     masters: int,
     public_agents: int,
@@ -125,11 +125,11 @@ def create(
     workspace_dir.mkdir(parents=True)
 
     doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
-    artifact_path = Path(artifact).resolve()
+    installer_path = Path(artifact).resolve()
 
     dcos_variant = get_variant(
         given_variant=variant,
-        artifact_path=artifact_path,
+        installer_path=installer_path,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
@@ -194,7 +194,7 @@ def create(
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         doctor_command=doctor,
         sibling_ctx=ctx,
-        installer=artifact_path,
+        installer=installer_path,
     )
 
     show_cluster_started_message(

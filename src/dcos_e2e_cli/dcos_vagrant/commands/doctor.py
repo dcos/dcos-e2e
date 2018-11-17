@@ -29,7 +29,7 @@ def check_docker() -> CheckLevels:
         message = (
             'Docker is not running. '
             'Docker is required for the "create" command to determine the '
-            'DC/OS variant of the given DC/OS artifact. '
+            'DC/OS variant of the given DC/OS installer. '
             'Use the "--variant" option when using the "create" command or '
             'install and run Docker.'
         )

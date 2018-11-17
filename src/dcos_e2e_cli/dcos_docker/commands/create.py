@@ -16,7 +16,7 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.arguments import artifact_argument
+from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.options import (
     agents_option,
@@ -228,7 +228,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 
 
 @click.command('create')
-@artifact_argument
+@installer_argument
 @click.option(
     '--docker-version',
     type=click.Choice(sorted(DOCKER_VERSIONS.keys())),
@@ -353,7 +353,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 def create(
     ctx: click.core.Context,
     agents: int,
-    artifact: str,
+    installer: str,
     cluster_id: str,
     docker_storage_driver: str,
     docker_version: str,
@@ -427,11 +427,11 @@ def create(
         private_key_path=private_key_path,
     )
 
-    artifact_path = Path(artifact).resolve()
+    installer_path = Path(artifact).resolve()
 
     dcos_variant = get_variant(
         given_variant=variant,
-        artifact_path=artifact_path,
+        installer_path=installer_path,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
@@ -508,7 +508,7 @@ def create(
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         doctor_command=doctor,
         sibling_ctx=ctx,
-        installer=artifact_path,
+        installer=installer_path,
     )
 
     if wait_for_dcos:

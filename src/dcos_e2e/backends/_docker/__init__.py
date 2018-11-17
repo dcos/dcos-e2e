@@ -453,7 +453,7 @@ class DockerCluster(ClusterManager):
 
     def install_dcos_from_url_with_bootstrap_node(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
@@ -464,7 +464,7 @@ class DockerCluster(ClusterManager):
         This is not supported and simply raises a ``NotImplementedError``.
 
         Args:
-            build_artifact: The URL string to an installer to install DC/OS
+            dcos_installer: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for
@@ -508,7 +508,7 @@ class DockerCluster(ClusterManager):
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output,
@@ -518,7 +518,7 @@ class DockerCluster(ClusterManager):
         Install DC/OS from a given installer.
 
         Args:
-            build_artifact: The ``Path`` to an installer to install DC/OS
+            dcos_installer: The ``Path`` to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script that is used for
@@ -551,7 +551,7 @@ class DockerCluster(ClusterManager):
 
         genconf_args = [
             'bash',
-            str(build_artifact),
+            str(dcos_installer),
             '--offline',
             '-v',
             '--genconf',
