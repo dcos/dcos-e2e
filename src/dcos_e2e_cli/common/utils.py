@@ -185,6 +185,8 @@ def wait_for_dcos(
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     doctor_command_name = _command_path(
+        sibling_ctx=sibling_ctx,
+        command=doctor_command,
     )
     message = (
         'A cluster may take some time to be ready.\n'

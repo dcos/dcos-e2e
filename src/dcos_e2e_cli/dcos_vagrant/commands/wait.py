@@ -42,11 +42,6 @@ def wait(
     )
     set_logging(verbosity_level=verbose)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
-    # We work on the assumption that the ``doctor`` command is a sibling
-    # command of this one.
-    command_path_list = ctx.command_path.split()
-    command_path_list[-1] = doctor.name
-    doctor_command_name = ' '.join(command_path_list)
 
     wait_for_dcos(
         is_enterprise=cluster_vms.is_enterprise,
@@ -54,5 +49,6 @@ def wait(
         superuser_username=superuser_username,
         superuser_password=superuser_password,
         http_checks=True,
-        doctor_command_name=doctor_command_name,
+        doctor_command=doctor,
+        sibling_ctx=ctx,
     )
