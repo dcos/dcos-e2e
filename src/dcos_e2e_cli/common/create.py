@@ -45,7 +45,7 @@ def get_config(
     security_mode: Optional[str],
 ) -> Dict[str, Any]:
     """
-    XXX
+    Get a DC/OS configuration to use for the given cluster.
     """
     if is_enterprise:
         superuser_username = 'admin'
@@ -68,3 +68,5 @@ def get_config(
         **cluster.base_config,
         **extra_config,
     }
+
+    return dcos_config
