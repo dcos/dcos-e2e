@@ -233,8 +233,8 @@ def variant_option(command: Callable[..., None]) -> Callable[..., None]:
         default='auto',
         help=(
             'Choose the DC/OS variant. '
-            'If the variant does not match the variant of the given installer, '
-            'an error will occur. '
+            'If the variant does not match the variant of the given '
+            'installer, an error will occur. '
             'Using "auto" finds the variant from the installer. '
             'Finding the variant from the installer takes some time and so '
             'using another option is a performance optimization.'
