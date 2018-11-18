@@ -90,7 +90,7 @@ Options:
                                   filesystems for the syntax to use.
   --variant [auto|oss|enterprise]
                                   Choose the DC/OS variant. If the variant does
-                                  not match the variant of the given artifact,
+                                  not match the variant of the given installer,
                                   an error will occur. Using "auto" finds the
                                   variant from the installer. Finding the
                                   variant from the installer takes some time and
