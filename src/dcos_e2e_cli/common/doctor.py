@@ -93,7 +93,7 @@ def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
     progress_bar = tqdm(
         iterable=check_functions,
         dynamic_ncols=True,
-        bar_format='{l_bar}{bar}',
+        bar_format='{n_fmt}/{total_fmt} checks complete: {bar}',
         unit_scale=None,
     )
 
