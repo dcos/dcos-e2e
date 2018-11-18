@@ -114,6 +114,17 @@ def _validate_tags(
         'an error will occur. '
     ),
 )
+@click.option(
+    '--wait-for-dcos',
+    is_flag=True,
+    help=(
+        'Wait for DC/OS after creating the cluster. '
+        'This is equivalent to using "minidcos aws wait" after this '
+        'command. '
+        '"minidcos aws wait" has various options available and so may be '
+        'more appropriate for your use case. '
+    ),
+)
 @masters_option
 @agents_option
 @extra_config_option
@@ -148,6 +159,7 @@ def create(
     enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
     custom_tag: Dict[str, str],
+    wait_for_dcos: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -303,6 +315,15 @@ def create(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+    if wait_for_dcos:
+        ctx.invoke(
+            wait,
+            cluster_id=cluster_id,
+            aws_region=aws_region,
+            verbose=verbose,
+        )
+        return
 
     show_cluster_started_message(
         # We work on the assumption that the ``wait`` command is a sibling
