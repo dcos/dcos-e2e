@@ -122,7 +122,7 @@ def _validate_tags(
         'This is equivalent to using "minidcos aws wait" after this '
         'command. '
         '"minidcos aws wait" has various options available and so may be '
-        'more appropriate for your use case. '
+        'more appropriate for your use case.'
     ),
 )
 @masters_option

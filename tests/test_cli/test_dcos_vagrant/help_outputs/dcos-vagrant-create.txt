@@ -74,4 +74,9 @@ Options:
   --enable-selinux-enforcing      With this flag set, SELinux is set to
                                   enforcing before DC/OS is installed on the
                                   cluster.
+  --wait-for-dcos                 Wait for DC/OS after creating the cluster.
+                                  This is equivalent to using "minidcos vagrant
+                                  wait" after this command. "minidcos vagrant
+                                  wait" has various options available and so may
+                                  be more appropriate for your use case.
   --help                          Show this message and exit.
