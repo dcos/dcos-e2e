@@ -30,8 +30,13 @@ Options:
   --custom-tag TEXT               Add tags to EC2 instances in the format
                                   "<TAG_KEY>:<TAG_VALUE>".
   --variant [oss|enterprise]      Choose the DC/OS variant. If the variant does
-                                  not match the variant of the given artifact
+                                  not match the variant of the given installer
                                   URL, an error will occur.   [required]
+  --wait-for-dcos                 Wait for DC/OS after creating the cluster.
+                                  This is equivalent to using "minidcos aws
+                                  wait" after this command. "minidcos aws wait"
+                                  has various options available and so may be
+                                  more appropriate for your use case.
   --masters INTEGER               The number of master nodes.  [default: 1]
   --agents INTEGER                The number of agent nodes.  [default: 1]
   --extra-config PATH             The path to a file including DC/OS
