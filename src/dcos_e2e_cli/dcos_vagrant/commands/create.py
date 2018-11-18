@@ -65,6 +65,17 @@ from .wait import wait
 @cluster_id_option
 @verbosity_option
 @enable_selinux_enforcing_option
+@click.option(
+    '--wait-for-dcos',
+    is_flag=True,
+    help=(
+        'Wait for DC/OS after creating the cluster. '
+        'This is equivalent to using "minidcos vagrant wait" after this '
+        'command. '
+        '"minidcos vagrant wait" has various options available and so may be '
+        'more appropriate for your use case.'
+    ),
+)
 @click.pass_context
 def create(
     ctx: click.core.Context,
@@ -82,6 +93,7 @@ def create(
     verbose: int,
     enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
+    wait_for_dcos: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -196,6 +208,10 @@ def create(
         sibling_ctx=ctx,
         installer=installer_path,
     )
+
+    if wait_for_dcos:
+        ctx.invoke(wait, cluster_id=cluster_id, verbose=verbose)
+        return
 
     show_cluster_started_message(
         # We work on the assumption that the ``wait`` command is a sibling
