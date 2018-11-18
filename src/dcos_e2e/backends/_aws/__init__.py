@@ -374,7 +374,6 @@ class AWSCluster(ClusterManager):
         self.launcher.config['dcos_config'] = dcos_config
         self.launcher.install_dcos()
 
-
     def install_dcos_from_path_with_bootstrap_node(
         self,
         dcos_installer: Path,
@@ -406,7 +405,6 @@ class AWSCluster(ClusterManager):
         """
         raise NotImplementedError
 
-
     def destroy_node(self, node: Node) -> None:
         """
         Destroy a nodes in the cluster. This is not implemented.
@@ -415,7 +413,6 @@ class AWSCluster(ClusterManager):
             NotImplementedError
         """
         raise NotImplementedError
-
 
     def destroy(self) -> None:
         """
@@ -428,7 +425,6 @@ class AWSCluster(ClusterManager):
         self.launcher.delete()
 
         rmtree(path=str(self._path), ignore_errors=True)
-
 
     @property
     def masters(self) -> Set[Node]:
@@ -448,7 +444,6 @@ class AWSCluster(ClusterManager):
 
         return nodes
 
-
     @property
     def agents(self) -> Set[Node]:
         """
@@ -466,7 +461,6 @@ class AWSCluster(ClusterManager):
             nodes.add(node)
 
         return nodes
-
 
     @property
     def public_agents(self) -> Set[Node]:
