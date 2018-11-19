@@ -11,6 +11,7 @@ from typing import Callable, Optional
 import click
 
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 
 def _tar_with_filter(
@@ -40,6 +41,57 @@ def _cache_filter(tar_info: tarfile.TarInfo) -> Optional[tarfile.TarInfo]:
         return None
     return tar_info
 
+
+def _send_tarstream_to_node_and_extract(
+    tarstream: io.BytesIO,
+    node: Node,
+    remote_path: Path,
+) -> None:
+    """
+    XXX
+    """
+    tar_path = '/tmp/dcos_e2e_tmp.tar'
+    with tempfile.namedtemporaryfile() as tmp_file:
+        tmp_file.write(tarstream.getvalue())
+        tmp_file.flush()
+
+        node.send_file(
+            local_path=path(tmp_file.name),
+            remote_path=path(tar_path),
+        )
+
+    tar_args = ['tar', '-c', str(node_destination), '-xvf', tar_path]
+    node.run(args=tar_args)
+    node.run(args=['rm', tar_path])
+
+
+def _sync_bootstrap_to_masters(
+    cluster: Cluster,
+    dcos_checkout_dir: Path,
+) -> None:
+    """
+    XXX
+    """
+    node_lib_dir = node_active_dir / 'bootstrap' / 'lib'
+    # Different versions of DC/OS have different versions of Python.
+    master = next(iter(cluster.masters))
+    ls_result = master.run(args=['ls', str(node_lib_dir)])
+    python_version = ls_result.stdout.decode().strip()
+    node_python_dir = node_lib_dir / python_version
+    node_bootstrap_dir = (
+        node_python_dir / 'site-packages' / 'dcos_internal_utils'
+    )
+    bootstrap_tarstream = _tar_with_filter(
+        path=local_bootstrap_dir,
+        tar_filter=_cache_filter,
+    )
+
+    for master in cluster.masters:
+        _send_tarstream_to_node_and_extract(
+            tarstream=bootstrap_tarstream,
+            node=master,
+            remote_path=node_bootstrap_dir,
+        )
 
 def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
     """
@@ -87,54 +139,22 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
             '"{local_test_dir}" does not exist.'
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
-    node_active_dir = Path('/opt/mesosphere/active')
-    node_test_dir = node_active_dir / 'dcos-integration-test'
-    node_lib_dir = node_active_dir / 'bootstrap' / 'lib'
-    # Different versions of DC/OS have different versions of Python.
-    master = next(iter(cluster.masters))
-    ls_result = master.run(args=['ls', str(node_lib_dir)])
-    python_version = ls_result.stdout.decode().strip()
-    node_python_dir = node_lib_dir / python_version
-    node_bootstrap_dir = (
-        node_python_dir / 'site-packages' / 'dcos_internal_utils'
-    )
-
-    local_bootstrap_dir = (
-        local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
-    )
 
     test_tarstream = _tar_with_filter(
         path=local_test_dir,
         tar_filter=_cache_filter,
     )
-    bootstrap_tarstream = _tar_with_filter(
-        path=local_bootstrap_dir,
-        tar_filter=_cache_filter,
-    )
 
-    node_test_py_pattern = node_test_dir / '*.py'
-    tar_path = '/tmp/dcos_e2e_tmp.tar'
     for master in cluster.masters:
         master.run(
-            args=['rm', '-rf', str(node_test_py_pattern)],
+            args=['rm', '-rf', str(node_test_dir / '*.py')],
             # We use a wildcard character, `*`, so we need shell expansion.
             shell=True,
         )
 
-        for tarstream, node_destination in (
-            (test_tarstream, node_test_dir),
-            (bootstrap_tarstream, node_bootstrap_dir),
-        ):
+        _send_tarstream_to_node_and_extract(
+            tarstream=test_tarstream,
+            node=master,
+            remote_path=Path('/opt/mesosphere/active/dcos-integration-test')
+        )
 
-            with tempfile.NamedTemporaryFile() as tmp_file:
-                tmp_file.write(tarstream.getvalue())
-                tmp_file.flush()
-
-                master.send_file(
-                    local_path=Path(tmp_file.name),
-                    remote_path=Path(tar_path),
-                )
-
-            tar_args = ['tar', '-C', str(node_destination), '-xvf', tar_path]
-            master.run(args=tar_args)
-            master.run(args=['rm', tar_path])
