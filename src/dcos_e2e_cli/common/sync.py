@@ -50,19 +50,19 @@ def _send_tarstream_to_node_and_extract(
     """
     Given a tarstream, send the contents to a remote path.
     """
-    tar_path = '/tmp/dcos_e2e_tmp.tar'
+    tar_path = Path('/tmp/dcos_e2e_tmp.tar')
     with tempfile.namedtemporaryfile() as tmp_file:
         tmp_file.write(tarstream.getvalue())
         tmp_file.flush()
 
         node.send_file(
-            local_path=path(tmp_file.name),
-            remote_path=path(tar_path),
+            local_path=Path(tmp_file.name),
+            remote_path=tar_path,
         )
 
-    tar_args = ['tar', '-c', str(node_destination), '-xvf', tar_path]
+    tar_args = ['tar', '-c', str(remote_path), '-xvf', str(tar_path)]
     node.run(args=tar_args)
-    node.run(args=['rm', tar_path])
+    node.run(args=['rm', str(tar_path)])
 
 
 def _sync_bootstrap_to_masters(
@@ -92,6 +92,7 @@ def _sync_bootstrap_to_masters(
             node=master,
             remote_path=node_bootstrap_dir,
         )
+
 
 def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
     """
@@ -155,6 +156,5 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
         _send_tarstream_to_node_and_extract(
             tarstream=test_tarstream,
             node=master,
-            remote_path=Path('/opt/mesosphere/active/dcos-integration-test')
+            remote_path=Path('/opt/mesosphere/active/dcos-integration-test'),
         )
-
