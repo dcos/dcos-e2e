@@ -48,7 +48,7 @@ def _send_tarstream_to_node_and_extract(
     remote_path: Path,
 ) -> None:
     """
-    XXX
+    Given a tarstream, send the contents to a remote path.
     """
     tar_path = '/tmp/dcos_e2e_tmp.tar'
     with tempfile.namedtemporaryfile() as tmp_file:
@@ -70,7 +70,7 @@ def _sync_bootstrap_to_masters(
     dcos_checkout_dir: Path,
 ) -> None:
     """
-    XXX
+    Sync bootstrap code to all masters in a cluster.
     """
     node_lib_dir = node_active_dir / 'bootstrap' / 'lib'
     # Different versions of DC/OS have different versions of Python.
