@@ -110,7 +110,7 @@ def ee_installer_url() -> str:
     """
     Return the url to an installer for Enterprise DC/OS.
     """
-    return os.environ['EE_MASTER_installer_url']
+    return os.environ['EE_MASTER_INSTALLER_URL']
 
 
 @pytest.fixture(scope='session')
