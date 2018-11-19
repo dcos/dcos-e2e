@@ -51,7 +51,7 @@ def _send_tarstream_to_node_and_extract(
     Given a tarstream, send the contents to a remote path.
     """
     tar_path = Path('/tmp/dcos_e2e_tmp.tar')
-    with tempfile.namedtemporaryfile() as tmp_file:
+    with tempfile.NamedTemporaryFile() as tmp_file:
         tmp_file.write(tarstream.getvalue())
         tmp_file.flush()
 
@@ -72,7 +72,11 @@ def _sync_bootstrap_to_masters(
     """
     Sync bootstrap code to all masters in a cluster.
     """
-    node_lib_dir = node_active_dir / 'bootstrap' / 'lib'
+    local_packages = dcos_checkout_dir / 'packages'
+    local_bootstrap_dir = (
+        local_packages / 'bootstrap' / 'extra' / 'dcos_internal_utils'
+    )
+    node_lib_dir = Path('/opt/mesosphere/active/bootstrap/lib')
     # Different versions of DC/OS have different versions of Python.
     master = next(iter(cluster.masters))
     ls_result = master.run(args=['ls', str(node_lib_dir)])
@@ -146,6 +150,8 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
         tar_filter=_cache_filter,
     )
 
+    node_active_dir = Path('/opt/mesosphere/active')
+    node_test_dir = node_active_dir / 'dcos-integration-test'
     for master in cluster.masters:
         master.run(
             args=['rm', '-rf', str(node_test_dir / '*.py')],
