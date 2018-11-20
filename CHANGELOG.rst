@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.11.20.0
+------------
+
 - Rename ``build_artifact`` and related variables to "installer".
 - If syncing a DC/OS OSS repository to a DC/OS Enterprise cluster, only Open
   Source tests are synced.
