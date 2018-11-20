@@ -150,10 +150,42 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
         dcos_checkout_dir=dcos_checkout_dir,
     )
 
+    # checkout_directory_variant
+    # cluster_variant
+
+    # If cluster is EE and checkout is OSS:
+    #   * Delete util directory in node_test_dir
+    #   * Move tarred tests to node_test_dir / open_source_tests
+    #   * Delete open_source_tests/conftest.py
+    #   * Move open_source_tests/util one level up
+
+    # If cluster is OSS and checkout is EE:
+    #   * Error
+
     test_tarstream = _tar_with_filter(
         path=local_test_dir,
         tar_filter=_cache_filter,
     )
+
+    # * Tell people "delete conftest.py"
+    # * If you're using DC/OS enterprise, sync takes a DC/OS Enterprise repo
+    #   and optionally a DC/OS OSS
+    # * If enterprise cluster and enterprise checkout dir, sync only EE code
+    #    AND if enterprise cluster and OSS checkout dir, sync OSS code to the right place
+
+    # run --sync-dir
+    # OSS:
+    #   minidcos docker run --sync-dir .
+    # EE:
+    #   minidcos docker run --sync-dir /path/to/ee --sync-dir /path/to/oss run
+
+    # On the cluster already:
+    # test_foo.py
+    # open_source_tests/test_bar.py
+
+    # sync enterprise
+    # local enterprise checkout has a open_source_tests/
+
 
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'
