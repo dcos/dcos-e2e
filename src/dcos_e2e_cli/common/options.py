@@ -346,6 +346,7 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
             '  * Bootstrap directory if the directory variant matches the '
             '    cluster variant.\n'
             '  * Integration tests.\n'
+            '\n'
             'Use this option multiple times on a DC/OS Enterprise cluster to '
             'sync both DC/OS Enterprise and DC/OS Open Source tests.'
         ),

@@ -18,6 +18,7 @@ Options:
                            the directory variant matches the     cluster
                            variant.
                              * Integration tests.
+                           
                            Use this option
                            multiple times on a DC/OS Enterprise cluster to sync
                            both DC/OS Enterprise and DC/OS Open Source tests.
