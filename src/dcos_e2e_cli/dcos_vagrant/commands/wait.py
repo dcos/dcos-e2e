@@ -41,7 +41,7 @@ def wait(
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
 
     wait_for_dcos(
-        is_enterprise=cluster_vms.is_enterprise,
+        dcos_variant=cluster_vms.dcos_variant,
         cluster=cluster_vms.cluster,
         superuser_username=superuser_username,
         superuser_password=superuser_password,
