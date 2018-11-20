@@ -146,6 +146,19 @@ def sync_code_to_masters(
       - `minidcos docker run systemctl restart dcos-mesos-master`
       - `minidcos docker run journalctl -f -u dcos-mesos-master`
       - We expect to see the assertion error.
+    * Test sync DC/OS OSS tests to a DC/OS Enterprise cluster
+      - Modify a DC/OS OSS checkout to include a new integration test file and
+        a new file in "util".
+      - Sync the DC/OS OSS checkout to a DC/OS Enterprise cluster.
+      - Assert that the DC/OS Enterprise tests still exist.
+      - Assert that the "open_source_tests" directory within the Enterprise
+        cluster's test directory includes the new integration test.
+      - Assert that the "util" directory in the Enterprise cluster's test
+        directory includes the new file.
+      - Assert that there is no "util" directory in the "open_source_tests"
+        directory.
+      - Assert that there is no "conftest.py" in the "open_source_tests"
+        directory.
 
     Args:
         cluster: The cluster to sync code to.
