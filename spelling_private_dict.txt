@@ -35,7 +35,6 @@ diff
 dir
 dockerfile
 drf
-miniDC
 dulwich
 enum
 env
@@ -45,7 +44,6 @@ filename
 func
 genconf
 gzip
-minidc
 homebrew
 hwclock
 idna
@@ -68,6 +66,8 @@ macOS
 macos
 makefile
 mesos
+miniDC
+minidc
 minidcos
 mkstemp
 modprobe
@@ -122,6 +122,7 @@ symlink
 systemctl
 systemd
 tarfile
+tarstream
 tempfile
 tmp
 tmpfs
