@@ -15,6 +15,7 @@ import yaml
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 from dcos_e2e_cli._vendor import vertigo_py
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
