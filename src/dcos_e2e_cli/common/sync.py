@@ -145,6 +145,11 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
 
+    _sync_bootstrap_to_masters(
+        cluster=cluster,
+        dcos_checkout_dir=dcos_checkout_dir,
+    )
+
     test_tarstream = _tar_with_filter(
         path=local_test_dir,
         tar_filter=_cache_filter,
