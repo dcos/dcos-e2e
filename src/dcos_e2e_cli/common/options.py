@@ -341,6 +341,10 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
             'The path to a DC/OS checkout. '
             'Part of this checkout will be synced to all master nodes before '
             'the command is run.'
+            'These parts are:\n'
+            '  * Bootstrap directory if the directory variant matches the '
+            '    cluster variant.\n'
+            '  * Integration tests.\n'
         ),
         callback=validate_path_is_directory,
     )(command)  # type: Callable[..., None]
