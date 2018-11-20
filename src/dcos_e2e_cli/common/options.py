@@ -346,10 +346,9 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
             'The path to a DC/OS checkout. '
             'Part of this checkout will be synced to all master nodes before '
             'the command is run. '
-            'These parts are:\n'
-            '  * Bootstrap directory if the directory variant matches the '
-            'cluster variant.\n'
-            '  * Integration tests.\n'
+            'The bootstrap directory is synced if the checkout directory '
+            'variant matches the cluster variant.'
+            'Integration tests are also synced.'
             'Use this option multiple times on a DC/OS Enterprise cluster to '
             'sync both DC/OS Enterprise and DC/OS Open Source tests.'
         ),
