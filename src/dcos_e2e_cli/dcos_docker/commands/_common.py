@@ -13,7 +13,6 @@ import docker
 from docker.client import DockerClient
 from docker.models.containers import Container
 
-from dcos_e2e._vendor.dcos_test_utils import DCOSVariant
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver

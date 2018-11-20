@@ -10,12 +10,13 @@ import urllib3
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 from .utils import command_path
 
 
 def wait_for_dcos(
-    is_enterprise: bool,
+    dcos_variant: DCOSVariant,
     cluster: Cluster,
     superuser_username: str,
     superuser_password: str,
@@ -27,8 +28,7 @@ def wait_for_dcos(
     Wait for DC/OS to start.
 
     Args:
-        is_enterprise: Whether or not the cluster is a DC/OS Enterprise
-            cluster.
+        dcos_variant: The DC/OS variant of the cluster.
         cluster: The cluster to wait for.
         superuser_username: If the cluster is a DC/OS Enterprise cluster, use
             this username to wait for DC/OS.
@@ -60,12 +60,12 @@ def wait_for_dcos(
         'To resolve that, run this command again.'
     )
 
-    if not is_enterprise:
+    if not dcos_variant == DCOSVariant.ENTERPRISE:
         click.echo(no_login_message)
 
     with click_spinner.spinner():
         try:
-            if is_enterprise:
+            if dcos_variant == DCOSVariant.ENTERPRISE:
                 cluster.wait_for_dcos_ee(
                     superuser_username=superuser_username,
                     superuser_password=superuser_password,

@@ -8,7 +8,6 @@ from typing import Dict, Optional, Tuple
 import click
 
 from dcos_e2e.node import Node, Transport
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import node_args_argument
 from dcos_e2e_cli.common.options import (
     dcos_login_pw_option,
@@ -144,10 +143,6 @@ def run(
         aws_region=aws_region,
     )
     cluster = cluster_instances.cluster
-    dcos_variant = {
-        True: DCOSVariant.ENTERPRISE,
-        False: DCOSVariant.OSS,
-    }[cluster_instances.is_enterprise]
     host = _get_node(
         cluster_id=cluster_id,
         node_reference=node,
@@ -158,7 +153,7 @@ def run(
         sync_code_to_masters(
             cluster=cluster,
             dcos_checkout_dir=sync_dir,
-            dcos_variant=dcos_variant,
+            dcos_variant=cluster_instances.dcos_variant,
         )
 
     run_command(
