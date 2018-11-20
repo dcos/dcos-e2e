@@ -61,7 +61,7 @@ def _send_tarstream_to_node_and_extract(
             remote_path=tar_path,
         )
 
-    tar_args = ['tar', '-c', str(remote_path), '-xvf', str(tar_path)]
+    tar_args = ['tar', '-C', str(remote_path), '-xvf', str(tar_path)]
     node.run(args=tar_args)
     node.run(args=['rm', str(tar_path)])
 
@@ -162,6 +162,7 @@ def sync_code_to_masters(
         directory.
       - Assert that the removed integration test is not present in the
         "open_source_tests" directory.
+      - Run a test from the "open_source_tests" directory.
 
     Args:
         cluster: The cluster to sync code to.
@@ -178,11 +179,6 @@ def sync_code_to_masters(
             '"{local_test_dir}" does not exist.'
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
-
-    _sync_bootstrap_to_masters(
-        cluster=cluster,
-        dcos_checkout_dir=dcos_checkout_dir,
-    )
 
     dcos_checkout_dir_variant = _dcos_checkout_dir_variant(
         dcos_checkout_dir=dcos_checkout_dir,
@@ -208,6 +204,23 @@ def sync_code_to_masters(
         # https://github.com/mesosphere/dcos-enterprise/blob/master/packages/dcos-integration-test/ee.build
         for master in cluster.masters:
             master.run(args=['rm', '-rf', str(node_test_dir / 'util')])
+            master.run(
+                args=[
+                    'rm',
+                    '-rf',
+                    str(node_test_dir / 'open_source_tests' / '*.py'),
+                ],
+                # We use a wildcard character, `*`, so we need shell expansion.
+                shell=True,
+            )
+
+            master.run(
+                args=[
+                    'mkdir',
+                    '--parents',
+                    str(node_test_dir / 'open_source_tests'),
+                ],
+            )
 
             _send_tarstream_to_node_and_extract(
                 tarstream=test_tarstream,
@@ -229,6 +242,11 @@ def sync_code_to_masters(
                 ],
             )
     else:
+        _sync_bootstrap_to_masters(
+            cluster=cluster,
+            dcos_checkout_dir=dcos_checkout_dir,
+        )
+
         for master in cluster.masters:
             master.run(
                 args=['rm', '-rf', str(node_test_dir / '*.py')],
