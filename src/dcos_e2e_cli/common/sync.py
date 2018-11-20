@@ -12,6 +12,7 @@ import click
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 
 def _tar_with_filter(
@@ -98,7 +99,11 @@ def _sync_bootstrap_to_masters(
         )
 
 
-def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
+def sync_code_to_masters(
+    cluster: Cluster,
+    dcos_checkout_dir: Path,
+    dcos_variant: DCOSVariant,
+) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
 
@@ -134,6 +139,7 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
         cluster: The cluster to sync code to.
         dcos_checkout_dir: The path to a DC/OS (Enterprise) checkout to sync
             code from.
+        dcos_variant: The DC/OS variant of the cluster.
     """
     local_packages = dcos_checkout_dir / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
@@ -171,7 +177,8 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
     # * If you're using DC/OS enterprise, sync takes a DC/OS Enterprise repo
     #   and optionally a DC/OS OSS
     # * If enterprise cluster and enterprise checkout dir, sync only EE code
-    #    AND if enterprise cluster and OSS checkout dir, sync OSS code to the right place
+    #    AND if enterprise cluster and OSS checkout dir, sync OSS code to the
+    #    right place
 
     # run --sync-dir
     # OSS:
@@ -185,7 +192,6 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
 
     # sync enterprise
     # local enterprise checkout has a open_source_tests/
-
 
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'

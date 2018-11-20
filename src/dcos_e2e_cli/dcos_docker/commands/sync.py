@@ -7,6 +7,7 @@ from pathlib import Path
 import click
 
 from dcos_e2e.node import Transport
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import dcos_checkout_dir_argument
 from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
@@ -54,7 +55,12 @@ def sync_code(
         transport=transport,
     )
     cluster = cluster_containers.cluster
+    dcos_variant = {
+        True: DCOSVariant.ENTERPRISE,
+        False: DCOSVariant.OSS,
+    }[cluster_containers.is_enterprise]
     sync_code_to_masters(
         cluster=cluster,
         dcos_checkout_dir=Path(dcos_checkout_dir),
+        dcos_variant=dcos_variant,
     )
