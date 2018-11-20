@@ -149,6 +149,7 @@ def sync_code_to_masters(
     * Test sync DC/OS OSS tests to a DC/OS Enterprise cluster
       - Modify a DC/OS OSS checkout to include a new integration test file and
         a new file in "util".
+      - Modify the DC/OS OSS checkout to remove an integration test.
       - Sync the DC/OS OSS checkout to a DC/OS Enterprise cluster.
       - Assert that the DC/OS Enterprise tests still exist.
       - Assert that the "open_source_tests" directory within the Enterprise
@@ -159,6 +160,8 @@ def sync_code_to_masters(
         directory.
       - Assert that there is no "conftest.py" in the "open_source_tests"
         directory.
+      - Assert that the removed integration test is not present in the
+        "open_source_tests" directory.
 
     Args:
         cluster: The cluster to sync code to.

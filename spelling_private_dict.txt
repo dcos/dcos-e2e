@@ -24,6 +24,7 @@ cli
 completedprocess
 conf
 config
+conftest
 customizable
 cwd
 dangoor
@@ -141,6 +142,7 @@ uninstalling
 untar
 url
 username
+util
 utils
 vagrantfile
 validator
