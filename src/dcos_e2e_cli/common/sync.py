@@ -99,6 +99,18 @@ def _sync_bootstrap_to_masters(
         )
 
 
+def _dcos_checkout_dir_variant(dcos_checkout_dir: Path) -> DCOSVariant:
+    """
+    Return the variant which matches the DC/OS checkout directory.
+    """
+    local_packages = dcos_checkout_dir / 'packages'
+    upstream_json = local_packages / 'upstream.json'
+    return {
+        True: DCOSVariant.ENTERPRISE,
+        False: DCOSVariant.OSS,
+    }[upstream_json.exists()]
+
+
 def sync_code_to_masters(
     cluster: Cluster,
     dcos_checkout_dir: Path,
@@ -153,6 +165,10 @@ def sync_code_to_masters(
 
     _sync_bootstrap_to_masters(
         cluster=cluster,
+        dcos_checkout_dir=dcos_checkout_dir,
+    )
+
+    dcos_checkout_dir_variant = _dcos_checkout_dir_variant(
         dcos_checkout_dir=dcos_checkout_dir,
     )
 
