@@ -7,6 +7,8 @@ Next
 ----
 
 - Rename ``build_artifact`` and related variables to "installer".
+- If syncing a DC/OS OSS repository to a DC/OS Enterprise cluster, only Open
+  Source tests are synced.
 
 2018.11.16.2
 ------------

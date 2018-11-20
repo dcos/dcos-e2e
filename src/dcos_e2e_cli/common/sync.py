@@ -12,6 +12,7 @@ import click
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 
 def _tar_with_filter(
@@ -60,7 +61,7 @@ def _send_tarstream_to_node_and_extract(
             remote_path=tar_path,
         )
 
-    tar_args = ['tar', '-c', str(remote_path), '-xvf', str(tar_path)]
+    tar_args = ['tar', '-C', str(remote_path), '-xvf', str(tar_path)]
     node.run(args=tar_args)
     node.run(args=['rm', str(tar_path)])
 
@@ -98,7 +99,23 @@ def _sync_bootstrap_to_masters(
         )
 
 
-def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
+def _dcos_checkout_dir_variant(dcos_checkout_dir: Path) -> DCOSVariant:
+    """
+    Return the variant which matches the DC/OS checkout directory.
+    """
+    local_packages = dcos_checkout_dir / 'packages'
+    upstream_json = local_packages / 'upstream.json'
+    return {
+        True: DCOSVariant.ENTERPRISE,
+        False: DCOSVariant.OSS,
+    }[upstream_json.exists()]
+
+
+def sync_code_to_masters(
+    cluster: Cluster,
+    dcos_checkout_dir: Path,
+    dcos_variant: DCOSVariant,
+) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
 
@@ -129,11 +146,29 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
       - `minidcos docker run systemctl restart dcos-mesos-master`
       - `minidcos docker run journalctl -f -u dcos-mesos-master`
       - We expect to see the assertion error.
+    * Test sync DC/OS OSS tests to a DC/OS Enterprise cluster
+      - Modify a DC/OS OSS checkout to include a new integration test file and
+        a new file in "util".
+      - Modify the DC/OS OSS checkout to remove an integration test.
+      - Sync the DC/OS OSS checkout to a DC/OS Enterprise cluster.
+      - Assert that the DC/OS Enterprise tests still exist.
+      - Assert that the "open_source_tests" directory within the Enterprise
+        cluster's test directory includes the new integration test.
+      - Assert that the "util" directory in the Enterprise cluster's test
+        directory includes the new file.
+      - Assert that there is no "util" directory in the "open_source_tests"
+        directory.
+      - Assert that there is no "conftest.py" in the "open_source_tests"
+        directory.
+      - Assert that the removed integration test is not present in the
+        "open_source_tests" directory.
+      - Run a test from the "open_source_tests" directory.
 
     Args:
         cluster: The cluster to sync code to.
         dcos_checkout_dir: The path to a DC/OS (Enterprise) checkout to sync
             code from.
+        dcos_variant: The DC/OS variant of the cluster.
     """
     local_packages = dcos_checkout_dir / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
@@ -145,27 +180,81 @@ def sync_code_to_masters(cluster: Cluster, dcos_checkout_dir: Path) -> None:
         ).format(local_test_dir=local_test_dir)
         raise click.BadArgumentUsage(message=message)
 
-    _sync_bootstrap_to_masters(
-        cluster=cluster,
+    dcos_checkout_dir_variant = _dcos_checkout_dir_variant(
         dcos_checkout_dir=dcos_checkout_dir,
     )
+
+    node_test_dir = Path('/opt/mesosphere/active/dcos-integration-test')
 
     test_tarstream = _tar_with_filter(
         path=local_test_dir,
         tar_filter=_cache_filter,
     )
 
+    syncing_oss_to_ee = bool(
+        dcos_variant == DCOSVariant.ENTERPRISE
+        and dcos_checkout_dir_variant == DCOSVariant.OSS,
+    )
+
     node_active_dir = Path('/opt/mesosphere/active')
     node_test_dir = node_active_dir / 'dcos-integration-test'
-    for master in cluster.masters:
-        master.run(
-            args=['rm', '-rf', str(node_test_dir / '*.py')],
-            # We use a wildcard character, `*`, so we need shell expansion.
-            shell=True,
+
+    if syncing_oss_to_ee:
+        # This matches part of
+        # https://github.com/mesosphere/dcos-enterprise/blob/master/packages/dcos-integration-test/ee.build
+        for master in cluster.masters:
+            master.run(args=['rm', '-rf', str(node_test_dir / 'util')])
+            master.run(
+                args=[
+                    'rm',
+                    '-rf',
+                    str(node_test_dir / 'open_source_tests' / '*.py'),
+                ],
+                # We use a wildcard character, `*`, so we need shell expansion.
+                shell=True,
+            )
+
+            master.run(
+                args=[
+                    'mkdir',
+                    '--parents',
+                    str(node_test_dir / 'open_source_tests'),
+                ],
+            )
+
+            _send_tarstream_to_node_and_extract(
+                tarstream=test_tarstream,
+                node=master,
+                remote_path=node_test_dir / 'open_source_tests',
+            )
+            master.run(
+                args=[
+                    'rm',
+                    '-rf',
+                    str(node_test_dir / 'open_source_tests' / 'conftest.py'),
+                ],
+            )
+            master.run(
+                args=[
+                    'mv',
+                    str(node_test_dir / 'open_source_tests' / 'util'),
+                    str(node_test_dir),
+                ],
+            )
+    else:
+        _sync_bootstrap_to_masters(
+            cluster=cluster,
+            dcos_checkout_dir=dcos_checkout_dir,
         )
 
-        _send_tarstream_to_node_and_extract(
-            tarstream=test_tarstream,
-            node=master,
-            remote_path=Path('/opt/mesosphere/active/dcos-integration-test'),
-        )
+        for master in cluster.masters:
+            master.run(
+                args=['rm', '-rf', str(node_test_dir / '*.py')],
+                # We use a wildcard character, `*`, so we need shell expansion.
+                shell=True,
+            )
+            _send_tarstream_to_node_and_extract(
+                tarstream=test_tarstream,
+                node=master,
+                remote_path=node_test_dir,
+            )
