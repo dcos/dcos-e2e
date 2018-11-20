@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Allow multiple ``--sync-dir`` options to be given to ``run`` commands.
+
 2018.11.20.0
 ------------
 
