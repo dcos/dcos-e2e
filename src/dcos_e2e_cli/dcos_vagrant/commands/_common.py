@@ -179,16 +179,19 @@ class ClusterVMs:
         return vm_names
 
     @property
-    def is_enterprise(self) -> bool:
+    def dcos_variant(self) -> DCOSVariant:
         """
-        Return whether the cluster is a DC/OS Enterprise cluster.
+        Return the DC/OS variant of the cluster.
         """
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
         data = json.loads(s=description)
-        variant = data[VARIANT_DESCRIPTION_KEY]
-        return bool(variant == 'ee')
+        vm_variant_value = data[VARIANT_DESCRIPTION_KEY]
+        return {
+            VARIANT_ENTERPRISE_DESCRIPTION_VALUE: DCOSVariant.ENTERPRISE,
+            VARIANT_OSS_DESCRIPTION_VALUE: DCOSVariant.OSS,
+        }[vm_variant_value]
 
     @property
     def cluster(self) -> Cluster:

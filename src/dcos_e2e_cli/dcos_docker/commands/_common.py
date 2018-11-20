@@ -13,6 +13,7 @@ import docker
 from docker.client import DockerClient
 from docker.models.containers import Container
 
+from dcos_e2e._vendor.dcos_test_utils import DCOSVariant
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
@@ -219,13 +220,16 @@ class ClusterContainers:
         return self._containers_by_role(role=Role.PUBLIC_AGENT)
 
     @property
-    def is_enterprise(self) -> bool:
+    def dcos_variant(self) -> DCOSVariant:
         """
-        Return whether the cluster is a DC/OS Enterprise cluster.
+        Return the DC/OS variant of the cluster.
         """
         master_container = next(iter(self.masters))
         container_variant_value = master_container.labels[VARIANT_LABEL_KEY]
-        return bool(container_variant_value == VARIANT_ENTERPRISE_LABEL_VALUE)
+        return {
+            VARIANT_ENTERPRISE_LABEL_VALUE: DCOSVariant.ENTERPRISE,
+            VARIANT_OSS_LABEL_VALUE: DCOSVariant.OSS,
+        }[container_variant_value]
 
     @property
     def cluster(self) -> Cluster:
