@@ -20,8 +20,10 @@ Options:
                                  matches the     cluster variant.
                                    *
                                  Integration tests.
-                                 Use this multiple times on a
-                                 DC
+                                 Use this option multiple
+                                 times on a DC/OS Enterprise cluster to sync
+                                 both DC/OS Enterprise and DC/OS Open Source
+                                 tests.
   -te, --test-env                With this flag set, environment variables are
                                  set and the command is run in the integration
                                  test directory. This means that "pytest" will
