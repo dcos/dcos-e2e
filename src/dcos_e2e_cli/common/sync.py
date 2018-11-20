@@ -15,6 +15,27 @@ from dcos_e2e.node import Node
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 
+SYNC_HELP = (
+    """
+    Sync files from a DC/OS checkout to master nodes.
+
+    This syncs integration test files and bootstrap files.
+
+    ``DCOS_CHECKOUT_DIR`` should be set to the path of clone of an open source
+    DC/OS or DC/OS Enterprise repository.
+
+    By default the ``DCOS_CHECKOUT_DIR`` argument is set to the value of the
+    ``DCOS_CHECKOUT_DIR`` environment variable.
+
+    If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is
+    used.
+
+    This makes an assumption that all DC/OS Enterprise and DC/OS OSS
+    integration tests are in the top level ``packages/dcos-integration-test``
+    directory.
+    """
+)
+
 def _tar_with_filter(
     path: Path,
     tar_filter: Callable[[tarfile.TarInfo], Optional[tarfile.TarInfo]],
@@ -204,6 +225,8 @@ def sync_code_to_masters(
         # https://github.com/mesosphere/dcos-enterprise/blob/master/packages/dcos-integration-test/ee.build
         for master in cluster.masters:
             master.run(args=['rm', '-rf', str(node_test_dir / 'util')])
+
+            # This makes an assumption that all tests are at the top level.
             master.run(
                 args=[
                     'rm',
@@ -248,6 +271,7 @@ def sync_code_to_masters(
         )
 
         for master in cluster.masters:
+            # This makes an assumption that all tests are at the top level.
             master.run(
                 args=['rm', '-rf', str(node_test_dir / '*.py')],
                 # We use a wildcard character, `*`, so we need shell expansion.

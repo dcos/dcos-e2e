@@ -12,6 +12,9 @@ Usage: minidcos aws sync [OPTIONS] [DCOS_CHECKOUT_DIR]
 
   If no ``DCOS_CHECKOUT_DIR`` is given, the current working directory is used.
 
+  This makes an assumption that all DC/OS Enterprise and DC/OS OSS integration
+  tests are in the top level ``packages/dcos-integration-test`` directory.
+
 Options:
   -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
   --aws-region TEXT      The AWS region to use.  [default: us-west-2]
