@@ -31,6 +31,17 @@ def validate_path_is_directory(
     return path
 
 
+def validate_paths_are_directories(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Tuple[Union[int, bool, str]],
+) -> Tuple[Path]:
+    """
+    Validate that all paths are directories.
+    """
+    return tuple(validate_path_is_directory(item) for item in value)
+
+
 def validate_path_pair(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],

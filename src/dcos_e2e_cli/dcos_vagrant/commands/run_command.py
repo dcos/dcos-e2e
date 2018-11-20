@@ -3,7 +3,7 @@ Tools for running arbitrary commands on cluster nodes.
 """
 
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Tuple
 
 import click
 
@@ -100,7 +100,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 def run(
     cluster_id: str,
     node_args: Tuple[str],
-    sync_dir: Optional[Path],
+    sync_dir: Tuple[Path],
     dcos_login_uname: str,
     dcos_login_pw: str,
     test_env: bool,
@@ -122,10 +122,10 @@ def run(
     host = _get_node(cluster_id=cluster_id, node_reference=node)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
     cluster = cluster_vms.cluster
-    if sync_dir is not None:
+    for dcos_checkout_dir in sync_dir:
         sync_code_to_masters(
             cluster=cluster,
-            dcos_checkout_dir=sync_dir,
+            dcos_checkout_dir=dcos_checkout_dir,
             dcos_variant=cluster_vms.dcos_variant,
         )
 
