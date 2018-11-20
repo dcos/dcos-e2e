@@ -34,15 +34,19 @@ def validate_path_is_directory(
 def validate_paths_are_directories(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Tuple[Union[int, bool, str]],
-) -> Tuple[Path]:
+    # ``value`` is set to "Any" as the typeshed stub is wrong:
+    # https://github.com/python/typeshed/issues/2615.
+    value: Any,
+) -> Tuple[Path, ...]:
     """
     Validate that all paths are directories.
     """
-    return tuple(
+    paths = []
+    for item in value:
         validate_path_is_directory(ctx=ctx, param=param, value=item)
-        for item in value
-    )
+        paths.append(Path(item))
+    return_value = tuple(item for item in paths)
+    return return_value
 
 
 def validate_path_pair(
