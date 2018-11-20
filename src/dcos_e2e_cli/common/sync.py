@@ -14,7 +14,6 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
-
 SYNC_HELP = (
     """
     Sync files from a DC/OS checkout to master nodes.

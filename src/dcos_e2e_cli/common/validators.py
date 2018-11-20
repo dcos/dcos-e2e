@@ -39,7 +39,10 @@ def validate_paths_are_directories(
     """
     Validate that all paths are directories.
     """
-    return tuple(validate_path_is_directory(item) for item in value)
+    return tuple(
+        validate_path_is_directory(ctx=ctx, param=param, value=item)
+        for item in value
+    )
 
 
 def validate_path_pair(
