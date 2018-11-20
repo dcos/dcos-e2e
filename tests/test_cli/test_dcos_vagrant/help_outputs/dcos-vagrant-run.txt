@@ -14,10 +14,12 @@ Options:
   --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
                            will be synced to all master nodes before the command
                            is run.These parts are:
-                           * Bootstrap directory if the
-                           directory variant matches the     cluster variant.
-                           *
-                           Integration tests.
+                             * Bootstrap directory if
+                           the directory variant matches the     cluster
+                           variant.
+                             * Integration tests.
+                           Use this multiple
+                           times on a DC
   -te, --test-env          With this flag set, environment variables are set and
                            the command is run in the integration test directory.
                            This means that "pytest" will run the integration

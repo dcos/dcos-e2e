@@ -337,6 +337,7 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     function = click.option(
         '--sync-dir',
         type=click.Path(exists=True),
+        multiple=True,
         help=(
             'The path to a DC/OS checkout. '
             'Part of this checkout will be synced to all master nodes before '
@@ -345,6 +346,7 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
             '  * Bootstrap directory if the directory variant matches the '
             '    cluster variant.\n'
             '  * Integration tests.\n'
+            'Use this multiple times on a DC'
         ),
         callback=validate_path_is_directory,
     )(command)  # type: Callable[..., None]
