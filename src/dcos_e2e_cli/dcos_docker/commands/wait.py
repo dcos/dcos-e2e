@@ -64,7 +64,7 @@ def wait(
     http_checks = not skip_http_checks
 
     wait_for_dcos(
-        is_enterprise=cluster_containers.is_enterprise,
+        dcos_variant=cluster_containers.dcos_variant,
         cluster=cluster_containers.cluster,
         superuser_username=superuser_username,
         superuser_password=superuser_password,

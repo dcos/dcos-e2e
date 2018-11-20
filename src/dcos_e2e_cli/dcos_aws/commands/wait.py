@@ -46,7 +46,7 @@ def wait(
         aws_region=aws_region,
     )
     wait_for_dcos(
-        is_enterprise=cluster_instances.is_enterprise,
+        dcos_variant=cluster_instances.dcos_variant,
         cluster=cluster_instances.cluster,
         superuser_username=superuser_username,
         superuser_password=superuser_password,

@@ -11,6 +11,7 @@ from boto3.resources.base import ServiceResource
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
@@ -25,6 +26,8 @@ NODE_TYPE_AGENT_TAG_VALUE = 'agent'
 NODE_TYPE_PUBLIC_AGENT_TAG_VALUE = 'public_agent'
 SSH_USER_TAG_KEY = 'dcos_e2e.ssh_user'
 VARIANT_TAG_KEY = 'dcos_e2e.variant'
+VARIANT_OSS_TAG_VALUE = ''
+VARIANT_ENTERPRISE_TAG_VALUE = 'ee'
 WORKSPACE_DIR_TAG_KEY = 'dcos_e2e.workspace_dir'
 
 
@@ -208,14 +211,17 @@ class ClusterInstances:
         return Path(tag_dict[WORKSPACE_DIR_TAG_KEY])
 
     @property
-    def is_enterprise(self) -> bool:
+    def dcos_variant(self) -> DCOSVariant:
         """
-        Return whether the cluster is a DC/OS Enterprise cluster.
+        Return the DC/OS variant of the cluster.
         """
         instance = next(iter(self.masters))
         tag_dict = _tag_dict(instance=instance)
-        variant = tag_dict[VARIANT_TAG_KEY]
-        return bool(variant == 'ee')
+        variant_tag_value = tag_dict[VARIANT_TAG_KEY]
+        return {
+            VARIANT_ENTERPRISE_TAG_VALUE: DCOSVariant.ENTERPRISE,
+            VARIANT_OSS_TAG_VALUE: DCOSVariant.OSS,
+        }[variant_tag_value]
 
     @property
     def cluster(self) -> Cluster:
