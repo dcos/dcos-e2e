@@ -33,6 +33,8 @@ from dcos_e2e_cli.common.options import (
     workspace_dir_option,
 )
 from dcos_e2e_cli.common.utils import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
     check_cluster_id_unique,
     get_doctor_message,
     get_variant,
@@ -318,6 +320,16 @@ def create(
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+    superuser_username = dcos_config.get(
+        'superuser_username',
+        DEFAULT_SUPERUSER_USERNAME,
+    )
+
+    superuser_password = dcos_config.get(
+        'superuser_password',
+        DEFAULT_SUPERUSER_PASSWORD,
+    )
 
     if wait_for_dcos:
         dcos_e2e_cli.common.wait.wait_for_dcos(
