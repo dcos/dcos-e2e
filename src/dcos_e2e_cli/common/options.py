@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, Optional, Union
 import click
 import yaml
 
+from .utils import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 from .validators import (
     validate_path_is_directory,
     validate_path_pair,
@@ -160,7 +161,7 @@ def superuser_username_option(command: Callable[..., None],
     function = click.option(
         '--superuser-username',
         type=str,
-        default='admin',
+        default=DEFAULT_SUPERUSER_USERNAME,
         help=(
             'The superuser username is needed only on DC/OS Enterprise '
             'clusters. '
@@ -178,7 +179,7 @@ def superuser_password_option(command: Callable[..., None],
     function = click.option(
         '--superuser-password',
         type=str,
-        default='admin',
+        default=DEFAULT_SUPERUSER_PASSWORD,
         help=(
             'The superuser password is needed only on DC/OS Enterprise '
             'clusters. '
@@ -308,7 +309,7 @@ def dcos_login_uname_option(command: Callable[..., None],
     function = click.option(
         '--dcos-login-uname',
         type=str,
-        default='admin',
+        default=DEFAULT_SUPERUSER_USERNAME,
         help=(
             'The username to set the ``DCOS_LOGIN_UNAME`` environment '
             'variable to.'
@@ -325,7 +326,7 @@ def dcos_login_pw_option(command: Callable[..., None]) -> Callable[..., None]:
     function = click.option(
         '--dcos-login-pw',
         type=str,
-        default='admin',
+        default=DEFAULT_SUPERUSER_PASSWORD,
         help=(
             'The password to set the ``DCOS_LOGIN_PW`` environment variable '
             'to.'

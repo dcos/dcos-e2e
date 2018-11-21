@@ -12,6 +12,7 @@ import docker
 from docker.models.networks import Network
 from docker.types import Mount
 
+import dcos_e2e_cli.common.wait
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
@@ -33,6 +34,8 @@ from dcos_e2e_cli.common.options import (
     workspace_dir_option,
 )
 from dcos_e2e_cli.common.utils import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
     check_cluster_id_unique,
     get_doctor_message,
     get_variant,
@@ -511,13 +514,27 @@ def create(
         installer=installer_path,
     )
 
+    http_checks = bool(transport == Transport.SSH)
+
+    superuser_username = dcos_config.get(
+        'superuser_username',
+        DEFAULT_SUPERUSER_USERNAME,
+    )
+
+    superuser_password = dcos_config.get(
+        'superuser_password',
+        DEFAULT_SUPERUSER_PASSWORD,
+    )
+
     if wait_for_dcos:
-        ctx.invoke(
-            wait,
-            cluster_id=cluster_id,
-            transport=transport,
-            skip_http_checks=bool(transport == Transport.DOCKER_EXEC),
-            verbose=verbose,
+        dcos_e2e_cli.common.wait.wait_for_dcos(
+            dcos_variant=dcos_variant,
+            cluster=cluster,
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+            http_checks=http_checks,
+            doctor_command=doctor,
+            sibling_ctx=ctx,
         )
         return
 

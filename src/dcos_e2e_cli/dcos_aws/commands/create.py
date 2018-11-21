@@ -13,6 +13,7 @@ import boto3
 import click
 import click_spinner
 
+import dcos_e2e_cli.common.wait
 from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
@@ -32,6 +33,8 @@ from dcos_e2e_cli.common.options import (
     workspace_dir_option,
 )
 from dcos_e2e_cli.common.utils import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
     check_cluster_id_unique,
     get_doctor_message,
     get_variant,
@@ -318,12 +321,25 @@ def create(
         cluster.destroy()
         sys.exit(exc.returncode)
 
+    superuser_username = dcos_config.get(
+        'superuser_username',
+        DEFAULT_SUPERUSER_USERNAME,
+    )
+
+    superuser_password = dcos_config.get(
+        'superuser_password',
+        DEFAULT_SUPERUSER_PASSWORD,
+    )
+
     if wait_for_dcos:
-        ctx.invoke(
-            wait,
-            cluster_id=cluster_id,
-            aws_region=aws_region,
-            verbose=verbose,
+        dcos_e2e_cli.common.wait.wait_for_dcos(
+            dcos_variant=dcos_variant,
+            cluster=cluster,
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+            http_checks=True,
+            doctor_command=doctor,
+            sibling_ctx=ctx,
         )
         return
 
