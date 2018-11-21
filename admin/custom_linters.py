@@ -4,8 +4,10 @@ Custom lint tests.
 
 import subprocess
 import sys
+from collections import defaultdict
 from pathlib import Path
-from typing import Dict  # noqa: F401
+from typing import List  # noqa: F401
+from typing import Mapping  # noqa: F401
 from typing import Set
 
 import pytest
@@ -83,14 +85,11 @@ def test_tests_collected_once() -> None:
     This does not necessarily mean that they are run - they may be skipped.
     """
     ci_patterns = _travis_ci_patterns()
-    tests_to_patterns = {}  # type: Dict[str, Set[str]]
+    tests_to_patterns = defaultdict(list)  # type: Mapping[str, List]
     for pattern in ci_patterns:
         tests = _tests_from_pattern(ci_pattern=pattern)
         for test in tests:
-            if test in tests_to_patterns:
-                tests_to_patterns[test].add(pattern)
-            else:
-                tests_to_patterns[test] = set([pattern])
+            tests_to_patterns[test].append(pattern)
 
     for test_name, patterns in tests_to_patterns.items():
         message = (
