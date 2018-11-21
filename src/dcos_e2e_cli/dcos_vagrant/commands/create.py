@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
+import dcos_e2e_cli.common.wait
 from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import installer_argument
@@ -210,7 +211,15 @@ def create(
     )
 
     if wait_for_dcos:
-        ctx.invoke(wait, cluster_id=cluster_id, verbose=verbose)
+        dcos_e2e_cli.common.wait.wait_for_dcos(
+            dcos_variant=dcos_variant,
+            cluster=cluster,
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+            http_checks=True,
+            doctor_command=doctor,
+            sibling_ctx=ctx,
+        )
         return
 
     show_cluster_started_message(
