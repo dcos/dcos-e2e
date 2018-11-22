@@ -208,7 +208,7 @@ class Cluster(ContextDecorator):
             password = 'password'
             zk_path = '/dcos/users/{email}'.format(email=email)
             curl_url = (
-                'http://localhost:8101:/acs/api/v1/users/{email}'
+                'http://localhost:8101/acs/api/v1/users/{email}'
             ).format(email=email)
             server_option = (
                 '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
@@ -245,22 +245,23 @@ class Cluster(ContextDecorator):
             # TODO iff curl commands fail, run ZK commands
             # Iff curl command passes, use uid/password for test utils,
             # else use ZK
+            import shlex
             create_user_curl_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
                 '&&',
                 'curl',
-                '-X'
+                '-X',
                 'PUT',
-                '-H'
+                '-H',
                 '"Content-Type: application/json"',
                 curl_url,
                 '-d',
-                json.dumps({
+                shlex.quote(json.dumps({
                     'description': 'AdministrativeUser',
                     'password': password,
                     'provider_type': 'internal',
-                }),
+                })),
             ]
 
             create_user_zk_args = [
