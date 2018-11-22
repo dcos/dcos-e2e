@@ -3,4 +3,4 @@ Usage: minidcos docker destroy-loopback-sidecar [OPTIONS] NAME
   Destroy a loopback sidecar.
 
 Options:
-  --help  Show this message and exit.
+  -h, --help  Show this message and exit.

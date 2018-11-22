@@ -3,7 +3,7 @@ Usage: minidcos vagrant [OPTIONS] COMMAND [ARGS]...
   Manage DC/OS clusters on Vagrant.
 
 Options:
-  --help  Show this message and exit.
+  -h, --help  Show this message and exit.
 
 Commands:
   create              Create a DC/OS cluster.

@@ -34,4 +34,4 @@ Options:
                            instance ID, a reference in the format
                            "<role>_<number>". These details be seen with
                            ``minidcos aws inspect``.
-  --help                   Show this message and exit.
+  -h, --help               Show this message and exit.

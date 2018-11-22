@@ -17,4 +17,4 @@ Options:
                         [default: stable]
   --download-path TEXT  The path to download an installer to.  [default:
                         ./dcos_generate_config.sh]
-  --help                Show this message and exit.
+  -h, --help            Show this message and exit.

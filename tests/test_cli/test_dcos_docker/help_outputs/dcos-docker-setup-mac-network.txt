@@ -9,4 +9,4 @@ Options:
                             containers from previous uses of this command.
   --configuration-dst PATH  The location to create an OpenVPN configuration
                             file.  [default: ~/Documents/docker-for-mac.ovpn]
-  --help                    Show this message and exit.
+  -h, --help                Show this message and exit.

@@ -79,4 +79,4 @@ Options:
                                   wait" after this command. "minidcos vagrant
                                   wait" has various options available and so may
                                   be more appropriate for your use case.
-  --help                          Show this message and exit.
+  -h, --help                      Show this message and exit.

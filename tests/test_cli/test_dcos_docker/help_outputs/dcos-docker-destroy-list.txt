@@ -15,4 +15,4 @@ Options:
                                  variable. When using a TTY, different
                                  transports may use different line endings.
                                  [default: docker-exec]
-  --help                         Show this message and exit.
+  -h, --help                     Show this message and exit.
