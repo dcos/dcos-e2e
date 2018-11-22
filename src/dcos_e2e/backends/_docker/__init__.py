@@ -133,6 +133,9 @@ class Docker(ClusterBackend):
         Create a configuration for a Docker cluster backend.
 
         Args:
+            container_name_prefix: The prefix that all container names will
+                start with. This is useful, for example, for later finding all
+                containers started with this backend.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted when the cluster is
                 destroyed.
