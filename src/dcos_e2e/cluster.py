@@ -262,6 +262,8 @@ class Cluster(ContextDecorator):
             any_master = next(iter(self.masters))
             # This allows this function to work even after a user has logged
             # in.
+            # In particular, we need the "albert" user to exist, or for no
+            # users to exist, for the DC/OS Test Utils API session to work.
             any_master.run(
                 args=create_user_args,
                 shell=True,
