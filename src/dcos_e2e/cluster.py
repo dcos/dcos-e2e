@@ -215,6 +215,11 @@ class Cluster(ContextDecorator):
                 'zk-5.zk:2181"'
             )
 
+            uid_password_credentials = {
+                'uid': email,
+                'password': password,
+            }
+
             delete_user_curl_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
@@ -248,11 +253,11 @@ class Cluster(ContextDecorator):
                 '-X'
                 'PUT',
                 '-H'
-                '"Content-Type: application/json"'
+                '"Content-Type: application/json"',
                 curl_url,
-                '-d'
+                '-d',
                 json.dumps({
-                    'description': 'Administrative User',
+                    'description': 'AdministrativeUser',
                     'password': password,
                     'provider_type': 'internal',
                 }),
@@ -296,15 +301,29 @@ class Cluster(ContextDecorator):
             # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
             any_master = next(iter(self.masters))
+            # We create a user.
             # This allows this function to work even after a user has logged
             # in.
             # In particular, we need the "albert" user to exist, or for no
             # users to exist, for the DC/OS Test Utils API session to work.
-            any_master.run(
-                args=create_user_args,
-                shell=True,
-                output=Output.CAPTURE,
-            )
+            try:
+                # This will not work on DC/OS OSS 1.12 and above.
+                # This API was added during the DC/OS OSS 1.13 development
+                # phase.
+                any_master.run(
+                    args=create_user_curl_args,
+                    shell=True,
+                    output=Output.CAPTURE,
+                )
+                credentials = uid_password_credentials
+            except subprocess.CalledProcessError:
+                # We are in a version of DC/OS which stores users in ZooKeeper.
+                any_master.run(
+                    args=create_user_zk_args,
+                    shell=True,
+                    output=Output.CAPTURE,
+                )
+                credentials = CI_CREDENTIALS
 
             api_session = DcosApiSession(
                 dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
@@ -313,7 +332,7 @@ class Cluster(ContextDecorator):
                 public_slaves=[
                     str(n.public_ip_address) for n in self.public_agents
                 ],
-                auth_user=DcosUser(credentials=CI_CREDENTIALS),
+                auth_user=DcosUser(credentials=credentials),
             )
 
             _test_utils_wait_for_dcos(session=api_session)
@@ -321,16 +340,22 @@ class Cluster(ContextDecorator):
             # Only the first user can log in with SSO, before granting others
             # access.
             # Therefore, we delete the user who was created to wait for DC/OS.
-            #
-            # In order to create an API session, we create a user with the
-            # hard coded credentials "CI_CREDENTIALS".
-            # These credentials match a user with the email address
-            # "albert@bekstil.net".
-            any_master.run(
-                args=delete_user_args,
-                shell=True,
-                output=Output.CAPTURE,
-            )
+            try:
+                # This will not work on DC/OS OSS 1.12 and above.
+                # This API was added during the DC/OS OSS 1.13 development
+                # phase.
+                any_master.run(
+                    args=delete_user_curl_args,
+                    shell=True,
+                    output=Output.CAPTURE,
+                )
+            except subprocess.CalledProcessError:
+                # We are in a version of DC/OS which stores users in ZooKeeper.
+                any_master.run(
+                    args=delete_user_zk_args,
+                    shell=True,
+                    output=Output.CAPTURE,
+                )
 
         wait_for_dcos_oss_until_timeout()
 
