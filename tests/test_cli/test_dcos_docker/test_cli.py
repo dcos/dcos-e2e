@@ -296,7 +296,7 @@ class TestCreate:
         expected_message = dedent(
             """\
             Usage: minidcos docker create [OPTIONS] INSTALLER
-            Try "minidcos docker create --help" for help.
+            Try "minidcos docker create -h" for help.
 
             Error: Invalid value for "--extra-config": Path "{path}" does not exist.
             """,# noqa: E501,E261
