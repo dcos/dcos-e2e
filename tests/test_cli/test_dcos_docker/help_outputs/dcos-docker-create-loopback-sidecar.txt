@@ -7,4 +7,4 @@ Usage: minidcos docker create-loopback-sidecar [OPTIONS] NAME
 
 Options:
   --size INTEGER RANGE  Size (in Megabytes) of the block device.
-  --help                Show this message and exit.
+  -h, --help            Show this message and exit.

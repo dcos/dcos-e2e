@@ -11,7 +11,8 @@ from ..dcos_docker import dcos_docker
 from ..dcos_vagrant import dcos_vagrant
 
 
-@click.group(name='minidcos')
+_CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+@click.group(name='minidcos', context_settings=_CONTEXT_SETTINGS)
 # We set the ``version`` parameter because in PyInstaller binaries,
 # ``pkg_resources`` is not available.
 #

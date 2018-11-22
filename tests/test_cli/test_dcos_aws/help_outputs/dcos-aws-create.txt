@@ -80,4 +80,4 @@ Options:
   --enable-selinux-enforcing      With this flag set, SELinux is set to
                                   enforcing before DC/OS is installed on the
                                   cluster.
-  --help                          Show this message and exit.
+  -h, --help                      Show this message and exit.

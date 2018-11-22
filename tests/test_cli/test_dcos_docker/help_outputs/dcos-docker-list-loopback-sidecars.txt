@@ -3,4 +3,4 @@ Usage: minidcos docker list-loopback-sidecars [OPTIONS]
   List loopback sidecars.
 
 Options:
-  --help  Show this message and exit.
+  -h, --help  Show this message and exit.

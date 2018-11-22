@@ -12,4 +12,4 @@ Options:
                              Enterprise cluster, `admin` is used.
   -v, --verbose              Use verbose output. Use this option multiple times
                              for more verbose output.
-  --help                     Show this message and exit.
+  -h, --help                 Show this message and exit.

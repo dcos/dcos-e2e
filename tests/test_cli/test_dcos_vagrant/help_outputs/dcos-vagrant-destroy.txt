@@ -4,4 +4,4 @@ Usage: minidcos vagrant destroy [OPTIONS]
 
 Options:
   -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
-  --help                 Show this message and exit.
+  -h, --help             Show this message and exit.

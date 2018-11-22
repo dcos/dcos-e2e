@@ -6,4 +6,4 @@ Usage: minidcos vagrant destroy-list [OPTIONS] [CLUSTER_IDS]...
   list)``.
 
 Options:
-  --help  Show this message and exit.
+  -h, --help  Show this message and exit.

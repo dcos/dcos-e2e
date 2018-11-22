@@ -13,4 +13,4 @@ Options:
   -v, --verbose              Use verbose output. Use this option multiple times
                              for more verbose output.
   --aws-region TEXT          The AWS region to use.  [default: us-west-2]
-  --help                     Show this message and exit.
+  -h, --help                 Show this message and exit.

@@ -3,4 +3,4 @@ Usage: minidcos vagrant list [OPTIONS]
   List all clusters.
 
 Options:
-  --help  Show this message and exit.
+  -h, --help  Show this message and exit.
