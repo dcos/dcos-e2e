@@ -205,13 +205,28 @@ class Cluster(ContextDecorator):
                 return
 
             email = 'albert@bekstil.net'
-            path = '/dcos/users/{email}'.format(email=email)
+            password = 'password'
+            zk_path = '/dcos/users/{email}'.format(email=email)
+            curl_url = (
+                'http://localhost:8101:/acs/api/v1/users/{email}'
+            ).format(email=email)
             server_option = (
                 '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
                 'zk-5.zk:2181"'
             )
 
-            delete_user_args = [
+            delete_user_curl_args = [
+                '.',
+                '/opt/mesosphere/environment.export',
+                '&&',
+                'curl',
+                '-X',
+                'DELETE',
+                curl_url,
+            ]
+
+            # curl -XDELETE http://localhost:8101/acs/api/v1/users/albert@bekstil.net
+            delete_user_zk_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
                 '&&',
@@ -219,10 +234,31 @@ class Cluster(ContextDecorator):
                 '-server',
                 server_option,
                 'delete',
-                path,
+                zk_path,
             ]
 
-            create_user_args = [
+            # TODO iff curl commands fail, run ZK commands
+            # Iff curl command passes, use uid/password for test utils,
+            # else use ZK
+            create_user_curl_args = [
+                '.',
+                '/opt/mesosphere/environment.export',
+                '&&',
+                'curl',
+                '-X'
+                'PUT',
+                '-H'
+                '"Content-Type: application/json"'
+                curl_url,
+                '-d'
+                json.dumps({
+                    'description': 'Administrative User',
+                    'password': password,
+                    'provider_type': 'internal',
+                }),
+            ]
+
+            create_user_zk_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
                 '&&',
@@ -230,7 +266,7 @@ class Cluster(ContextDecorator):
                 '-server',
                 server_option,
                 'create',
-                path,
+                zk_path,
                 email,
             ]
 
