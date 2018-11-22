@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2018.11.22.0
+------------
+
 - Allow ``-h`` instead of ``--help`` on all CLI commands.
 
 2018.11.21.0
