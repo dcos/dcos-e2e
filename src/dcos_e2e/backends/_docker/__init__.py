@@ -112,6 +112,7 @@ class Docker(ClusterBackend):
 
     def __init__(
         self,
+        container_name_prefix: str = 'dcos-e2e',
         workspace_dir: Optional[Path] = None,
         custom_container_mounts: Optional[List[Mount]] = None,
         custom_master_mounts: Optional[List[Mount]] = None,
@@ -235,7 +236,7 @@ class Docker(ClusterBackend):
         self.transport = transport
         self.network = network
         self.one_master_host_port_map = one_master_host_port_map or {}
-        self.container_name_prefix = 'dcos-e2e'
+        self.container_name_prefix = container_name_prefix
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
