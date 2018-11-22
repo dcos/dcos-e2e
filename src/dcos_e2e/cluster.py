@@ -205,7 +205,7 @@ class Cluster(ContextDecorator):
                 return
 
             email = 'albert@bekstil.net'
-            path = '/dcos/users/{email}'.format(email=email)
+            zk_path = '/dcos/users/{email}'.format(email=email)
             server_option = (
                 '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
                 'zk-5.zk:2181"'
@@ -219,7 +219,7 @@ class Cluster(ContextDecorator):
                 '-server',
                 server_option,
                 'delete',
-                path,
+                zk_path,
             ]
 
             create_user_args = [
@@ -230,7 +230,7 @@ class Cluster(ContextDecorator):
                 '-server',
                 server_option,
                 'create',
-                path,
+                zk_path,
                 email,
             ]
 
@@ -268,6 +268,8 @@ class Cluster(ContextDecorator):
                 output=Output.CAPTURE,
             )
 
+            credentials = CI_CREDENTIALS
+
             api_session = DcosApiSession(
                 dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
                 masters=[str(n.public_ip_address) for n in self.masters],
@@ -275,7 +277,7 @@ class Cluster(ContextDecorator):
                 public_slaves=[
                     str(n.public_ip_address) for n in self.public_agents
                 ],
-                auth_user=DcosUser(credentials=CI_CREDENTIALS),
+                auth_user=DcosUser(credentials=credentials),
             )
 
             _test_utils_wait_for_dcos(session=api_session)
@@ -283,11 +285,6 @@ class Cluster(ContextDecorator):
             # Only the first user can log in with SSO, before granting others
             # access.
             # Therefore, we delete the user who was created to wait for DC/OS.
-            #
-            # In order to create an API session, we create a user with the
-            # hard coded credentials "CI_CREDENTIALS".
-            # These credentials match a user with the email address
-            # "albert@bekstil.net".
             any_master.run(
                 args=delete_user_args,
                 shell=True,
