@@ -8,6 +8,7 @@ Docker version or base operating system, for cost reasons.
 import uuid
 from pathlib import Path
 
+from kazoo.client import KazooClient
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import ClusterBackend
@@ -36,6 +37,18 @@ class Test19:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            # We check that the user created with the special credentials does
+            # not exist after ``wait_for_dcos_oss``.
+            email = 'albert@bekstil.net'
+            path = '/dcos/users/{email}'.format(email=email)
+            (master, ) = cluster.masters
+            zk_client_port = '2181'
+            zk_host = str(master.public_ip_address)
+            zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
+            zk_client.start()
+            zk_user_exists = zk_client.exists(path=path)
+            zk_client.stop()
+            assert not zk_user_exists
 
     def test_enterprise(
         self,
