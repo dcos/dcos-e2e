@@ -16,18 +16,6 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Output
 
 
-def _zk_client(cluster: Cluster) -> Iterator[KazooClient]:
-    """
-    Return a ZooKeeper client connected to ``cluster``.
-    """
-    (master, ) = cluster.masters
-    zk_client_port = '2181'
-    zk_host = str(master.public_ip_address)
-    zk_client = KazooClient(hosts=zk_host + ':' + zk_client_port)
-    zk_client.start()
-    return _zk_client
-
-
 class Test19:
     """
     Tests for running DC/OS 1.9.
