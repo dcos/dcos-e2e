@@ -241,7 +241,6 @@ class Cluster(ContextDecorator):
                 zk_path,
             ]
 
-            # TODO try to use a service account
             create_user_curl_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
@@ -258,9 +257,8 @@ class Cluster(ContextDecorator):
                         {
                             'description': 'AdministrativeUser',
                             'password': password,
-                            'provider_type': 'internal',
-                        }
-                    )
+                        },
+                    ),
                 ),
             ]
 

@@ -5,6 +5,7 @@ Some tests are together when it would be neater otherwise as the tests take a
 long time to run.
 """
 
+import json
 import logging
 from pathlib import Path
 from subprocess import CalledProcessError
@@ -66,8 +67,8 @@ class TestIntegrationTests:
             'http://localhost:8101/acs/api/v1/users',
         ]
         (master, ) = cluster.masters
-        result = get_users_curl.run(
-            args=delete_user_curl_args,
+        result = master.run(
+            args=get_users_args,
             shell=True,
             output=Output.CAPTURE,
         )
