@@ -207,9 +207,8 @@ class Cluster(ContextDecorator):
 
             email = 'albert@bekstil.net'
             password = 'password'
-            curl_url = (
-                'http://localhost:8101/acs/api/v1/users/{email}'
-            ).format(email=email)
+            curl_url = ('http://localhost:8101/acs/api/v1/users/{email}'
+                        ).format(email=email)
             zk_path = '/dcos/users/{email}'.format(email=email)
             server_option = (
                 '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
@@ -231,7 +230,6 @@ class Cluster(ContextDecorator):
                 curl_url,
             ]
 
-            # curl -XDELETE http://localhost:8101/acs/api/v1/users/albert@bekstil.net
             delete_user_zk_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
@@ -243,6 +241,7 @@ class Cluster(ContextDecorator):
                 zk_path,
             ]
 
+            # TODO try to use a service account
             create_user_curl_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
@@ -254,11 +253,15 @@ class Cluster(ContextDecorator):
                 '"Content-Type: application/json"',
                 curl_url,
                 '-d',
-                shlex.quote(json.dumps({
-                    'description': 'AdministrativeUser',
-                    'password': password,
-                    'provider_type': 'internal',
-                })),
+                shlex.quote(
+                    json.dumps(
+                        {
+                            'description': 'AdministrativeUser',
+                            'password': password,
+                            'provider_type': 'internal',
+                        }
+                    )
+                ),
             ]
 
             create_user_zk_args = [
@@ -322,8 +325,6 @@ class Cluster(ContextDecorator):
                     output=Output.CAPTURE,
                 )
                 credentials = CI_CREDENTIALS
-
-            credentials = CI_CREDENTIALS
 
             api_session = DcosApiSession(
                 dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
