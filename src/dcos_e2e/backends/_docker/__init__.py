@@ -112,6 +112,7 @@ class Docker(ClusterBackend):
 
     def __init__(
         self,
+        container_name_prefix: str = 'dcos-e2e',
         workspace_dir: Optional[Path] = None,
         custom_container_mounts: Optional[List[Mount]] = None,
         custom_master_mounts: Optional[List[Mount]] = None,
@@ -132,6 +133,9 @@ class Docker(ClusterBackend):
         Create a configuration for a Docker cluster backend.
 
         Args:
+            container_name_prefix: The prefix that all container names will
+                start with. This is useful, for example, for later finding all
+                containers started with this backend.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted when the cluster is
                 destroyed.
@@ -235,7 +239,7 @@ class Docker(ClusterBackend):
         self.transport = transport
         self.network = network
         self.one_master_host_port_map = one_master_host_port_map or {}
-        self.container_name_prefix = 'dcos-e2e'
+        self.container_name_prefix = container_name_prefix
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:

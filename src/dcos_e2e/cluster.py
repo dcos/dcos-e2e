@@ -206,10 +206,10 @@ class Cluster(ContextDecorator):
 
             email = 'albert@bekstil.net'
             password = 'password'
-            zk_path = '/dcos/users/{email}'.format(email=email)
             curl_url = (
                 'http://localhost:8101/acs/api/v1/users/{email}'
             ).format(email=email)
+            zk_path = '/dcos/users/{email}'.format(email=email)
             server_option = (
                 '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
                 'zk-5.zk:2181"'
@@ -325,6 +325,8 @@ class Cluster(ContextDecorator):
                     output=Output.CAPTURE,
                 )
                 credentials = CI_CREDENTIALS
+
+            credentials = CI_CREDENTIALS
 
             api_session = DcosApiSession(
                 dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),

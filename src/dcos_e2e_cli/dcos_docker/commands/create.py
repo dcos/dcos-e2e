@@ -452,7 +452,11 @@ def create(
         DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
     }[dcos_variant]
 
+    # This is useful for some people to identify containers.
+    container_name_prefix = Docker().container_name_prefix + '-' + cluster_id
+
     cluster_backend = Docker(
+        container_name_prefix=container_name_prefix,
         custom_container_mounts=custom_volume,
         custom_master_mounts=custom_master_volume,
         custom_agent_mounts=custom_agent_volume,
