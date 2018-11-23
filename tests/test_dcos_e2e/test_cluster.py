@@ -56,7 +56,23 @@ class TestIntegrationTests:
         # more thorough dcos-checks.
         cluster.wait_for_dcos_oss(http_checks=False)
         cluster.wait_for_dcos_oss(http_checks=True)
-        # TODO check w/ curl on the node that the albert user does not exist
+        # We check that no users are added by ``wait_for_dcos_oss``.
+        # If a user is added, a user cannot log in via the web UI.
+        get_users_args = [
+            '.',
+            '/opt/mesosphere/environment.export',
+            '&&',
+            'curl',
+            'http://localhost:8101/acs/api/v1/users',
+        ]
+        (master, ) = cluster.masters
+        result = get_users_curl.run(
+            args=delete_user_curl_args,
+            shell=True,
+            output=Output.CAPTURE,
+        )
+        users = json.loads(result.stdout)['array']
+        assert not users
 
     def test_run_pytest(self, cluster: Cluster) -> None:
         """

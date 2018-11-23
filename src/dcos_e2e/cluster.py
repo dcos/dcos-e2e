@@ -3,6 +3,7 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import json
+import shlex
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -242,10 +243,6 @@ class Cluster(ContextDecorator):
                 zk_path,
             ]
 
-            # TODO iff curl commands fail, run ZK commands
-            # Iff curl command passes, use uid/password for test utils,
-            # else use ZK
-            import shlex
             create_user_curl_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
