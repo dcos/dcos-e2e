@@ -306,7 +306,7 @@ class Cluster(ContextDecorator):
             # In particular, we need the "albert" user to exist, or for no
             # users to exist, for the DC/OS Test Utils API session to work.
             try:
-                # This will not work on DC/OS OSS 1.12 and above.
+                # This will not work on DC/OS OSS 1.12 and below.
                 # This API was added during the DC/OS OSS 1.13 development
                 # phase.
                 any_master.run(
@@ -340,7 +340,7 @@ class Cluster(ContextDecorator):
             # access.
             # Therefore, we delete the user who was created to wait for DC/OS.
             try:
-                # This will not work on DC/OS OSS 1.12 and above.
+                # This will not work on DC/OS OSS 1.12 and below.
                 # This API was added during the DC/OS OSS 1.13 development
                 # phase.
                 any_master.run(
