@@ -4,24 +4,11 @@ SHELL := /bin/bash -euxo pipefail
 
 .PHONY: yapf
 yapf:
-	yapf \
-	    --diff \
-	    --recursive \
-	    --exclude 'src/*/_vendor' \
-	    --exclude 'src/*/_version.py' \
-	    --exclude release/ \
-	    --exclude versioneer.py \
-	    .
+	yapf --diff --recursive .
 
 .PHONY: fix-yapf
 fix-yapf:
-	yapf \
-	    --in-place \
-	    --recursive \
-	    --exclude 'src/*/_vendor' \
-	    --exclude 'src/*/_version.py' \
-	    --exclude versioneer.py \
-	    .
+	yapf --in-place --recursive .
 
 .PHONY: mypy
 mypy:
