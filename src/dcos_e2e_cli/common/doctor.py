@@ -85,8 +85,9 @@ def check_ssh() -> CheckLevels:
     return CheckLevels.NONE
 
 
-def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
-                        ) -> None:
+def run_doctor_commands(
+    check_functions: List[Callable[[], CheckLevels]],
+) -> None:
     """
     Run doctor commands.
     """
