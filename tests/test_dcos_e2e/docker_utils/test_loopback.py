@@ -17,7 +17,7 @@ class TestDockerLoopbackVolume:
         """
         client = docker.from_env(version='auto')
 
-        with DockerLoopbackVolume(size=1) as device:
+        with DockerLoopbackVolume(size_megabytes=1) as device:
             new_container = client.containers.create(
                 privileged=True,
                 detach=True,
@@ -56,7 +56,7 @@ class TestDockerLoopbackVolume:
         value = uuid.uuid4().hex
         labels = {key: value}
 
-        with DockerLoopbackVolume(size=1, labels=labels):
+        with DockerLoopbackVolume(size_megabytes=1, labels=labels):
             filters = {'label': ['{key}={value}'.format(key=key, value=value)]}
             [existing_container] = client.containers.list(filters=filters)
             for key, value in labels.items():
@@ -66,8 +66,8 @@ class TestDockerLoopbackVolume:
         """
         Multiple sidecars can exist at once.
         """
-        with DockerLoopbackVolume(size=1) as first:
-            with DockerLoopbackVolume(size=1) as second:
+        with DockerLoopbackVolume(size_megabytes=1) as first:
+            with DockerLoopbackVolume(size_megabytes=1) as second:
                 assert first.path != second.path
 
     def test_destroy(self) -> None:
@@ -79,7 +79,7 @@ class TestDockerLoopbackVolume:
         value = uuid.uuid4().hex
         labels = {key: value}
 
-        with DockerLoopbackVolume(size=1, labels=labels) as device:
+        with DockerLoopbackVolume(size_megabytes=1, labels=labels) as device:
             filters = {'label': ['{key}={value}'.format(key=key, value=value)]}
             [existing_container] = client.containers.list(filters=filters)
             block_device_exists_cmd = ['lsblk', device.path]
