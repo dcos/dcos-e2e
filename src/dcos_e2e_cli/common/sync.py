@@ -271,8 +271,8 @@ def sync_code_to_masters(
                         'mv',
                         str(node_test_dir / 'open_source_tests' / 'common.py'),
                         str(node_test_dir),
-                        ],
-                    )
+                    ],
+                )
             except subprocess.CalledProcessError:
                 # This file does not exist in DC/OS versions <1.13.
                 pass
