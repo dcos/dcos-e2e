@@ -3,6 +3,7 @@ Tools for syncing code to a cluster.
 """
 
 import io
+import subprocess
 import tarfile
 import tempfile
 from pathlib import Path
@@ -264,6 +265,17 @@ def sync_code_to_masters(
                     str(node_test_dir),
                 ],
             )
+            try:
+                master.run(
+                    args=[
+                        'mv',
+                        str(node_test_dir / 'open_source_tests' / 'common.py'),
+                        str(node_test_dir),
+                        ],
+                    )
+            except subprocess.CalledProcessError:
+                # This file does not exist in DC/OS versions <1.13.
+                pass
     else:
         _sync_bootstrap_to_masters(
             cluster=cluster,
@@ -271,12 +283,32 @@ def sync_code_to_masters(
         )
 
         for master in cluster.masters:
+            try:
+                master.run(
+                    args=[
+                        'mv',
+                        str(node_test_dir / 'common.py'),
+                        str(node_test_dir / 'common.bak'),
+                    ],
+                )
+            except subprocess.CalledProcessError:
+                pass
             # This makes an assumption that all tests are at the top level.
             master.run(
                 args=['rm', '-rf', str(node_test_dir / '*.py')],
                 # We use a wildcard character, `*`, so we need shell expansion.
                 shell=True,
             )
+            try:
+                master.run(
+                    args=[
+                        'mv',
+                        str(node_test_dir / 'common.bak'),
+                        str(node_test_dir / 'common.py'),
+                    ],
+                )
+            except subprocess.CalledProcessError:
+                pass
             _send_tarstream_to_node_and_extract(
                 tarstream=test_tarstream,
                 node=master,
