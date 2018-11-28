@@ -3,6 +3,7 @@ Tools for syncing code to a cluster.
 """
 
 import io
+import subprocess
 import tarfile
 import tempfile
 from pathlib import Path
@@ -264,6 +265,18 @@ def sync_code_to_masters(
                     str(node_test_dir),
                 ],
             )
+            try:
+                master.run(
+                    args=[
+                        'mv',
+                        str(node_test_dir / 'open_source_tests' / 'common.py'),
+                        str(node_test_dir),
+                        ],
+                    )
+            except subprocess.CalledProcessError:
+                # This file does not exist in DC/OS versions <1.13.
+                import pdb; pdb.set_trace()
+                pass
     else:
         _sync_bootstrap_to_masters(
             cluster=cluster,
