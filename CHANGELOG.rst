@@ -6,7 +6,7 @@ Changelog
 Next
 ----
 
-- Ship type hints for other packages to use
+- Ship type hints for other packages to use.
 
 2018.11.22.0
 ------------
