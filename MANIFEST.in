@@ -7,3 +7,4 @@ recursive-include src/dcos_e2e_cli/dcos_docker/commands/docker-mac-network-maste
 recursive-include src/dcos_e2e_cli/dcos_docker/commands/openvpn *
 include versioneer.py
 include src/dcos_e2e/_version.py
+include src/*/py.typed
