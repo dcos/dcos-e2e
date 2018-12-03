@@ -188,6 +188,14 @@ def start_dcos_container(
         ['systemctl', 'start', 'sshd'],
         # Work around https://jira.mesosphere.com/browse/DCOS_OSS-1361.
         ['systemd-tmpfiles', '--create', '--prefix', '/run/log/journal'],
+        ['echo', 'SystemKeepFree=1K', '>>', '/etc/systemd/journald.conf'],
+        ['echo', 'RuntimeKeepFree=1K', '>>', '/etc/systemd/journald.conf'],
+        ['echo', 'SystemMaxUse=2G', '>>', '/etc/systemd/journald.conf'],
+        ['echo', 'RuntimeMaxUse=2G', '>>', '/etc/systemd/journald.conf'],
+        ['echo', 'SystemMaxFileSize=2G', '>>', '/etc/systemd/journald.conf'],
+        ['echo', 'RuntimeMaxFileSize=2G', '>>', '/etc/systemd/journald.conf'],
+        ['echo', 'Storage=persistent', '>>', '/etc/systemd/journald.conf'],
+        ['systemctl', 'force-reload', 'systemd-journald']
     ]:
         exit_code, output = container.exec_run(cmd=cmd)
         assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()
