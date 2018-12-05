@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Limit UUID in the cluster ID to 5 characters to avoid problems with Docker.
+
 2018.12.01.1
 ------------
 

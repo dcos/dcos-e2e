@@ -288,7 +288,7 @@ class DockerCluster(ClusterManager):
         #
         self._cluster_id = '{prefix}-{random}'.format(
             prefix=cluster_backend.container_name_prefix,
-            random=uuid.uuid4(),
+            random=str(uuid.uuid4())[:5],
         )
 
         # We work in a new directory.
