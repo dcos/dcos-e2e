@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.12.01.1"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2018.12.05.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -253,8 +253,8 @@ class Minidcos < Formula
   end
 
   resource "PyJWT" do
-    url "https://files.pythonhosted.org/packages/00/5e/b358c9bb24421e6155799d995b4aa3aa3307ffc7ecae4ad9d29fd7e07a73/PyJWT-1.6.4.tar.gz"
-    sha256 "4ee413b357d53fd3fb44704577afac88e72e878716116270d722723d65b42176"
+    url "https://files.pythonhosted.org/packages/6c/91/195c34ea8ff93f1b43c5d944598b853b2e8056703aab7bc95767d233ed92/PyJWT-1.7.0.tar.gz"
+    sha256 "ddec8409c57e9d371c6006e388f91daf3b0b43bdf9fcbf99451fb7cf5ce0a86d"
   end
 
   resource "PyNaCl" do
