@@ -15,7 +15,7 @@ On Ubuntu, install system requirements:
 
 .. substitution-prompt:: bash
 
-   apt install -y gcc python3-dev
+   apt upgrade -y gcc python3-dev python3.6-dev
 
 Install dependencies in a virtual environment.
 
