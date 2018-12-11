@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: dcos-test-utils
+Version: 0.1
+Summary: Backend for the dcos_api_session object used as a test harness in the DC/OS integration tests
+Home-page: https://dcos.io
+Author: Mesosphere, Inc.
+Author-email: help@dcos.io
+License: apache2
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Requires-Dist: py
+Requires-Dist: pytest
+Requires-Dist: requests
+Requires-Dist: retrying
+
+UNKNOWN
+
+

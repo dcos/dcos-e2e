@@ -1,0 +1,3 @@
+[console_scripts]
+dcos-launch = dcos_launch.cli:main
+
