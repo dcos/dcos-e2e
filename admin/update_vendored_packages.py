@@ -51,7 +51,7 @@ def main() -> None:
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_test_utils',
         https_address='https://github.com/dcos/dcos-test-utils',
-        git_reference='5361c8623cd0751f9312cf79b66dde6f09da1e74',
+        git_reference='2cca7625217952a6d7ee78b13f5f8d6a03f81a09',
     )
 
     vertigo_e2e = _Requirement(
