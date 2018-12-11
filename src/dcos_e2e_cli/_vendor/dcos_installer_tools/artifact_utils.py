@@ -52,7 +52,7 @@ def get_dcos_installer_details(
     keep_extracted: bool = False,
 ) -> _DCOSInstallerDetails:
     """
-    Get details from a DC/OS installer.
+    Get details from a DC/OS artifact.
 
     Args:
         installer: The path to a DC/OS installer. This cannot include a
