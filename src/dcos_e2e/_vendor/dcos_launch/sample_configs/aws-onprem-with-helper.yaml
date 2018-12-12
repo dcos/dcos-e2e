@@ -7,7 +7,6 @@ provider: onprem
 aws_region: us-west-2
 os_name: cent-os-7-dcos-prereqs
 instance_type: m4.xlarge
-bootstrap_os_name: cent-os-7-dcos-prereqs
 bootstrap_instance_type: m4.xlarge
 dcos_config:
   cluster_name: My Awesome DC/OS

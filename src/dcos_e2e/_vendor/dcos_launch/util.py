@@ -131,6 +131,11 @@ class AbstractLauncher(metaclass=abc.ABCMeta):
         # populate minimal env if not already set. Note: use private IPs as this test is from
         # within the cluster
         # required for 1.8
+        dcos_version = self.config.get('dcos_version')
+        if dcos_version:
+            env_dict['DCOS_CLI_URL'] = 'https://downloads.dcos.io/cli/testing/binaries/dcos/linux/x86-64/master/dcos' \
+                if dcos_version == 'master' else \
+                'https://downloads.dcos.io/binaries/cli/linux/x86-64/dcos-{}/dcos'.format(dcos_version)
         if 'DNS_SEARCH' not in env_dict:
             env_dict['DNS_SEARCH'] = 'false'
         if 'DCOS_PROVIDER' not in env_dict:
