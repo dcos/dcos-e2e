@@ -42,7 +42,7 @@ def _get_requirements() -> List[_Requirement]:
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
         https_address='https://github.com/dcos/dcos-launch',
-        git_reference='2442b5246684c0663162e51136b2fe7a5c7ef3e1',
+        git_reference='4a413207918e491a9b0e4f20a06e860f69485229',
     )
 
     test_utils = _Requirement(
