@@ -5,6 +5,7 @@ Vendor some requirements.
 import subprocess
 import sys
 from pathlib import Path
+from typing import List
 
 import vendorize
 
@@ -30,16 +31,13 @@ class _Requirement:
         self.git_reference = git_reference
 
 
-def main() -> None:
+def _get_requirements(
+    dcos_e2e_target_directory: Path,
+    dcos_cli_target_directory: Path,
+) -> List[_Requiremente]:
     """
-    We vendor some requirements.
-
-    We use our own script as we want the vendored ``dcos_launch`` to use the
-    vendored ``dcos_test_utils``.
+    XXX
     """
-    dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
-    dcos_cli_target_directory = Path('src/dcos_e2e_cli/_vendor')
-
     dcos_launch = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
@@ -82,6 +80,24 @@ def main() -> None:
         vertigo_e2e,
         vertigo_cli,
     ]
+
+    return requirements
+
+def main() -> None:
+    """
+    We vendor some requirements.
+
+    We use our own script as we want the vendored ``dcos_launch`` to use the
+    vendored ``dcos_test_utils``.
+    """
+    dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
+    dcos_cli_target_directory = Path('src/dcos_e2e_cli/_vendor')
+
+    requirements = _get_requirements(
+        dcos_e2e_target_directory=dcos_e2e_target_directory,
+        dcos_cli_target_directory=dcos_cli_target_directory,
+    )
+
     target_directories = set(
         requirement.target_directory for requirement in requirements
     )
