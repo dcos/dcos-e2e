@@ -3,11 +3,12 @@ Vendor some requirements.
 """
 
 import subprocess
-import sys
 from pathlib import Path
 from typing import List
+import shutil
 
 import vendorize
+from dulwich.porcelain import remove
 
 
 class _Requirement:
@@ -31,13 +32,13 @@ class _Requirement:
         self.git_reference = git_reference
 
 
-def _get_requirements(
-    dcos_e2e_target_directory: Path,
-    dcos_cli_target_directory: Path,
-) -> List[_Requiremente]:
+def _get_requirements() -> List[_Requirement]:
     """
     XXX
     """
+    dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
+    dcos_cli_target_directory = Path('src/dcos_e2e_cli/_vendor')
+
     dcos_launch = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
@@ -83,6 +84,7 @@ def _get_requirements(
 
     return requirements
 
+
 def main() -> None:
     """
     We vendor some requirements.
@@ -90,33 +92,18 @@ def main() -> None:
     We use our own script as we want the vendored ``dcos_launch`` to use the
     vendored ``dcos_test_utils``.
     """
-    dcos_e2e_target_directory = Path('src/dcos_e2e/_vendor')
-    dcos_cli_target_directory = Path('src/dcos_e2e_cli/_vendor')
-
-    requirements = _get_requirements(
-        dcos_e2e_target_directory=dcos_e2e_target_directory,
-        dcos_cli_target_directory=dcos_cli_target_directory,
-    )
+    requirements = _get_requirements()
 
     target_directories = set(
         requirement.target_directory for requirement in requirements
     )
 
+    remove(paths=target_directories)
     for target_directory in target_directories:
         try:
-            target_directory.mkdir(exist_ok=False)
-        except FileExistsError:
-            message = (
-                'Error: {target_directory} exists. '
-                'Run the following commands before running this script again:'
-                '\n\n'
-                'git rm -rf {target_directory}\n'
-                'rm -rf {target_directory}'
-            )
-
-            print(message.format(target_directory=target_directory))
-            sys.exit(1)
-
+            shutil.rmtree(path=str(target_directory))
+        except FileNotFoundError:
+            pass
         init_file = Path(target_directory) / '__init__.py'
         Path(init_file).touch()
 
