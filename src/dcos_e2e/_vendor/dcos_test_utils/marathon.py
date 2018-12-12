@@ -318,6 +318,8 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
         for pod in pods_response.json():
             log.info('Deleting pod: {}'.format(pod['id']))
             self.delete('/v2/pods' + pod['id'], params=FORCE_PARAMS)
+        log.info('Deleting groups')
+        self.delete('/v2/groups/', params=FORCE_PARAMS)
         self.wait_for_deployments_complete()
 
     @retrying.retry(

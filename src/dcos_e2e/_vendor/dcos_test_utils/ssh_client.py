@@ -51,9 +51,10 @@ class Tunnelled():
         run_cmd = ['ssh', '-p', str(self.port)] + self.opt_list + [self.target] + cmd
         log.debug('Running socket cmd: ' + ' '.join(run_cmd))
         if 'stdout' in kwargs:
-            return subprocess.check_call(run_cmd, **kwargs)
+            return subprocess.run(run_cmd, **kwargs, check=True, env={"PATH": os.environ["PATH"]})
         else:
-            return subprocess.check_output(run_cmd, **kwargs)
+            return subprocess.run(run_cmd, **kwargs, check=True, env={"PATH": os.environ["PATH"]},
+                                  stdout=subprocess.PIPE).stdout
 
     def copy_file(self, src: str, dst: str, to_remote=True) -> None:
         """ Copy a path from localhost to target. If path is a local directory, then
@@ -76,7 +77,7 @@ class Tunnelled():
         cmd = ['scp'] + self.opt_list + ['-P', str(self.port)] + copy_command
         log.debug('Copying {} to {}'.format(*copy_command[-2:]))
         log.debug('scp command: {}'.format(cmd))
-        subprocess.check_call(cmd)
+        subprocess.run(cmd, check=True, env={"PATH": os.environ["PATH"]})
 
 
 def temp_ssh_key(key: str) -> str:
@@ -110,7 +111,7 @@ def open_tunnel(
 
     start_tunnel = base_cmd + ['-fnN', '-i', key_path, target]
     log.debug('Starting SSH tunnel: ' + ' '.join(start_tunnel))
-    subprocess.check_call(start_tunnel)
+    subprocess.run(start_tunnel, check=True, env={"PATH": os.environ["PATH"]})
     log.debug('SSH Tunnel established!')
 
     yield Tunnelled(opt_list, target, port)
@@ -118,7 +119,8 @@ def open_tunnel(
     close_tunnel = base_cmd + ['-O', 'exit', target]
     log.debug('Closing SSH Tunnel: ' + ' '.join(close_tunnel))
     # after we are done using the tunnel, we do not care about its output
-    subprocess.check_call(close_tunnel, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.run(close_tunnel, check=True, env={"PATH": os.environ["PATH"]}, stdout=subprocess.DEVNULL,
+                   stderr=subprocess.DEVNULL)
 
 
 class SshClient:
@@ -169,7 +171,7 @@ class SshClient:
         """
         return self.command(host, ['pwd'], port=port).decode().strip()
 
-    @retrying.retry(wait_fixed=1000)
+    @retrying.retry(wait_fixed=1000, stop_max_attempt_number=600)
     def wait_for_ssh_connection(self, host: str, port: int=22) -> None:
         """ Blocks until SSH connection can be established
 
