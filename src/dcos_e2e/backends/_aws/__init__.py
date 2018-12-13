@@ -189,21 +189,21 @@ class AWSCluster(ClusterManager):
             Distribution.RHEL_7: 'ec2-user',
         }
 
+        # There is a bug hit when using ``install_prereqs`` with some
+        # distributions.
+        # See https://jira.mesosphere.com/browse/DCOS-40894.
         install_prereqs = {
             Distribution.COREOS:
             True,
-            # There is a bug hit when using ``install_prereqs`` with some
-            # distributions.
-            # See https://jira.mesosphere.com/browse/DCOS-40894.
             Distribution.CENTOS_7:
-            False,
+            True,
             Distribution.RHEL_7:
             False,
         }[cluster_backend.linux_distribution]
 
         prereqs_script_filename = {
             Distribution.CENTOS_7: 'install_prereqs.sh',
-            Distribution.COREOS: 'run_coreos_prereqs.sh',
+            Distribution.COREOS: 'run_centos74_prereqs.sh',
             Distribution.RHEL_7: 'install_prereqs.sh',
         }[cluster_backend.linux_distribution]
         self._default_user = ssh_user[cluster_backend.linux_distribution]
