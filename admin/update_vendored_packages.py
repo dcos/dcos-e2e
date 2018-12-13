@@ -174,7 +174,7 @@ def _commit_vendored(requirements: List[_Requirement]) -> None:
 
 def _remove_untracked_files(requirements: List[_Requirement]) -> None:
     """
-    XXX
+    Remove files downloaded by pip which are not tracked by git.
     """
     target_directories = set(
         requirement.target_directory for requirement in requirements
@@ -186,10 +186,10 @@ def _remove_untracked_files(requirements: List[_Requirement]) -> None:
             if item.decode().startswith(str(target_directory))
         ]
 
-        for item in target_directory.glob('**/*'):
-            if str(item) not in git_paths:
-                print(item)
-                # shutil.rmtree(path=str(item))
+        for item in target_directory.iterdir():
+            if not [path for path in git_paths if path.startswith(str(item))]:
+                shutil.rmtree(path=str(item))
+
 
 def main() -> None:
     """
@@ -202,7 +202,7 @@ def main() -> None:
     _remove_existing_files(requirements=requirements)
     _vendor_requirements(requirements=requirements)
     _commit_vendored(requirements=requirements)
-    # _remove_untracked_files(requirements=requirements)
+    _remove_untracked_files(requirements=requirements)
 
 
 if __name__ == '__main__':
