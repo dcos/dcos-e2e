@@ -137,6 +137,8 @@ def _vendor_requirements(requirements: List[_Requirement]) -> None:
                 'pip',
                 'install',
                 '--no-dependencies',
+                '--no-binary',
+                ':all:',
                 '--target',
                 str(requirement.target_directory),
                 uri,
@@ -186,7 +188,8 @@ def _remove_untracked_files(requirements: List[_Requirement]) -> None:
 
         for item in target_directory.glob('**/*'):
             if str(item) not in git_paths:
-                shutil.rmtree(path=str(item))
+                print(item)
+                # shutil.rmtree(path=str(item))
 
 def main() -> None:
     """
@@ -199,7 +202,7 @@ def main() -> None:
     _remove_existing_files(requirements=requirements)
     _vendor_requirements(requirements=requirements)
     _commit_vendored(requirements=requirements)
-    _remove_untracked_files(requirements=requirements)
+    # _remove_untracked_files(requirements=requirements)
 
 
 if __name__ == '__main__':
