@@ -44,7 +44,7 @@ def _get_requirements() -> List[_Requirement]:
     dcos_launch = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
-        install_directories=['dcos_launch'],
+        install_directories=['dcos_launch', 'bin'],
         https_address='https://github.com/dcos/dcos-launch',
         git_reference='2442b5246684c0663162e51136b2fe7a5c7ef3e1',
     )
@@ -94,7 +94,7 @@ def _get_requirements() -> List[_Requirement]:
 
 def _remove_existing_files(requirements: List[_Requirement]) -> None:
     """
-    XXX
+    Remove existing files in vendored target directories.
     """
     target_directories = set(
         requirement.target_directory for requirement in requirements
@@ -115,7 +115,7 @@ def _remove_existing_files(requirements: List[_Requirement]) -> None:
 
 def _vendor_requirements(requirements: List[_Requirement]) -> None:
     """
-    XXX
+    Clone vendored requirements.
     """
     target_directories = set(
         requirement.target_directory for requirement in requirements
@@ -158,9 +158,9 @@ def _vendor_requirements(requirements: List[_Requirement]) -> None:
 
 
 def _commit_vendored(requirements: List[_Requirement]) -> None:
-    # target_directories = set(
-    #     requirement.target_directory for requirement in requirements
-    # )
+    """
+    Commit files for vendored requirements.
+    """
     for requirement in requirements:
         add(paths=[str(requirement.target_directory / '__init__.py')])
         for install_directory in requirement.install_directories:
