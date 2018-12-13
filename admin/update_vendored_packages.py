@@ -20,6 +20,7 @@ class _Requirement:
         self,
         target_directory: Path,
         package_name: str,
+        install_directories: List[str],
         https_address: str,
         git_reference: str,
     ) -> None:
@@ -28,6 +29,7 @@ class _Requirement:
         """
         self.target_directory = target_directory
         self.package_name = package_name
+        self.install_directories = install_directories
         self.https_address = https_address
         self.git_reference = git_reference
 
@@ -42,6 +44,7 @@ def _get_requirements() -> List[_Requirement]:
     dcos_launch = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_launch',
+        install_directories=['dcos_launch'],
         https_address='https://github.com/dcos/dcos-launch',
         git_reference='2442b5246684c0663162e51136b2fe7a5c7ef3e1',
     )
@@ -49,6 +52,7 @@ def _get_requirements() -> List[_Requirement]:
     test_utils = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_test_utils',
+        install_directories=['dcos_test_utils', 'pytest_dcos'],
         https_address='https://github.com/dcos/dcos-test-utils',
         git_reference='2cca7625217952a6d7ee78b13f5f8d6a03f81a09',
     )
@@ -56,6 +60,7 @@ def _get_requirements() -> List[_Requirement]:
     vertigo_e2e = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='vertigo',
+        install_directories=['vertigo_py'],
         https_address='https://github.com/adamtheturtle/vertigo',
         git_reference='77d7aa5d994e2650ece9e8aded6e9bffda21a2ac',
     )
@@ -63,6 +68,7 @@ def _get_requirements() -> List[_Requirement]:
     vertigo_cli = _Requirement(
         target_directory=dcos_cli_target_directory,
         package_name='vertigo',
+        install_directories=['vertigo_py'],
         https_address='https://github.com/adamtheturtle/vertigo',
         git_reference='77d7aa5d994e2650ece9e8aded6e9bffda21a2ac',
     )
@@ -70,6 +76,7 @@ def _get_requirements() -> List[_Requirement]:
     dcos_installer_tools = _Requirement(
         target_directory=dcos_cli_target_directory,
         package_name='dcos_installer_tools',
+        install_directories=['dcos_installer_tools'],
         https_address='https://github.com/adamtheturtle/dcos-installer-tools',
         git_reference='eed084208813c9bf0cf4ff753da85fe11909a7bb',
     )
@@ -149,11 +156,15 @@ def _vendor_requirements(requirements: List[_Requirement]) -> None:
         )
 
 def _commit_vendored(requirements: List[_Requirement]) -> None:
-    target_directories = set(
-        requirement.target_directory for requirement in requirements
-    )
-    for target_directory in target_directories:
-        add(paths=[str(target_directory)])
+    # target_directories = set(
+    #     requirement.target_directory for requirement in requirements
+    # )
+    for requirement in requirements:
+        add(paths=[str(requirement.target_directory / '__init__.py')])
+        for install_directory in requirement.install_directories:
+            directory = requirement.target_directory / install_directory
+            for item in directory.glob('**/*'):
+                add(paths=[str(item)])
     commit(message='Update vendored packages')
 
 def main() -> None:
