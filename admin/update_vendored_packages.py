@@ -16,7 +16,8 @@ class _Requirement:
     A requirement to vendor.
     """
 
- __init__,
+    def __init__(
+        self,
         target_directory: Path,
         package_name: str,
         https_address: str,
