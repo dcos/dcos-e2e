@@ -2,10 +2,10 @@
 Vendor some requirements.
 """
 
+import shutil
 import subprocess
 from pathlib import Path
 from typing import List
-import shutil
 
 import vendorize
 from dulwich.porcelain import add, commit, ls_files, remove
@@ -103,14 +103,15 @@ def _remove_existing_files(requirements: List[_Requirement]) -> None:
     repo_files = ls_files(repo='.')
     for target_directory in target_directories:
         git_paths = [
-            item.decode() for item in repo_files if
-            item.decode().startswith(str(target_directory))
+            item.decode() for item in repo_files
+            if item.decode().startswith(str(target_directory))
         ]
         remove(paths=git_paths)
         try:
             shutil.rmtree(path=str(target_directory))
         except FileNotFoundError:
             pass
+
 
 def _vendor_requirements(requirements: List[_Requirement]) -> None:
     """
@@ -155,6 +156,7 @@ def _vendor_requirements(requirements: List[_Requirement]) -> None:
             top_level_names=package_names,
         )
 
+
 def _commit_vendored(requirements: List[_Requirement]) -> None:
     # target_directories = set(
     #     requirement.target_directory for requirement in requirements
@@ -166,6 +168,7 @@ def _commit_vendored(requirements: List[_Requirement]) -> None:
             for item in directory.glob('**/*'):
                 add(paths=[str(item)])
     commit(message='Update vendored packages')
+
 
 def main() -> None:
     """
