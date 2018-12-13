@@ -8,7 +8,7 @@ from typing import List
 import shutil
 
 import vendorize
-from dulwich.porcelain import ls_files, remove
+from dulwich.porcelain import add, commit, ls_files, remove
 
 
 class _Requirement:
@@ -16,8 +16,7 @@ class _Requirement:
     A requirement to vendor.
     """
 
-    def __init__(
-        self,
+ __init__,
         target_directory: Path,
         package_name: str,
         https_address: str,
@@ -85,27 +84,35 @@ def _get_requirements() -> List[_Requirement]:
     return requirements
 
 
-def main() -> None:
+def _remove_existing_files(requirements: List[_Requirement]) -> None:
     """
-    We vendor some requirements.
-
-    We use our own script as we want the vendored ``dcos_launch`` to use the
-    vendored ``dcos_test_utils``.
+    XXX
     """
-    requirements = _get_requirements()
     target_directories = set(
         requirement.target_directory for requirement in requirements
     )
 
     repo_files = ls_files(repo='.')
     for target_directory in target_directories:
-        git_paths = [str(Path(item.decode()).absolute()) for item in repo_files if item.decode().startswith(str(target_directory))]
+        git_paths = [
+            item.decode() for item in repo_files if
+            item.decode().startswith(str(target_directory))
+        ]
         remove(paths=git_paths)
         try:
             shutil.rmtree(path=str(target_directory))
         except FileNotFoundError:
             pass
 
+def _vendor_requirements(requirements: List[_Requirement]) -> None:
+    """
+    XXX
+    """
+    target_directories = set(
+        requirement.target_directory for requirement in requirements
+    )
+
+    for target_directory in target_directories:
         target_directory.mkdir(exist_ok=True)
         init_file = Path(target_directory) / '__init__.py'
         Path(init_file).touch()
@@ -139,6 +146,26 @@ def main() -> None:
             target_directory=target_directory,
             top_level_names=package_names,
         )
+
+def _commit_vendored(requirements: List[_Requirement]) -> None:
+    target_directories = set(
+        requirement.target_directory for requirement in requirements
+    )
+    for target_directory in target_directories:
+        add(paths=[str(target_directory)])
+    commit(message='Update vendored packages')
+
+def main() -> None:
+    """
+    We vendor some requirements.
+
+    We use our own script as we want the vendored ``dcos_launch`` to use the
+    vendored ``dcos_test_utils``.
+    """
+    requirements = _get_requirements()
+    _remove_existing_files(requirements=requirements)
+    _vendor_requirements(requirements=requirements)
+    _commit_vendored(requirements=requirements)
 
 
 if __name__ == '__main__':
