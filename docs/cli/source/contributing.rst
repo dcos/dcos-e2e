@@ -246,10 +246,10 @@ Release Process
 
 See :doc:`release-process`.
 
-Updating DC/OS Test Utils and DC/OS Launch
-------------------------------------------
+Updating vendored packages
+--------------------------
 
-`DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
+Various repositories, such as `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
 To update DC/OS Test Utils or DC/OS Launch:
 
 Update the SHAs in ``admin/update_vendored_packages.py``.
@@ -258,7 +258,7 @@ The following creates a commit with changes to the vendored packages:
 
 .. substitution-prompt:: bash
 
-   admin/update_vendored_packages.sh
+   python admin/update_vendored_packages.py
 
 .. _Homebrew: https://brew.sh/
 .. _Linuxbrew: http://linuxbrew.sh/
