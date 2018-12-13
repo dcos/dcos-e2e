@@ -99,6 +99,7 @@ def main() -> None:
 
     remove(paths=target_directories)
     for target_directory in target_directories:
+        remove(paths=[str(target_directory)])
         try:
             shutil.rmtree(path=str(target_directory))
         except FileNotFoundError:
