@@ -605,6 +605,7 @@ SSH_INFO = {
 OS_SSH_INFO = {
     'cent-os-7': SSH_INFO['centos'],
     'cent-os-7-dcos-prereqs': SSH_INFO['centos'],
+    'cent-os-7-with-docker': SSH_INFO['centos'],
     'coreos': SSH_INFO['coreos'],
     'debian-8': SSH_INFO['debian'],
     'rhel-7-dcos-prereqs': SSH_INFO['rhel'],
@@ -617,9 +618,7 @@ CF_OS_SSH_INFO = {
 }
 
 
-OS_AMIS = {
-    # CentOS 7.4
-    'cent-os-7': {'ap-northeast-1': 'ami-965345f8',
+CENTOS_74_AMIS = {'ap-northeast-1': 'ami-965345f8',
                   'ap-southeast-1': 'ami-8af586e9',
                   'ap-southeast-2': 'ami-427d9c20',
                   'eu-central-1': 'ami-2d0cbc42',
@@ -627,16 +626,29 @@ OS_AMIS = {
                   'sa-east-1': 'ami-a5acd0c9',
                   'us-east-1': 'ami-771beb0d',
                   'us-west-1': 'ami-866151e6',
-                  'us-west-2': 'ami-a9b24bd1'},
-    'cent-os-7-dcos-prereqs': {'ap-northeast-1': 'ami-72f93314',
-                               'ap-southeast-1': 'ami-cac2b2a9',
-                               'ap-southeast-2': 'ami-a0d736c2',
-                               'eu-central-1': 'ami-b371c1dc',
-                               'eu-west-1': 'ami-4d4f8634',
-                               'sa-east-1': 'ami-1264187e',
-                               'us-east-1': 'ami-b05aadca',
-                               'us-west-1': 'ami-63cafb03',
-                               'us-west-2': 'ami-1de01e65'},
+                  'us-west-2': 'ami-a9b24bd1'}
+
+
+OS_AMIS = {
+    # CentOS 7.4
+    'cent-os-7': CENTOS_74_AMIS,
+    'cent-os-7-dcos-prereqs': CENTOS_74_AMIS,  # run_centos74_prereqs.sh will also be ran when this option is specified
+    # used for the bootstrap host
+    'cent-os-7-with-docker': {'ap-northeast-1': 'ami-023fe9ba88dfc1339',
+                              'ap-northeast-2': 'ami-085f7275040429a2f',
+                              'ap-south-1': 'ami-07b913395ee5282df',
+                              'ap-southeast-1': 'ami-06890ad7295bd4e4b',
+                              'ap-southeast-2': 'ami-01a1c6ded405b43a9',
+                              'ca-central-1': 'ami-010bd16a1ea7d010a',
+                              'eu-central-1': 'ami-0b6a8b2453889f012',
+                              'eu-west-1': 'ami-0f4101e8c6c46f86a',
+                              'eu-west-2': 'ami-0c64993daba80da53',
+                              'eu-west-3': 'ami-02f3169248abeab2f',
+                              'sa-east-1': 'ami-0c6bf10f43f4ab65c',
+                              'us-east-1': 'ami-0df90d83033b1c207',
+                              'us-east-2': 'ami-07f48e9948906d95d',
+                              'us-west-1': 'ami-0b1320a3d397fa07a',
+                              'us-west-2': 'ami-0116dcbe0583de7ca'},
     'coreos': {'ap-northeast-1': 'ami-884835ee',
                'ap-southeast-1': 'ami-b9c280c5',
                'ap-southeast-2': 'ami-04be7b66',
