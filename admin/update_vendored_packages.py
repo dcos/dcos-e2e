@@ -8,7 +8,7 @@ from typing import List
 import shutil
 
 import vendorize
-from dulwich.porcelain import remove
+from dulwich.porcelain import ls_files, remove
 
 
 class _Requirement:
@@ -97,13 +97,16 @@ def main() -> None:
         requirement.target_directory for requirement in requirements
     )
 
-    remove(paths=target_directories)
+    repo_files = ls_files(repo='.')
     for target_directory in target_directories:
-        remove(paths=[str(target_directory)])
+        git_paths = [str(Path(item.decode()).absolute()) for item in repo_files if item.decode().startswith(str(target_directory))]
+        remove(paths=git_paths)
         try:
             shutil.rmtree(path=str(target_directory))
         except FileNotFoundError:
             pass
+
+        target_directory.mkdir(exist_ok=True)
         init_file = Path(target_directory) / '__init__.py'
         Path(init_file).touch()
 
