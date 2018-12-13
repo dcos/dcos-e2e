@@ -170,6 +170,24 @@ def _commit_vendored(requirements: List[_Requirement]) -> None:
     commit(message='Update vendored packages')
 
 
+def _remove_untracked_files(requirements: List[_Requirement]) -> None:
+    """
+    XXX
+    """
+    target_directories = set(
+        requirement.target_directory for requirement in requirements
+    )
+    repo_files = ls_files(repo='.')
+    for target_directory in target_directories:
+        git_paths = [
+            item.decode() for item in repo_files
+            if item.decode().startswith(str(target_directory))
+        ]
+
+        for item in target_directory.glob('**/*'):
+            if str(item) not in git_paths:
+                shutil.rmtree(path=str(item))
+
 def main() -> None:
     """
     We vendor some requirements.
@@ -181,6 +199,7 @@ def main() -> None:
     _remove_existing_files(requirements=requirements)
     _vendor_requirements(requirements=requirements)
     _commit_vendored(requirements=requirements)
+    _remove_untracked_files(requirements=requirements)
 
 
 if __name__ == '__main__':
