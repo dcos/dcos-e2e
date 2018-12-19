@@ -19,7 +19,7 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .backends import ClusterManager  # noqa: F401
 from .backends import ClusterBackend, _ExistingCluster
 from .exceptions import DCOSTimeoutError
-from .node import Node, Output, Role, Transport
+from .node import Node, Output, Transport
 
 
 @retry(
