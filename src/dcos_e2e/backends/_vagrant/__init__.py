@@ -151,7 +151,19 @@ class VagrantCluster(ClusterManager):
                 installer node. This must be empty as it is not currently
                 supported.
         """
-        raise NotImplementedError
+        cluster = Cluster.from_nodes(
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
+        )
+
+        cluster.install_dcos_from_url_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            output=output,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
@@ -174,7 +186,20 @@ class VagrantCluster(ClusterManager):
                 installer node. This must be empty as it is not currently
                 supported.
         """
-        raise NotImplementedError
+        cluster = Cluster.from_nodes(
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
+        )
+
+        cluster.install_dcos_from_path_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            output=output,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
+
 
     def destroy_node(self, node: Node) -> None:
         """
