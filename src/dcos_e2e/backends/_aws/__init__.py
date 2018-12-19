@@ -372,6 +372,7 @@ class AWSCluster(ClusterManager):
                 output=output,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
+            return
 
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``dcos_installer`` URL is overwritten.
