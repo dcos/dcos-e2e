@@ -523,11 +523,6 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
-
-        Raises:
-            NotImplementedError: `NotImplementedError` because it is more
-                efficient for the given backend to use the DC/OS advanced
-                installation method that takes installers by URL string.
         """
         try:
             self._cluster.install_dcos_from_path_with_bootstrap_node(
