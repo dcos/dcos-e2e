@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Move ``_base_classes`` to be a public module.
+
 2018.12.10.0
 ------------
 
