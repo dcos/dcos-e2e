@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from dcos_e2e.base_classes import ClusterBackend, ClusterManager
-from dcos_e2e.node import Node, Output
+from dcos_e2e.node import Node, Role, Output
 
 
 class ExistingCluster(ClusterBackend):

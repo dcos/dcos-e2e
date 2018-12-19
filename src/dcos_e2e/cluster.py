@@ -16,7 +16,6 @@ from ._existing_cluster import ExistingCluster as _ExistingCluster
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
-from .backends._existing_cluster import ExistingCluster as _ExistingCluster
 from .base_classes import ClusterManager  # noqa: F401
 from .base_classes import ClusterBackend
 from .exceptions import DCOSTimeoutError
