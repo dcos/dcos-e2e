@@ -15,7 +15,7 @@ import boto3
 
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
-from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Output
 

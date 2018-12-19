@@ -5,9 +5,8 @@ Helpers for interacting with existing clusters.
 from pathlib import Path
 from typing import Any, Dict, Iterable, Set, Tuple, Type
 
-from dcos_e2e.node import Node, Output, Role
-
-from ._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.node import Node, Output
 
 
 class ExistingCluster(ClusterBackend):
