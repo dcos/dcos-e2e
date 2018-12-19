@@ -478,31 +478,13 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
         """
-        try:
-            self._cluster.install_dcos_from_url_with_bootstrap_node(
-                dcos_installer=dcos_installer,
-                dcos_config=dcos_config,
-                ip_detect_path=ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-                output=output,
-            )
-        except NotImplementedError:
-            for nodes, role in (
-                (self.masters, Role.MASTER),
-                (self.agents, Role.AGENT),
-                (self.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_url(
-                        dcos_installer=dcos_installer,
-                        dcos_config=dcos_config,
-                        ip_detect_path=ip_detect_path,
-                        files_to_copy_to_genconf_dir=(
-                            files_to_copy_to_genconf_dir
-                        ),
-                        role=role,
-                        output=output,
-                    )
+        self._cluster.install_dcos_from_url_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
     def install_dcos_from_path(
         self,
@@ -524,31 +506,13 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
         """
-        try:
-            self._cluster.install_dcos_from_path_with_bootstrap_node(
-                dcos_installer=dcos_installer,
-                dcos_config=dcos_config,
-                ip_detect_path=ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-                output=output,
-            )
-        except NotImplementedError:
-            for nodes, role in (
-                (self.masters, Role.MASTER),
-                (self.agents, Role.AGENT),
-                (self.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_path(
-                        dcos_installer=dcos_installer,
-                        dcos_config=dcos_config,
-                        ip_detect_path=ip_detect_path,
-                        role=role,
-                        files_to_copy_to_genconf_dir=(
-                            files_to_copy_to_genconf_dir
-                        ),
-                        output=output,
-                    )
+        self._cluster.install_dcos_from_path_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
     def run_integration_tests(
         self,
