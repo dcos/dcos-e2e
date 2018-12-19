@@ -6,7 +6,7 @@ Changelog
 Next
 ----
 
-- Move ``_base_classes`` to be a public module.
+- Backwards incompatible change: Move ``ClusterBackend`` and ``ClusterManager`` to ``dcos_e2e.base_classes``.
 
 2018.12.10.0
 ------------

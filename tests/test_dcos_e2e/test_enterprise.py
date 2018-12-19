@@ -10,7 +10,7 @@ from pathlib import Path
 import requests
 from passlib.hash import sha512_crypt
 
-from dcos_e2e.backends import ClusterBackend
+from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Output, Role
 
