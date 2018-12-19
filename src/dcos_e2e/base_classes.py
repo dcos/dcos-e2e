@@ -6,7 +6,7 @@ import abc
 from pathlib import Path
 from typing import Any, Dict, Iterable, Set, Tuple, Type
 
-from ..node import Node, Output
+from dcos_e2e.node import Node, Output
 
 
 class ClusterManager(abc.ABC):

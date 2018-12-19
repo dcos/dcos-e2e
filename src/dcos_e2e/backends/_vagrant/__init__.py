@@ -10,9 +10,8 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Any, Dict, Iterable, Optional, Set, Tuple, Type
 
+from dcos_e2e.base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.node import Node, Output
-
-from .._base_classes import ClusterBackend, ClusterManager
 
 
 class Vagrant(ClusterBackend):
