@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, Set, Tuple, Type
 
 from dcos_e2e.node import Node, Output
 
-from ._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
 
 
 class ExistingCluster(ClusterBackend):
