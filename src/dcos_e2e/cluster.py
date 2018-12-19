@@ -17,7 +17,8 @@ from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 # Ignore a spurious error - this import is used in a type hint.
 from .backends import ClusterManager  # noqa: F401
-from .backends import ClusterBackend, _ExistingCluster
+from .backends import ClusterBackend
+from .backends._existing_cluster import ExistingCluster as _ExistingCluster
 from .exceptions import DCOSTimeoutError
 from .node import Node, Output, Transport
 
