@@ -21,6 +21,7 @@ from docker.types import Mount
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
@@ -483,7 +484,7 @@ class DockerCluster(ClusterManager):
             public_agents=self.public_agents,
         )
 
-        cluster.install_dcos_from_url_with_bootstrap_node(
+        cluster.install_dcos_from_url(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,

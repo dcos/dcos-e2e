@@ -10,6 +10,7 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Any, Dict, Iterable, Optional, Set, Tuple, Type
 
+from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node, Output
 
 from .._base_classes import ClusterBackend, ClusterManager
@@ -157,7 +158,7 @@ class VagrantCluster(ClusterManager):
             public_agents=self.public_agents,
         )
 
-        cluster.install_dcos_from_url_with_bootstrap_node(
+        cluster.install_dcos_from_url(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
@@ -192,14 +193,13 @@ class VagrantCluster(ClusterManager):
             public_agents=self.public_agents,
         )
 
-        cluster.install_dcos_from_path_with_bootstrap_node(
+        cluster.install_dcos_from_path(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
             output=output,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
-
 
     def destroy_node(self, node: Node) -> None:
         """
