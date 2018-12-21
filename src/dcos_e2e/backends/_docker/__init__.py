@@ -21,6 +21,7 @@ from docker.types import Mount
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e.base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
@@ -465,7 +466,6 @@ class DockerCluster(ClusterManager):
     ) -> None:
         """
         Install DC/OS from a URL with a bootstrap node.
-        This is not supported and simply raises a ``NotImplementedError``.
 
         Args:
             dcos_installer: The URL string to an installer to install DC/OS
@@ -477,13 +477,20 @@ class DockerCluster(ClusterManager):
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-
-        Raises:
-            NotImplementedError: ``NotImplementedError`` because the Docker
-                backend does not support the DC/OS advanced installation
-                method with a bootstrap node.
         """
-        raise NotImplementedError
+        cluster = Cluster.from_nodes(
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
+        )
+
+        cluster.install_dcos_from_url(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            output=output,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
 
     @property
     def base_config(self) -> Dict[str, Any]:

@@ -16,6 +16,7 @@ import boto3
 from dcos_e2e._vendor.dcos_launch import config, get_launcher
 from dcos_e2e._vendor.dcos_launch.util import AbstractLauncher  # noqa: F401
 from dcos_e2e.base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Output
 
@@ -355,18 +356,23 @@ class AWSCluster(ClusterManager):
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-
-        Raises:
-            NotImplementedError: ``NotImplementedError`` because this function
-                backend by ``dcos-launch`` does not support a custom
-                ``ip-detect`` script or any other files supplied to the
-                installer by copying them to the ``/genconf`` directory.
         """
-        if ip_detect_path != self._ip_detect_path:
-            raise NotImplementedError
+        new_ip_detect_given = bool(ip_detect_path != self._ip_detect_path)
+        if new_ip_detect_given or files_to_copy_to_genconf_dir:
+            cluster = Cluster.from_nodes(
+                masters=self.masters,
+                agents=self.agents,
+                public_agents=self.public_agents,
+            )
 
-        if files_to_copy_to_genconf_dir:
-            raise NotImplementedError
+            cluster.install_dcos_from_url(
+                dcos_installer=dcos_installer,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                output=output,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            )
+            return
 
         # In order to install DC/OS with the preliminary dcos-launch
         # config the ``dcos_installer`` URL is overwritten.
@@ -384,8 +390,6 @@ class AWSCluster(ClusterManager):
     ) -> None:
         """
         Install DC/OS from a given installer with a bootstrap node.
-        This is not supported and simply raises a his is not supported and
-        simply raises a ``NotImplementedError``.
 
         Args:
             dcos_installer: The ``Path`` to an installer to install DC/OS
@@ -397,13 +401,20 @@ class AWSCluster(ClusterManager):
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
                 installer node. This must be empty as it is not currently
                 supported.
-
-        Raises:
-            NotImplementedError: ``NotImplementedError`` because the AWS
-                backend does not support the DC/OS advanced installation
-                method.
         """
-        raise NotImplementedError
+        cluster = Cluster.from_nodes(
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
+        )
+
+        cluster.install_dcos_from_path(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
     def destroy_node(self, node: Node) -> None:
         """
