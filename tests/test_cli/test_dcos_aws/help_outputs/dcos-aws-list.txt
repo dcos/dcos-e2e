@@ -1,0 +1,7 @@
+Usage: minidcos aws list [OPTIONS]
+
+  List all clusters.
+
+Options:
+  --aws-region TEXT  The AWS region to use.  [default: us-west-2]
+  -h, --help         Show this message and exit.

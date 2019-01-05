@@ -1,0 +1,35 @@
+Usage: minidcos vagrant run [OPTIONS] NODE_ARGS...
+
+  Run an arbitrary command on a node.
+
+  To use special characters such as single quotes in your command, wrap the
+  whole command in double quotes.
+
+Options:
+  -c, --cluster-id TEXT    The ID of the cluster to use.  [default: default]
+  --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
+                           environment variable to.
+  --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` environment
+                           variable to.
+  --sync-dir PATH          The path to a DC/OS checkout. Part of this checkout
+                           will be synced to all master nodes before the command
+                           is run. The bootstrap directory is synced if the
+                           checkout directory variant matches the cluster
+                           variant.Integration tests are also synced.Use this
+                           option multiple times on a DC/OS Enterprise cluster
+                           to sync both DC/OS Enterprise and DC/OS Open Source
+                           tests.
+  -te, --test-env          With this flag set, environment variables are set and
+                           the command is run in the integration test directory.
+                           This means that "pytest" will run the integration
+                           tests.
+  --env TEXT               Set environment variables in the format
+                           "<KEY>=<VALUE>"
+  --node TEXT              A reference to a particular node to run the command
+                           on. This can be one of: The node's IP address, the
+                           node's VM name, a reference in the format
+                           "<role>_<number>". These details be seen with
+                           ``minidcos vagrant inspect``.
+  -v, --verbose            Use verbose output. Use this option multiple times
+                           for more verbose output.
+  -h, --help               Show this message and exit.

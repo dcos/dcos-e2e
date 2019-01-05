@@ -21,7 +21,7 @@ def get_logger(name: str) -> logging.Logger:
     """
     # This gets the root logger with a ``logging.lastResort``
     # StreamHandler that logs on WARNING level.
-    logger = logging.getLogger(name)
+    logger = logging.getLogger(name=name)
     logger.setLevel(logging.DEBUG)
 
     # Add a new StreamHandler that logs on DEBUG level in order
@@ -41,6 +41,22 @@ def get_logger(name: str) -> logging.Logger:
 
 
 LOGGER = get_logger(__name__)
+
+
+def _safe_decode(output_bytes: bytes) -> str:
+    """
+    Decode a bytestring to Unicode with a safe fallback.
+    """
+    try:
+        return output_bytes.decode(
+            encoding='utf-8',
+            errors='strict',
+        )
+    except UnicodeDecodeError:
+        return output_bytes.decode(
+            encoding='ascii',
+            errors='backslashreplace',
+        )
 
 
 def run_subprocess(
@@ -74,13 +90,13 @@ def run_subprocess(
         Exception: An exception was raised in getting the output from the call.
     """
     process_stdout = PIPE if pipe_output else None
+    process_stderr = PIPE if pipe_output else None
+
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
     # See http://stackoverflow.com/a/18423003.
     if log_output_live:
         process_stderr = STDOUT
-    else:
-        process_stderr = PIPE
 
     with Popen(
         args=args,
@@ -94,9 +110,8 @@ def run_subprocess(
                 stdout = b''
                 stderr = b''
                 for line in process.stdout:
-                    LOGGER.debug(
-                        line.rstrip().decode('ascii', 'backslashreplace'),
-                    )
+                    log_message = _safe_decode(line.rstrip())
+                    LOGGER.debug(log_message)
                     stdout += line
                 # stderr/stdout are not readable anymore which usually means
                 # that the child process has exited. However, the child
@@ -109,8 +124,14 @@ def run_subprocess(
         except Exception:  # pragma: no cover
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
-            process.kill()
-            process.wait()
+
+            # Attempt to give the subprocess(es) a chance to terminate.
+            process.terminate()
+            try:
+                process.wait(1)
+            except subprocess.TimeoutExpired:
+                # If the process cannot terminate cleanly, we just kill it.
+                process.kill()
             raise
         if stderr:
             if process.returncode == 0:
@@ -119,7 +140,8 @@ def run_subprocess(
             else:
                 log = LOGGER.error
             for line in stderr.rstrip().split(b'\n'):
-                log(line.rstrip().decode('ascii', 'backslashreplace'))
+                log_message = _safe_decode(line.rstrip())
+                log(log_message)
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
                 returncode=process.returncode,

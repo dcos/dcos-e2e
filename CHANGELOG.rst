@@ -6,8 +6,260 @@ Changelog
 Next
 ----
 
-2018.06.21.0
+- Backwards incompatible change: Move ``ClusterBackend`` and ``ClusterManager`` to ``dcos_e2e.base_classes``.
+
+2018.12.10.0
 ------------
+
+2018.12.05.0
+------------
+
+- Limit UUID in the cluster ID to 5 characters to avoid problems with Docker.
+
+2018.12.01.1
+------------
+
+2018.12.01.0
+------------
+
+- Ship type hints for other packages to use.
+
+2018.11.22.0
+------------
+
+- Allow ``-h`` instead of ``--help`` on all CLI commands.
+
+2018.11.21.0
+------------
+
+2018.11.20.1
+------------
+
+- Allow multiple ``--sync-dir`` options to be given to ``run`` commands.
+
+2018.11.20.0
+------------
+
+- Rename ``build_artifact`` and related variables to "installer".
+- If syncing a DC/OS OSS repository to a DC/OS Enterprise cluster, only Open
+  Source tests are synced.
+
+2018.11.16.2
+------------
+
+2018.11.16.1
+------------
+
+- Backwards incompatible change: Changed CLI commands from ``dcos-docker`` to ``minidcos docker`` and alike.
+
+2018.11.16.0
+------------
+
+- Add a ``dcos-docker doctor`` check for systemd.
+- Add a progress bar for ``doctor`` commands.
+- Log subprocess output unicode characters where possible.
+
+2018.11.09.1
+------------
+
+- Backwards incompatible change: Change ``--no-test-env`` to ``--test-env`` on ``run`` commands, with the opposite default.
+
+2018.11.09.0
+------------
+
+- Fix an issue which caused incompatible version errors between ``keyring`` and ``SecretStore`` dependencies.
+
+2018.11.07.1
+------------
+
+2018.11.07.0
+------------
+
+- Add ``dcos-docker create-loopback-sidecar`` and ``dcos-docker destroy-loopback-sidecar`` commands to provide unformatted block devices to DC/OS.
+- Add ``dcos-docker clean`` command to clean left over artifacts.
+- Backwards incompatible change: Changed names of VPN containers on macOS.
+
+2018.10.17.1
+------------
+
+2018.10.17.0
+------------
+
+- Fix an issue which stopped the SSH transport from working on CLIs.
+
+2018.10.16.0
+------------
+
+- Remove ``log_output_live`` parameters on various functions in favor of new ``output`` options.
+- ``Node.__init__``'s ``ssh_key_path`` parameter now expects a path to an SSH key file with specific permissions.
+   See the documentation for this class for details.
+
+2018.10.13.0
+------------
+
+2018.10.12.2
+------------
+
+2018.10.12.1
+------------
+
+2018.10.12.0
+------------
+
+- The ``docker-exec`` transport uses interactive mode only when running in a terminal.
+
+2018.10.11.3
+------------
+
+2018.10.11.2
+------------
+
+2018.10.11.1
+------------
+
+2018.10.11.0
+------------
+
+- Show full path on ``download-artifact`` downloads.
+- Default to downloading to the current directory for ``download-artifact`` downloads.
+- Use a TTY on CLI run commands only if Stdin is a TTY.
+
+2018.10.10.0
+------------
+
+- Fix issues which stopped pre-built Linux binaries from working.
+
+2018.09.25.0
+------------
+
+- ``wait_for_dcos_oss`` and ``wait_for_dcos_ee`` now raise a custom ``DCOSTimeoutError`` if DC/OS has not started within one hour.
+
+2018.09.06.0
+------------
+
+- The ``--variant`` option is now required for the ``dcos-aws`` CLI.
+- Added the ability to install on Linux from a pre-built binary.
+- Add the ability to do a release to a fork.
+
+2018.08.31.0
+------------
+
+- Fix using macOS with no custom network.
+
+2018.08.28.0
+------------
+
+- Support for CoreOS on the AWS backend.
+- Fix an issue which prevented the Vagrant backend from working.
+
+2018.08.22.0
+------------
+
+- Improve diagnostics when creating a Docker-backed cluster with no running Docker daemon.
+
+2018.08.13.0
+------------
+
+- Add instructions for uninstalling |project-name|.
+
+2018.08.03.0
+------------
+
+- Pin ``msrestazure`` pip dependency to specific version to avoid dependency conflict.
+
+2018.07.31.0
+------------
+
+- Add a ``dcos-docker doctor`` check that relevant Docker images can be built.
+
+2018.07.30.0
+------------
+
+- Add Red Hat Enterprise Linux 7.4 support to the AWS backend.
+
+2018.07.27.0
+------------
+
+- Fix bug which meant that a user could not log in after ``dcos-docker wait`` on DC/OS Open Source clusters.
+- Backwards incompatible change: Remove ``files_to_copy_to_installer`` from ``Cluster.__init__`` and add ``files_to_copy_to_genconf_dir`` as an argument to ``Cluster.install_dcos_from_path`` as well as ``Cluster.install_dcos_from_url``.
+- Add ``files_to_copy_to_genconf_dir`` as an argument to ``Node.install_dcos_from_path`` and ``Node.install_dcos_from_url``.
+
+2018.07.25.0
+------------
+
+- Add the capability of sending a directory to a ``Node`` via ``Node.send_file``.
+- Add ``ip_detect_path`` to the each ``ClusterBackend`` as a property and to each install DC/OS function as a parameter.
+
+2018.07.23.1
+------------
+
+2018.07.23.0
+------------
+
+- Add an initial ``dcos-aws`` CLI.
+
+2018.07.22.1
+------------
+
+- Add ``dcos-docker download-artifact`` and ``dcos-vagrant download-artifact``.
+
+2018.07.22.0
+------------
+
+- Add ``verbose`` option to multiple commands.
+
+2018.07.16.0
+------------
+
+- Add ``virtualbox_description`` parameter to the ``Vagrant`` backend.
+- Change the default transport for the Docker backend to ``DOCKER_EXEC``.
+
+2018.07.15.0
+------------
+
+- Add a ``--one-master-host-port-map`` option to ``dcos-docker create``.
+
+2018.07.10.0
+------------
+
+- Execute ``node-poststart`` checks in ``Cluster.wait_for_dcos`` and ``Cluster.wait_for_dcos_ee``.
+- Add ``dcos-vagrant doctor`` checks.
+
+2018.07.03.5
+------------
+
+- Add a ``--network`` option to the ``dcos-docker`` CLI.
+
+2018.07.03.0
+------------
+
+- Add a ``dcos-vagrant`` CLI.
+
+2018.07.01.0
+------------
+
+- Renamed Homebrew formula.
+  To upgrade from a previous version, follow Homebrew's linking instructions after upgrade instructions.
+
+2018.06.30.0
+------------
+
+- Add a ``Vagrant`` backend.
+
+2018.06.28.2
+------------
+
+- Add a ``aws_instance_type`` parameter to the ``AWS`` backend.
+
+2018.06.28.0
+------------
+
+- Compare ``Node`` objects based on the ``public_ip_address`` and ``private_ip_address``.
+
+2018.06.26.0
+------------
+
+- Add a ``network`` parameter to the ``Docker`` backend.
 
 2018.06.20.0
 ------------
@@ -172,8 +424,8 @@ Next
 2018.02.28.0
 ------------
 
-- Add ``Vagrantfile`` to run DC/OS E2E in a virtual machine.
-- Add instructions for running DC/OS E2E on Windows.
+- Add ``Vagrantfile`` to run |project-name| in a virtual machine.
+- Add instructions for running |project-name| on Windows.
 - Allow relative paths for the build artifact.
 
 2018.02.27.0
@@ -332,3 +584,10 @@ Next
 ------------
 
 -  Initial release.
+
+.. This document is included in the source tree as well as the Sphinx documentation.
+.. We automatically define |project| in all Sphinx documentation.
+.. Defining |project| twice causes an error.
+.. We need it defined both in the source tree view (GitHub preview) and in Sphinx.
+.. We therefore use |project-name| in this document.
+.. |project-name| replace:: DC/OS E2E

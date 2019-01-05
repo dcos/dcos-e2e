@@ -1,0 +1,10 @@
+Usage: minidcos docker create-loopback-sidecar [OPTIONS] NAME
+
+  Create a loopback sidecar.
+
+  A loopback sidecar provides a loopback device that points to a (unformatted)
+  block device.
+
+Options:
+  --size INTEGER RANGE  Size (in Megabytes) of the block device.
+  -h, --help            Show this message and exit.

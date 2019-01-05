@@ -10,6 +10,7 @@ RUN apt-get update \
 		debianutils \
 		dbus \
 		gawk \
+		gettext \
 		git \
 		iproute \
 		ipset \
@@ -17,6 +18,7 @@ RUN apt-get update \
 		iputils-ping \
 		libcgroup-dev \
 		libpopt0 \
+		locales \
 		net-tools \
 		openssh-client \
 		openssh-server \
@@ -25,7 +27,7 @@ RUN apt-get update \
 		tar \
 		tree \
 		unzip \
-                xfsprogs \
+		xfsprogs \
 		xz-utils \
 	&& rm -rf /var/lib/apt/lists/* \
 && ( \
@@ -65,3 +67,5 @@ RUN echo '' >> /lib/systemd/system/systemd-journald-init.service
 RUN echo '[Install]' >> /lib/systemd/system/systemd-journald-init.service
 RUN echo 'WantedBy=default.target' >> /lib/systemd/system/systemd-journald-init.service
 RUN systemctl enable systemd-journald-init.service || true
+
+RUN locale-gen en_US.UTF-8

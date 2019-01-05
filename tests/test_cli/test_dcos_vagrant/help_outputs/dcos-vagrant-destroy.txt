@@ -1,0 +1,7 @@
+Usage: minidcos vagrant destroy [OPTIONS]
+
+  Destroy a cluster.
+
+Options:
+  -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+  -h, --help             Show this message and exit.

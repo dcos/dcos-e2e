@@ -1,0 +1,23 @@
+# Requirements which are indirectly needed for various reasons.
+# That is, they are not imported by our code.
+# -------------------------------------------------------------
+# At the time of writing, with the latest versions of the DC/OS E2E direct
+# dependencies, there is a version conflict for ``msrestazure``, an
+# indirect dependency.
+# Therefore, we pin a particular version which satisfies all requirements.
+# See DCOS-40131.
+msrestazure==0.4.34
+# ``keyring`` is a requirement of ``msrestazure``.
+# We make sure that we get a version of keyring which is compatible with the
+# pinned version of SecretStorage on Python 3.5+ (compatibility is different
+# on different Python versions).
+keyring==16.0.2
+# Without the following, some users get:
+# The 'secretstorage' distribution was not found and is required by keyring
+SecretStorage==3.1.0
+# Requirements from DC/OS Launch
+azure-mgmt-network==2.2.1
+azure-mgmt-resource==2.0.0
+# Without the following we get a version conflict.
+# In particular, ``requests`` requires ``idna<2.8`` at the time of writing.
+idna==2.7

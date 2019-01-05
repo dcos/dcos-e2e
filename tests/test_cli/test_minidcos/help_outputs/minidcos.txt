@@ -1,0 +1,12 @@
+Usage: minidcos [OPTIONS] COMMAND [ARGS]...
+
+  Manage DC/OS clusters.
+
+Options:
+  --version   Show the version and exit.
+  -h, --help  Show this message and exit.
+
+Commands:
+  aws      Manage DC/OS clusters on AWS.
+  docker   Manage DC/OS clusters on Docker.
+  vagrant  Manage DC/OS clusters on Vagrant.

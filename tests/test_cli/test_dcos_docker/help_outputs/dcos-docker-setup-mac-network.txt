@@ -1,0 +1,12 @@
+Usage: minidcos docker setup-mac-network [OPTIONS]
+
+  Set up a network to connect to nodes on macOS.
+
+  This creates an OpenVPN configuration file and describes how to use it.
+
+Options:
+  --force                   Overwrite any files and destroy conflicting
+                            containers from previous uses of this command.
+  --configuration-dst PATH  The location to create an OpenVPN configuration
+                            file.  [default: ~/Documents/docker-for-mac.ovpn]
+  -h, --help                Show this message and exit.

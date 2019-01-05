@@ -6,30 +6,62 @@ import json
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 
+import retrying
+import timeout_decorator
 from retry import retry
 
+from ._existing_cluster import ExistingCluster as _ExistingCluster
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
-# Ignore a spurious error - this import is used in a type hint.
-from .backends import ClusterManager  # noqa: F401
-from .backends import ClusterBackend, _ExistingCluster
-from .node import Node, Role, Transport
+from .base_classes import ClusterManager  # noqa: F401
+from .base_classes import ClusterBackend
+from .exceptions import DCOSTimeoutError
+from .node import Node, Output, Transport
 
 
 @retry(
     exceptions=(subprocess.CalledProcessError),
-    tries=60,
+    tries=5,
     delay=1,
 )
 def _wait_for_ssh(node: Node) -> None:
     """
-    Retry for up to one minute (arbitrary) until SSH is available on the given
+    Retry up to five times (arbitrary) until SSH is available on the given
     node.
     """
-    node.run(args=['systemctl', 'status', 'sshd'])
+    # In theory we could just use any args and specify the transport as SSH.
+    # However, this would not work on macOS without a special network set up.
+    args = [
+        'systemctl',
+        'status',
+        'sshd.socket',
+        '||',
+        'systemctl',
+        'status',
+        'sshd',
+    ]
+    node.run(
+        args=args,
+        output=Output.LOG_AND_CAPTURE,
+        shell=True,
+    )
+
+
+@retry(exceptions=(retrying.RetryError, ))
+def _test_utils_wait_for_dcos(
+    session: Union[DcosApiSession, EnterpriseApiSession],
+) -> None:
+    """
+    Wait for DC/OS using DC/OS Test Utils.
+
+    DC/OS Test Utils raises its own timeout, a ``retrying.RetryError``.
+    We want to ignore this error and use our own timeouts, so we wrap this in
+    our own retried function.
+    """
+    session.wait_for_dcos()  # type: ignore
 
 
 class Cluster(ContextDecorator):
@@ -45,7 +77,6 @@ class Cluster(ContextDecorator):
         masters: int = 1,
         agents: int = 1,
         public_agents: int = 1,
-        files_to_copy_to_installer: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Create a DC/OS cluster.
@@ -55,15 +86,11 @@ class Cluster(ContextDecorator):
             masters: The number of master nodes to create.
             agents: The number of agent nodes to create.
             public_agents: The number of public agent nodes to create.
-            files_to_copy_to_installer: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
         """
         self._cluster = cluster_backend.cluster_cls(
             masters=masters,
             agents=agents,
             public_agents=public_agents,
-            files_to_copy_to_installer=list(files_to_copy_to_installer),
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
 
@@ -102,38 +129,48 @@ class Cluster(ContextDecorator):
             masters=len(masters),
             agents=len(agents),
             public_agents=len(public_agents),
-            files_to_copy_to_installer=(),
             cluster_backend=backend,
         )
 
     @retry(
         exceptions=(subprocess.CalledProcessError),
-        tries=500,
         delay=10,
     )
-    def _wait_for_dcos_diagnostics(self) -> None:
+    def _wait_for_node_poststart(self) -> None:
         """
-        Wait until all DC/OS systemd units are healthy.
+        Wait until all DC/OS node-poststart checks are healthy.
+
+        The execution will differ for different version of DC/OS.
+        ``dcos-check-runner`` only exists on DC/OS 1.12+. ``dcos-diagnostics
+        check node-poststart`` only works on DC/OS 1.10 and 1.11. ``3dt`` only
+        exists on DC/OS 1.9. ``node-poststart`` requires ``sudo`` to allow
+        reading the CA certificate used by certain checks.
         """
         for node in self.masters:
             node.run(
                 args=[
+                    'sudo',
+                    '/opt/mesosphere/bin/dcos-check-runner',
+                    'check',
+                    'node-poststart',
+                    '||',
+                    'sudo',
                     '/opt/mesosphere/bin/dcos-diagnostics',
-                    '--diag',
+                    'check',
+                    'node-poststart',
                     '||',
                     '/opt/mesosphere/bin/3dt',
                     '--diag',
                 ],
                 # Keep in mind this must be run as privileged user.
-                log_output_live=True,
-                env={
-                    'LC_ALL': 'en_US.UTF-8',
-                    'LANG': 'en_US.UTF-8',
-                },
+                output=Output.LOG_AND_CAPTURE,
                 shell=True,
             )
 
-    def wait_for_dcos_oss(self, http_checks: bool = True) -> None:
+    def wait_for_dcos_oss(
+        self,
+        http_checks: bool = True,
+    ) -> None:
         """
         Wait until the DC/OS OSS boot process has completed.
 
@@ -145,52 +182,116 @@ class Cluster(ContextDecorator):
                 macOS without a VPN set up.
 
         Raises:
-            RetryError: Raised if any cluster component did not become
-                healthy in time.
+            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
+                did not become ready within one hour.
         """
 
-        self._wait_for_dcos_diagnostics()
-        if not http_checks:
-            return
-
-        # The dcos-diagnostics check is not yet sufficient to determine
-        # when a CLI login would be possible with DC/OS OSS. It only
-        # checks the healthy state of the systemd units, not reachability
-        # of services through HTTP.
-
-        # Since DC/OS uses a Single-Sign-On flow with Identity Providers
-        # outside the cluster for the login and Admin Router only rewrites
-        # requests to them, the login endpoint does not provide anything.
-
-        # Current solution to guarantee the security CLI login:
-
-        # Try until one can login successfully with a long lived token
-        # (dirty hack in dcos-test-utils wait_for_dcos). This is to avoid
-        # having to simulate a browser that does the SSO flow.
-
-        # Suggestion for replacing this with a DC/OS check for CLI login:
-
-        # Determine and wait for all dependencies of the SSO OAuth login
-        # inside of DC/OS. This should include Admin Router, ZooKeeper and
-        # the DC/OS OAuth login service. Note that this may only guarantee
-        # that the login could work, however not that is actually works.
-
-        # In order to fully replace this method one would need to have
-        # DC/OS checks for every HTTP endpoint exposed by Admin Router.
-
-        any_master = next(iter(self.masters))
-
-        api_session = DcosApiSession(
-            dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
-            masters=[str(n.public_ip_address) for n in self.masters],
-            slaves=[str(n.public_ip_address) for n in self.agents],
-            public_slaves=[
-                str(n.public_ip_address) for n in self.public_agents
-            ],
-            auth_user=DcosUser(credentials=CI_CREDENTIALS),
+        @timeout_decorator.timeout(
+            # We choose a one hour timeout based on experience that the cluster
+            # will almost certainly not start up after this time.
+            #
+            # In the future we may want to increase this or make it
+            # customizable.
+            60 * 60,
+            timeout_exception=DCOSTimeoutError,
         )
+        def wait_for_dcos_oss_until_timeout() -> None:
+            """
+            Wait until DC/OS OSS is up or timeout hits.
+            """
 
-        api_session.wait_for_dcos()  # type: ignore
+            self._wait_for_node_poststart()
+            if not http_checks:
+                return
+
+            email = 'albert@bekstil.net'
+            zk_path = '/dcos/users/{email}'.format(email=email)
+            server_option = (
+                '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
+                'zk-5.zk:2181"'
+            )
+
+            delete_user_args = [
+                '.',
+                '/opt/mesosphere/environment.export',
+                '&&',
+                'zkCli.sh',
+                '-server',
+                server_option,
+                'delete',
+                zk_path,
+            ]
+
+            create_user_args = [
+                '.',
+                '/opt/mesosphere/environment.export',
+                '&&',
+                'zkCli.sh',
+                '-server',
+                server_option,
+                'create',
+                zk_path,
+                email,
+            ]
+
+            # The dcos-diagnostics check is not yet sufficient to determine
+            # when a CLI login would be possible with DC/OS OSS. It only
+            # checks the healthy state of the systemd units, not reachability
+            # of services through HTTP.
+
+            # Since DC/OS uses a Single-Sign-On flow with Identity Providers
+            # outside the cluster for the login and Admin Router only rewrites
+            # requests to them, the login endpoint does not provide anything.
+
+            # Current solution to guarantee the CLI login:
+
+            # Try until one can login successfully with a long lived token
+            # (dirty hack in dcos-test-utils wait_for_dcos). This is to avoid
+            # having to simulate a browser that does the SSO flow.
+
+            # Suggestion for replacing this with a DC/OS check for CLI login:
+
+            # Determine and wait for all dependencies of the SSO OAuth login
+            # inside of DC/OS. This should include Admin Router, ZooKeeper and
+            # the DC/OS OAuth login service. Note that this may only guarantee
+            # that the login could work, however not that is actually works.
+
+            # In order to fully replace this method one would need to have
+            # DC/OS checks for every HTTP endpoint exposed by Admin Router.
+
+            any_master = next(iter(self.masters))
+            # This allows this function to work even after a user has logged
+            # in.
+            any_master.run(
+                args=create_user_args,
+                shell=True,
+                output=Output.CAPTURE,
+            )
+
+            credentials = CI_CREDENTIALS
+
+            api_session = DcosApiSession(
+                dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
+                masters=[str(n.public_ip_address) for n in self.masters],
+                slaves=[str(n.public_ip_address) for n in self.agents],
+                public_slaves=[
+                    str(n.public_ip_address) for n in self.public_agents
+                ],
+                auth_user=DcosUser(credentials=credentials),
+            )
+
+            _test_utils_wait_for_dcos(session=api_session)
+
+            # Only the first user can log in with SSO, before granting others
+            # access.
+            # Therefore, we delete the user who was created to wait for DC/OS.
+            any_master.run(
+                args=delete_user_args,
+                shell=True,
+                output=Output.CAPTURE,
+            )
+
+        wait_for_dcos_oss_until_timeout()
 
     def wait_for_dcos_ee(
         self,
@@ -211,72 +312,89 @@ class Cluster(ContextDecorator):
                 macOS without a VPN set up.
 
         Raises:
-            RetryError: Raised if any cluster component did not become
-                healthy in time.
+            dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
+                did not become ready within one hour.
         """
 
-        self._wait_for_dcos_diagnostics()
-        if not http_checks:
-            return
-
-        # The dcos-diagnostics check is not yet sufficient to determine
-        # when a CLI login would be possible with Enterprise DC/OS. It only
-        # checks the healthy state of the systemd units, not reachability
-        # of services through HTTP.
-
-        # In the case of Enterprise DC/OS this method uses dcos-test-utils
-        # and superuser credentials to perform a superuser login that
-        # assure authenticating via CLI is working.
-
-        # Suggestion for replacing this with a DC/OS check for CLI login:
-
-        # In Enterprise DC/OS this could be replace by polling the login
-        # endpoint with random login credentials until it returns 401. In
-        # that case the guarantees would be the same as with the OSS
-        # suggestion.
-
-        # The progress on a partial replacement can be followed here:
-        # https://jira.mesosphere.com/browse/DCOS_OSS-1313
-
-        # In order to fully replace this method one would need to have
-        # DC/OS checks for every HTTP endpoint exposed by Admin Router.
-
-        credentials = {
-            'uid': superuser_username,
-            'password': superuser_password,
-        }
-
-        any_master = next(iter(self.masters))
-        config_result = any_master.run(
-            args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
+        @timeout_decorator.timeout(
+            # will almost certainly not start up after this time.
+            #
+            # In the future we may want to increase this or make it
+            # customizable.
+            60 * 60,
+            timeout_exception=DCOSTimeoutError,
         )
-        config = json.loads(config_result.stdout.decode())
-        ssl_enabled = config['ssl_enabled']
+        def wait_for_dcos_ee_until_timeout() -> None:
+            """
+            Wait until DC/OS Enterprise is up or timeout hits.
+            """
 
-        scheme = 'https://' if ssl_enabled else 'http://'
-        dcos_url = scheme + str(any_master.public_ip_address)
-        enterprise_session = EnterpriseApiSession(  # type: ignore
-            dcos_url=dcos_url,
-            masters=[str(n.public_ip_address) for n in self.masters],
-            slaves=[str(n.public_ip_address) for n in self.agents],
-            public_slaves=[
-                str(n.public_ip_address) for n in self.public_agents
-            ],
-            auth_user=DcosUser(credentials=credentials),
-        )
+            self._wait_for_node_poststart()
+            if not http_checks:
+                return
 
-        if ssl_enabled:
-            response = enterprise_session.get(
-                # We wait for 10 minutes which is arbitrary but should
-                # be more than enough after all systemd units are healthy.
-                '/ca/dcos-ca.crt',
-                retry_timeout=60 * 10,
-                verify=False,
+            # The dcos-diagnostics check is not yet sufficient to determine
+            # when a CLI login would be possible with Enterprise DC/OS. It only
+            # checks the healthy state of the systemd units, not reachability
+            # of services through HTTP.
+
+            # In the case of Enterprise DC/OS this method uses dcos-test-utils
+            # and superuser credentials to perform a superuser login that
+            # assure authenticating via CLI is working.
+
+            # Suggestion for replacing this with a DC/OS check for CLI login:
+
+            # In Enterprise DC/OS this could be replace by polling the login
+            # endpoint with random login credentials until it returns 401. In
+            # that case the guarantees would be the same as with the OSS
+            # suggestion.
+
+            # The progress on a partial replacement can be followed here:
+            # https://jira.mesosphere.com/browse/DCOS_OSS-1313
+
+            # In order to fully replace this method one would need to have
+            # DC/OS checks for every HTTP endpoint exposed by Admin Router.
+
+            credentials = {
+                'uid': superuser_username,
+                'password': superuser_password,
+            }
+
+            any_master = next(iter(self.masters))
+            config_result = any_master.run(
+                args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
             )
-            response.raise_for_status()
-            enterprise_session.set_ca_cert()
+            config = json.loads(config_result.stdout.decode())
+            ssl_enabled = config['ssl_enabled']
 
-        enterprise_session.wait_for_dcos()
+            scheme = 'https://' if ssl_enabled else 'http://'
+            dcos_url = scheme + str(any_master.public_ip_address)
+            enterprise_session = EnterpriseApiSession(  # type: ignore
+                dcos_url=dcos_url,
+                masters=[str(n.public_ip_address) for n in self.masters],
+                slaves=[str(n.public_ip_address) for n in self.agents],
+                public_slaves=[
+                    str(n.public_ip_address) for n in self.public_agents
+                ],
+                auth_user=DcosUser(credentials=credentials),
+            )
+
+            if ssl_enabled:
+                response = enterprise_session.get(
+                    # Avoid hitting a RetryError in the get function.
+                    # Waiting a year is considered equivalent to an
+                    # infinite timeout.
+                    '/ca/dcos-ca.crt',
+                    retry_timeout=60 * 60 * 24 * 365,
+                    verify=False,
+                )
+                response.raise_for_status()
+                # This is already done in enterprise_session.wait_for_dcos()
+                enterprise_session.set_ca_cert()
+
+            _test_utils_wait_for_dcos(session=enterprise_session)
+
+        wait_for_dcos_ee_until_timeout()
 
     def __enter__(self) -> 'Cluster':
         """
@@ -327,9 +445,11 @@ class Cluster(ContextDecorator):
 
     def install_dcos_from_url(
         self,
-        build_artifact: str,
+        dcos_installer: str,
         dcos_config: Dict[str, Any],
-        log_output_live: bool = False,
+        ip_detect_path: Path,
+        output: Output = Output.CAPTURE,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
     ) -> None:
         """
         Installs DC/OS using the DC/OS advanced installation method.
@@ -339,85 +459,66 @@ class Cluster(ContextDecorator):
         necessary installation files.
 
         Since the bootstrap host is different from the host initiating the
-        cluster creation passing the ``build_artifact`` via URL string
-        saves the time of copying the ``build_artifact`` to the bootstrap host.
+        cluster creation passing the ``dcos_installer`` via URL string
+        saves the time of copying the ``dcos_installer`` to the bootstrap host.
 
         However, some backends may not support using a bootstrap node. For
-        these backends, each node will download and extract the build
-        artifact. This may be very slow, as the build artifact is downloaded to
+        these backends, each node will download and extract the installer.
+        This may be very slow, as the installer is downloaded to
         and extracted on each node, one at a time.
 
         Args:
-            build_artifact: The URL string to a build artifact to install DC/OS
+            dcos_installer: The URL string to an installer to install DC/OS
                 from.
             dcos_config: The contents of the DC/OS ``config.yaml``.
-            log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
         """
-        try:
-            self._cluster.install_dcos_from_url_with_bootstrap_node(
-                build_artifact=build_artifact,
-                dcos_config=dcos_config,
-                log_output_live=log_output_live,
-            )
-        except NotImplementedError:
-            for nodes, role in (
-                (self.masters, Role.MASTER),
-                (self.agents, Role.AGENT),
-                (self.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_url(
-                        build_artifact=build_artifact,
-                        dcos_config=dcos_config,
-                        role=role,
-                        log_output_live=log_output_live,
-                    )
+        self._cluster.install_dcos_from_url_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
     def install_dcos_from_path(
         self,
-        build_artifact: Path,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
-        log_output_live: bool = False,
+        ip_detect_path: Path,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        output: Output = Output.CAPTURE,
     ) -> None:
         """
         Args:
-            build_artifact: The `Path` to a build artifact to install DC/OS
+            dcos_installer: The `Path` to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
-            log_output_live: If `True`, log output of the installation live.
-                If `True`, stderr is merged into stdout in the return value.
-
-        Raises:
-            NotImplementedError: `NotImplementedError` because it is more
-                efficient for the given backend to use the DC/OS advanced
-                installation method that takes build artifacts by URL string.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
         """
-        try:
-            self._cluster.install_dcos_from_path_with_bootstrap_node(
-                build_artifact=build_artifact,
-                dcos_config=dcos_config,
-                log_output_live=log_output_live,
-            )
-        except NotImplementedError:
-            for nodes, role in (
-                (self.masters, Role.MASTER),
-                (self.agents, Role.AGENT),
-                (self.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_path(
-                        build_artifact=build_artifact,
-                        dcos_config=dcos_config,
-                        role=role,
-                        log_output_live=log_output_live,
-                    )
+        self._cluster.install_dcos_from_path_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
     def run_integration_tests(
         self,
         pytest_command: List[str],
         env: Optional[Dict[str, Any]] = None,
-        log_output_live: bool = False,
+        output: Output = Output.CAPTURE,
         tty: bool = False,
         test_host: Optional[Node] = None,
         transport: Optional[Transport] = None,
@@ -430,9 +531,7 @@ class Cluster(ContextDecorator):
             env: Environment variables to be set on the node before running
                 the `pytest_command`. On enterprise clusters,
                 ``DCOS_LOGIN_UNAME`` and ``DCOS_LOGIN_PW`` must be set.
-            log_output_live: If ``True``, log output of the ``pytest_command``
-                live. If ``True``, ``stderr`` is merged into ``stdout`` in the
-                return value.
+            output: What happens with stdout and stderr.
             test_host: The node to run the given command on. if not given, an
                 arbitrary master node is used.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
@@ -449,7 +548,7 @@ class Cluster(ContextDecorator):
             subprocess.CalledProcessError: If the ``pytest`` command fails.
         """
         args = [
-            'source',
+            '.',
             '/opt/mesosphere/environment.export',
             '&&',
             'cd',
@@ -483,7 +582,7 @@ class Cluster(ContextDecorator):
 
         return test_host.run(
             args=args,
-            log_output_live=log_output_live,
+            output=output,
             env=environment_variables,
             tty=tty,
             shell=True,

@@ -6,9 +6,9 @@ import sys
 import uuid
 
 import requests
-
 import cerberus
 import yaml
+
 from ..dcos_launch import util
 from ..dcos_launch.platforms import aws, gcp
 
@@ -119,8 +119,8 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
         validator.schema.update(TERRAFORM_COMMON_SCHEMA)
     elif provider in ('aws', 'azure'):
         validator.schema.update(TEMPLATE_DEPLOY_COMMON_SCHEMA)
-    elif provider == 'acs-engine':
-        validator.schema.update(ACS_ENGINE_SCHEMA)
+    elif provider == 'dcos-engine':
+        validator.schema.update(DCOS_ENGINE_SCHEMA)
     else:
         raise Exception('Unknown provider!: {}'.format(provider))
 
@@ -185,6 +185,10 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
     validator.allow_unknown = False
     if not validator.validate(user_config):
         _raise_errors(validator)
+    if 'genconf_dir' in user_config:
+        if 'dcos_config' in user_config:
+            genconf_dir = expand_path(user_config['genconf_dir'], user_config['config_dir'])
+            _validate_genconf_scripts(genconf_dir, user_config['dcos_config'])
     return validator.normalized(user_config)
 
 
@@ -195,7 +199,7 @@ COMMON_SCHEMA = {
         'allowed': [
             'aws',
             'azure',
-            'acs-engine',
+            'dcos-engine',
             'onprem',
             'terraform']},
     'config_dir': {
@@ -263,7 +267,18 @@ def _validate_fault_domain_helper(field, value, error):
 
 def _validate_genconf_dir(field, value, error):
     if not value.endswith('genconf'):
-        error(field, 'genconf_dir must be named geconf')
+        error(field, 'genconf_dir must be named genconf')
+
+
+def _validate_genconf_scripts(genconf_dir, dcos_config):
+    for script in ('ip_detect', 'ip_detect_public', 'fault_domain_detect'):
+        filename_key = script + '_filename'
+        if filename_key in dcos_config:
+            if os.path.isabs(dcos_config[filename_key]):
+                continue
+            if not os.path.exists(os.path.join(genconf_dir, dcos_config[filename_key])):
+                raise util.LauncherError('FileNotFoundError', '{} script must exist in the genconf dir ({})'.format(
+                    dcos_config[filename_key], genconf_dir))
 
 
 ONPREM_DEPLOY_COMMON_SCHEMA = {
@@ -311,16 +326,12 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'default_setter': lambda doc: yaml.load(util.read_file(os.path.join(doc['genconf_dir'], 'config.yaml'))),
         'schema': {
             'ip_detect_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'ip_detect_contents'},
             'ip_detect_public_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'ip_detect_public_contents'},
             'fault_domain_detect_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'fault_domain_detect_contents'},
             'license_key_filename': {
-                'coerce': 'expand_local_path',
                 'excludes': 'license_key_contents'},
             # the following are fields that will be injected by dcos-launch
             'agent_list': {'readonly': True},
@@ -331,7 +342,6 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'type': 'string',
         'required': False,
         'default': 'genconf',
-        'coerce': 'expand_local_path',
         'validator': _validate_genconf_dir
         },
     'fault_domain_helper': {
@@ -363,7 +373,7 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
     },
     'prereqs_script_filename': {
         'type': 'string',
-        'default': 'unset'
+        'default': 'install_prereqs.sh'
     },
     'install_prereqs': {
         'type': 'boolean',
@@ -470,24 +480,24 @@ def get_platform_dependent_url(url_to_format: str, error_msg: str) -> str:
         raise Exception(error_msg)
 
 
-ACS_ENGINE_SCHEMA = {
+DCOS_ENGINE_SCHEMA = {
     'deployment_name': {
         'type': 'string',
         'required': True},
-    'acs_version': {
+    'dcos_engine_version': {
         'type': 'string',
-        'default_setter': lambda doc: get_latest_github_release('Azure', 'acs-engine', '0.16.2')
+        'default_setter': lambda doc: get_latest_github_release('Azure', 'dcos-engine', '0.2.0')
     },
-    'acs_engine_tarball_url': {
+    'dcos_engine_tarball_url': {
         'type': 'string',
         'default_setter': lambda doc: get_platform_dependent_url(
-            'https://github.com/Azure/acs-engine/releases/download/v{0}/acs-engine-v{0}-{1}-amd64.tar.gz'.
-                format(doc['acs_version'], '{}'),
-            'No ACS-Engine distribution for {}'.format(sys.platform))},
+            'https://github.com/Azure/dcos-engine/releases/download/v{0}/dcos-engine-v{0}-{1}-amd64.tar.gz'.
+                format(doc['dcos_engine_version'], '{}'),
+            'No DCOS-Engine distribution for {}'.format(sys.platform))},
     'acs_template_filename': {
         'type': 'string',
         'required': False},
-    'acs_engine_dcos_orchestrator_release': {
+    'dcos_engine_orchestrator_release': {
         'type': 'string',
         'default': '1.11'},
     'platform': {
@@ -540,6 +550,9 @@ ACS_ENGINE_SCHEMA = {
     'template_parameters': {
         'type': 'dict'},
     'dcos_linux_bootstrap_url': {
+        'type': 'string',
+        'required': False},
+    'dcos_windows_bootstrap_url': {
         'type': 'string',
         'required': False},
     'windows_publisher': {

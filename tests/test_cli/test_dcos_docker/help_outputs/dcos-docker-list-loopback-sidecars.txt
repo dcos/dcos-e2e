@@ -1,0 +1,6 @@
+Usage: minidcos docker list-loopback-sidecars [OPTIONS]
+
+  List loopback sidecars.
+
+Options:
+  -h, --help  Show this message and exit.

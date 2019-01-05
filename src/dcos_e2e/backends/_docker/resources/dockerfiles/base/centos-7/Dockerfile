@@ -6,6 +6,7 @@ RUN yum install -y \
 		btrfs-progs \
 		ca-certificates \
 		curl \
+		gettext \
 		git \
 		iproute \
 		ipset \
@@ -22,7 +23,8 @@ RUN yum install -y \
 		tree \
 		unzip \
 		which \
-                xfsprogs \
+                # This is needed to run DC/OS E2E on hosts with XFS.
+		xfsprogs \
 		xz \
 && ( \
 cd /lib/systemd/system/sysinit.target.wants/; \

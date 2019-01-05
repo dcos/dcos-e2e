@@ -1,0 +1,8 @@
+Usage: minidcos docker clean [OPTIONS]
+
+  Remove containers, volumes and networks created by this tool.
+
+Options:
+  -v, --verbose  Use verbose output. Use this option multiple times for more
+                 verbose output.
+  -h, --help     Show this message and exit.

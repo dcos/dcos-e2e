@@ -1,76 +1,26 @@
 """
-Release the next version of DC/OS E2E.
+Release the next version.
 """
 
 import datetime
-import os
+import logging
 import re
-import subprocess
 from pathlib import Path
-from textwrap import dedent
+from typing import List
 
+import click
+from dulwich.client import HttpGitClient
 from dulwich.porcelain import add, commit, push, tag_list
 from dulwich.repo import Repo
-from github import Github
+from github import Github, Repository, UnknownObjectException
 
-
-def get_homebrew_formula(version: str) -> str:
-    """
-    Return the contents of a Homebrew formula for the DC/OS E2E CLI.
-    """
-    requirements_file = Path(__file__).parent.parent / 'requirements.txt'
-    lines = requirements_file.read_text().strip().split('\n')
-    requirements = [line for line in lines if not line.startswith('#')]
-    # Keyring is not a direct dependency but without it some users get:
-    #
-    # Cannot load 'keyring' on your system (either not installed, or not
-    # configured correctly): No module named 'keyring'
-    requirements.append('keyring')
-    # Similarly, without the following, some users get:
-    # The 'secretstorage' distribution was not found and is required by keyring
-    requirements.append('secretstorage')
-    first = requirements[0]
-
-    args = ['poet', first]
-    for requirement in requirements[1:]:
-        args.append('--also')
-        args.append(requirement)
-
-    result = subprocess.run(args=args, stdout=subprocess.PIPE)
-    resource_stanzas = str(result.stdout.decode())
-
-    pattern = dedent(
-        """\
-        class Dcosdocker < Formula
-          include Language::Python::Virtualenv
-
-          url "https://github.com/dcos/dcos-e2e/archive/{version}.tar.gz"
-          head "https://github.com/dcos/dcos-e2e.git"
-          homepage "http://dcos-e2e.readthedocs.io/en/latest/cli.html"
-          depends_on "python3"
-          depends_on "pkg-config"
-
-        {resource_stanzas}
-
-          def install
-            virtualenv_install_with_resources
-          end
-
-          test do
-              ENV["LC_ALL"] = "en_US.utf-8"
-              ENV["LANG"] = "en_US.utf-8"
-              system "#{{bin}}/dcos_docker", "--help"
-          end
-        end
-        """,
-    )
-
-    return pattern.format(resource_stanzas=resource_stanzas, version=version)
+from binaries import make_linux_binaries
+from homebrew import get_homebrew_formula
 
 
 def get_version() -> str:
     """
-    Returns the next version of DC/OS E2E.
+    Return the next version.
     This is today’s date in the format ``YYYY.MM.DD.MICRO``.
     ``MICRO`` refers to the number of releases created on this date,
     starting from ``0``.
@@ -78,8 +28,8 @@ def get_version() -> str:
     utc_now = datetime.datetime.utcnow()
     date_format = '%Y.%m.%d'
     date_str = utc_now.strftime(date_format)
-    repo = Repo('.')
-    tag_labels = tag_list(repo)
+    local_repository = Repo('.')
+    tag_labels = tag_list(repo=local_repository)
     tag_labels = [item.decode() for item in tag_labels]
     today_tag_labels = [
         item for item in tag_labels if item.startswith(date_str)
@@ -88,11 +38,10 @@ def get_version() -> str:
     return '{date}.{micro}'.format(date=date_str, micro=micro)
 
 
-def update_changelog(version: str) -> None:
+def update_changelog(version: str, changelog: Path) -> None:
     """
     Add a version title to the changelog.
     """
-    changelog = Path('CHANGELOG.rst')
     changelog_contents = changelog.read_text()
     new_changelog_contents = changelog_contents.replace(
         'Next\n----',
@@ -102,58 +51,102 @@ def update_changelog(version: str) -> None:
 
 
 def create_github_release(
-    github_token: str,
+    repository: Repository,
     version: str,
 ) -> None:
     """
     Create a tag and release on GitHub.
     """
-    github_client = Github(github_token)
-    org = github_client.get_organization('mesosphere')
-    repository = org.get_repo('dcos-e2e')
     changelog_url = 'https://dcos-e2e.readthedocs.io/en/latest/changelog.html'
-    repository.create_git_tag_and_release(
+    release_name = 'Release ' + version
+    release_message = 'See ' + changelog_url
+    github_release = repository.create_git_tag_and_release(
         tag=version,
         tag_message='Release ' + version,
-        release_name='Release ' + version,
-        release_message='See ' + changelog_url,
+        release_name=release_name,
+        release_message=release_message,
         type='commit',
         object=repository.get_commits()[0].sha,
+        draft=False,
     )
 
+    # The artifacts we build must be built from the tag we just created.
+    # This tag is created remotely on GitHub using the GitHub HTTP API.
+    #
+    # We fetch all tags from GitHub and set our local HEAD to the latest master
+    # from GitHub.
+    #
+    # One symptom of this is that ``minidcos --version`` from the PyInstaller
+    # binary shows the correct version.
+    local_repository = Repo('.')
+    client = HttpGitClient(repository.owner.html_url)
+    remote_refs = client.fetch(repository.name + '.git', local_repository)
 
-def commit_and_push(version: str) -> None:
+    # Update the local tags and references with the remote ones.
+    for key, value in remote_refs.items():
+        local_repository.refs[key] = value
+
+    # Advance local HEAD to remote master HEAD.
+    local_repository[b'HEAD'] = remote_refs[b'refs/heads/master']
+
+    # We need to make the artifacts just after creating a tag so that the
+    # --version output is exactly the one of the tag.
+    # No tag exists when the GitHub release is a draft.
+    # This means that temporarily we have a release without binaries.
+    linux_artifacts = make_linux_binaries(repo_root=Path('.'))
+    for installer_path in linux_artifacts:
+        github_release.upload_asset(
+            path=str(installer_path),
+            label=installer_path.name,
+        )
+
+
+def commit_and_push(
+    version: str,
+    repository: Repository,
+    paths: List[Path],
+) -> None:
     """
     Commit and push all changes.
     """
-    repo = Repo('.')
-    paths = ['dcosdocker.rb', 'CHANGELOG.rst', 'vagrant/Vagrantfile']
-    _, ignored = add(paths=paths)
+    local_repository = Repo('.')
+    _, ignored = add(paths=[str(path) for path in paths])
     assert not ignored
     message = b'Update for release ' + version.encode('utf-8')
     commit(message=message)
     branch_name = 'master'
     push(
-        repo=repo,
-        remote_location='git@github.com:mesosphere/dcos-e2e.git',
+        repo=local_repository,
+        remote_location=repository.ssh_url,
         refspecs=branch_name.encode('utf-8'),
     )
 
 
-def update_homebrew(version_str: str) -> None:
+def update_homebrew(
+    homebrew_file: Path,
+    version_str: str,
+    repository: Repository,
+) -> None:
     """
     Update the Homebrew file.
     """
-    homebrew_formula_contents = get_homebrew_formula(version=version_str)
-    homebrew_file = Path('dcosdocker.rb')
+    archive_url = repository.get_archive_link(
+        archive_format='tarball',
+        ref=version_str,
+    )
+
+    homebrew_formula_contents = get_homebrew_formula(
+        archive_url=archive_url,
+        head_url=repository.clone_url,
+        homebrew_recipe_filename=homebrew_file.name,
+    )
     homebrew_file.write_text(homebrew_formula_contents)
 
 
-def update_vagrantfile(version: str) -> None:
+def update_vagrantfile(version: str, vagrantfile: Path) -> None:
     """
     Update the Vagrantfile.
     """
-    vagrantfile = Path('vagrant/Vagrantfile')
     vagrantfile_contents = vagrantfile.read_text()
     updated = re.sub(
         r"DEFAULT_DCOS_E2E_REF\s*=\s*'[^']+'",
@@ -164,18 +157,43 @@ def update_vagrantfile(version: str) -> None:
     vagrantfile.write_text(updated)
 
 
-def main() -> None:
-    github_token = os.environ['GITHUB_TOKEN']
+def get_repo(github_token: str, github_owner: str) -> Repository:
+    """
+    Get a GitHub repository.
+    """
+    github_client = Github(github_token)
+    try:
+        github_user_or_org = github_client.get_organization(github_owner)
+    except UnknownObjectException:
+        github_user_or_org = github_client.get_user(github_owner)
+
+    return github_user_or_org.get_repo('dcos-e2e')
+
+
+@click.command('release')
+@click.argument('github_token')
+@click.argument('github_owner')
+def release(github_token: str, github_owner: str) -> None:
+    """
+    Perform a release.
+    """
+    logging.basicConfig(level=logging.DEBUG)
+    repository = get_repo(github_token=github_token, github_owner=github_owner)
     version_str = get_version()
-    update_changelog(version=version_str)
-    update_homebrew(version_str=version_str)
-    update_vagrantfile(version=version_str)
-    commit_and_push(version=version_str)
-    create_github_release(
-        github_token=github_token,
-        version=version_str,
+    homebrew_file = Path('minidcos.rb')
+    vagrantfile = Path('vagrant/Vagrantfile')
+    changelog = Path('CHANGELOG.rst')
+    update_changelog(version=version_str, changelog=changelog)
+    update_homebrew(
+        homebrew_file=homebrew_file,
+        version_str=version_str,
+        repository=repository,
     )
+    update_vagrantfile(vagrantfile=vagrantfile, version=version_str)
+    paths = [homebrew_file, changelog, vagrantfile]
+    commit_and_push(version=version_str, repository=repository, paths=paths)
+    create_github_release(repository=repository, version=version_str)
 
 
 if __name__ == '__main__':
-    main()
+    release()

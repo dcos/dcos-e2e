@@ -1,0 +1,9 @@
+Usage: minidcos vagrant inspect [OPTIONS]
+
+  Show cluster details.
+
+Options:
+  -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+  -v, --verbose          Use verbose output. Use this option multiple times for
+                         more verbose output.
+  -h, --help             Show this message and exit.

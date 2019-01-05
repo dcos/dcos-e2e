@@ -10,7 +10,7 @@ from passlib.hash import sha512_crypt
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
-from dcos_e2e.node import Node
+from dcos_e2e.node import Node, Output
 
 
 def _get_node_distribution(node: Node) -> Distribution:
@@ -42,7 +42,7 @@ def _get_node_distribution(node: Node) -> Distribution:
 
 def _oss_distribution_test(
     distribution: Distribution,
-    oss_artifact: Path,
+    oss_installer: Path,
 ) -> None:
     """
     Assert that given a ``linux_distribution``, an open source DC/OS
@@ -51,16 +51,18 @@ def _oss_distribution_test(
     We use this rather than pytest parameterization so that we can separate
     the tests in ``.travis.yml``.
     """
+    cluster_backend = Docker(linux_distribution=distribution)
     with Cluster(
-        cluster_backend=Docker(linux_distribution=distribution),
+        cluster_backend=cluster_backend,
         masters=1,
         agents=0,
         public_agents=0,
     ) as cluster:
         cluster.install_dcos_from_path(
-            build_artifact=oss_artifact,
+            dcos_installer=oss_installer,
             dcos_config=cluster.base_config,
-            log_output_live=True,
+            output=Output.CAPTURE,
+            ip_detect_path=cluster_backend.ip_detect_path,
         )
         cluster.wait_for_dcos_oss()
         (master, ) = cluster.masters
@@ -71,7 +73,7 @@ def _oss_distribution_test(
 
 def _enterprise_distribution_test(
     distribution: Distribution,
-    enterprise_artifact: Path,
+    enterprise_installer: Path,
     license_key_contents: str,
 ) -> None:
     """
@@ -90,19 +92,21 @@ def _enterprise_distribution_test(
         'license_key_contents': license_key_contents,
     }
 
+    cluster_backend = Docker(linux_distribution=distribution)
     with Cluster(
-        cluster_backend=Docker(linux_distribution=distribution),
+        cluster_backend=cluster_backend,
         masters=1,
         agents=0,
         public_agents=0,
     ) as cluster:
         cluster.install_dcos_from_path(
-            build_artifact=enterprise_artifact,
+            dcos_installer=enterprise_installer,
             dcos_config={
                 **cluster.base_config,
                 **config,
             },
-            log_output_live=True,
+            ip_detect_path=cluster_backend.ip_detect_path,
+            output=Output.CAPTURE,
         )
         cluster.wait_for_dcos_ee(
             superuser_username=superuser_username,
@@ -158,19 +162,19 @@ class TestCoreOS:
 
     def test_oss(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         DC/OS OSS can start up on CoreOS.
         """
         _oss_distribution_test(
             distribution=Distribution.COREOS,
-            oss_artifact=oss_artifact,
+            oss_installer=oss_installer,
         )
 
     def test_enterprise(
         self,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -178,7 +182,7 @@ class TestCoreOS:
         """
         _enterprise_distribution_test(
             distribution=Distribution.COREOS,
-            enterprise_artifact=enterprise_artifact,
+            enterprise_installer=enterprise_installer,
             license_key_contents=license_key_contents,
         )
 
@@ -190,19 +194,19 @@ class TestUbuntu1604:
 
     def test_oss(
         self,
-        oss_artifact: Path,
+        oss_installer: Path,
     ) -> None:
         """
         DC/OS OSS can start up on Ubuntu 16.04.
         """
         _oss_distribution_test(
             distribution=Distribution.UBUNTU_16_04,
-            oss_artifact=oss_artifact,
+            oss_installer=oss_installer,
         )
 
     def test_enterprise(
         self,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -210,6 +214,6 @@ class TestUbuntu1604:
         """
         _enterprise_distribution_test(
             distribution=Distribution.UBUNTU_16_04,
-            enterprise_artifact=enterprise_artifact,
+            enterprise_installer=enterprise_installer,
             license_key_contents=license_key_contents,
         )

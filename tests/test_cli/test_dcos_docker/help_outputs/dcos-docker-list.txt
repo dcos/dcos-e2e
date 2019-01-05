@@ -1,0 +1,6 @@
+Usage: minidcos docker list [OPTIONS]
+
+  List all clusters.
+
+Options:
+  -h, --help  Show this message and exit.

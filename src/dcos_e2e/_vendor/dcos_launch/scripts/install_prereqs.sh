@@ -128,6 +128,7 @@ yum_install git
 yum_install unzip
 yum_install xz
 yum_install ipset
+yum_install bind-utils  # required by dcos-iam-ldap-sync
 
 echo "Validating SELinux..."
 if [[ "$(getenforce)" == "Enforcing" ]]; then

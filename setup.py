@@ -2,41 +2,39 @@
 Setup script for DC/OS End to End tests.
 """
 
+from pathlib import Path
 import versioneer
 from setuptools import find_packages, setup
+from typing import List
 
-# Avoid dependency links because they are not supported by Read The Docs.
-#
-# Also, they require users to use ``--process-dependency-links``.
-DEPENDENCY_LINKS = []
 
-with open('requirements.txt') as requirements:
-    INSTALL_REQUIRES = []
-    # Keyring is not a direct dependency but without it some users get:
-    #
-    # Cannot load 'keyring' on your system (either not installed, or not
-    # configured correctly): No module named 'keyring'
-    INSTALL_REQUIRES.append('keyring')
-    # Similarly, without the following, some users get:
-    # The 'secretstorage' distribution was not found and is required by keyring
-    INSTALL_REQUIRES.append('secretstorage')
-    for line in requirements.readlines():
-        if line.startswith('#'):
-            continue
-        if line.startswith('--find-links'):
-            _, link = line.split('--find-links ')
-            DEPENDENCY_LINKS.append(link)
-        else:
-            INSTALL_REQUIRES.append(line)
+def _get_dependencies(requirements_file: Path) -> List[str]:
+    """
+    Return requirements from a requirements file.
 
-with open('dev-requirements.txt') as dev_requirements:
-    DEV_REQUIRES = []
-    for line in dev_requirements.readlines():
-        if not line.startswith('#'):
-            DEV_REQUIRES.append(line)
+    This expects a requirements file with no ``--find-links`` lines.
+    """
+    lines = requirements_file.read_text().strip().split('\n')
+    return [line for line in lines if not line.startswith('#')]
 
-with open('README.rst') as f:
-    LONG_DESCRIPTION = f.read()
+
+_DIRECT_REQUIRES = _get_dependencies(
+    requirements_file=Path('requirements.txt'),
+)
+
+_INDIRECT_REQUIRES = _get_dependencies(
+    requirements_file=Path('indirect-requirements.txt'),
+)
+
+INSTALL_REQUIRES = _DIRECT_REQUIRES + _INDIRECT_REQUIRES
+DEV_REQUIRES = _get_dependencies(
+    requirements_file=Path('dev-requirements.txt'),
+)
+PACKAGING_REQUIRES = _get_dependencies(
+    requirements_file=Path('packaging-requirements.txt'),
+)
+
+LONG_DESCRIPTION = Path('README.rst').read_text()
 
 setup(
     name='DCOS E2E',
@@ -56,6 +54,7 @@ setup(
     url='https://github.com/dcos/dcos-e2e',
     extras_require={
         'dev': DEV_REQUIRES,
+        'packaging': PACKAGING_REQUIRES,
     },
     classifiers=[
         'Operating System :: POSIX',
@@ -66,9 +65,9 @@ setup(
     # Avoid dependency links because they are not supported by Read The Docs.
     #
     # Also, they require users to use ``--process-dependency-links``.
-    dependency_links=DEPENDENCY_LINKS,
+    dependency_links=[],
     entry_points="""
         [console_scripts]
-        dcos-docker=cli:dcos_docker
+        minidcos=dcos_e2e_cli.minidcos:minidcos
     """,
 )

@@ -1,0 +1,12 @@
+Usage: minidcos vagrant web [OPTIONS]
+
+  Open the browser at the web UI.
+
+  Note that the web UI may not be available at first. Consider using
+  ``minidcos vagrant wait`` before running this command.
+
+Options:
+  -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+  -v, --verbose          Use verbose output. Use this option multiple times for
+                         more verbose output.
+  -h, --help             Show this message and exit.

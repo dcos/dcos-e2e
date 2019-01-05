@@ -1,0 +1,6 @@
+Usage: minidcos docker destroy-mac-network [OPTIONS]
+
+  Destroy containers created by "minidcos docker setup-mac-network".
+
+Options:
+  -h, --help  Show this message and exit.

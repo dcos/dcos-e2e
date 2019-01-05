@@ -1,4 +1,4 @@
-from ..dcos_launch import acs_engine, arm, aws, gcp, terraform, util
+from ..dcos_launch import dcos_engine, arm, aws, gcp, terraform, util
 
 VERSION = '0.1.0'
 
@@ -18,8 +18,8 @@ def get_launcher(config, env=None):
     if platform == 'azure':
         if provider == 'azure':
             return arm.AzureResourceGroupLauncher(config, env=env)
-        if provider == 'acs-engine':
-            return acs_engine.ACSEngineLauncher(config, env=env)
+        if provider == 'dcos-engine':
+            return dcos_engine.DcosEngineLauncher(config, env=env)
         if provider == 'terraform':
             return terraform.AzureLauncher(config, env=env)
     if platform == 'gcp':

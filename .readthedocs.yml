@@ -1,4 +1,5 @@
 python:
    pip_install: true
+   version: 3.5
    extra_requirements:
        - dev

@@ -1,9 +1,0 @@
-[run]
-branch = True
-omit =
-    *_vendor*
-    src/dcos_e2e/_version.py
-
-[report]
-exclude_lines =
-    pragma: no cover

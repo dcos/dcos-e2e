@@ -1,15 +1,22 @@
 """
 Tests for managing DC/OS cluster nodes.
+
+See ``test_node_install.py`` for more, related tests.
 """
 
 import logging
+import os
+import subprocess
+import sys
 import textwrap
 import uuid
+from ipaddress import IPv4Address
 from pathlib import Path
 from subprocess import CalledProcessError, TimeoutExpired
 from typing import Iterator
 
 import pytest
+from _pytest.capture import CaptureFixture
 from _pytest.fixtures import SubRequest
 from _pytest.logging import LogCaptureFixture
 # See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
@@ -18,14 +25,19 @@ from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node, Role, Transport
+from dcos_e2e.node import Node, Output, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
 # pylint: disable=redefined-outer-name
 
+# Set TEST_ONE_TRANSPORT=1 to run these tests with just one transport.
+# This can be useful during development for transport-agnostic testing.
+_TRANSPORTS = [
+    Transport.DOCKER_EXEC,
+] if os.getenv('TEST_ONE_TRANSPORT') == '1' else list(Transport)
 
-@pytest.fixture(scope='module', params=list(Transport))
+
+@pytest.fixture(scope='module', params=_TRANSPORTS)
 def dcos_node(request: SubRequest) -> Iterator[Node]:
     """
     Return a ``Node``.
@@ -44,6 +56,73 @@ def dcos_node(request: SubRequest) -> Iterator[Node]:
     ) as cluster:
         (master, ) = cluster.masters
         yield master
+
+
+class TestEquality:
+    """
+    Tests for Node.__eq__
+    """
+
+    def test_eq(self, tmpdir: local) -> None:
+        """
+        Two nodes are equal iff their IP addresses are equal.
+        """
+
+        content = str(uuid.uuid4())
+        key1_filename = 'foo.key'
+        key1_file = tmpdir.join(key1_filename)
+        key1_file.write(content)
+        key2_filename = 'bar.key'
+        key2_file = tmpdir.join(key2_filename)
+        key2_file.write(content)
+
+        node_public_ip_address = IPv4Address('172.0.0.1')
+        node_private_ip_address = IPv4Address('172.0.0.3')
+        other_ip_address = IPv4Address('172.0.0.4')
+        node_ssh_key_path = Path(str(key1_file))
+        other_ssh_key_path = Path(str(key2_file))
+        node_user = 'a'
+        other_user = 'b'
+        node_transport = Transport.DOCKER_EXEC
+        other_transport = Transport.SSH
+        node = Node(
+            public_ip_address=node_public_ip_address,
+            private_ip_address=node_private_ip_address,
+            ssh_key_path=node_ssh_key_path,
+            default_user=node_user,
+            default_transport=node_transport,
+        )
+        for transport in (node_transport, other_transport):
+            for public_ip_address in (
+                node_public_ip_address,
+                other_ip_address,
+            ):
+                for private_ip_address in (
+                    node_private_ip_address,
+                    other_ip_address,
+                ):
+                    for ssh_key_path in (
+                        node_ssh_key_path,
+                        other_ssh_key_path,
+                    ):
+                        for user in (node_user, other_user):
+                            other_node = Node(
+                                public_ip_address=public_ip_address,
+                                private_ip_address=private_ip_address,
+                                ssh_key_path=ssh_key_path,
+                                default_user=user,
+                                default_transport=transport,
+                            )
+
+                            should_match = bool(
+                                (public_ip_address, private_ip_address) == (
+                                    node_public_ip_address,
+                                    node_private_ip_address,
+                                ),
+                            )
+
+                            do_match = bool(node == other_node)
+                            assert should_match == do_match
 
 
 class TestStringRepresentation:
@@ -89,6 +168,73 @@ class TestSendFile:
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == content
+
+    def test_send_directory(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a directory to a cluster node as the default
+        user.
+        """
+        original_content = str(uuid.uuid4())
+        dir_name = 'directory'
+        file_name = 'example_file.txt'
+        dir_path = tmpdir.mkdir(dir_name)
+        local_file_path = dir_path.join(file_name)
+        local_file_path.write(original_content)
+
+        random = uuid.uuid4().hex
+        master_base_dir = '/etc/{random}'.format(random=random)
+        master_destination_dir = Path(master_base_dir)
+
+        dcos_node.send_file(
+            local_path=Path(str(local_file_path)),
+            remote_path=master_destination_dir / dir_name / file_name,
+        )
+
+        args = ['cat', str(master_destination_dir / dir_name / file_name)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == original_content
+
+        new_content = str(uuid.uuid4())
+        local_file_path.write(new_content)
+
+        dcos_node.send_file(
+            local_path=Path(str(dir_path)),
+            remote_path=master_destination_dir,
+        )
+        args = ['cat', str(master_destination_dir / dir_name / file_name)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == new_content
+
+    def test_send_file_to_directory(
+        self,
+        dcos_node: Node,
+        tmpdir: local,
+    ) -> None:
+        """
+        It is possible to send a file to a cluster node to a directory that
+        is mounted as tmpfs.
+        See ``DockerExecTransport.send_file`` for details.
+        """
+        content = str(uuid.uuid4())
+        file_name = 'example_file.txt'
+        local_file = tmpdir.join(file_name)
+        local_file.write(content)
+
+        master_destination_path = Path(
+            '/etc/{random}'.format(random=uuid.uuid4().hex),
+        )
+        dcos_node.run(args=['mkdir', '--parent', str(master_destination_path)])
+        dcos_node.send_file(
+            local_path=Path(str(local_file)),
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path / file_name)]
         result = dcos_node.run(args=args)
         assert result.stdout.decode() == content
 
@@ -198,6 +344,28 @@ class TestSendFile:
 
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
+
+    def test_send_symlink(self, dcos_node: Node, tmpdir: local) -> None:
+        """
+        If sending the path to a symbolic link, the link's target is sent.
+        """
+        random = str(uuid.uuid4())
+        dir_containing_real_file = tmpdir.mkdir(uuid.uuid4().hex)
+        dir_containing_symlink = tmpdir.mkdir(uuid.uuid4().hex)
+        local_file = dir_containing_real_file.join('example_file.txt')
+        local_file.write(random)
+        symlink_file = dir_containing_symlink.join('symlink.txt')
+        symlink_file_path = Path(str(symlink_file))
+        symlink_file_path.symlink_to(target=Path(str(local_file)))
+        master_destination_dir = '/etc/{random}'.format(random=random)
+        master_destination_path = Path(master_destination_dir) / 'file.txt'
+        dcos_node.send_file(
+            local_path=symlink_file_path,
+            remote_path=master_destination_path,
+        )
+        args = ['cat', str(master_destination_path)]
+        result = dcos_node.run(args=args)
+        assert result.stdout.decode() == random
 
 
 class TestPopen:
@@ -398,6 +566,9 @@ class TestRun:
 
         dcos_node.run(args=['userdel', '-r', testuser])
 
+    # We skip coverage on this test because CI may not be a TTY.
+    # However, we do not skip the whole test so we at least cover more code in
+    # the implementation.
     @pytest.mark.parametrize('tty', [True, False])
     def test_tty(
         self,
@@ -412,9 +583,9 @@ class TestRun:
             """
             if [ -t 1 ]
             then
-            echo True > {filename}
+            echo True
             else
-            echo False > {filename}
+            echo False
             fi
             """,
         ).format(filename=filename)
@@ -424,9 +595,15 @@ class TestRun:
             shell=True,
         )
 
-        assert echo_result.returncode == 0
-        run_result = dcos_node.run(args=['cat', filename])
-        assert run_result.stdout.strip().decode() == str(tty)
+        if not sys.stdout.isatty():  # pragma: no cover
+            reason = (
+                'For this test to be valid, stdout must be a TTY. '
+                'Use ``--capture=no / -s`` to run this test.'
+            )
+            raise pytest.skip(reason)
+        else:  # pragma: no cover
+            assert echo_result.returncode == 0
+            assert echo_result.stdout.strip().decode() == str(tty)
 
     def test_shell(
         self,
@@ -505,110 +682,202 @@ class TestRun:
         assert echo_result.stdout.strip().decode() == 'hello, world'
         assert echo_result.stderr.strip().decode() == ''
 
-    @pytest.mark.parametrize('shell', [True, False])
-    @pytest.mark.parametrize('log_output_live', [True, False])
-    def test_error(
-        self,
-        caplog: LogCaptureFixture,
-        dcos_node: Node,
-        shell: bool,
-        log_output_live: bool,
-    ) -> None:
+    def test_error(self, dcos_node: Node) -> None:
         """
         Commands which return a non-0 code raise a ``CalledProcessError``.
         """
         with pytest.raises(CalledProcessError) as excinfo:
-            dcos_node.run(
-                args=['rm', 'does_not_exist'],
-                shell=shell,
-                log_output_live=log_output_live,
-            )
+            dcos_node.run(args=['rm', 'does_not_exist'])
 
         exception = excinfo.value
         assert exception.returncode == 1
-        error_message = (
-            'rm: cannot remove ‘does_not_exist’: No such file or directory'
-        )
-        if log_output_live:
-            assert exception.stderr.strip() == b''
-            assert exception.stdout.decode().strip() == error_message
-        else:
-            assert exception.stdout.strip() == b''
-            assert exception.stderr.decode().strip() == error_message
-        # The stderr output is not in the debug log output.
-        debug_messages = set(
-            filter(
-                lambda record: record.levelno == logging.DEBUG,
-                caplog.records,
-            ),
-        )
-        matching_messages = set(
-            filter(
-                lambda record: 'No such file' in record.getMessage(),
-                caplog.records,
-            ),
-        )
-        assert bool(len(debug_messages & matching_messages)) is log_output_live
-
-    def test_log_output_live_and_tty(self, dcos_node: Node) -> None:
-        """
-        A ``ValueError`` is raised if ``tty`` is ``True`` and
-        ``log_output_live`` is ``True``.
-        """
-        with pytest.raises(ValueError) as excinfo:
-            dcos_node.run(
-                args=['echo', '1'],
-                log_output_live=True,
-                tty=True,
-            )
-
-        expected_message = '`log_output_live` and `tty` cannot both be `True`.'
-        assert str(excinfo.value) == expected_message
 
 
-class TestAdvancedInstallationMethod:
+class TestOutput:
     """
-    Test installing DC/OS on a node.
+    Tests for the ``output`` parameter of ``Node.run``.
     """
 
-    def test_install_dcos_from_url(self, oss_artifact_url: str) -> None:
+    def test_default(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+    ) -> None:
         """
-        It is possible to install DC/OS on a node from a URL.
-        """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            for nodes, role in (
-                (cluster.masters, Role.MASTER),
-                (cluster.agents, Role.AGENT),
-                (cluster.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_url(
-                        build_artifact=oss_artifact_url,
-                        dcos_config=cluster.base_config,
-                        role=role,
-                    )
-            cluster.wait_for_dcos_oss()
+        By default, stderr and stdout are captured in the output.
 
-    def test_install_dcos_from_path(self, oss_artifact: Path) -> None:
+        stderr is logged.
         """
-        It is possible to install DC/OS on a node from a path.
+        stdout_message = uuid.uuid4().hex
+        stderr_message = uuid.uuid4().hex
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(args=args, shell=True)
+        assert result.stdout.strip().decode() == stdout_message
+        assert result.stderr.strip().decode() == stderr_message
+
+        args_log, result_log = caplog.records
+
+        assert args_log.levelno == logging.WARNING
+        assert stdout_message in args_log.message
+        assert stderr_message in args_log.message
+        assert 'echo' in args_log.message
+
+        assert result_log.levelno == logging.WARNING
+        assert result_log.message == stderr_message
+
+    @pytest.mark.parametrize(
+        'stdout_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    @pytest.mark.parametrize(
+        'stderr_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    def test_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+        stdout_message: str,
+        stderr_message: str,
+    ) -> None:
         """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
-        with Cluster(cluster_backend=cluster_backend) as cluster:
-            for nodes, role in (
-                (cluster.masters, Role.MASTER),
-                (cluster.agents, Role.AGENT),
-                (cluster.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_path(
-                        build_artifact=oss_artifact,
-                        dcos_config=cluster.base_config,
-                        role=role,
-                    )
-            cluster.wait_for_dcos_oss()
+        When given ``Output.CAPTURE``, stderr and stdout are captured in the
+        output.
+
+        stderr is logged.
+        """
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
+        assert result.stdout.strip().decode() == stdout_message
+        assert result.stderr.strip().decode() == stderr_message
+
+        args_log, result_log = caplog.records
+
+        assert args_log.levelno == logging.WARNING
+        assert stdout_message in args_log.message
+        assert stderr_message in args_log.message
+        assert 'echo' in args_log.message
+
+        assert result_log.levelno == logging.WARNING
+        assert result_log.message == stderr_message
+
+    @pytest.mark.parametrize(
+        'stdout_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    @pytest.mark.parametrize(
+        'stderr_message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    def test_log_and_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+        stdout_message: str,
+        stderr_message: str,
+    ) -> None:
+        """
+        When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
+        in the output as stdout.
+
+        stdout and stderr are logged.
+        """
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(
+            args=args,
+            shell=True,
+            output=Output.LOG_AND_CAPTURE,
+        )
+
+        # stderr is merged into stdout.
+        # This is not ideal but for now it is the case.
+        # The order is not necessarily preserved.
+        expected_messages = set([stdout_message, stderr_message])
+        result_stdout = result.stdout.strip().decode()
+        assert set(result_stdout.split('\n')) == expected_messages
+
+        first_log, second_log = caplog.records
+        assert first_log.levelno == logging.DEBUG
+        assert second_log.levelno == logging.DEBUG
+
+        messages = set([first_log.message, second_log.message])
+        assert messages == expected_messages
+
+    def test_not_utf_8_log_and_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+    ) -> None:
+        """
+        It is possible to see output of commands which output non-utf-8
+        bytes using ``output.LOG_AND_CAPTURE``.
+        """
+        # We expect that this will trigger a UnicodeDecodeError when run on a
+        # node, if the result is meant to be decoded with utf-8.
+        # It also is not so long that it will kill our terminal.
+        args = ['head', '-c', '100', '/bin/cat']
+        dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
+        # We do not test the output, but we at least test its length for now.
+        [log] = caplog.records
+        assert len(log.message) >= 100
+
+    def test_not_utf_8_capture(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+    ) -> None:
+        """
+        It is possible to capture output of commands which output non-utf-8
+        bytes using ``output.CAPTURE``.
+        """
+        # We expect that this will trigger a UnicodeDecodeError when run on a
+        # node, if the result is meant to be decoded with utf-8.
+        # It also is not so long that it will kill our terminal.
+        args = ['head', '-c', '100', '/bin/cat']
+        args = ['>&2'] + args
+        dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
+        _, result_log = caplog.records
+        # We do not test the output, but we at least test its length for now.
+        assert len(result_log.message) >= 100
+
+    def test_no_capture(
+        self,
+        capfd: CaptureFixture,
+        dcos_node: Node,
+    ) -> None:
+        """
+        When given ``Output.NO_CAPTURE``, no output is captured.
+        """
+        stdout_message = uuid.uuid4().hex
+        stderr_message = uuid.uuid4().hex
+        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        result = dcos_node.run(args=args, shell=True, output=Output.NO_CAPTURE)
+        assert result.stdout is None
+        assert result.stderr is None
+
+        captured = capfd.readouterr()
+        assert captured.out.strip() == stdout_message
+        assert captured.err.strip() == stderr_message
+
+    @pytest.mark.parametrize('output', list(Output))
+    def test_errors(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+        output: Output,
+    ) -> None:
+        """
+        Errors are always logged at the error level.
+        """
+        args = ['rm', 'does_not_exist']
+        output = Output.CAPTURE
+        with pytest.raises(subprocess.CalledProcessError):
+            dcos_node.run(args=args, shell=True, output=output)
+        [record] = caplog.records
+        assert record.levelno == logging.ERROR
+        expected_message = 'No such file or directory'
+        assert expected_message in record.message

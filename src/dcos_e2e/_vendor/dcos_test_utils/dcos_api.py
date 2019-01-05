@@ -147,13 +147,19 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
             auth_user = DcosUser({'token': dcos_acs_token})
         masters = os.getenv('MASTER_HOSTS')
         slaves = os.getenv('SLAVE_HOSTS')
+        windows_slaves = os.getenv('WINDOWS_HOSTS')
         public_slaves = os.getenv('PUBLIC_SLAVE_HOSTS')
+        windows_public_slaves = os.getenv('WINDOWS_PUBLIC_HOSTS')
+        if windows_slaves:
+            slaves = ",".join((slaves, windows_slaves))
+        if windows_public_slaves:
+            public_slaves = ",".join((public_slaves, windows_public_slaves))
         return {
             'auth_user': auth_user,
             'dcos_url': os.getenv('DCOS_DNS_ADDRESS', 'http://leader.mesos'),
-            'masters': masters.split(',') if masters else None,
-            'slaves': slaves.split(',') if slaves else None,
-            'public_slaves': public_slaves.split(',') if public_slaves else None}
+            'masters': masters.split(',') if masters is not None else None,
+            'slaves': slaves.split(',') if slaves is not None else [],
+            'public_slaves': public_slaves.split(',') if public_slaves is not None else []}
 
     @property
     def masters(self) -> List[str]:
@@ -366,7 +372,7 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
             # slaves can be unknown here. For those, this endpoint
             # returns a 404. Retry in this case, until this endpoint
             # is confirmed to work for all known agents.
-            uri = '/slave/{}/slave%281%29/state.json'.format(slave_id)
+            uri = '/slave/{}/slave%281%29/state'.format(slave_id)
             r = self.get(uri)
             if r.status_code == 404:
                 return False
@@ -436,7 +442,7 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         if wait_for_hosts and not node_lists_set:
             raise Exception(
                 'This cluster is set to wait for hosts, however, not all host lists '
-                'were suppplied. Please set all three environment variables of MASTER_HOSTS, '
+                'were supplied. Please set all three environment variables of MASTER_HOSTS, '
                 'SLAVE_HOSTS, and PUBLIC_SLAVE_HOSTS to the appropriate cluster IPs (comma separated). '
                 'Alternatively, set WAIT_FOR_HOSTS=false in the environment to use whichever hosts '
                 'are currently registered.')

@@ -1,0 +1,8 @@
+Usage: minidcos aws doctor [OPTIONS]
+
+  Diagnose common issues which stop this CLI from working correctly.
+
+Options:
+  -v, --verbose  Use verbose output. Use this option multiple times for more
+                 verbose output.
+  -h, --help     Show this message and exit.

@@ -5,6 +5,7 @@ Utilities to connect to nodes with Docker exec.
 import io
 import os
 import subprocess
+import sys
 import tarfile
 import uuid
 from ipaddress import IPv4Address
@@ -12,6 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import docker
+from docker.models.containers import Container
 
 from dcos_e2e._common import get_logger, run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
@@ -44,13 +46,7 @@ def _compose_docker_command(
     Returns:
         The full ``docker exec`` command to be run.
     """
-    client = docker.from_env(version='auto')
-    containers = client.containers.list()
-    [container] = [
-        container for container in containers
-        if container.attrs['NetworkSettings']['IPAddress'] ==
-        str(public_ip_address)
-    ]
+    container = _get_container_from_ip_address(public_ip_address)
 
     docker_exec_args = [
         'docker',
@@ -59,8 +55,12 @@ def _compose_docker_command(
         user,
     ]
 
-    if tty:
+    # Do not cover this because there is currently no test for
+    # using this in a terminal in the CI.
+    if sys.stdin.isatty():  # pragma: no cover
         docker_exec_args.append('--interactive')
+
+    if tty:
         docker_exec_args.append('--tty')
 
     for key, value in env.items():
@@ -87,6 +87,7 @@ class DockerExecTransport(NodeTransport):
         tty: bool,
         ssh_key_path: Path,
         public_ip_address: IPv4Address,
+        capture_output: bool,
     ) -> subprocess.CompletedProcess:
         """
         Run a command on this node the given user.
@@ -101,11 +102,10 @@ class DockerExecTransport(NodeTransport):
                 values.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
-                This means that the values of stdout and stderr will not be in
-                the returned ``subprocess.CompletedProcess``.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
+            capture_output: Whether to capture output in the result.
 
         Returns:
             The representation of the finished process.
@@ -125,7 +125,7 @@ class DockerExecTransport(NodeTransport):
         return run_subprocess(
             args=docker_exec_args,
             log_output_live=log_output_live,
-            pipe_output=not tty,
+            pipe_output=capture_output,
         )
 
     def popen(
@@ -203,6 +203,7 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         ).stdout.strip().decode()
 
         tmp_path = '{home}/dcos-docker-{uuid}'.format(
@@ -218,17 +219,16 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         )
 
-        client = docker.from_env(version='auto')
-        containers = client.containers.list()
-        [container] = [
-            container for container in containers
-            if container.attrs['NetworkSettings']['IPAddress'] ==
-            str(public_ip_address)
-        ]
+        container = _get_container_from_ip_address(public_ip_address)
         tarstream = io.BytesIO()
-        with tarfile.TarFile(fileobj=tarstream, mode='w') as tar:
+        with tarfile.TarFile(
+            fileobj=tarstream,
+            mode='w',
+            dereference=True,
+        ) as tar:
             tar.add(name=str(local_path), arcname='/' + remote_path.name)
         tarstream.seek(0)
 
@@ -245,6 +245,7 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         )
 
         self.run(
@@ -255,4 +256,22 @@ class DockerExecTransport(NodeTransport):
             tty=False,
             ssh_key_path=ssh_key_path,
             public_ip_address=public_ip_address,
+            capture_output=True,
         )
+
+
+def _get_container_from_ip_address(ip_address: IPv4Address) -> Container:
+    """
+    Return the ``Container`` with the given ``ip_address``.
+    """
+    client = docker.from_env(version='auto')
+    containers = client.containers.list()
+    matching_containers = []
+    for container in containers:
+        networks = container.attrs['NetworkSettings']['Networks']
+        for net in networks:
+            if networks[net]['IPAddress'] == str(ip_address):
+                matching_containers.append(container)
+
+    assert len(matching_containers) == 1
+    return matching_containers[0]

@@ -1,7 +1,8 @@
 """
-Tests for using the test harness with a DC/OS Enterprise cluster.
+5ests for using the test harness with a DC/OS Enterprise cluster.
 """
 
+import json
 import subprocess
 import uuid
 from pathlib import Path
@@ -9,8 +10,9 @@ from pathlib import Path
 import requests
 from passlib.hash import sha512_crypt
 
-from dcos_e2e.backends import ClusterBackend
+from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Output, Role
 
 
 class TestEnterpriseIntegrationTests:
@@ -21,7 +23,7 @@ class TestEnterpriseIntegrationTests:
     def test_run_pytest(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -39,12 +41,13 @@ class TestEnterpriseIntegrationTests:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.CAPTURE,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
@@ -57,7 +60,7 @@ class TestEnterpriseIntegrationTests:
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
             )
 
 
@@ -69,7 +72,7 @@ class TestCopyFiles:
     def test_copy_files_to_installer(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -110,14 +113,13 @@ class TestCopyFiles:
             'license_key_contents': license_key_contents,
         }
 
-        files_to_copy_to_installer = (
+        files_to_copy_to_genconf_dir = [
             (cert_path, installer_cert_path),
             (ca_key_path, installer_key_path),
-        )
+        ]
 
         with Cluster(
             cluster_backend=cluster_backend,
-            files_to_copy_to_installer=files_to_copy_to_installer,
             masters=1,
             agents=0,
             public_agents=0,
@@ -129,12 +131,14 @@ class TestCopyFiles:
             )
 
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
 
             # We exercise the "http_checks=False" code here but we do not test
@@ -156,7 +160,7 @@ class TestCopyFiles:
     def test_copy_directory_to_installer(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -197,11 +201,10 @@ class TestCopyFiles:
             'license_key_contents': license_key_contents,
         }
 
-        files_to_copy_to_installer = ((cert_dir_on_host, genconf), )
+        files_to_copy_to_genconf_dir = ((cert_dir_on_host, genconf), )
 
         with Cluster(
             cluster_backend=cluster_backend,
-            files_to_copy_to_installer=files_to_copy_to_installer,
             masters=1,
             agents=0,
             public_agents=0,
@@ -213,12 +216,87 @@ class TestCopyFiles:
             )
 
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            )
+
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
+            master_url = 'https://' + str(master.public_ip_address)
+            response = requests.get(master_url, verify=str(cert_path))
+            response.raise_for_status()
+
+    def test_copy_directory_to_node_installer_genconf_dir(
+        self,
+        cluster_backend: ClusterBackend,
+        enterprise_installer: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        Directories can be copied to the ``genconf`` directory from the host
+        to the installing node when installing DC/OS.
+
+        Supplying a custom CA certificate directory is a good example for this
+        capability. See CA certificate tests in Enterprise DC/OS for more
+        details.
+        """
+        cert_filename = 'dcos-ca-certificate.crt'
+        key_filename = 'dcos-ca-certificate-key.key'
+
+        genconf = Path('/genconf')
+        installer_cert_path = genconf / 'certificates' / cert_filename
+        installer_key_path = genconf / 'certificates' / key_filename
+
+        cert_dir_on_host = Path('tests/test_dcos_e2e/certificates').resolve()
+        cert_path = cert_dir_on_host / cert_filename
+        ca_key_path = cert_dir_on_host / key_filename
+
+        master_key_path = Path(
+            '/var/lib/dcos/pki/tls/CA/private/custom_ca.key',
+        )
+
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+
+        config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'security': 'strict',
+            'ca_certificate_path': str(installer_cert_path),
+            'ca_certificate_key_path': str(installer_key_path),
+            'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
+        }
+
+        with Cluster(
+            cluster_backend=cluster_backend,
+            masters=1,
+            agents=0,
+            public_agents=0,
+        ) as cluster:
+            (master, ) = cluster.masters
+            master.send_file(
+                local_path=ca_key_path,
+                remote_path=master_key_path,
+            )
+            master.install_dcos_from_path(
+                dcos_installer=enterprise_installer,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
+                ip_detect_path=cluster_backend.ip_detect_path,
+                role=Role.MASTER,
+                files_to_copy_to_genconf_dir=[(cert_dir_on_host, genconf)],
+                output=Output.CAPTURE,
             )
 
             cluster.wait_for_dcos_ee(
@@ -230,19 +308,19 @@ class TestCopyFiles:
             response.raise_for_status()
 
 
-class TestSecurityDisabled:
+class TestSSLDisabled:
     """
-    Tests for clusters in security disabled mode.
+    Tests for clusters with SSL disabled.
     """
 
     def test_wait_for_dcos_ee(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_1_11_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
-        A cluster can start up in security disabled mode.
+        A cluster can start up with SSL disabled.
         """
         superuser_username = str(uuid.uuid4())
         superuser_password = str(uuid.uuid4())
@@ -260,17 +338,27 @@ class TestSecurityDisabled:
             public_agents=0,
         ) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_1_11_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+
+            # On 1.11 with security mode disabled, SSL is disabled.
+            any_master = next(iter(cluster.masters))
+            config_result = any_master.run(
+                args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
+            )
+            config = json.loads(config_result.stdout.decode())
+            ssl_enabled = config['ssl_enabled']
+            assert not ssl_enabled
 
 
 class TestWaitForDCOS:
@@ -281,7 +369,7 @@ class TestWaitForDCOS:
     def test_auth_with_cli(
         self,
         cluster_backend: ClusterBackend,
-        enterprise_artifact: Path,
+        enterprise_installer: Path,
         license_key_contents: str,
     ) -> None:
         """
@@ -299,14 +387,16 @@ class TestWaitForDCOS:
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                build_artifact=enterprise_artifact,
+                dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                log_output_live=True,
+                output=Output.CAPTURE,
+                ip_detect_path=cluster_backend.ip_detect_path,
             )
             (master, ) = cluster.masters
+
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
