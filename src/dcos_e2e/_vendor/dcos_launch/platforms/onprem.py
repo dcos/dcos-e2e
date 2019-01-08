@@ -11,6 +11,8 @@ from ...dcos_test_utils import onprem, ssh_client
 
 log = logging.getLogger(__name__)
 
+NGINX_DOCKER_IMAGE_VERSION = 'nginx:1.15.2'
+
 
 def get_client(
         cluster: onprem.OnpremCluster,
@@ -148,7 +150,7 @@ def do_genconf(
     start_docker_service(
         ssh_tunnel,
         nginx_service_name,
-        ['--publish=80:80', '--volume=' + volume_mount, 'nginx'])
+        ['--publish=80:80', '--volume=' + volume_mount, NGINX_DOCKER_IMAGE_VERSION])
 
 
 def curl(download_url: str, out_path: str) -> list:
