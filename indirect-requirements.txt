@@ -16,8 +16,8 @@ keyring==16.0.2
 # The 'secretstorage' distribution was not found and is required by keyring
 SecretStorage==3.1.0
 # Requirements from DC/OS Launch
+azure-common==1.1.16
+azure-datalake-store==0.0.40
 azure-mgmt-network==2.2.1
 azure-mgmt-resource==2.0.0
-# Without the following we get a version conflict.
-# In particular, ``requests`` requires ``idna<2.8`` at the time of writing.
-idna==2.7
+azure-monitor==0.3.1
