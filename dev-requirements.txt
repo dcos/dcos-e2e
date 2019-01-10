@@ -9,24 +9,24 @@ flake8==3.6.0
 homebrew-pypi-poet==0.10.0
 isort==4.3.4
 kazoo==2.6.0
-mypy==0.641
+mypy==0.650
 pip_check_reqs==2.0.3
 py==1.7.0
 pydocstyle==3.0.0
 pyenchant==2.0.0
-pygithub==1.43.3
-pylint==2.1.1
+pygithub==1.43.4
+pylint==2.2.2
 pyroma==2.4
-pytest-cov==2.6.0  # Measure code coverage
+pytest-cov==2.6.1  # Measure code coverage
 pytest-timeout==1.3.3
 requests-mock==1.5.2
-sphinx==1.8.2
-sphinx-autodoc-typehints==1.5.1
+sphinx==1.8.3
+sphinx-autodoc-typehints==1.6.0
 sphinx-click==1.4.1
 sphinx-paramlinks==0.3.5
 Sphinx-Substitution-Extensions==2018.11.12.3
 sphinxcontrib-spelling==4.2.0
-vendorize==0.1.0
+vendorize==0.2.0
 vulture==1.0
 yapf==0.25.0
 # We should also use https://github.com/pyga/ebb-lint when it is released for
