@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+- Fix issue where "RuntimeError: cannot join current thread" was shown.
+
 2019.01.05.0
 ------------
 
