@@ -86,7 +86,12 @@ def _check_docker_root_free_space() -> CheckLevels:
         'The Docker root directory is at "{docker_root_dir}". '
         'On macOS this location is on a hidden virtual machine. '
         'This directory has {free_space:.1f} GB of free space available. '
-        'If you encounter problems try running ``docker volume prune``.'
+        'If you encounter problems try running ``docker volume prune`` to free'
+        'space. '
+        'This will remove all local volumes not used by at least one '
+        'container. '
+        'However, space may be used by volumes used by stopped containers. '
+        'To remove stopped containers, use ``docker container prune``.'
     ).format(
         docker_root_dir=client.info()['DockerRootDir'],
         free_space=available_gigabytes,
