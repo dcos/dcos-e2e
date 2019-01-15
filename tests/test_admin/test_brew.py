@@ -95,5 +95,5 @@ def test_brew(tmpdir: local) -> None:
         print(log)
 
     status_code = container.wait()['StatusCode']
-    print(status_code)
-    container.remove()
+    assert status_code == 0
+    container.remove(force=True)
