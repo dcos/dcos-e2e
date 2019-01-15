@@ -94,7 +94,7 @@ def test_brew(tmpdir: local) -> None:
     )
 
     container.start()
-    for log in container.logs(stream=True):
+    for line in container.logs(stream=True):
         line = line.decode().strip()
         LOGGER.info(line)
 
