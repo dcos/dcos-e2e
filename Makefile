@@ -65,5 +65,5 @@ pull-images:
 	docker pull luca3m/sleep
 	# This is used for testing installation.
 	docker pull linuxbrew/linuxbrew
-	#i This is required for making Linux binaries
+	# This is required for making Linux binaries
 	docker pull python:3.6

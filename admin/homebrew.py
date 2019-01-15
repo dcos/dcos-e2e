@@ -65,9 +65,9 @@ def get_homebrew_formula(
     first = requirements[0]
 
     args = ['poet', first]
-    # for requirement in requirements[1:]:
-    #     args.append('--also')
-    #     args.append(requirement)
+    for requirement in requirements[1:]:
+        args.append('--also')
+        args.append(requirement)
 
     result = subprocess.run(args=args, stdout=subprocess.PIPE, check=True)
     resource_stanzas = str(result.stdout.decode())
