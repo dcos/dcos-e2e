@@ -83,10 +83,17 @@ def test_brew(tmpdir: local) -> None:
         command=' '.join(command_list),
     )
 
-    client.containers.run(
+    container = client.containers.create(
         image=linuxbrew_image,
         mounts=mounts,
         command=command,
         environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
-        remove=True,
     )
+
+    container.start()
+    for log in container.logs(stream=True):
+        print(log)
+
+    status_code = container.wait()['StatusCode']
+    print(status_code)
+    container.remove()
