@@ -49,10 +49,17 @@ def test_linux_binaries() -> None:
             str(remote_path),
             '--version',
         ]
-        cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
-        client.containers.run(
+        command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
+        client.containers.create(
             image='python:3.6',
             mounts=mounts,
-            command=cmd,
-            remove=True,
+            command=command,
         )
+
+        container.start()
+        for log in container.logs(stream=True):
+            print(log)
+
+        status_code = container.wait()['StatusCode']
+        assert status_code == 0
+        container.remove(force=True)
