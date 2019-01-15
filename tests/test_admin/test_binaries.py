@@ -58,7 +58,8 @@ def test_linux_binaries() -> None:
 
         container.start()
         for log in container.logs(stream=True):
-            print(log)
+            line = line.decode().strip()
+            LOGGER.info(line)
 
         status_code = container.wait()['StatusCode']
         assert status_code == 0
