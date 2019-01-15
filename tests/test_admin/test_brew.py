@@ -2,6 +2,7 @@
 Tests for Homebrew and Linuxbrew.
 """
 
+import logging
 import subprocess
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from dulwich.repo import Repo
 from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from admin.homebrew import get_homebrew_formula
+
+LOGGER = logging.getLogger(__name__)
 
 
 def test_brew(tmpdir: local) -> None:
@@ -83,10 +86,18 @@ def test_brew(tmpdir: local) -> None:
         command=' '.join(command_list),
     )
 
-    client.containers.run(
+    container = client.containers.create(
         image=linuxbrew_image,
         mounts=mounts,
         command=command,
         environment={'HOMEBREW_NO_AUTO_UPDATE': 1},
-        remove=True,
     )
+
+    container.start()
+    for line in container.logs(stream=True):
+        line = line.decode().strip()
+        LOGGER.info(line)
+
+    status_code = container.wait()['StatusCode']
+    assert status_code == 0
+    container.remove(force=True)
