@@ -120,4 +120,4 @@ class DockerLoopbackVolume:
         On exiting, destroy the loopback volume.
         """
         DockerLoopbackVolume.destroy(self._container)
-        return True
+        return False
