@@ -34,16 +34,15 @@ class TestDockerLoopbackVolume:
                 assert exit_code == 0, device.path + ': ' + output.decode()
 
                 block_device_has_right_size = [
-                    'stat',
-                    '-f',
-                    '"%z"',
+                    'blockdev',
+                    '--getsize64',
                     device.path,
                 ]
                 exit_code, output = new_container.exec_run(
                     cmd=block_device_has_right_size,
                 )
                 assert exit_code == 0, device.path + ': ' + output.decode()
-                assert output == '1048576'
+                assert output == str(1024 * 1024)
             finally:
                 new_container.stop()
                 new_container.remove()
