@@ -17,13 +17,13 @@ class TestDockerLoopbackVolume:
         A block device is created which is accessible to multiple containers.
         """
         client = docker.from_env(version='auto')
+        container = client.containers.create(
+            privileged=True,
+            detach=True,
+            image='centos:7',
+            entrypoint =['/bin/sleep', 'infinity'],
+        )
         with DockerLoopbackVolume(size_megabytes=size_megabytes) as device:
-            container = client.containers.create(
-                privileged=True,
-                detach=True,
-                image='centos:7',
-                entrypoint =['/bin/sleep', 'infinity'],
-            )
             container.start()
             path = device.path
             block_device_exists = ['lsblk', path]
