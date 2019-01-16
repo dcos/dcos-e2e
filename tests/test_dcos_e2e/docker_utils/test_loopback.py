@@ -11,12 +11,12 @@ class TestDockerLoopbackVolume:
     Tests for setting device mapping on master or agent Docker containers.
     """
 
-    def test_loopback(self) -> None:
+    @pytest.mark.parametrize('size_megabytes', [1, 2])
+    def test_loopback(self, size_megabytes: int) -> None:
         """
         A block device is created which is accessible to multiple containers.
         """
         client = docker.from_env(version='auto')
-        size_megabytes = 1
         with DockerLoopbackVolume(size_megabytes=size_megabytes) as device:
             container = client.containers.create(
                 privileged=True,
