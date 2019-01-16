@@ -16,36 +16,31 @@ class TestDockerLoopbackVolume:
         A block device is created which is accessible to multiple containers.
         """
         client = docker.from_env(version='auto')
-
-        with DockerLoopbackVolume(size_megabytes=1) as device:
-            new_container = client.containers.create(
+        size_megabytes = 1
+        with DockerLoopbackVolume(size_megabytes=size_megabytes) as device:
+            container = client.containers.create(
                 privileged=True,
                 detach=True,
                 image='centos:7',
                 entrypoint =['/bin/sleep', 'infinity'],
             )
-            new_container.start()
+            container.start()
+            path = device.path
+            block_device_exists = ['lsblk', path]
+            block_device_has_right_size = ['blockdev', '--getsize64', path]
+            exists_exit_code, exists_output = container.exec_run(
+                cmd=block_device_exists,
+            )
+            size_exit_code, size_output = container.exec_run(
+                cmd=block_device_has_right_size,
+            )
+            container.stop()
+            container.remove()
 
-            try:
-                block_device_exists_cmd = ['lsblk', device.path]
-                exit_code, output = new_container.exec_run(
-                    cmd=block_device_exists_cmd,
-                )
-                assert exit_code == 0, device.path + ': ' + output.decode()
-
-                block_device_has_right_size = [
-                    'blockdev',
-                    '--getsize64',
-                    device.path,
-                ]
-                exit_code, output = new_container.exec_run(
-                    cmd=block_device_has_right_size,
-                )
-                assert exit_code == 0, device.path + ': ' + output.decode()
-                assert output.decode().strip() == str(1024 * 1024)
-            finally:
-                new_container.stop()
-                new_container.remove()
+            assert exists_exit_code == 0, path + ': ' + exists_output.decode()
+            assert size_exit_code == 0, path + ': ' + size_output.decode()
+            expected_output = str(1024 * 1024 * size_megabytes)
+            assert size_output.decode().strip() == expected_output
 
     def test_labels(self) -> None:
         """
