@@ -34,13 +34,14 @@ class TestDockerLoopbackVolume:
             size_exit_code, size_output = container.exec_run(
                 cmd=block_device_has_right_size,
             )
-            container.stop()
-            container.remove()
 
-            assert exists_exit_code == 0, path + ': ' + exists_output.decode()
-            assert size_exit_code == 0, path + ': ' + size_output.decode()
-            expected_output = str(1024 * 1024 * size_megabytes)
-            assert size_output.decode().strip() == expected_output
+        container.stop()
+        container.remove()
+
+        assert exists_exit_code == 0, path + ': ' + exists_output.decode()
+        assert size_exit_code == 0, path + ': ' + size_output.decode()
+        expected_output = str(1024 * 1024 * size_megabytes)
+        assert size_output.decode().strip() == expected_output
 
     def test_labels(self) -> None:
         """
