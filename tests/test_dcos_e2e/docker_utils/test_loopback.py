@@ -22,6 +22,7 @@ class TestDockerLoopbackVolume:
                 privileged=True,
                 detach=True,
                 image='centos:7',
+                entrypoint =['/bin/sleep', 'infinity'],
             )
             new_container.start()
 
