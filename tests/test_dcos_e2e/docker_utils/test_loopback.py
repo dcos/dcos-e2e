@@ -21,7 +21,7 @@ class TestDockerLoopbackVolume:
             privileged=True,
             detach=True,
             image='centos:7',
-            entrypoint =['/bin/sleep', 'infinity'],
+            entrypoint=['/bin/sleep', 'infinity'],
         )
         with DockerLoopbackVolume(size_megabytes=size_megabytes) as device:
             container.start()
