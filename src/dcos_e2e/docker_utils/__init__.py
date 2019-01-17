@@ -10,7 +10,7 @@ import docker
 from dcos_e2e.backends import Docker
 
 
-class DockerLoopbackVolume():
+class DockerLoopbackVolume:
     """
     A loopback device sidecar, created in a Docker container.
     """
@@ -120,4 +120,4 @@ class DockerLoopbackVolume():
         On exiting, destroy the loopback volume.
         """
         DockerLoopbackVolume.destroy(self._container)
-        return True
+        return False
