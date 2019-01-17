@@ -105,9 +105,12 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
     owner = os.environ.get('USER')
     if owner:
         user_config.setdefault('tags', {'owner': owner})
+
     # validate against the fields common to all configs
     user_config['config_dir'] = config_dir
     validator = LaunchValidator(COMMON_SCHEMA, config_dir=config_dir, allow_unknown=True)
+    if 'dcos_version' in user_config:
+        user_config['dcos_version'] = validator.normalized(user_config)['dcos_version']
     if not validator.validate(user_config):
         _raise_errors(validator)
 
@@ -159,6 +162,9 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
                     os.environ['AWS_REGION'] if 'AWS_REGION' in os.environ else
                     util.set_from_env('AWS_DEFAULT_REGION')}})
         if provider == 'onprem':
+            if user_config.get('os_name', 'cent-os-7-dcos-prereqs') == 'cent-os-7-dcos-prereqs':
+                user_config['install_prereqs'] = True
+                user_config['prereqs_script_filename'] = 'run_centos74_prereqs.sh'
             validator.schema.update(AWS_ONPREM_SCHEMA)
     elif platform in ('gcp', 'gce'):
         if provider != 'terraform':
@@ -187,8 +193,7 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
         _raise_errors(validator)
     if 'genconf_dir' in user_config:
         if 'dcos_config' in user_config:
-            genconf_dir = expand_path(user_config['genconf_dir'], user_config['config_dir'])
-            _validate_genconf_scripts(genconf_dir, user_config['dcos_config'])
+            _validate_genconf_scripts(user_config['genconf_dir'], user_config['dcos_config'])
     return validator.normalized(user_config)
 
 
@@ -204,8 +209,11 @@ COMMON_SCHEMA = {
             'terraform']},
     'config_dir': {
         'type': 'string',
-        'required': False
-    },
+        'required': False},
+    'dcos_version': {
+        'type': ['string', 'float'],
+        'required': False,
+        'coerce': lambda version: str(version)},
     'launch_config_version': {
         'type': 'integer',
         'required': True,
@@ -285,6 +293,11 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
     'deployment_name': {
         'type': 'string',
         'required': True},
+    'enable_selinux': {
+        'type': 'boolean',
+        'default_setter': lambda doc:
+            doc.get('dcos_version', '') >= '1.12' and 'dcos-enterprise' in doc['installer_url'] and
+            doc['os_name'] == 'cent-os-7-dcos-prereqs'},
     'platform': {
         'type': 'string',
         'required': True,
@@ -342,6 +355,7 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'type': 'string',
         'required': False,
         'default': 'genconf',
+        'coerce': 'expand_local_path',
         'validator': _validate_genconf_dir
         },
     'fault_domain_helper': {
@@ -403,7 +417,7 @@ AWS_ONPREM_SCHEMA = {
         'type': 'string',
         'required': False,
         # bootstrap node requires docker to be installed
-        'default': 'cent-os-7-dcos-prereqs',
+        'default': 'cent-os-7.4-with-docker-selinux-disabled',
         'allowed': list(aws.OS_AMIS.keys())},
     'instance_ami': {
         'type': 'string',

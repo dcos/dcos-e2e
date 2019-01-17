@@ -11,7 +11,7 @@ template_parameters:
     masterEndpointDNSNamePrefix: testing-foo-bar
     agentEndpointDNSNamePrefix: testing-baz-qux
     agentCount: 4
-    oauthEnabled: false
+    oauthEnabled: "false" # Azure specifically expects the boolean value for this field as a string
     nameSuffix: 12435
 tags:
     expiration: 2weeks
