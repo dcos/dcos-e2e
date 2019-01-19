@@ -214,7 +214,7 @@ class AWSCluster(ClusterManager):
         self.cluster_info = {}  # type: Dict[str, Any]
 
         aws_distros = {
-            Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
+            Distribution.CENTOS_7: 'cent-os-7.4',
             Distribution.COREOS: 'coreos',
             Distribution.RHEL_7: 'rhel-7-dcos-prereqs',
         }
