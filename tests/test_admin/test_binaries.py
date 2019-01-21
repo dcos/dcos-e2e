@@ -41,7 +41,16 @@ def test_linux_binaries() -> None:
     client = docker.from_env(version='auto')
 
     for remote_path in remote_paths:
+        # Unset LANG and LC_ALL to show that these are not necessary for the
+        # CLI to run.
+        # This was a problem when the binaries were built with Python < 3.7.
         cmd_in_container = [
+            'unset',
+            'LANG',
+            '&&',
+            'unset',
+            'LC_ALL',
+            '&&',
             'chmod',
             '+x',
             str(remote_path),
