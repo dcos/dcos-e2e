@@ -42,6 +42,12 @@ def test_linux_binaries() -> None:
 
     for remote_path in remote_paths:
         cmd_in_container = [
+            'unset',
+            'LANG',
+            '&&',
+            'unset',
+            'LC_ALL',
+            '&&',
             'chmod',
             '+x',
             str(remote_path),
