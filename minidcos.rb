@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.01.10.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.01.21.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -63,8 +63,8 @@ class Minidcos < Formula
   end
 
   resource "bcrypt" do
-    url "https://files.pythonhosted.org/packages/91/a5/fd19eac0252e56b4ce65ced937ae40024782c21108da7d830003b7f76cdb/bcrypt-3.1.5.tar.gz"
-    sha256 "136243dc44e5bab9b61206bd46fff3018bd80980b1a1dfbab64a22ff5745957f"
+    url "https://files.pythonhosted.org/packages/ce/3a/3d540b9f5ee8d92ce757eebacf167b9deedb8e30aedec69a2a072b2399bb/bcrypt-3.1.6.tar.gz"
+    sha256 "44636759d222baa62806bbceb20e96f75a015a6381690d1bc2eda91c01ec02ea"
   end
 
   resource "boto3" do
@@ -213,8 +213,8 @@ class Minidcos < Formula
   end
 
   resource "oauthlib" do
-    url "https://files.pythonhosted.org/packages/df/5f/3f4aae7b28db87ddef18afed3b71921e531ca288dc604eb981e9ec9f8853/oauthlib-2.1.0.tar.gz"
-    sha256 "ac35665a61c1685c56336bda97d5eefa246f1202618a1d6f34fccb1bdd404162"
+    url "https://files.pythonhosted.org/packages/a2/c8/fcb769d478397c92fbd922369a58b9356fa7c4e8ab024d133090bdb9e025/oauthlib-3.0.0.tar.gz"
+    sha256 "0a8b2e0daa7afb62bd1b0b387b7a3723fa9a35d1183694ca5a5c8e3d6df59913"
   end
 
   resource "paramiko" do
@@ -288,8 +288,8 @@ class Minidcos < Formula
   end
 
   resource "requests-oauthlib" do
-    url "https://files.pythonhosted.org/packages/62/49/88b3b9019c649f63e722208dc540dbcb144c6f53e24bf438117bec8e64dc/requests-oauthlib-1.1.0.tar.gz"
-    sha256 "eabd8eb700ebed81ba080c6ead96d39d6bdc39996094bd23000204f6965786b0"
+    url "https://files.pythonhosted.org/packages/de/a2/f55312dfe2f7a344d0d4044fdfae12ac8a24169dc668bd55f72b27090c32/requests-oauthlib-1.2.0.tar.gz"
+    sha256 "bd6533330e8748e94bf0b214775fed487d309b8b8fe823dc45641ebcd9a32f57"
   end
 
   resource "retry" do
@@ -353,8 +353,6 @@ class Minidcos < Formula
   end
 
   test do
-      ENV["LC_ALL"] = "en_US.utf-8"
-      ENV["LANG"] = "en_US.utf-8"
       system "#{bin}/dcos_docker", "--help"
   end
 end
