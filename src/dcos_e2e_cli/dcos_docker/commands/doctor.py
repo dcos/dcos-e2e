@@ -373,7 +373,7 @@ def _check_systemd() -> CheckLevels:
         type='bind',
     )
     try:
-        client.containers.run(
+        container = client.containers.run(
             image=tiny_image,
             mounts=[cgroup_mount],
             detach=True,
@@ -387,6 +387,10 @@ def _check_systemd() -> CheckLevels:
             error(message=message)
             return CheckLevels.ERROR
         raise
+
+    container.stop()
+    container.remove(v=True)
+
     return CheckLevels.NONE
 
 
