@@ -159,7 +159,7 @@ class TestSendFile:
         master_destination_dir = '/etc/{random}'.format(random=random)
         master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
@@ -188,7 +188,7 @@ class TestSendFile:
         master_destination_dir = Path(master_base_dir)
 
         dcos_node.send_file(
-            local_path=Path(str(local_file_path)),
+            local_path=local_file_path,
             remote_path=master_destination_dir / dir_name / file_name,
         )
 
@@ -200,7 +200,7 @@ class TestSendFile:
         local_file_path.write_text(new_content)
 
         dcos_node.send_file(
-            local_path=Path(str(dir_path)),
+            local_path=dir_path,
             remote_path=master_destination_dir,
         )
         args = ['cat', str(master_destination_dir / dir_name / file_name)]
@@ -227,7 +227,7 @@ class TestSendFile:
         )
         dcos_node.run(args=['mkdir', '--parent', str(master_destination_path)])
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path / file_name)]
@@ -249,7 +249,7 @@ class TestSendFile:
         local_file.write_text(content)
         master_destination_path = Path('/tmp/mydir/on_master_node.txt')
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
@@ -280,7 +280,7 @@ class TestSendFile:
         )
         master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
             user=testuser,
         )
@@ -323,12 +323,12 @@ class TestSendFile:
         master_destination_path = Path(master_destination_dir) / 'file.txt'
         with pytest.raises(CalledProcessError):
             dcos_node.send_file(
-                local_path=Path(str(local_file)),
+                local_path=local_file,
                 remote_path=master_destination_path,
                 user=testuser,
             )
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
             user=testuser,
             sudo=True,

@@ -15,9 +15,6 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from passlib.hash import sha512_crypt
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
@@ -179,13 +176,13 @@ class TestCustomKeyPair:
     Tests for passing a custom key pair to the AWS backend.
     """
 
-    def test_custom_key_pair(self, tmpdir: local) -> None:
+    def test_custom_key_pair(self, tmp_path: Path) -> None:
         """
         It is possible to pass a custom key pair to the AWS backend.
         """
         key_name = 'e2e-test-{random}'.format(random=uuid.uuid4().hex)
-        private_key_path = Path(str(tmpdir.join('private_key')))
-        public_key_path = Path(str(tmpdir.join('public_key')))
+        private_key_path = tmp_path / 'private_key'
+        public_key_path = tmp_path / 'public_key'
         _write_key_pair(
             public_key_path=public_key_path,
             private_key_path=private_key_path,
@@ -262,7 +259,7 @@ class TestDCOSInstallation:
     def test_install_dcos_with_custom_ip_detect(
         self,
         oss_installer_url: str,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to install DC/OS on an AWS with a custom IP detect
@@ -275,14 +272,14 @@ class TestDCOSInstallation:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_file = tmp_path / 'ip-detect'
             ip_detect_contents = dedent(
                 """\
                 #!/bin/bash
                 echo {ip_address}
                 """,
             ).format(ip_address=master.private_ip_address)
-            ip_detect_file.write(ip_detect_contents)
+            ip_detect_file.write_text(ip_detect_contents)
 
             cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
@@ -303,7 +300,7 @@ class TestDCOSInstallation:
     def test_install_dcos_with_custom_genconf(
         self,
         oss_installer_url: str,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to install DC/OS on an AWS including
@@ -316,14 +313,14 @@ class TestDCOSInstallation:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_file = tmp_path / 'ip-detect'
             ip_detect_contents = dedent(
                 """\
                 #!/bin/bash
                 echo {ip_address}
                 """,
             ).format(ip_address=master.private_ip_address)
-            ip_detect_file.write(ip_detect_contents)
+            ip_detect_file.write_text(ip_detect_contents)
 
             cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
