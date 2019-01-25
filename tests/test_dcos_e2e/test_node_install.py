@@ -105,7 +105,7 @@ class TestCopyFiles:
                 # Test that this overwrites the ``ip-detect`` script given
                 # by ``ip_detect_path``.
                 files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                    (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
                 role=Role.MASTER,
             )

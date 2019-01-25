@@ -285,7 +285,7 @@ class TestDCOSInstallation:
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,
-                ip_detect_path=Path(str(ip_detect_file)),
+                ip_detect_path=ip_detect_file,
             )
             cluster.wait_for_dcos_oss()
             cat_result = master.run(
@@ -328,7 +328,7 @@ class TestDCOSInstallation:
                 output=Output.CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                    (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
             )
             cluster.wait_for_dcos_oss()

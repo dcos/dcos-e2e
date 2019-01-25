@@ -477,7 +477,7 @@ class TestNetworks:
             master_destination_dir = '/etc/{random}'.format(random=random)
             master_destination_path = Path(master_destination_dir) / 'file.txt'
             master.send_file(
-                local_path=Path(str(local_file)),
+                local_path=local_file,
                 remote_path=master_destination_path,
                 transport=Transport.DOCKER_EXEC,
             )

@@ -204,7 +204,7 @@ class TestCopyFiles:
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                    (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
             )
             cluster.wait_for_dcos_oss()
@@ -244,7 +244,7 @@ class TestCopyFiles:
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                    (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
             )
             cluster.wait_for_dcos_oss()
