@@ -15,9 +15,6 @@ from typing import List
 
 import pytest
 from click.testing import CliRunner
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e_cli import dcos_docker, minidcos
 
@@ -304,13 +301,13 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_invalid_yaml(self, oss_installer: Path, tmpdir: local) -> None:
+    def test_invalid_yaml(self, oss_installer: Path, tmp_path: Path) -> None:
         """
         An error is shown if invalid YAML is given in the file given to
         ``--extra-config``.
         """
-        invalid_file = tmpdir.join(uuid.uuid4().hex)
-        invalid_file.write('@')
+        invalid_file = tmp_path / uuid.uuid4().hex
+        invalid_file.write_text('@')
         runner = CliRunner()
         result = runner.invoke(
             minidcos,
@@ -337,13 +334,13 @@ class TestCreate:
         # yapf: enable
         assert result.output == expected_message
 
-    def test_not_key_value(self, oss_installer: Path, tmpdir: local) -> None:
+    def test_not_key_value(self, oss_installer: Path, tmp_path: Path) -> None:
         """
         An error is shown if YAML is given for ``--extra-config`` which is not
         a key-value mapping.
         """
-        invalid_file = tmpdir.join(uuid.uuid4().hex)
-        invalid_file.write('example')
+        invalid_file = tmp_path / uuid.uuid4().hex
+        invalid_file.write_text('example')
         runner = CliRunner()
         result = runner.invoke(
             minidcos,
@@ -432,13 +429,13 @@ class TestCreate:
     def test_genconf_path_is_file(
         self,
         oss_installer: Path,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         Genconf path must be a directory.
         """
-        genconf_file = tmpdir.join('testfile')
-        genconf_file.write('test')
+        genconf_file = tmp_path / 'testfile'
+        genconf_file.write_text('test')
 
         runner = CliRunner()
         result = runner.invoke(
@@ -485,13 +482,13 @@ class TestCreate:
     def test_workspace_path_is_file(
         self,
         oss_installer: Path,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         ``--workspace-dir`` must be a directory.
         """
-        workspace_file = tmpdir.join('testfile')
-        workspace_file.write('test')
+        workspace_file = tmp_path / 'testfile'
+        workspace_file.write_text('test')
 
         runner = CliRunner()
         result = runner.invoke(
@@ -640,13 +637,13 @@ class TestSetupMacNetwork():
     Tests for the ``setup-mac-network`` subcommand.
     """
 
-    def test_suffix_not_ovpn(self, tmpdir: local) -> None:
+    def test_suffix_not_ovpn(self, tmp_path: Path) -> None:
         """
         If a configuration file does not have the 'ovpn' suffix, an error is
         shown.
         """
-        configuration_file = tmpdir.join('example.txt')
-        configuration_file.write('example')
+        configuration_file = tmp_path / 'example.txt'
+        configuration_file.write_text('example')
         runner = CliRunner()
         result = runner.invoke(
             minidcos,
@@ -674,13 +671,13 @@ class TestSetupMacNetwork():
         assert result.exit_code == 2
         assert result.output == expected_error
 
-    def test_configuration_already_exists(self, tmpdir: local) -> None:
+    def test_configuration_already_exists(self, tmp_path: Path) -> None:
         """
         If a configuration file already exists at the given location, an error
         is shown.
         """
-        configuration_file = tmpdir.join('example.ovpn')
-        configuration_file.write('example')
+        configuration_file = tmp_path / 'example.ovpn'
+        configuration_file.write_text('example')
         runner = CliRunner()
         result = runner.invoke(
             minidcos,

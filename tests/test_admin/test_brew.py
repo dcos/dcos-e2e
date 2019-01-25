@@ -9,14 +9,13 @@ from pathlib import Path
 import docker
 from docker.types import Mount
 from dulwich.repo import Repo
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from admin.homebrew import get_homebrew_formula
 
 LOGGER = logging.getLogger(__name__)
 
 
-def test_brew(tmpdir: local) -> None:
+def test_brew(tmp_path: Path) -> None:
     """
     It is possible to create a Homebrew formula and to install this with
     Linuxbrew.
@@ -25,7 +24,7 @@ def test_brew(tmpdir: local) -> None:
     version = '1'
     archive_name = '{version}.tar.gz'.format(version=version)
     local_repository = Repo('.')
-    archive_file = Path(str(tmpdir.join(archive_name)))
+    archive_file = tmp_path / archive_name
     archive_file.touch()
     # We do not use ``dulwich.porcelain.archive`` because it has no option to
     # use a gzip format.
@@ -56,7 +55,7 @@ def test_brew(tmpdir: local) -> None:
         homebrew_recipe_filename=homebrew_filename,
     )
 
-    homebrew_file = Path(str(tmpdir.join(homebrew_filename)))
+    homebrew_file = tmp_path / homebrew_filename
     homebrew_file.write_text(homebrew_formula_contents)
     container_homebrew_file_path = '/' + homebrew_filename
 

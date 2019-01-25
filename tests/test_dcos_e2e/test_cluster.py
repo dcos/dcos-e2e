@@ -14,7 +14,6 @@ from typing import Iterator, List
 import pytest
 from _pytest.logging import LogCaptureFixture
 from kazoo.client import KazooClient
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -178,7 +177,7 @@ class TestCopyFiles:
         self,
         cluster_backend: ClusterBackend,
         oss_installer: Path,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         Install a DC/OS cluster with a custom ``ip-detect`` script.
@@ -191,14 +190,14 @@ class TestCopyFiles:
         ) as cluster:
 
             (master, ) = cluster.masters
-            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_file = tmp_path / 'ip-detect'
             ip_detect_contents = dedent(
                 """\
                 #!/bin/bash
                 echo {ip_address}
                 """,
             ).format(ip_address=master.private_ip_address)
-            ip_detect_file.write(ip_detect_contents)
+            ip_detect_file.write_text(ip_detect_contents)
 
             cluster.install_dcos_from_path(
                 dcos_installer=oss_installer,
@@ -218,7 +217,7 @@ class TestCopyFiles:
         self,
         cluster_backend: ClusterBackend,
         oss_installer_url: str,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         Install a DC/OS cluster with a custom ``ip-detect`` script.
@@ -231,14 +230,14 @@ class TestCopyFiles:
         ) as cluster:
 
             (master, ) = cluster.masters
-            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_file = tmp_path / 'ip-detect'
             ip_detect_contents = dedent(
                 """\
                 #!/bin/bash
                 echo {ip_address}
                 """,
             ).format(ip_address=master.private_ip_address)
-            ip_detect_file.write(ip_detect_contents)
+            ip_detect_file.write_text(ip_detect_contents)
 
             cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
