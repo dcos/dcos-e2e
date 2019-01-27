@@ -358,16 +358,6 @@ class DockerCluster(ClusterManager):
             type='bind',
         )
 
-        # Mount cgroups into agents for Mesos DRF.
-        # See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for removing
-        # this.
-        cgroup_mount = Mount(
-            source='/sys/fs/cgroup',
-            target='/sys/fs/cgroup',
-            read_only=True,
-            type='bind',
-        )
-
         var_lib_docker_mount = Mount(
             source=None,
             target='/var/lib/docker',
@@ -386,7 +376,6 @@ class DockerCluster(ClusterManager):
         agent_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
-            cgroup_mount,
             var_lib_docker_mount,
             opt_mount,
             mesos_slave_mount,
