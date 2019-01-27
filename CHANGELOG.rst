@@ -6,11 +6,12 @@ Changelog
 Next
 ----
 
+* Stop mounting ``/sys/fs/cgroup`` into Docker agents.
+
 2019.01.27.0
 ------------
 
-2019.01.21.0
-------------
+* Add more ``minidcos docker doctor`` checks.
 
 2019.01.10.0
 ------------

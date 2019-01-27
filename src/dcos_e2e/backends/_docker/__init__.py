@@ -358,21 +358,14 @@ class DockerCluster(ClusterManager):
             type='bind',
         )
 
-        var_lib_docker_mount = Mount(
-            source=None,
-            target='/var/lib/docker',
-        )
+        var_lib_docker_mount = Mount(source=None, target='/var/lib/docker')
+        opt_mount = Mount(source=None, target='/opt')
+        mesos_slave_mount = Mount(source=None, target='/var/lib/mesos/slave')
 
-        opt_mount = Mount(
-            source=None,
-            target='/opt',
-        )
-
-        mesos_slave_mount = Mount(
-            source=None,
-            target='/var/lib/mesos/slave',
-        )
-
+        # It used to be the case that we mounted ``/sys/fs/cgroup`` to agents.
+        # The details of exactly why this was are not clear.
+        # A comment said that this was "for Mesos DRF".
+        # This was removed so that we could support hosts without systemd.
         agent_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
