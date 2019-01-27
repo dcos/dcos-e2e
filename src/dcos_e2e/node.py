@@ -614,10 +614,9 @@ class Node:
         ).stdout.decode().strip()
 
         with tarfile.open(str(local_tar_path), 'w', dereference=True) as tar:
-            arcname = remote_path.relative_to(remote_path.parent)
+            arcname = Path(remote_path.name)
             if is_dir == 'True':
-                filename = local_path.relative_to(local_path.parent)
-                arcname = arcname / filename
+                arcname = arcname / local_path.name
             tar.add(str(local_path), arcname=str(arcname), recursive=True)
 
         # `remote_path` may be a tmpfs mount.

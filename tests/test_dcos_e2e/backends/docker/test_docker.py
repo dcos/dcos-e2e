@@ -10,13 +10,10 @@ import uuid
 from pathlib import Path
 from typing import Iterator
 
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
 import docker
 import pytest
 from docker.models.networks import Network
 from docker.types import Mount
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 from requests_mock import Mocker, NoMockAddress
 from retry import retry
 
@@ -62,18 +59,18 @@ class TestDockerBackend:
     Tests for functionality specific to the Docker backend.
     """
 
-    def test_custom_mounts(self, tmpdir: local) -> None:
+    def test_custom_mounts(self, tmp_path: Path) -> None:
         """
         It is possible to mount local files to master nodes.
         """
-        local_all_file = tmpdir.join('all_file.txt')
-        local_all_file.write('')
-        local_master_file = tmpdir.join('master_file.txt')
-        local_master_file.write('')
-        local_agent_file = tmpdir.join('agent_file.txt')
-        local_agent_file.write('')
-        local_public_agent_file = tmpdir.join('public_agent_file.txt')
-        local_public_agent_file.write('')
+        local_all_file = tmp_path / 'all_file.txt'
+        local_all_file.write_text('')
+        local_master_file = tmp_path / 'master_file.txt'
+        local_master_file.write_text('')
+        local_agent_file = tmp_path / 'agent_file.txt'
+        local_agent_file.write_text('')
+        local_public_agent_file = tmp_path / 'public_agent_file.txt'
+        local_public_agent_file.write_text('')
 
         master_path = Path('/etc/on_master_nodes.txt')
         agent_path = Path('/etc/on_agent_nodes.txt')
@@ -131,7 +128,7 @@ class TestDockerBackend:
             ]:
                 for node in nodes:
                     content = str(uuid.uuid4())
-                    local_file.write(content)
+                    local_file.write_text(content)
                     args = ['cat', str(path)]
                     result = node.run(args=args)
                     assert result.stdout.decode() == content
@@ -455,7 +452,7 @@ class TestNetworks:
     def test_docker_exec_transport(
         self,
         docker_network: Network,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         ``Node`` operations with the Docker exec transport work even if the
@@ -471,13 +468,13 @@ class TestNetworks:
         ) as cluster:
             (master, ) = cluster.masters
             content = str(uuid.uuid4())
-            local_file = tmpdir.join('example_file.txt')
-            local_file.write(content)
+            local_file = tmp_path / 'example_file.txt'
+            local_file.write_text(content)
             random = uuid.uuid4().hex
             master_destination_dir = '/etc/{random}'.format(random=random)
             master_destination_path = Path(master_destination_dir) / 'file.txt'
             master.send_file(
-                local_path=Path(str(local_file)),
+                local_path=local_file,
                 remote_path=master_destination_path,
                 transport=Transport.DOCKER_EXEC,
             )

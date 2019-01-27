@@ -5,10 +5,6 @@ Tests for installing DC/OS on cluster nodes.
 from pathlib import Path
 from textwrap import dedent
 
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
-
 from dcos_e2e.backends import Docker
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
@@ -76,7 +72,7 @@ class TestCopyFiles:
         self,
         cluster_backend: ClusterBackend,
         oss_installer: Path,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to copy files to the ``genconf`` directory.
@@ -89,14 +85,14 @@ class TestCopyFiles:
         ) as cluster:
 
             (master, ) = cluster.masters
-            ip_detect_file = tmpdir.join('ip-detect')
+            ip_detect_file = tmp_path / 'ip-detect'
             ip_detect_contents = dedent(
                 """\
                 #!/bin/bash
                 echo {ip_address}
                 """,
             ).format(ip_address=master.private_ip_address)
-            ip_detect_file.write(ip_detect_contents)
+            ip_detect_file.write_text(ip_detect_contents)
 
             master.install_dcos_from_path(
                 dcos_installer=oss_installer,
@@ -105,7 +101,7 @@ class TestCopyFiles:
                 # Test that this overwrites the ``ip-detect`` script given
                 # by ``ip_detect_path``.
                 files_to_copy_to_genconf_dir=[
-                    (Path(str(ip_detect_file)), Path('/genconf/ip-detect')),
+                    (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
                 role=Role.MASTER,
             )
