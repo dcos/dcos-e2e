@@ -357,43 +357,6 @@ def _check_docker_supports_mounts() -> CheckLevels:
     return CheckLevels.NONE
 
 
-def _check_systemd() -> CheckLevels:
-    """
-    Check that the host supports systemd.
-
-    See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for removing the need
-    for this.
-    """
-    client = docker_client()
-    tiny_image = 'luca3m/sleep'
-    cgroup_mount = docker.types.Mount(
-        source='/sys/fs/cgroup/systemd',
-        target='/sys/fs/cgroup/systemd',
-        read_only=True,
-        type='bind',
-    )
-    try:
-        container = client.containers.run(
-            image=tiny_image,
-            mounts=[cgroup_mount],
-            detach=True,
-        )
-    except docker.errors.APIError as exc:
-        expected = (
-            'bind mount source path does not exist: /sys/fs/cgroup/systemd"'
-        )
-        if expected in str(exc):
-            message = 'systemd is required.'
-            error(message=message)
-            return CheckLevels.ERROR
-        raise
-
-    container.stop()
-    container.remove(v=True)
-
-    return CheckLevels.NONE
-
-
 def _check_can_build() -> CheckLevels:
     """
     Check that the default cluster images can be built.
@@ -485,7 +448,6 @@ def doctor(verbose: int) -> None:
         check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
-        _check_systemd,
     ]
 
     # Ideally no checks would create ``Cluster``s.
