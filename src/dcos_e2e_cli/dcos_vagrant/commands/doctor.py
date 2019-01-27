@@ -60,12 +60,15 @@ def check_vagrant_plugins() -> CheckLevels:
     import vagrant
 
     client = vagrant.Vagrant()
-    if 'vagrant-vbguest' in set(
-        plugin.name for plugin in client.plugin_list()
-    ):
+    plugin_list = client.plugin_list()
+    if 'vagrant-vbguest' in set(plugin.name for plugin in plugin_list):
         return CheckLevels.NONE
 
-    error(message='The `vagrant-vbguest` plugin must be installed.')
+    message = (
+        'The "vagrant-vbguest" plugin must be installed. '
+        'Run "vagrant plugin install vagrant-vbguest".'
+    )
+    error(message=message)
     return CheckLevels.ERROR
 
 
