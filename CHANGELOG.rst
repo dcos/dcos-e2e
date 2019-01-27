@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.01.27.1
+------------
+
 * Stop mounting ``/sys/fs/cgroup`` into Docker agents.
 
 2019.01.27.0

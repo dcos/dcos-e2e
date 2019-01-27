@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.01.27.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.01.27.1"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -68,13 +68,13 @@ class Minidcos < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/ce/fd/10e1e6b10f688ab7bb583dd2adf532e8de0332ba98728d95eb956d2bdaaa/boto3-1.9.76.tar.gz"
-    sha256 "9d2e79eb36486c8ea1979b966c1993a948765466237bf8b8035e1a191d2fbdc4"
+    url "https://files.pythonhosted.org/packages/d2/ae/a3a6a0176e5e29716d5f5f89572525689f0d3eb031fc3091000af9b4200c/boto3-1.9.86.tar.gz"
+    sha256 "63cd957ba663f5c10ff48ed904575eaa701314f79f18dbc59bd050311cd5f809"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/a4/3c/7024ae28a82007c30a0390c98614fd2de3da61824b284edd8ee74a4f5311/botocore-1.12.76.tar.gz"
-    sha256 "3dea3109b7b9c6aaed1f0c6dcb718f41e8b95c1137fbf01644c789fedcfd19cb"
+    url "https://files.pythonhosted.org/packages/8e/b3/b9f7ffa347057fa44c65197864eec6a8a53f5a24f613b1b7b3f2b755cc65/botocore-1.12.86.tar.gz"
+    sha256 "24444e7580f0114c3e9fff5d2032c6f0cfbf88691b1be3ba27c6922507a902ec"
   end
 
   resource "cachetools" do
@@ -113,8 +113,8 @@ class Minidcos < Formula
   end
 
   resource "cryptography" do
-    url "https://files.pythonhosted.org/packages/f3/39/d3904df7c56f8654691c4ae1bdb270c1c9220d6da79bd3b1fbad91afd0e1/cryptography-2.4.2.tar.gz"
-    sha256 "05a6052c6a9f17ff78ba78f8e6eb1d777d25db3b763343a1ae89a7a8670386dd"
+    url "https://files.pythonhosted.org/packages/69/ed/5e97b7f54237a9e4e6291b6e52173372b7fa45ca730d36ea90b790c0059a/cryptography-2.5.tar.gz"
+    sha256 "4946b67235b9d2ea7d31307be9d5ad5959d6c4a8f98f900157b47abddf698401"
   end
 
   resource "decorator" do
@@ -123,8 +123,8 @@ class Minidcos < Formula
   end
 
   resource "docker" do
-    url "https://files.pythonhosted.org/packages/cc/9c/50ec68951d10fc341b650a2f5a6ed3925f7e4adc245113acfe64eb61f46a/docker-3.6.0.tar.gz"
-    sha256 "145c673f531df772a957bd1ebc49fc5a366bcd55efa0e64bbd029f5cc7a1fd8e"
+    url "https://files.pythonhosted.org/packages/42/e1/784ec7b36b9b1592055b4c6f36f9cebfc320427cf56b8a9051f613d343f7/docker-3.7.0.tar.gz"
+    sha256 "2840ffb9dc3ef6d00876bde476690278ab13fa1f8ba9127ef855ac33d00c3152"
   end
 
   resource "docker-pycreds" do
@@ -263,8 +263,8 @@ class Minidcos < Formula
   end
 
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/77/ae/06047559c82066b16eb57094da60f5e0c6c7a09e2e951c9fc44761e1d9e5/pytest-4.1.0.tar.gz"
-    sha256 "5924060b374f62608a078494b909d341720a050b5224ff87e17e12377486a71d"
+    url "https://files.pythonhosted.org/packages/e2/1d/5aaae6a77d9699ebcc5cbed574c28272371b8915073a126a9ead961c8f6c/pytest-4.1.1.tar.gz"
+    sha256 "c3c573a29d7c9547fb90217ece8a8843aa0c1328a797e200290dc3d0b4b823be"
   end
 
   resource "python-dateutil" do
@@ -333,8 +333,8 @@ class Minidcos < Formula
   end
 
   resource "tqdm" do
-    url "https://files.pythonhosted.org/packages/f3/75/1072640a8ef9eb6cd338215800f0f3c6eb8150c0733aec47b57363d356d1/tqdm-4.29.0.tar.gz"
-    sha256 "79420109a762f82e20e8ecdc3b3bc1bc6c6536884a8de5fa86a50eb99386376a"
+    url "https://files.pythonhosted.org/packages/df/85/1b4a823ee751ae69d028f2b65f5127b03218dfab3289b6d720578fb724f2/tqdm-4.30.0.tar.gz"
+    sha256 "dd60ea2567baa013c625153ce41fd274209c69a5814513e1d635f20e5cd61b97"
   end
 
   resource "uritemplate" do
