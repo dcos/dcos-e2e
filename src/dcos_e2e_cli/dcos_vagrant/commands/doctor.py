@@ -38,6 +38,21 @@ def check_docker() -> CheckLevels:
     return CheckLevels.NONE
 
 
+def check_virtualbox() -> CheckLevels:
+    """
+    Error if VirtualBox is not installed.
+    """
+    if shutil.which('VBoxManage') is None:
+        message = (
+            '"VBoxManage" is not available on the PATH. '
+            'To resolve this, install VirtualBox from '
+            'https://www.virtualbox.org/wiki/Downloads.'
+        )
+        error(message=message)
+        return CheckLevels.ERROR
+    return CheckLevels.NONE
+
+
 def check_vagrant() -> CheckLevels:
     """
     Error if `vagrant` is not available on the path.
@@ -85,6 +100,7 @@ def doctor(verbose: int) -> None:
         check_ssh,
         check_vagrant,
         check_vagrant_plugins,
+        check_virtualbox,
     ]
 
     run_doctor_commands(check_functions=check_functions)
