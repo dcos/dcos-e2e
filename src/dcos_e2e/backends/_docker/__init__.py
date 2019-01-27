@@ -366,6 +366,7 @@ class DockerCluster(ClusterManager):
         # The details of exactly why this was are not clear.
         # A comment said that this was "for Mesos DRF".
         # This was removed so that we could support hosts without systemd.
+        # See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for details.
         agent_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
