@@ -18,6 +18,7 @@ breakpoint
 bytestring
 calledprocesserror
 centos
+cgroup
 cgroups
 changelog
 ci
@@ -43,6 +44,7 @@ env
 eval
 fallback
 filename
+fs
 func
 genconf
 gzip
@@ -121,6 +123,7 @@ subpackages
 subprocess
 sudo
 symlink
+sys
 systemctl
 systemd
 tarfile
