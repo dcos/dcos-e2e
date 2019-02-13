@@ -60,18 +60,19 @@ def test_brew(tmp_path: Path) -> None:
     container_homebrew_file_path = '/' + homebrew_filename
 
     archive_mount = Mount(
-        source=str(archive_file.absolute()),
+        source=str(archive_file.resolve().absolute()),
         target=container_archive_path,
         type='bind',
     )
 
     homebrew_file_mount = Mount(
-        source=str(homebrew_file.absolute()),
+        source=str(homebrew_file.resolve().absolute()),
         target=container_homebrew_file_path,
         type='bind',
     )
 
     mounts = [archive_mount, homebrew_file_mount]
+    client.images.pull(repository=linuxbrew_image, tag='latest')
     command_list = [
         'brew',
         'install',
