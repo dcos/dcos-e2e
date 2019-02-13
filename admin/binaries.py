@@ -34,6 +34,9 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     cmd_in_container = [
         'pip3',
         'install',
+        # See https://github.com/pypa/pip/issues/6163 for why we use this
+        # option.
+        '--no-use-pep517',
         '.[packaging]',
         '&&',
         'python',
