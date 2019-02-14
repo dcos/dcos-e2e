@@ -361,6 +361,23 @@ class DockerCluster(ClusterManager):
         var_lib_docker_mount = Mount(source=None, target='/var/lib/docker')
         opt_mount = Mount(source=None, target='/opt')
         mesos_slave_mount = Mount(source=None, target='/var/lib/mesos/slave')
+        # Comment why this is needed
+        # Switch to turn this off - to be noted in doctor
+        # Steps:
+        # Try:
+        #   mount /sys/fs/cgroup:/sys/fs/cgroup with kafka
+        #   ... if this works, we know the cgroup thing is the issue
+        #   mount None:/sys/fs/cgroup
+        #   install kafka
+        #   if this works...we know we just need space for /sys/fs/cgroup
+        # ...
+        # maybe we can use some Mesos options
+        cgroup_mount = Mount(
+            source='/sys/fs/cgroup',
+            target='/sys/fs/cgroup',
+            read_only=True,
+            type='bind',
+        )
 
         # It used to be the case that we mounted ``/sys/fs/cgroup`` to agents.
         # The details of exactly why this was are not clear.
@@ -373,6 +390,7 @@ class DockerCluster(ClusterManager):
             var_lib_docker_mount,
             opt_mount,
             mesos_slave_mount,
+            cgroup_mount,
             *cluster_backend.custom_container_mounts,
         ]
 
