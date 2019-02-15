@@ -385,7 +385,6 @@ class DockerCluster(ClusterManager):
             var_lib_docker_mount,
             opt_mount,
             mesos_slave_mount,
-            cgroup_mount,
         ]
 
         agent_mounts = [
