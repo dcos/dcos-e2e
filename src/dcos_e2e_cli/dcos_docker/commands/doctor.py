@@ -386,8 +386,7 @@ def _check_systemd() -> CheckLevels:
             message = (
                 'Launching various applications requires ``/sys/fs/cgroup`` '
                 'to be mounted from the host. '
-                'The applications which require ``/sys/fs/cgroup`` to be '
-                'mounted are those which XXX'
+                'This is because UCR applications require cgroup isolation. '
                 'Therefore, by default, ``/sys/fs/cgroup`` is mounted from '
                 'the host. '
                 'It appears that this is not available on the host. '
