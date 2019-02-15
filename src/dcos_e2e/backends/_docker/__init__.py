@@ -242,6 +242,23 @@ class Docker(ClusterBackend):
         self.one_master_host_port_map = one_master_host_port_map or {}
         self.container_name_prefix = container_name_prefix
 
+        # Deploying some applications, such as Kafka, read from the cgroups
+        # isolator to know their CPU quota.
+        # This is determined only by error messages when we attempt to deploy
+        # Kafka on a cluster without this mount.
+        # Therefore, we mount ``/sys/fs/cgroup`` from the host.
+        #
+        # This has a problem - some hosts do not have systemd, and therefore
+        # ``/sys/fs/cgroup`` is not available, and a mount error is shown.
+        # See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for details.
+        cgroup_mount = Mount(
+            source='/sys/fs/cgroup',
+            target='/sys/fs/cgroup',
+            read_only=True,
+            type='bind',
+        )
+        self.cgroup_mounts = [cgroup_mount]
+
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
         """
@@ -361,29 +378,19 @@ class DockerCluster(ClusterManager):
         var_lib_docker_mount = Mount(source=None, target='/var/lib/docker')
         opt_mount = Mount(source=None, target='/opt')
         mesos_slave_mount = Mount(source=None, target='/var/lib/mesos/slave')
-        # Deploying some applications, such as Kafka, read from the cgroups
-        # isolator to know their CPU quota.
-        # This is determined only by error messages when we attempt to deploy
-        # Kafka on a cluster without this mount.
-        # Therefore, we mount ``/sys/fs/cgroup`` from the host.
-        #
-        # This has a problem - some hosts do not have systemd, and therefore
-        # ``/sys/fs/cgroup`` is not available, and a mount error is shown.
-        # See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for details.
-        cgroup_mount = Mount(
-            source='/sys/fs/cgroup',
-            target='/sys/fs/cgroup',
-            read_only=True,
-            type='bind',
-        )
 
-        agent_mounts = [
+        base_agent_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
             var_lib_docker_mount,
             opt_mount,
             mesos_slave_mount,
             cgroup_mount,
+        ]
+
+        agent_mounts = [
+            *base_agent_mounts,
+            *cluster_backend.cgroup_mounts,
             *cluster_backend.custom_container_mounts,
         ]
 
