@@ -129,6 +129,7 @@ class Docker(ClusterBackend):
         transport: Transport = Transport.DOCKER_EXEC,
         network: Optional[docker.models.networks.Network] = None,
         one_master_host_port_map: Optional[Dict[str, int]] = None,
+        mount_sys_fs_cgroup: bool = True,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -178,6 +179,10 @@ class Docker(ClusterBackend):
                 master only if there are multiple master nodes. See `ports` in
                 `Containers.run`_. Currently, only Transmission Control
                 Protocol is supported.
+            mount_sys_fs_cgroup: Whether to mount ``/sys/fs/cgroup`` from the
+                host. This is required to run some applications such as Kafka
+                which read from ``cgroups`` isolators. Set this to ``False``
+                if ``/sys/fs/cgroup`` is not available on the host.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -220,6 +225,7 @@ class Docker(ClusterBackend):
             container_name_prefix: The prefix that all container names will
                 start with. This is useful, for example, for later finding all
                 containers started with this backend.
+            cgroup_mounts: Mounts to use for cgroups.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
@@ -257,7 +263,7 @@ class Docker(ClusterBackend):
             read_only=True,
             type='bind',
         )
-        self.cgroup_mounts = [cgroup_mount]
+        self.cgroup_mounts = [cgroup_mount] if mount_sys_fs_cgroup else []
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
