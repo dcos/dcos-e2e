@@ -180,9 +180,8 @@ class Docker(ClusterBackend):
                 `Containers.run`_. Currently, only Transmission Control
                 Protocol is supported.
             mount_sys_fs_cgroup: Whether to mount ``/sys/fs/cgroup`` from the
-                host. This is required to run some applications such as Kafka
-                which read from ``cgroups`` isolators. Set this to ``False``
-                if ``/sys/fs/cgroup`` is not available on the host.
+                host. This is required to run applications which require
+                cgroup isolation.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
