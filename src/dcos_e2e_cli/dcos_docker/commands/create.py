@@ -261,7 +261,10 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
     default=True,
     show_default=True,
     help=(
-        ''
+        'Mounting ``/sys/fs/cgroup`` from the host is required to run '
+        'applications which require ``cgroup`` isolation. '
+        'Choose to not mount ``/sys/fs/cgroup`` if it is not available on the '
+        'host.'
     ),
 )
 @masters_option
