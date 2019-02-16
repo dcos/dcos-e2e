@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.02.16.0
+------------
+
 * Mount ``/sys/fs/cgroup`` into Docker agents by default.
 * Add options to the CLI and library to disable mounting ``/sys/fs/cgroup``.
 
