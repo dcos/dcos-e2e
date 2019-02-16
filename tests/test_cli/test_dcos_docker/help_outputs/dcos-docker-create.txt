@@ -37,6 +37,12 @@ Options:
                                   The storage driver to use for Docker in
                                   Docker. By default this uses the host's
                                   driver.
+  --mount-sys-fs-cgroup / --no-mount-sys-fs-cgroup
+                                  Mounting ``/sys/fs/cgroup`` from the host is
+                                  required to run applications which require
+                                  ``cgroup`` isolation. Choose to not mount
+                                  ``/sys/fs/cgroup`` if it is not available on
+                                  the host.  [default: True]
   --masters INTEGER               The number of master nodes.  [default: 1]
   --agents INTEGER                The number of agent nodes.  [default: 1]
   --public-agents INTEGER         The number of public agent nodes.  [default:

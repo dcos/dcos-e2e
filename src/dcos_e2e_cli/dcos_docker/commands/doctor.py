@@ -383,9 +383,19 @@ def _check_systemd() -> CheckLevels:
             'bind mount source path does not exist: /sys/fs/cgroup/systemd"'
         )
         if expected in str(exc):
-            message = 'systemd is required.'
+            message = (
+                'Launching various applications requires ``/sys/fs/cgroup`` '
+                'to be mounted from the host. '
+                'This is because UCR applications require cgroup isolation. '
+                'Therefore, by default, ``/sys/fs/cgroup`` is mounted from '
+                'the host. '
+                'It appears that this is not available on the host. '
+                'Therefore, to launch a cluster you must use '
+                '``--no-mount-sys-fs-cgroup``. '
+                'Some applications will not work on the launched cluster.'
+            )
             error(message=message)
-            return CheckLevels.ERROR
+            return CheckLevels.WARNING
         raise
 
     container.stop()
