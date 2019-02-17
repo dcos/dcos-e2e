@@ -3,6 +3,7 @@ Tools for creating DC/OS clusters.
 """
 
 import sys
+import textwrap
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, Optional
@@ -41,7 +42,10 @@ def create_cluster(
         )
     except CalledProcessError as exc:
         click.echo('Error creating cluster.', err=True)
-        click.echo(doctor_message)
+        click.echo(click.style('Full error:', fg='yellow'))
+        click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
+        click.echo(doctor_message, err=True)
+
         sys.exit(exc.returncode)
 
 
