@@ -40,4 +40,5 @@ def sync_code(
         cluster=cluster,
         dcos_checkout_dir=Path(dcos_checkout_dir),
         dcos_variant=cluster_vms.dcos_variant,
+        sudo=True,
     )

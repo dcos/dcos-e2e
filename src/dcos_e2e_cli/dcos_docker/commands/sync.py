@@ -47,4 +47,5 @@ def sync_code(
         cluster=cluster,
         dcos_checkout_dir=Path(dcos_checkout_dir),
         dcos_variant=cluster_containers.dcos_variant,
+        sudo=False,
     )
