@@ -99,9 +99,6 @@ def run_doctor_commands(
     )
 
     for function in progress_bar:
-        # Enable at the start of each chunk, disable at the end, to avoid
-        # showing statistics at the end.
-        progress_bar.disable = False
         try:
             level = function()
         except Exception as exc:  # pylint: disable=broad-except
@@ -119,4 +116,3 @@ def run_doctor_commands(
 
         if level == CheckLevels.ERROR:
             sys.exit(1)
-        progress_bar.disable = True
