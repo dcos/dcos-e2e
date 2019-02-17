@@ -196,6 +196,7 @@ def sync_code_to_masters(
         dcos_checkout_dir: The path to a DC/OS (Enterprise) checkout to sync
             code from.
         dcos_variant: The DC/OS variant of the cluster.
+        sudo: Whether to use sudo for commands running on nodes.
     """
     local_packages = dcos_checkout_dir / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
