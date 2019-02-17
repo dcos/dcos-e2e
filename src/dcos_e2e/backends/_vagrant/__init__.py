@@ -124,7 +124,7 @@ class VagrantCluster(ClusterManager):
             root=str(path),
             env=vagrant_env,
             quiet_stdout=False,
-            quiet_stderr=True,
+            quiet_stderr=False,
         )
 
         self._vagrant_client.up()
