@@ -32,6 +32,7 @@ def _get_node_distribution(node: Node) -> Distribution:
         ('"rhel"', '"7.4"'): Distribution.RHEL_7,
         ('coreos', '1911.3.0'): Distribution.COREOS,
         ('coreos', '1632.3.0'): Distribution.COREOS,
+        ('coreos', '1967.6.0'): Distribution.COREOS,
     }
 
     distro_id = version_data['ID'].strip()
