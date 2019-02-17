@@ -28,3 +28,13 @@ azure-monitor==0.3.1
 # To avoid this issue, we pin an older version of entrypoints.
 entrypoints==0.2.3
 jeepney==0.3.1
+# Homebrew installation uses "--no-binary".
+# To avoid https://github.com/pypa/pip/issues/6222 we use "--no-use-pep-517".
+# However, using these together is not possible with modern ``python-dateutil``
+# as that shows the error:
+#
+# > Disabling PEP 517 processing is invalid: project specifies a build backend
+# > of setuptools.build_meta in pyproject.toml
+#
+# Therefore we pin an older ``python-dateutil``.
+python-dateutil==2.7.5
