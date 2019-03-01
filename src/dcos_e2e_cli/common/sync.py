@@ -197,6 +197,10 @@ def sync_code_to_masters(
             code from.
         dcos_variant: The DC/OS variant of the cluster.
         sudo: Whether to use sudo for commands running on nodes.
+
+    Raises:
+        click.BadArgumentUsage: If ``DCOS_CHECKOUT_DIR`` is set to something
+            that is not a checkout of a DC/OS repository.
     """
     local_packages = dcos_checkout_dir / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
