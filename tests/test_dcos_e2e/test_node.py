@@ -594,7 +594,7 @@ class TestRun:
                 'For this test to be valid, stdout must be a TTY. '
                 'Use ``--capture=no / -s`` to run this test.'
             )
-            raise pytest.skip(reason)
+            pytest.skip(reason)
         else:  # pragma: no cover
             assert echo_result.returncode == 0
             assert echo_result.stdout.strip().decode() == str(tty)

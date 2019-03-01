@@ -1,4 +1,5 @@
 AbstractLauncher
+BadArgumentUsage
 Dockerfiles
 RetryError
 RuntimeError
