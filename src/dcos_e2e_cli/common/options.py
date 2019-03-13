@@ -314,6 +314,7 @@ def dcos_login_uname_option(command: Callable[..., None],
             'The username to set the ``DCOS_LOGIN_UNAME`` environment '
             'variable to.'
         ),
+        show_default=True,
     )(command)  # type: Callable[..., None]
     return function
 

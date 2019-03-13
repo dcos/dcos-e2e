@@ -9,7 +9,7 @@ Options:
   -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
                                  default]
   --dcos-login-uname TEXT        The username to set the ``DCOS_LOGIN_UNAME``
-                                 environment variable to.
+                                 environment variable to.  [default: admin]
   --dcos-login-pw TEXT           The password to set the ``DCOS_LOGIN_PW``
                                  environment variable to.
   --sync-dir PATH                The path to a DC/OS checkout. Part of this
