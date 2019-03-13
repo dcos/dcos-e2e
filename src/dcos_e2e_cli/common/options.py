@@ -332,6 +332,7 @@ def dcos_login_pw_option(command: Callable[..., None]) -> Callable[..., None]:
             'The password to set the ``DCOS_LOGIN_PW`` environment variable '
             'to.'
         ),
+        show_default=True,
     )(command)  # type: Callable[..., None]
     return function
 
