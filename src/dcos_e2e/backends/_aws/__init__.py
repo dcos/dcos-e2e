@@ -192,7 +192,7 @@ class AWSCluster(ClusterManager):
 
         install_prereqs = {
             Distribution.COREOS:
-            False,
+            True,
             # There is a bug hit when using ``install_prereqs`` with some
             # distributions.
             # See https://jira.mesosphere.com/browse/DCOS-40894.
