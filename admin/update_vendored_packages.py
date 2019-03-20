@@ -46,7 +46,7 @@ def _get_requirements() -> List[_Requirement]:
         package_name='dcos_launch',
         install_directories=['dcos_launch'],
         https_address='https://github.com/dcos/dcos-launch',
-        git_reference='ff5ab0ee9f9dabc22f78d32d5dc14308c55b414e',
+        git_reference='629dc43a0d9b8956d1417f7d1caab34a57571f9a',
     )
 
     test_utils = _Requirement(
