@@ -37,7 +37,7 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
     def get_bootstrap_ssh_client(self):
         return self.get_ssh_client(user='bootstrap_ssh_user')
 
-    def get_completed_onprem_config(self, genconf_dir) -> dict:
+    def get_completed_onprem_config(self) -> dict:
         """ Will fill in the necessary and/or recommended sections of the config file, including:
         * starting a ZK backend if left undefined
         * filling in the master_list for a static exhibitor backend
@@ -72,6 +72,7 @@ class AbstractOnpremLauncher(util.AbstractLauncher, metaclass=abc.ABCMeta):
 
         # Check for ip-detect configuration and inject defaults if not present
         # set the simple default IP detect script if not provided
+        genconf_dir = self.config['genconf_dir']
         if not os.path.exists(genconf_dir):
             os.makedirs(genconf_dir)
         for script in ('ip_detect', 'ip_detect_public', 'fault_domain_detect'):
@@ -186,9 +187,8 @@ echo "{{\\"fault_domain\\":{{\\"region\\":{{\\"name\\": \\"$REGION\\"}},\\"zone\
         bootstrap_ssh_client.wait_for_ssh_connection(bootstrap_host)
         with bootstrap_ssh_client.tunnel(bootstrap_host) as t:
             installer_path = platforms_onprem.prepare_bootstrap(t, self.config['installer_url'])
-            genconf_dir = config.expand_path(self.config['genconf_dir'], self.config['config_dir'])
-            complete_config = self.get_completed_onprem_config(genconf_dir)
-            platforms_onprem.do_genconf(t, genconf_dir, installer_path)
+            complete_config = self.get_completed_onprem_config()
+            platforms_onprem.do_genconf(t, self.config['genconf_dir'], installer_path)
 
         prereqs_script_path = config.expand_path(pkg_resources.resource_filename(
             dcos_launch.__name__, 'scripts/' + self.config['prereqs_script_filename']), self.config['config_dir'])
@@ -199,7 +199,8 @@ echo "{{\\"fault_domain\\":{{\\"region\\":{{\\"name\\": \\"$REGION\\"}},\\"zone\
             prereqs_script_path,
             self.config['install_prereqs'],
             complete_config['bootstrap_url'] + '/dcos_install.sh',
-            self.config['onprem_install_parallelism'])
+            self.config['onprem_install_parallelism'],
+            self.config.get('enable_selinux'))
 
     def describe(self):
         """ returns host information stored in the config as

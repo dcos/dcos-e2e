@@ -13,6 +13,6 @@ template_parameters:
   agentCount: 1
   nameSuffix: 12345
   enableVMDiagnostics: false
-  oauthEnabled: true
+  oauthEnabled: "true" # Azure specifically expects the boolean value for this field as a string
 ssh_user: dcos
 

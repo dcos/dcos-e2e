@@ -1,7 +1,7 @@
 ---
 launch_config_version: 1
 deployment_name: dcos-onprem-with-new-stack
-installer_url: https://downloads.dcos.io/dcos/testing/master/dcos_generate_config.sh
+installer_url: https://downloads.mesosphere.com/dcos-enterprise/testing/master/dcos_generate_config.ee.sh
 platform: aws
 provider: onprem
 aws_region: us-west-2
@@ -21,3 +21,4 @@ num_private_agents: 1
 num_public_agents: 1
 ssh_user: centos
 key_helper: true
+dcos_version: 1.12
