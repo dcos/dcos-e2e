@@ -28,7 +28,7 @@ class AWS(ClusterBackend):
 
     def __init__(
         self,
-        aws_instance_type: str = 'm4.large',
+        aws_instance_type: str = 'm5.large',
         aws_region: str = 'us-west-2',
         admin_location: str = '0.0.0.0/0',
         linux_distribution: Distribution = Distribution.CENTOS_7,

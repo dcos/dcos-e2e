@@ -37,7 +37,7 @@ class TestDefaults:
         """
         The default ``aws_instance_type`` is correct.
         """
-        assert AWS().aws_instance_type == 'm4.large'
+        assert AWS().aws_instance_type == 'm5.large'
 
     def test_aws_region(self) -> None:
         """
