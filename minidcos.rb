@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.03.13.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.03.22.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -118,8 +118,8 @@ class Minidcos < Formula
   end
 
   resource "decorator" do
-    url "https://files.pythonhosted.org/packages/c4/26/b48aaa231644bc875bb348e162d156edb18b994da900a10f4493ea995a2f/decorator-4.3.2.tar.gz"
-    sha256 "33cd704aea07b4c28b3eb2c97d288a06918275dac0ecebdaf1bc8a48d98adb9e"
+    url "https://files.pythonhosted.org/packages/ba/19/1119fe7b1e49b9c8a9f154c930060f37074ea2e8f9f6558efc2eeaa417a2/decorator-4.4.0.tar.gz"
+    sha256 "86156361c50488b84a3f148056ea716ca587df2f0de1d34750d35c21312725de"
   end
 
   resource "docker" do
@@ -198,8 +198,8 @@ class Minidcos < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/71/4f/408da7e619c348782762d88f96d664086a97f6f2f70804367f3ca5e7d589/msrest-0.6.4.tar.gz"
-    sha256 "5dadd54bec98d52cd9f43fb095015c346135b8cafaa35f24c7309cc25d3ad266"
+    url "https://files.pythonhosted.org/packages/0b/ec/437da5296f540830eb7fe0d0d06e4f3f4d97b82ef369b637dec76bf20f3e/msrest-0.6.6.tar.gz"
+    sha256 "947e9155fb55bda98340e99c15e4115a268ff69aee0007aaa54b7bf05018029b"
   end
 
   resource "msrestazure" do
@@ -348,8 +348,8 @@ class Minidcos < Formula
   end
 
   resource "websocket_client" do
-    url "https://files.pythonhosted.org/packages/23/f9/d31c5ce35bdd865de3aa6453c0cae13a7fe6799a8b0d6967c767bbb83a30/websocket_client-0.55.0.tar.gz"
-    sha256 "f6029deea21218f2c771848935aa26c15699c831770f4fa66958bdaabff80ca0"
+    url "https://files.pythonhosted.org/packages/c5/01/8c9c7de6c46f88e70b5a3276c791a2be82ae83d8e0d0cc030525ee2866fd/websocket_client-0.56.0.tar.gz"
+    sha256 "1fd5520878b68b84b5748bb30e592b10d0a91529d5383f74f4964e72b297fd3a"
   end
 
 
