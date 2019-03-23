@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.03.22.1"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.03.23.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -354,12 +354,6 @@ class Minidcos < Formula
 
 
   def install
-    # Without this we hit various issues including
-    # https://github.com/takluyver/flit/issues/245.
-    # All of these issues are caught by CI so it is safe to remove this
-    # and then run CI.
-    ENV["PIP_USE_PEP517"] = "false"
-
     virtualenv_install_with_resources
   end
 
