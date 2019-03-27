@@ -250,6 +250,10 @@ class Cluster(ContextDecorator):
             # in.
             # In particular, we need the "albert" user to exist, or for no
             # users to exist, for the DC/OS Test Utils API session to work.
+            #
+            # Creating the "albert" user will error if the user already exists.
+            # Therefore, we delete the user.
+            # This command returns a 0 exit code even if the user is not found.
             any_master.run(args=delete_user_args)
             any_master.run(
                 args=create_user_args,

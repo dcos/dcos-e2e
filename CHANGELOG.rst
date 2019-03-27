@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Allow login after "wait" on 1.13.
+
 2019.03.23.0
 ------------
 
