@@ -205,32 +205,17 @@ class Cluster(ContextDecorator):
                 return
 
             email = 'albert@bekstil.net'
-            zk_path = '/dcos/users/{email}'.format(email=email)
-            server_option = (
-                '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
-                'zk-5.zk:2181"'
-            )
+            curl_url = ('http://localhost:8101/acs/api/v1/users/{email}'
+                        ).format(email=email)
 
-            delete_user_args = [
-                '.',
-                '/opt/mesosphere/environment.export',
-                '&&',
-                'zkCli.sh',
-                '-server',
-                server_option,
-                'delete',
-                zk_path,
-            ]
+            delete_user_args = ['curl', '-X', 'DELETE', curl_url]
 
             create_user_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
                 '&&',
-                'zkCli.sh',
-                '-server',
-                server_option,
-                'create',
-                zk_path,
+                'python',
+                '/opt/mesosphere/bin/dcos_add_user.py',
                 email,
             ]
 
@@ -260,14 +245,20 @@ class Cluster(ContextDecorator):
             # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
             any_master = next(iter(self.masters))
+            # We create a user.
             # This allows this function to work even after a user has logged
             # in.
+            # In particular, we need the "albert" user to exist, or for no
+            # users to exist, for the DC/OS Test Utils API session to work.
+            #
+            # Creating the "albert" user will error if the user already exists.
+            # Therefore, we delete the user.
+            # This command returns a 0 exit code even if the user is not found.
+            any_master.run(args=delete_user_args)
             any_master.run(
                 args=create_user_args,
                 shell=True,
-                output=Output.CAPTURE,
             )
-
             credentials = CI_CREDENTIALS
 
             api_session = DcosApiSession(
@@ -285,11 +276,7 @@ class Cluster(ContextDecorator):
             # Only the first user can log in with SSO, before granting others
             # access.
             # Therefore, we delete the user who was created to wait for DC/OS.
-            any_master.run(
-                args=delete_user_args,
-                shell=True,
-                output=Output.CAPTURE,
-            )
+            any_master.run(args=delete_user_args)
 
         wait_for_dcos_oss_until_timeout()
 

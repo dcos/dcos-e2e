@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Allow login after ``minidcos docker wait`` on DC/OS OSS 1.13.
+
 2019.03.23.0
 ------------
 
