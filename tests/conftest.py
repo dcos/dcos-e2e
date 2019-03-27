@@ -6,7 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from dcos_e2e.backends import ClusterBackend, Docker
+from dcos_e2e.backends import Docker
+from dcos_e2e.base_classes import ClusterBackend
 
 
 @pytest.fixture(scope='session')

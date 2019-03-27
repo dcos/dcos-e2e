@@ -10,14 +10,14 @@ import docker
 from dcos_e2e.backends import Docker
 
 
-class DockerLoopbackVolume():
+class DockerLoopbackVolume:
     """
     A loopback device sidecar, created in a Docker container.
     """
 
     def __init__(
         self,
-        size: int,
+        size_megabytes: int,
         labels: Optional[Dict[str, str]] = None,
     ) -> None:
         """
@@ -26,7 +26,7 @@ class DockerLoopbackVolume():
         disk to a cluster.
 
         Args:
-            size: Size of the block device in Megabytes.
+            size_megabytes: Size of the block device in Megabytes.
             labels: Docker labels to add to the container.
 
         Attributes:
@@ -55,7 +55,7 @@ class DockerLoopbackVolume():
             'if=/dev/zero',
             'of=volume0',
             'bs=1M',
-            'count={size}'.format(size=size),
+            'count={size}'.format(size=size_megabytes),
         ]
 
         exit_code, output = self._container.exec_run(
@@ -120,4 +120,4 @@ class DockerLoopbackVolume():
         On exiting, destroy the loopback volume.
         """
         DockerLoopbackVolume.destroy(self._container)
-        return True
+        return False

@@ -20,7 +20,8 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.types import Mount
 
 from dcos_e2e._common import get_logger, run_subprocess
-from dcos_e2e.backends._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
@@ -128,6 +129,7 @@ class Docker(ClusterBackend):
         transport: Transport = Transport.DOCKER_EXEC,
         network: Optional[docker.models.networks.Network] = None,
         one_master_host_port_map: Optional[Dict[str, int]] = None,
+        mount_sys_fs_cgroup: bool = True,
     ) -> None:
         """
         Create a configuration for a Docker cluster backend.
@@ -177,6 +179,9 @@ class Docker(ClusterBackend):
                 master only if there are multiple master nodes. See `ports` in
                 `Containers.run`_. Currently, only Transmission Control
                 Protocol is supported.
+            mount_sys_fs_cgroup: Whether to mount ``/sys/fs/cgroup`` from the
+                host. This is required to run applications which require
+                cgroup isolation.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -219,6 +224,7 @@ class Docker(ClusterBackend):
             container_name_prefix: The prefix that all container names will
                 start with. This is useful, for example, for later finding all
                 containers started with this backend.
+            cgroup_mounts: Mounts to use for cgroups.
 
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
@@ -240,6 +246,23 @@ class Docker(ClusterBackend):
         self.network = network
         self.one_master_host_port_map = one_master_host_port_map or {}
         self.container_name_prefix = container_name_prefix
+
+        # Deploying some applications, such as Kafka, read from the cgroups
+        # isolator to know their CPU quota.
+        # This is determined only by error messages when we attempt to deploy
+        # Kafka on a cluster without this mount.
+        # Therefore, we mount ``/sys/fs/cgroup`` from the host.
+        #
+        # This has a problem - some hosts do not have systemd, and therefore
+        # ``/sys/fs/cgroup`` is not available, and a mount error is shown.
+        # See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for details.
+        cgroup_mount = Mount(
+            source='/sys/fs/cgroup',
+            target='/sys/fs/cgroup',
+            read_only=True,
+            type='bind',
+        )
+        self.cgroup_mounts = [cgroup_mount] if mount_sys_fs_cgroup else []
 
     @property
     def cluster_cls(self) -> Type['DockerCluster']:
@@ -288,7 +311,7 @@ class DockerCluster(ClusterManager):
         #
         self._cluster_id = '{prefix}-{random}'.format(
             prefix=cluster_backend.container_name_prefix,
-            random=uuid.uuid4(),
+            random=str(uuid.uuid4())[:5],
         )
 
         # We work in a new directory.
@@ -357,38 +380,21 @@ class DockerCluster(ClusterManager):
             type='bind',
         )
 
-        # Mount cgroups into agents for Mesos DRF.
-        # See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for removing
-        # this.
-        cgroup_mount = Mount(
-            source='/sys/fs/cgroup',
-            target='/sys/fs/cgroup',
-            read_only=True,
-            type='bind',
-        )
+        var_lib_docker_mount = Mount(source=None, target='/var/lib/docker')
+        opt_mount = Mount(source=None, target='/opt')
+        mesos_slave_mount = Mount(source=None, target='/var/lib/mesos/slave')
 
-        var_lib_docker_mount = Mount(
-            source=None,
-            target='/var/lib/docker',
-        )
-
-        opt_mount = Mount(
-            source=None,
-            target='/opt',
-        )
-
-        mesos_slave_mount = Mount(
-            source=None,
-            target='/var/lib/mesos/slave',
-        )
-
-        agent_mounts = [
+        base_agent_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
-            cgroup_mount,
             var_lib_docker_mount,
             opt_mount,
             mesos_slave_mount,
+        ]
+
+        agent_mounts = [
+            *base_agent_mounts,
+            *cluster_backend.cgroup_mounts,
             *cluster_backend.custom_container_mounts,
         ]
 
@@ -465,7 +471,6 @@ class DockerCluster(ClusterManager):
     ) -> None:
         """
         Install DC/OS from a URL with a bootstrap node.
-        This is not supported and simply raises a ``NotImplementedError``.
 
         Args:
             dcos_installer: The URL string to an installer to install DC/OS
@@ -477,13 +482,20 @@ class DockerCluster(ClusterManager):
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
-
-        Raises:
-            NotImplementedError: ``NotImplementedError`` because the Docker
-                backend does not support the DC/OS advanced installation
-                method with a bootstrap node.
         """
-        raise NotImplementedError
+        cluster = Cluster.from_nodes(
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
+        )
+
+        cluster.install_dcos_from_url(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            output=output,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
 
     @property
     def base_config(self) -> Dict[str, Any]:

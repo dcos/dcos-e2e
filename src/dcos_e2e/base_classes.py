@@ -6,7 +6,7 @@ import abc
 from pathlib import Path
 from typing import Any, Dict, Iterable, Set, Tuple, Type
 
-from ..node import Node, Output
+from dcos_e2e.node import Node, Output
 
 
 class ClusterManager(abc.ABC):
@@ -45,10 +45,6 @@ class ClusterManager(abc.ABC):
         """
         Install DC/OS from a URL with a bootstrap node.
 
-        If a method which implements this abstract method raises a
-        ``NotImplementedError``, users of the backend can still install DC/OS
-        from a URL in an inefficient manner.
-
         Args:
             dcos_installer: The URL string to an installer to install DC/OS
                 from.
@@ -72,10 +68,6 @@ class ClusterManager(abc.ABC):
     ) -> None:
         """
         Install DC/OS from an installer passed as a file system `Path`.
-
-        If a method which implements this abstract method raises a
-        ``NotImplementedError``, users of the backend can still install DC/OS
-        from a path in an inefficient manner.
 
         Args:
             dcos_installer: The path to an installer to install DC/OS from.

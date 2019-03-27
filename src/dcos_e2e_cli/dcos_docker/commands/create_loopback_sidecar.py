@@ -37,7 +37,7 @@ def create_loopback_sidecar(size: int, name: str) -> None:
         raise click.BadParameter(message)
 
     loopback_volume = DockerLoopbackVolume(
-        size=size,
+        size_megabytes=size,
         labels={
             NODE_TYPE_LABEL_KEY: NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
             SIDECAR_NAME_LABEL_KEY: name,

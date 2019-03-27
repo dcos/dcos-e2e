@@ -5,9 +5,8 @@ Helpers for interacting with existing clusters.
 from pathlib import Path
 from typing import Any, Dict, Iterable, Set, Tuple, Type
 
-from dcos_e2e.node import Node, Output
-
-from ._base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.base_classes import ClusterBackend, ClusterManager
+from dcos_e2e.node import Node, Output, Role
 
 
 class ExistingCluster(ClusterBackend):
@@ -88,12 +87,35 @@ class ExistingClusterManager(ClusterManager):
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
-        Raises:
-            NotImplementedError: It is assumed that clusters created with the
-                :class:`ExistingCluster` backend already have an installed
-                instance of DC/OS running on them.
+        Install DC/OS from a URL with a bootstrap node.
+
+        Args:
+            dcos_installer: The URL string to an installer to install DC/OS
+                from.
+            dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script to use for installing
+                DC/OS.
+            output: What happens with stdout and stderr.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
-        raise NotImplementedError
+        for nodes, role in (
+            (self.masters, Role.MASTER),
+            (self.agents, Role.AGENT),
+            (self.public_agents, Role.PUBLIC_AGENT),
+        ):
+            for node in nodes:
+                node.install_dcos_from_url(
+                    dcos_installer=dcos_installer,
+                    dcos_config=dcos_config,
+                    ip_detect_path=ip_detect_path,
+                    files_to_copy_to_genconf_dir=(
+                        files_to_copy_to_genconf_dir
+                    ),
+                    role=role,
+                    output=output,
+                )
 
     def install_dcos_from_path_with_bootstrap_node(
         self,
@@ -104,12 +126,34 @@ class ExistingClusterManager(ClusterManager):
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
-        Raises:
-            NotImplementedError: It is assumed that clusters created with the
-                :class:`ExistingCluster` backend already have an installed
-                instance of DC/OS running on them.
+        Install DC/OS from an installer passed as a file system `Path`.
+
+        Args:
+            dcos_installer: The path to an installer to install DC/OS from.
+            dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The ``ip-detect`` script to use for installing
+                DC/OS.
+            output: What happens with stdout and stderr.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
         """
-        raise NotImplementedError
+        for nodes, role in (
+            (self.masters, Role.MASTER),
+            (self.agents, Role.AGENT),
+            (self.public_agents, Role.PUBLIC_AGENT),
+        ):
+            for node in nodes:
+                node.install_dcos_from_path(
+                    dcos_installer=dcos_installer,
+                    dcos_config=dcos_config,
+                    ip_detect_path=ip_detect_path,
+                    role=role,
+                    files_to_copy_to_genconf_dir=(
+                        files_to_copy_to_genconf_dir
+                    ),
+                    output=output,
+                )
 
     @property
     def base_config(self) -> Dict[str, Any]:

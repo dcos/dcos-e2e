@@ -19,9 +19,6 @@ import pytest
 from _pytest.capture import CaptureFixture
 from _pytest.fixtures import SubRequest
 from _pytest.logging import LogCaptureFixture
-# See https://github.com/PyCQA/pylint/issues/1536 for details on why the errors
-# are disabled.
-from py.path import local  # pylint: disable=no-name-in-module, import-error
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -63,24 +60,22 @@ class TestEquality:
     Tests for Node.__eq__
     """
 
-    def test_eq(self, tmpdir: local) -> None:
+    def test_eq(self, tmp_path: Path) -> None:
         """
         Two nodes are equal iff their IP addresses are equal.
         """
 
         content = str(uuid.uuid4())
-        key1_filename = 'foo.key'
-        key1_file = tmpdir.join(key1_filename)
-        key1_file.write(content)
-        key2_filename = 'bar.key'
-        key2_file = tmpdir.join(key2_filename)
-        key2_file.write(content)
+        node_ssh_key_filename = 'foo.key'
+        node_ssh_key = tmp_path / node_ssh_key_filename
+        node_ssh_key.write_text(content)
+        other_ssh_key_filename = 'bar.key'
+        other_ssh_key = tmp_path / other_ssh_key_filename
+        other_ssh_key.write_text(content)
 
         node_public_ip_address = IPv4Address('172.0.0.1')
         node_private_ip_address = IPv4Address('172.0.0.3')
         other_ip_address = IPv4Address('172.0.0.4')
-        node_ssh_key_path = Path(str(key1_file))
-        other_ssh_key_path = Path(str(key2_file))
         node_user = 'a'
         other_user = 'b'
         node_transport = Transport.DOCKER_EXEC
@@ -88,7 +83,7 @@ class TestEquality:
         node = Node(
             public_ip_address=node_public_ip_address,
             private_ip_address=node_private_ip_address,
-            ssh_key_path=node_ssh_key_path,
+            ssh_key_path=node_ssh_key,
             default_user=node_user,
             default_transport=node_transport,
         )
@@ -101,10 +96,7 @@ class TestEquality:
                     node_private_ip_address,
                     other_ip_address,
                 ):
-                    for ssh_key_path in (
-                        node_ssh_key_path,
-                        other_ssh_key_path,
-                    ):
+                    for ssh_key_path in (node_ssh_key, other_ssh_key):
                         for user in (node_user, other_user):
                             other_node = Node(
                                 public_ip_address=public_ip_address,
@@ -152,19 +144,19 @@ class TestSendFile:
     def test_send_file(
         self,
         dcos_node: Node,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to send a file to a cluster node as the default user.
         """
         content = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
+        local_file = tmp_path / 'example_file.txt'
+        local_file.write_text(content)
         random = uuid.uuid4().hex
         master_destination_dir = '/etc/{random}'.format(random=random)
         master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
@@ -174,7 +166,7 @@ class TestSendFile:
     def test_send_directory(
         self,
         dcos_node: Node,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to send a directory to a cluster node as the default
@@ -183,16 +175,17 @@ class TestSendFile:
         original_content = str(uuid.uuid4())
         dir_name = 'directory'
         file_name = 'example_file.txt'
-        dir_path = tmpdir.mkdir(dir_name)
-        local_file_path = dir_path.join(file_name)
-        local_file_path.write(original_content)
+        dir_path = tmp_path / dir_name
+        dir_path.mkdir()
+        local_file_path = dir_path / file_name
+        local_file_path.write_text(original_content)
 
         random = uuid.uuid4().hex
         master_base_dir = '/etc/{random}'.format(random=random)
         master_destination_dir = Path(master_base_dir)
 
         dcos_node.send_file(
-            local_path=Path(str(local_file_path)),
+            local_path=local_file_path,
             remote_path=master_destination_dir / dir_name / file_name,
         )
 
@@ -201,10 +194,10 @@ class TestSendFile:
         assert result.stdout.decode() == original_content
 
         new_content = str(uuid.uuid4())
-        local_file_path.write(new_content)
+        local_file_path.write_text(new_content)
 
         dcos_node.send_file(
-            local_path=Path(str(dir_path)),
+            local_path=dir_path,
             remote_path=master_destination_dir,
         )
         args = ['cat', str(master_destination_dir / dir_name / file_name)]
@@ -214,7 +207,7 @@ class TestSendFile:
     def test_send_file_to_directory(
         self,
         dcos_node: Node,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to send a file to a cluster node to a directory that
@@ -223,15 +216,15 @@ class TestSendFile:
         """
         content = str(uuid.uuid4())
         file_name = 'example_file.txt'
-        local_file = tmpdir.join(file_name)
-        local_file.write(content)
+        local_file = tmp_path / file_name
+        local_file.write_text(content)
 
         master_destination_path = Path(
             '/etc/{random}'.format(random=uuid.uuid4().hex),
         )
         dcos_node.run(args=['mkdir', '--parent', str(master_destination_path)])
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path / file_name)]
@@ -241,7 +234,7 @@ class TestSendFile:
     def test_send_file_to_tmp_directory(
         self,
         dcos_node: Node,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to send a file to a cluster node to a directory that
@@ -249,11 +242,11 @@ class TestSendFile:
         See ``DockerExecTransport.send_file`` for details.
         """
         content = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(content)
+        local_file = tmp_path / 'example_file.txt'
+        local_file.write_text(content)
         master_destination_path = Path('/tmp/mydir/on_master_node.txt')
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
         )
         args = ['cat', str(master_destination_path)]
@@ -263,7 +256,7 @@ class TestSendFile:
     def test_custom_user(
         self,
         dcos_node: Node,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to send a file to a cluster node as a custom user.
@@ -276,15 +269,15 @@ class TestSendFile:
         )
 
         random = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(random)
+        local_file = tmp_path / 'example_file.txt'
+        local_file.write_text(random)
         master_destination_dir = '/home/{testuser}/{random}'.format(
             testuser=testuser,
             random=random,
         )
         master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
             user=testuser,
         )
@@ -298,7 +291,7 @@ class TestSendFile:
     def test_sudo(
         self,
         dcos_node: Node,
-        tmpdir: local,
+        tmp_path: Path,
     ) -> None:
         """
         It is possible to use sudo to send a file to a directory which the
@@ -318,8 +311,8 @@ class TestSendFile:
         )
 
         random = str(uuid.uuid4())
-        local_file = tmpdir.join('example_file.txt')
-        local_file.write(random)
+        local_file = tmp_path / 'example_file.txt'
+        local_file.write_text(random)
         master_destination_dir = '/etc/{testuser}/{random}'.format(
             testuser=testuser,
             random=random,
@@ -327,12 +320,12 @@ class TestSendFile:
         master_destination_path = Path(master_destination_dir) / 'file.txt'
         with pytest.raises(CalledProcessError):
             dcos_node.send_file(
-                local_path=Path(str(local_file)),
+                local_path=local_file,
                 remote_path=master_destination_path,
                 user=testuser,
             )
         dcos_node.send_file(
-            local_path=Path(str(local_file)),
+            local_path=local_file,
             remote_path=master_destination_path,
             user=testuser,
             sudo=True,
@@ -345,18 +338,19 @@ class TestSendFile:
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
 
-    def test_send_symlink(self, dcos_node: Node, tmpdir: local) -> None:
+    def test_send_symlink(self, dcos_node: Node, tmp_path: Path) -> None:
         """
         If sending the path to a symbolic link, the link's target is sent.
         """
         random = str(uuid.uuid4())
-        dir_containing_real_file = tmpdir.mkdir(uuid.uuid4().hex)
-        dir_containing_symlink = tmpdir.mkdir(uuid.uuid4().hex)
-        local_file = dir_containing_real_file.join('example_file.txt')
-        local_file.write(random)
-        symlink_file = dir_containing_symlink.join('symlink.txt')
-        symlink_file_path = Path(str(symlink_file))
-        symlink_file_path.symlink_to(target=Path(str(local_file)))
+        dir_containing_real_file = tmp_path / uuid.uuid4().hex
+        dir_containing_real_file.mkdir()
+        dir_containing_symlink = tmp_path / uuid.uuid4().hex
+        dir_containing_symlink.mkdir()
+        local_file = dir_containing_real_file / 'example_file.txt'
+        local_file.write_text(random)
+        symlink_file_path = dir_containing_symlink / 'symlink.txt'
+        symlink_file_path.symlink_to(target=local_file)
         master_destination_dir = '/etc/{random}'.format(random=random)
         master_destination_path = Path(master_destination_dir) / 'file.txt'
         dcos_node.send_file(
@@ -600,7 +594,7 @@ class TestRun:
                 'For this test to be valid, stdout must be a TTY. '
                 'Use ``--capture=no / -s`` to run this test.'
             )
-            raise pytest.skip(reason)
+            pytest.skip(reason)
         else:  # pragma: no cover
             assert echo_result.returncode == 0
             assert echo_result.stdout.strip().decode() == str(tty)

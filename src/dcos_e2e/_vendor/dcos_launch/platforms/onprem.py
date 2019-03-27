@@ -8,8 +8,11 @@ import sys
 import retrying
 
 from ...dcos_test_utils import onprem, ssh_client
+from typing import Union
 
 log = logging.getLogger(__name__)
+
+NGINX_DOCKER_IMAGE_VERSION = 'nginx:1.15.2'
 
 
 def get_client(
@@ -68,7 +71,8 @@ def install_dcos(
         prereqs_script_path: str,
         install_prereqs: bool,
         bootstrap_script_url: str,
-        parallelism: int):
+        parallelism: int,
+        enable_selinux: Union[bool, None]):
     """
     Args:
         cluster: cluster abstraction for handling network addresses
@@ -76,20 +80,31 @@ def install_dcos(
         prereqs_script_path: if given, this will be run before preflight on any nodes
         bootstrap_script_url: where the installation script will be pulled from (see do_genconf)
         parallelism: how many concurrent SSH tunnels to run
+        enable_selinux: attempt to enable selinux on every node
     """
     # Check to make sure we can talk to the cluster
     for host in cluster.cluster_hosts:
         node_client.wait_for_ssh_connection(host.public_ip)
     # do genconf and configure bootstrap if necessary
     all_client = get_client(cluster, 'cluster_hosts', node_client, parallelism=parallelism)
+
+    # enable or disable selinux depending on the config
+    if enable_selinux is not None:
+        setenforce = '1' if enable_selinux else '0'
+        check_results(all_client.run_command('run', ['sudo setenforce ' + setenforce]), node_client, 'Set SELinux mode')
+
     # install prereqs if enabled
     if install_prereqs:
+        log.info('Copying prereqs installation script on cluster hosts')
+        check_results(
+            all_client.run_command('copy', prereqs_script_path, '~/install_prereqs.sh', False), node_client,
+            'copy install_prereqs script')
         log.info('Installing prerequisites on cluster hosts')
-        with open(prereqs_script_path, 'r') as p:
-            commands = p.readlines()
-            check_results(
-                all_client.run_command('run', commands), node_client, 'install_prereqs')
+        check_results(
+            all_client.run_command('run', ['chmod +x ~/install_prereqs.sh', '&&', '~/install_prereqs.sh']), node_client,
+            'install DC/OS prerequisites')
         log.info('Prerequisites installed.')
+
     # download install script from boostrap host and run it
     remote_script_path = '/tmp/install_dcos.sh'
     log.info('Starting preflight')
@@ -148,7 +163,7 @@ def do_genconf(
     start_docker_service(
         ssh_tunnel,
         nginx_service_name,
-        ['--publish=80:80', '--volume=' + volume_mount, 'nginx'])
+        ['--publish=80:80', '--volume=' + volume_mount, NGINX_DOCKER_IMAGE_VERSION])
 
 
 def curl(download_url: str, out_path: str) -> list:
@@ -238,14 +253,17 @@ def do_deploy(
 
 
 def do_postflight(client: ssh_client.AsyncSshClient):
-    """ Runs a script that will check if DC/OS is operational without needing to authenticate
+    """Runs a script that will check if DC/OS is operational without needing to authenticate
+
+    It waits 20mins+ for the cluster poststart checks to succeed.
+    See https://jira.mesosphere.com/browse/DCOS-41568.
     """
     postflight_script = """
 function run_command_until_success() {
-    # Run $@ until it exits 0 or until it has been tried 900 times. Prints shell output and returns the status of the
+    # Run $@ until it exits 0 or until it has been tried 1200 times. Prints shell output and returns the status of the
     # last attempted run.
     cmd=$@
-    max_runs=900
+    max_runs=1200
 
     runs=$max_runs
     until out=$($cmd) || [[ runs -eq 0 ]]; do
@@ -259,8 +277,8 @@ function run_command_until_success() {
 }
 
 function run_checks() {
-    # Run checks with the base command $@ until they succeed or have been tried 900 times. Prints shell output and
-    # returns the status of the last attempted check run.
+    # Run checks with the base command $@ until they succeed or the attempt limit has been reached. Prints shell output
+    # and returns the status of the last attempted check run.
     check_cmd=$@
 
     for check_type in node-poststart cluster; do

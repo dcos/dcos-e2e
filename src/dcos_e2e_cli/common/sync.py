@@ -3,6 +3,7 @@ Tools for syncing code to a cluster.
 """
 
 import io
+import subprocess
 import tarfile
 import tempfile
 from pathlib import Path
@@ -68,6 +69,7 @@ def _send_tarstream_to_node_and_extract(
     tarstream: io.BytesIO,
     node: Node,
     remote_path: Path,
+    sudo: bool,
 ) -> None:
     """
     Given a tarstream, send the contents to a remote path.
@@ -80,16 +82,18 @@ def _send_tarstream_to_node_and_extract(
         node.send_file(
             local_path=Path(tmp_file.name),
             remote_path=tar_path,
+            sudo=sudo,
         )
 
     tar_args = ['tar', '-C', str(remote_path), '-xvf', str(tar_path)]
-    node.run(args=tar_args)
-    node.run(args=['rm', str(tar_path)])
+    node.run(args=tar_args, sudo=sudo)
+    node.run(args=['rm', str(tar_path)], sudo=sudo)
 
 
 def _sync_bootstrap_to_masters(
     cluster: Cluster,
     dcos_checkout_dir: Path,
+    sudo: bool,
 ) -> None:
     """
     Sync bootstrap code to all masters in a cluster.
@@ -117,6 +121,7 @@ def _sync_bootstrap_to_masters(
             tarstream=bootstrap_tarstream,
             node=master,
             remote_path=node_bootstrap_dir,
+            sudo=sudo,
         )
 
 
@@ -136,6 +141,7 @@ def sync_code_to_masters(
     cluster: Cluster,
     dcos_checkout_dir: Path,
     dcos_variant: DCOSVariant,
+    sudo: bool,
 ) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
@@ -190,6 +196,11 @@ def sync_code_to_masters(
         dcos_checkout_dir: The path to a DC/OS (Enterprise) checkout to sync
             code from.
         dcos_variant: The DC/OS variant of the cluster.
+        sudo: Whether to use sudo for commands running on nodes.
+
+    Raises:
+        click.BadArgumentUsage: If ``DCOS_CHECKOUT_DIR`` is set to something
+            that is not a checkout of a DC/OS repository.
     """
     local_packages = dcos_checkout_dir / 'packages'
     local_test_dir = local_packages / 'dcos-integration-test' / 'extra'
@@ -235,6 +246,7 @@ def sync_code_to_masters(
                 ],
                 # We use a wildcard character, `*`, so we need shell expansion.
                 shell=True,
+                sudo=sudo,
             )
 
             master.run(
@@ -243,12 +255,14 @@ def sync_code_to_masters(
                     '--parents',
                     str(node_test_dir / 'open_source_tests'),
                 ],
+                sudo=sudo,
             )
 
             _send_tarstream_to_node_and_extract(
                 tarstream=test_tarstream,
                 node=master,
                 remote_path=node_test_dir / 'open_source_tests',
+                sudo=sudo,
             )
             master.run(
                 args=[
@@ -256,6 +270,7 @@ def sync_code_to_masters(
                     '-rf',
                     str(node_test_dir / 'open_source_tests' / 'conftest.py'),
                 ],
+                sudo=sudo,
             )
             master.run(
                 args=[
@@ -263,22 +278,60 @@ def sync_code_to_masters(
                     str(node_test_dir / 'open_source_tests' / 'util'),
                     str(node_test_dir),
                 ],
+                sudo=sudo,
             )
+            try:
+                master.run(
+                    args=[
+                        'mv',
+                        str(node_test_dir / 'open_source_tests' / 'common.py'),
+                        str(node_test_dir),
+                    ],
+                    sudo=sudo,
+                )
+            except subprocess.CalledProcessError:
+                # This file does not exist in DC/OS versions <1.13.
+                pass
     else:
         _sync_bootstrap_to_masters(
             cluster=cluster,
             dcos_checkout_dir=dcos_checkout_dir,
+            sudo=sudo,
         )
 
         for master in cluster.masters:
+            try:
+                master.run(
+                    args=[
+                        'mv',
+                        str(node_test_dir / 'common.py'),
+                        str(node_test_dir / 'common.bak'),
+                    ],
+                    sudo=sudo,
+                )
+            except subprocess.CalledProcessError:
+                pass
             # This makes an assumption that all tests are at the top level.
             master.run(
                 args=['rm', '-rf', str(node_test_dir / '*.py')],
                 # We use a wildcard character, `*`, so we need shell expansion.
                 shell=True,
+                sudo=sudo,
             )
+            try:
+                master.run(
+                    args=[
+                        'mv',
+                        str(node_test_dir / 'common.bak'),
+                        str(node_test_dir / 'common.py'),
+                    ],
+                    sudo=sudo,
+                )
+            except subprocess.CalledProcessError:
+                pass
             _send_tarstream_to_node_and_extract(
                 tarstream=test_tarstream,
                 node=master,
                 remote_path=node_test_dir,
+                sudo=sudo,
             )

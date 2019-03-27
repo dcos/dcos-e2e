@@ -3,6 +3,7 @@ Tools for creating DC/OS clusters.
 """
 
 import sys
+import textwrap
 from pathlib import Path
 from subprocess import CalledProcessError
 from typing import Any, Dict, Optional
@@ -10,7 +11,7 @@ from typing import Any, Dict, Optional
 import click
 from passlib.hash import sha512_crypt
 
-from dcos_e2e.backends import ClusterBackend
+from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
@@ -41,7 +42,10 @@ def create_cluster(
         )
     except CalledProcessError as exc:
         click.echo('Error creating cluster.', err=True)
-        click.echo(doctor_message)
+        click.echo(click.style('Full error:', fg='yellow'))
+        click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
+        click.echo(doctor_message, err=True)
+
         sys.exit(exc.returncode)
 
 

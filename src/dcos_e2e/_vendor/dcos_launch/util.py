@@ -131,6 +131,11 @@ class AbstractLauncher(metaclass=abc.ABCMeta):
         # populate minimal env if not already set. Note: use private IPs as this test is from
         # within the cluster
         # required for 1.8
+        dcos_version = self.config.get('dcos_version')
+        if dcos_version:
+            env_dict['DCOS_CLI_URL'] = 'https://downloads.dcos.io/cli/testing/binaries/dcos/linux/x86-64/master/dcos' \
+                if dcos_version == 'master' else \
+                'https://downloads.dcos.io/binaries/cli/linux/x86-64/dcos-{}/dcos'.format(dcos_version)
         if 'DNS_SEARCH' not in env_dict:
             env_dict['DNS_SEARCH'] = 'false'
         if 'DCOS_PROVIDER' not in env_dict:
@@ -150,10 +155,14 @@ class AbstractLauncher(metaclass=abc.ABCMeta):
         env_dict = {e: "'{}'".format(env_dict[e]) if ' ' in env_dict[e] else env_dict[e] for e in env_dict}
         env_string = ' '.join(['{}={}'.format(e, env_dict[e]) for e in env_dict])
         arg_string = ' '.join(args)
-        # To support 1.8.9-EE, try using the dcos-integration-test-ee folder if possible
-        pytest_cmd = """ "source /opt/mesosphere/environment.export &&
+        # 1) To support 1.8.9-EE, try using the dcos-integration-test-ee folder if possible
+        # 2) Here we are using "| tee ~/pytest_output" so that we can parse that output in CI. When trying to create
+        #    that pytest_output file in CI instead (e.g. "./dcos-launch pytest | tee pytest_output"), ssh times out and
+        #    our CI builds time out.
+        pytest_cmd = """ "set -o pipefail &&
+source /opt/mesosphere/environment.export &&
 cd `find /opt/mesosphere/active/ -name dcos-integration-test* | sort | tail -n 1` &&
-{env} py.test {args}" """.format(env=env_string, args=arg_string)
+{env} py.test {args} | tee ~/pytest_output" """.format(env=env_string, args=arg_string)
         log.info('Running integration test...')
         if test_host is None:
             test_host = details['masters'][0]['public_ip']

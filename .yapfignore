@@ -1,0 +1,3 @@
+src/*/_vendor
+src/*/_version.py
+versioneer.py

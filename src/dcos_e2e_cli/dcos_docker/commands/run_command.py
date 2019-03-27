@@ -147,6 +147,7 @@ def run(
             cluster=cluster,
             dcos_checkout_dir=dcos_checkout_dir,
             dcos_variant=cluster_containers.dcos_variant,
+            sudo=False,
         )
 
     run_command(

@@ -41,7 +41,16 @@ def test_linux_binaries() -> None:
     client = docker.from_env(version='auto')
 
     for remote_path in remote_paths:
+        # Unset LANG and LC_ALL to show that these are not necessary for the
+        # CLI to run.
+        # This was a problem when the binaries were built with Python < 3.7.
         cmd_in_container = [
+            'unset',
+            'LANG',
+            '&&',
+            'unset',
+            'LC_ALL',
+            '&&',
             'chmod',
             '+x',
             str(remote_path),
@@ -49,10 +58,18 @@ def test_linux_binaries() -> None:
             str(remote_path),
             '--version',
         ]
-        cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
-        client.containers.run(
+        command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
+        container = client.containers.create(
             image='python:3.6',
             mounts=mounts,
-            command=cmd,
-            remove=True,
+            command=command,
         )
+
+        container.start()
+        for line in container.logs(stream=True):
+            line = line.decode().strip()
+            LOGGER.info(line)
+
+        status_code = container.wait()['StatusCode']
+        assert status_code == 0
+        container.remove(force=True)

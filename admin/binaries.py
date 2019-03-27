@@ -34,6 +34,9 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     cmd_in_container = [
         'pip3',
         'install',
+        # See https://github.com/pypa/pip/issues/6163 for why we use this
+        # option.
+        '--no-use-pep517',
         '.[packaging]',
         '&&',
         'python',
@@ -42,7 +45,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
 
     container = client.containers.run(
-        image='python:3.6',
+        image='python:3.7',
         mounts=[code_mount],
         command=cmd,
         working_dir=target_dir,

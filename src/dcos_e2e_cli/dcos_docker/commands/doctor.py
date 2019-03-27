@@ -86,7 +86,12 @@ def _check_docker_root_free_space() -> CheckLevels:
         'The Docker root directory is at "{docker_root_dir}". '
         'On macOS this location is on a hidden virtual machine. '
         'This directory has {free_space:.1f} GB of free space available. '
-        'If you encounter problems try running ``docker volume prune``.'
+        'If you encounter problems try running ``docker volume prune`` to free'
+        'space. '
+        'This will remove all local volumes not used by at least one '
+        'container. '
+        'However, space may be used by volumes used by stopped containers. '
+        'To remove stopped containers, use ``docker container prune``.'
     ).format(
         docker_root_dir=client.info()['DockerRootDir'],
         free_space=available_gigabytes,
@@ -368,7 +373,7 @@ def _check_systemd() -> CheckLevels:
         type='bind',
     )
     try:
-        client.containers.run(
+        container = client.containers.run(
             image=tiny_image,
             mounts=[cgroup_mount],
             detach=True,
@@ -378,10 +383,24 @@ def _check_systemd() -> CheckLevels:
             'bind mount source path does not exist: /sys/fs/cgroup/systemd"'
         )
         if expected in str(exc):
-            message = 'systemd is required.'
+            message = (
+                'Launching various applications requires ``/sys/fs/cgroup`` '
+                'to be mounted from the host. '
+                'This is because UCR applications require cgroup isolation. '
+                'Therefore, by default, ``/sys/fs/cgroup`` is mounted from '
+                'the host. '
+                'It appears that this is not available on the host. '
+                'Therefore, to launch a cluster you must use '
+                '``--no-mount-sys-fs-cgroup``. '
+                'Some applications will not work on the launched cluster.'
+            )
             error(message=message)
-            return CheckLevels.ERROR
+            return CheckLevels.WARNING
         raise
+
+    container.stop()
+    container.remove(v=True)
+
     return CheckLevels.NONE
 
 

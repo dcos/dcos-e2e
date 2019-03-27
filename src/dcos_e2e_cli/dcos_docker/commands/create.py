@@ -256,6 +256,17 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
         "By default this uses the host's driver."
     ),
 )
+@click.option(
+    '--mount-sys-fs-cgroup/--no-mount-sys-fs-cgroup',
+    default=True,
+    show_default=True,
+    help=(
+        'Mounting ``/sys/fs/cgroup`` from the host is required to run '
+        'applications which require ``cgroup`` isolation. '
+        'Choose to not mount ``/sys/fs/cgroup`` if it is not available on the '
+        'host.'
+    ),
+)
 @masters_option
 @agents_option
 @public_agents_option
@@ -379,6 +390,7 @@ def create(
     network: Network,
     one_master_host_port_map: Dict[str, int],
     verbose: int,
+    mount_sys_fs_cgroup: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -480,6 +492,7 @@ def create(
         transport=transport,
         network=network,
         one_master_host_port_map=one_master_host_port_map,
+        mount_sys_fs_cgroup=mount_sys_fs_cgroup,
     )
 
     cluster = create_cluster(

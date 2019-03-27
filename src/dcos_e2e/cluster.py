@@ -12,14 +12,14 @@ import retrying
 import timeout_decorator
 from retry import retry
 
+from ._existing_cluster import ExistingCluster as _ExistingCluster
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
-# Ignore a spurious error - this import is used in a type hint.
-from .backends import ClusterManager  # noqa: F401
-from .backends import ClusterBackend, _ExistingCluster
+from .base_classes import ClusterManager  # noqa: F401
+from .base_classes import ClusterBackend
 from .exceptions import DCOSTimeoutError
-from .node import Node, Output, Role, Transport
+from .node import Node, Output, Transport
 
 
 @retry(
@@ -461,31 +461,13 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
         """
-        try:
-            self._cluster.install_dcos_from_url_with_bootstrap_node(
-                dcos_installer=dcos_installer,
-                dcos_config=dcos_config,
-                ip_detect_path=ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-                output=output,
-            )
-        except NotImplementedError:
-            for nodes, role in (
-                (self.masters, Role.MASTER),
-                (self.agents, Role.AGENT),
-                (self.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_url(
-                        dcos_installer=dcos_installer,
-                        dcos_config=dcos_config,
-                        ip_detect_path=ip_detect_path,
-                        files_to_copy_to_genconf_dir=(
-                            files_to_copy_to_genconf_dir
-                        ),
-                        role=role,
-                        output=output,
-                    )
+        self._cluster.install_dcos_from_url_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
     def install_dcos_from_path(
         self,
@@ -506,37 +488,14 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
-
-        Raises:
-            NotImplementedError: `NotImplementedError` because it is more
-                efficient for the given backend to use the DC/OS advanced
-                installation method that takes installers by URL string.
         """
-        try:
-            self._cluster.install_dcos_from_path_with_bootstrap_node(
-                dcos_installer=dcos_installer,
-                dcos_config=dcos_config,
-                ip_detect_path=ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-                output=output,
-            )
-        except NotImplementedError:
-            for nodes, role in (
-                (self.masters, Role.MASTER),
-                (self.agents, Role.AGENT),
-                (self.public_agents, Role.PUBLIC_AGENT),
-            ):
-                for node in nodes:
-                    node.install_dcos_from_path(
-                        dcos_installer=dcos_installer,
-                        dcos_config=dcos_config,
-                        ip_detect_path=ip_detect_path,
-                        role=role,
-                        files_to_copy_to_genconf_dir=(
-                            files_to_copy_to_genconf_dir
-                        ),
-                        output=output,
-                    )
+        self._cluster.install_dcos_from_path_with_bootstrap_node(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
     def run_integration_tests(
         self,

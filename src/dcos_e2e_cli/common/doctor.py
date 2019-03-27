@@ -85,8 +85,9 @@ def check_ssh() -> CheckLevels:
     return CheckLevels.NONE
 
 
-def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
-                        ) -> None:
+def run_doctor_commands(
+    check_functions: List[Callable[[], CheckLevels]],
+) -> None:
     """
     Run doctor commands.
     """
@@ -98,9 +99,6 @@ def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
     )
 
     for function in progress_bar:
-        # Enable at the start of each chunk, disable at the end, to avoid
-        # showing statistics at the end.
-        progress_bar.disable = False
         try:
             level = function()
         except Exception as exc:  # pylint: disable=broad-except
@@ -118,4 +116,3 @@ def run_doctor_commands(check_functions: List[Callable[[], CheckLevels]],
 
         if level == CheckLevels.ERROR:
             sys.exit(1)
-        progress_bar.disable = True

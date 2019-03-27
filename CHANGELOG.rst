@@ -6,6 +6,72 @@ Changelog
 Next
 ----
 
+2019.03.23.0
+------------
+
+2019.03.22.1
+------------
+
+2019.03.22.0
+------------
+
+2019.03.13.0
+------------
+
+2019.02.17.1
+------------
+
+2019.02.17.0
+------------
+
+2019.02.16.0
+------------
+
+* Mount ``/sys/fs/cgroup`` into Docker agents by default.
+* Add options to the CLI and library to disable mounting ``/sys/fs/cgroup``.
+
+2019.01.29.1
+------------
+
+2019.01.29.0
+------------
+
+2019.01.27.1
+------------
+
+* Stop mounting ``/sys/fs/cgroup`` into Docker agents.
+
+2019.01.27.0
+------------
+
+* Add more ``minidcos docker doctor`` checks.
+
+2019.01.10.0
+------------
+
+- Fix issue where "RuntimeError: cannot join current thread" was shown.
+
+2019.01.05.0
+------------
+
+- Backwards incompatible change: Move ``ClusterBackend`` and ``ClusterManager`` to ``dcos_e2e.base_classes``.
+
+2018.12.10.0
+------------
+
+2018.12.05.0
+------------
+
+- Limit UUID in the cluster ID to 5 characters to avoid problems with Docker.
+
+2018.12.01.1
+------------
+
+2018.12.01.0
+------------
+
+- Ship type hints for other packages to use.
+
 2018.11.22.0
 ------------
 

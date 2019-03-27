@@ -92,6 +92,24 @@ def get_validated_config_from_path(config_path: str) -> dict:
     return get_validated_config(config, config_dir)
 
 
+def check_selinux_compatible(version: str):
+    """ Checks if the version is higher or equal to 1.12
+    """
+    if not version:
+        return False
+    if version == 'master':
+        return True
+    split_version = version.split('.')
+    major = int(split_version[0])
+    minor = int(split_version[1])
+    if major > 1:
+        return True
+    if major == 1:
+        if minor >= 12:
+            return True
+    return False
+
+
 def get_validated_config(user_config: dict, config_dir: str) -> dict:
     """ Returns validated a finalized argument dictionary for dcos-launch
     Given the huge range of configuration space provided by this configuration
@@ -105,9 +123,12 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
     owner = os.environ.get('USER')
     if owner:
         user_config.setdefault('tags', {'owner': owner})
+
     # validate against the fields common to all configs
     user_config['config_dir'] = config_dir
     validator = LaunchValidator(COMMON_SCHEMA, config_dir=config_dir, allow_unknown=True)
+    if 'dcos_version' in user_config:
+        user_config['dcos_version'] = validator.normalized(user_config)['dcos_version']
     if not validator.validate(user_config):
         _raise_errors(validator)
 
@@ -115,6 +136,9 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
     provider = validator.normalized(user_config)['provider']
     if provider == 'onprem':
         validator.schema.update(ONPREM_DEPLOY_COMMON_SCHEMA)
+        user_config.setdefault('dcos_config', {})
+        user_config['dcos_config'].setdefault('platform', user_config['platform'])
+        user_config['dcos_config'].setdefault('rexray_config_preset', user_config['platform'])
     elif provider == 'terraform':
         validator.schema.update(TERRAFORM_COMMON_SCHEMA)
     elif provider in ('aws', 'azure'):
@@ -135,6 +159,20 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
             user_config['terraform_config']['gcp_ssh_user'] = user_config['ssh_user']
         else:
             raise Exception('Cannot currently set ssh_user parameter for ' + platform)
+
+    if validator.normalized(user_config).get('auto_set_selinux'):
+        if 'enable_selinux' in user_config:
+            raise Exception('Parameter conflict: enable_selinux cannot be in config if auto_set_selinux is true')
+
+        selinux_compatible = False
+        try:
+            selinux_compatible = check_selinux_compatible(user_config.get('dcos_version', ''))
+        except Exception:
+            pass
+
+        user_config['enable_selinux'] = selinux_compatible and \
+            'dcos-enterprise' in user_config['installer_url'] and \
+            user_config['os_name'] == 'cent-os-7-dcos-prereqs'
 
     if platform == 'aws':
         region = None
@@ -187,8 +225,7 @@ def get_validated_config(user_config: dict, config_dir: str) -> dict:
         _raise_errors(validator)
     if 'genconf_dir' in user_config:
         if 'dcos_config' in user_config:
-            genconf_dir = expand_path(user_config['genconf_dir'], user_config['config_dir'])
-            _validate_genconf_scripts(genconf_dir, user_config['dcos_config'])
+            _validate_genconf_scripts(user_config['genconf_dir'], user_config['dcos_config'])
     return validator.normalized(user_config)
 
 
@@ -204,8 +241,11 @@ COMMON_SCHEMA = {
             'terraform']},
     'config_dir': {
         'type': 'string',
-        'required': False
-    },
+        'required': False},
+    'dcos_version': {
+        'type': ['string', 'float'],
+        'required': False,
+        'coerce': lambda version: str(version)},
     'launch_config_version': {
         'type': 'integer',
         'required': True,
@@ -285,6 +325,11 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
     'deployment_name': {
         'type': 'string',
         'required': True},
+    'auto_set_selinux': {
+        'type': 'boolean',
+        'default': False},
+    'enable_selinux': {
+        'type': 'boolean'},
     'platform': {
         'type': 'string',
         'required': True,
@@ -342,6 +387,7 @@ ONPREM_DEPLOY_COMMON_SCHEMA = {
         'type': 'string',
         'required': False,
         'default': 'genconf',
+        'coerce': 'expand_local_path',
         'validator': _validate_genconf_dir
         },
     'fault_domain_helper': {
@@ -403,7 +449,7 @@ AWS_ONPREM_SCHEMA = {
         'type': 'string',
         'required': False,
         # bootstrap node requires docker to be installed
-        'default': 'cent-os-7-dcos-prereqs',
+        'default': 'cent-os-7.4-with-docker-selinux-disabled',
         'allowed': list(aws.OS_AMIS.keys())},
     'instance_ami': {
         'type': 'string',

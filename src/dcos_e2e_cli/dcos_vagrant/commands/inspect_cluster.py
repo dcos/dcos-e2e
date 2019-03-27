@@ -46,6 +46,7 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
+        'DC/OS Variant': cluster_vms.dcos_variant.name,
     }  # type: Dict[Any, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),

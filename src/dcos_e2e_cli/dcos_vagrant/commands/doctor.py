@@ -6,6 +6,7 @@ import shutil
 
 import click
 import docker
+from semver import VersionInfo
 
 from dcos_e2e_cli.common.doctor import (
     CheckLevels,
@@ -38,6 +39,21 @@ def check_docker() -> CheckLevels:
     return CheckLevels.NONE
 
 
+def check_virtualbox() -> CheckLevels:
+    """
+    Error if VirtualBox is not installed.
+    """
+    if shutil.which('VBoxManage') is None:
+        message = (
+            '"VBoxManage" is not available on the PATH. '
+            'To resolve this, install VirtualBox from '
+            'https://www.virtualbox.org/wiki/Downloads.'
+        )
+        error(message=message)
+        return CheckLevels.ERROR
+    return CheckLevels.NONE
+
+
 def check_vagrant() -> CheckLevels:
     """
     Error if `vagrant` is not available on the path.
@@ -48,7 +64,7 @@ def check_vagrant() -> CheckLevels:
     return CheckLevels.NONE
 
 
-def check_vagrant_plugins() -> CheckLevels:
+def check_vagrant_plugins_installed() -> CheckLevels:
     """
     Error if `vagrant-vbguest` is not installed.
     """
@@ -60,12 +76,47 @@ def check_vagrant_plugins() -> CheckLevels:
     import vagrant
 
     client = vagrant.Vagrant()
-    if 'vagrant-vbguest' in set(
-        plugin.name for plugin in client.plugin_list()
-    ):
+    plugin_list = client.plugin_list()
+    if 'vagrant-vbguest' in set(plugin.name for plugin in plugin_list):
         return CheckLevels.NONE
 
-    error(message='The `vagrant-vbguest` plugin must be installed.')
+    message = (
+        'The "vagrant-vbguest" plugin must be installed. '
+        'Run "vagrant plugin install vagrant-vbguest".'
+    )
+    error(message=message)
+    return CheckLevels.ERROR
+
+
+def check_vagrant_plugin_versions() -> CheckLevels:
+    """
+    Error if `vagrant-vbguest` is not of at least version 0.17.2.
+    """
+    # We import Vagrant here instead of at the top of the file because, if
+    # the Vagrant executable is not found, a warning is logged.
+    #
+    # We want to avoid that warning for users of other backends who do not
+    # have the Vagrant executable.
+    import vagrant
+
+    client = vagrant.Vagrant()
+    plugin_list = client.plugin_list()
+    name = 'vagrant-vbguest'
+    (plugin, ) = set(plugin for plugin in plugin_list if plugin.name == name)
+    version_info = VersionInfo.parse(plugin.version)
+    minimum_version = VersionInfo(0, 17, 2)
+    # We require a minimum version to work around
+    # https://github.com/dotless-de/vagrant-vbguest/issues/320.
+    plugin_recent = version_info >= minimum_version
+    if plugin_recent:
+        return CheckLevels.NONE
+
+    message = (
+        'The "vagrant-vbguest" plugin version is {plugin_version}. '
+        'The minimum supported version is 0.17.2. '
+        'Run "vagrant plugin update".'
+    ).format(plugin_version=plugin.version)
+    error(message=message)
     return CheckLevels.ERROR
 
 
@@ -81,7 +132,9 @@ def doctor(verbose: int) -> None:
         check_1_9_sed,
         check_ssh,
         check_vagrant,
-        check_vagrant_plugins,
+        check_vagrant_plugins_installed,
+        check_vagrant_plugin_versions,
+        check_virtualbox,
     ]
 
     run_doctor_commands(check_functions=check_functions)

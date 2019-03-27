@@ -5,6 +5,10 @@
     "SubnetConfig" : {
       "VPC"     : { "CIDR" : "10.10.0.0/16" },
       "Public"  : { "CIDR" : "10.10.0.0/24" }
+    },
+    "RegionMap" : {
+      "us-east-1" : { "AZ" : "us-east-1a" },
+      "us-west-2" : { "AZ" : "us-west-2a" }
     }
   },
   "Parameters": {
@@ -76,6 +80,7 @@
     "PublicSubnet" : {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
+        "AvailabilityZone": { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AZ" ]},
         "VpcId" : { "Ref" : "VPC" },
         "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "Public", "CIDR" ]},
         "Tags" : [

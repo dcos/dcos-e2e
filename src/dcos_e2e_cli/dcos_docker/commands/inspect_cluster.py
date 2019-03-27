@@ -91,6 +91,7 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
         'Web UI': web_ui,
         'Nodes': nodes,
         'SSH key': str(ssh_key),
+        'DC/OS Variant': cluster_containers.dcos_variant.name,
     }  # type: Dict[Any, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
