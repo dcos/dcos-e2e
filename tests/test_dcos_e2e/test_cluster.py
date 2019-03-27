@@ -59,19 +59,9 @@ class TestIntegrationTests:
         cluster.wait_for_dcos_oss(http_checks=True)
         # We check that no users are added by ``wait_for_dcos_oss``.
         # If a user is added, a user cannot log in via the web UI.
-        get_users_args = [
-            '.',
-            '/opt/mesosphere/environment.export',
-            '&&',
-            'curl',
-            'http://localhost:8101/acs/api/v1/users',
-        ]
+        get_users_args = ['curl', 'http://localhost:8101/acs/api/v1/users']
         (master, ) = cluster.masters
-        result = master.run(
-            args=get_users_args,
-            shell=True,
-            output=Output.CAPTURE,
-        )
+        result = master.run(args=get_users_args, output=Output.CAPTURE)
         users = json.loads(result.stdout)['array']
         assert not users
 
