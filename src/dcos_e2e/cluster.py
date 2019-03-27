@@ -206,71 +206,22 @@ class Cluster(ContextDecorator):
                 return
 
             email = 'albert@bekstil.net'
-            password = 'password'
             curl_url = ('http://localhost:8101/acs/api/v1/users/{email}'
                         ).format(email=email)
-            zk_path = '/dcos/users/{email}'.format(email=email)
-            server_option = (
-                '"zk-1.zk:2181,zk-2.zk:2181,zk-3.zk:2181,zk-4.zk:2181,'
-                'zk-5.zk:2181"'
-            )
 
-            uid_password_credentials = {
-                'uid': email,
-                'password': password,
-            }
-
-            delete_user_curl_args = [
-                '.',
-                '/opt/mesosphere/environment.export',
-                '&&',
+            delete_user_args = [
                 'curl',
                 '-X',
                 'DELETE',
                 curl_url,
             ]
 
-            delete_user_zk_args = [
+            create_user_args = [
                 '.',
                 '/opt/mesosphere/environment.export',
                 '&&',
-                'zkCli.sh',
-                '-server',
-                server_option,
-                'delete',
-                zk_path,
-            ]
-
-            create_user_curl_args = [
-                '.',
-                '/opt/mesosphere/environment.export',
-                '&&',
-                'curl',
-                '-X',
-                'PUT',
-                '-H',
-                '"Content-Type: application/json"',
-                curl_url,
-                '-d',
-                shlex.quote(
-                    json.dumps(
-                        {
-                            'description': 'AdministrativeUser',
-                            'password': password,
-                        },
-                    ),
-                ),
-            ]
-
-            create_user_zk_args = [
-                '.',
-                '/opt/mesosphere/environment.export',
-                '&&',
-                'zkCli.sh',
-                '-server',
-                server_option,
-                'create',
-                zk_path,
+                'python',
+                '/opt/mesosphere/bin/dcos_add_user.py',
                 email,
             ]
 
@@ -305,24 +256,12 @@ class Cluster(ContextDecorator):
             # in.
             # In particular, we need the "albert" user to exist, or for no
             # users to exist, for the DC/OS Test Utils API session to work.
-            try:
-                # This will not work on DC/OS OSS 1.12 and below.
-                # This API was added during the DC/OS OSS 1.13 development
-                # phase.
-                any_master.run(
-                    args=create_user_curl_args,
-                    shell=True,
-                    output=Output.CAPTURE,
-                )
-                credentials = uid_password_credentials
-            except subprocess.CalledProcessError:
-                # We are in a version of DC/OS which stores users in ZooKeeper.
-                any_master.run(
-                    args=create_user_zk_args,
-                    shell=True,
-                    output=Output.CAPTURE,
-                )
-                credentials = CI_CREDENTIALS
+            any_master.run(args=delete_user_args)
+            any_master.run(
+                args=create_user_args,
+                shell=True,
+            )
+            credentials = CI_CREDENTIALS
 
             api_session = DcosApiSession(
                 dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
@@ -339,22 +278,7 @@ class Cluster(ContextDecorator):
             # Only the first user can log in with SSO, before granting others
             # access.
             # Therefore, we delete the user who was created to wait for DC/OS.
-            try:
-                # This will not work on DC/OS OSS 1.12 and below.
-                # This API was added during the DC/OS OSS 1.13 development
-                # phase.
-                any_master.run(
-                    args=delete_user_curl_args,
-                    shell=True,
-                    output=Output.CAPTURE,
-                )
-            except subprocess.CalledProcessError:
-                # We are in a version of DC/OS which stores users in ZooKeeper.
-                any_master.run(
-                    args=delete_user_zk_args,
-                    shell=True,
-                    output=Output.CAPTURE,
-                )
+            any_master.run(args=delete_user_args)
 
         wait_for_dcos_oss_until_timeout()
 
