@@ -3,7 +3,6 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import json
-import shlex
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
