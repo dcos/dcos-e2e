@@ -208,12 +208,7 @@ class Cluster(ContextDecorator):
             curl_url = ('http://localhost:8101/acs/api/v1/users/{email}'
                         ).format(email=email)
 
-            delete_user_args = [
-                'curl',
-                '-X',
-                'DELETE',
-                curl_url,
-            ]
+            delete_user_args = ['curl', '-X', 'DELETE', curl_url]
 
             create_user_args = [
                 '.',
