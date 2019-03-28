@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.03.28.0
+------------
+
 * Change names of install functions for custom backends to remove ``_with_bootstrap_node``.
 
 2019.03.27.0
