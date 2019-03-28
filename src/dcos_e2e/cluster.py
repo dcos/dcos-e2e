@@ -465,7 +465,7 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
         """
-        self._cluster.install_dcos_from_url_with_bootstrap_node(
+        self._cluster.install_dcos_from_url(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
@@ -493,7 +493,7 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
         """
-        self._cluster.install_dcos_from_path_with_bootstrap_node(
+        self._cluster.install_dcos_from_path(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,

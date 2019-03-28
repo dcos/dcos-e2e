@@ -34,7 +34,7 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def install_dcos_from_url_with_bootstrap_node(
+    def install_dcos_from_url(
         self,
         dcos_installer: str,
         dcos_config: Dict[str, Any],
@@ -43,7 +43,7 @@ class ClusterManager(abc.ABC):
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
-        Install DC/OS from a URL with a bootstrap node.
+        Install DC/OS from a URL.
 
         Args:
             dcos_installer: The URL string to an installer to install DC/OS
@@ -58,7 +58,7 @@ class ClusterManager(abc.ABC):
         """
 
     @abc.abstractmethod
-    def install_dcos_from_path_with_bootstrap_node(
+    def install_dcos_from_path(
         self,
         dcos_installer: Path,
         dcos_config: Dict[str, Any],
@@ -67,7 +67,7 @@ class ClusterManager(abc.ABC):
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     ) -> None:
         """
-        Install DC/OS from an installer passed as a file system `Path`.
+        Install DC/OS from an installer passed as a file system ``Path``.
 
         Args:
             dcos_installer: The path to an installer to install DC/OS from.

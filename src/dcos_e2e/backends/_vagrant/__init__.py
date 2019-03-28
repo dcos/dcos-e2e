@@ -129,7 +129,7 @@ class VagrantCluster(ClusterManager):
 
         self._vagrant_client.up()
 
-    def install_dcos_from_url_with_bootstrap_node(
+    def install_dcos_from_url(
         self,
         dcos_installer: str,
         dcos_config: Dict[str, Any],
@@ -165,7 +165,7 @@ class VagrantCluster(ClusterManager):
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
 
-    def install_dcos_from_path_with_bootstrap_node(
+    def install_dcos_from_path(
         self,
         dcos_installer: Path,
         dcos_config: Dict[str, Any],

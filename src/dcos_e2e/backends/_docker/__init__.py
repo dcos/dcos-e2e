@@ -461,7 +461,7 @@ class DockerCluster(ClusterManager):
                     network=cluster_backend.network,
                 )
 
-    def install_dcos_from_url_with_bootstrap_node(
+    def install_dcos_from_url(
         self,
         dcos_installer: str,
         dcos_config: Dict[str, Any],
@@ -522,7 +522,7 @@ class DockerCluster(ClusterManager):
             'ssh_user': ssh_user,
         }
 
-    def install_dcos_from_path_with_bootstrap_node(
+    def install_dcos_from_path(
         self,
         dcos_installer: Path,
         dcos_config: Dict[str, Any],
