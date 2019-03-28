@@ -78,7 +78,7 @@ class ExistingClusterManager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-    def install_dcos_from_url_with_bootstrap_node(
+    def install_dcos_from_url(
         self,
         dcos_installer: str,
         dcos_config: Dict[str, Any],
@@ -117,7 +117,7 @@ class ExistingClusterManager(ClusterManager):
                     output=output,
                 )
 
-    def install_dcos_from_path_with_bootstrap_node(
+    def install_dcos_from_path(
         self,
         dcos_installer: Path,
         dcos_config: Dict[str, Any],
