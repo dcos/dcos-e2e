@@ -36,5 +36,6 @@ jeepney==0.3.1
 # > Disabling PEP 517 processing is invalid: project specifies a build backend
 # > of setuptools.build_meta in pyproject.toml
 #
-# Therefore we pin an older ``python-dateutil``.
+# Therefore we pin an older ``python-dateutil`` and ``attrs``.
 python-dateutil==2.7.5
+attrs==18.2.0

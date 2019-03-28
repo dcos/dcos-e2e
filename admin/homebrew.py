@@ -53,14 +53,15 @@ def get_homebrew_formula(
     Return the contents of a Homebrew formula for the CLIs.
     """
     repository_root = Path(__file__).parent.parent
-    direct_requires = _get_dependencies(
-        requirements_file=repository_root / 'requirements.txt',
-    )
     indirect_requires = _get_dependencies(
         requirements_file=repository_root / 'indirect-requirements.txt',
     )
 
-    requirements = direct_requires + indirect_requires
+    direct_requires = _get_dependencies(
+        requirements_file=repository_root / 'requirements.txt',
+    )
+
+    requirements = indirect_requires + direct_requires
 
     first = requirements[0]
 
@@ -87,6 +88,11 @@ def get_homebrew_formula(
         {resource_stanzas}
 
           def install
+            # Without this we hit various issues including
+            # https://github.com/takluyver/flit/issues/245.
+            # All of these issues are caught by CI so it is safe to remove this
+            # and then run CI.
+            ENV["PIP_USE_PEP517"] = "false"
             virtualenv_install_with_resources
           end
 
