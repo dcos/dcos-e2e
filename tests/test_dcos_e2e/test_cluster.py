@@ -61,7 +61,7 @@ class TestIntegrationTests:
         get_users_args = ['curl', 'http://localhost:8101/acs/api/v1/users']
         (master, ) = cluster.masters
         result = master.run(args=get_users_args, output=Output.CAPTURE)
-        users = json.loads(result.stdout)['array']
+        users = json.loads(result.stdout.decode())['array']
         assert not users
 
     def test_run_pytest(self, cluster: Cluster) -> None:
