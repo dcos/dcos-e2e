@@ -22,7 +22,7 @@ def _travis_ci_patterns() -> Set[str]:
     """
     travis_file = Path(__file__).parent.parent / '.travis.yml'
     travis_contents = travis_file.read_text()
-    travis_dict = yaml.load(travis_contents. Loader=yaml.FullLoader)
+    travis_dict = yaml.load(travis_contents, Loader=yaml.FullLoader)
     travis_matrix = travis_dict['env']['matrix']
 
     ci_patterns = set()  # type: Set[str]
