@@ -109,10 +109,15 @@ class ContainerInspectView:
     """
 
     def __init__(
-        self, container: Container, cluster_containers: 'ClusterContainers') -> None:
+        self,
+        container: Container,
+        cluster_containers: 'ClusterContainers',
+    ) -> None:
         """
         Args:
             container: The Docker container which represents the node.
+            cluster_containers: A representation of a cluster constructed from
+                Docker nodes.
         """
         self._container = container
         self._cluster_containers = cluster_containers

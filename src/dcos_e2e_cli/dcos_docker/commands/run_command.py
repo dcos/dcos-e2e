@@ -30,11 +30,16 @@ from ._common import (
 from ._options import node_transport_option
 
 
-def _get_node(cluster_containers: ClusterContainers, cluster_id: str, node_reference: str) -> Node:
+def _get_node(
+    cluster_containers: ClusterContainers,
+    cluster_id: str,
+    node_reference: str,
+) -> Node:
     """
     Get a node from a "reference".
 
     Args:
+        cluster_containers: A representation of the cluster.
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's IP address
@@ -139,7 +144,11 @@ def run(
         transport=transport,
     )
     cluster = cluster_containers.cluster
-    host = _get_node(cluster_containers=cluster_containers, cluster_id=cluster_id, node_reference=node)
+    host = _get_node(
+        cluster_containers=cluster_containers,
+        cluster_id=cluster_id,
+        node_reference=node,
+    )
 
     for dcos_checkout_dir in sync_dir:
         sync_code_to_masters(

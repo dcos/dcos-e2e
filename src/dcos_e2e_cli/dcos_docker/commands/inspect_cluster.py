@@ -86,8 +86,7 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
             ContainerInspectView(
                 container=container,
                 cluster_containers=cluster_containers,
-            ).to_dict()
-            for container in containers
+            ).to_dict() for container in containers
         ]
         for key, containers in keys.items()
     }
