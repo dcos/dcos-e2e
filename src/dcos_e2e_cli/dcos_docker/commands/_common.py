@@ -2,6 +2,7 @@
 Common code for minidcos docker CLI modules.
 """
 
+import functools
 import sys
 from ipaddress import IPv4Address
 from pathlib import Path
@@ -51,10 +52,12 @@ NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE = 'public_agent'
 NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE = 'loopback'
 
 
+@functools.lru_cache()
 def docker_client() -> DockerClient:
     """
     Return a Docker client.
     """
+    print('in docker client')
     try:
         return docker.from_env(version='auto')
     except docker.errors.DockerException:
@@ -73,6 +76,7 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
+    print('in existing cluster ids')
     client = docker_client()
     filters = {'label': CLUSTER_ID_LABEL_KEY}
     containers = client.containers.list(filters=filters)
@@ -117,6 +121,7 @@ class ContainerInspectView:
         """
         Return dictionary with information to be shown to users.
         """
+        print('in to dict')
         container = self._container
         role = container.labels[NODE_TYPE_LABEL_KEY]
         container_ip = container.attrs['NetworkSettings']['IPAddress']
