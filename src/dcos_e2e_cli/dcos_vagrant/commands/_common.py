@@ -103,7 +103,7 @@ class VMInspectView:
         """
         ip_address = _ip_from_vm_name(vm_name=self._vm_name)
         cluster_vms = self._cluster_vms
-        vagrant_client = cluster_vms.vagrant_client
+        vagrant_client = cluster_vms.vagrant_client()
 
         if self._vm_name in cluster_vms.masters:
             role = 'master'
@@ -147,7 +147,7 @@ class ClusterVMs:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
-        client = self.vagrant_client
+        client = self.vagrant_client()
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
         ssh_key_path = Path(client.keyfile(vm_name=vm_name))
@@ -256,7 +256,6 @@ class ClusterVMs:
 
     # Use type "Any" so we do not have to import ``vagrant`` because importing
     # that shows a warning on machines that do not have Vagrant installed.
-    @property
     @functools.lru_cache()
     def vagrant_client(self) -> Any:
         """
@@ -300,5 +299,5 @@ class ClusterVMs:
         Destroy this cluster.
         """
         workspace_dir = self.workspace_dir
-        self.vagrant_client.destroy()
+        self.vagrant_client().destroy()
         rmtree(path=str(workspace_dir), ignore_errors=True)
