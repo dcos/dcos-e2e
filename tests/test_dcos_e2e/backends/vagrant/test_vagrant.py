@@ -71,7 +71,7 @@ def _ip_from_vm_name(vm_name: str,
         property_name,
     ]
     property_result = vertigo_py.execute(args=args)  # type: ignore
-    results = yaml.load(property_result)
+    results = yaml.load(property_result, Loader=yaml.FullLoader)
     if results == 'No value set!':
         return None
     return IPv4Address(results['Value'])

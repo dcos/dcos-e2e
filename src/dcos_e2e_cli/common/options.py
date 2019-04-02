@@ -85,7 +85,7 @@ def _validate_dcos_configuration(
     content = Path(str(value)).read_text()
 
     try:
-        return dict(yaml.load(content) or {})
+        return dict(yaml.load(content, Loader=yaml.FullLoader) or {})
     except ValueError:
         message = '"{content}" is not a valid DC/OS configuration'.format(
             content=content,
