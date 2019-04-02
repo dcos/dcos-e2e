@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.04.02.1
+------------
+
 * Make various ``minidcos`` commands faster by using caching.
 
 2019.04.02.0
