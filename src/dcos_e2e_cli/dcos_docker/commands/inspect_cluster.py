@@ -65,7 +65,10 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
         env_dict = {}
         for _, containers in keys.items():
             for container in containers:
-                inspect_view = ContainerInspectView(container=container)
+                inspect_view = ContainerInspectView(
+                    container=container,
+                    cluster_containers=cluster_containers,
+                )
                 inspect_data = inspect_view.to_dict()
                 reference = inspect_data['e2e_reference'].upper()
                 env_dict[reference] = container.id
@@ -80,8 +83,10 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
 
     nodes = {
         key: [
-            ContainerInspectView(container).to_dict()
-            for container in containers
+            ContainerInspectView(
+                container=container,
+                cluster_containers=cluster_containers,
+            ).to_dict() for container in containers
         ]
         for key, containers in keys.items()
     }

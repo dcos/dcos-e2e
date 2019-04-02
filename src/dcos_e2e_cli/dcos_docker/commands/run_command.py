@@ -30,11 +30,16 @@ from ._common import (
 from ._options import node_transport_option
 
 
-def _get_node(cluster_id: str, node_reference: str) -> Node:
+def _get_node(
+    cluster_containers: ClusterContainers,
+    cluster_id: str,
+    node_reference: str,
+) -> Node:
     """
     Get a node from a "reference".
 
     Args:
+        cluster_containers: A representation of the cluster.
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's IP address
@@ -48,11 +53,6 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     Raises:
         click.BadParameter: There is no such node.
     """
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        transport=Transport.DOCKER_EXEC,
-    )
-
     containers = {
         *cluster_containers.masters,
         *cluster_containers.agents,
@@ -60,7 +60,11 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     }
 
     for container in containers:
-        inspect_data = ContainerInspectView(container=container).to_dict()
+        inspect_view = ContainerInspectView(
+            container=container,
+            cluster_containers=cluster_containers,
+        )
+        inspect_data = inspect_view.to_dict()
         reference = inspect_data['e2e_reference']
         ip_address = inspect_data['ip_address']
         container_name = inspect_data['docker_container_name']
@@ -134,13 +138,17 @@ def run(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    host = _get_node(cluster_id=cluster_id, node_reference=node)
 
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,
     )
     cluster = cluster_containers.cluster
+    host = _get_node(
+        cluster_containers=cluster_containers,
+        cluster_id=cluster_id,
+        node_reference=node,
+    )
 
     for dcos_checkout_dir in sync_dir:
         sync_code_to_masters(

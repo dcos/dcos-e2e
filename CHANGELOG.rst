@@ -6,7 +6,7 @@ Changelog
 Next
 ----
 
-* Make various ``minidcos vagrant`` commands faster by using caching.
+* Make various ``minidcos`` commands faster by using caching.
 
 2019.04.02.0
 ------------
