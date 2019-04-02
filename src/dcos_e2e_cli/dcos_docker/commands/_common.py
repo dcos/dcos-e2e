@@ -110,12 +110,14 @@ class ContainerInspectView:
     Details of a node from a container.
     """
 
-    def __init__(self, container: Container) -> None:
+    def __init__(
+        self, container: Container, cluster_containers: 'ClusterContainers') -> None:
         """
         Args:
             container: The Docker container which represents the node.
         """
         self._container = container
+        self._cluster_containers = cluster_containers
 
     def to_dict(self) -> Dict[str, str]:
         """
@@ -125,10 +127,7 @@ class ContainerInspectView:
         container = self._container
         role = container.labels[NODE_TYPE_LABEL_KEY]
         container_ip = container.attrs['NetworkSettings']['IPAddress']
-        cluster_containers = ClusterContainers(
-            cluster_id=container.labels[CLUSTER_ID_LABEL_KEY],
-            transport=Transport.DOCKER_EXEC,
-        )
+        cluster_containers = self._cluster_containers
 
         containers = {
             NODE_TYPE_MASTER_LABEL_VALUE: cluster_containers.masters,
@@ -165,6 +164,7 @@ class ClusterContainers:
         self._cluster_id_label = CLUSTER_ID_LABEL_KEY + '=' + cluster_id
         self._transport = transport
 
+    @functools.lru_cache()
     def _containers_by_role(
         self,
         role: Role,
@@ -172,6 +172,7 @@ class ClusterContainers:
         """
         Return all containers in this cluster of a particular node type.
         """
+        print('in c by r: ', role)
         node_types = {
             Role.MASTER: NODE_TYPE_MASTER_LABEL_VALUE,
             Role.AGENT: NODE_TYPE_AGENT_LABEL_VALUE,
