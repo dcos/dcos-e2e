@@ -22,7 +22,9 @@ def _travis_ci_patterns() -> Set[str]:
     """
     travis_file = Path(__file__).parent.parent / '.travis.yml'
     travis_contents = travis_file.read_text()
-    travis_dict = yaml.load(travis_contents, Loader=yaml.FullLoader)
+    # Ignoring error because of https://github.com/python/typeshed/issues/2886.
+    loader = yaml.FullLoader  # type: ignore
+    travis_dict = yaml.load(travis_contents, Loader=loader)
     travis_matrix = travis_dict['env']['matrix']
 
     ci_patterns = set()  # type: Set[str]

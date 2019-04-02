@@ -51,7 +51,10 @@ def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
         property_name,
     ]
     property_result = vertigo_py.execute(args=args)  # type: ignore
-    results = yaml.load(property_result, Loader=yaml.FullLoader)
+
+    # Ignoring error because of https://github.com/python/typeshed/issues/2886.
+    loader = yaml.FullLoader  # type: ignore
+    results = yaml.load(property_result, Loader=loader)
     if results == 'No value set!':
         return None
     return IPv4Address(results['Value'])
@@ -156,7 +159,6 @@ class ClusterVMs:
             ssh_key_path=ssh_key_path,
         )
 
-    @property
     @functools.lru_cache()
     def _vm_names(self) -> Set[str]:
         """
@@ -187,7 +189,7 @@ class ClusterVMs:
         """
         Return the DC/OS variant of the cluster.
         """
-        vm_names = self._vm_names
+        vm_names = self._vm_names()
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
         data = json.loads(s=description)
@@ -218,15 +220,17 @@ class ClusterVMs:
         # Instead, we should set different Virtualbox descriptions for
         # different node types.
         # see https://jira.mesosphere.com/browse/DCOS_OSS-3851.
-        return set(name for name in self._vm_names if '-master-' in name)
+        vm_names = self._vm_names()
+        return set(name for name in vm_names if '-master-' in name)
 
     @property
     def agents(self) -> Set[str]:
         """
         VM names which represent agent nodes.
         """
+        vm_names = self._vm_names()
         return set(
-            name for name in self._vm_names
+            name for name in vm_names
             if '-agent-' in name and '-public-agent-' not in name
         )
 
@@ -235,14 +239,15 @@ class ClusterVMs:
         """
         VM names which represent public agent nodes.
         """
-        return set(name for name in self._vm_names if '-public-agent-' in name)
+        vm_names = self._vm_names()
+        return set(name for name in vm_names if '-public-agent-' in name)
 
     @property
     def workspace_dir(self) -> Path:
         """
         The workspace directory to put temporary files in.
         """
-        vm_names = self._vm_names
+        vm_names = self._vm_names()
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
         data = json.loads(s=description)
@@ -257,7 +262,7 @@ class ClusterVMs:
         """
         A Vagrant client attached to this cluster.
         """
-        vm_names = self._vm_names
+        vm_names = self._vm_names()
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
 
