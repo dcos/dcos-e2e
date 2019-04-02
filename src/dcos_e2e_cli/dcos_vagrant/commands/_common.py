@@ -30,7 +30,6 @@ def _description_from_vm_name(vm_name: str) -> str:
     """
     Given the name of a VirtualBox VM, return its description.
     """
-    print('In description ' + vm_name)
     virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
     info = virtualbox_vm.parse_info()  # type: Dict[str, str]
     escaped_description = info.get('description', '')
@@ -43,7 +42,6 @@ def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
     """
     Given the name of a VirtualBox VM, return its IP address.
     """
-    print('In IP from ' + vm_name)
     property_name = '/VirtualBox/GuestInfo/Net/1/V4/IP'
     args = [
         vertigo_py.constants.cmd,
@@ -63,7 +61,6 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
-    print('In existing cluster')
     ls_output = vertigo_py.ls()  # type: ignore
     vm_ls_output = ls_output['vms']
     lines = vm_ls_output.decode().strip().split('\n')
@@ -150,7 +147,6 @@ class ClusterVMs:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
-        print('In to node ' + vm_name)
         client = self.vagrant_client
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
@@ -169,7 +165,6 @@ class ClusterVMs:
         """
         Return VirtualBox and Vagrant names of VMs in this cluster.
         """
-        print('In _vm_names')
         ls_output = vertigo_py.ls()  # type: ignore
         vm_ls_output = ls_output['vms']
         lines = vm_ls_output.decode().strip().split('\n')
@@ -233,7 +228,6 @@ class ClusterVMs:
         """
         VM names which represent agent nodes.
         """
-        print('in agents')
         return set(
             name for name in self._vm_names
             if '-agent-' in name and '-public-agent-' not in name
@@ -244,7 +238,6 @@ class ClusterVMs:
         """
         VM names which represent public agent nodes.
         """
-        print('in pub agents')
         return set(name for name in self._vm_names if '-public-agent-' in name)
 
     @property
@@ -267,7 +260,6 @@ class ClusterVMs:
         """
         A Vagrant client attached to this cluster.
         """
-        print('in v client')
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
