@@ -93,6 +93,8 @@ class VMInspectView:
         """
         Args:
             vm_name: The name of the VM which represents the node.
+            cluster_vms: A representation of a cluster constructed from Vagrant
+                VMs.
         """
         self._vm_name = vm_name
         self._cluster_vms = cluster_vms
