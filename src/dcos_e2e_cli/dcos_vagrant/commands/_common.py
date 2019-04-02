@@ -89,12 +89,13 @@ class VMInspectView:
     Details of a node from a VM.
     """
 
-    def __init__(self, vm_name: str) -> None:
+    def __init__(self, vm_name: str, cluster_vms: 'ClusterVMs') -> None:
         """
         Args:
             vm_name: The name of the VM which represents the node.
         """
         self._vm_name = vm_name
+        self._cluster_vms = cluster_vms
 
     def to_dict(self) -> Dict[str, str]:
         """
@@ -104,7 +105,7 @@ class VMInspectView:
         description = _description_from_vm_name(vm_name=self._vm_name)
         data = json.loads(s=description)
         cluster_id = data[CLUSTER_ID_DESCRIPTION_KEY]
-        cluster_vms = ClusterVMs(cluster_id=cluster_id)
+        cluster_vms = self._cluster_vms
         vagrant_client = cluster_vms.vagrant_client
 
         if self._vm_name in cluster_vms.masters:
@@ -261,10 +262,12 @@ class ClusterVMs:
     # Use type "Any" so we do not have to import ``vagrant`` because importing
     # that shows a warning on machines that do not have Vagrant installed.
     @property
+    @functools.lru_cache()
     def vagrant_client(self) -> Any:
         """
         A Vagrant client attached to this cluster.
         """
+        print('in v client')
         vm_names = self._vm_names
         one_vm_name = next(iter(vm_names))
         description = _description_from_vm_name(vm_name=one_vm_name)
