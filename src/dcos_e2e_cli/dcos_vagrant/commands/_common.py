@@ -2,6 +2,7 @@
 Common code for minidcos docker CLI modules.
 """
 
+import functools
 import json
 import os
 from ipaddress import IPv4Address
@@ -24,10 +25,12 @@ VARIANT_ENTERPRISE_DESCRIPTION_VALUE = 'ee'
 VARIANT_OSS_DESCRIPTION_VALUE = 'oss'
 
 
+@functools.lru_cache()
 def _description_from_vm_name(vm_name: str) -> str:
     """
     Given the name of a VirtualBox VM, return its description.
     """
+    print('In description ' + vm_name)
     virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
     info = virtualbox_vm.parse_info()  # type: Dict[str, str]
     escaped_description = info.get('description', '')
@@ -35,10 +38,12 @@ def _description_from_vm_name(vm_name: str) -> str:
     return str(description)
 
 
+@functools.lru_cache()
 def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
     """
     Given the name of a VirtualBox VM, return its IP address.
     """
+    print('In IP from' + vm_name)
     property_name = '/VirtualBox/GuestInfo/Net/1/V4/IP'
     args = [
         vertigo_py.constants.cmd,
