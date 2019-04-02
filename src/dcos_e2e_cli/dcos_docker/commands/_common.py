@@ -194,6 +194,7 @@ class ClusterContainers:
         """
         Return the ``Node`` that is represented by a given ``container``.
         """
+        print('in to node')
         address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
         ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
         return Node(
