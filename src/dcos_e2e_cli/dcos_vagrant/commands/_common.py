@@ -43,7 +43,7 @@ def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
     """
     Given the name of a VirtualBox VM, return its IP address.
     """
-    print('In IP from' + vm_name)
+    print('In IP from ' + vm_name)
     property_name = '/VirtualBox/GuestInfo/Net/1/V4/IP'
     args = [
         vertigo_py.constants.cmd,
@@ -63,6 +63,7 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
+    print('In existing cluster')
     ls_output = vertigo_py.ls()  # type: ignore
     vm_ls_output = ls_output['vms']
     lines = vm_ls_output.decode().strip().split('\n')
@@ -143,10 +144,12 @@ class ClusterVMs:
         """
         self._cluster_id = cluster_id
 
+    @functools.lru_cache()
     def to_node(self, vm_name: str) -> Node:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
+        print('In to node ' + vm_name)
         client = self.vagrant_client
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
@@ -160,10 +163,12 @@ class ClusterVMs:
         )
 
     @property
+    @functools.lru_cache()
     def _vm_names(self) -> Set[str]:
         """
         Return VirtualBox and Vagrant names of VMs in this cluster.
         """
+        print('In _vm_names')
         ls_output = vertigo_py.ls()  # type: ignore
         vm_ls_output = ls_output['vms']
         lines = vm_ls_output.decode().strip().split('\n')
@@ -227,6 +232,7 @@ class ClusterVMs:
         """
         VM names which represent agent nodes.
         """
+        print('in agents')
         return set(
             name for name in self._vm_names
             if '-agent-' in name and '-public-agent-' not in name
@@ -237,6 +243,7 @@ class ClusterVMs:
         """
         VM names which represent public agent nodes.
         """
+        print('in pub agents')
         return set(name for name in self._vm_names if '-public-agent-' in name)
 
     @property
