@@ -38,7 +38,10 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
     master = next(iter(cluster_vms.cluster.masters))
     web_ui = 'http://' + str(master.private_ip_address)
     nodes = {
-        key: [VMInspectView(vm).to_dict() for vm in vms]
+        key: [
+            VMInspectView(vm_name=vm, cluster_vms=cluster_vms).to_dict()
+            for vm in vms
+        ]
         for key, vms in keys.items()
     }
 

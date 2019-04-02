@@ -51,7 +51,8 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     }
 
     for vm_name in vm_names:
-        inspect_data = VMInspectView(vm_name=vm_name).to_dict()
+        inspect_view = VMInspectView(vm_name=vm_name, cluster_vms=cluster_vms)
+        inspect_data = inspect_view.to_dict()
         reference = inspect_data['e2e_reference']
         ip_address = inspect_data['ip_address']
         accepted = (
