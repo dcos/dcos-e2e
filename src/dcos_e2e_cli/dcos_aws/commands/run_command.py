@@ -104,7 +104,7 @@ def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
 @click.option(
     '--node',
     type=str,
-    default='master_0',
+    default=('master_0', ),
     help=(
         'A reference to a particular node to run the command on. '
         'This can be one of: '
@@ -114,6 +114,7 @@ def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
         'a reference in the format "<role>_<number>". '
         'These details be seen with ``minidcos aws inspect``.'
     ),
+    multiple=True,
 )
 def run(
     cluster_id: str,
@@ -125,14 +126,14 @@ def run(
     env: Dict[str, str],
     aws_region: str,
     verbose: int,
-    node: str,
+    node: Tuple[str],
 ) -> None:
     """
-    Run an arbitrary command on a node.
+    Run an arbitrary command on a node or multiple nodes.
 
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
-    """  # noqa: E501
+    """
     set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
@@ -143,11 +144,6 @@ def run(
         aws_region=aws_region,
     )
     cluster = cluster_instances.cluster
-    host = _get_node(
-        cluster_id=cluster_id,
-        node_reference=node,
-        aws_region=aws_region,
-    )
 
     for dcos_checkout_dir in sync_dir:
         sync_code_to_masters(
@@ -157,13 +153,19 @@ def run(
             sudo=True,
         )
 
-    run_command(
-        args=list(node_args),
-        cluster=cluster,
-        host=host,
-        use_test_env=test_env,
-        dcos_login_uname=dcos_login_uname,
-        dcos_login_pw=dcos_login_pw,
-        env=env,
-        transport=Transport.SSH,
-    )
+    for node_reference in node:
+        host = _get_node(
+            cluster_id=cluster_id,
+            node_reference=node_reference,
+            aws_region=aws_region,
+        )
+        run_command(
+            args=list(node_args),
+            cluster=cluster,
+            host=host,
+            use_test_env=test_env,
+            dcos_login_uname=dcos_login_uname,
+            dcos_login_pw=dcos_login_pw,
+            env=env,
+            transport=Transport.SSH,
+        )

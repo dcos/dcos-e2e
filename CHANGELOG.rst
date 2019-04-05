@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Allow multiple ``--node`` options on ``run`` commands to run a command on multiple nodes.
+
 2019.04.02.1
 ------------
 

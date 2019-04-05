@@ -1,6 +1,6 @@
 Usage: minidcos docker run [OPTIONS] NODE_ARGS...
 
-  Run an arbitrary command on a node.
+  Run an arbitrary command on a node or multiple nodes.
 
   To use special characters such as single quotes in your command, wrap the
   whole command in double quotes.

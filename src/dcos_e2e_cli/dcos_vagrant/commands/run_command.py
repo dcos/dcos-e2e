@@ -87,7 +87,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
 @click.option(
     '--node',
     type=str,
-    default='master_0',
+    default=('master_0', ),
     help=(
         'A reference to a particular node to run the command on. '
         'This can be one of: '
@@ -96,6 +96,7 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
         'a reference in the format "<role>_<number>". '
         'These details be seen with ``minidcos vagrant inspect``.'
     ),
+    multiple=True,
 )
 @verbosity_option
 def run(
@@ -105,22 +106,21 @@ def run(
     dcos_login_uname: str,
     dcos_login_pw: str,
     test_env: bool,
-    node: str,
+    node: Tuple[str],
     env: Dict[str, str],
     verbose: int,
 ) -> None:
     """
-    Run an arbitrary command on a node.
+    Run an arbitrary command on a node or multiple nodes.
 
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
-    """  # noqa: E501
+    """
     set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    host = _get_node(cluster_id=cluster_id, node_reference=node)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
     cluster = cluster_vms.cluster
     for dcos_checkout_dir in sync_dir:
@@ -131,13 +131,18 @@ def run(
             sudo=True,
         )
 
-    run_command(
-        args=list(node_args),
-        cluster=cluster,
-        host=host,
-        use_test_env=test_env,
-        dcos_login_uname=dcos_login_uname,
-        dcos_login_pw=dcos_login_pw,
-        env=env,
-        transport=Transport.SSH,
-    )
+    for node_reference in node:
+        host = _get_node(
+            cluster_id=cluster_id,
+            node_reference=node_reference,
+        )
+        run_command(
+            args=list(node_args),
+            cluster=cluster,
+            host=host,
+            use_test_env=test_env,
+            dcos_login_uname=dcos_login_uname,
+            dcos_login_pw=dcos_login_pw,
+            env=env,
+            transport=Transport.SSH,
+        )
