@@ -10,7 +10,7 @@ Commands:
   doctor   Diagnose common issues which stop this CLI from working correctly.
   inspect  Show cluster details.
   list     List all clusters.
-  run      Run an arbitrary command on a node.
+  run      Run an arbitrary command on a node or multiple nodes.
   sync     Sync files from a DC/OS checkout to master nodes.
   wait     Wait for DC/OS to start.
   web      Open the browser at the web UI.

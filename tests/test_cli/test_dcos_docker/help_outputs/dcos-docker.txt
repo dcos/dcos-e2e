@@ -19,7 +19,7 @@ Commands:
   inspect                   Show cluster details.
   list                      List all clusters.
   list-loopback-sidecars    List loopback sidecars.
-  run                       Run an arbitrary command on a node.
+  run                       Run an arbitrary command on a node or multiple...
   setup-mac-network         Set up a network to connect to nodes on macOS.
   sync                      Sync files from a DC/OS checkout to master nodes.
   wait                      Wait for DC/OS to start.
