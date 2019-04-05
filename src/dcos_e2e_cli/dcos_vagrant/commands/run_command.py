@@ -25,11 +25,16 @@ from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 from ._common import ClusterVMs, VMInspectView, existing_cluster_ids
 
 
-def _get_node(cluster_id: str, node_reference: str) -> Node:
+def _get_node(
+    cluster_vms: ClusterVMs,
+    cluster_id: str,
+    node_reference: str,
+) -> Node:
     """
     Get a node from a "reference".
 
     Args:
+        cluster_vms: A representation of the cluster.
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's IP address
@@ -42,8 +47,6 @@ def _get_node(cluster_id: str, node_reference: str) -> Node:
     Raises:
         click.BadParameter: There is no such node.
     """
-    cluster_vms = ClusterVMs(cluster_id=cluster_id)
-
     vm_names = {
         *cluster_vms.masters,
         *cluster_vms.agents,
@@ -133,6 +136,7 @@ def run(
 
     for node_reference in node:
         host = _get_node(
+            cluster_vms=cluster_vms,
             cluster_id=cluster_id,
             node_reference=node_reference,
         )
