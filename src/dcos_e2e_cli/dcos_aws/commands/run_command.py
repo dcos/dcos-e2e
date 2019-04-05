@@ -30,11 +30,17 @@ from ._common import (
 from ._options import aws_region_option
 
 
-def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
+def _get_node(
+    cluster_instances: ClusterInstances,
+    cluster_id: str,
+    node_reference: str,
+    aws_region: str,
+) -> Node:
     """
     Get a node from a "reference".
 
     Args:
+        cluster_instances: A representation of the cluster.
         cluster_id: The ID of a cluster.
         node_reference: One of:
             * A node's public IP address
@@ -49,11 +55,6 @@ def _get_node(cluster_id: str, node_reference: str, aws_region: str) -> Node:
     Raises:
         click.BadParameter: There is no such node.
     """
-    cluster_instances = ClusterInstances(
-        cluster_id=cluster_id,
-        aws_region=aws_region,
-    )
-
     instances = {
         *cluster_instances.masters,
         *cluster_instances.agents,
@@ -155,6 +156,7 @@ def run(
 
     for node_reference in node:
         host = _get_node(
+            cluster_instances=cluster_instances,
             cluster_id=cluster_id,
             node_reference=node_reference,
             aws_region=aws_region,
