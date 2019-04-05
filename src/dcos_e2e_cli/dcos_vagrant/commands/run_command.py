@@ -120,7 +120,6 @@ def run(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    host = _get_node(cluster_id=cluster_id, node_reference=node)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
     cluster = cluster_vms.cluster
     for dcos_checkout_dir in sync_dir:
@@ -131,13 +130,18 @@ def run(
             sudo=True,
         )
 
-    run_command(
-        args=list(node_args),
-        cluster=cluster,
-        host=host,
-        use_test_env=test_env,
-        dcos_login_uname=dcos_login_uname,
-        dcos_login_pw=dcos_login_pw,
-        env=env,
-        transport=Transport.SSH,
-    )
+    for node_reference in node:
+        host = _get_node(
+            cluster_id=cluster_id,
+            node_reference=node,
+        )
+        run_command(
+            args=list(node_args),
+            cluster=cluster,
+            host=host,
+            use_test_env=test_env,
+            dcos_login_uname=dcos_login_uname,
+            dcos_login_pw=dcos_login_pw,
+            env=env,
+            transport=Transport.SSH,
+        )
