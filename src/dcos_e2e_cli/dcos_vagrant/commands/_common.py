@@ -36,6 +36,7 @@ def _description_from_vm_name(vm_name: str) -> str:
     description = escaped_description.encode().decode('unicode_escape')
     return str(description)
 
+
 def _state_from_vm_name(vm_name: str) -> str:
     """
     Given the name of a VirtualBox VM, return its VM state, such as
@@ -48,6 +49,7 @@ def _state_from_vm_name(vm_name: str) -> str:
     virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
     info = virtualbox_vm.parse_info()  # type: Dict[str, str]
     return info['VMState']
+
 
 @functools.lru_cache()
 def _running_vm_names() -> Set[str]:
