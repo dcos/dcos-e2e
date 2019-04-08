@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.04.08.0
+------------
+
 * Allow multiple ``--node`` options on ``run`` commands to run a command on multiple nodes.
 * ``minidcos vagrant list`` will now not show clusters with aborted VMs.
   A VM is aborted for example if the host is shut down.
