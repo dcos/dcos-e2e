@@ -2,10 +2,10 @@
 Common code for minidcos docker CLI modules.
 """
 
-from collections import defaultdict
 import functools
 import json
 import os
+from collections import defaultdict
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
@@ -53,14 +53,14 @@ def _state_from_vm_name(vm_name: str) -> str:
 
 
 @functools.lru_cache()
-def _running_vm_names_by_cluster() -> Set[str]:
+def _running_vm_names_by_cluster() -> Dict[str, Set[str]]:
     """
-    Return the names of all running VMs.
+    Return a mapping of Cluster IDs to the names of VMs in those clusters.
     """
     ls_output = bytes(vertigo_py.ls(option='vms'))  # type: ignore
     lines = ls_output.decode().strip().split('\n')
     lines = [line for line in lines if line]
-    result = defaultdict(set)
+    result = defaultdict(set)  # type: Dict[str, Set[str]]
     for line in lines:
         vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
@@ -73,12 +73,14 @@ def _running_vm_names_by_cluster() -> Set[str]:
         if state != 'running':
             # We do not show e.g. aborted VMs.
             # For example, a VM is aborted when the host is rebooted.
-            # This is problematic as we cannot assume that the workspace directory,
+            # This is problematic as we cannot assume that the workspace
+            # directory,
             # which might be in /tmp/ is still there.
             #
             # We do not show paused VMs.
-            # A VM can be manually paused.  This can be problematic if someone
-            # pauses a VM, then creates a new one with the same cluster ID.
+            # A VM can be manually paused.
+            # This can be problematic if someone pauses a VM, then creates a
+            # new one with the same cluster ID.
             # However, we work on the assumption that a user will not manually
             # interfere with VirtualBox.
             continue
