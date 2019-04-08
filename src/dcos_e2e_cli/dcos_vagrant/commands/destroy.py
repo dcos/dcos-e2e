@@ -13,6 +13,21 @@ from dcos_e2e_cli.common.utils import check_cluster_id_exists
 from ._common import ClusterVMs, existing_cluster_ids
 
 
+def _destroy_cluster(cluster_id: str) -> None:
+    """
+    Destroy a cluster.
+
+    Args:
+        cluster_id: The ID of the cluster.
+    """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
+    cluster_vms = ClusterVMs(cluster_id=cluster_id)
+    cluster_vms.destroy()
+
+
 @click.command('destroy-list')
 @click.argument(
     'cluster_ids',
@@ -20,10 +35,7 @@ from ._common import ClusterVMs, existing_cluster_ids
     type=str,
 )
 @click.pass_context
-def destroy_list(
-    ctx: click.core.Context,
-    cluster_ids: List[str],
-) -> None:
+def destroy_list(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
 
@@ -38,10 +50,9 @@ def destroy_list(
             click.echo(warning, err=True)
             continue
 
-        ctx.invoke(
-            destroy,
-            cluster_id=cluster_id,
-        )
+        with click_spinner.spinner():
+            _destroy_cluster(cluster_id=cluster_id)
+        click.echo(cluster_id)
 
 
 @click.command('destroy')
@@ -50,11 +61,6 @@ def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
-    check_cluster_id_exists(
-        new_cluster_id=cluster_id,
-        existing_cluster_ids=existing_cluster_ids(),
-    )
-    cluster_vms = ClusterVMs(cluster_id=cluster_id)
     with click_spinner.spinner():
-        cluster_vms.destroy()
+        _destroy_cluster(cluster_id=cluster_id)
     click.echo(cluster_id)
