@@ -1,0 +1,12 @@
+Usage: minidcos vagrant clean [OPTIONS]
+
+  Remove VMs created by this tool.
+
+  This is useful in removing paused and aborted VMs. VMs are aborted when the
+  host is shut down.
+
+Options:
+  --destroy-running-clusters  Destroy running clusters.  [default: False]
+  -v, --verbose               Use verbose output. Use this option multiple times
+                              for more verbose output.
+  -h, --help                  Show this message and exit.
