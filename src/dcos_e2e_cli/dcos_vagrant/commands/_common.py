@@ -278,7 +278,11 @@ class ClusterVMs:
             if item.is_dir() and item.name != 'genconf'
         ]
 
-        [vagrant_root] = list(vagrant_root_parent.iterdir())
+        # We ignore files such as .DS_Store files.
+        [vagrant_root] = [
+            item for item in vagrant_root_parent.iterdir()
+            if item.is_dir()
+        ]
 
         # We import Vagrant here instead of at the top of the file because, if
         # the Vagrant executable is not found, a warning is logged.
