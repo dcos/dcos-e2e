@@ -65,7 +65,13 @@ def _running_vm_names() -> Set[str]:
     for line in lines:
         vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
-        vm_names.add(vm_name)
+        state = _state_from_vm_name(vm_name=vm_name)
+        if state == 'running':
+            # A VM can be manually paused.  This can be problematic if someone
+            # pauses a VM, then creates a new one with the same cluster ID.
+            # However, we work on the assumption that a user will not manually
+            # interfere with VirtualBox.
+            vm_names.add(vm_name)
     return vm_names
 
 
@@ -102,18 +108,13 @@ def existing_cluster_ids() -> Set[str]:
         # A VM is in a cluster if it has a description and that description is
         # valid JSON and has a known key.
         description = _description_from_vm_name(vm_name=vm_name)
-        # state = _state_from_vm_name(vm_name=vm_name)
-        # if state != 'running':
-        #     continue
         try:
             data = json.loads(s=description)
         except json.decoder.JSONDecodeError:
             continue
 
         cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
-        workspace_dir = Path(data[WORKSPACE_DIR_DESCRIPTION_KEY])
-        if workspace_dir.exists():
-            cluster_ids.add(cluster_id)
+        cluster_ids.add(cluster_id)
 
     return cluster_ids - set([None])
 
