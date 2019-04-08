@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Add ``minidcos vagrant clean`` command to clean up left over VMs.
+
 2019.04.08.0
 ------------
 
