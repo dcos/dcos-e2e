@@ -4,22 +4,25 @@ Clean all Docker containers, volumes etc. from using the Docker backend.
 
 import click
 
+
+from dcos_e2e_cli._vendor import vertigo_py
 from dcos_e2e_cli.common.options import verbosity_option
 from dcos_e2e_cli.common.utils import set_logging
+from dcos_e2e_cli.dcos_vagrant.commands.destroy import destroy_cluster
 
-from ._common import (
-    CLUSTER_ID_DESCRIPTION_KEY,
-)
+from ._common import vm_names_by_cluster
+
 
 @click.command('clean')
 @click.option(
-    '--keep-running',
+    '--destroy-running-clusters',
     is_flag=True,
-    default=True,
-    help='Do not destroy running VMs.',
+    default=False,
+    show_default=True,
+    help='Destroy running clusters.',
 )
 @verbosity_option
-def clean(verbose: int, keep_running: bool) -> None:
+def clean(verbose: int, destroy_running_clusters: bool) -> None:
     """
     Remove VMs created by this tool.
 
@@ -27,30 +30,18 @@ def clean(verbose: int, keep_running: bool) -> None:
     VMs are aborted when the host is shut down.
     """
     set_logging(verbosity_level=verbose)
+    running_clusters = vm_names_by_cluster(running_only=True)
+    all_clusters = vm_names_by_cluster(running_only=False)
+    not_running_cluster_names = set(
+        all_clusters.keys() - running_clusters.keys(),
+    )
 
-    client = docker_client()
+    if destroy_running_clusters:
+        for cluster_id in running_clusters.keys():
+            destroy_cluster(cluster_id=cluster_id)
 
-    filters = {
-        'label': [
-            '{key}={value}'.format(
-                key=NODE_TYPE_LABEL_KEY,
-                value=NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
-            ),
-        ],
-    }
-    loopback_sidecars = client.containers.list(filters=filters)
-    for loopback_sidecar in loopback_sidecars:
-        DockerLoopbackVolume.destroy(container=loopback_sidecar)
-
-    node_filters = {'name': Docker().container_name_prefix}
-    network_filters = {'name': Docker().container_name_prefix}
-
-    node_containers = client.containers.list(filters=node_filters, all=True)
-
-    for container in node_containers:
-        container.stop()
-        container.remove(v=True)
-
-    networks = client.networks.list(filters=network_filters)
-    for network in networks:
-        network.remove()
+    for cluster_id in not_running_cluster_names:
+        for vm_name in all_clusters[cluster_id]:
+            virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
+            virtualbox_vm.unregistervm(delete=True)
+            print('not running ', vm_name)

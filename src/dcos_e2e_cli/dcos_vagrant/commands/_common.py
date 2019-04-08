@@ -53,9 +53,12 @@ def _state_from_vm_name(vm_name: str) -> str:
 
 
 @functools.lru_cache()
-def _running_vm_names_by_cluster() -> Dict[str, Set[str]]:
+def vm_names_by_cluster(running_only: bool = False) -> Dict[str, Set[str]]:
     """
     Return a mapping of Cluster IDs to the names of VMs in those clusters.
+
+    Args:
+        running_only: If ``True`` only return running VMs.
     """
     ls_output = bytes(vertigo_py.ls(option='vms'))  # type: ignore
     lines = ls_output.decode().strip().split('\n')
@@ -70,14 +73,14 @@ def _running_vm_names_by_cluster() -> Dict[str, Set[str]]:
             data = json.loads(s=description)
         except json.decoder.JSONDecodeError:
             continue
-        if state != 'running':
-            # We do not show e.g. aborted VMs.
+        if running_only and state != 'running':
+            # We do not show e.g. aborted VMs when listing clusters.
             # For example, a VM is aborted when the host is rebooted.
             # This is problematic as we cannot assume that the workspace
             # directory,
             # which might be in /tmp/ is still there.
             #
-            # We do not show paused VMs.
+            # We do not show paused VMs when listing clusters.
             # A VM can be manually paused.
             # This can be problematic if someone pauses a VM, then creates a
             # new one with the same cluster ID.
@@ -120,7 +123,7 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
-    return set(_running_vm_names_by_cluster().keys())
+    return set(vm_names_by_cluster().keys())
 
 
 class VMInspectView:
@@ -205,7 +208,7 @@ class ClusterVMs:
         """
         Return VirtualBox and Vagrant names of VMs in this cluster.
         """
-        return _running_vm_names_by_cluster()[self._cluster_id]
+        return vm_names_by_cluster()[self._cluster_id]
 
     @property
     def dcos_variant(self) -> DCOSVariant:

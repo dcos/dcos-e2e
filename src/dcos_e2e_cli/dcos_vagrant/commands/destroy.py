@@ -13,7 +13,7 @@ from dcos_e2e_cli.common.utils import check_cluster_id_exists
 from ._common import ClusterVMs, existing_cluster_ids
 
 
-def _destroy_cluster(cluster_id: str) -> None:
+def destroy_cluster(cluster_id: str) -> None:
     """
     Destroy a cluster.
 
@@ -51,7 +51,7 @@ def destroy_list(cluster_ids: List[str]) -> None:
             continue
 
         with click_spinner.spinner():
-            _destroy_cluster(cluster_id=cluster_id)
+            destroy_cluster(cluster_id=cluster_id)
         click.echo(cluster_id)
 
 
@@ -62,5 +62,5 @@ def destroy(cluster_id: str) -> None:
     Destroy a cluster.
     """
     with click_spinner.spinner():
-        _destroy_cluster(cluster_id=cluster_id)
+        destroy_cluster(cluster_id=cluster_id)
     click.echo(cluster_id)
