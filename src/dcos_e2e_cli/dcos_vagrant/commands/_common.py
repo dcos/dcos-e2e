@@ -273,13 +273,6 @@ class ClusterVMs:
             'VM_DESCRIPTION': description,
         }
 
-        # We import Vagrant here instead of at the top of the file because, if
-        # the Vagrant executable is not found, a warning is logged.
-        #
-        # We want to avoid that warning for users of other backends who do not
-        # have the Vagrant executable.
-        import vagrant
-
         [vagrant_root_parent] = [
             item for item in self.workspace_dir.iterdir()
             if item.is_dir() and item.name != 'genconf'
@@ -287,6 +280,12 @@ class ClusterVMs:
 
         [vagrant_root] = list(vagrant_root_parent.iterdir())
 
+        # We import Vagrant here instead of at the top of the file because, if
+        # the Vagrant executable is not found, a warning is logged.
+        #
+        # We want to avoid that warning for users of other backends who do not
+        # have the Vagrant executable.
+        import vagrant
         vagrant_client = vagrant.Vagrant(
             root=str(vagrant_root),
             env=vagrant_env,
