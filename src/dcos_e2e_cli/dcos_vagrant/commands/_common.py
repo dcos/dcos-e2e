@@ -64,9 +64,8 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
-    ls_output = vertigo_py.ls()  # type: ignore
-    vm_ls_output = ls_output['vms']
-    lines = vm_ls_output.decode().strip().split('\n')
+    ls_output = vertigo_py.ls(option='vms')  # type: ignore
+    lines = ls_output.decode().strip().split('\n')
     lines = [line for line in lines if line]
     cluster_ids = set()
     for line in lines:
@@ -166,9 +165,8 @@ class ClusterVMs:
         """
         Return VirtualBox and Vagrant names of VMs in this cluster.
         """
-        ls_output = vertigo_py.ls()  # type: ignore
-        vm_ls_output = ls_output['vms']
-        lines = vm_ls_output.decode().strip().split('\n')
+        ls_output = vertigo_py.ls(option='vms')  # type: ignore
+        lines = ls_output.decode().strip().split('\n')
         lines = [line for line in lines if line]
         vm_names = set()
         for line in lines:
