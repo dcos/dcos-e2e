@@ -37,6 +37,20 @@ def _description_from_vm_name(vm_name: str) -> str:
     return str(description)
 
 
+def _state_from_vm_name(vm_name: str) -> str:
+    """
+    Given the name of a VirtualBox VM, return its VM state, such as
+    "running".
+
+    See
+    https://www.virtualbox.org/sdkref/_virtual_box_8idl.html#a80b08f71210afe16038e904a656ed9eb
+    for possible states.
+    """
+    virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
+    info = virtualbox_vm.parse_info()  # type: Dict[str, str]
+    return info['VMState']
+
+
 @functools.lru_cache()
 def _running_vm_names() -> Set[str]:
     """
@@ -53,7 +67,13 @@ def _running_vm_names() -> Set[str]:
     for line in lines:
         vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
-        vm_names.add(vm_name)
+        state = _state_from_vm_name(vm_name=vm_name)
+        if state == 'running':
+            # A VM can be manually paused.  This can be problematic if someone
+            # pauses a VM, then creates a new one with the same cluster ID.
+            # However, we work on the assumption that a user will not manually
+            # interfere with VirtualBox.
+            vm_names.add(vm_name)
     return vm_names
 
 
