@@ -4,7 +4,6 @@ Clean all Docker containers, volumes etc. from using the Docker backend.
 
 import click
 
-
 from dcos_e2e_cli._vendor import vertigo_py
 from dcos_e2e_cli.common.options import verbosity_option
 from dcos_e2e_cli.common.utils import set_logging
