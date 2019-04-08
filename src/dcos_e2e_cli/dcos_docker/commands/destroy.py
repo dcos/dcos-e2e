@@ -15,6 +15,24 @@ from ._common import ClusterContainers, existing_cluster_ids
 from ._options import node_transport_option
 
 
+def _destroy_cluster(cluster_id: str) -> None:
+    """
+    Destroy a cluster.
+
+    Args:
+        cluster_id: The ID of the cluster.
+    """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(),
+    )
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=Transport.DOCKER_EXEC,
+    )
+    cluster_containers.destroy()
+
+
 @click.command('destroy-list')
 @click.argument(
     'cluster_ids',
@@ -23,11 +41,7 @@ from ._options import node_transport_option
 )
 @node_transport_option
 @click.pass_context
-def destroy_list(
-    ctx: click.core.Context,
-    cluster_ids: List[str],
-    transport: Transport,
-) -> None:
+def destroy_list(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
 
@@ -42,28 +56,17 @@ def destroy_list(
             click.echo(warning, err=True)
             continue
 
-        ctx.invoke(
-            destroy,
-            cluster_id=cluster_id,
-            transport=transport,
-        )
+        with click_spinner.spinner():
+            _destroy_cluster(cluster_id=cluster_id)
+        click.echo(cluster_id)
 
 
 @click.command('destroy')
 @existing_cluster_id_option
-@node_transport_option
-def destroy(cluster_id: str, transport: Transport) -> None:
+def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
-    check_cluster_id_exists(
-        new_cluster_id=cluster_id,
-        existing_cluster_ids=existing_cluster_ids(),
-    )
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        transport=transport,
-    )
     with click_spinner.spinner():
-        cluster_containers.destroy()
+        _destroy_cluster(cluster_id=cluster_id)
     click.echo(cluster_id)
