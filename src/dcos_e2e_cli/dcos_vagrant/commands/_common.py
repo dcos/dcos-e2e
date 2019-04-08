@@ -36,6 +36,18 @@ def _description_from_vm_name(vm_name: str) -> str:
     description = escaped_description.encode().decode('unicode_escape')
     return str(description)
 
+def _state_from_vm_name(vm_name: str) -> str:
+    """
+    Given the name of a VirtualBox VM, return its VM state, such as
+    "running".
+
+    See
+    https://www.virtualbox.org/sdkref/_virtual_box_8idl.html#a80b08f71210afe16038e904a656ed9eb
+    for possible states.
+    """
+    virtualbox_vm = vertigo_py.VM(name=vm_name)  # type: ignore
+    info = virtualbox_vm.parse_info()  # type: Dict[str, str]
+    return info['VMState']
 
 @functools.lru_cache()
 def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
@@ -73,13 +85,18 @@ def existing_cluster_ids() -> Set[str]:
         vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
         description = _description_from_vm_name(vm_name=vm_name)
+        # state = _state_from_vm_name(vm_name=vm_name)
+        # if state != 'running':
+        #     continue
         try:
             data = json.loads(s=description)
         except json.decoder.JSONDecodeError:
             continue
 
         cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
-        cluster_ids.add(cluster_id)
+        workspace_dir = Path(data[WORKSPACE_DIR_DESCRIPTION_KEY])
+        if workspace_dir.exists():
+            cluster_ids.add(cluster_id)
 
     return cluster_ids - set([None])
 
@@ -273,20 +290,23 @@ class ClusterVMs:
             'VM_DESCRIPTION': description,
         }
 
+        [vagrant_root_parent] = [
+            item for item in self.workspace_dir.iterdir()
+            if item.is_dir() and item.name != 'genconf'
+        ]
+
+        # We ignore files such as .DS_Store files.
+        [vagrant_root] = [
+            item for item in vagrant_root_parent.iterdir()
+            if item.is_dir()
+        ]
+
         # We import Vagrant here instead of at the top of the file because, if
         # the Vagrant executable is not found, a warning is logged.
         #
         # We want to avoid that warning for users of other backends who do not
         # have the Vagrant executable.
         import vagrant
-
-        [vagrant_root_parent] = [
-            item for item in self.workspace_dir.iterdir()
-            if item.is_dir() and item.name != 'genconf'
-        ]
-
-        [vagrant_root] = list(vagrant_root_parent.iterdir())
-
         vagrant_client = vagrant.Vagrant(
             root=str(vagrant_root),
             env=vagrant_env,
