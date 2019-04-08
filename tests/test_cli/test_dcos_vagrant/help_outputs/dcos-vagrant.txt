@@ -6,6 +6,7 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
+  clean               Remove VMs created by this tool.
   create              Create a DC/OS cluster.
   destroy             Destroy a cluster.
   destroy-list        Destroy clusters.
