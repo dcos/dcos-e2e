@@ -5,6 +5,7 @@ Common code for minidcos docker CLI modules.
 import functools
 import json
 import os
+from collections import defaultdict
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
@@ -52,29 +53,44 @@ def _state_from_vm_name(vm_name: str) -> str:
 
 
 @functools.lru_cache()
-def _running_vm_names() -> Set[str]:
+def _running_vm_names_by_cluster() -> Dict[str, Set[str]]:
     """
-    Return the names of all running VMs.
+    Return a mapping of Cluster IDs to the names of VMs in those clusters.
     """
-    # We do not show e.g. aborted VMs.
-    # For example, a VM is aborted when the host is rebooted.
-    # This is problematic as we cannot assume that the workspace directory,
-    # which might be in /tmp/ is still there.
-    ls_output = bytes(vertigo_py.ls(option='runningvms'))  # type: ignore
+    ls_output = bytes(vertigo_py.ls(option='vms'))  # type: ignore
     lines = ls_output.decode().strip().split('\n')
     lines = [line for line in lines if line]
-    vm_names = set([])
+    result = defaultdict(set)  # type: Dict[str, Set[str]]
     for line in lines:
         vm_name_in_quotes, _ = line.split(' ')
         vm_name = vm_name_in_quotes[1:-1]
         state = _state_from_vm_name(vm_name=vm_name)
-        if state == 'running':
-            # A VM can be manually paused.  This can be problematic if someone
-            # pauses a VM, then creates a new one with the same cluster ID.
+        description = _description_from_vm_name(vm_name=vm_name)
+        try:
+            data = json.loads(s=description)
+        except json.decoder.JSONDecodeError:
+            continue
+        if state != 'running':
+            # We do not show e.g. aborted VMs.
+            # For example, a VM is aborted when the host is rebooted.
+            # This is problematic as we cannot assume that the workspace
+            # directory,
+            # which might be in /tmp/ is still there.
+            #
+            # We do not show paused VMs.
+            # A VM can be manually paused.
+            # This can be problematic if someone pauses a VM, then creates a
+            # new one with the same cluster ID.
             # However, we work on the assumption that a user will not manually
             # interfere with VirtualBox.
-            vm_names.add(vm_name)
-    return vm_names
+            continue
+        # A VM is in a cluster if it has a description and that description is
+        # valid JSON and has a known key.
+        cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
+        if cluster_id is None:
+            continue
+        result[cluster_id].add(vm_name)
+    return result
 
 
 @functools.lru_cache()
@@ -104,21 +120,7 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
-    vm_names = _running_vm_names()
-    cluster_ids = set()
-    for vm_name in vm_names:
-        # A VM is in a cluster if it has a description and that description is
-        # valid JSON and has a known key.
-        description = _description_from_vm_name(vm_name=vm_name)
-        try:
-            data = json.loads(s=description)
-        except json.decoder.JSONDecodeError:
-            continue
-
-        cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
-        cluster_ids.add(cluster_id)
-
-    return cluster_ids - set([None])
+    return set(_running_vm_names_by_cluster().keys())
 
 
 class VMInspectView:
@@ -203,20 +205,7 @@ class ClusterVMs:
         """
         Return VirtualBox and Vagrant names of VMs in this cluster.
         """
-        running_vm_names = _running_vm_names()
-        vm_names = set([])
-        for vm_name in running_vm_names:
-            description = _description_from_vm_name(vm_name=vm_name)
-            try:
-                data = json.loads(s=description)
-            except json.decoder.JSONDecodeError:
-                continue
-
-            cluster_id = data.get(CLUSTER_ID_DESCRIPTION_KEY)
-            if cluster_id == self._cluster_id:
-                vm_names.add(vm_name)
-
-        return vm_names
+        return _running_vm_names_by_cluster()[self._cluster_id]
 
     @property
     def dcos_variant(self) -> DCOSVariant:
