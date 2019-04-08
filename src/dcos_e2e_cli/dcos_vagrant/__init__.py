@@ -6,6 +6,7 @@ import click
 
 from dcos_e2e_cli.common.commands import download_installer
 
+from .commands.clean import clean
 from .commands.create import create
 from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
@@ -24,6 +25,7 @@ def dcos_vagrant() -> None:
     """
 
 
+dcos_vagrant.add_command(clean)
 dcos_vagrant.add_command(create)
 dcos_vagrant.add_command(destroy)
 dcos_vagrant.add_command(destroy_list)
