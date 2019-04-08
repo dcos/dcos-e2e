@@ -38,6 +38,26 @@ def _description_from_vm_name(vm_name: str) -> str:
 
 
 @functools.lru_cache()
+def _running_vm_names() -> Set[str]:
+    """
+    Return the names of all running VMs.
+    """
+    # We do not show e.g. aborted VMs.
+    # For example, a VM is aborted when the host is rebooted.
+    # This is problematic as we cannot assume that the workspace directory,
+    # which might be in /tmp/ is still there.
+    ls_output = bytes(vertigo_py.ls(option='runningvms'))  # type: ignore
+    lines = ls_output.decode().strip().split('\n')
+    lines = [line for line in lines if line]
+    vm_names = set([])
+    for line in lines:
+        vm_name_in_quotes, _ = line.split(' ')
+        vm_name = vm_name_in_quotes[1:-1]
+        vm_names.add(vm_name)
+    return vm_names
+
+
+@functools.lru_cache()
 def _ip_from_vm_name(vm_name: str) -> Optional[IPv4Address]:
     """
     Given the name of a VirtualBox VM, return its IP address.
@@ -64,13 +84,11 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
-    ls_output = vertigo_py.ls(option='vms')  # type: ignore
-    lines = ls_output.decode().strip().split('\n')
-    lines = [line for line in lines if line]
+    vm_names = _running_vm_names()
     cluster_ids = set()
-    for line in lines:
-        vm_name_in_quotes, _ = line.split(' ')
-        vm_name = vm_name_in_quotes[1:-1]
+    for vm_name in vm_names:
+        # A VM is in a cluster if it has a description and that description is
+        # valid JSON and has a known key.
         description = _description_from_vm_name(vm_name=vm_name)
         try:
             data = json.loads(s=description)
@@ -165,13 +183,9 @@ class ClusterVMs:
         """
         Return VirtualBox and Vagrant names of VMs in this cluster.
         """
-        ls_output = vertigo_py.ls(option='vms')  # type: ignore
-        lines = ls_output.decode().strip().split('\n')
-        lines = [line for line in lines if line]
-        vm_names = set()
-        for line in lines:
-            vm_name_in_quotes, _ = line.split(' ')
-            vm_name = vm_name_in_quotes[1:-1]
+        running_vm_names = _running_vm_names()
+        vm_names = set([])
+        for vm_name in running_vm_names:
             description = _description_from_vm_name(vm_name=vm_name)
             try:
                 data = json.loads(s=description)
@@ -278,8 +292,7 @@ class ClusterVMs:
 
         # We ignore files such as .DS_Store files.
         [vagrant_root] = [
-            item for item in vagrant_root_parent.iterdir()
-            if item.is_dir()
+            item for item in vagrant_root_parent.iterdir() if item.is_dir()
         ]
 
         # We import Vagrant here instead of at the top of the file because, if
