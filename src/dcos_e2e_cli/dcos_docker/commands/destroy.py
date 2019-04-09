@@ -36,11 +36,7 @@ def _destroy_cluster(cluster_id: str) -> None:
 
 
 @click.command('destroy-list')
-@click.argument(
-    'cluster_ids',
-    nargs=-1,
-    type=str,
-)
+@click.argument('cluster_ids', nargs=-1, type=str)
 def destroy_list(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
