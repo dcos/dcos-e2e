@@ -242,13 +242,6 @@ def install_dcos_from_path(
         doctor_message: A message which instructs the user on which command to
             use if installation fails.
     """
-    doctor_path = command_path(
-        sibling_ctx=sibling_ctx,
-        command=doctor_command,
-    )
-    doctor_message = 'Try `{doctor_path}` for troubleshooting help.'.format(
-        doctor_path=doctor_path,
-    )
     try:
         cluster.install_dcos_from_path(
             dcos_installer=installer,
