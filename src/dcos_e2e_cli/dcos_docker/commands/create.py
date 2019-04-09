@@ -524,6 +524,7 @@ def create(
         security_mode=security_mode,
         license_key=license_key,
     )
+
     install_dcos_from_path(
         cluster=cluster,
         dcos_config=dcos_config,
@@ -534,6 +535,8 @@ def create(
     )
 
     http_checks = bool(transport == Transport.SSH)
+    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
+    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
 
     superuser_username = dcos_config.get(
         'superuser_username',
@@ -552,13 +555,11 @@ def create(
             superuser_username=superuser_username,
             superuser_password=superuser_password,
             http_checks=http_checks,
-            doctor_command=doctor,
-            sibling_ctx=ctx,
+            doctor_command_name=doctor_command_name,
         )
 
         return
 
-    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
     show_cluster_started_message(
         wait_command_name=wait_command_name,
         cluster_id=cluster_id,
