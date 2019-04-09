@@ -13,8 +13,8 @@ from typing import Any  # noqa: F401
 from typing import Union
 
 import click
-from halo import Halo
 import docker
+from halo import Halo
 
 from dcos_e2e.backends import Docker
 

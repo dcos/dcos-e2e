@@ -5,7 +5,6 @@ Tools for waiting for DC/OS.
 import sys
 
 import click
-from halo import Halo
 import urllib3
 
 from dcos_e2e.cluster import Cluster
