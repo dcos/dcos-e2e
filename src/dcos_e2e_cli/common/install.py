@@ -5,7 +5,7 @@ Helpers for installing DC/OS.
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 import click
 
