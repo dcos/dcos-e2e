@@ -21,9 +21,6 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import (
     get_dcos_installer_details,
 )
 
-DEFAULT_SUPERUSER_USERNAME = 'admin'
-DEFAULT_SUPERUSER_PASSWORD = 'admin'
-
 
 def command_path(
     sibling_ctx: click.core.Context,
