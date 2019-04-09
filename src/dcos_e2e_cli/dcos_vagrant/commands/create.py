@@ -12,19 +12,14 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 from halo import Halo
 
-import dcos_e2e_cli.common.wait
 from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
-from dcos_e2e_cli.common.credentials import (
-    DEFAULT_SUPERUSER_PASSWORD,
-    DEFAULT_SUPERUSER_USERNAME,
-)
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
     install_dcos_from_path,
-    show_cluster_started_message,
+    run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
     agents_option,
@@ -146,6 +141,7 @@ def create(
     workspace_dir.mkdir(parents=True)
 
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
+    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
     doctor_message = get_doctor_message(
         doctor_command_name=doctor_command_name,
     )
@@ -211,32 +207,13 @@ def create(
         local_genconf_dir=genconf_dir,
     )
 
-    superuser_username = dcos_config.get(
-        'superuser_username',
-        DEFAULT_SUPERUSER_USERNAME,
-    )
-
-    superuser_password = dcos_config.get(
-        'superuser_password',
-        DEFAULT_SUPERUSER_PASSWORD,
-    )
-
-    if wait_for_dcos:
-        dcos_e2e_cli.common.wait.wait_for_dcos(
-            dcos_variant=dcos_variant,
-            cluster=cluster,
-            superuser_username=superuser_username,
-            superuser_password=superuser_password,
-            http_checks=True,
-            doctor_command_name=doctor_command_name,
-        )
-
-        return
-
-    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
-    show_cluster_started_message(
-        wait_command_name=wait_command_name,
+    run_post_install_steps(
+        cluster=cluster,
         cluster_id=cluster_id,
+        dcos_config=dcos_config,
+        dcos_variant=dcos_variant,
+        doctor_command_name=doctor_command_name,
+        http_checks=True,
+        wait_command_name=wait_command_name,
+        wait_for_dcos=wait_for_dcos,
     )
-
-    click.echo(cluster_id)
