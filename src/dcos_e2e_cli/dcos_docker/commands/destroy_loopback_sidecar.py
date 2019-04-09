@@ -11,6 +11,7 @@ from ._common import loopback_sidecars_by_name
 
 
 @click.command('destroy-loopback-sidecar')
+@Halo()
 @click.argument('name', type=str)
 def destroy_loopback_sidecar(name: str) -> None:
     """
@@ -25,5 +26,4 @@ def destroy_loopback_sidecar(name: str) -> None:
         raise click.BadParameter(message)
 
     [loopback_sidecar] = loopback_sidecars
-    with Halo():
-        DockerLoopbackVolume.destroy(container=loopback_sidecar)
+    DockerLoopbackVolume.destroy(container=loopback_sidecar)

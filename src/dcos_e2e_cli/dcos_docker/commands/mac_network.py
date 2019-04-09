@@ -200,6 +200,7 @@ def _destroy_mac_network_containers() -> None:
         'uses of this command.'
     ),
 )
+@Halo()
 @click.command('setup-mac-network')
 def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     """
@@ -211,8 +212,7 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
         _destroy_mac_network_containers()
 
     try:
-        with Halo():
-            _create_mac_network(configuration_dst=configuration_dst)
+        _create_mac_network(configuration_dst=configuration_dst)
     except docker.errors.APIError as exc:
         if exc.status_code == 409:
             message = (

@@ -144,6 +144,7 @@ def _validate_tags(
 @verbosity_option
 @cluster_id_option
 @enable_selinux_enforcing_option
+@Halo()
 @click.pass_context
 def create(
     ctx: click.core.Context,
@@ -308,13 +309,12 @@ def create(
     )
 
     try:
-        with Halo():
-            cluster.install_dcos_from_url(
-                dcos_installer=installer_url,
-                dcos_config=dcos_config,
-                ip_detect_path=cluster_backend.ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            )
+        cluster.install_dcos_from_url(
+            dcos_installer=installer_url,
+            dcos_config=dcos_config,
+            ip_detect_path=cluster_backend.ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
     except CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)

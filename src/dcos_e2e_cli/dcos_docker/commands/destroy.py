@@ -40,6 +40,7 @@ def _destroy_cluster(cluster_id: str) -> None:
     type=str,
 )
 @node_transport_option
+@Halo()
 @click.pass_context
 def destroy_list(cluster_ids: List[str]) -> None:
     """
@@ -56,17 +57,16 @@ def destroy_list(cluster_ids: List[str]) -> None:
             click.echo(warning, err=True)
             continue
 
-        with Halo():
-            _destroy_cluster(cluster_id=cluster_id)
+        _destroy_cluster(cluster_id=cluster_id)
         click.echo(cluster_id)
 
 
 @click.command('destroy')
+@Halo()
 @existing_cluster_id_option
 def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
-    with Halo():
-        _destroy_cluster(cluster_id=cluster_id)
+    _destroy_cluster(cluster_id=cluster_id)
     click.echo(cluster_id)
