@@ -6,6 +6,7 @@ import sys
 
 import click
 import urllib3
+from halo import Halo
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
@@ -53,6 +54,8 @@ def wait_for_dcos(
     if dcos_variant == DCOSVariant.OSS:
         click.echo(no_login_message)
 
+    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner.start(text='Waiting for DC/OS')
     try:
         if dcos_variant == DCOSVariant.ENTERPRISE:
             cluster.wait_for_dcos_ee(
@@ -60,9 +63,10 @@ def wait_for_dcos(
                 superuser_password=superuser_password,
                 http_checks=http_checks,
             )
-            return
-
-        cluster.wait_for_dcos_oss(http_checks=http_checks)
+        else:
+            cluster.wait_for_dcos_oss(http_checks=http_checks)
     except DCOSTimeoutError:
-        click.echo('Waiting for DC/OS to start timed out.', err=True)
+        spinner.fail(text='Waiting for DC/OS to start timed out.')
         sys.exit(1)
+
+    spinner.succeed()

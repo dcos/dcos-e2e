@@ -3,14 +3,12 @@ Tools for creating a DC/OS cluster.
 """
 
 import json
-import sys
 import tempfile
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import click
-from halo import Halo
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
@@ -80,7 +78,6 @@ from .wait import wait
     ),
 )
 @click.pass_context
-@Halo(enabled=sys.stdout.isatty())
 def create(
     ctx: click.core.Context,
     agents: int,

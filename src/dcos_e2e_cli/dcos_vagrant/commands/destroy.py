@@ -14,6 +14,7 @@ from dcos_e2e_cli.common.utils import check_cluster_id_exists
 from ._common import ClusterVMs, existing_cluster_ids
 
 
+@Halo(enabled=sys.stdout.isatty())
 def destroy_cluster(cluster_id: str) -> None:
     """
     Destroy a cluster.
@@ -31,7 +32,6 @@ def destroy_cluster(cluster_id: str) -> None:
 
 @click.command('destroy-list')
 @click.argument('cluster_ids', nargs=-1, type=str)
-@Halo(enabled=sys.stdout.isatty())
 def destroy_list(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
@@ -53,7 +53,6 @@ def destroy_list(cluster_ids: List[str]) -> None:
 
 @click.command('destroy')
 @existing_cluster_id_option
-@Halo(enabled=sys.stdout.isatty())
 def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.

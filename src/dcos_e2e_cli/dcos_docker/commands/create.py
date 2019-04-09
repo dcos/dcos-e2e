@@ -2,7 +2,6 @@
 Tools for creating a DC/OS cluster.
 """
 
-import sys
 import tempfile
 import uuid
 from pathlib import Path
@@ -12,7 +11,6 @@ import click
 import docker
 from docker.models.networks import Network
 from docker.types import Mount
-from halo import Halo
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
@@ -366,7 +364,6 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 )
 @verbosity_option
 @click.pass_context
-@Halo(enabled=sys.stdout.isatty())
 def create(
     ctx: click.core.Context,
     agents: int,

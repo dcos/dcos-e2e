@@ -84,6 +84,7 @@ def _validate_ovpn_file_does_not_exist(
     return path
 
 
+@Halo(enabled=sys.stdout.isatty())
 def _create_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
@@ -170,6 +171,7 @@ def _create_mac_network(configuration_dst: Path) -> None:
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
 
+@Halo(enabled=sys.stdout.isatty())
 def _destroy_mac_network_containers() -> None:
     """
     Destroy containers created by ``minidcos docker setup-mac-network``.
@@ -201,7 +203,6 @@ def _destroy_mac_network_containers() -> None:
     ),
 )
 @click.command('setup-mac-network')
-@Halo(enabled=sys.stdout.isatty())
 def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     """
     Set up a network to connect to nodes on macOS.

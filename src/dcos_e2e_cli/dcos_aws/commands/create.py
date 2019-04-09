@@ -2,7 +2,6 @@
 Tools for creating a DC/OS cluster.
 """
 
-import sys
 import tempfile
 import uuid
 from pathlib import Path
@@ -10,7 +9,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import boto3
 import click
-from halo import Halo
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
@@ -145,7 +143,6 @@ def _validate_tags(
 @cluster_id_option
 @enable_selinux_enforcing_option
 @click.pass_context
-@Halo(enabled=sys.stdout.isatty())
 def create(
     ctx: click.core.Context,
     agents: int,
