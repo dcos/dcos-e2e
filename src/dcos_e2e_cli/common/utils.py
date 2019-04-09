@@ -39,19 +39,6 @@ def command_path(
     return ' '.join(command_path_list)
 
 
-def get_doctor_message(doctor_command_name: str) -> str:
-    """
-    Return a message which instructs the user to use a given doctor command for
-    troubleshooting help.
-
-    Args:
-        doctor_command_name: A command which will give troubleshooting help.
-    """
-    return ('Try "{doctor_command_name}" for troubleshooting help.').format(
-        doctor_command_name=doctor_command_name,
-    )
-
-
 def get_variant(
     given_variant: str,
     installer_path: Optional[Path],

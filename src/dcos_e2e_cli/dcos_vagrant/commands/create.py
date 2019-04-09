@@ -21,6 +21,7 @@ from dcos_e2e_cli.common.credentials import (
     DEFAULT_SUPERUSER_PASSWORD,
     DEFAULT_SUPERUSER_USERNAME,
 )
+from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
     install_dcos_from_path,
     show_cluster_started_message,
@@ -43,7 +44,6 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    get_doctor_message,
     get_variant,
     set_logging,
 )
