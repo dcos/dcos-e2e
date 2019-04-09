@@ -300,14 +300,6 @@ def create(
                 sudo=True,
             )
 
-    files_to_copy_to_genconf_dir = []
-    if genconf_dir is not None:
-        node_genconf_path = Path('/genconf')
-        for genconf_file in genconf_dir.glob('*'):
-            genconf_relative = genconf_file.relative_to(genconf_dir)
-            relative_path = node_genconf_path / genconf_relative
-            files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
-
     dcos_config = get_config(
         cluster=cluster,
         extra_config=extra_config,
@@ -321,7 +313,7 @@ def create(
         dcos_config=dcos_config,
         dcos_installer_url=installer_url,
         doctor_message=doctor_message,
-        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        local_genconf_dir=genconf_dir,
         ip_detect_path=cluster_backend.ip_detect_path,
     )
 
