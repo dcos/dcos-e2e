@@ -13,7 +13,7 @@ from typing import Any  # noqa: F401
 from typing import Union
 
 import click
-import click_spinner
+from halo import Halo
 import docker
 
 from dcos_e2e.backends import Docker
@@ -211,7 +211,7 @@ def setup_mac_network(configuration_dst: Path, force: bool) -> None:
         _destroy_mac_network_containers()
 
     try:
-        with click_spinner.spinner():
+        with Halo():
             _create_mac_network(configuration_dst=configuration_dst)
     except docker.errors.APIError as exc:
         if exc.status_code == 409:

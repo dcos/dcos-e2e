@@ -10,8 +10,8 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Any, Dict, Iterable, Optional, Set, Tuple
 
+from halo import Halo
 import click
-import click_spinner
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -93,7 +93,7 @@ def get_variant(
     if given_variant == 'auto':
         assert installer_path is not None
         try:
-            with click_spinner.spinner():
+            with Halo():
                 return get_dcos_installer_details(
                     installer=installer_path,
                     workspace_dir=workspace_dir,
@@ -254,7 +254,7 @@ def install_dcos_from_path(
         doctor_path=doctor_path,
     )
     try:
-        with click_spinner.spinner():
+        with Halo():
             cluster.install_dcos_from_path(
                 dcos_installer=installer,
                 dcos_config=dcos_config,

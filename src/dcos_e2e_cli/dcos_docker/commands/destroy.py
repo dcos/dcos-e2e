@@ -5,7 +5,7 @@ Tools for destroying clusters.
 from typing import List
 
 import click
-import click_spinner
+from halo import Halo
 
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.options import existing_cluster_id_option
@@ -56,7 +56,7 @@ def destroy_list(cluster_ids: List[str]) -> None:
             click.echo(warning, err=True)
             continue
 
-        with click_spinner.spinner():
+        with Halo():
             _destroy_cluster(cluster_id=cluster_id)
         click.echo(cluster_id)
 
@@ -67,6 +67,6 @@ def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
-    with click_spinner.spinner():
+    with Halo():
         _destroy_cluster(cluster_id=cluster_id)
     click.echo(cluster_id)
