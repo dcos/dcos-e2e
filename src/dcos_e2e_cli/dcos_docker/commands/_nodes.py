@@ -2,7 +2,7 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
-def _get_node(
+def get_node(
     cluster_containers: ClusterContainers,
     node_reference: str,
 ) -> Optional[Node]:

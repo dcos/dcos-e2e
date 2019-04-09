@@ -27,6 +27,7 @@ from ._common import (
     ContainerInspectView,
     existing_cluster_ids,
 )
+from ._nodes import get_node
 from ._options import node_transport_option
 
 
