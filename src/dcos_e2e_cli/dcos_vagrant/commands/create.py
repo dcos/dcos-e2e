@@ -17,6 +17,10 @@ from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
+from dcos_e2e_cli.common.credentials import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
+)
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -37,13 +41,11 @@ from dcos_e2e_cli.common.utils import (
     command_path,
     get_doctor_message,
     get_variant,
-    install_dcos_from_path,
     set_logging,
-    show_cluster_started_message,
 )
-from dcos_e2e_cli.common.credentials import (
-    DEFAULT_SUPERUSER_USERNAME,
-    DEFAULT_SUPERUSER_PASSWORD,
+from dcos_e2e_cli.common.install import (
+    install_dcos_from_path,
+    show_cluster_started_message,
 )
 
 from ._common import (
@@ -143,7 +145,10 @@ def create(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
-    doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
+    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
+    doctor_message = get_doctor_message(
+        doctor_command_name=doctor_command_name,
+    )
     installer_path = Path(installer).resolve()
 
     dcos_variant = get_variant(
@@ -224,7 +229,6 @@ def create(
         DEFAULT_SUPERUSER_PASSWORD,
     )
 
-    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     if wait_for_dcos:
         dcos_e2e_cli.common.wait.wait_for_dcos(
             dcos_variant=dcos_variant,
