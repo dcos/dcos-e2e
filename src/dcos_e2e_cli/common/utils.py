@@ -190,8 +190,7 @@ def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
 
 
 def show_cluster_started_message(
-    sibling_ctx: click.core.Context,
-    wait_command: click.core.Command,
+    wait_command_name: str,
     cluster_id: str,
 ) -> None:
     """
@@ -199,23 +198,17 @@ def show_cluster_started_message(
     Point the user towards a ``wait`` command.
 
     Args:
-        sibling_ctx: A context associated with a call to a sibling of
-            ``wait_command``.
-        wait_command: A command which can take a ``--cluster-id`` option to
-            wait for a cluster.
+        wait_command_name: A command which can take a ``--cluster-id`` option
+            to wait for a cluster.
         cluster_id: The ID of a cluster which has just been created.
     """
-    waitcommand_name = command_path(
-        sibling_ctx=sibling_ctx,
-        command=wait_command,
-    )
     cluster_started_message = (
         'Cluster "{cluster_id}" has started. '
-        'Run "{waitcommand_name} --cluster-id {cluster_id}" to wait for '
+        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
         'DC/OS to become ready.'
     ).format(
         cluster_id=cluster_id,
-        waitcommand_name=waitcommand_name,
+        wait_command_name=wait_command_name,
     )
     click.echo(cluster_started_message, err=True)
 
