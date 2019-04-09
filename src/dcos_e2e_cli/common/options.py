@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, Optional, Union
 import click
 import yaml
 
-from .utils import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
+from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 from .validators import (
     validate_path_is_directory,
     validate_path_pair,
