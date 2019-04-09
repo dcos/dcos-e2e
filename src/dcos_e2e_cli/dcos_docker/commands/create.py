@@ -462,14 +462,6 @@ def create(
         doctor_message=doctor_message,
     )
 
-    files_to_copy_to_genconf_dir = []
-    if genconf_dir is not None:
-        container_genconf_path = Path('/genconf')
-        for genconf_file in genconf_dir.glob('*'):
-            genconf_relative = genconf_file.relative_to(genconf_dir)
-            relative_path = container_genconf_path / genconf_relative
-            files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
-
     variant_label_value = {
         DCOSVariant.OSS: VARIANT_OSS_LABEL_VALUE,
         DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
@@ -536,9 +528,9 @@ def create(
         cluster=cluster,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
-        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         doctor_message=doctor_message,
         dcos_installer=installer_path,
+        local_genconf_dir=genconf_dir,
     )
 
     http_checks = bool(transport == Transport.SSH)
