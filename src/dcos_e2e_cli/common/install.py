@@ -102,30 +102,6 @@ def install_dcos_from_url(
         sys.exit(exc.returncode)
 
 
-def show_cluster_started_message(
-    wait_command_name: str,
-    cluster_id: str,
-) -> None:
-    """
-    Show a message which says that the cluster has started.
-    Point the user towards a ``wait`` command.
-
-    Args:
-        wait_command_name: A command which can take a ``--cluster-id`` option
-            to wait for a cluster.
-        cluster_id: The ID of a cluster which has just been created.
-    """
-    cluster_started_message = (
-        'Cluster "{cluster_id}" has started. '
-        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
-        'DC/OS to become ready.'
-    ).format(
-        cluster_id=cluster_id,
-        wait_command_name=wait_command_name,
-    )
-    click.echo(cluster_started_message, err=True)
-
-
 def run_post_install_steps(
     cluster: Cluster,
     cluster_id: str,
@@ -174,9 +150,14 @@ def run_post_install_steps(
 
         return
 
-    show_cluster_started_message(
-        wait_command_name=wait_command_name,
+    cluster_started_message = (
+        'Cluster "{cluster_id}" has started. '
+        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
+        'DC/OS to become ready.'
+    ).format(
         cluster_id=cluster_id,
+        wait_command_name=wait_command_name,
     )
+    click.echo(cluster_started_message, err=True)
 
     click.echo(cluster_id)
