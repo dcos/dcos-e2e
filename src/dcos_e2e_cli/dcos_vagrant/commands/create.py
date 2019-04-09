@@ -153,7 +153,7 @@ def create(
         doctor_message=doctor_message,
     )
 
-    variant_label_value = {
+    variant_description_value = {
         DCOSVariant.OSS: VARIANT_OSS_DESCRIPTION_VALUE,
         DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_DESCRIPTION_VALUE,
     }[dcos_variant]
@@ -161,7 +161,7 @@ def create(
     description = {
         CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
         WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
-        VARIANT_DESCRIPTION_KEY: variant_label_value,
+        VARIANT_DESCRIPTION_KEY: variant_description_value,
     }
     cluster_backend = Vagrant(
         workspace_dir=workspace_dir,
