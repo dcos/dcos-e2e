@@ -9,7 +9,11 @@ from typing import Any, Dict, Optional
 
 import click
 
+import dcos_e2e_cli.common.wait
 from dcos_e2e.cluster import Cluster
+from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+
+from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
 
 def install_dcos_from_path(
@@ -120,3 +124,59 @@ def show_cluster_started_message(
         wait_command_name=wait_command_name,
     )
     click.echo(cluster_started_message, err=True)
+
+
+def run_post_install_steps(
+    cluster: Cluster,
+    cluster_id: str,
+    dcos_config: Dict[str, Any],
+    dcos_variant: DCOSVariant,
+    doctor_command_name: str,
+    http_checks: bool,
+    wait_command_name: str,
+    wait_for_dcos: bool,
+) -> None:
+    """
+    Wait for DC/OS if wanted, else print a message stating that next you should
+    wait.
+
+    Args:
+        cluster: A DC/OS cluster to run steps against.
+        cluster_id: The ID of the cluster.
+        dcos_config: The config that DC/OS was installed with.
+        dcos_variant: The variant of DC/OS.
+        doctor_command_name: The name of a ``doctor`` command to use if things
+            go wrong.
+        http_checks: Whether to run HTTP checks when waiting for DC/OS.
+        wait_command_name: The name of a ``wait`` command to use after the
+            cluster is installed.
+        wait_for_dcos: Whether to wait for DC/OS to be installed.
+    """
+    superuser_username = dcos_config.get(
+        'superuser_username',
+        DEFAULT_SUPERUSER_USERNAME,
+    )
+
+    superuser_password = dcos_config.get(
+        'superuser_password',
+        DEFAULT_SUPERUSER_PASSWORD,
+    )
+
+    if wait_for_dcos:
+        dcos_e2e_cli.common.wait.wait_for_dcos(
+            dcos_variant=dcos_variant,
+            cluster=cluster,
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+            http_checks=True,
+            doctor_command_name=doctor_command_name,
+        )
+
+        return
+
+    show_cluster_started_message(
+        wait_command_name=wait_command_name,
+        cluster_id=cluster_id,
+    )
+
+    click.echo(cluster_id)
