@@ -59,7 +59,7 @@ def wait_for_dcos(
         'To resolve that, run this command again.'
     )
 
-    if not dcos_variant == DCOSVariant.ENTERPRISE:
+    if dcos_variant == DCOSVariant.OSS:
         click.echo(no_login_message)
 
     try:
