@@ -302,10 +302,10 @@ def create(
 
     files_to_copy_to_genconf_dir = []
     if genconf_dir is not None:
-        container_genconf_path = Path('/genconf')
+        node_genconf_path = Path('/genconf')
         for genconf_file in genconf_dir.glob('*'):
             genconf_relative = genconf_file.relative_to(genconf_dir)
-            relative_path = container_genconf_path / genconf_relative
+            relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
     dcos_config = get_config(
