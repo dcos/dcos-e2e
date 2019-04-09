@@ -39,6 +39,7 @@ from dcos_e2e_cli.common.utils import (
     DEFAULT_SUPERUSER_PASSWORD,
     DEFAULT_SUPERUSER_USERNAME,
     check_cluster_id_unique,
+    command_path,
     get_doctor_message,
     get_variant,
     install_dcos_from_path,
