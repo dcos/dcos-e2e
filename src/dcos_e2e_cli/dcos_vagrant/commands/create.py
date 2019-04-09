@@ -222,6 +222,7 @@ def create(
         DEFAULT_SUPERUSER_PASSWORD,
     )
 
+    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     if wait_for_dcos:
         dcos_e2e_cli.common.wait.wait_for_dcos(
             dcos_variant=dcos_variant,
@@ -229,8 +230,7 @@ def create(
             superuser_username=superuser_username,
             superuser_password=superuser_password,
             http_checks=True,
-            doctor_command=doctor,
-            sibling_ctx=ctx,
+            doctor_command_name=doctor_command_name,
         )
 
         return

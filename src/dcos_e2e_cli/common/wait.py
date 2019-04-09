@@ -20,8 +20,7 @@ def wait_for_dcos(
     superuser_username: str,
     superuser_password: str,
     http_checks: bool,
-    sibling_ctx: click.core.Context,
-    doctor_command: click.core.Command,
+    doctor_command_name: str,
 ) -> None:
     """
     Wait for DC/OS to start.
@@ -35,15 +34,9 @@ def wait_for_dcos(
             this password to wait for DC/OS.
         http_checks: Whether or not to wait for checks which require an HTTP
             connection to the cluster.
-        doctor_command: A ``doctor`` command to advise a user to use.
-        sibling_ctx: A context associated with a call to a sibling of
-            ``doctor_command``.
+        doctor_command_name: A ``doctor`` command to advise a user to use.
     """
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    doctor_command_name = command_path(
-        sibling_ctx=sibling_ctx,
-        command=doctor_command,
-    )
     message = (
         'A cluster may take some time to be ready.\n'
         'The amount of time it takes to start a cluster depends on a variety '
