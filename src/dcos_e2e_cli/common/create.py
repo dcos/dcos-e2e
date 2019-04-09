@@ -15,7 +15,7 @@ from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
-from .utils import get_doctor_message
+from .utils import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
 
 def create_cluster(
@@ -23,16 +23,11 @@ def create_cluster(
     masters: int,
     agents: int,
     public_agents: int,
-    sibling_ctx: click.core.Context,
-    doctor_command: click.core.Command,
+    doctor_message: str,
 ) -> Cluster:
     """
     Create a cluster.
     """
-    doctor_message = get_doctor_message(
-        sibling_ctx=sibling_ctx,
-        doctor_command=doctor_command,
-    )
     try:
         return Cluster(
             cluster_backend=cluster_backend,
@@ -62,8 +57,8 @@ def get_config(
     is_enterprise = bool(dcos_variant == DCOSVariant.ENTERPRISE)
 
     if is_enterprise:
-        superuser_username = 'admin'
-        superuser_password = 'admin'
+        superuser_username = DEFAULT_SUPERUSER_USERNAME
+        superuser_password = DEFAULT_SUPERUSER_PASSWORD
 
         enterprise_extra_config = {
             'superuser_username': superuser_username,

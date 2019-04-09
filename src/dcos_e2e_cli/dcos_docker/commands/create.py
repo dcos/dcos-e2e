@@ -503,8 +503,7 @@ def create(
         masters=masters,
         agents=agents,
         public_agents=public_agents,
-        sibling_ctx=ctx,
-        doctor_command=doctor,
+        doctor_message=doctor_message,
     )
 
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
@@ -529,8 +528,7 @@ def create(
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        doctor_command=doctor,
-        sibling_ctx=ctx,
+        doctor_message=doctor_message,
         installer=installer_path,
     )
 

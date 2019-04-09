@@ -226,8 +226,7 @@ def install_dcos_from_path(
     dcos_config: Dict[str, Any],
     files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     installer: Path,
-    doctor_command: click.core.Command,
-    sibling_ctx: click.core.Context,
+    doctor_message: str,
 ) -> None:
     """
     Install DC/OS on a cluster.
@@ -240,17 +239,9 @@ def install_dcos_from_path(
             installer node before installing DC/OS.
         dcos_config: The DC/OS configuration to use.
         installer: The path to a DC/OS installer.
-        doctor_command: A doctor command to suggest if the installation fails.
-        sibling_ctx: A context associated with a call to a sibling of
-            ``doctor_command``.
+        doctor_message: A message which instructs the user on which command to
+            use if installation fails.
     """
-    doctor_path = command_path(
-        sibling_ctx=sibling_ctx,
-        command=doctor_command,
-    )
-    doctor_message = 'Try `{doctor_path}` for troubleshooting help.'.format(
-        doctor_path=doctor_path,
-    )
     try:
         cluster.install_dcos_from_path(
             dcos_installer=installer,
