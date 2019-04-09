@@ -2,6 +2,7 @@
 Tools for destroying clusters.
 """
 
+import sys
 from typing import List
 
 import click
@@ -40,8 +41,8 @@ def _destroy_cluster(cluster_id: str) -> None:
     type=str,
 )
 @node_transport_option
-@Halo()
 @click.pass_context
+@Halo(enabled=sys.stdout.isatty())
 def destroy_list(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
@@ -62,8 +63,8 @@ def destroy_list(cluster_ids: List[str]) -> None:
 
 
 @click.command('destroy')
-@Halo()
 @existing_cluster_id_option
+@Halo(enabled=sys.stdout.isatty())
 def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.

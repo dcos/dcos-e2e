@@ -3,6 +3,7 @@ Tools for creating a DC/OS cluster.
 """
 
 import json
+import sys
 import tempfile
 import uuid
 from pathlib import Path
@@ -78,8 +79,8 @@ from .wait import wait
         'command.'
     ),
 )
-@Halo()
 @click.pass_context
+@Halo(enabled=sys.stdout.isatty())
 def create(
     ctx: click.core.Context,
     agents: int,

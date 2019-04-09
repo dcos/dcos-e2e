@@ -2,6 +2,7 @@
 Tools for creating a DC/OS cluster.
 """
 
+import sys
 import tempfile
 import uuid
 from pathlib import Path
@@ -364,8 +365,8 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
     multiple=True,
 )
 @verbosity_option
-@Halo()
 @click.pass_context
+@Halo(enabled=sys.stdout.isatty())
 def create(
     ctx: click.core.Context,
     agents: int,

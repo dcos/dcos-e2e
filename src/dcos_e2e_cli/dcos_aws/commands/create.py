@@ -144,8 +144,8 @@ def _validate_tags(
 @verbosity_option
 @cluster_id_option
 @enable_selinux_enforcing_option
-@Halo()
 @click.pass_context
+@Halo(enabled=sys.stdout.isatty())
 def create(
     ctx: click.core.Context,
     agents: int,

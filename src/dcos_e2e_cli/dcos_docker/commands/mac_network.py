@@ -200,8 +200,8 @@ def _destroy_mac_network_containers() -> None:
         'uses of this command.'
     ),
 )
-@Halo()
 @click.command('setup-mac-network')
+@Halo(enabled=sys.stdout.isatty())
 def setup_mac_network(configuration_dst: Path, force: bool) -> None:
     """
     Set up a network to connect to nodes on macOS.

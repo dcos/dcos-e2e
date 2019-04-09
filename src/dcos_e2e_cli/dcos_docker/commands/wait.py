@@ -2,6 +2,8 @@
 Tools for waiting for a cluster.
 """
 
+import sys
+
 import click
 from halo import Halo
 
@@ -39,8 +41,8 @@ from .doctor import doctor
 )
 @node_transport_option
 @verbosity_option
-@Halo()
 @click.pass_context
+@Halo(enabled=sys.stdout.isatty())
 def wait(
     ctx: click.core.Context,
     cluster_id: str,
