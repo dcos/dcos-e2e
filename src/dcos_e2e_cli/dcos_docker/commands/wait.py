@@ -3,6 +3,7 @@ Tools for waiting for a cluster.
 """
 
 import click
+from halo import Halo
 
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.options import (
@@ -38,6 +39,7 @@ from .doctor import doctor
 )
 @node_transport_option
 @verbosity_option
+@Halo()
 @click.pass_context
 def wait(
     ctx: click.core.Context,

@@ -29,11 +29,8 @@ def destroy_cluster(cluster_id: str) -> None:
 
 
 @click.command('destroy-list')
-@click.argument(
-    'cluster_ids',
-    nargs=-1,
-    type=str,
-)
+@click.argument('cluster_ids', nargs=-1, type=str)
+@Halo()
 @click.pass_context
 def destroy_list(cluster_ids: List[str]) -> None:
     """
@@ -43,24 +40,23 @@ def destroy_list(cluster_ids: List[str]) -> None:
     ``minidcos vagrant destroy $(minidcos vagrant list)``.
     """
     for cluster_id in cluster_ids:
-        if cluster_id not in existing_cluster_ids():
+        if cluster_id in existing_cluster_ids():
+            destroy_cluster(cluster_id=cluster_id)
+            click.echo(cluster_id)
+        else:
             warning = 'Cluster "{cluster_id}" does not exist'.format(
                 cluster_id=cluster_id,
             )
             click.echo(warning, err=True)
             continue
 
-        with Halo():
-            destroy_cluster(cluster_id=cluster_id)
-        click.echo(cluster_id)
-
 
 @click.command('destroy')
+@Halo()
 @existing_cluster_id_option
 def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.
     """
-    with Halo():
-        destroy_cluster(cluster_id=cluster_id)
+    destroy_cluster(cluster_id=cluster_id)
     click.echo(cluster_id)

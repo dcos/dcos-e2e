@@ -10,7 +10,6 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Any, Dict, Iterable, Optional, Set, Tuple
 
-from halo import Halo
 import click
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
@@ -93,11 +92,10 @@ def get_variant(
     if given_variant == 'auto':
         assert installer_path is not None
         try:
-            with Halo():
-                return get_dcos_installer_details(
-                    installer=installer_path,
-                    workspace_dir=workspace_dir,
-                ).variant
+            return get_dcos_installer_details(
+                installer=installer_path,
+                workspace_dir=workspace_dir,
+            ).variant
         except subprocess.CalledProcessError as exc:
             rmtree(path=str(workspace_dir), ignore_errors=True)
             click.echo(doctor_message)
@@ -254,13 +252,12 @@ def install_dcos_from_path(
         doctor_path=doctor_path,
     )
     try:
-        with Halo():
-            cluster.install_dcos_from_path(
-                dcos_installer=installer,
-                dcos_config=dcos_config,
-                ip_detect_path=ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            )
+        cluster.install_dcos_from_path(
+            dcos_installer=installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
     except subprocess.CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)

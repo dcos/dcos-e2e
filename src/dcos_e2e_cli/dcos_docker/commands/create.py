@@ -11,6 +11,7 @@ import click
 import docker
 from docker.models.networks import Network
 from docker.types import Mount
+from halo import Halo
 
 import dcos_e2e_cli.common.wait
 from dcos_e2e.backends import Docker
@@ -363,6 +364,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
     multiple=True,
 )
 @verbosity_option
+@Halo()
 @click.pass_context
 def create(
     ctx: click.core.Context,

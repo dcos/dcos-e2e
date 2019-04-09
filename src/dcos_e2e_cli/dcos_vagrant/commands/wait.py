@@ -3,6 +3,7 @@ Tools for waiting for a cluster.
 """
 
 import click
+from halo import Halo
 
 from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
@@ -22,6 +23,7 @@ from .doctor import doctor
 @superuser_username_option
 @superuser_password_option
 @verbosity_option
+@Halo()
 @click.pass_context
 def wait(
     ctx: click.core.Context,

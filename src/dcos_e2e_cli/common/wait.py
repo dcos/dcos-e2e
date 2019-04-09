@@ -63,17 +63,16 @@ def wait_for_dcos(
     if not dcos_variant == DCOSVariant.ENTERPRISE:
         click.echo(no_login_message)
 
-    with Halo():
-        try:
-            if dcos_variant == DCOSVariant.ENTERPRISE:
-                cluster.wait_for_dcos_ee(
-                    superuser_username=superuser_username,
-                    superuser_password=superuser_password,
-                    http_checks=http_checks,
-                )
-                return
+    try:
+        if dcos_variant == DCOSVariant.ENTERPRISE:
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+                http_checks=http_checks,
+            )
+            return
 
-            cluster.wait_for_dcos_oss(http_checks=http_checks)
-        except DCOSTimeoutError:
-            click.echo('Waiting for DC/OS to start timed out.', err=True)
-            sys.exit(1)
+        cluster.wait_for_dcos_oss(http_checks=http_checks)
+    except DCOSTimeoutError:
+        click.echo('Waiting for DC/OS to start timed out.', err=True)
+        sys.exit(1)
