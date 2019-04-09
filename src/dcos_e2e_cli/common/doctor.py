@@ -116,3 +116,16 @@ def run_doctor_commands(
 
         if level == CheckLevels.ERROR:
             sys.exit(1)
+
+
+def get_doctor_message(doctor_command_name: str) -> str:
+    """
+    Return a message which instructs the user to use a given doctor command for
+    troubleshooting help.
+
+    Args:
+        doctor_command_name: A command which will give troubleshooting help.
+    """
+    return ('Try "{doctor_command_name}" for troubleshooting help.').format(
+        doctor_command_name=doctor_command_name,
+    )
