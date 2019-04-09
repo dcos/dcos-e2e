@@ -22,6 +22,7 @@ from dcos_e2e_cli.common.credentials import (
     DEFAULT_SUPERUSER_PASSWORD,
     DEFAULT_SUPERUSER_USERNAME,
 )
+from dcos_e2e_cli.common.install import show_cluster_started_message
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -44,7 +45,6 @@ from dcos_e2e_cli.common.utils import (
     set_logging,
     write_key_pair,
 )
-from dcos_e2e_cli.common.install import show_cluster_started_message
 
 from ._common import (
     CLUSTER_ID_TAG_KEY,
@@ -227,7 +227,9 @@ def create(
     )
 
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
-    doctor_message = get_doctor_message(doctor_command_name=doctor_command_name)
+    doctor_message = get_doctor_message(
+        doctor_command_name=doctor_command_name
+    )
     dcos_variant = get_variant(
         given_variant=variant,
         installer_path=None,

@@ -5,14 +5,11 @@ Helpers for installing DC/OS.
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Tuple, Dict, Iterable
+from typing import Any, Dict, Iterable, Tuple
 
 import click
-from dcos_e2e.cluster import Cluster
 
-from dcos_e2e_cli._vendor.dcos_installer_tools import (
-    get_dcos_installer_details,
-)
+from dcos_e2e.cluster import Cluster
 
 
 def install_dcos_from_path(
