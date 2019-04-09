@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import click
+from halo import Halo
 
 import dcos_e2e_cli.common.wait
 from dcos_e2e.cluster import Cluster
@@ -46,12 +47,13 @@ def install_dcos_from_path(
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
     try:
-        cluster.install_dcos_from_path(
-            dcos_installer=dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        )
+        with Halo(text='Installing DC/OS', enabled=sys.stdout.isatty()):
+            cluster.install_dcos_from_path(
+                dcos_installer=dcos_installer,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            )
     except subprocess.CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)
@@ -89,12 +91,13 @@ def install_dcos_from_url(
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
     try:
-        cluster.install_dcos_from_url(
-            dcos_installer=dcos_installer_url,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        )
+        with Halo(text='Installing DC/OS', enabled=sys.stdout.isatty()):
+            cluster.install_dcos_from_url(
+                dcos_installer=dcos_installer_url,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            )
     except subprocess.CalledProcessError as exc:
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)

@@ -1,4 +1,4 @@
-"""
+"cluster""
 Download installers.
 """
 

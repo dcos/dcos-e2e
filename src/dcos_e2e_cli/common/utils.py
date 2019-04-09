@@ -14,6 +14,7 @@ import click
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+from halo import Halo
 
 from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
@@ -66,10 +67,14 @@ def get_variant(
     if given_variant == 'auto':
         assert installer_path is not None
         try:
-            return get_dcos_installer_details(
-                installer=installer_path,
-                workspace_dir=workspace_dir,
-            ).variant
+            with Halo(
+                text='Determining DC/OS variant',
+                enabled=sys.stdout.isatty(),
+            ):
+                return get_dcos_installer_details(
+                    installer=installer_path,
+                    workspace_dir=workspace_dir,
+                ).variant
         except subprocess.CalledProcessError as exc:
             rmtree(path=str(workspace_dir), ignore_errors=True)
             click.echo(doctor_message)
