@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import boto3
 import click
-import click_spinner
+from halo import Halo
 
 import dcos_e2e_cli.common.wait
 from dcos_e2e.backends import AWS
@@ -308,7 +308,7 @@ def create(
     )
 
     try:
-        with click_spinner.spinner():
+        with Halo():
             cluster.install_dcos_from_url(
                 dcos_installer=installer_url,
                 dcos_config=dcos_config,

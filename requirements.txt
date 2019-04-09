@@ -2,7 +2,6 @@ Cerberus==1.2
 PyYAML==5.1
 boto3==1.9.123
 botocore==1.12.123
-click-spinner==0.1.8
 click==7.0
 cryptography==2.6.1
 docker==3.7.1

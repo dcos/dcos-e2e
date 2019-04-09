@@ -5,7 +5,7 @@ Tools for waiting for DC/OS.
 import sys
 
 import click
-import click_spinner
+from halo import Halo
 import urllib3
 
 from dcos_e2e.cluster import Cluster
@@ -63,7 +63,7 @@ def wait_for_dcos(
     if not dcos_variant == DCOSVariant.ENTERPRISE:
         click.echo(no_login_message)
 
-    with click_spinner.spinner():
+    with Halo():
         try:
             if dcos_variant == DCOSVariant.ENTERPRISE:
                 cluster.wait_for_dcos_ee(
