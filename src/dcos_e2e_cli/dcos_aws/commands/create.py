@@ -23,7 +23,10 @@ from dcos_e2e_cli.common.credentials import (
     DEFAULT_SUPERUSER_USERNAME,
 )
 from dcos_e2e_cli.common.doctor import get_doctor_message
-from dcos_e2e_cli.common.install import show_cluster_started_message
+from dcos_e2e_cli.common.install import (
+    install_dcos_from_url,
+    show_cluster_started_message,
+)
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -313,18 +316,14 @@ def create(
         license_key=license_key,
     )
 
-    try:
-        cluster.install_dcos_from_url(
-            dcos_installer=installer_url,
-            dcos_config=dcos_config,
-            ip_detect_path=cluster_backend.ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        )
-    except CalledProcessError as exc:
-        click.echo('Error installing DC/OS.', err=True)
-        click.echo(doctor_message)
-        cluster.destroy()
-        sys.exit(exc.returncode)
+    install_dcos_from_url(
+        cluster=cluster,
+        dcos_config=dcos_config,
+        dcos_installer_url=installer_url,
+        doctor_message=doctor_message,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        ip_detect_path=cluster_backend.ip_detect_path,
+    )
 
     superuser_username = dcos_config.get(
         'superuser_username',

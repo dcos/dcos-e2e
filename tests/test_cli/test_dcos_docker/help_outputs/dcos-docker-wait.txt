@@ -17,7 +17,7 @@ Options:
                                  fully ready. Use this flag in cases where an
                                  HTTP connection cannot be made to the cluster.
                                  For example this is useful on macOS without a
-                                 VPN set up.
+                                 VPN set up.  [default: False]
   --transport [docker-exec|ssh]  The communication transport to use. On macOS
                                  the SSH transport requires IP routing to be set
                                  up. See "minidcos docker setup-mac-network". It
