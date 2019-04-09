@@ -538,20 +538,6 @@ def create(
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     wait_command_name = command_path(sibling_ctx=ctx, command=wait)
 
-    run_post_install_steps(
-        cluster=cluster,
-        cluster_id=cluster_id,
-        dcos_config=dcos_config,
-        dcos_variant=dcos_variant,
-        doctor_command_name=doctor_command_name,
-        http_checks=http_checks,
-        superuser_password=superuser_password,
-        superuser_username=superuser_username,
-        wait_command_name=wait_command_name,
-        wait_for_dcos=wait_for_dcos,
-    )
-
-
     superuser_username = dcos_config.get(
         'superuser_username',
         DEFAULT_SUPERUSER_USERNAME,
