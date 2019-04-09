@@ -3,7 +3,6 @@ Tools for creating a DC/OS cluster.
 """
 
 import json
-import sys
 import tempfile
 import uuid
 from pathlib import Path

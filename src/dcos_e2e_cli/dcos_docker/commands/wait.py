@@ -2,10 +2,7 @@
 Tools for waiting for a cluster.
 """
 
-import sys
-
 import click
-from halo import Halo
 
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.options import (
