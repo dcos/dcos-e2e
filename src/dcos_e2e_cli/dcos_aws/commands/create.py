@@ -228,7 +228,7 @@ def create(
 
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     doctor_message = get_doctor_message(
-        doctor_command_name=doctor_command_name
+        doctor_command_name=doctor_command_name,
     )
     dcos_variant = get_variant(
         given_variant=variant,
