@@ -170,8 +170,7 @@ def create(
         masters=masters,
         agents=agents,
         public_agents=public_agents,
-        sibling_ctx=ctx,
-        doctor_command=doctor,
+        doctor_message=doctor_message,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}

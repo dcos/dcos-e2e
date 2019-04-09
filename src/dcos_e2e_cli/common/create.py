@@ -15,24 +15,17 @@ from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
-from .utils import get_doctor_message
-
 
 def create_cluster(
     cluster_backend: ClusterBackend,
     masters: int,
     agents: int,
     public_agents: int,
-    sibling_ctx: click.core.Context,
-    doctor_command: click.core.Command,
+    doctor_message: str,
 ) -> Cluster:
     """
     Create a cluster.
     """
-    doctor_message = get_doctor_message(
-        sibling_ctx=sibling_ctx,
-        doctor_command=doctor_command,
-    )
     try:
         return Cluster(
             cluster_backend=cluster_backend,
