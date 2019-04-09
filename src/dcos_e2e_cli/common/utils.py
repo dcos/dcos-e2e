@@ -8,14 +8,13 @@ import subprocess
 import sys
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, Iterable, Optional, Set, Tuple
+from typing import Optional, Set
 
 import click
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from dcos_e2e.cluster import Cluster
 from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
     get_dcos_installer_details,
@@ -40,26 +39,17 @@ def command_path(
     return ' '.join(command_path_list)
 
 
-def get_doctor_message(
-    sibling_ctx: click.core.Context,
-    doctor_command: click.core.Command,
-) -> str:
+def get_doctor_message(doctor_command_name: str) -> str:
     """
     Return a message which instructs the user to use a given doctor command for
     troubleshooting help.
 
     Args:
-        sibling_ctx: A context associated with a call to a sibling of
-            ``doctor_command``.
-        doctor_command: A command which will give troubleshooting help.
+        doctor_command_name: A command which will give troubleshooting help.
     """
-    doctor_command_name = command_path(
-        sibling_ctx=sibling_ctx,
-        command=doctor_command,
+    return ('Try "{doctor_command_name}" for troubleshooting help.').format(
+        doctor_command_name=doctor_command_name,
     )
-    doctor_message = ('Try "{doctor_command_name}" for troubleshooting help.'
-                      ).format(doctor_command_name=doctor_command_name)
-    return doctor_message
 
 
 def get_variant(
@@ -184,63 +174,3 @@ def write_key_pair(public_key_path: Path, private_key_path: Path) -> None:
     private_key_path.write_bytes(data=private_key)
 
     private_key_path.chmod(mode=stat.S_IRUSR)
-
-
-def show_cluster_started_message(
-    wait_command_name: str,
-    cluster_id: str,
-) -> None:
-    """
-    Show a message which says that the cluster has started.
-    Point the user towards a ``wait`` command.
-
-    Args:
-        wait_command_name: A command which can take a ``--cluster-id`` option
-            to wait for a cluster.
-        cluster_id: The ID of a cluster which has just been created.
-    """
-    cluster_started_message = (
-        'Cluster "{cluster_id}" has started. '
-        'Run "{wait_command_name} --cluster-id {cluster_id}" to wait for '
-        'DC/OS to become ready.'
-    ).format(
-        cluster_id=cluster_id,
-        wait_command_name=wait_command_name,
-    )
-    click.echo(cluster_started_message, err=True)
-
-
-def install_dcos_from_path(
-    cluster: Cluster,
-    ip_detect_path: Path,
-    dcos_config: Dict[str, Any],
-    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-    installer: Path,
-    doctor_message: str,
-) -> None:
-    """
-    Install DC/OS on a cluster.
-
-    Args:
-        cluster: The cluster to install DC/OS on.
-        ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
-        files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
-            installer node. These are files to copy from the host to the
-            installer node before installing DC/OS.
-        dcos_config: The DC/OS configuration to use.
-        installer: The path to a DC/OS installer.
-        doctor_message: A message which instructs the user on which command to
-            use if installation fails.
-    """
-    try:
-        cluster.install_dcos_from_path(
-            dcos_installer=installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        )
-    except subprocess.CalledProcessError as exc:
-        click.echo('Error installing DC/OS.', err=True)
-        click.echo(doctor_message)
-        cluster.destroy()
-        sys.exit(exc.returncode)

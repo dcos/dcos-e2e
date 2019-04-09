@@ -21,6 +21,14 @@ from dcos_e2e.node import Transport
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
+from dcos_e2e_cli.common.credentials import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
+)
+from dcos_e2e_cli.common.install import (
+    install_dcos_from_path,
+    show_cluster_started_message,
+)
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -40,14 +48,8 @@ from dcos_e2e_cli.common.utils import (
     command_path,
     get_doctor_message,
     get_variant,
-    install_dcos_from_path,
     set_logging,
-    show_cluster_started_message,
     write_key_pair,
-)
-from dcos_e2e_cli.common.credentials import (
-    DEFAULT_SUPERUSER_USERNAME,
-    DEFAULT_SUPERUSER_PASSWORD,
 )
 
 from ._common import (
@@ -438,7 +440,10 @@ def create(
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
 
-    doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
+    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
+    doctor_message = get_doctor_message(
+        doctor_command_name=doctor_command_name,
+    )
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     public_key_path = ssh_keypair_dir / 'id_rsa.pub'
@@ -537,7 +542,6 @@ def create(
     )
 
     http_checks = bool(transport == Transport.SSH)
-    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     wait_command_name = command_path(sibling_ctx=ctx, command=wait)
 
     superuser_username = dcos_config.get(

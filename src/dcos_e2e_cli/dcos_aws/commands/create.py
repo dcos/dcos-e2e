@@ -18,6 +18,11 @@ from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.create import create_cluster, get_config
+from dcos_e2e_cli.common.credentials import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
+)
+from dcos_e2e_cli.common.install import show_cluster_started_message
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
@@ -38,12 +43,7 @@ from dcos_e2e_cli.common.utils import (
     get_doctor_message,
     get_variant,
     set_logging,
-    show_cluster_started_message,
     write_key_pair,
-)
-from dcos_e2e_cli.common.credentials import (
-    DEFAULT_SUPERUSER_USERNAME,
-    DEFAULT_SUPERUSER_PASSWORD,
 )
 
 from ._common import (
@@ -226,7 +226,10 @@ def create(
         PublicKeyMaterial=public_key_path.read_bytes(),
     )
 
-    doctor_message = get_doctor_message(sibling_ctx=ctx, doctor_command=doctor)
+    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
+    doctor_message = get_doctor_message(
+        doctor_command_name=doctor_command_name,
+    )
     dcos_variant = get_variant(
         given_variant=variant,
         installer_path=None,
@@ -332,8 +335,6 @@ def create(
         'superuser_password',
         DEFAULT_SUPERUSER_PASSWORD,
     )
-
-    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
 
     if wait_for_dcos:
         dcos_e2e_cli.common.wait.wait_for_dcos(
