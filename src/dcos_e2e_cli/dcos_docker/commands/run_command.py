@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 import click
 
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import node_args_argument
 from dcos_e2e_cli.common.options import (
     dcos_login_pw_option,
@@ -22,13 +22,9 @@ from dcos_e2e_cli.common.run_command import run_command
 from dcos_e2e_cli.common.sync import sync_code_to_masters
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 
-from ._common import (
-    ClusterContainers,
-    ContainerInspectView,
-    existing_cluster_ids,
-)
+from ._common import ClusterContainers, existing_cluster_ids
 from ._nodes import get_node
-from ._options import node_transport_option
+from ._options import node_option, node_transport_option
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
@@ -38,21 +34,7 @@ from ._options import node_transport_option
 @dcos_login_pw_option
 @sync_dir_run_option
 @test_env_run_option
-@click.option(
-    '--node',
-    type=str,
-    default=('master_0', ),
-    help=(
-        'A reference to a particular node to run the command on. '
-        'This can be one of: '
-        'The node\'s IP address, '
-        'the node\'s Docker container name, '
-        'the node\'s Docker container ID, '
-        'a reference in the format "<role>_<number>". '
-        'These details be seen with ``minidcos docker inspect``.'
-    ),
-    multiple=True,
-)
+@node_option
 @environment_variables_option
 @node_transport_option
 @verbosity_option
@@ -96,7 +78,7 @@ def run(
 
     hosts = set([])
     for node_reference in node:
-        host = _get_node(
+        host = get_node(
             cluster_containers=cluster_containers,
             node_reference=node_reference,
         )

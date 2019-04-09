@@ -2,6 +2,13 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
+from typing import Optional
+
+from dcos_e2e.node import Node
+
+from ._common import ClusterContainers, ContainerInspectView
+
+
 def get_node(
     cluster_containers: ClusterContainers,
     node_reference: str,
@@ -47,4 +54,3 @@ def get_node(
 
         if node_reference in accepted:
             return cluster_containers.to_node(container=container)
-
