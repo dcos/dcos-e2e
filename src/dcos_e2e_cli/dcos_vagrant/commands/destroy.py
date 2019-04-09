@@ -31,7 +31,6 @@ def destroy_cluster(cluster_id: str) -> None:
 
 @click.command('destroy-list')
 @click.argument('cluster_ids', nargs=-1, type=str)
-@click.pass_context
 @Halo(enabled=sys.stdout.isatty())
 def destroy_list(cluster_ids: List[str]) -> None:
     """
