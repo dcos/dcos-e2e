@@ -168,7 +168,7 @@ def run_post_install_steps(
             cluster=cluster,
             superuser_username=superuser_username,
             superuser_password=superuser_password,
-            http_checks=True,
+            http_checks=http_checks,
             doctor_command_name=doctor_command_name,
         )
 

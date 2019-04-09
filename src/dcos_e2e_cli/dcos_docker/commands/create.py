@@ -436,6 +436,8 @@ def create(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
+    http_checks = bool(transport == Transport.SSH)
+    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     doctor_message = get_doctor_message(
         doctor_command_name=doctor_command_name,
@@ -528,9 +530,6 @@ def create(
         dcos_installer=installer_path,
         local_genconf_dir=genconf_dir,
     )
-
-    http_checks = bool(transport == Transport.SSH)
-    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
 
     run_post_install_steps(
         cluster=cluster,
