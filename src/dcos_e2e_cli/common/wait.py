@@ -54,17 +54,19 @@ def wait_for_dcos(
     if dcos_variant == DCOSVariant.OSS:
         click.echo(no_login_message)
 
+    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner.start(text='Waiting for DC/OS')
     try:
-        with Halo(text='Waiting for DC/OS', enabled=sys.stdout.isatty()):
-            if dcos_variant == DCOSVariant.ENTERPRISE:
-                cluster.wait_for_dcos_ee(
-                    superuser_username=superuser_username,
-                    superuser_password=superuser_password,
-                    http_checks=http_checks,
-                )
-                return
-
+        if dcos_variant == DCOSVariant.ENTERPRISE:
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+                http_checks=http_checks,
+            )
+        else:
             cluster.wait_for_dcos_oss(http_checks=http_checks)
     except DCOSTimeoutError:
-        click.echo('Waiting for DC/OS to start timed out.', err=True)
+        spinner.fail(text='Waiting for DC/OS to start timed out.')
         sys.exit(1)
+
+    spinner.succeed()

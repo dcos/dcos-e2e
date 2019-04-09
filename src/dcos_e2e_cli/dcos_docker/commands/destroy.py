@@ -16,6 +16,7 @@ from ._common import ClusterContainers, existing_cluster_ids
 from ._options import node_transport_option
 
 
+@Halo(enabled=sys.stdout.isatty())
 def _destroy_cluster(cluster_id: str) -> None:
     """
     Destroy a cluster.
@@ -40,9 +41,6 @@ def _destroy_cluster(cluster_id: str) -> None:
     nargs=-1,
     type=str,
 )
-@node_transport_option
-@click.pass_context
-@Halo(enabled=sys.stdout.isatty())
 def destroy_list(cluster_ids: List[str]) -> None:
     """
     Destroy clusters.
@@ -64,7 +62,6 @@ def destroy_list(cluster_ids: List[str]) -> None:
 
 @click.command('destroy')
 @existing_cluster_id_option
-@Halo(enabled=sys.stdout.isatty())
 def destroy(cluster_id: str) -> None:
     """
     Destroy a cluster.

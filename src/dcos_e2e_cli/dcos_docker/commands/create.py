@@ -2,6 +2,7 @@
 Tools for creating a DC/OS cluster.
 """
 
+import sys
 import tempfile
 import uuid
 from pathlib import Path
@@ -11,6 +12,7 @@ import click
 import docker
 from docker.models.networks import Network
 from docker.types import Mount
+from halo import Halo
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster

@@ -32,7 +32,6 @@ from .doctor import doctor
 @verbosity_option
 @aws_region_option
 @click.pass_context
-@Halo(enabled=sys.stdout.isatty())
 def wait(
     ctx: click.core.Context,
     cluster_id: str,

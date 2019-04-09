@@ -29,21 +29,26 @@ def create_cluster(
     """
     Create a cluster.
     """
+    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner.start(text='Creating cluster')
     try:
-        with Halo(text='Creating cluster', enabled=sys.stdout.isatty()):
-            return Cluster(
-                cluster_backend=cluster_backend,
-                masters=masters,
-                agents=agents,
-                public_agents=public_agents,
-            )
+        cluster = Cluster(
+            cluster_backend=cluster_backend,
+            masters=masters,
+            agents=agents,
+            public_agents=public_agents,
+        )
     except CalledProcessError as exc:
+        spinner.stop()
         click.echo('Error creating cluster.', err=True)
         click.echo(click.style('Full error:', fg='yellow'))
         click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
         click.echo(doctor_message, err=True)
 
         sys.exit(exc.returncode)
+
+    spinner.succeed()
+    return cluster
 
 
 def get_config(

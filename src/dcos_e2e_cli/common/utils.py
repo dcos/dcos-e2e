@@ -66,17 +66,16 @@ def get_variant(
     """
     if given_variant == 'auto':
         assert installer_path is not None
+        spinner = Halo(enabled=sys.stdout.isatty())
+        spinner.start(text='Determining DC/OS variant')
         try:
-            with Halo(
-                text='Determining DC/OS variant',
-                enabled=sys.stdout.isatty(),
-            ):
-                return get_dcos_installer_details(
-                    installer=installer_path,
-                    workspace_dir=workspace_dir,
-                ).variant
+            details = get_dcos_installer_details(
+                installer=installer_path,
+                workspace_dir=workspace_dir,
+            )
         except subprocess.CalledProcessError as exc:
             rmtree(path=str(workspace_dir), ignore_errors=True)
+            spinner.stop()
             click.echo(doctor_message)
             click.echo()
             click.echo('Original error:', err=True)
@@ -85,6 +84,9 @@ def get_variant(
         except ValueError as exc:
             click.echo(str(exc), err=True)
             sys.exit(1)
+
+        spinner.succeed()
+        return details.variant
 
     return {
         'oss': DCOSVariant.OSS,

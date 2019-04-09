@@ -47,7 +47,6 @@ from .doctor import doctor
 @node_transport_option
 @verbosity_option
 @click.pass_context
-@Halo(enabled=sys.stdout.isatty())
 def wait(
     ctx: click.core.Context,
     cluster_id: str,

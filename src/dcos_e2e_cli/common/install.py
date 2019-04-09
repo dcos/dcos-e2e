@@ -46,19 +46,23 @@ def install_dcos_from_path(
             relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
+    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner.start('Installing DC/OS')
     try:
-        with Halo(text='Installing DC/OS', enabled=sys.stdout.isatty()):
-            cluster.install_dcos_from_path(
-                dcos_installer=dcos_installer,
-                dcos_config=dcos_config,
-                ip_detect_path=ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            )
+        cluster.install_dcos_from_path(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
     except subprocess.CalledProcessError as exc:
+        spinner.stop()
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+    spinner.succeed()
 
 
 def install_dcos_from_url(
@@ -90,19 +94,23 @@ def install_dcos_from_url(
             relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
+    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner.start('Installing DC/OS')
     try:
-        with Halo(text='Installing DC/OS', enabled=sys.stdout.isatty()):
-            cluster.install_dcos_from_url(
-                dcos_installer=dcos_installer_url,
-                dcos_config=dcos_config,
-                ip_detect_path=ip_detect_path,
-                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            )
+        cluster.install_dcos_from_url(
+            dcos_installer=dcos_installer_url,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
     except subprocess.CalledProcessError as exc:
+        spinner.stop()
         click.echo('Error installing DC/OS.', err=True)
         click.echo(doctor_message)
         cluster.destroy()
         sys.exit(exc.returncode)
+
+    spinner.succeed()
 
 
 def run_post_install_steps(
