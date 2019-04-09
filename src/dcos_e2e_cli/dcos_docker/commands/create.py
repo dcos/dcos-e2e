@@ -439,6 +439,7 @@ def create(
     )
     base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    workspace_dir.mkdir(parents=True)
 
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     doctor_message = get_doctor_message(
