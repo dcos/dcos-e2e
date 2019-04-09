@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Improve the spinner while waiting for ``minidcos`` commands.
+
 2019.04.08.1
 ------------
 
