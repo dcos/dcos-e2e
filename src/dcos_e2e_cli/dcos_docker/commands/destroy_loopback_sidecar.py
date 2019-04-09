@@ -2,6 +2,8 @@
 Tools for destroying sidecar containers.
 """
 
+import sys
+
 import click
 from halo import Halo
 
@@ -12,6 +14,7 @@ from ._common import loopback_sidecars_by_name
 
 @click.command('destroy-loopback-sidecar')
 @click.argument('name', type=str)
+@Halo(enabled=sys.stdout.isatty())
 def destroy_loopback_sidecar(name: str) -> None:
     """
     Destroy a loopback sidecar.
@@ -25,5 +28,4 @@ def destroy_loopback_sidecar(name: str) -> None:
         raise click.BadParameter(message)
 
     [loopback_sidecar] = loopback_sidecars
-    with Halo():
-        DockerLoopbackVolume.destroy(container=loopback_sidecar)
+    DockerLoopbackVolume.destroy(container=loopback_sidecar)

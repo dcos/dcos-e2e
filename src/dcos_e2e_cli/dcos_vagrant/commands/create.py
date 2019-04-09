@@ -3,12 +3,14 @@ Tools for creating a DC/OS cluster.
 """
 
 import json
+import sys
 import tempfile
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import click
+from halo import Halo
 
 import dcos_e2e_cli.common.wait
 from dcos_e2e.backends import Vagrant
@@ -74,12 +76,11 @@ from .wait import wait
     help=(
         'Wait for DC/OS after creating the cluster. '
         'This is equivalent to using "minidcos vagrant wait" after this '
-        'command. '
-        '"minidcos vagrant wait" has various options available and so may be '
-        'more appropriate for your use case.'
+        'command.'
     ),
 )
 @click.pass_context
+@Halo(enabled=sys.stdout.isatty())
 def create(
     ctx: click.core.Context,
     agents: int,
