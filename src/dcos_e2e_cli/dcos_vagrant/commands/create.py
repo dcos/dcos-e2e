@@ -36,6 +36,7 @@ from dcos_e2e_cli.common.utils import (
     DEFAULT_SUPERUSER_PASSWORD,
     DEFAULT_SUPERUSER_USERNAME,
     check_cluster_id_unique,
+    command_path,
     get_doctor_message,
     get_variant,
     install_dcos_from_path,
@@ -231,13 +232,12 @@ def create(
             doctor_command=doctor,
             sibling_ctx=ctx,
         )
+
         return
 
+    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
     show_cluster_started_message(
-        # We work on the assumption that the ``wait`` command is a sibling
-        # command of this one.
-        sibling_ctx=ctx,
-        wait_command=wait,
+        wait_command_name=wait_command_name,
         cluster_id=cluster_id,
     )
 
