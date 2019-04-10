@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 import click
 
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import node_args_argument
 from dcos_e2e_cli.common.options import (
     dcos_login_pw_option,
@@ -22,7 +22,7 @@ from dcos_e2e_cli.common.run_command import run_command
 from dcos_e2e_cli.common.sync import sync_code_to_masters
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 
-from ._common import ClusterVMs, VMInspectView, existing_cluster_ids
+from ._common import ClusterVMs, existing_cluster_ids
 from ._nodes import get_node, node_option
 
 

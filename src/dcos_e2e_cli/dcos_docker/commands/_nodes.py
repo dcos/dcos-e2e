@@ -7,6 +7,7 @@ from typing import Callable, Optional
 import click
 
 from dcos_e2e.node import Node
+
 from ._common import ClusterContainers, ContainerInspectView
 
 
@@ -31,6 +32,7 @@ def node_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
+
 
 def get_node(
     cluster_containers: ClusterContainers,

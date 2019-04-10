@@ -7,6 +7,7 @@ from typing import Callable, Optional
 import click
 
 from dcos_e2e.node import Node
+
 from ._common import ClusterVMs, VMInspectView
 
 
@@ -71,4 +72,3 @@ def get_node(
         if node_reference in accepted:
             return cluster_vms.to_node(vm_name=vm_name)
     return None
-
