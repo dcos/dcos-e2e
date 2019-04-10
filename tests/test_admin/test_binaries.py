@@ -73,3 +73,4 @@ def test_linux_binaries() -> None:
         status_code = container.wait()['StatusCode']
         assert status_code == 0
         container.remove(force=True)
+        remote_path.unlink()

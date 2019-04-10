@@ -23,6 +23,8 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         A set of paths to the built binaries.
     """
     client = docker.from_env(version='auto')
+    dist_dir = repo_root / 'dist'
+    assert not dist_dir.exists() or not set(dist_dir.iterdir())
 
     target_dir = '/e2e'
     code_mount = Mount(
@@ -34,9 +36,6 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     cmd_in_container = [
         # 'pip3',
         # 'install',
-        # # See https://github.com/pypa/pip/issues/6163 for why we use this
-        # # option.
-        # '--no-use-pep517',
         # '.[packaging]',
         # '&&',
         # We override the PyInstaller version installed.
@@ -68,5 +67,4 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         line = line.strip()
         LOGGER.info(line)
 
-    dist_dir = repo_root / 'dist'
     return set(dist_dir.iterdir())
