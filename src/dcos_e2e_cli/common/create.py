@@ -9,7 +9,7 @@ from subprocess import CalledProcessError
 from typing import Any, Dict, Optional
 
 import click
-from halo import Halo
+import halo
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.base_classes import ClusterBackend
@@ -29,7 +29,7 @@ def create_cluster(
     """
     Create a cluster.
     """
-    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner = halo.Halo(enabled=sys.stdout.isatty())
     spinner.start(text='Creating cluster')
     try:
         cluster = Cluster(
