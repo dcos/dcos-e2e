@@ -43,7 +43,7 @@ def get_node(
     Get a node from a "reference".
 
     Args:
-        cluster_vms: A representation of the cluster.
+        cluster_instances: A representation of the cluster.
         node_reference: One of:
             * A node's public IP address
             * A node's private IP address
