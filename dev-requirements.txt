@@ -28,5 +28,3 @@ sphinxcontrib-spelling==4.2.1
 vendorize==0.2.1
 vulture==1.0
 yapf==0.26.0
-# We should also use https://github.com/pyga/ebb-lint when it is released for
-# Python 3.6.
