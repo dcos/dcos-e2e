@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 import click
 
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import node_args_argument
 from dcos_e2e_cli.common.options import (
     dcos_login_pw_option,
@@ -22,74 +22,9 @@ from dcos_e2e_cli.common.run_command import run_command
 from dcos_e2e_cli.common.sync import sync_code_to_masters
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 
-from ._common import (
-    ClusterInstances,
-    InstanceInspectView,
-    existing_cluster_ids,
-)
+from ._common import ClusterInstances, existing_cluster_ids
+from ._nodes import get_node, node_option
 from ._options import aws_region_option
-
-
-def _get_node(
-    cluster_instances: ClusterInstances,
-    cluster_id: str,
-    node_reference: str,
-    aws_region: str,
-) -> Node:
-    """
-    Get a node from a "reference".
-
-    Args:
-        cluster_instances: A representation of the cluster.
-        cluster_id: The ID of a cluster.
-        node_reference: One of:
-            * A node's public IP address
-            * A node's private IP address
-            * A node's EC2 instance ID
-            * A reference in the format "<role>_<number>"
-        aws_region: The AWS region the cluster is in.
-
-    Returns:
-        The ``Node`` from the given cluster with the given ID.
-
-    Raises:
-        click.BadParameter: There is no such node.
-    """
-    instances = {
-        *cluster_instances.masters,
-        *cluster_instances.agents,
-        *cluster_instances.public_agents,
-    }
-
-    for instance in instances:
-        inspect_data = InstanceInspectView(
-            instance=instance,
-            aws_region=aws_region,
-        ).to_dict()
-        reference = inspect_data['e2e_reference']
-        instance_id = inspect_data['ec2_instance_id']
-        public_ip_address = inspect_data['public_ip_address']
-        private_ip_address = inspect_data['private_ip_address']
-        accepted = (
-            reference,
-            reference.upper(),
-            instance_id,
-            public_ip_address,
-            private_ip_address,
-        )
-
-        if node_reference in accepted:
-            return cluster_instances.to_node(instance=instance)
-
-    message = (
-        'No such node in cluster "{cluster_id}" with IP address, VM name or '
-        'node reference "{node_reference}". '
-        'Node references can be seen with ``minidcos vagrant inspect``.'
-    ).format(
-        cluster_id=cluster_id,
-        node_reference=node_reference,
-    )
-    raise click.BadParameter(message=message)
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
@@ -102,21 +37,7 @@ def _get_node(
 @environment_variables_option
 @aws_region_option
 @verbosity_option
-@click.option(
-    '--node',
-    type=str,
-    default=('master_0', ),
-    help=(
-        'A reference to a particular node to run the command on. '
-        'This can be one of: '
-        'The node\'s public IP address, '
-        'The node\'s private IP address, '
-        'the node\'s EC2 instance ID, '
-        'a reference in the format "<role>_<number>". '
-        'These details be seen with ``minidcos aws inspect``.'
-    ),
-    multiple=True,
-)
+@node_option
 def run(
     cluster_id: str,
     node_args: Tuple[str],
@@ -154,13 +75,27 @@ def run(
             sudo=True,
         )
 
+    hosts = set([])
     for node_reference in node:
-        host = _get_node(
+        host = get_node(
             cluster_instances=cluster_instances,
-            cluster_id=cluster_id,
             node_reference=node_reference,
             aws_region=aws_region,
         )
+        if host is None:
+            message = (
+                'No such node in cluster "{cluster_id}" with IP address, EC2 '
+                'instance ID or node reference "{node_reference}". Node '
+                'references can be seen with ``minidcos aws inspect``.'
+            ).format(
+                cluster_id=cluster_id,
+                node_reference=node_reference,
+            )
+            raise click.BadParameter(message=message)
+
+        hosts.add(host)
+
+    for host in hosts:
         run_command(
             args=list(node_args),
             cluster=cluster,
