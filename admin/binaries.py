@@ -82,4 +82,6 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         line = line.strip()
         LOGGER.info(line)
 
+    status_code = container.wait()['StatusCode']
+    assert status_code == 0
     return set(dist_dir.iterdir())
