@@ -68,12 +68,12 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         'python',
         'admin/create_pyinstaller_binaries.py',
     ]
-    cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
+    command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
 
     container = client.containers.run(
         image='python:3.7',
         mounts=[code_mount],
-        command=cmd,
+        command=command,
         working_dir=target_dir,
         remove=True,
         detach=True,
