@@ -39,7 +39,3 @@ jeepney==0.3.1
 # Therefore we pin an older ``python-dateutil`` and ``attrs``.
 python-dateutil==2.7.5
 attrs==18.2.0
-# For some reason pip-check-reqs does not recognise this
-halo==0.0.23
-# Required by halo
-six==1.11.0
