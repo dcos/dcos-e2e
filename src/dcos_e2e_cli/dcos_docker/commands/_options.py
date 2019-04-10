@@ -37,26 +37,3 @@ def node_transport_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
-
-
-def node_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for choosing a node.
-    """
-    function = click.option(
-        '--node',
-        type=str,
-        default=('master_0', ),
-        show_default=True,
-        multiple=True,
-        help=(
-            'A reference to a particular node to run the command on. '
-            'This can be one of: '
-            'The node\'s IP address, '
-            'the node\'s Docker container name, '
-            'the node\'s Docker container ID, '
-            'a reference in the format "<role>_<number>". '
-            'These details be seen with ``minidcos docker inspect``.'
-        ),
-    )(command)  # type: Callable[..., None]
-    return function

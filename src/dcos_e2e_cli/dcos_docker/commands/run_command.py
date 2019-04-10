@@ -23,8 +23,8 @@ from dcos_e2e_cli.common.sync import sync_code_to_masters
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 
 from ._common import ClusterContainers, existing_cluster_ids
-from ._nodes import get_node
-from ._options import node_option, node_transport_option
+from ._nodes import get_node, node_option
+from ._options import node_transport_option
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))

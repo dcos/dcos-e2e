@@ -2,12 +2,35 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
-from typing import Optional
+from typing import Callable, Optional
+
+import click
 
 from dcos_e2e.node import Node
-
 from ._common import ClusterContainers, ContainerInspectView
 
+
+def node_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An option decorator for choosing a node.
+    """
+    function = click.option(
+        '--node',
+        type=str,
+        default=('master_0', ),
+        show_default=True,
+        multiple=True,
+        help=(
+            'A reference to a particular node to run the command on. '
+            'This can be one of: '
+            'The node\'s IP address, '
+            'the node\'s Docker container name, '
+            'the node\'s Docker container ID, '
+            'a reference in the format "<role>_<number>". '
+            'These details be seen with ``minidcos docker inspect``.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
 
 def get_node(
     cluster_containers: ClusterContainers,
@@ -25,8 +48,8 @@ def get_node(
             * A reference in the format "<role>_<number>"
 
     Returns:
-        The ``Node`` from the given cluster with the given ID or ``None`` if
-        there is no such node.
+        The ``Node`` from the given cluster or ``None`` if there is no such
+        node.
     """
     containers = {
         *cluster_containers.masters,
@@ -54,3 +77,4 @@ def get_node(
 
         if node_reference in accepted:
             return cluster_containers.to_node(container=container)
+    return None
