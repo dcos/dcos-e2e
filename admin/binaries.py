@@ -32,13 +32,25 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     )
 
     cmd_in_container = [
+        # 'pip3',
+        # 'install',
+        # # See https://github.com/pypa/pip/issues/6163 for why we use this
+        # # option.
+        # '--no-use-pep517',
+        # '.[packaging]',
+        # '&&',
+        # We override the PyInstaller version installed.
+        # This is so that we can get a fix which should be 
         'pip3',
         'install',
-        # See https://github.com/pypa/pip/issues/6163 for why we use this
-        # option.
-        '--no-use-pep517',
-        '.[packaging]',
+        'git+https://github.com/pyinstaller/pyinstaller',
         '&&',
+        'pip install .',
+        '&&',
+        'pip install git+https://github.com/manrajgrover/py-log-symbols',
+        '&&',
+        'pip uninstall --yes enum34',
+	'&&',
         'python',
         'admin/create_pyinstaller_binaries.py',
     ]

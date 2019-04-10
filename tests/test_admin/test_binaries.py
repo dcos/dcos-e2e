@@ -60,7 +60,7 @@ def test_linux_binaries() -> None:
         ]
         command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
         container = client.containers.create(
-            image='python:3.6',
+            image='python:3.7',
             mounts=mounts,
             command=command,
         )
