@@ -9,8 +9,7 @@ import click
 from dcos_e2e.node import Transport
 
 
-def node_transport_option(command: Callable[..., None],
-                          ) -> Callable[..., None]:
+def node_transport_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for node transport options.
     """

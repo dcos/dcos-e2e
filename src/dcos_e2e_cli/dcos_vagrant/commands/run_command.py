@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 import click
 
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import node_args_argument
 from dcos_e2e_cli.common.options import (
     dcos_login_pw_option,
@@ -22,61 +22,8 @@ from dcos_e2e_cli.common.run_command import run_command
 from dcos_e2e_cli.common.sync import sync_code_to_masters
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 
-from ._common import ClusterVMs, VMInspectView, existing_cluster_ids
-
-
-def _get_node(
-    cluster_vms: ClusterVMs,
-    cluster_id: str,
-    node_reference: str,
-) -> Node:
-    """
-    Get a node from a "reference".
-
-    Args:
-        cluster_vms: A representation of the cluster.
-        cluster_id: The ID of a cluster.
-        node_reference: One of:
-            * A node's IP address
-            * A node's VM name
-            * A reference in the format "<role>_<number>"
-
-    Returns:
-        The ``Node`` from the given cluster with the given ID.
-
-    Raises:
-        click.BadParameter: There is no such node.
-    """
-    vm_names = {
-        *cluster_vms.masters,
-        *cluster_vms.agents,
-        *cluster_vms.public_agents,
-    }
-
-    for vm_name in vm_names:
-        inspect_view = VMInspectView(vm_name=vm_name, cluster_vms=cluster_vms)
-        inspect_data = inspect_view.to_dict()
-        reference = inspect_data['e2e_reference']
-        ip_address = inspect_data['ip_address']
-        accepted = (
-            reference,
-            reference.upper(),
-            ip_address,
-            vm_name,
-        )
-
-        if node_reference in accepted:
-            return cluster_vms.to_node(vm_name=vm_name)
-
-    message = (
-        'No such node in cluster "{cluster_id}" with IP address, VM name or '
-        'node reference "{node_reference}". '
-        'Node references can be seen with ``minidcos vagrant inspect``.'
-    ).format(
-        cluster_id=cluster_id,
-        node_reference=node_reference,
-    )
-    raise click.BadParameter(message=message)
+from ._common import ClusterVMs, existing_cluster_ids
+from ._nodes import get_node, node_option
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
@@ -87,20 +34,7 @@ def _get_node(
 @sync_dir_run_option
 @test_env_run_option
 @environment_variables_option
-@click.option(
-    '--node',
-    type=str,
-    default=('master_0', ),
-    help=(
-        'A reference to a particular node to run the command on. '
-        'This can be one of: '
-        'The node\'s IP address, '
-        'the node\'s VM name, '
-        'a reference in the format "<role>_<number>". '
-        'These details be seen with ``minidcos vagrant inspect``.'
-    ),
-    multiple=True,
-)
+@node_option
 @verbosity_option
 def run(
     cluster_id: str,
@@ -134,12 +68,26 @@ def run(
             sudo=True,
         )
 
+    hosts = set([])
     for node_reference in node:
-        host = _get_node(
+        host = get_node(
             cluster_vms=cluster_vms,
-            cluster_id=cluster_id,
             node_reference=node_reference,
         )
+        if host is None:
+            message = (
+                'No such node in cluster "{cluster_id}" with IP address, VM '
+                'name or node reference "{node_reference}". Node '
+                'references can be seen with ``minidcos vagrant inspect``.'
+            ).format(
+                cluster_id=cluster_id,
+                node_reference=node_reference,
+            )
+            raise click.BadParameter(message=message)
+
+        hosts.add(host)
+
+    for host in hosts:
         run_command(
             args=list(node_args),
             cluster=cluster,
