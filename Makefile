@@ -66,4 +66,4 @@ pull-images:
 	# This is used for testing installation.
 	docker pull linuxbrew/linuxbrew
 	# This is required for making Linux binaries
-	docker pull python:3.6
+	docker pull python:3.7

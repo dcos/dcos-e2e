@@ -23,6 +23,8 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         A set of paths to the built binaries.
     """
     client = docker.from_env(version='auto')
+    dist_dir = repo_root / 'dist'
+    assert not dist_dir.exists() or not set(dist_dir.iterdir())
 
     target_dir = '/e2e'
     code_mount = Mount(
@@ -32,22 +34,46 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     )
 
     cmd_in_container = [
+        # This includes a few hacks.
+        # Those work around linked issues.
+        # When those issues are resolved, we can use:
+        # pip install .[packaging]
+        #
+        # We use an uninstalled PyInstaller version.
+        # This is so that we can get a fix which should be in the next
+        # PyInstaller release after PyInstaller 3.4.
+        # See https://github.com/pyinstaller/pyinstaller/issues/3507.
         'pip3',
         'install',
-        # See https://github.com/pypa/pip/issues/6163 for why we use this
-        # option.
-        '--no-use-pep517',
-        '.[packaging]',
+        'git+https://github.com/pyinstaller/pyinstaller',
         '&&',
+        'pip',
+        'install',
+        '.',
+        '&&',
+        # PyInstaller is not compatible with enum34.
+        # We have one requirement which depends on enum34 -
+        # py_log_symbols 0.0.12.
+        # We use an unreleased version of py_log_symbols which does not
+        # require enum34 and then we uninstall enum34.
+        'pip',
+        'install',
+        'git+https://github.com/manrajgrover/py-log-symbols',
+        '&&',
+        'pip',
+        'uninstall',
+        '--yes',
+        'enum34',
+	'&&',
         'python',
         'admin/create_pyinstaller_binaries.py',
     ]
-    cmd = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
+    command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
 
     container = client.containers.run(
         image='python:3.7',
         mounts=[code_mount],
-        command=cmd,
+        command=command,
         working_dir=target_dir,
         remove=True,
         detach=True,
@@ -56,5 +82,6 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         line = line.strip()
         LOGGER.info(line)
 
-    dist_dir = repo_root / 'dist'
+    status_code = container.wait()['StatusCode']
+    assert status_code == 0
     return set(dist_dir.iterdir())

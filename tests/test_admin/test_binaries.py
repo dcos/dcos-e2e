@@ -60,7 +60,7 @@ def test_linux_binaries() -> None:
         ]
         command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
         container = client.containers.create(
-            image='python:3.6',
+            image='python:3.7',
             mounts=mounts,
             command=command,
         )
@@ -73,3 +73,6 @@ def test_linux_binaries() -> None:
         status_code = container.wait()['StatusCode']
         assert status_code == 0
         container.remove(force=True)
+
+    for binary_path in binary_paths:
+        binary_path.unlink()
