@@ -571,13 +571,13 @@ class Node:
 
         transport = transport or self.default_transport
         node_transport = self._get_node_transport(transport=transport)
-        # mkdir_args = ['mkdir', '--parents', str(remote_path.parent)]
-        # self.run(
-        #     args=mkdir_args,
-        #     user=user,
-        #     transport=transport,
-        #     sudo=sudo,
-        # )
+        mkdir_args = ['mkdir', '--parents', str(remote_path.parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
         #
         # stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
         # stat_result = self.run(
@@ -598,43 +598,43 @@ class Node:
         #     sudo=sudo,
         # )
         #
-        # tempdir = Path(gettempdir())
-        # tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
-        # local_tar_path = tempdir / tar_name
-        #
-        # is_dir = self.run(
-        #     args=[
-        #         'python',
-        #         '-c',
-        #         '"import os; print(os.path.isdir(\'{remote_path}\'))"'.format(
-        #             remote_path=remote_path,
-        #         ),
-        #     ],
-        #     shell=True,
-        # ).stdout.decode().strip()
-        #
-        # with tarfile.open(str(local_tar_path), 'w', dereference=True) as tar:
-        #     arcname = Path(remote_path.name)
-        #     if is_dir == 'True':
-        #         arcname = arcname / local_path.name
-        #     tar.add(str(local_path), arcname=str(arcname), recursive=True)
-        #
-        # # `remote_path` may be a tmpfs mount.
-        # # At the time of writing, for example, `/tmp` is a tmpfs mount
-        # # on the Docker backend.
-        # # Copying files to tmpfs mounts fails silently.
-        # # See https://github.com/moby/moby/issues/22020.
-        # home_path = self.run(
-        #     args=['echo', '$HOME'],
-        #     user=user,
-        #     transport=transport,
-        #     sudo=False,
-        #     shell=True,
-        # ).stdout.strip().decode()
-        # # Therefore, we create a temporary file within our home directory.
-        # # We then remove the temporary file at the end of this function.
-        #
-        # remote_tar_path = Path(home_path) / tar_name
+        tempdir = Path(gettempdir())
+        tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
+        local_tar_path = tempdir / tar_name
+
+        is_dir = self.run(
+            args=[
+                'python',
+                '-c',
+                '"import os; print(os.path.isdir(\'{remote_path}\'))"'.format(
+                    remote_path=remote_path,
+                ),
+            ],
+            shell=True,
+        ).stdout.decode().strip()
+
+        with tarfile.open(str(local_tar_path), 'w', dereference=True) as tar:
+            arcname = Path(remote_path.name)
+            if is_dir == 'True':
+                arcname = arcname / local_path.name
+            tar.add(str(local_path), arcname=str(arcname), recursive=True)
+
+        # `remote_path` may be a tmpfs mount.
+        # At the time of writing, for example, `/tmp` is a tmpfs mount
+        # on the Docker backend.
+        # Copying files to tmpfs mounts fails silently.
+        # See https://github.com/moby/moby/issues/22020.
+        home_path = self.run(
+            args=['echo', '$HOME'],
+            user=user,
+            transport=transport,
+            sudo=False,
+            shell=True,
+        ).stdout.strip().decode()
+        # Therefore, we create a temporary file within our home directory.
+        # We then remove the temporary file at the end of this function.
+
+        remote_tar_path = Path(home_path) / tar_name
 
         node_transport.send_file(
             local_path=local_path,
@@ -644,21 +644,21 @@ class Node:
             public_ip_address=self.public_ip_address,
         )
 
-        # Path(local_tar_path).unlink()
-        #
-        # tar_args = [
-        #     'tar',
-        #     '-C',
-        #     str(remote_path.parent),
-        #     '-xvf',
-        #     str(remote_tar_path),
-        # ]
-        # self.run(
-        #     args=tar_args,
-        #     user=user,
-        #     transport=transport,
-        #     sudo=False,
-        # )
+        Path(local_tar_path).unlink()
+
+        tar_args = [
+            'tar',
+            '-C',
+            str(remote_path.parent),
+            '-xvf',
+            str(remote_tar_path),
+        ]
+        self.run(
+            args=tar_args,
+            user=user,
+            transport=transport,
+            sudo=False,
+        )
         #
         # chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
         # self.run(
@@ -668,9 +668,9 @@ class Node:
         #     sudo=sudo,
         # )
         #
-        # self.run(
-        #     args=['rm', str(remote_tar_path)],
-        #     user=user,
-        #     transport=transport,
-        #     sudo=sudo,
-        # )
+        self.run(
+            args=['rm', str(remote_tar_path)],
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
