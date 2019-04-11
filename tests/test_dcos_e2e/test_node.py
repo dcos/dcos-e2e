@@ -288,11 +288,7 @@ class TestSendFile:
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
 
-    def test_sudo(
-        self,
-        dcos_node: Node,
-        tmp_path: Path,
-    ) -> None:
+    def test_sudo(self, dcos_node: Node, tmp_path: Path) -> None:
         """
         It is possible to use sudo to send a file to a directory which the
         user does not have access to.
@@ -333,7 +329,7 @@ class TestSendFile:
 
         args = ['stat', '-c', '"%U"', str(master_destination_path)]
         result = dcos_node.run(args=args, shell=True)
-        assert result.stdout.decode().strip() == 'root'
+        assert result.stdout.decode().strip() == testuser
 
         # Implicitly asserts SSH connection closed by ``send_file``.
         dcos_node.run(args=['userdel', '-r', testuser])
