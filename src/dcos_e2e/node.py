@@ -589,15 +589,15 @@ class Node:
         )
 
         original_parent = stat_result.stdout.decode().strip()
-
-        chown_args = ['chown', '-R', user, str(remote_path.parent)]
-        self.run(
-            args=chown_args,
-            user=user,
-            transport=transport,
-            sudo=sudo,
-        )
-
+        #
+        # chown_args = ['chown', '-R', user, str(remote_path.parent)]
+        # self.run(
+        #     args=chown_args,
+        #     user=user,
+        #     transport=transport,
+        #     sudo=sudo,
+        # )
+        #
         tempdir = Path(gettempdir())
         tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
         local_tar_path = tempdir / tar_name
@@ -612,7 +612,7 @@ class Node:
             ],
             shell=True,
         ).stdout.decode().strip()
-
+        #
         with tarfile.open(str(local_tar_path), 'w', dereference=True) as tar:
             arcname = Path(remote_path.name)
             if is_dir == 'True':
@@ -660,13 +660,13 @@ class Node:
             sudo=False,
         )
 
-        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
-        self.run(
-            args=chown_args,
-            user=user,
-            transport=transport,
-            sudo=sudo,
-        )
+        # chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
+        # self.run(
+        #     args=chown_args,
+        #     user=user,
+        #     transport=transport,
+        #     sudo=sudo,
+        # )
 
         self.run(
             args=['rm', str(remote_tar_path)],

@@ -1,3 +1,8 @@
+"""
+Tools for sending files to cluster nodes.
+"""
+
+from pathlib import Path
 from typing import Tuple
 
 import click
@@ -7,7 +12,11 @@ from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
     verbosity_option,
 )
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+
+from ._common import ClusterContainers, existing_cluster_ids
 from ._nodes import get_node, node_option
+from ._options import node_transport_option
 
 
 @click.command('send-file')
@@ -26,7 +35,7 @@ def send_file(
     destination: str,
 ) -> None:
     """
-    Send a file to a node.
+    Send a file to a node or multiple nodes.
     """
     set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
@@ -38,7 +47,7 @@ def send_file(
         cluster_id=cluster_id,
         transport=transport,
     )
-    cluster = cluster_containers.cluster
+    cluster_containers.cluster
 
     hosts = set([])
     for node_reference in node:
@@ -61,13 +70,9 @@ def send_file(
         hosts.add(host)
 
     for host in hosts:
-        run_command(
-            args=list(node_args),
-            cluster=cluster,
-            host=host,
-            use_test_env=test_env,
-            dcos_login_uname=dcos_login_uname,
-            dcos_login_pw=dcos_login_pw,
-            env=env,
+        host.send_file(
+            local_path=Path(source),
+            remote_path=Path(destination),
             transport=transport,
+            sudo=True,
         )

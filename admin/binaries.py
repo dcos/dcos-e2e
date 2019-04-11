@@ -64,7 +64,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         'uninstall',
         '--yes',
         'enum34',
-	'&&',
+        '&&',
         'python',
         'admin/create_pyinstaller_binaries.py',
     ]
