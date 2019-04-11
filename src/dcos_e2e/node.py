@@ -578,26 +578,26 @@ class Node:
             transport=transport,
             sudo=sudo,
         )
-        #
-        # stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
-        # stat_result = self.run(
-        #     args=stat_cmd,
-        #     shell=True,
-        #     user=user,
-        #     transport=transport,
-        #     sudo=sudo,
-        # )
-        #
-        # original_parent = stat_result.stdout.decode().strip()
-        #
-        # chown_args = ['chown', '-R', user, str(remote_path.parent)]
-        # self.run(
-        #     args=chown_args,
-        #     user=user,
-        #     transport=transport,
-        #     sudo=sudo,
-        # )
-        #
+
+        stat_cmd = ['stat', '-c', '"%U"', str(remote_path.parent)]
+        stat_result = self.run(
+            args=stat_cmd,
+            shell=True,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
+
+        original_parent = stat_result.stdout.decode().strip()
+
+        chown_args = ['chown', user, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
+
         tempdir = Path(gettempdir())
         tar_name = '{unique}.tar'.format(unique=uuid.uuid4().hex)
         local_tar_path = tempdir / tar_name
@@ -633,12 +633,11 @@ class Node:
         ).stdout.strip().decode()
         # Therefore, we create a temporary file within our home directory.
         # We then remove the temporary file at the end of this function.
-
         remote_tar_path = Path(home_path) / tar_name
 
         node_transport.send_file(
-            local_path=local_path,
-            remote_path=remote_path,
+            local_path=local_tar_path,
+            remote_path=remote_tar_path,
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
@@ -659,15 +658,15 @@ class Node:
             transport=transport,
             sudo=False,
         )
-        #
-        # chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
-        # self.run(
-        #     args=chown_args,
-        #     user=user,
-        #     transport=transport,
-        #     sudo=sudo,
-        # )
-        #
+
+        chown_args = ['chown', original_parent, str(remote_path.parent)]
+        self.run(
+            args=chown_args,
+            user=user,
+            transport=transport,
+            sudo=sudo,
+        )
+
         self.run(
             args=['rm', str(remote_tar_path)],
             user=user,

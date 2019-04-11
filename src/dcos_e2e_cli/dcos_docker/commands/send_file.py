@@ -74,5 +74,5 @@ def send_file(
             local_path=Path(source),
             remote_path=Path(destination),
             transport=transport,
-            sudo=True,
+            sudo=False,
         )
