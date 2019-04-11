@@ -11,6 +11,10 @@ python:
 - '3.5'
 env:
   matrix:
+  - CI_PATTERN=''
+  - CI_PATTERN=tests/test_admin/test_brew.py
+  - CI_PATTERN=tests/test_admin/test_binaries.py
+  - CI_PATTERN=tests/test_cli
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestRunIntegrationTest
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestUnsupported
@@ -25,12 +29,15 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_distributions.py::TestCoreOS::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_distributions.py::TestRHEL7::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_distributions.py::TestRHEL7::test_enterprise
+  - CI_PATTERN=tests/test_dcos_e2e/backends/aws/test_aws.py::TestTags
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/backends/docker/test_docker.py
+  - CI_PATTERN=tests/test_dcos_e2e/backends/vagrant
+  - CI_PATTERN=tests/test_dcos_e2e/docker_utils/test_loopback.py
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path
