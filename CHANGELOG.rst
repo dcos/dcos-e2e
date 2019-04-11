@@ -7,6 +7,7 @@ Next
 ----
 
 * Improve the spinner while waiting for ``minidcos`` commands.
+* Add ``send-file`` commands to ``minidcos`` subcommands.
 
 2019.04.08.1
 ------------

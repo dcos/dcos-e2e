@@ -633,6 +633,7 @@ class Node:
         ).stdout.strip().decode()
         # Therefore, we create a temporary file within our home directory.
         # We then remove the temporary file at the end of this function.
+
         remote_tar_path = Path(home_path) / tar_name
 
         node_transport.send_file(

@@ -193,6 +193,7 @@ class DockerExecTransport(NodeTransport):
             pipe_output=True,
         )
 
+
 def _get_container_from_ip_address(ip_address: IPv4Address) -> Container:
     """
     Return the ``Container`` with the given ``ip_address``.
