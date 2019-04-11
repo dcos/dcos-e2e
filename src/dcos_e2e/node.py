@@ -590,7 +590,7 @@ class Node:
 
         original_parent = stat_result.stdout.decode().strip()
 
-        chown_args = ['chown', '-R', user, str(remote_path.parent)]
+        chown_args = ['chown', user, str(remote_path.parent)]
         self.run(
             args=chown_args,
             user=user,
@@ -660,7 +660,7 @@ class Node:
             sudo=False,
         )
 
-        chown_args = ['chown', '-R', original_parent, str(remote_path.parent)]
+        chown_args = ['chown', original_parent, str(remote_path.parent)]
         self.run(
             args=chown_args,
             user=user,
