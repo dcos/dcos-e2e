@@ -2,12 +2,8 @@
 Utilities to connect to nodes with Docker exec.
 """
 
-import io
-import os
 import subprocess
 import sys
-import tarfile
-import uuid
 from ipaddress import IPv4Address
 from pathlib import Path
 from typing import Any, Dict, List
@@ -185,8 +181,13 @@ class DockerExecTransport(NodeTransport):
             public_ip_address: The public IP address of the node.
         """
         container = _get_container_from_ip_address(public_ip_address)
-        args = ['docker', 'cp', str(local_path), container.id + ':' + str(remote_path)]
-        return run_subprocess(
+        args = [
+            'docker',
+            'cp',
+            str(local_path),
+            container.id + ':' + str(remote_path),
+        ]
+        run_subprocess(
             args=args,
             log_output_live=False,
             pipe_output=True,
