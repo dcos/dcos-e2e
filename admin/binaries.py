@@ -39,7 +39,7 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         # When those issues are resolved, we can use:
         # pip install .[packaging]
         #
-        # We use an uninstalled PyInstaller version.
+        # We use an unreleased PyInstaller version.
         # This is so that we can get a fix which should be in the next
         # PyInstaller release after PyInstaller 3.4.
         # See https://github.com/pyinstaller/pyinstaller/issues/3507.
