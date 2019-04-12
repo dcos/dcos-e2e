@@ -57,6 +57,7 @@ def test_linux_binaries() -> None:
             '--version',
             '&&',
             'rm',
+            '-rf',
             str(remote_path),
         ]
         command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
