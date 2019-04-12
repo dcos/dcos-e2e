@@ -18,10 +18,8 @@ def test_linux_binaries() -> None:
     """
     ``make_linux_binaries`` creates a binary which can be run on Linux.
     """
-
-    binary_paths = make_linux_binaries(
-        repo_root=Path(__file__).parent.parent.parent,
-    )
+    repo_root = Path(__file__).parent.parent.parent
+    binary_paths = make_linux_binaries(repo_root=repo_root)
     binary_path_names = set(path.name for path in binary_paths)
     assert binary_path_names == {'minidcos'}
 
@@ -76,4 +74,4 @@ def test_linux_binaries() -> None:
         container.remove(force=True)
 
     for binary_path in binary_paths:
-        os.remove(binary_path.resolve())
+        os.remove(str(binary_path.resolve()))
