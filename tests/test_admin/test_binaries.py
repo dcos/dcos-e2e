@@ -72,7 +72,7 @@ def test_linux_binaries() -> None:
         status_code = container.wait()['StatusCode']
         assert status_code == 0
         container.stop()
-        container.remove()
+        container.remove(v=True)
 
     for binary_path in binary_paths:
         binary_path.chmod(0o777)
