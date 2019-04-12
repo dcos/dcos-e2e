@@ -71,7 +71,8 @@ def test_linux_binaries() -> None:
 
         status_code = container.wait()['StatusCode']
         assert status_code == 0
-        container.remove(force=True)
+        container.stop()
+        container.remove()
 
     for binary_path in binary_paths:
         os.remove(str(binary_path.resolve()))
