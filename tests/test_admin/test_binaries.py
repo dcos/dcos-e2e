@@ -3,7 +3,6 @@ Tests for creating binaries.
 """
 
 import logging
-import os
 from pathlib import Path
 
 import docker
@@ -56,6 +55,9 @@ def test_linux_binaries() -> None:
             '&&',
             str(remote_path),
             '--version',
+            '&&',
+            'rm',
+            str(remote_path),
         ]
         command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
         container = client.containers.create(
@@ -73,7 +75,3 @@ def test_linux_binaries() -> None:
         assert status_code == 0
         container.stop()
         container.remove(v=True)
-
-    for binary_path in binary_paths:
-        binary_path.chmod(0o777)
-        binary_path.unlink()
