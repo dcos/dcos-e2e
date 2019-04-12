@@ -17,25 +17,25 @@ def test_linux_binaries() -> None:
     """
     ``make_linux_binaries`` creates a binary which can be run on Linux.
     """
-
-    binary_paths = make_linux_binaries(
-        repo_root=Path(__file__).parent.parent.parent,
-    )
+    repo_root = Path(__file__).parent.parent.parent.absolute()
+    binary_paths = make_linux_binaries(repo_root=repo_root)
     binary_path_names = set(path.name for path in binary_paths)
     assert binary_path_names == {'minidcos'}
-
     mounts = []
-    remote_binaries_dir = Path('/binaries')
+    remote_repo_dir = Path('/repo')
+
+    mounts.append(
+        Mount(
+            source=str(repo_root),
+            target=str(remote_repo_dir),
+            type='bind',
+        ),
+    )
+
     remote_paths = []
     for path in binary_paths:
-        remote_path = remote_binaries_dir / path.name
-        mounts.append(
-            Mount(
-                source=str(path.absolute()),
-                target=str(remote_path),
-                type='bind',
-            ),
-        )
+        relative_path = path.relative_to(repo_root)
+        remote_path = remote_repo_dir / str(relative_path)
         remote_paths.append(remote_path)
 
     client = docker.from_env(version='auto')
@@ -57,6 +57,10 @@ def test_linux_binaries() -> None:
             '&&',
             str(remote_path),
             '--version',
+            '&&',
+            'rm',
+            '-rf',
+            str(remote_path),
         ]
         command = 'bash -c "{cmd}"'.format(cmd=' '.join(cmd_in_container))
         container = client.containers.create(
@@ -72,7 +76,5 @@ def test_linux_binaries() -> None:
 
         status_code = container.wait()['StatusCode']
         assert status_code == 0
-        container.remove(force=True)
-
-    for binary_path in binary_paths:
-        binary_path.unlink()
+        container.stop()
+        container.remove(v=True)
