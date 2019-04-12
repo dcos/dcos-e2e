@@ -3,6 +3,7 @@ Tests for creating binaries.
 """
 
 import logging
+import os
 from pathlib import Path
 
 import docker
@@ -75,4 +76,4 @@ def test_linux_binaries() -> None:
         container.remove(force=True)
 
     for binary_path in binary_paths:
-        binary_path.unlink()
+        os.remove(binary_path.resolve())
