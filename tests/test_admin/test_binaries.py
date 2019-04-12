@@ -75,4 +75,5 @@ def test_linux_binaries() -> None:
         container.remove()
 
     for binary_path in binary_paths:
-        os.remove(str(binary_path.resolve()))
+        binary_path.chmod(0o777)
+        binary_path.unlink()
