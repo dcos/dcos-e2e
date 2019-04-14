@@ -94,6 +94,7 @@ def get_nodes(
     Get nodes from "reference"s.
 
     Args:
+        cluster_id: The ID of the cluster to get nodes from.
         cluster_instances: A representation of the cluster.
         node_references: Each reference is one of:
             * A node's public IP address
