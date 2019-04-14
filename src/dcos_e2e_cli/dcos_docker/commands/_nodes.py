@@ -2,7 +2,7 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
-from typing import Callable, Optional
+from typing import Callable, Iterable, Optional, Set
 
 import click
 
@@ -83,6 +83,7 @@ def get_node(
 
 
 def get_nodes(
+    cluster_id: str,
     node_references: Iterable[str],
     cluster_containers: ClusterContainers,
     inspect_command_name: str,
@@ -98,6 +99,9 @@ def get_nodes(
             * A reference in the format "<role>_<number>"
         inspect_command_name: The name of an inspect command to use to find
             available references.
+
+    Returns:
+        All ``Node``s from the given cluster which match the references.
 
     Raises:
         click.BadParameter: There is no node which matches a given reference.
@@ -121,5 +125,5 @@ def get_nodes(
             )
             raise click.BadParameter(message=message)
 
-        nodes.add(host)
+        nodes.add(node)
     return nodes

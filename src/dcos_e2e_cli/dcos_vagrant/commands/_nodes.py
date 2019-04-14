@@ -2,7 +2,7 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
-from typing import Callable, Optional
+from typing import Callable, Iterable, Optional, Set
 
 import click
 
@@ -72,3 +72,48 @@ def get_node(
         if node_reference in accepted:
             return cluster_vms.to_node(vm_name=vm_name)
     return None
+
+
+def get_nodes(
+    cluster_id: str,
+    node_references: Iterable[str],
+    cluster_vms: ClusterVMs,
+    inspect_command_name: str,
+) -> Set[Node]:
+    """
+    Get nodes from "reference"s.
+    Args:
+        cluster_vms: A representation of the cluster.
+        node_references: Each reference is one of:
+            * A node's IP address
+            * A node's VM name
+            * A reference in the format "<role>_<number>"
+        inspect_command_name: The name of an inspect command to use to find
+            available references.
+
+    Returns:
+        All ``Node``s from the given cluster which match the references.
+
+    Raises:
+        click.BadParameter: There is no node which matches a given reference.
+    """
+    nodes = set([])
+    for node_reference in node_references:
+        node = get_node(
+            cluster_vms=cluster_vms,
+            node_reference=node_reference,
+        )
+        if node is None:
+            message = (
+                'No such node in cluster "{cluster_id}" with IP address, VM '
+                'name or node reference "{node_reference}". '
+                'Node references can be seen with ``{inspect_command}``.'
+            ).format(
+                cluster_id=cluster_id,
+                node_reference=node_reference,
+                inspect_command=inspect_command_name,
+            )
+            raise click.BadParameter(message=message)
+
+        nodes.add(node)
+    return nodes
