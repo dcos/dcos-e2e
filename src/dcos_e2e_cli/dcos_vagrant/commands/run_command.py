@@ -20,10 +20,15 @@ from dcos_e2e_cli.common.options import (
 )
 from dcos_e2e_cli.common.run_command import run_command
 from dcos_e2e_cli.common.sync import sync_code_to_masters
-from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+from dcos_e2e_cli.common.utils import (
+    check_cluster_id_exists,
+    command_path,
+    set_logging,
+)
 
 from ._common import ClusterVMs, existing_cluster_ids
-from ._nodes import get_node, node_option
+from ._nodes import get_nodes, node_option
+from .inspect_cluster import inspect_cluster
 
 
 @click.command('run', context_settings=dict(ignore_unknown_options=True))
@@ -36,7 +41,9 @@ from ._nodes import get_node, node_option
 @environment_variables_option
 @node_option
 @verbosity_option
+@click.pass_context
 def run(
+    ctx: click.core.Context,
     cluster_id: str,
     node_args: Tuple[str],
     sync_dir: Tuple[Path],
@@ -68,24 +75,16 @@ def run(
             sudo=True,
         )
 
-    hosts = set([])
-    for node_reference in node:
-        host = get_node(
-            cluster_vms=cluster_vms,
-            node_reference=node_reference,
-        )
-        if host is None:
-            message = (
-                'No such node in cluster "{cluster_id}" with IP address, VM '
-                'name or node reference "{node_reference}". Node '
-                'references can be seen with ``minidcos vagrant inspect``.'
-            ).format(
-                cluster_id=cluster_id,
-                node_reference=node_reference,
-            )
-            raise click.BadParameter(message=message)
-
-        hosts.add(host)
+    inspect_command_name = command_path(
+        sibling_ctx=ctx,
+        command=inspect_cluster,
+    )
+    hosts = get_nodes(
+        cluster_id=cluster_id,
+        cluster_vms=cluster_vms,
+        node_references=node,
+        inspect_command_name=inspect_command_name,
+    )
 
     for host in hosts:
         run_command(
