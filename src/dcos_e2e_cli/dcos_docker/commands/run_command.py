@@ -27,7 +27,7 @@ from dcos_e2e_cli.common.utils import (
 )
 
 from ._common import ClusterContainers, existing_cluster_ids
-from ._nodes import get_node, node_option
+from ._nodes import get_nodes, node_option
 from ._options import node_transport_option
 from .inspect_cluster import inspect_cluster
 
@@ -87,26 +87,13 @@ def run(
         sibling_ctx=ctx,
         command=inspect_cluster,
     )
-    hosts = set([])
-    for node_reference in node:
-        host = get_node(
-            cluster_containers=cluster_containers,
-            node_reference=node_reference,
-        )
-        if host is None:
-            message = (
-                'No such node in cluster "{cluster_id}" with IP address, '
-                'Docker container name, Docker container ID or node reference '
-                '"{node_reference}". '
-                'Node references can be seen with ``{inspect_command}``.'
-            ).format(
-                cluster_id=cluster_id,
-                node_reference=node_reference,
-                inspect_command=inspect_command_name,
-            )
-            raise click.BadParameter(message=message)
 
-        hosts.add(host)
+    hosts = get_nodes(
+        cluster_id=cluster_id,
+        cluster_containers=cluster_containers,
+        node_references=node,
+        inspect_command_name=inspect_command_name,
+    )
 
     for host in hosts:
         run_command(

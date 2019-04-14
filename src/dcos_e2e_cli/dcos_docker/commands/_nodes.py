@@ -2,7 +2,7 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
-from typing import Callable, Optional
+from typing import Callable, Iterable, Optional, Set
 
 import click
 
@@ -80,3 +80,51 @@ def get_node(
         if node_reference in accepted:
             return cluster_containers.to_node(container=container)
     return None
+
+
+def get_nodes(
+    cluster_id: str,
+    node_references: Iterable[str],
+    cluster_containers: ClusterContainers,
+    inspect_command_name: str,
+) -> Set[Node]:
+    """
+    Get nodes from "reference"s.
+    Args:
+        cluster_id: The ID of the cluster to get nodes from.
+        cluster_containers: A representation of the cluster.
+        node_references: Each reference is one of:
+            * A node's IP address
+            * A node's Docker container name
+            * A node's Docker container ID
+            * A reference in the format "<role>_<number>"
+        inspect_command_name: The name of an inspect command to use to find
+            available references.
+
+    Returns:
+        All ``Node``s from the given cluster which match the references.
+
+    Raises:
+        click.BadParameter: There is no node which matches a given reference.
+    """
+    nodes = set([])
+    for node_reference in node_references:
+        node = get_node(
+            cluster_containers=cluster_containers,
+            node_reference=node_reference,
+        )
+        if node is None:
+            message = (
+                'No such node in cluster "{cluster_id}" with IP address, '
+                'Docker container name, Docker container ID or node reference '
+                '"{node_reference}". '
+                'Node references can be seen with ``{inspect_command}``.'
+            ).format(
+                cluster_id=cluster_id,
+                node_reference=node_reference,
+                inspect_command=inspect_command_name,
+            )
+            raise click.BadParameter(message=message)
+
+        nodes.add(node)
+    return nodes
