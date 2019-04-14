@@ -12,11 +12,16 @@ from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
     verbosity_option,
 )
-from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+from dcos_e2e_cli.common.utils import (
+    check_cluster_id_exists,
+    command_path,
+    set_logging,
+)
 
 from ._common import ClusterContainers, existing_cluster_ids
-from ._nodes import get_node, node_option
+from ._nodes import get_node, get_nodes, node_option
 from ._options import node_transport_option
+from .inspect_cluster import inspect_cluster
 
 
 @click.command('send-file')
@@ -26,7 +31,9 @@ from ._options import node_transport_option
 @verbosity_option
 @click.argument('source', type=click.Path(exists=True))
 @click.argument('destination')
+@click.pass_context
 def send_file(
+    ctx: click.core.Context,
     cluster_id: str,
     node: Tuple[str],
     transport: Transport,
@@ -47,27 +54,18 @@ def send_file(
         cluster_id=cluster_id,
         transport=transport,
     )
-    cluster_containers.cluster
 
-    hosts = set([])
-    for node_reference in node:
-        host = get_node(
-            cluster_containers=cluster_containers,
-            node_reference=node_reference,
-        )
-        if host is None:
-            message = (
-                'No such node in cluster "{cluster_id}" with IP address, '
-                'Docker container name, Docker container ID or node reference '
-                '"{node_reference}". '
-                'Node references can be seen with ``minidcos docker inspect``.'
-            ).format(
-                cluster_id=cluster_id,
-                node_reference=node_reference,
-            )
-            raise click.BadParameter(message=message)
+    inspect_command_name = command_path(
+        sibling_ctx=ctx,
+        command=inspect_cluster,
+    )
 
-        hosts.add(host)
+    hosts = get_nodes(
+        cluster_id=cluster_id,
+        cluster_containers=cluster_containers,
+        node_references=node,
+        inspect_command_name=inspect_command_name,
+    )
 
     for host in hosts:
         host.send_file(
