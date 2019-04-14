@@ -27,7 +27,7 @@ from dcos_e2e_cli.common.utils import (
 )
 
 from ._common import ClusterVMs, existing_cluster_ids
-from ._nodes import get_node, node_option
+from ._nodes import get_nodes, node_option
 from .inspect_cluster import inspect_cluster
 
 
@@ -81,7 +81,7 @@ def run(
     )
     hosts = get_nodes(
         cluster_id=cluster_id,
-        cluster_containers=cluster_vms,
+        cluster_vms=cluster_vms,
         node_references=node,
         inspect_command_name=inspect_command_name,
     )
