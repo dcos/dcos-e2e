@@ -18,7 +18,7 @@ from dcos_e2e_cli.common.utils import (
     set_logging,
 )
 
-from ._common import ClusterContainers, existing_cluster_ids
+from ._common import ClusterVMs, existing_cluster_ids
 from ._nodes import get_node, get_nodes, node_option
 from .inspect_cluster import inspect_cluster
 
@@ -66,5 +66,5 @@ def send_file(
             local_path=Path(source),
             remote_path=Path(destination),
             transport=Transport.SSH,
-            sudo=False,
+            sudo=True,
         )
