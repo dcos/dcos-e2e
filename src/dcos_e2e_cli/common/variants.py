@@ -102,7 +102,7 @@ def cluster_variant_available(cluster: Cluster) -> bool:
     return {'True': True, 'False': False}[output]
 
 
-def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
+def get_cluster_variant(cluster: Cluster) -> Optional[DCOSVariant]:
     """
     Get the variant of DC/OS running on a cluster.
 
@@ -110,8 +110,12 @@ def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
         cluster: The cluster running DC/OS.
 
     Returns:
-        The variant of DC/OS installed on the given cluster.
+        The variant of DC/OS installed on the given cluster or ``None`` if the
+        file required for us to know is not ready.
     """
+    if not cluster_variant_available(cluster=cluster):
+        return None
+
     master = next(iter(cluster.masters))
     get_version_json_args = ['cat', '/opt/mesosphere/etc/dcos-version.json']
     result = master.run(args=get_version_json_args, output=Output.CAPTURE)

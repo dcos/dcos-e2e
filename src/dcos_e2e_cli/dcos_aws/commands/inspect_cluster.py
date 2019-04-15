@@ -56,11 +56,15 @@ def inspect_cluster(cluster_id: str, aws_region: str, verbose: int) -> None:
         for key, instances in keys.items()
     }
 
+    variant_name = str(
+        cluster_instances.dcos_variant.name
+        if cluster_instances.dcos_variant else None,
+    )
     data = {
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
-        'DC/OS Variant': cluster_instances.dcos_variant.name,
+        'DC/OS Variant': variant_name,
     }  # type: Dict[Any, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),

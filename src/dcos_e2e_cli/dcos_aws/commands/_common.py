@@ -3,7 +3,7 @@ Common code for minidcos aws CLI modules.
 """
 
 from pathlib import Path
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
 import boto3
 from boto3.resources.base import ServiceResource
@@ -12,6 +12,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+from dcos_e2e_cli.common.variants import get_cluster_variant
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
@@ -211,17 +212,12 @@ class ClusterInstances:
         return Path(tag_dict[WORKSPACE_DIR_TAG_KEY])
 
     @property
-    def dcos_variant(self) -> DCOSVariant:
+    def dcos_variant(self) -> Optional[DCOSVariant]:
         """
-        Return the DC/OS variant of the cluster.
+        Return the DC/OS variant of the cluster or ``None`` if it cannot be
+        retrieved.
         """
-        instance = next(iter(self.masters))
-        tag_dict = _tag_dict(instance=instance)
-        variant_tag_value = tag_dict[VARIANT_TAG_KEY]
-        return {
-            VARIANT_ENTERPRISE_TAG_VALUE: DCOSVariant.ENTERPRISE,
-            VARIANT_OSS_TAG_VALUE: DCOSVariant.OSS,
-        }[variant_tag_value]
+        return get_cluster_variant(cluster=self.cluster)
 
     @property
     def cluster(self) -> Cluster:

@@ -4,6 +4,7 @@ Tools for syncing code to a cluster.
 
 import io
 import subprocess
+import sys
 import tarfile
 import tempfile
 from pathlib import Path
@@ -140,7 +141,7 @@ def _dcos_checkout_dir_variant(dcos_checkout_dir: Path) -> DCOSVariant:
 def sync_code_to_masters(
     cluster: Cluster,
     dcos_checkout_dir: Path,
-    dcos_variant: DCOSVariant,
+    dcos_variant: Optional[DCOSVariant],
     sudo: bool,
 ) -> None:
     """
@@ -195,7 +196,8 @@ def sync_code_to_masters(
         cluster: The cluster to sync code to.
         dcos_checkout_dir: The path to a DC/OS (Enterprise) checkout to sync
             code from.
-        dcos_variant: The DC/OS variant of the cluster.
+        dcos_variant: The DC/OS variant of the cluster. ``None`` if the variant
+            is not known.
         sudo: Whether to use sudo for commands running on nodes.
 
     Raises:
@@ -222,6 +224,14 @@ def sync_code_to_masters(
         path=local_test_dir,
         tar_filter=_cache_filter,
     )
+
+    if dcos_variant is None:
+        message = (
+            'The DC/OS variant cannot yet be determined. '
+            'Therefore, code cannot be synced to the cluster.'
+        )
+        click.echo(message, err=True)
+        sys.exit(1)
 
     syncing_oss_to_ee = bool(
         dcos_variant == DCOSVariant.ENTERPRISE
