@@ -54,7 +54,6 @@ def wait_for_dcos(
     Wait for DC/OS to start.
 
     Args:
-        dcos_variant: The DC/OS variant of the cluster.
         cluster: The cluster to wait for.
         superuser_username: If the cluster is a DC/OS Enterprise cluster, use
             this username to wait for DC/OS.
