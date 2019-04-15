@@ -31,9 +31,9 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_exists,
     command_path,
-    get_variant,
     set_logging,
 )
+from dcos_e2e_cli.common.variants import get_install_variant
 
 from ._common import ClusterContainers, existing_cluster_ids
 from .doctor import doctor
@@ -96,7 +96,7 @@ def install_dcos(
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
 
-    dcos_variant = get_variant(
+    dcos_variant = get_install_variant(
         given_variant=variant,
         installer_path=installer_path,
         workspace_dir=workspace_dir,

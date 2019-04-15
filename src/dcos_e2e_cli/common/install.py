@@ -3,7 +3,6 @@ Helpers for installing DC/OS.
 """
 
 import subprocess
-import textwrap
 import sys
 import textwrap
 from pathlib import Path
