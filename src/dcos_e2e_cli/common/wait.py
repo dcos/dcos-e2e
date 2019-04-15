@@ -24,7 +24,8 @@ from dcos_e2e_cli.common.variants import get_cluster_variant
 )
 def _wait_for_variant(cluster: Cluster) -> None:
     """
-    XXX
+    Wait for a particular file to be available on the cluster.
+    This means that the cluster variant can be determined.
     """
     (master, ) = cluster.masters
     script = textwrap.dedent(
