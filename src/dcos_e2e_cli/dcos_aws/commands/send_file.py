@@ -19,7 +19,7 @@ from dcos_e2e_cli.common.utils import (
 )
 
 from ._common import ClusterInstances, existing_cluster_ids
-from ._nodes import get_node, get_nodes, node_option
+from ._nodes import get_nodes, node_option
 from ._options import aws_region_option
 from .inspect_cluster import inspect_cluster
 

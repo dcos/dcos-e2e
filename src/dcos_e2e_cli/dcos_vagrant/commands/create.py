@@ -37,9 +37,9 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    get_install_variant,
     set_logging,
 )
+from dcos_e2e_cli.common.variants import get_install_variant
 
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,
