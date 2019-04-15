@@ -36,7 +36,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    get_variant,
+    get_install_variant,
     set_logging,
     write_key_pair,
 )
@@ -225,7 +225,7 @@ def create(
     doctor_message = get_doctor_message(
         doctor_command_name=doctor_command_name,
     )
-    dcos_variant = get_variant(
+    dcos_variant = get_install_variant(
         given_variant=variant,
         installer_path=None,
         workspace_dir=workspace_dir,

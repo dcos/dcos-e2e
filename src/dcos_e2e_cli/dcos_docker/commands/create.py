@@ -40,7 +40,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    get_variant,
+    get_install_variant,
     set_logging,
     write_key_pair,
 )
@@ -450,7 +450,7 @@ def create(
 
     installer_path = Path(installer).resolve()
 
-    dcos_variant = get_variant(
+    dcos_variant = get_install_variant(
         given_variant=variant,
         installer_path=installer_path,
         workspace_dir=workspace_dir,

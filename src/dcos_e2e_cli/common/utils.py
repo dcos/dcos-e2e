@@ -40,7 +40,7 @@ def command_path(
     return ' '.join(command_path_list)
 
 
-def get_variant(
+def get_install_variant(
     given_variant: str,
     installer_path: Optional[Path],
     doctor_message: str,
