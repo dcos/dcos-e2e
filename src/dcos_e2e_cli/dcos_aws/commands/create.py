@@ -50,9 +50,6 @@ from ._common import (
     NODE_TYPE_PUBLIC_AGENT_TAG_VALUE,
     NODE_TYPE_TAG_KEY,
     SSH_USER_TAG_KEY,
-    VARIANT_ENTERPRISE_TAG_VALUE,
-    VARIANT_OSS_TAG_VALUE,
-    VARIANT_TAG_KEY,
     WORKSPACE_DIR_TAG_KEY,
     existing_cluster_ids,
 )
@@ -231,11 +228,6 @@ def create(
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
-    variant_tag_value = {
-        DCOSVariant.OSS: VARIANT_OSS_TAG_VALUE,
-        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_TAG_VALUE,
-    }[dcos_variant]
-
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
         Distribution.COREOS: 'core',
@@ -252,7 +244,6 @@ def create(
         CLUSTER_ID_TAG_KEY: cluster_id,
         WORKSPACE_DIR_TAG_KEY: str(workspace_dir),
         KEY_NAME_TAG_KEY: key_name,
-        VARIANT_TAG_KEY: variant_tag_value,
         **custom_tag,
     }
 
