@@ -70,7 +70,6 @@ def wait(
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
 
     wait_for_dcos(
-        dcos_variant=cluster_containers.dcos_variant,
         cluster=cluster_containers.cluster,
         superuser_username=superuser_username,
         superuser_password=superuser_password,

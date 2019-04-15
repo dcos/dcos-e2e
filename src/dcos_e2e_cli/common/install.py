@@ -13,7 +13,6 @@ from halo import Halo
 
 import dcos_e2e_cli.common.wait
 from dcos_e2e.cluster import Cluster
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e.node import Output
 
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
@@ -132,7 +131,6 @@ def run_post_install_steps(
     cluster: Cluster,
     cluster_id: str,
     dcos_config: Dict[str, Any],
-    dcos_variant: DCOSVariant,
     doctor_command_name: str,
     http_checks: bool,
     wait_command_name: str,
@@ -146,7 +144,6 @@ def run_post_install_steps(
         cluster: A DC/OS cluster to run steps against.
         cluster_id: The ID of the cluster.
         dcos_config: The config that DC/OS was installed with.
-        dcos_variant: The variant of DC/OS.
         doctor_command_name: The name of a ``doctor`` command to use if things
             go wrong.
         http_checks: Whether to run HTTP checks when waiting for DC/OS.
@@ -166,7 +163,6 @@ def run_post_install_steps(
 
     if wait_for_dcos:
         dcos_e2e_cli.common.wait.wait_for_dcos(
-            dcos_variant=dcos_variant,
             cluster=cluster,
             superuser_username=superuser_username,
             superuser_password=superuser_password,

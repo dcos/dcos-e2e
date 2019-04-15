@@ -18,12 +18,10 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 from dcos_e2e_cli._vendor import vertigo_py
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+from dcos_e2e_cli.common.variants import get_cluster_variant
 
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
-VARIANT_DESCRIPTION_KEY = 'dcos_e2e.variant'
-VARIANT_ENTERPRISE_DESCRIPTION_VALUE = 'ee'
-VARIANT_OSS_DESCRIPTION_VALUE = 'oss'
 
 
 @functools.lru_cache()
@@ -211,19 +209,12 @@ class ClusterVMs:
         return vm_names_by_cluster()[self._cluster_id]
 
     @property
-    def dcos_variant(self) -> DCOSVariant:
+    def dcos_variant(self) -> Optional[DCOSVariant]:
         """
-        Return the DC/OS variant of the cluster.
+        Return the DC/OS variant of the cluster or ``None`` if it cannot be
+        retrieved.
         """
-        vm_names = self._vm_names()
-        one_vm_name = next(iter(vm_names))
-        description = _description_from_vm_name(vm_name=one_vm_name)
-        data = json.loads(s=description)
-        vm_variant_value = data[VARIANT_DESCRIPTION_KEY]
-        return {
-            VARIANT_ENTERPRISE_DESCRIPTION_VALUE: DCOSVariant.ENTERPRISE,
-            VARIANT_OSS_DESCRIPTION_VALUE: DCOSVariant.OSS,
-        }[vm_variant_value]
+        return get_cluster_variant(cluster=self.cluster)
 
     @property
     def cluster(self) -> Cluster:

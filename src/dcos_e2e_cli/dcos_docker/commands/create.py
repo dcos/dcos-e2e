@@ -40,10 +40,10 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    get_variant,
     set_logging,
     write_key_pair,
 )
+from dcos_e2e_cli.common.variants import get_install_variant
 
 from ._common import (
     CLUSTER_ID_LABEL_KEY,
@@ -54,9 +54,6 @@ from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_MASTER_LABEL_VALUE,
     NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
-    VARIANT_ENTERPRISE_LABEL_VALUE,
-    VARIANT_LABEL_KEY,
-    VARIANT_OSS_LABEL_VALUE,
     WORKSPACE_DIR_LABEL_KEY,
     docker_client,
     existing_cluster_ids,
@@ -438,17 +435,12 @@ def create(
 
     installer_path = Path(installer).resolve()
 
-    dcos_variant = get_variant(
+    dcos_variant = get_install_variant(
         given_variant=variant,
         installer_path=installer_path,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
-
-    variant_label_value = {
-        DCOSVariant.OSS: VARIANT_OSS_LABEL_VALUE,
-        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
-    }[dcos_variant]
 
     # This is useful for some people to identify containers.
     container_name_prefix = Docker().container_name_prefix + '-' + cluster_id
@@ -465,7 +457,6 @@ def create(
         docker_container_labels={
             CLUSTER_ID_LABEL_KEY: cluster_id,
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
-            VARIANT_LABEL_KEY: variant_label_value,
         },
         docker_master_labels={
             NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE,
@@ -521,7 +512,6 @@ def create(
         cluster=cluster,
         cluster_id=cluster_id,
         dcos_config=dcos_config,
-        dcos_variant=dcos_variant,
         doctor_command_name=doctor_command_name,
         http_checks=http_checks,
         wait_command_name=wait_command_name,

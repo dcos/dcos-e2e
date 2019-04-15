@@ -91,12 +91,16 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
         for key, containers in keys.items()
     }
 
+    variant_name = str(
+        cluster_containers.dcos_variant.name
+        if cluster_containers.dcos_variant else None,
+    )
     data = {
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
         'SSH key': str(ssh_key),
-        'DC/OS Variant': cluster_containers.dcos_variant.name,
+        'DC/OS Variant': variant_name,
     }  # type: Dict[Any, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),

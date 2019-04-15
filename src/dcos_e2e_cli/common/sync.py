@@ -4,6 +4,7 @@ Tools for syncing code to a cluster.
 
 import io
 import subprocess
+import sys
 import tarfile
 import tempfile
 from pathlib import Path
@@ -140,7 +141,7 @@ def _dcos_checkout_dir_variant(dcos_checkout_dir: Path) -> DCOSVariant:
 def sync_code_to_masters(
     cluster: Cluster,
     dcos_checkout_dir: Path,
-    dcos_variant: DCOSVariant,
+    dcos_variant: Optional[DCOSVariant],
     sudo: bool,
 ) -> None:
     """
@@ -195,7 +196,8 @@ def sync_code_to_masters(
         cluster: The cluster to sync code to.
         dcos_checkout_dir: The path to a DC/OS (Enterprise) checkout to sync
             code from.
-        dcos_variant: The DC/OS variant of the cluster.
+        dcos_variant: The DC/OS variant of the cluster. ``None`` if the variant
+            is not known.
         sudo: Whether to use sudo for commands running on nodes.
 
     Raises:
@@ -222,6 +224,14 @@ def sync_code_to_masters(
         path=local_test_dir,
         tar_filter=_cache_filter,
     )
+
+    if dcos_variant is None:
+        message = (
+            'The DC/OS variant cannot yet be determined. '
+            'Therefore, code cannot be synced to the cluster.'
+        )
+        click.echo(message, err=True)
+        sys.exit(1)
 
     syncing_oss_to_ee = bool(
         dcos_variant == DCOSVariant.ENTERPRISE
@@ -280,18 +290,6 @@ def sync_code_to_masters(
                 ],
                 sudo=sudo,
             )
-            try:
-                master.run(
-                    args=[
-                        'mv',
-                        str(node_test_dir / 'open_source_tests' / 'common.py'),
-                        str(node_test_dir),
-                    ],
-                    sudo=sudo,
-                )
-            except subprocess.CalledProcessError:
-                # This file does not exist in DC/OS versions <1.13.
-                pass
     else:
         _sync_bootstrap_to_masters(
             cluster=cluster,
@@ -300,17 +298,6 @@ def sync_code_to_masters(
         )
 
         for master in cluster.masters:
-            try:
-                master.run(
-                    args=[
-                        'mv',
-                        str(node_test_dir / 'common.py'),
-                        str(node_test_dir / 'common.bak'),
-                    ],
-                    sudo=sudo,
-                )
-            except subprocess.CalledProcessError:
-                pass
             # This makes an assumption that all tests are at the top level.
             master.run(
                 args=['rm', '-rf', str(node_test_dir / '*.py')],
@@ -318,17 +305,6 @@ def sync_code_to_masters(
                 shell=True,
                 sudo=sudo,
             )
-            try:
-                master.run(
-                    args=[
-                        'mv',
-                        str(node_test_dir / 'common.bak'),
-                        str(node_test_dir / 'common.py'),
-                    ],
-                    sudo=sudo,
-                )
-            except subprocess.CalledProcessError:
-                pass
             _send_tarstream_to_node_and_extract(
                 tarstream=test_tarstream,
                 node=master,

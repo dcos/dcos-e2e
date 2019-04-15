@@ -7,7 +7,7 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 import click
 import docker
@@ -20,6 +20,7 @@ from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node, Role, Transport
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+from dcos_e2e_cli.common.variants import get_cluster_variant
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -42,9 +43,6 @@ DOCKER_STORAGE_DRIVERS = {
 CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 SIDECAR_NAME_LABEL_KEY = 'dcos_e2e.sidecar_name'
 WORKSPACE_DIR_LABEL_KEY = 'dcos_e2e.workspace_dir'
-VARIANT_LABEL_KEY = 'dcos_e2e.variant'
-VARIANT_ENTERPRISE_LABEL_VALUE = 'ee'
-VARIANT_OSS_LABEL_VALUE = 'oss'
 NODE_TYPE_LABEL_KEY = 'dcos_e2e.node_type'
 NODE_TYPE_MASTER_LABEL_VALUE = 'master'
 NODE_TYPE_AGENT_LABEL_VALUE = 'agent'
@@ -227,18 +225,12 @@ class ClusterContainers:
         return self._containers_by_role(role=Role.PUBLIC_AGENT)
 
     @property
-    def dcos_variant(self) -> DCOSVariant:
+    def dcos_variant(self) -> Optional[DCOSVariant]:
         """
-        Return the DC/OS variant of the cluster.
+        Return the DC/OS variant of the cluster or ``None`` if it cannot be
+        retrieved.
         """
-        # TODO: This won't work when we have a cluster created with no variant
-        # Instead read something from a cluster
-        master_container = next(iter(self.masters))
-        container_variant_value = master_container.labels[VARIANT_LABEL_KEY]
-        return {
-            VARIANT_ENTERPRISE_LABEL_VALUE: DCOSVariant.ENTERPRISE,
-            VARIANT_OSS_LABEL_VALUE: DCOSVariant.OSS,
-        }[container_variant_value]
+        return get_cluster_variant(cluster=self.cluster)
 
     @property
     def cluster(self) -> Cluster:

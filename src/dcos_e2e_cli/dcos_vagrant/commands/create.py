@@ -37,15 +37,12 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    get_variant,
     set_logging,
 )
+from dcos_e2e_cli.common.variants import get_install_variant
 
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,
-    VARIANT_DESCRIPTION_KEY,
-    VARIANT_ENTERPRISE_DESCRIPTION_VALUE,
-    VARIANT_OSS_DESCRIPTION_VALUE,
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
@@ -144,22 +141,16 @@ def create(
     )
     installer_path = Path(installer).resolve()
 
-    dcos_variant = get_variant(
+    dcos_variant = get_install_variant(
         given_variant=variant,
         installer_path=installer_path,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
 
-    variant_description_value = {
-        DCOSVariant.OSS: VARIANT_OSS_DESCRIPTION_VALUE,
-        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_DESCRIPTION_VALUE,
-    }[dcos_variant]
-
     description = {
         CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
         WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
-        VARIANT_DESCRIPTION_KEY: variant_description_value,
     }
     cluster_backend = Vagrant(
         workspace_dir=workspace_dir,
@@ -208,7 +199,6 @@ def create(
         cluster=cluster,
         cluster_id=cluster_id,
         dcos_config=dcos_config,
-        dcos_variant=dcos_variant,
         doctor_command_name=doctor_command_name,
         http_checks=True,
         wait_command_name=wait_command_name,
