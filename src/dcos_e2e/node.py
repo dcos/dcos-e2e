@@ -657,7 +657,7 @@ class Node:
             args=tar_args,
             user=user,
             transport=transport,
-            sudo=sudo,
+            sudo=False,
         )
 
         chown_args = ['chown', original_parent, str(remote_path.parent)]
