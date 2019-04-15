@@ -1,0 +1,16 @@
+Usage: minidcos aws send-file [OPTIONS] SOURCE DESTINATION
+
+  Send a file to a node or multiple nodes.
+
+Options:
+  -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+  --node TEXT            A reference to a particular node to run the command on.
+                         This can be one of: The node's public IP address, The
+                         node's private IP address, the node's EC2 instance ID,
+                         a reference in the format "<role>_<number>". These
+                         details be seen with ``minidcos aws inspect``.
+                         [default: master_0]
+  -v, --verbose          Use verbose output. Use this option multiple times for
+                         more verbose output.
+  --aws-region TEXT      The AWS region to use.  [default: us-west-2]
+  -h, --help             Show this message and exit.

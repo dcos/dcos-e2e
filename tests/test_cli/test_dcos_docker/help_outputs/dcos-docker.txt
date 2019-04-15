@@ -20,6 +20,7 @@ Commands:
   list                      List all clusters.
   list-loopback-sidecars    List loopback sidecars.
   run                       Run an arbitrary command on a node or multiple...
+  send-file                 Send a file to a node or multiple nodes.
   setup-mac-network         Set up a network to connect to nodes on macOS.
   sync                      Sync files from a DC/OS checkout to master nodes.
   wait                      Wait for DC/OS to start.
