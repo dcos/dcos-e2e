@@ -2,12 +2,12 @@
 Installing DC/OS on a Docker cluster.
 """
 
+import tempfile
+import uuid
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 import click
-import uuid
-import tempfile
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.node import Transport
@@ -36,8 +36,8 @@ from dcos_e2e_cli.common.utils import (
 from dcos_e2e_cli.common.variants import get_install_variant
 
 from ._common import ClusterContainers, existing_cluster_ids
-from .doctor import doctor
 from ._options import node_transport_option, wait_for_dcos_option
+from .doctor import doctor
 from .wait import wait
 
 

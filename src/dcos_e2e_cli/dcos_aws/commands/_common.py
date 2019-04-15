@@ -3,7 +3,7 @@ Common code for minidcos aws CLI modules.
 """
 
 from pathlib import Path
-from typing import Dict, Optional, Set
+from typing import Dict, Set
 
 import boto3
 from boto3.resources.base import ServiceResource
@@ -11,8 +11,6 @@ from boto3.resources.base import ServiceResource
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.variants import get_cluster_variant
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'

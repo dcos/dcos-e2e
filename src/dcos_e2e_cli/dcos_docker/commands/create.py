@@ -15,7 +15,6 @@ from docker.types import Mount
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Transport
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
