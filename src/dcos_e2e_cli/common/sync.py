@@ -3,7 +3,6 @@ Tools for syncing code to a cluster.
 """
 
 import io
-import subprocess
 import sys
 import tarfile
 import tempfile

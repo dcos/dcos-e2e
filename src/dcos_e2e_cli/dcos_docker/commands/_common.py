@@ -7,7 +7,7 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Set
 
 import click
 import docker
@@ -19,8 +19,6 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node, Role, Transport
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.variants import get_cluster_variant
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
