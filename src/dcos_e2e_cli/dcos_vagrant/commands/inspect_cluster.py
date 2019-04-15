@@ -15,6 +15,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 
 from ._common import ClusterVMs, VMInspectView, existing_cluster_ids
+from dcos_e2e_cli.common.variants import get_cluster_variant
 
 
 @click.command('inspect')
@@ -45,9 +46,10 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
         for key, vms in keys.items()
     }
 
-    variant_name = str(
-        cluster_vms.dcos_variant.name if cluster_vms.dcos_variant else None,
-    )
+    cluster = cluster_vms.cluster
+    dcos_variant = get_cluster_variant(cluster=cluster)
+    variant_name = str(dcos_variant if dcos_variant else None)
+
     data = {
         'Cluster ID': cluster_id,
         'Web UI': web_ui,

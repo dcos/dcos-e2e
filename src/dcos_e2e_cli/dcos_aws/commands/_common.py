@@ -209,14 +209,6 @@ class ClusterInstances:
         return Path(tag_dict[WORKSPACE_DIR_TAG_KEY])
 
     @property
-    def dcos_variant(self) -> Optional[DCOSVariant]:
-        """
-        Return the DC/OS variant of the cluster or ``None`` if it cannot be
-        retrieved.
-        """
-        return get_cluster_variant(cluster=self.cluster)
-
-    @property
     def cluster(self) -> Cluster:
         """
         Return a ``Cluster`` constructed from the EC2 instances.
