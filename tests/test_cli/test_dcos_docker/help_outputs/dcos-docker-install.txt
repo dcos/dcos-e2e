@@ -1,0 +1,9 @@
+Usage: minidcos docker install [OPTIONS]
+
+  Install DC/OS on the given Docker cluster.
+
+Options:
+  -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
+  -v, --verbose          Use verbose output. Use this option multiple times for
+                         more verbose output.
+  -h, --help             Show this message and exit.
