@@ -14,6 +14,7 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
 )
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+from dcos_e2e_cli.common.variants import get_cluster_variant
 
 from ._common import (
     ClusterContainers,
@@ -91,10 +92,10 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
         for key, containers in keys.items()
     }
 
-    variant_name = str(
-        cluster_containers.dcos_variant.name
-        if cluster_containers.dcos_variant else None,
-    )
+    cluster = cluster_containers.cluster
+    dcos_variant = get_cluster_variant(cluster=cluster)
+    variant_name = str(dcos_variant if dcos_variant else None)
+
     data = {
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
