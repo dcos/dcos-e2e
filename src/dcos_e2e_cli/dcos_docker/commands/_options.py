@@ -37,3 +37,23 @@ def node_transport_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
+
+
+def wait_for_dcos_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An option decorator for waiting for DC/OS to be up.
+    """
+    function = click.option(
+        '--wait-for-dcos',
+        is_flag=True,
+        help=(
+            'Wait for DC/OS after creating the cluster. '
+            'This is equivalent to using "minidcos docker wait" after this '
+            'command. '
+            '"minidcos docker wait" has various options available and so may '
+            'be more appropriate for your use case. '
+            'If the chosen transport is "docker-exec", this will skip HTTP '
+            'checks and so the cluster may not be fully ready.'
+        ),
+    )(command)  # type: Callable[..., None]
+    return function
