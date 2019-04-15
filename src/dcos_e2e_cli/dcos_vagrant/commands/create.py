@@ -43,9 +43,6 @@ from dcos_e2e_cli.common.variants import get_install_variant
 
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,
-    VARIANT_DESCRIPTION_KEY,
-    VARIANT_ENTERPRISE_DESCRIPTION_VALUE,
-    VARIANT_OSS_DESCRIPTION_VALUE,
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
@@ -151,15 +148,9 @@ def create(
         doctor_message=doctor_message,
     )
 
-    variant_description_value = {
-        DCOSVariant.OSS: VARIANT_OSS_DESCRIPTION_VALUE,
-        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_DESCRIPTION_VALUE,
-    }[dcos_variant]
-
     description = {
         CLUSTER_ID_DESCRIPTION_KEY: cluster_id,
         WORKSPACE_DIR_DESCRIPTION_KEY: str(workspace_dir),
-        VARIANT_DESCRIPTION_KEY: variant_description_value,
     }
     cluster_backend = Vagrant(
         workspace_dir=workspace_dir,

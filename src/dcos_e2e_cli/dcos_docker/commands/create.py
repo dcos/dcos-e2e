@@ -54,9 +54,6 @@ from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_MASTER_LABEL_VALUE,
     NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
-    VARIANT_ENTERPRISE_LABEL_VALUE,
-    VARIANT_LABEL_KEY,
-    VARIANT_OSS_LABEL_VALUE,
     WORKSPACE_DIR_LABEL_KEY,
     docker_client,
     existing_cluster_ids,
@@ -445,11 +442,6 @@ def create(
         doctor_message=doctor_message,
     )
 
-    variant_label_value = {
-        DCOSVariant.OSS: VARIANT_OSS_LABEL_VALUE,
-        DCOSVariant.ENTERPRISE: VARIANT_ENTERPRISE_LABEL_VALUE,
-    }[dcos_variant]
-
     # This is useful for some people to identify containers.
     container_name_prefix = Docker().container_name_prefix + '-' + cluster_id
 
@@ -465,7 +457,6 @@ def create(
         docker_container_labels={
             CLUSTER_ID_LABEL_KEY: cluster_id,
             WORKSPACE_DIR_LABEL_KEY: str(workspace_dir),
-            VARIANT_LABEL_KEY: variant_label_value,
         },
         docker_master_labels={
             NODE_TYPE_LABEL_KEY: NODE_TYPE_MASTER_LABEL_VALUE,

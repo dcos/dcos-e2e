@@ -26,9 +26,6 @@ NODE_TYPE_MASTER_TAG_VALUE = 'master'
 NODE_TYPE_AGENT_TAG_VALUE = 'agent'
 NODE_TYPE_PUBLIC_AGENT_TAG_VALUE = 'public_agent'
 SSH_USER_TAG_KEY = 'dcos_e2e.ssh_user'
-VARIANT_TAG_KEY = 'dcos_e2e.variant'
-VARIANT_OSS_TAG_VALUE = ''
-VARIANT_ENTERPRISE_TAG_VALUE = 'ee'
 WORKSPACE_DIR_TAG_KEY = 'dcos_e2e.workspace_dir'
 
 
