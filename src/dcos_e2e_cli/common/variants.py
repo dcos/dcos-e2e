@@ -1,6 +1,8 @@
 """
 Helpers for managing DC/OS Variants.
 """
+
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -10,6 +12,8 @@ from typing import Optional
 import click
 from halo import Halo
 
+from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Output
 from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
     get_dcos_installer_details,
@@ -66,5 +70,26 @@ def get_install_variant(
 
     return {
         'oss': DCOSVariant.OSS,
+        'enterprise': DCOSVariant.ENTERPRISE,
+    }[given_variant]
+
+
+def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
+    """
+    Get the variant of DC/OS running on a cluster.
+
+    Args:
+        cluster: The cluster running DC/OS.
+
+    Returns:
+        The variant of DC/OS installed on the given cluster.
+    """
+    (master, ) = cluster.masters
+    get_version_json_args = ['cat', '/opt/mesosphere/etc/dcos-version.json']
+    result = master.run(args=get_version_json_args, output=Output.CAPTURE)
+    dcos_version = json.loads(result.stdout.decode())
+    given_variant = dcos_version['dcos-variant']
+    return {
+        'open': DCOSVariant.OSS,
         'enterprise': DCOSVariant.ENTERPRISE,
     }[given_variant]

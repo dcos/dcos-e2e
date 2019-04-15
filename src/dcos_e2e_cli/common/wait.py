@@ -3,18 +3,47 @@ Tools for waiting for DC/OS.
 """
 
 import sys
+import textwrap
 
 import click
 import urllib3
 from halo import Halo
+from retry import retry
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+from dcos_e2e_cli.common.variants import get_cluster_variant
+
+
+@retry(
+    exceptions=(DCOSTimeoutError),
+    tries=60 * 60,
+    delay=1,
+)
+def _wait_for_variant(cluster: Cluster) -> None:
+    """
+    Wait for a particular file to be available on the cluster.
+    This means that the cluster variant can be determined.
+    """
+    (master, ) = cluster.masters
+    script = textwrap.dedent(
+        """
+        #!/bin/bash
+        if [ -e /opt/mesosphere/etc/dcos-version.json ]
+        then
+            echo "True"
+        else
+            echo "False"
+        fi
+        """,
+    )
+    version_file_exists = master.run(args=[script], shell=True)
+    if version_file_exists.stdout.strip().decode() != 'True':
+        raise DCOSTimeoutError
 
 
 def wait_for_dcos(
-    dcos_variant: DCOSVariant,
     cluster: Cluster,
     superuser_username: str,
     superuser_password: str,
@@ -25,7 +54,6 @@ def wait_for_dcos(
     Wait for DC/OS to start.
 
     Args:
-        dcos_variant: The DC/OS variant of the cluster.
         cluster: The cluster to wait for.
         superuser_username: If the cluster is a DC/OS Enterprise cluster, use
             this username to wait for DC/OS.
@@ -51,11 +79,14 @@ def wait_for_dcos(
         'To resolve that, run this command again.'
     )
 
+    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner.start(text='Waiting for DC/OS variant')
+    _wait_for_variant(cluster=cluster)
+    dcos_variant = get_cluster_variant(cluster=cluster)
+    spinner.succeed()
     if dcos_variant == DCOSVariant.OSS:
         click.echo(no_login_message)
-
-    spinner = Halo(enabled=sys.stdout.isatty())
-    spinner.start(text='Waiting for DC/OS')
+    spinner.start(text='Waiting for DC/OS variant')
     try:
         if dcos_variant == DCOSVariant.ENTERPRISE:
             cluster.wait_for_dcos_ee(
