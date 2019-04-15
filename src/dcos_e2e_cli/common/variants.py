@@ -79,7 +79,7 @@ def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
     Get the variant of DC/OS running on a cluster.
 
     Args:
-        cluster: The cluster running DC/oS.
+        cluster: The cluster running DC/OS.
 
     Returns:
         The variant of DC/OS installed on the given cluster.
@@ -90,6 +90,6 @@ def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
     dcos_version = json.loads(result.stdout.decode())
     given_variant = dcos_version['dcos-variant']
     return {
-        'oss': DCOSVariant.OSS,
+        'open': DCOSVariant.OSS,
         'enterprise': DCOSVariant.ENTERPRISE,
     }[given_variant]

@@ -313,7 +313,6 @@ def create(
         cluster=cluster,
         cluster_id=cluster_id,
         dcos_config=dcos_config,
-        dcos_variant=dcos_variant,
         doctor_command_name=doctor_command_name,
         http_checks=True,
         wait_command_name=wait_command_name,
