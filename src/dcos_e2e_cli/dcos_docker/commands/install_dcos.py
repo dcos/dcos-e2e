@@ -102,19 +102,6 @@ def install_dcos(
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
-    #
-    # existing_config = get_config_from_cluster(cluster)  # defaults to {} if there is no existing config on the cluster
-    #
-    # extra_config = {**existing_config, **extra_config}
-    import yaml
-    from dcos_e2e.node import Output
-    (master, ) = cluster.masters
-    # TODO describe how this works in the docstring
-    # TODO - ignore error and set to '' if this does not exist
-    get_config_args = ['cat', '/opt/mesosphere/etc/user.config.full.yaml']
-    result = master.run(args=get_config_args, output=Output.CAPTURE)
-    existing_config = yaml.load(result.stdout.decode())
-    extra_config = {**existing_config, **extra_config}
 
     dcos_config = get_config(
         cluster=cluster,
