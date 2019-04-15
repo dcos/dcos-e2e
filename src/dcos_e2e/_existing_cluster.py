@@ -160,6 +160,7 @@ class ExistingClusterManager(ClusterManager):
         """
         Return a base configuration for installing DC/OS OSS.
         """
+        # TODO have sensible defaults
         return {}
 
     @property

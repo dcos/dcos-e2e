@@ -254,7 +254,6 @@ class Node:
             '&&',
             'bash',
             'genconf/serve/dcos_install.sh',
-            '--no-block-dcos-setup',
             role.value,
         ]
 

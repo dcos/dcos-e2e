@@ -2,62 +2,56 @@
 Installing DC/OS on a Docker cluster.
 """
 
-import click
-
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict, Any
 
-from dcos_e2e.node import Transport
+import click
+import uuid
+import tempfile
+
 from dcos_e2e.backends import Docker
-from dcos_e2e_cli.common.doctor import get_doctor_message
+from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import installer_argument
-from dcos_e2e_cli.common.options import (
-    existing_cluster_id_option,
-    verbosity_option,
-)
-from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+from dcos_e2e_cli.common.create import get_config
+from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
     install_dcos_from_path,
     run_post_install_steps,
 )
-from dcos_e2e_cli.common.create import create_cluster, get_config
-
-from .doctor import doctor
-
 from dcos_e2e_cli.common.options import (
-    agents_option,
-    cluster_id_option,
-    copy_to_master_option,
+    existing_cluster_id_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
-    masters_option,
-    public_agents_option,
     security_mode_option,
     variant_option,
     verbosity_option,
     workspace_dir_option,
 )
 from dcos_e2e_cli.common.utils import (
-    check_cluster_id_unique,
+    check_cluster_id_exists,
     command_path,
     get_variant,
     set_logging,
-    write_key_pair,
 )
 
 from ._common import ClusterContainers, existing_cluster_ids
+from .doctor import doctor
+from ._options import node_transport_option, wait_for_dcos_option
+from .wait import wait
 
 
 @click.command('install')
+@genconf_dir_option
 @installer_argument
 @existing_cluster_id_option
 @extra_config_option
 @security_mode_option
 @license_key_option
-@genconf_dir_option
+@node_transport_option
 @variant_option
 @verbosity_option
+@wait_for_dcos_option
 @workspace_dir_option
 @click.pass_context
 def install_dcos(
@@ -71,6 +65,8 @@ def install_dcos(
     variant: str,
     verbose: int,
     workspace_dir: Optional[Path],
+    transport: Transport,
+    wait_for_dcos: bool,
 ) -> None:
     """
     Install DC/OS on the given Docker cluster.
@@ -96,12 +92,29 @@ def install_dcos(
 
     installer_path = Path(installer).resolve()
 
+    base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
+    workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    workspace_dir.mkdir(parents=True)
+
     dcos_variant = get_variant(
         given_variant=variant,
         installer_path=installer_path,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
+    #
+    # existing_config = get_config_from_cluster(cluster)  # defaults to {} if there is no existing config on the cluster
+    #
+    # extra_config = {**existing_config, **extra_config}
+    import yaml
+    from dcos_e2e.node import Output
+    (master, ) = cluster.masters
+    # TODO describe how this works in the docstring
+    # TODO - ignore error and set to '' if this does not exist
+    get_config_args = ['cat', '/opt/mesosphere/etc/user.config.full.yaml']
+    result = master.run(args=get_config_args, output=Output.CAPTURE)
+    existing_config = yaml.load(result.stdout.decode())
+    extra_config = {**existing_config, **extra_config}
 
     dcos_config = get_config(
         cluster=cluster,
@@ -118,6 +131,9 @@ def install_dcos(
         dcos_installer=installer_path,
         local_genconf_dir=genconf_dir,
     )
+
+    http_checks = bool(transport == Transport.SSH)
+    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
 
     run_post_install_steps(
         cluster=cluster,

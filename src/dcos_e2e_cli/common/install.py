@@ -3,6 +3,7 @@ Helpers for installing DC/OS.
 """
 
 import subprocess
+import textwrap
 import sys
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -13,6 +14,7 @@ from halo import Halo
 import dcos_e2e_cli.common.wait
 from dcos_e2e.cluster import Cluster
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+from dcos_e2e.node import Output
 
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
@@ -54,12 +56,20 @@ def install_dcos_from_path(
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=Output.LOG_AND_CAPTURE,
         )
     except subprocess.CalledProcessError as exc:
         spinner.stop()
         click.echo('Error installing DC/OS.', err=True)
+        click.echo(click.style('Full error:', fg='yellow'))
+        click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
         click.echo(doctor_message)
-        cluster.destroy()
+        # TODO this may raise NotImplementedError now:
+        # handle that
+        try:
+            cluster.destroy()
+        except NotImplementedError:
+            pass
         sys.exit(exc.returncode)
 
     spinner.succeed()
@@ -106,8 +116,13 @@ def install_dcos_from_url(
     except subprocess.CalledProcessError as exc:
         spinner.stop()
         click.echo('Error installing DC/OS.', err=True)
+        click.echo(click.style('Full error:', fg='yellow'))
+        click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
         click.echo(doctor_message)
-        cluster.destroy()
+        try:
+            cluster.destroy()
+        except NotImplementedError:
+            pass
         sys.exit(exc.returncode)
 
     spinner.succeed()

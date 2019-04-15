@@ -61,7 +61,7 @@ from ._common import (
     docker_client,
     existing_cluster_ids,
 )
-from ._options import node_transport_option
+from ._options import node_transport_option, wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
 
@@ -326,19 +326,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
     multiple=True,
 )
 @variant_option
-@click.option(
-    '--wait-for-dcos',
-    is_flag=True,
-    help=(
-        'Wait for DC/OS after creating the cluster. '
-        'This is equivalent to using "minidcos docker wait" after this '
-        'command. '
-        '"minidcos docker wait" has various options available and so may be '
-        'more appropriate for your use case. '
-        'If the chosen transport is "docker-exec", this will skip HTTP checks '
-        'and so the cluster may not be fully ready.'
-    ),
-)
+@wait_for_dcos_option
 @click.option(
     '--network',
     default='bridge',
