@@ -75,7 +75,7 @@ def wait_for_dcos(
     spinner.succeed()
     if dcos_variant == DCOSVariant.OSS:
         click.echo(no_login_message)
-    spinner.start(text='Waiting for DC/OS variant')
+    spinner.start(text='Waiting for DC/OS to start')
     try:
         if dcos_variant == DCOSVariant.ENTERPRISE:
             cluster.wait_for_dcos_ee(
