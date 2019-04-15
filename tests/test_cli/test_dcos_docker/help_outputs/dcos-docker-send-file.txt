@@ -1,0 +1,26 @@
+Usage: minidcos docker send-file [OPTIONS] SOURCE DESTINATION
+
+  Send a file to a node or multiple nodes.
+
+Options:
+  -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                 default]
+  --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                 the SSH transport requires IP routing to be set
+                                 up. See "minidcos docker setup-mac-network". It
+                                 also requires the "ssh" command to be
+                                 available. This can be provided by setting the
+                                 `MINIDCOS_DOCKER_TRANSPORT` environment
+                                 variable. When using a TTY, different
+                                 transports may use different line endings.
+                                 [default: docker-exec]
+  --node TEXT                    A reference to a particular node to run the
+                                 command on. This can be one of: The node's IP
+                                 address, the node's Docker container name, the
+                                 node's Docker container ID, a reference in the
+                                 format "<role>_<number>". These details be seen
+                                 with ``minidcos docker inspect``.  [default:
+                                 master_0]
+  -v, --verbose                  Use verbose output. Use this option multiple
+                                 times for more verbose output.
+  -h, --help                     Show this message and exit.

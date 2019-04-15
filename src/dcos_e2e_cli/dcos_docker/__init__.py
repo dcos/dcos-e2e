@@ -17,6 +17,7 @@ from .commands.list_clusters import list_clusters
 from .commands.list_loopback_sidecars import list_loopback_sidecars
 from .commands.mac_network import destroy_mac_network, setup_mac_network
 from .commands.run_command import run
+from .commands.send_file import send_file
 from .commands.sync import sync_code
 from .commands.wait import wait
 from .commands.web import web
@@ -43,6 +44,7 @@ dcos_docker.add_command(list_clusters)
 dcos_docker.add_command(list_loopback_sidecars)
 dcos_docker.add_command(run)
 dcos_docker.add_command(setup_mac_network)
+dcos_docker.add_command(send_file)
 dcos_docker.add_command(sync_code)
 dcos_docker.add_command(wait)
 dcos_docker.add_command(web)

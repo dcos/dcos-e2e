@@ -9,6 +9,7 @@ from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
 from .commands.list_clusters import list_clusters
 from .commands.run_command import run
+from .commands.send_file import send_file
 from .commands.sync import sync_code
 from .commands.wait import wait
 from .commands.web import web
@@ -25,6 +26,7 @@ dcos_aws.add_command(create)
 dcos_aws.add_command(doctor)
 dcos_aws.add_command(list_clusters)
 dcos_aws.add_command(run)
+dcos_aws.add_command(send_file)
 dcos_aws.add_command(sync_code)
 dcos_aws.add_command(wait)
 dcos_aws.add_command(web)
