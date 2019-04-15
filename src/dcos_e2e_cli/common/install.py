@@ -9,12 +9,9 @@ from typing import Any, Dict, Optional
 
 import click
 from halo import Halo
-from retry import retry
 
 import dcos_e2e_cli.common.wait
 from dcos_e2e.cluster import Cluster
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.variants import get_cluster_variant
 
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 

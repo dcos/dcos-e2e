@@ -3,13 +3,12 @@ Tools for waiting for DC/OS.
 """
 
 import sys
+import textwrap
 
 import click
 import urllib3
-from retry import retry
 from halo import Halo
-import subprocess
-import textwrap
+from retry import retry
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
