@@ -5,6 +5,7 @@ Helpers for installing DC/OS.
 import subprocess
 import textwrap
 import sys
+import textwrap
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -111,6 +112,7 @@ def install_dcos_from_url(
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=Output.LOG_AND_CAPTURE,
         )
     except subprocess.CalledProcessError as exc:
         spinner.stop()
