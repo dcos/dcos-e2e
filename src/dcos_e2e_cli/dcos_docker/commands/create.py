@@ -490,6 +490,7 @@ def create(
     )
 
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
+    return
 
     for node in cluster.masters:
         for path_pair in copy_to_master:

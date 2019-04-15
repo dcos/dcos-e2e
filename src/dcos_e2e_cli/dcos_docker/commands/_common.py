@@ -231,6 +231,8 @@ class ClusterContainers:
         """
         Return the DC/OS variant of the cluster.
         """
+        # TODO: This won't work when we have a cluster created with no variant
+        # Instead read something from a cluster
         master_container = next(iter(self.masters))
         container_variant_value = master_container.labels[VARIANT_LABEL_KEY]
         return {
