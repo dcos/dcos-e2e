@@ -12,7 +12,6 @@ import click
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from dcos_e2e_cli.common.create import create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
