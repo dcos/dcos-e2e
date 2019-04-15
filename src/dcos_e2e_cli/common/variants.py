@@ -5,6 +5,7 @@ Helpers for managing DC/OS Variants.
 import json
 import subprocess
 import sys
+import textwrap
 from pathlib import Path
 from shutil import rmtree
 from typing import Optional
@@ -74,6 +75,33 @@ def get_install_variant(
     }[given_variant]
 
 
+def cluster_variant_available(cluster: Cluster) -> bool:
+    """
+    Check whether a cluster's variant can be retrieved.
+
+    Args:
+        cluster: The cluster to check.
+
+    Returns:
+        Whether the cluster variant is available.
+    """
+    master = next(iter(cluster.masters))
+    script = textwrap.dedent(
+        """
+        #!/bin/bash
+        if [ -e /opt/mesosphere/etc/dcos-version.json ]
+        then
+            echo "True"
+        else
+            echo "False"
+        fi
+        """,
+    )
+    version_file_exists = master.run(args=[script], shell=True)
+    output = version_file_exists.stdout.strip().decode()
+    return {'True': True, 'False': False}[output]
+
+
 def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
     """
     Get the variant of DC/OS running on a cluster.
@@ -84,7 +112,7 @@ def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
     Returns:
         The variant of DC/OS installed on the given cluster.
     """
-    (master, ) = cluster.masters
+    master = next(iter(cluster.masters))
     get_version_json_args = ['cat', '/opt/mesosphere/etc/dcos-version.json']
     result = master.run(args=get_version_json_args, output=Output.CAPTURE)
     dcos_version = json.loads(result.stdout.decode())

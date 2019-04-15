@@ -3,7 +3,6 @@ Tools for waiting for DC/OS.
 """
 
 import sys
-import textwrap
 
 import click
 import urllib3
@@ -13,7 +12,10 @@ from retry import retry
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.variants import get_cluster_variant
+from dcos_e2e_cli.common.variants import (
+    cluster_variant_available,
+    get_cluster_variant,
+)
 
 
 @retry(
@@ -26,20 +28,7 @@ def _wait_for_variant(cluster: Cluster) -> None:
     Wait for a particular file to be available on the cluster.
     This means that the cluster variant can be determined.
     """
-    (master, ) = cluster.masters
-    script = textwrap.dedent(
-        """
-        #!/bin/bash
-        if [ -e /opt/mesosphere/etc/dcos-version.json ]
-        then
-            echo "True"
-        else
-            echo "False"
-        fi
-        """,
-    )
-    version_file_exists = master.run(args=[script], shell=True)
-    if version_file_exists.stdout.strip().decode() != 'True':
+    if not cluster_variant_available(cluster=cluster):
         raise DCOSTimeoutError
 
 
@@ -86,7 +75,7 @@ def wait_for_dcos(
     spinner.succeed()
     if dcos_variant == DCOSVariant.OSS:
         click.echo(no_login_message)
-    spinner.start(text='Waiting for DC/OS variant')
+    spinner.start(text='Waiting for DC/OS to start')
     try:
         if dcos_variant == DCOSVariant.ENTERPRISE:
             cluster.wait_for_dcos_ee(
