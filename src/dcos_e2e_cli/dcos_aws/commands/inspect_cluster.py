@@ -15,11 +15,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e_cli.common.variants import get_cluster_variant
 
-from ._common import (
-    ClusterInstances,
-    InstanceInspectView,
-    existing_cluster_ids,
-)
+from ._common import ClusterInstances, existing_cluster_ids
 from ._options import aws_region_option
 
 
@@ -49,10 +45,8 @@ def inspect_cluster(cluster_id: str, aws_region: str, verbose: int) -> None:
     web_ui = 'http://' + str(master.public_ip_address)
     nodes = {
         key: [
-            InstanceInspectView(
-                instance=instance,
-                aws_region=aws_region,
-            ).to_dict() for instance in instances
+            cluster_instances.to_dict(node_representation=instance)
+            for instance in instances
         ]
         for key, instances in keys.items()
     }
@@ -65,6 +59,8 @@ def inspect_cluster(cluster_id: str, aws_region: str, verbose: int) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
+        'SSH Default User': cluster_instances.ssh_default_user,
+        'SSH key': str(cluster_instances.ssh_key_path),
         'DC/OS Variant': variant_name,
     }  # type: Dict[Any, Any]
     click.echo(

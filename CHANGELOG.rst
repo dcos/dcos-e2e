@@ -8,6 +8,7 @@ Next
 
 * Improve the spinner while waiting for ``minidcos`` commands.
 * Add ``send-file`` commands to ``minidcos`` subcommands.
+* Remove ``--env`` option on ``minidcos docker inspect``.
 
 2019.04.08.1
 ------------

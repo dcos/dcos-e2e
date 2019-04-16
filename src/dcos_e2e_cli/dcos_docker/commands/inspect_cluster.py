@@ -16,30 +16,15 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e_cli.common.variants import get_cluster_variant
 
-from ._common import (
-    ClusterContainers,
-    ContainerInspectView,
-    existing_cluster_ids,
-)
+from ._common import ClusterContainers, existing_cluster_ids
 
 
 @click.command('inspect')
 @existing_cluster_id_option
-@click.option(
-    '--env',
-    is_flag=True,
-    help='Show details in an environment variable format to eval.',
-)
 @verbosity_option
-def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
+def inspect_cluster(cluster_id: str, verbose: int) -> None:
     """
     Show cluster details.
-
-    To quickly get environment variables to use with Docker tooling, use the
-    ``--env`` flag.
-
-    Run ``eval $(minidcos docker inspect <CLUSTER_ID> --env)``, then run
-    ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
     set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
@@ -54,7 +39,6 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
     )
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
-    ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
 
     keys = {
         'masters': cluster_containers.masters,
@@ -62,32 +46,10 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
         'public_agents': cluster_containers.public_agents,
     }
 
-    if env:
-        env_dict = {}
-        for _, containers in keys.items():
-            for container in containers:
-                inspect_view = ContainerInspectView(
-                    container=container,
-                    cluster_containers=cluster_containers,
-                )
-                inspect_data = inspect_view.to_dict()
-                reference = inspect_data['e2e_reference'].upper()
-                env_dict[reference] = container.id
-                node_ip_key = reference + '_IP'
-                node_ip = container.attrs['NetworkSettings']['IPAddress']
-                env_dict[node_ip_key] = node_ip
-        env_dict['WEB_UI'] = web_ui
-        env_dict['SSH_KEY'] = ssh_key
-        for key, value in env_dict.items():
-            click.echo('export {key}={value}'.format(key=key, value=value))
-        return
-
     nodes = {
         key: [
-            ContainerInspectView(
-                container=container,
-                cluster_containers=cluster_containers,
-            ).to_dict() for container in containers
+            cluster_containers.to_dict(node_representation=container)
+            for container in containers
         ]
         for key, containers in keys.items()
     }
@@ -100,9 +62,10 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
-        'SSH key': str(ssh_key),
+        'SSH Default User': cluster_containers.ssh_default_user,
+        'SSH key': str(cluster_containers.ssh_key_path),
         'DC/OS Variant': variant_name,
-    }  # type: Dict[Any, Any]
+    }  # type: Dict[str, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
     )
