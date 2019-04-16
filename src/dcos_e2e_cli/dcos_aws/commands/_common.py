@@ -158,7 +158,7 @@ class ClusterInstances:
         """
         A key which can be used to SSH to any node.
         """
-        return self.workspace_dir / 'ssh' / 'id_rsa'
+        return self._workspace_dir / 'ssh' / 'id_rsa'
 
     @property
     def masters(self) -> Set[ServiceResource]:
@@ -182,7 +182,7 @@ class ClusterInstances:
         return self._instances_by_role(role=Role.PUBLIC_AGENT)
 
     @property
-    def workspace_dir(self) -> Path:
+    def _workspace_dir(self) -> Path:
         """
         The workspace directory to put temporary files in.
         """
