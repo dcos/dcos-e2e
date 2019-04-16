@@ -7,13 +7,14 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, Set
+from typing import Any, Dict, Set
 
 import click
 import docker
 from docker.client import DockerClient
 from docker.models.containers import Container
 
+from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
@@ -212,6 +213,18 @@ class ClusterContainers(ClusterRepresentation):
         container = next(iter(self.masters))
         workspace_dir = container.labels[WORKSPACE_DIR_LABEL_KEY]
         return Path(workspace_dir)
+
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        backend = Docker()
+
+        return {
+            **self.cluster.base_config,
+            **backend.base_config,
+        }
 
     def destroy(self) -> None:
         """
