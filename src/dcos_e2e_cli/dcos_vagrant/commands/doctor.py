@@ -17,7 +17,6 @@ from dcos_e2e_cli.common.doctor import (
     warn,
 )
 from dcos_e2e_cli.common.options import verbosity_option
-from dcos_e2e_cli.common.utils import set_logging
 
 
 def check_docker() -> CheckLevels:
@@ -122,11 +121,10 @@ def check_vagrant_plugin_versions() -> CheckLevels:
 
 @click.command('doctor')
 @verbosity_option
-def doctor(verbose: int) -> None:
+def doctor() -> None:
     """
     Diagnose common issues which stop this CLI from working correctly.
     """
-    set_logging(verbosity_level=verbose)
     check_functions = [
         check_docker,
         check_1_9_sed,

@@ -36,7 +36,6 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    set_logging,
     write_key_pair,
 )
 from dcos_e2e_cli.common.variants import get_install_variant
@@ -372,7 +371,6 @@ def create(
     wait_for_dcos: bool,
     network: Network,
     one_master_host_port_map: Dict[str, int],
-    verbose: int,
     mount_sys_fs_cgroup: bool,
 ) -> None:
     """
@@ -407,7 +405,6 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    set_logging(verbosity_level=verbose)
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),

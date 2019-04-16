@@ -33,7 +33,6 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
-    set_logging,
     write_key_pair,
 )
 from dcos_e2e_cli.common.variants import get_install_variant
@@ -151,7 +150,6 @@ def create(
     license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    verbose: int,
     aws_region: str,
     linux_distribution: str,
     cluster_id: str,
@@ -192,7 +190,6 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    set_logging(verbosity_level=verbose)
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
