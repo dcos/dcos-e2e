@@ -26,7 +26,6 @@ from dcos_e2e_cli.common.options import (
     security_mode_option,
     variant_option,
     verbosity_option,
-    workspace_dir_option,
 )
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_exists,
@@ -34,6 +33,7 @@ from dcos_e2e_cli.common.utils import (
     set_logging,
 )
 from dcos_e2e_cli.common.variants import get_install_variant
+from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
 from ._common import ClusterContainers, existing_cluster_ids
 from ._options import node_transport_option, wait_for_dcos_option
@@ -64,7 +64,7 @@ def install_dcos(
     security_mode: Optional[str],
     variant: str,
     verbose: int,
-    workspace_dir: Optional[Path],
+    workspace_dir: Path,
     transport: Transport,
     wait_for_dcos: bool,
 ) -> None:
@@ -90,10 +90,6 @@ def install_dcos(
     cluster_backend = Docker()
 
     installer_path = Path(installer).resolve()
-
-    base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
-    workspace_dir = base_workspace_dir / uuid.uuid4().hex
-    workspace_dir.mkdir(parents=True)
 
     dcos_variant = get_install_variant(
         given_variant=variant,
