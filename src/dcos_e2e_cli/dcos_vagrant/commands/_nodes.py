@@ -69,7 +69,7 @@ def get_node(
         )
 
         if node_reference in accepted:
-            return cluster_vms.to_node(vm_name=vm_name)
+            return cluster_vms.to_node(node_representation=vm_name)
     return None
 
 
