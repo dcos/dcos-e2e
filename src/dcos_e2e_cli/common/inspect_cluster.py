@@ -2,12 +2,15 @@
 Helpers for showing details of a cluster.
 """
 
+import json
 from typing import Any  # noqa: F401
 from typing import Dict  # noqa: F401
-from dcos_e2e_cli.common.base_classes import ClusterRepresentation
-import json
+
 import click
+
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 from dcos_e2e_cli.common.variants import get_cluster_variant
+
 
 def show_cluster_details(
     cluster_id: str,
