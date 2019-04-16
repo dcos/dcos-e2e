@@ -7,9 +7,9 @@ from typing import Callable, Iterable, Set
 import click
 
 from dcos_e2e.node import Node
+from dcos_e2e_cli.common.nodes import get_node
 
 from ._common import ClusterContainers
-from dcos_e2e_cli.common.nodes import get_node
 
 
 def node_option(command: Callable[..., None]) -> Callable[..., None]:
@@ -43,6 +43,7 @@ def get_nodes(
 ) -> Set[Node]:
     """
     Get nodes from "reference"s.
+
     Args:
         cluster_id: The ID of the cluster to get nodes from.
         cluster_containers: A representation of the cluster.
