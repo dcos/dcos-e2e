@@ -23,6 +23,7 @@ def _destroy_cluster(cluster_id: str, transport: Transport) -> None:
 
     Args:
         cluster_id: The ID of the cluster.
+        transport: The transport to use for any communication with the cluster.
     """
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
