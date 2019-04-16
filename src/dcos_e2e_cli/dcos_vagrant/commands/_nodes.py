@@ -39,14 +39,11 @@ def get_node(cluster_vms: ClusterVMs, node_reference: str) -> Optional[Node]:
 
     Args:
         cluster_vms: A representation of the cluster.
-        node_reference: One of:
-            * A node's IP address
-            * A node's VM name
-            * A reference in the format "<role>_<number>"
+        node_reference: Unique node data as shown in the "inspect" command.
 
     Returns:
         The ``Node`` from the given cluster or ``None`` if there is no such
-        node.
+            node.
     """
     vm_names = {
         *cluster_vms.masters,
