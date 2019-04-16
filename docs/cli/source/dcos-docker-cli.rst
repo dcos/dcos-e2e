@@ -146,15 +146,6 @@ This means that you can use tools such as ``docker exec`` to run commands on nod
 To do this, first choose the container ID of a node.
 Use :ref:`dcos-docker-cli:inspect` to see all node container IDs.
 
-Alternatively, use the ``--env`` flag to output commands to be evaluated as such:
-
-.. substitution-prompt:: bash $,# auto
-
-   $ eval $(minidcos docker inspect --env)
-   $ docker exec -it $MASTER_0 systemctl list-units
-
-Which environment variables are available depends on the size of your cluster.
-
 Running commands on a cluster node using ``ssh``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
