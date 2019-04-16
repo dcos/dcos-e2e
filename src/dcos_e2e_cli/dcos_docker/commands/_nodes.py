@@ -2,13 +2,14 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
-from typing import Callable, Iterable, Optional, Set
+from typing import Callable, Iterable, Set
 
 import click
 
 from dcos_e2e.node import Node
 
 from ._common import ClusterContainers
+from dcos_e2e_cli.common.nodes import get_node
 
 
 def node_option(command: Callable[..., None]) -> Callable[..., None]:
@@ -32,36 +33,6 @@ def node_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
-
-
-def get_node(
-    cluster_containers: ClusterContainers,
-    node_reference: str,
-) -> Optional[Node]:
-    """
-    Get a node from a "reference".
-
-    Args:
-        cluster_containers: A representation of the cluster.
-        node_reference: Unique node data as shown in the "inspect" command.
-
-    Returns:
-        The ``Node`` from the given cluster or ``None`` if there is no such
-            node.
-    """
-    containers = {
-        *cluster_containers.masters,
-        *cluster_containers.agents,
-        *cluster_containers.public_agents,
-    }
-
-    for container in containers:
-        inspect_data = cluster_containers.to_dict(
-            node_representation=container,
-        )
-        if node_reference in inspect_data.values():
-            return cluster_containers.to_node(node_representation=container)
-    return None
 
 
 def get_nodes(
@@ -92,7 +63,7 @@ def get_nodes(
     nodes = set([])
     for node_reference in node_references:
         node = get_node(
-            cluster_containers=cluster_containers,
+            cluster_representation=cluster_containers,
             node_reference=node_reference,
         )
         if node is None:
