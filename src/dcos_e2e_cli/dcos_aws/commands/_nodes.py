@@ -37,7 +37,6 @@ def node_option(command: Callable[..., None]) -> Callable[..., None]:
 def get_node(
     cluster_instances: ClusterInstances,
     node_reference: str,
-    aws_region: str,
 ) -> Optional[Node]:
     """
     Get a node from a "reference".
@@ -49,7 +48,6 @@ def get_node(
             * A node's private IP address
             * A node's EC2 instance ID
             * A reference in the format "<role>_<number>"
-        aws_region: The AWS region the cluster is in.
 
     Returns:
         The ``Node`` from the given cluster or ``None`` if there is no such
@@ -85,7 +83,6 @@ def get_nodes(
     node_references: Iterable[str],
     cluster_instances: ClusterInstances,
     inspect_command_name: str,
-    aws_region: str,
 ) -> Set[Node]:
     """
     Get nodes from "reference"s.
@@ -100,7 +97,6 @@ def get_nodes(
             * A reference in the format "<role>_<number>"
         inspect_command_name: The name of an inspect command to use to find
             available references.
-        aws_region: The AWS region the cluster is in.
 
     Returns:
         All ``Node``s from the given cluster which match the references.
@@ -113,7 +109,6 @@ def get_nodes(
         node = get_node(
             cluster_instances=cluster_instances,
             node_reference=node_reference,
-            aws_region=aws_region,
         )
         if node is None:
             message = (

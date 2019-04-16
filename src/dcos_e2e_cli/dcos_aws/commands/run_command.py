@@ -91,7 +91,6 @@ def run(
         cluster_instances=cluster_instances,
         node_references=node,
         inspect_command_name=inspect_command_name,
-        aws_region=aws_region,
     )
 
     for host in hosts:
