@@ -2,7 +2,6 @@
 Common utilities for making CLIs.
 """
 
-import logging
 import stat
 from pathlib import Path
 from typing import Set
@@ -29,23 +28,6 @@ def command_path(
     command_path_list = sibling_ctx.command_path.split()
     command_path_list[-1] = command.name
     return ' '.join(command_path_list)
-
-
-def set_logging(verbosity_level: int) -> None:
-    """
-    Set logging level depending on the chosen verbosity.
-    """
-    verbosity_level = min(verbosity_level, 3)
-    verbosity_level = max(verbosity_level, 0)
-    verbosity_map = {
-        0: logging.WARNING,
-        1: logging.INFO,
-        2: logging.DEBUG,
-        3: logging.NOTSET,
-    }
-    logging.basicConfig(level=logging.NOTSET)
-    # Disable logging calls of the given severity level or below.
-    logging.disable(verbosity_map[int(verbosity_level or 0)])
 
 
 def check_cluster_id_unique(

@@ -13,11 +13,7 @@ from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
     verbosity_option,
 )
-from dcos_e2e_cli.common.utils import (
-    check_cluster_id_exists,
-    command_path,
-    set_logging,
-)
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 
 from ._common import ClusterInstances, existing_cluster_ids
 from ._nodes import node_option
@@ -37,7 +33,6 @@ def send_file(
     ctx: click.core.Context,
     cluster_id: str,
     node: Tuple[str],
-    verbose: int,
     source: str,
     destination: str,
     aws_region: str,
@@ -45,7 +40,6 @@ def send_file(
     """
     Send a file to a node or multiple nodes.
     """
-    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),

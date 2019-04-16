@@ -2,6 +2,7 @@
 Click options which are common across CLI tools.
 """
 
+import logging
 import re
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Union
@@ -341,6 +342,31 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
+def set_logging(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> None:
+    """
+    Set logging level depending on the chosen verbosity.
+    """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
+    verbosity_level = min(value, 3)
+    verbosity_level = max(verbosity_level, 0)
+    verbosity_map = {
+        0: logging.WARNING,
+        1: logging.INFO,
+        2: logging.DEBUG,
+        3: logging.NOTSET,
+    }
+    logging.basicConfig(level=logging.NOTSET)
+    # Disable logging calls of the given severity level or below.
+    logging.disable(verbosity_map[int(verbosity_level or 0)])
+
+
 def verbosity_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     A decorator for setting the verbosity of logging.
@@ -353,6 +379,8 @@ def verbosity_option(command: Callable[..., None]) -> Callable[..., None]:
             'Use this option multiple times for more verbose output.'
         ),
         count=True,
+        expose_value=False,
+        callback=set_logging,
     )(command)  # type: Callable[..., None]
     return function
 
