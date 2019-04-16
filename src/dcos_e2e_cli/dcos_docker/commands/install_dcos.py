@@ -78,8 +78,7 @@ def install_dcos(
     )
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
-        # The transport is not used so does not matter.
-        transport=Transport.DOCKER_EXEC,
+        transport=transport,
     )
     cluster = cluster_containers.cluster
 
