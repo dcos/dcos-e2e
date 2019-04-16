@@ -525,7 +525,6 @@ class DockerCluster(ClusterManager):
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
 
-
     def install_dcos_from_path(
         self,
         dcos_installer: Path,
