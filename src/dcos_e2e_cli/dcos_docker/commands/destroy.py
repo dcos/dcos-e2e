@@ -13,10 +13,11 @@ from dcos_e2e_cli.common.options import existing_cluster_id_option
 from dcos_e2e_cli.common.utils import check_cluster_id_exists
 
 from ._common import ClusterContainers, existing_cluster_ids
+from ._options import node_transport_option
 
 
 @Halo(enabled=sys.stdout.isatty())
-def _destroy_cluster(cluster_id: str) -> None:
+def _destroy_cluster(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.
 
@@ -29,14 +30,15 @@ def _destroy_cluster(cluster_id: str) -> None:
     )
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
-        transport=Transport.DOCKER_EXEC,
+        transport=transport,
     )
     cluster_containers.destroy()
 
 
 @click.command('destroy-list')
 @click.argument('cluster_ids', nargs=-1, type=str)
-def destroy_list(cluster_ids: List[str]) -> None:
+@node_transport_option
+def destroy_list(cluster_ids: List[str], transport: Transport) -> None:
     """
     Destroy clusters.
 
@@ -51,15 +53,16 @@ def destroy_list(cluster_ids: List[str]) -> None:
             click.echo(warning, err=True)
             continue
 
-        _destroy_cluster(cluster_id=cluster_id)
+        _destroy_cluster(cluster_id=cluster_id, transport=transport)
         click.echo(cluster_id)
 
 
 @click.command('destroy')
 @existing_cluster_id_option
-def destroy(cluster_id: str) -> None:
+@node_transport_option
+def destroy(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.
     """
-    _destroy_cluster(cluster_id=cluster_id)
+    _destroy_cluster(cluster_id=cluster_id, transport=transport)
     click.echo(cluster_id)
