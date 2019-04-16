@@ -122,54 +122,6 @@ def existing_cluster_ids() -> Set[str]:
     return set(vm_names_by_cluster().keys())
 
 
-class VMInspectView:
-    """
-    Details of a node from a VM.
-    """
-
-    def __init__(self, vm_name: str, cluster_vms: 'ClusterVMs') -> None:
-        """
-        Args:
-            vm_name: The name of the VM which represents the node.
-            cluster_vms: A representation of a cluster constructed from Vagrant
-                VMs.
-        """
-        self._vm_name = vm_name
-        self._cluster_vms = cluster_vms
-
-    def to_dict(self) -> Dict[str, str]:
-        """
-        Return dictionary with information to be shown to users.
-        """
-        ip_address = _ip_from_vm_name(vm_name=self._vm_name)
-        cluster_vms = self._cluster_vms
-        vagrant_client = cluster_vms.vagrant_client()
-
-        if self._vm_name in cluster_vms.masters:
-            role = 'master'
-            role_names = cluster_vms.masters
-        elif self._vm_name in cluster_vms.agents:
-            role = 'agent'
-            role_names = cluster_vms.agents
-        elif self._vm_name in cluster_vms.public_agents:
-            role = 'public_agent'
-            role_names = cluster_vms.public_agents
-
-        sorted_ips = sorted(
-            [_ip_from_vm_name(vm_name=name) for name in role_names],
-        )
-        index = sorted_ips.index(ip_address)
-
-        return {
-            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
-            'vm_name': self._vm_name,
-            'ip_address': str(ip_address),
-            'ssh_key': vagrant_client.keyfile(vm_name=self._vm_name),
-            'ssh_user': vagrant_client.user(vm_name=self._vm_name),
-            'vagrant_root': vagrant_client.root,
-        }
-
-
 class ClusterVMs:
     """
     A representation of a cluster constructed from Vagrant VMs.
@@ -195,6 +147,34 @@ class ClusterVMs:
             default_user=self.ssh_default_user,
             ssh_key_path=self.ssh_key_path,
         )
+
+    def to_dict(self, node_representation: str) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        vm_name = node_representation
+        ip_address = _ip_from_vm_name(vm_name=vm_name)
+
+        if vm_name in self.masters:
+            role = 'master'
+            role_names = self.masters
+        elif vm_name in self.agents:
+            role = 'agent'
+            role_names = self.agents
+        elif vm_name in self.public_agents:
+            role = 'public_agent'
+            role_names = self.public_agents
+
+        sorted_ips = sorted(
+            [_ip_from_vm_name(vm_name=name) for name in role_names],
+        )
+        index = sorted_ips.index(ip_address)
+
+        return {
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
+            'vm_name': vm_name,
+            'ip_address': str(ip_address),
+        }
 
     @property
     def ssh_default_user(self) -> str:

@@ -15,7 +15,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e_cli.common.variants import get_cluster_variant
 
-from ._common import ClusterVMs, VMInspectView, existing_cluster_ids
+from ._common import ClusterVMs, existing_cluster_ids
 
 
 @click.command('inspect')
@@ -40,10 +40,10 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
     web_ui = 'http://' + str(master.private_ip_address)
     nodes = {
         key: [
-            VMInspectView(vm_name=vm, cluster_vms=cluster_vms).to_dict()
-            for vm in vms
+            cluster_vms.to_dict(node_representation=vm_name)
+            for vm_name in vm_names
         ]
-        for key, vms in keys.items()
+        for key, vm_names in keys.items()
     }
 
     cluster = cluster_vms.cluster

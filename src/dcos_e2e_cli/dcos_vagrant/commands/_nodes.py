@@ -8,7 +8,7 @@ import click
 
 from dcos_e2e.node import Node
 
-from ._common import ClusterVMs, VMInspectView
+from ._common import ClusterVMs
 
 
 def node_option(command: Callable[..., None]) -> Callable[..., None]:
@@ -58,8 +58,7 @@ def get_node(
     }
 
     for vm_name in vm_names:
-        inspect_view = VMInspectView(vm_name=vm_name, cluster_vms=cluster_vms)
-        inspect_data = inspect_view.to_dict()
+        inspect_data = cluster_vms.to_dict(node_representation=vm_name)
         reference = inspect_data['e2e_reference']
         ip_address = inspect_data['ip_address']
         accepted = (
