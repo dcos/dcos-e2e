@@ -3,11 +3,12 @@ Common code for minidcos aws CLI modules.
 """
 
 from pathlib import Path
-from typing import Dict, Set
+from typing import Any, Dict, Set
 
 import boto3
 from boto3.resources.base import ServiceResource
 
+from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
@@ -201,6 +202,18 @@ class ClusterInstances(ClusterRepresentation):
             agents=set(map(self.to_node, self.agents)),
             public_agents=set(map(self.to_node, self.public_agents)),
         )
+
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        backend = AWS()
+
+        return {
+            **self.cluster.base_config,
+            **backend.base_config,
+        }
 
     def destroy(self) -> None:
         """

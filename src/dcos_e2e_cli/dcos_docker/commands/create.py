@@ -490,18 +490,19 @@ def create(
                 remote_path=remote_path,
             )
 
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
+
     dcos_config = get_config(
-        cluster=cluster,
+        cluster_representation=cluster_containers,
         extra_config=extra_config,
         dcos_variant=dcos_variant,
         security_mode=security_mode,
         license_key=license_key,
     )
 
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        transport=transport,
-    )
     install_dcos_from_path(
         cluster_representation=cluster_containers,
         dcos_config=dcos_config,
