@@ -16,11 +16,7 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 from dcos_e2e_cli.common.variants import get_cluster_variant
 
-from ._common import (
-    ClusterContainers,
-    ContainerInspectView,
-    existing_cluster_ids,
-)
+from ._common import ClusterContainers, existing_cluster_ids
 
 
 @click.command('inspect')
@@ -52,10 +48,8 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
 
     nodes = {
         key: [
-            ContainerInspectView(
-                container=container,
-                cluster_containers=cluster_containers,
-            ).to_dict() for container in containers
+            cluster_containers.to_dict(node_representation=container)
+            for container in containers
         ]
         for key, containers in keys.items()
     }
