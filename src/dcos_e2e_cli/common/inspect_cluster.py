@@ -16,6 +16,13 @@ def show_cluster_details(
     cluster_id: str,
     cluster_representation: ClusterRepresentation,
 ) -> None:
+    """
+    Show details of a cluster for "inspect" views.
+
+    Args:
+        cluster_id: The ID of the cluster.
+        cluster_representation: A representation of the cluster.
+    """
     keys = {
         'masters': cluster_representation.masters,
         'agents': cluster_representation.agents,
