@@ -2,15 +2,18 @@ Usage: minidcos docker inspect [OPTIONS]
 
   Show cluster details.
 
-  To quickly get environment variables to use with Docker tooling, use the
-  ``--env`` flag.
-
-  Run ``eval $(minidcos docker inspect <CLUSTER_ID> --env)``, then run
-  ``docker exec -it $MASTER_0`` to enter the first master, for example.
-
 Options:
-  -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
-  --env                  Show details in an environment variable format to eval.
-  -v, --verbose          Use verbose output. Use this option multiple times for
-                         more verbose output.
-  -h, --help             Show this message and exit.
+  -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
+                                 default]
+  -v, --verbose                  Use verbose output. Use this option multiple
+                                 times for more verbose output.
+  --transport [docker-exec|ssh]  The communication transport to use. On macOS
+                                 the SSH transport requires IP routing to be set
+                                 up. See "minidcos docker setup-mac-network". It
+                                 also requires the "ssh" command to be
+                                 available. This can be provided by setting the
+                                 `MINIDCOS_DOCKER_TRANSPORT` environment
+                                 variable. When using a TTY, different
+                                 transports may use different line endings.
+                                 [default: docker-exec]
+  -h, --help                     Show this message and exit.

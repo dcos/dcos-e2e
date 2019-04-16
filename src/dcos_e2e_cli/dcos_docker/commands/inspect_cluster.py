@@ -13,12 +13,18 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
 
 from ._common import ClusterContainers, existing_cluster_ids
+from ._options import node_transport_option
 
 
 @click.command('inspect')
 @existing_cluster_id_option
 @verbosity_option
-def inspect_cluster(cluster_id: str, verbose: int) -> None:
+@node_transport_option
+def inspect_cluster(
+    cluster_id: str,
+    verbose: int,
+    transport: Transport,
+) -> None:
     """
     Show cluster details.
     """
@@ -30,9 +36,7 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
 
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
-        # The transport here is not relevant as we do not make calls to the
-        # cluster.
-        transport=Transport.DOCKER_EXEC,
+        transport=transport,
     )
 
     show_cluster_details(

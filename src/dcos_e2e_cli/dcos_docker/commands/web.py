@@ -10,14 +10,17 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
 )
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+from dcos_e2e_cli.common.web import launch_web_ui
 
 from ._common import ClusterContainers, existing_cluster_ids
+from ._options import node_transport_option
 
 
 @click.command('web')
 @existing_cluster_id_option
 @verbosity_option
-def web(cluster_id: str, verbose: int) -> None:
+@node_transport_option
+def web(cluster_id: str, verbose: int, transport: Transport) -> None:
     """
     Open the browser at the web UI.
 
@@ -31,10 +34,6 @@ def web(cluster_id: str, verbose: int) -> None:
     )
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
-        # The transport is not used so does not matter.
-        transport=Transport.DOCKER_EXEC,
+        transport=transport,
     )
-    cluster = cluster_containers.cluster
-    master = next(iter(cluster.masters))
-    web_ui = 'http://' + str(master.public_ip_address)
-    click.launch(web_ui)
+    launch_web_ui(cluster=cluster_containers.cluster)
