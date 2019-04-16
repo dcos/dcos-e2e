@@ -10,8 +10,8 @@ from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
     SIDECAR_NAME_LABEL_KEY,
-    loopback_sidecars_by_name,
 )
+from ._loopback_sidecars import loopback_sidecars_by_name
 
 
 @click.command('create-loopback-sidecar')
