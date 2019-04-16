@@ -47,6 +47,13 @@ class ExistingCluster(ClusterBackend):
         """
         raise NotImplementedError
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        return {}
+
 
 class ExistingClusterManager(ClusterManager):
     """
@@ -154,13 +161,6 @@ class ExistingClusterManager(ClusterManager):
                     ),
                     output=output,
                 )
-
-    @property
-    def base_config(self) -> Dict[str, Any]:
-        """
-        Return a base configuration for installing DC/OS OSS.
-        """
-        return {}
 
     @property
     def masters(self) -> Set[Node]:
