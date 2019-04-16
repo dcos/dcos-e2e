@@ -103,14 +103,15 @@ def install_dcos(
     )
 
     dcos_config = get_config(
-        cluster=cluster,
+        cluster_representation=cluster_containers,
         extra_config=extra_config,
         dcos_variant=dcos_variant,
         security_mode=security_mode,
         license_key=license_key,
     )
+
     install_dcos_from_path(
-        cluster=cluster,
+        cluster_representation=cluster_containers,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,

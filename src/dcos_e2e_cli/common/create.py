@@ -16,6 +16,7 @@ from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
+from .base_classes import ClusterRepresentation
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
 
@@ -52,7 +53,7 @@ def create_cluster(
 
 
 def get_config(
-    cluster: Cluster,
+    cluster_representation: ClusterRepresentation,
     extra_config: Dict[str, Any],
     dcos_variant: DCOSVariant,
     security_mode: Optional[str],
@@ -81,7 +82,7 @@ def get_config(
             extra_config['security'] = security_mode
 
     dcos_config = {
-        **cluster.base_config,
+        **cluster_representation.base_config,
         **extra_config,
     }
 
