@@ -6,7 +6,7 @@ import click
 
 from dcos_e2e_cli._vendor import vertigo_py
 from dcos_e2e_cli.common.options import verbosity_option
-from dcos_e2e_cli.common.utils import set_logging
+
 from dcos_e2e_cli.dcos_vagrant.commands.destroy import destroy_cluster
 
 from ._common import vm_names_by_cluster
@@ -21,14 +21,13 @@ from ._common import vm_names_by_cluster
     help='Destroy running clusters.',
 )
 @verbosity_option
-def clean(verbose: int, destroy_running_clusters: bool) -> None:
+def clean(destroy_running_clusters: bool) -> None:
     """
     Remove VMs created by this tool.
 
     This is useful in removing paused and aborted VMs.
     VMs are aborted when the host is shut down.
     """
-    set_logging(verbosity_level=verbose)
     running_clusters = vm_names_by_cluster(running_only=True)
     all_clusters = vm_names_by_cluster(running_only=False)
     not_running_cluster_names = set(

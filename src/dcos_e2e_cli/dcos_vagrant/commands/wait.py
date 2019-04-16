@@ -13,7 +13,6 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_exists,
     command_path,
-    set_logging,
 )
 from dcos_e2e_cli.common.wait import wait_for_dcos
 
@@ -32,7 +31,6 @@ def wait(
     cluster_id: str,
     superuser_username: str,
     superuser_password: str,
-    verbose: int,
 ) -> None:
     """
     Wait for DC/OS to start.
@@ -41,7 +39,6 @@ def wait(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    set_logging(verbosity_level=verbose)
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
 
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)

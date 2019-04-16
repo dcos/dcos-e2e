@@ -7,7 +7,7 @@ import click
 from dcos_e2e.backends import Docker
 from dcos_e2e.docker_utils import DockerLoopbackVolume
 from dcos_e2e_cli.common.options import verbosity_option
-from dcos_e2e_cli.common.utils import set_logging
+
 
 from ._common import (
     NODE_TYPE_LABEL_KEY,
@@ -18,11 +18,10 @@ from ._common import (
 
 @click.command('clean')
 @verbosity_option
-def clean(verbose: int) -> None:
+def clean() -> None:
     """
     Remove containers, volumes and networks created by this tool.
     """
-    set_logging(verbosity_level=verbose)
 
     client = docker_client()
 

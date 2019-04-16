@@ -24,7 +24,6 @@ from dcos_e2e_cli.common.sync import sync_code_to_masters
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_exists,
     command_path,
-    set_logging,
 )
 
 from ._common import ClusterInstances, existing_cluster_ids
@@ -55,7 +54,6 @@ def run(
     test_env: bool,
     env: Dict[str, str],
     aws_region: str,
-    verbose: int,
     node: Tuple[str],
 ) -> None:
     """
@@ -64,7 +62,6 @@ def run(
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
     """
-    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),

@@ -14,7 +14,6 @@ from dcos_e2e_cli.common.options import (
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_exists,
     command_path,
-    set_logging,
 )
 from dcos_e2e_cli.common.wait import wait_for_dcos
 
@@ -51,7 +50,6 @@ def wait(
     superuser_password: str,
     transport: Transport,
     skip_http_checks: bool,
-    verbose: int,
 ) -> None:
     """
     Wait for DC/OS to start.
@@ -60,7 +58,6 @@ def wait(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    set_logging(verbosity_level=verbose)
     cluster_containers = ClusterContainers(
         cluster_id=cluster_id,
         transport=transport,

@@ -16,9 +16,9 @@ def get_workspace_dir(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Optional[Union[int, bool, str]],
-) -> Optional[Path]:
+) -> Path:
     """
-    Validate that a path is a directory.
+    Get a new workspace directory, within the given directory if one is given.
     """
     optional_base_path = validate_path_is_directory(
         ctx=ctx,

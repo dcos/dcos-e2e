@@ -12,7 +12,7 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
 )
 from dcos_e2e_cli.common.sync import SYNC_HELP, sync_code_to_masters
-from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+from dcos_e2e_cli.common.utils import check_cluster_id_exists
 
 from ._common import ClusterInstances, existing_cluster_ids
 from ._options import aws_region_option
@@ -27,12 +27,10 @@ def sync_code(
     cluster_id: str,
     dcos_checkout_dir: str,
     aws_region: str,
-    verbose: int,
 ) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
     """
-    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),

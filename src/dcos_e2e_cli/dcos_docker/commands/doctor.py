@@ -23,7 +23,7 @@ from dcos_e2e_cli.common.doctor import (
     warn,
 )
 from dcos_e2e_cli.common.options import verbosity_option
-from dcos_e2e_cli.common.utils import set_logging
+
 
 from ._common import DOCKER_STORAGE_DRIVERS, docker_client
 
@@ -479,11 +479,10 @@ def _check_can_mount_in_docker() -> CheckLevels:
 
 @click.command('doctor')
 @verbosity_option
-def doctor(verbose: int) -> None:
+def doctor() -> None:
     """
     Diagnose common issues which stop this CLI from working correctly.
     """
-    set_logging(verbosity_level=verbose)
     check_functions_no_cluster = [
         check_1_9_sed,
         _check_docker_root_free_space,

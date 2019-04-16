@@ -30,11 +30,7 @@ from dcos_e2e_cli.common.options import (
     variant_option,
     verbosity_option,
 )
-from dcos_e2e_cli.common.utils import (
-    check_cluster_id_unique,
-    command_path,
-    set_logging,
-)
+from dcos_e2e_cli.common.utils import check_cluster_id_unique, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
@@ -86,7 +82,6 @@ def create(
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     cluster_id: str,
-    verbose: int,
     enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
     wait_for_dcos: bool,
@@ -123,7 +118,6 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    set_logging(verbosity_level=verbose)
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
