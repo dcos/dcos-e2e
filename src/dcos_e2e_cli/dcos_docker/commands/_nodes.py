@@ -8,7 +8,7 @@ import click
 
 from dcos_e2e.node import Node
 
-from ._common import ClusterContainers, ContainerInspectView
+from ._common import ClusterContainers
 
 
 def node_option(command: Callable[..., None]) -> Callable[..., None]:
@@ -60,11 +60,9 @@ def get_node(
     }
 
     for container in containers:
-        inspect_view = ContainerInspectView(
-            container=container,
-            cluster_containers=cluster_containers,
+        inspect_data = cluster_containers.to_dict(
+            node_representation=container,
         )
-        inspect_data = inspect_view.to_dict()
         reference = inspect_data['e2e_reference']
         ip_address = inspect_data['ip_address']
         container_name = inspect_data['docker_container_name']

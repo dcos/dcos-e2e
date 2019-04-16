@@ -99,55 +99,6 @@ def loopback_sidecars_by_name(name: str) -> List[Container]:
     return list(client.containers.list(filters=filters))
 
 
-class ContainerInspectView:
-    """
-    Details of a node from a container.
-    """
-
-    def __init__(
-        self,
-        container: Container,
-        cluster_containers: 'ClusterContainers',
-    ) -> None:
-        """
-        Args:
-            container: The Docker container which represents the node.
-            cluster_containers: A representation of a cluster constructed from
-                Docker nodes.
-        """
-        self._container = container
-        self._cluster_containers = cluster_containers
-
-    def to_dict(self) -> Dict[str, str]:
-        """
-        Return dictionary with information to be shown to users.
-        """
-        container = self._container
-        role = container.labels[NODE_TYPE_LABEL_KEY]
-        container_ip = container.attrs['NetworkSettings']['IPAddress']
-        cluster_containers = self._cluster_containers
-
-        containers = {
-            NODE_TYPE_MASTER_LABEL_VALUE: cluster_containers.masters,
-            NODE_TYPE_AGENT_LABEL_VALUE: cluster_containers.agents,
-            NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE:
-            cluster_containers.public_agents,
-        }[role]
-
-        sorted_ips = sorted(
-            [ctr.attrs['NetworkSettings']['IPAddress'] for ctr in containers],
-        )
-
-        index = sorted_ips.index(container_ip)
-
-        return {
-            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
-            'docker_container_name': container.name,
-            'docker_container_id': container.id,
-            'ip_address': container_ip,
-        }
-
-
 class ClusterContainers:
     """
     A representation of a cluster constructed from Docker nodes.
@@ -163,10 +114,7 @@ class ClusterContainers:
         self._transport = transport
 
     @functools.lru_cache()
-    def _containers_by_role(
-        self,
-        role: Role,
-    ) -> Set[Container]:
+    def _containers_by_role(self, role: Role) -> Set[Container]:
         """
         Return all containers in this cluster of a particular node type.
         """
@@ -199,6 +147,33 @@ class ClusterContainers:
             ssh_key_path=self.ssh_key_path,
             default_transport=self._transport,
         )
+
+    def to_dict(self, node_representation: Container) -> Dict[str, str]:
+        """
+        Return dictionary with information to be shown to users.
+        """
+        container = node_representation
+        role = container.labels[NODE_TYPE_LABEL_KEY]
+        container_ip = container.attrs['NetworkSettings']['IPAddress']
+
+        containers = {
+            NODE_TYPE_MASTER_LABEL_VALUE: self.masters,
+            NODE_TYPE_AGENT_LABEL_VALUE: self.agents,
+            NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE: self.public_agents,
+        }[role]
+
+        sorted_ips = sorted(
+            [ctr.attrs['NetworkSettings']['IPAddress'] for ctr in containers],
+        )
+
+        index = sorted_ips.index(container_ip)
+
+        return {
+            'e2e_reference': '{role}_{index}'.format(role=role, index=index),
+            'docker_container_name': container.name,
+            'docker_container_id': container.id,
+            'ip_address': container_ip,
+        }
 
     @property
     def ssh_default_user(self) -> str:
