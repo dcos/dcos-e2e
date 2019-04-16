@@ -86,8 +86,11 @@ def install_dcos(
     doctor_message = get_doctor_message(
         doctor_command_name=doctor_command_name,
     )
+    http_checks = bool(transport == Transport.SSH)
+    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
 
     cluster_backend = Docker()
+    ip_detect_path = cluster_backend.ip_detect_path
 
     installer_path = Path(installer).resolve()
 
@@ -109,14 +112,11 @@ def install_dcos(
     install_dcos_from_path(
         cluster_representation=cluster_containers,
         dcos_config=dcos_config,
-        ip_detect_path=cluster_backend.ip_detect_path,
+        ip_detect_path=ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer_path,
         local_genconf_dir=genconf_dir,
     )
-
-    http_checks = bool(transport == Transport.SSH)
-    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
 
     run_post_install_steps(
         cluster=cluster,
