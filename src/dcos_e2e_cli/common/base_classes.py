@@ -3,9 +3,11 @@ Abstract base classes for making CLIs.
 """
 
 import abc
+from pathlib import Path
 from typing import Any, Dict, Set
 
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.node import Node
 
 
 class ClusterRepresentation(abc.ABC):
@@ -14,7 +16,7 @@ class ClusterRepresentation(abc.ABC):
     """
 
     @abc.abstractmethod
-    def to_node(self, node_representation: Any) -> None:
+    def to_node(self, node_representation: Any) -> Node:
         """
         Return the ``Node`` that is represented.
         """
@@ -35,7 +37,7 @@ class ClusterRepresentation(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def ssh_key_path(self) -> str:
+    def ssh_key_path(self) -> Path:
         """
         A key which can be used to SSH to any node.
         """
