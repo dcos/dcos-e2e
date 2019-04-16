@@ -2,8 +2,6 @@
 Installing DC/OS on a Docker cluster.
 """
 
-import tempfile
-import uuid
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -27,11 +25,7 @@ from dcos_e2e_cli.common.options import (
     variant_option,
     verbosity_option,
 )
-from dcos_e2e_cli.common.utils import (
-    check_cluster_id_exists,
-    command_path,
-    set_logging,
-)
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
@@ -63,7 +57,6 @@ def install_dcos(
     extra_config: Dict[str, Any],
     security_mode: Optional[str],
     variant: str,
-    verbose: int,
     workspace_dir: Path,
     transport: Transport,
     wait_for_dcos: bool,
@@ -71,7 +64,6 @@ def install_dcos(
     """
     Install DC/OS on the given Docker cluster.
     """
-    set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
