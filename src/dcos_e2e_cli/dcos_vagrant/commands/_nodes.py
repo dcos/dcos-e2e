@@ -2,11 +2,12 @@
 Helpers for interacting with specific nodes in a cluster.
 """
 
-from typing import Callable, Iterable, Optional, Set
+from typing import Callable, Iterable, Set
 
 import click
 
 from dcos_e2e.node import Node
+from dcos_e2e_cli.common.nodes import get_node
 
 from ._common import ClusterVMs
 
@@ -31,31 +32,6 @@ def node_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)  # type: Callable[..., None]
     return function
-
-
-def get_node(cluster_vms: ClusterVMs, node_reference: str) -> Optional[Node]:
-    """
-    Get a node from a "reference".
-
-    Args:
-        cluster_vms: A representation of the cluster.
-        node_reference: Unique node data as shown in the "inspect" command.
-
-    Returns:
-        The ``Node`` from the given cluster or ``None`` if there is no such
-            node.
-    """
-    vm_names = {
-        *cluster_vms.masters,
-        *cluster_vms.agents,
-        *cluster_vms.public_agents,
-    }
-
-    for vm_name in vm_names:
-        inspect_data = cluster_vms.to_dict(node_representation=vm_name)
-        if node_reference in inspect_data.values():
-            return cluster_vms.to_node(node_representation=vm_name)
-    return None
 
 
 def get_nodes(
@@ -85,7 +61,7 @@ def get_nodes(
     nodes = set([])
     for node_reference in node_references:
         node = get_node(
-            cluster_vms=cluster_vms,
+            cluster_representation=cluster_vms,
             node_reference=node_reference,
         )
         if node is None:
