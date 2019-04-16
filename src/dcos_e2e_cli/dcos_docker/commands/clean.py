@@ -8,7 +8,6 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.docker_utils import DockerLoopbackVolume
 from dcos_e2e_cli.common.options import verbosity_option
 
-
 from ._common import (
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,

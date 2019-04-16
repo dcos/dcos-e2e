@@ -19,7 +19,6 @@ from dcos_e2e_cli.common.doctor import (
 from dcos_e2e_cli.common.options import verbosity_option
 
 
-
 def check_docker() -> CheckLevels:
     """
     Error if Docker is not running.

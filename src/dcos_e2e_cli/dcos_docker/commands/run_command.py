@@ -21,10 +21,7 @@ from dcos_e2e_cli.common.options import (
 )
 from dcos_e2e_cli.common.run_command import run_command
 from dcos_e2e_cli.common.sync import sync_code_to_masters
-from dcos_e2e_cli.common.utils import (
-    check_cluster_id_exists,
-    command_path,
-)
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 
 from ._common import ClusterContainers, existing_cluster_ids
 from ._nodes import node_option

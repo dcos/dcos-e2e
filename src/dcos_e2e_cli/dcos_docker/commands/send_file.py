@@ -13,10 +13,7 @@ from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
     verbosity_option,
 )
-from dcos_e2e_cli.common.utils import (
-    check_cluster_id_exists,
-    command_path,
-)
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 
 from ._common import ClusterContainers, existing_cluster_ids
 from ._nodes import node_option

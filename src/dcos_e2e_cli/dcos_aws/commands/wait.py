@@ -10,10 +10,7 @@ from dcos_e2e_cli.common.options import (
     superuser_username_option,
     verbosity_option,
 )
-from dcos_e2e_cli.common.utils import (
-    check_cluster_id_exists,
-    command_path,
-)
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.wait import wait_for_dcos
 
 from ._common import ClusterInstances, existing_cluster_ids
@@ -33,7 +30,6 @@ def wait(
     cluster_id: str,
     superuser_username: str,
     superuser_password: str,
-    verbose: int,
     aws_region: str,
 ) -> None:
     """

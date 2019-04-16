@@ -6,7 +6,6 @@ import click
 
 from dcos_e2e_cli._vendor import vertigo_py
 from dcos_e2e_cli.common.options import verbosity_option
-
 from dcos_e2e_cli.dcos_vagrant.commands.destroy import destroy_cluster
 
 from ._common import vm_names_by_cluster
