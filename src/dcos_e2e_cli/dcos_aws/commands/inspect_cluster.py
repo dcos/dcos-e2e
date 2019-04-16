@@ -65,6 +65,8 @@ def inspect_cluster(cluster_id: str, aws_region: str, verbose: int) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
+        'SSH Default User': cluster_instances.ssh_default_user,
+        'SSH key': str(cluster_instances.ssh_key_path),
         'DC/OS Variant': variant_name,
     }  # type: Dict[Any, Any]
     click.echo(

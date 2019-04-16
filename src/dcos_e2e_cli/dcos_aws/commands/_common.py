@@ -162,16 +162,30 @@ class ClusterInstances:
         """
         public_ip_address = instance.public_ip_address
         private_ip_address = instance.private_ip_address
-        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
-        tag_dict = _tag_dict(instance=instance)
-        default_user = tag_dict[SSH_USER_TAG_KEY]
 
         return Node(
             public_ip_address=public_ip_address,
             private_ip_address=private_ip_address,
-            default_user=default_user,
-            ssh_key_path=ssh_key_path,
+            default_user=self.ssh_default_user,
+            ssh_key_path=self.ssh_key_path,
         )
+
+    @property
+    def ssh_default_user(self) -> str:
+        """
+        A user which can be used to SSH to any node using
+        ``self.ssh_key_path``.
+        """
+        instance = next(iter(self.masters))
+        tag_dict = _tag_dict(instance=instance)
+        return tag_dict[SSH_USER_TAG_KEY]
+
+    @property
+    def ssh_key_path(self) -> Path:
+        """
+        A key which can be used to SSH to any node.
+        """
+        return self.workspace_dir / 'ssh' / 'id_rsa'
 
     @property
     def masters(self) -> Set[ServiceResource]:

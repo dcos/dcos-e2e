@@ -54,8 +54,10 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
+        'SSH Default User': cluster_vms.ssh_default_user,
+        'SSH key': str(cluster_vms.ssh_key_path),
         'DC/OS Variant': variant_name,
-    }  # type: Dict[Any, Any]
+    }  # type: Dict[str, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
     )
