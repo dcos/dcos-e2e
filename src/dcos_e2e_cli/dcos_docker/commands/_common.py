@@ -131,7 +131,7 @@ class ClusterContainers:
 
     def to_dict(self, node_representation: Container) -> Dict[str, str]:
         """
-        Return dictionary with information to be shown to users.
+        Return information to be shown to users which is unique to this node.
         """
         container = node_representation
         role = container.labels[NODE_TYPE_LABEL_KEY]
