@@ -150,7 +150,7 @@ class ClusterVMs:
 
     def to_dict(self, node_representation: str) -> Dict[str, str]:
         """
-        Return dictionary with information to be shown to users.
+        Return information to be shown to users which is unique to this node.
         """
         vm_name = node_representation
         ip_address = _ip_from_vm_name(vm_name=vm_name)
