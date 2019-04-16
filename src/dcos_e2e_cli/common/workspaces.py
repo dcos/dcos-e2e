@@ -2,11 +2,33 @@
 Tools for managing workspaces.
 """
 
-from typing import Callable
+import tempfile
+import uuid
+from pathlib import Path
+from typing import Callable, Optional, Union
 
 import click
 
 from .validators import validate_path_is_directory
+
+
+def get_workspace_dir(
+    ctx: click.core.Context,
+    param: Union[click.core.Option, click.core.Parameter],
+    value: Optional[Union[int, bool, str]],
+) -> Optional[Path]:
+    """
+    Validate that a path is a directory.
+    """
+    optional_base_path = validate_path_is_directory(
+        ctx=ctx,
+        param=param,
+        value=value,
+    )
+    base_workspace_dir = optional_base_path or Path(tempfile.gettempdir())
+    workspace_dir = base_workspace_dir / uuid.uuid4().hex
+    workspace_dir.mkdir(parents=True)
+    return workspace_dir
 
 
 def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
@@ -25,7 +47,7 @@ def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     function = click.option(
         '--workspace-dir',
         type=click.Path(exists=True),
-        callback=validate_path_is_directory,
+        callback=get_workspace_dir,
         help=help_text,
     )(command)  # type: Callable[..., None]
     return function

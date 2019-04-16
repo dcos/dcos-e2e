@@ -3,8 +3,6 @@ Tools for creating a DC/OS cluster.
 """
 
 import json
-import tempfile
-import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -83,7 +81,7 @@ def create(
     masters: int,
     public_agents: int,
     variant: str,
-    workspace_dir: Optional[Path],
+    workspace_dir: Path,
     license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
@@ -130,9 +128,6 @@ def create(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
-    workspace_dir = base_workspace_dir / uuid.uuid4().hex
-    workspace_dir.mkdir(parents=True)
 
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
     wait_command_name = command_path(sibling_ctx=ctx, command=wait)
