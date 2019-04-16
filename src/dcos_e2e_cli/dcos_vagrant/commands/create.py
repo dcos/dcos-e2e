@@ -43,6 +43,7 @@ from dcos_e2e_cli.common.variants import get_install_variant
 from ._common import (
     CLUSTER_ID_DESCRIPTION_KEY,
     WORKSPACE_DIR_DESCRIPTION_KEY,
+    ClusterVMs,
     existing_cluster_ids,
 )
 from .doctor import doctor
@@ -185,8 +186,9 @@ def create(
         license_key=license_key,
     )
 
+    cluster_vms = ClusterVMs(cluster_id=cluster_id)
     install_dcos_from_path(
-        cluster=cluster,
+        cluster_representation=cluster_vms,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,

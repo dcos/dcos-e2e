@@ -50,6 +50,7 @@ from ._common import (
     NODE_TYPE_TAG_KEY,
     SSH_USER_TAG_KEY,
     WORKSPACE_DIR_TAG_KEY,
+    ClusterInstances,
     existing_cluster_ids,
 )
 from ._options import aws_region_option, linux_distribution_option
@@ -290,8 +291,12 @@ def create(
         license_key=license_key,
     )
 
+    cluster_instances = ClusterInstances(
+        cluster_id=cluster_id,
+        aws_region=aws_region,
+    )
     install_dcos_from_url(
-        cluster=cluster,
+        cluster_representation=cluster_instances,
         dcos_config=dcos_config,
         dcos_installer_url=installer_url,
         doctor_message=doctor_message,

@@ -54,6 +54,7 @@ from ._common import (
     NODE_TYPE_MASTER_LABEL_VALUE,
     NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
     WORKSPACE_DIR_LABEL_KEY,
+    ClusterContainers,
     docker_client,
     existing_cluster_ids,
 )
@@ -497,8 +498,12 @@ def create(
         license_key=license_key,
     )
 
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
     install_dcos_from_path(
-        cluster=cluster,
+        cluster_representation=cluster_containers,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
