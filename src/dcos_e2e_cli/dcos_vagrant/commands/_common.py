@@ -187,17 +187,33 @@ class ClusterVMs:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
-        client = self.vagrant_client()
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
-        ssh_key_path = Path(client.keyfile(vm_name=vm_name))
-        default_user = client.user(vm_name=vm_name)
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_user=default_user,
-            ssh_key_path=ssh_key_path,
+            default_user=self.ssh_default_user,
+            ssh_key_path=self.ssh_key_path,
         )
+
+    @property
+    def ssh_default_user(self) -> str:
+        """
+        A user which can be used to SSH to any node using
+        ``self.ssh_key_path``.
+        """
+        vm_name = next(iter(self.masters))
+        client = self.vagrant_client()
+        return str(client.user(vm_name=vm_name))
+
+    @property
+    def ssh_key_path(self) -> Path:
+        """
+        A key which can be used to SSH to any node.
+        """
+        vm_name = next(iter(self.masters))
+        client = self.vagrant_client()
+        return Path(client.keyfile(vm_name=vm_name))
 
     @functools.lru_cache()
     def _vm_names(self) -> Set[str]:

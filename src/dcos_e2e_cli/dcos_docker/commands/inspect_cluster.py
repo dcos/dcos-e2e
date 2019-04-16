@@ -43,7 +43,6 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
     )
     master = next(iter(cluster_containers.masters))
     web_ui = 'http://' + master.attrs['NetworkSettings']['IPAddress']
-    ssh_key = cluster_containers.workspace_dir / 'ssh' / 'id_rsa'
 
     keys = {
         'masters': cluster_containers.masters,
@@ -69,9 +68,10 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
-        'SSH key': str(ssh_key),
+        'SSH Default User': cluster_containers.ssh_default_user,
+        'SSH key': str(cluster_containers.ssh_key_path),
         'DC/OS Variant': variant_name,
-    }  # type: Dict[Any, Any]
+    }  # type: Dict[str, Any]
     click.echo(
         json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
     )

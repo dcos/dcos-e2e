@@ -192,14 +192,28 @@ class ClusterContainers:
         Return the ``Node`` that is represented by a given ``container``.
         """
         address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
-        ssh_key_path = self.workspace_dir / 'ssh' / 'id_rsa'
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_user='root',
-            ssh_key_path=ssh_key_path,
+            default_user=self.ssh_default_user,
+            ssh_key_path=self.ssh_key_path,
             default_transport=self._transport,
         )
+
+    @property
+    def ssh_default_user(self) -> str:
+        """
+        A user which can be used to SSH to any node using
+        ``self.ssh_key_path``.
+        """
+        return 'root'
+
+    @property
+    def ssh_key_path(self) -> Path:
+        """
+        A key which can be used to SSH to any node.
+        """
+        return self.workspace_dir / 'ssh' / 'id_rsa'
 
     @property
     def masters(self) -> Set[Container]:
