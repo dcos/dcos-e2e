@@ -7,7 +7,7 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, List, Set
+from typing import Dict, Set
 
 import click
 import docker
@@ -19,6 +19,7 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node, Role, Transport
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -79,27 +80,7 @@ def existing_cluster_ids() -> Set[str]:
     )
 
 
-def loopback_sidecars_by_name(name: str) -> List[Container]:
-    """
-    Return all loopback sidecar containers with the given sidecar ``name``.
-    """
-    client = docker_client()
-    filters = {
-        'label': [
-            '{key}={value}'.format(
-                key=NODE_TYPE_LABEL_KEY,
-                value=NODE_TYPE_LOOPBACK_SIDECAR_LABEL_VALUE,
-            ),
-            '{key}={value}'.format(
-                key=SIDECAR_NAME_LABEL_KEY,
-                value=name,
-            ),
-        ],
-    }
-    return list(client.containers.list(filters=filters))
-
-
-class ClusterContainers:
+class ClusterContainers(ClusterRepresentation):
     """
     A representation of a cluster constructed from Docker nodes.
     """
@@ -135,10 +116,11 @@ class ClusterContainers:
         }
         return set(client.containers.list(filters=filters))
 
-    def to_node(self, container: Container) -> Node:
+    def to_node(self, node_representation: Container) -> Node:
         """
         Return the ``Node`` that is represented by a given ``container``.
         """
+        container = node_representation
         address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
         return Node(
             public_ip_address=address,
@@ -150,7 +132,7 @@ class ClusterContainers:
 
     def to_dict(self, node_representation: Container) -> Dict[str, str]:
         """
-        Return dictionary with information to be shown to users.
+        Return information to be shown to users which is unique to this node.
         """
         container = node_representation
         role = container.labels[NODE_TYPE_LABEL_KEY]
@@ -188,7 +170,7 @@ class ClusterContainers:
         """
         A key which can be used to SSH to any node.
         """
-        return self.workspace_dir / 'ssh' / 'id_rsa'
+        return self._workspace_dir / 'ssh' / 'id_rsa'
 
     @property
     def masters(self) -> Set[Container]:
@@ -223,7 +205,7 @@ class ClusterContainers:
         )
 
     @property
-    def workspace_dir(self) -> Path:
+    def _workspace_dir(self) -> Path:
         """
         The workspace directory to put temporary files in.
         """
@@ -240,7 +222,7 @@ class ClusterContainers:
             *self.agents,
             *self.public_agents,
         }
-        rmtree(path=str(self.workspace_dir), ignore_errors=True)
+        rmtree(path=str(self._workspace_dir), ignore_errors=True)
         for container in containers:
             container.stop()
             container.remove(v=True)

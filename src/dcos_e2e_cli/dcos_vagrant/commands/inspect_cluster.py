@@ -2,18 +2,14 @@
 Tools for inspecting existing clusters.
 """
 
-import json
-from typing import Any  # noqa: F401
-from typing import Dict  # noqa: F401
-
 import click
 
+from dcos_e2e_cli.common.inspect_cluster import show_cluster_details
 from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
     verbosity_option,
 )
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
-from dcos_e2e_cli.common.variants import get_cluster_variant
 
 from ._common import ClusterVMs, existing_cluster_ids
 
@@ -31,33 +27,7 @@ def inspect_cluster(cluster_id: str, verbose: int) -> None:
         existing_cluster_ids=existing_cluster_ids(),
     )
     cluster_vms = ClusterVMs(cluster_id=cluster_id)
-    keys = {
-        'masters': cluster_vms.masters,
-        'agents': cluster_vms.agents,
-        'public_agents': cluster_vms.public_agents,
-    }
-    master = next(iter(cluster_vms.cluster.masters))
-    web_ui = 'http://' + str(master.private_ip_address)
-    nodes = {
-        key: [
-            cluster_vms.to_dict(node_representation=vm_name)
-            for vm_name in vm_names
-        ]
-        for key, vm_names in keys.items()
-    }
-
-    cluster = cluster_vms.cluster
-    dcos_variant = get_cluster_variant(cluster=cluster)
-    variant_name = str(dcos_variant if dcos_variant else None)
-
-    data = {
-        'Cluster ID': cluster_id,
-        'Web UI': web_ui,
-        'Nodes': nodes,
-        'SSH Default User': cluster_vms.ssh_default_user,
-        'SSH key': str(cluster_vms.ssh_key_path),
-        'DC/OS Variant': variant_name,
-    }  # type: Dict[str, Any]
-    click.echo(
-        json.dumps(data, indent=4, separators=(',', ': '), sort_keys=True),
+    show_cluster_details(
+        cluster_id=cluster_id,
+        cluster_representation=cluster_vms,
     )

@@ -11,6 +11,7 @@ from boto3.resources.base import ServiceResource
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
@@ -63,7 +64,7 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
     return cluster_ids
 
 
-class ClusterInstances:
+class ClusterInstances(ClusterRepresentation):
     """
     A representation of a cluster constructed from EC2 instances.
     """
@@ -99,10 +100,11 @@ class ClusterInstances:
         ec2_instances = set(ec2.instances.filter(Filters=filters))
         return ec2_instances
 
-    def to_node(self, instance: ServiceResource) -> Node:
+    def to_node(self, node_representation: ServiceResource) -> Node:
         """
         Return the ``Node`` that is represented by a given EC2 instance.
         """
+        instance = node_representation
         public_ip_address = instance.public_ip_address
         private_ip_address = instance.private_ip_address
 
@@ -115,7 +117,7 @@ class ClusterInstances:
 
     def to_dict(self, node_representation: ServiceResource) -> Dict[str, str]:
         """
-        Return dictionary with information to be shown to users.
+        Return information to be shown to users which is unique to this node.
         """
         instance = node_representation
         tag_dict = _tag_dict(instance=instance)
@@ -157,7 +159,7 @@ class ClusterInstances:
         """
         A key which can be used to SSH to any node.
         """
-        return self.workspace_dir / 'ssh' / 'id_rsa'
+        return self._workspace_dir / 'ssh' / 'id_rsa'
 
     @property
     def masters(self) -> Set[ServiceResource]:
@@ -181,7 +183,7 @@ class ClusterInstances:
         return self._instances_by_role(role=Role.PUBLIC_AGENT)
 
     @property
-    def workspace_dir(self) -> Path:
+    def _workspace_dir(self) -> Path:
         """
         The workspace directory to put temporary files in.
         """
@@ -199,3 +201,11 @@ class ClusterInstances:
             agents=set(map(self.to_node, self.agents)),
             public_agents=set(map(self.to_node, self.public_agents)),
         )
+
+    def destroy(self) -> None:
+        """
+        Destroy this cluster.
+
+        This is not yet implemented, see:
+        https://jira.mesosphere.com/browse/DCOS_OSS-5042
+        """

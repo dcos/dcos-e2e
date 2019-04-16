@@ -17,6 +17,7 @@ import yaml
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 from dcos_e2e_cli._vendor import vertigo_py
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
@@ -122,7 +123,7 @@ def existing_cluster_ids() -> Set[str]:
     return set(vm_names_by_cluster().keys())
 
 
-class ClusterVMs:
+class ClusterVMs(ClusterRepresentation):
     """
     A representation of a cluster constructed from Vagrant VMs.
     """
@@ -134,11 +135,11 @@ class ClusterVMs:
         """
         self._cluster_id = cluster_id
 
-    @functools.lru_cache()
-    def to_node(self, vm_name: str) -> Node:
+    def to_node(self, node_representation: str) -> Node:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
+        vm_name = node_representation
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
         return Node(
@@ -150,7 +151,7 @@ class ClusterVMs:
 
     def to_dict(self, node_representation: str) -> Dict[str, str]:
         """
-        Return dictionary with information to be shown to users.
+        Return information to be shown to users which is unique to this node.
         """
         vm_name = node_representation
         ip_address = _ip_from_vm_name(vm_name=vm_name)
@@ -246,7 +247,7 @@ class ClusterVMs:
         return set(name for name in vm_names if '-public-agent-' in name)
 
     @property
-    def workspace_dir(self) -> Path:
+    def _workspace_dir(self) -> Path:
         """
         The workspace directory to put temporary files in.
         """
@@ -275,7 +276,7 @@ class ClusterVMs:
         }
 
         [vagrant_root_parent] = [
-            item for item in self.workspace_dir.iterdir()
+            item for item in self._workspace_dir.iterdir()
             if item.is_dir() and item.name != 'genconf'
         ]
 
@@ -303,6 +304,6 @@ class ClusterVMs:
         """
         Destroy this cluster.
         """
-        workspace_dir = self.workspace_dir
+        workspace_dir = self._workspace_dir
         self.vagrant_client().destroy()
         rmtree(path=str(workspace_dir), ignore_errors=True)

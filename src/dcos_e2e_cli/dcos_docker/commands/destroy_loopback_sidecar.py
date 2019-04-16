@@ -9,7 +9,7 @@ from halo import Halo
 
 from dcos_e2e.docker_utils import DockerLoopbackVolume
 
-from ._common import loopback_sidecars_by_name
+from ._loopback_sidecars import loopback_sidecars_by_name
 
 
 @click.command('destroy-loopback-sidecar')
