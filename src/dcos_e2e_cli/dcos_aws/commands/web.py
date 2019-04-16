@@ -9,6 +9,7 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
 )
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, set_logging
+from dcos_e2e_cli.common.web import launch_web_ui
 
 from ._common import ClusterInstances, existing_cluster_ids
 from ._options import aws_region_option
@@ -34,7 +35,4 @@ def web(cluster_id: str, aws_region: str, verbose: int) -> None:
         cluster_id=cluster_id,
         aws_region=aws_region,
     )
-    cluster = cluster_instances.cluster
-    master = next(iter(cluster.masters))
-    web_ui = 'http://' + str(master.public_ip_address)
-    click.launch(web_ui)
+    launch_web_ui(cluster=cluster_instances.cluster)
