@@ -134,10 +134,7 @@ class ClusterInstances:
         self._cluster_id = cluster_id
         self._aws_region = aws_region
 
-    def _instances_by_role(
-        self,
-        role: Role,
-    ) -> Set[ServiceResource]:
+    def _instances_by_role(self, role: Role) -> Set[ServiceResource]:
         """
         Return all EC2 instances in this cluster of a particular node type.
         """

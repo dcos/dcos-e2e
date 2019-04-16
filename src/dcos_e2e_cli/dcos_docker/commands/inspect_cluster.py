@@ -25,21 +25,10 @@ from ._common import (
 
 @click.command('inspect')
 @existing_cluster_id_option
-@click.option(
-    '--env',
-    is_flag=True,
-    help='Show details in an environment variable format to eval.',
-)
 @verbosity_option
-def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
+def inspect_cluster(cluster_id: str, verbose: int) -> None:
     """
     Show cluster details.
-
-    To quickly get environment variables to use with Docker tooling, use the
-    ``--env`` flag.
-
-    Run ``eval $(minidcos docker inspect <CLUSTER_ID> --env)``, then run
-    ``docker exec -it $MASTER_0`` to enter the first master, for example.
     """
     set_logging(verbosity_level=verbose)
     check_cluster_id_exists(
@@ -61,26 +50,6 @@ def inspect_cluster(cluster_id: str, env: bool, verbose: int) -> None:
         'agents': cluster_containers.agents,
         'public_agents': cluster_containers.public_agents,
     }
-
-    if env:
-        env_dict = {}
-        for _, containers in keys.items():
-            for container in containers:
-                inspect_view = ContainerInspectView(
-                    container=container,
-                    cluster_containers=cluster_containers,
-                )
-                inspect_data = inspect_view.to_dict()
-                reference = inspect_data['e2e_reference'].upper()
-                env_dict[reference] = container.id
-                node_ip_key = reference + '_IP'
-                node_ip = container.attrs['NetworkSettings']['IPAddress']
-                env_dict[node_ip_key] = node_ip
-        env_dict['WEB_UI'] = web_ui
-        env_dict['SSH_KEY'] = ssh_key
-        for key, value in env_dict.items():
-            click.echo('export {key}={value}'.format(key=key, value=value))
-        return
 
     nodes = {
         key: [
