@@ -93,6 +93,7 @@ class Cluster(ContextDecorator):
             public_agents=public_agents,
             cluster_backend=cluster_backend,
         )  # type: ClusterManager
+        self._base_config = cluster_backend.base_config
 
         for node in {
             *self.masters,
@@ -427,7 +428,7 @@ class Cluster(ContextDecorator):
         }
         return {
             **config,
-            **self._cluster.base_config,
+            **self._base_config,
         }
 
     def install_dcos_from_url(
