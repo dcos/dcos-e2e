@@ -116,7 +116,7 @@ class ClusterInstances:
 
     def to_dict(self, node_representation: ServiceResource) -> Dict[str, str]:
         """
-        Return dictionary with information to be shown to users.
+        Return information to be shown to users which is unique to this node.
         """
         instance = node_representation
         tag_dict = _tag_dict(instance=instance)
