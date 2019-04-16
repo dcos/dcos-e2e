@@ -8,6 +8,7 @@ from typing import Tuple
 import click
 
 from dcos_e2e.node import Transport
+from dcos_e2e_cli.common.nodes import get_nodes
 from dcos_e2e_cli.common.options import (
     existing_cluster_id_option,
     verbosity_option,
@@ -19,7 +20,7 @@ from dcos_e2e_cli.common.utils import (
 )
 
 from ._common import ClusterVMs, existing_cluster_ids
-from ._nodes import get_nodes, node_option
+from ._nodes import node_option
 from .inspect_cluster import inspect_cluster
 
 
@@ -56,7 +57,7 @@ def send_file(
 
     hosts = get_nodes(
         cluster_id=cluster_id,
-        cluster_vms=cluster_vms,
+        cluster_representation=cluster_vms,
         node_references=node,
         inspect_command_name=inspect_command_name,
     )
