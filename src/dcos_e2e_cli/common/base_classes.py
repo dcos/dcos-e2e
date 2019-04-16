@@ -3,10 +3,9 @@ Abstract base classes for making CLIs.
 """
 
 import abc
-from pathlib import Path
-from typing import Any, Dict, Iterable, Set, Tuple, Type
+from typing import Any, Dict, Set
 
-from dcos_e2e.node import Node, Output
+from dcos_e2e.cluster import Cluster
 
 
 class ClusterRepresentation(abc.ABC):
@@ -62,8 +61,15 @@ class ClusterRepresentation(abc.ABC):
         All DC/OS agent node representations.
         """
 
+    @property
+    @abc.abstractmethod
+    def cluster(self) -> Cluster:
+        """
+        Return a ``Cluster`` constructed from the containers.
+        """
+
     @abc.abstractmethod
     def destroy(self) -> None:
         """
-        Destroy all nodes in the cluster.
+        Destroy this cluster.
         """
