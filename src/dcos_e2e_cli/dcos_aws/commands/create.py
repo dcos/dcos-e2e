@@ -2,7 +2,6 @@
 Tools for creating a DC/OS cluster.
 """
 
-import tempfile
 import uuid
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -30,7 +29,6 @@ from dcos_e2e_cli.common.options import (
     public_agents_option,
     security_mode_option,
     verbosity_option,
-    workspace_dir_option,
 )
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
@@ -39,6 +37,7 @@ from dcos_e2e_cli.common.utils import (
     write_key_pair,
 )
 from dcos_e2e_cli.common.variants import get_install_variant
+from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
 from ._common import (
     CLUSTER_ID_TAG_KEY,
@@ -148,7 +147,7 @@ def create(
     masters: int,
     public_agents: int,
     variant: str,
-    workspace_dir: Optional[Path],
+    workspace_dir: Path,
     license_key: Optional[str],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
@@ -198,9 +197,6 @@ def create(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
-    base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
-    workspace_dir = base_workspace_dir / uuid.uuid4().hex
-    workspace_dir.mkdir(parents=True)
     ssh_keypair_dir = workspace_dir / 'ssh'
     ssh_keypair_dir.mkdir(parents=True)
     key_name = 'key-{random}'.format(random=uuid.uuid4().hex)
