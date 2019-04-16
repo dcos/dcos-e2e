@@ -189,7 +189,7 @@ class ClusterContainers:
         """
         A key which can be used to SSH to any node.
         """
-        return self.workspace_dir / 'ssh' / 'id_rsa'
+        return self._workspace_dir / 'ssh' / 'id_rsa'
 
     @property
     def masters(self) -> Set[Container]:
@@ -224,7 +224,7 @@ class ClusterContainers:
         )
 
     @property
-    def workspace_dir(self) -> Path:
+    def _workspace_dir(self) -> Path:
         """
         The workspace directory to put temporary files in.
         """
@@ -241,7 +241,7 @@ class ClusterContainers:
             *self.agents,
             *self.public_agents,
         }
-        rmtree(path=str(self.workspace_dir), ignore_errors=True)
+        rmtree(path=str(self._workspace_dir), ignore_errors=True)
         for container in containers:
             container.stop()
             container.remove(v=True)

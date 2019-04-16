@@ -246,7 +246,7 @@ class ClusterVMs:
         return set(name for name in vm_names if '-public-agent-' in name)
 
     @property
-    def workspace_dir(self) -> Path:
+    def _workspace_dir(self) -> Path:
         """
         The workspace directory to put temporary files in.
         """
@@ -275,7 +275,7 @@ class ClusterVMs:
         }
 
         [vagrant_root_parent] = [
-            item for item in self.workspace_dir.iterdir()
+            item for item in self._workspace_dir.iterdir()
             if item.is_dir() and item.name != 'genconf'
         ]
 
@@ -303,6 +303,6 @@ class ClusterVMs:
         """
         Destroy this cluster.
         """
-        workspace_dir = self.workspace_dir
+        workspace_dir = self._workspace_dir
         self.vagrant_client().destroy()
         rmtree(path=str(workspace_dir), ignore_errors=True)
