@@ -283,18 +283,19 @@ def create(
                 sudo=True,
             )
 
+    cluster_instances = ClusterInstances(
+        cluster_id=cluster_id,
+        aws_region=aws_region,
+    )
+
     dcos_config = get_config(
-        cluster=cluster,
+        cluster_representation=cluster_instances,
         extra_config=extra_config,
         dcos_variant=dcos_variant,
         security_mode=security_mode,
         license_key=license_key,
     )
 
-    cluster_instances = ClusterInstances(
-        cluster_id=cluster_id,
-        aws_region=aws_region,
-    )
     install_dcos_from_url(
         cluster_representation=cluster_instances,
         dcos_config=dcos_config,

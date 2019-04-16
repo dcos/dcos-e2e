@@ -14,6 +14,7 @@ from typing import Any, Optional, Set
 
 import yaml
 
+from dcos_e2e.backends import Vagrant
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 from dcos_e2e_cli._vendor import vertigo_py
@@ -299,6 +300,18 @@ class ClusterVMs(ClusterRepresentation):
         )
 
         return vagrant_client
+
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        backend = Vagrant()
+
+        return {
+            **self.cluster.base_config,
+            **backend.base_config,
+        }
 
     def destroy(self) -> None:
         """

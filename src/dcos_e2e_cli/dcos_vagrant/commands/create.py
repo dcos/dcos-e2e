@@ -178,15 +178,15 @@ def create(
                 remote_path=remote_path,
             )
 
+    cluster_vms = ClusterVMs(cluster_id=cluster_id)
     dcos_config = get_config(
-        cluster=cluster,
+        cluster_representation=cluster_vms,
         extra_config=extra_config,
         dcos_variant=dcos_variant,
         security_mode=security_mode,
         license_key=license_key,
     )
 
-    cluster_vms = ClusterVMs(cluster_id=cluster_id)
     install_dcos_from_path(
         cluster_representation=cluster_vms,
         dcos_config=dcos_config,
