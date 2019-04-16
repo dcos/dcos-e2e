@@ -17,6 +17,7 @@ import yaml
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Node
 from dcos_e2e_cli._vendor import vertigo_py
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 
 CLUSTER_ID_DESCRIPTION_KEY = 'dcos_e2e.cluster_id'
 WORKSPACE_DIR_DESCRIPTION_KEY = 'dcos_e2e.workspace_dir'
@@ -122,7 +123,7 @@ def existing_cluster_ids() -> Set[str]:
     return set(vm_names_by_cluster().keys())
 
 
-class ClusterVMs:
+class ClusterVMs(ClusterRepresentation):
     """
     A representation of a cluster constructed from Vagrant VMs.
     """
