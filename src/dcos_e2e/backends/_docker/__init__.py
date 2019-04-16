@@ -184,6 +184,7 @@ class Docker(ClusterBackend):
                 cgroup isolation.
 
         Attributes:
+            default_user: A user which can be used to SSH into nodes.
             workspace_dir: The directory in which large temporary files will be
                 created. These files will be deleted at the end of a test run.
             custom_container_mounts: Custom mounts add to all node containers.
@@ -229,6 +230,8 @@ class Docker(ClusterBackend):
         .. _Containers.run:
             http://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run
         """
+        self.default_user = 'root'
+        self.bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
         self.docker_version = docker_version
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.custom_container_mounts = custom_container_mounts or []
@@ -280,6 +283,31 @@ class Docker(ClusterBackend):
         current_parent = Path(__file__).parent.resolve()
         return current_parent / 'resources' / 'ip-detect'
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS, not including the
+        list of nodes.
+        """
+        ssh_user = self.default_user
+        return {
+            'bootstrap_url': 'file://' + str(self.bootstrap_tmp_path),
+            # Without this, we see errors like:
+            # "Time is not synchronized / marked as bad by the kernel.".
+            # Adam saw this on Docker for Mac 17.09.0-ce-mac35.
+            #
+            # In that case this was fixable with:
+            #   $ docker run --rm --privileged alpine hwclock -s
+            'check_time': 'false',
+            'cluster_name': 'DCOS',
+            'exhibitor_storage_backend': 'static',
+            'master_discovery': 'static',
+            'process_timeout': 10000,
+            'resolvers': ['8.8.8.8'],
+            'ssh_port': 22,
+            'ssh_user': ssh_user,
+        }
+
 
 class DockerCluster(ClusterManager):
     """
@@ -302,8 +330,9 @@ class DockerCluster(ClusterManager):
             public_agents: The number of public agent nodes to create.
             cluster_backend: Details of the specific Docker backend to use.
         """
-        self._default_user = 'root'
+        self._default_user = cluster_backend.default_user
         self._default_transport = cluster_backend.transport
+        self._bootstrap_tmp_path = cluster_backend.bootstrap_tmp_path
 
         # To avoid conflicts, we use random container names.
         # We use the same random string for each container in a cluster so
@@ -350,7 +379,6 @@ class DockerCluster(ClusterManager):
 
         bootstrap_genconf_path = self._genconf_dir / 'serve'
         bootstrap_genconf_path.mkdir()
-        self._bootstrap_tmp_path = Path('/opt/dcos_install_tmp')
 
         # See https://success.docker.com/KBase/Different_Types_of_Volumes
         # for a definition of different types of volumes.
@@ -496,31 +524,6 @@ class DockerCluster(ClusterManager):
             output=output,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
-
-    @property
-    def base_config(self) -> Dict[str, Any]:
-        """
-        Return a base configuration for installing DC/OS OSS, not including the
-        list of nodes.
-        """
-        ssh_user = self._default_user
-        return {
-            'bootstrap_url': 'file://' + str(self._bootstrap_tmp_path),
-            # Without this, we see errors like:
-            # "Time is not synchronized / marked as bad by the kernel.".
-            # Adam saw this on Docker for Mac 17.09.0-ce-mac35.
-            #
-            # In that case this was fixable with:
-            #   $ docker run --rm --privileged alpine hwclock -s
-            'check_time': 'false',
-            'cluster_name': 'DCOS',
-            'exhibitor_storage_backend': 'static',
-            'master_discovery': 'static',
-            'process_timeout': 10000,
-            'resolvers': ['8.8.8.8'],
-            'ssh_port': 22,
-            'ssh_user': ssh_user,
-        }
 
     def install_dcos_from_path(
         self,

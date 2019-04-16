@@ -61,6 +61,23 @@ class Vagrant(ClusterBackend):
         current_parent = Path(__file__).parent.resolve()
         return current_parent / 'resources' / 'ip-detect'
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        # See https://jira.mesosphere.com/browse/DCOS_OSS-2501
+        # for removing "check_time: 'false'".
+        return {
+            'check_time': 'false',
+            'cluster_name': 'DCOS',
+            'exhibitor_storage_backend': 'static',
+            'master_discovery': 'static',
+            'resolvers': ['8.8.8.8'],
+            'ssh_port': 22,
+            'ssh_user': 'vagrant',
+        }
+
 
 class VagrantCluster(ClusterManager):
     """
@@ -290,20 +307,3 @@ class VagrantCluster(ClusterManager):
         Return all DC/OS public agent :class:`.node.Node` s.
         """
         return self._nodes(node_base_name=self._public_agent_prefix)
-
-    @property
-    def base_config(self) -> Dict[str, Any]:
-        """
-        Return a base configuration for installing DC/OS OSS.
-        """
-        # See https://jira.mesosphere.com/browse/DCOS_OSS-2501
-        # for removing "check_time: 'false'".
-        return {
-            'check_time': 'false',
-            'cluster_name': 'DCOS',
-            'exhibitor_storage_backend': 'static',
-            'master_discovery': 'static',
-            'resolvers': ['8.8.8.8'],
-            'ssh_port': 22,
-            'ssh_user': 'vagrant',
-        }

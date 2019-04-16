@@ -113,16 +113,6 @@ class ClusterManager(abc.ABC):
         All DC/OS public agent :class:`.node.Node` s.
         """
 
-    @property
-    @abc.abstractmethod
-    def base_config(self) -> Dict[str, Any]:
-        """
-        Return a base configuration for installing DC/OS OSS.
-
-        This does not need to include the lists of IP addresses for each node
-        type.
-        """
-
 
 class ClusterBackend(abc.ABC):
     """
@@ -142,4 +132,14 @@ class ClusterBackend(abc.ABC):
     def ip_detect_path(self) -> Path:
         """
         Return the path to a backend specific ``ip-detect`` script.
+        """
+
+    @property
+    @abc.abstractmethod
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+
+        This does not need to include the lists of IP addresses for each node
+        type.
         """

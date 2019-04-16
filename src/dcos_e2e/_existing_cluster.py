@@ -47,6 +47,13 @@ class ExistingCluster(ClusterBackend):
         """
         raise NotImplementedError
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        return {}
+
 
 class ExistingClusterManager(ClusterManager):
     """
@@ -154,29 +161,6 @@ class ExistingClusterManager(ClusterManager):
                     ),
                     output=output,
                 )
-
-    @property
-    def base_config(self) -> Dict[str, Any]:
-        """
-        Return a base configuration for installing DC/OS OSS.
-        """
-        # TODO have sensible defaults
-        return {
-            # Without this, we see errors like:
-            # "Time is not synchronized / marked as bad by the kernel.".
-            # Adam saw this on Docker for Mac 17.09.0-ce-mac35.
-            #
-            # In that case, on a Docker cluster, this was fixable with:
-            #   $ docker run --rm --privileged alpine hwclock -s
-            'check_time': 'false',
-            'cluster_name': 'DCOS',
-            'exhibitor_storage_backend': 'static',
-            'master_discovery': 'static',
-            'process_timeout': 10000,
-            'resolvers': ['8.8.8.8'],
-            'ssh_port': 22,
-            # TODO - compared to Docker, missing SSH user and bootstrap URL
-        }
 
     @property
     def masters(self) -> Set[Node]:
