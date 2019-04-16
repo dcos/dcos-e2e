@@ -11,6 +11,7 @@ from boto3.resources.base import ServiceResource
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
@@ -63,7 +64,7 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
     return cluster_ids
 
 
-class ClusterInstances:
+class ClusterInstances(ClusterRepresentation):
     """
     A representation of a cluster constructed from EC2 instances.
     """
@@ -200,3 +201,11 @@ class ClusterInstances:
             agents=set(map(self.to_node, self.agents)),
             public_agents=set(map(self.to_node, self.public_agents)),
         )
+
+    def destroy(self) -> None:
+        """
+        Destroy this cluster.
+
+        This is not yet implemented, see:
+        https://jira.mesosphere.com/browse/DCOS_OSS-5042
+        """

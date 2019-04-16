@@ -19,6 +19,7 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Node, Role, Transport
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 
 LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
@@ -79,7 +80,7 @@ def existing_cluster_ids() -> Set[str]:
     )
 
 
-class ClusterContainers:
+class ClusterContainers(ClusterRepresentation):
     """
     A representation of a cluster constructed from Docker nodes.
     """
