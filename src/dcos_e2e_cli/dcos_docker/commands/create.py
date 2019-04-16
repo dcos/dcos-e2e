@@ -364,7 +364,7 @@ def create(
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     genconf_dir: Optional[Path],
-    workspace_dir: Optional[Path],
+    workspace_dir: Path,
     custom_volume: List[Mount],
     custom_master_volume: List[Mount],
     custom_agent_volume: List[Mount],
@@ -414,9 +414,6 @@ def create(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    base_workspace_dir = workspace_dir or Path(tempfile.gettempdir())
-    workspace_dir = base_workspace_dir / uuid.uuid4().hex
-    workspace_dir.mkdir(parents=True)
 
     http_checks = bool(transport == Transport.SSH)
     wait_command_name = command_path(sibling_ctx=ctx, command=wait)
