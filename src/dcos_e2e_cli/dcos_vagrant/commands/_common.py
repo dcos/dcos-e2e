@@ -134,11 +134,11 @@ class ClusterVMs:
         """
         self._cluster_id = cluster_id
 
-    @functools.lru_cache()
-    def to_node(self, vm_name: str) -> Node:
+    def to_node(self, node_representation: str) -> Node:
         """
         Return the ``Node`` that is represented by a given VM name.
         """
+        vm_name = node_representation
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
         return Node(

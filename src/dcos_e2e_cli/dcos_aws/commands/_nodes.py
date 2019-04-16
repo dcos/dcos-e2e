@@ -74,7 +74,7 @@ def get_node(
         )
 
         if node_reference in accepted:
-            return cluster_instances.to_node(instance=instance)
+            return cluster_instances.to_node(node_representation=instance)
     return None
 
 
