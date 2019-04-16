@@ -43,15 +43,11 @@ def get_node(
 
     Args:
         cluster_instances: A representation of the cluster.
-        node_reference: One of:
-            * A node's public IP address
-            * A node's private IP address
-            * A node's EC2 instance ID
-            * A reference in the format "<role>_<number>"
+        node_reference: Unique node data as shown in the "inspect" command.
 
     Returns:
         The ``Node`` from the given cluster or ``None`` if there is no such
-        node.
+            node.
     """
     instances = {
         *cluster_instances.masters,
@@ -61,20 +57,8 @@ def get_node(
 
     for instance in instances:
         inspect_data = cluster_instances.to_dict(node_representation=instance)
-        reference = inspect_data['e2e_reference']
-        instance_id = inspect_data['ec2_instance_id']
-        public_ip_address = inspect_data['public_ip_address']
-        private_ip_address = inspect_data['private_ip_address']
-        accepted = (
-            reference,
-            reference.upper(),
-            instance_id,
-            public_ip_address,
-            private_ip_address,
-        )
-
-        if node_reference in accepted:
-            return cluster_instances.to_node(instance=instance)
+        if node_reference in inspect_data.values():
+            return cluster_instances.to_node(node_representation=instance)
     return None
 
 

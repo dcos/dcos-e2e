@@ -43,15 +43,11 @@ def get_node(
 
     Args:
         cluster_containers: A representation of the cluster.
-        node_reference: One of:
-            * A node's IP address
-            * A node's Docker container name
-            * A node's Docker container ID
-            * A reference in the format "<role>_<number>"
+        node_reference: Unique node data as shown in the "inspect" command.
 
     Returns:
         The ``Node`` from the given cluster or ``None`` if there is no such
-        node.
+            node.
     """
     containers = {
         *cluster_containers.masters,
@@ -63,20 +59,8 @@ def get_node(
         inspect_data = cluster_containers.to_dict(
             node_representation=container,
         )
-        reference = inspect_data['e2e_reference']
-        ip_address = inspect_data['ip_address']
-        container_name = inspect_data['docker_container_name']
-        container_id = inspect_data['docker_container_id']
-        accepted = (
-            reference,
-            reference.upper(),
-            ip_address,
-            container_name,
-            container_id,
-        )
-
-        if node_reference in accepted:
-            return cluster_containers.to_node(container=container)
+        if node_reference in inspect_data.values():
+            return cluster_containers.to_node(node_representation=container)
     return None
 
 

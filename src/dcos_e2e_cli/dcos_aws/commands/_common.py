@@ -99,10 +99,11 @@ class ClusterInstances:
         ec2_instances = set(ec2.instances.filter(Filters=filters))
         return ec2_instances
 
-    def to_node(self, instance: ServiceResource) -> Node:
+    def to_node(self, node_representation: ServiceResource) -> Node:
         """
         Return the ``Node`` that is represented by a given EC2 instance.
         """
+        instance = node_representation
         public_ip_address = instance.public_ip_address
         private_ip_address = instance.private_ip_address
 

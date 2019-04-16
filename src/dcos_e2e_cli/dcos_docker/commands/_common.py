@@ -135,10 +135,11 @@ class ClusterContainers:
         }
         return set(client.containers.list(filters=filters))
 
-    def to_node(self, container: Container) -> Node:
+    def to_node(self, node_representation: Container) -> Node:
         """
         Return the ``Node`` that is represented by a given ``container``.
         """
+        container = node_representation
         address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
         return Node(
             public_ip_address=address,
