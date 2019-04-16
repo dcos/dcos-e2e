@@ -152,6 +152,20 @@ class AWS(ClusterBackend):
         current_parent = Path(__file__).parent.resolve()
         return current_parent / 'resources' / 'ip-detect'
 
+    @property
+    def base_config(self) -> Dict[str, Any]:
+        """
+        Return a base configuration for installing DC/OS OSS.
+        """
+        return {
+            'cluster_name': 'DCOS',
+            'exhibitor_storage_backend': 'static',
+            'master_discovery': 'static',
+            'platform': 'aws',
+            'resolvers': ['10.10.0.2', '8.8.8.8'],
+            'rexray_config_preset': 'aws',
+        }
+
 
 class AWSCluster(ClusterManager):
     # pylint: disable=super-init-not-called
@@ -250,12 +264,7 @@ class AWSCluster(ClusterManager):
 
         # First we create a preliminary dcos-config inside the
         # dcos-launch config to pass the config validation step.
-        launch_config['dcos_config'] = {
-            'cluster_name': unique,
-            'resolvers': ['10.10.0.2', '8.8.8.8'],
-            'master_discovery': 'static',
-            'exhibitor_storage_backend': 'static',
-        }
+        launch_config['dcos_config'] = self.cluster_backend.base_config
 
         # Validate the preliminary dcos-launch config.
         # This also fills in blanks in the dcos-launch config.
@@ -326,14 +335,6 @@ class AWSCluster(ClusterManager):
             ]
 
             ec2.create_tags(Resources=instance_ids, Tags=ec2_tags)
-
-    @property
-    def base_config(self) -> Dict[str, Any]:
-        """
-        Return a base configuration for installing DC/OS OSS.
-        """
-        conf = self.launcher.config['dcos_config']  # type: Dict[str, Any]
-        return conf
 
     def install_dcos_from_url(
         self,
