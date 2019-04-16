@@ -7,7 +7,7 @@ import sys
 from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
-from typing import Dict, List, Set
+from typing import Dict, Set
 
 import click
 import docker
@@ -80,6 +80,7 @@ def existing_cluster_ids() -> Set[str]:
     )
 
 
+<<<<<<< HEAD
 def loopback_sidecars_by_name(name: str) -> List[Container]:
     """
     Return all loopback sidecar containers with the given sidecar ``name``.
