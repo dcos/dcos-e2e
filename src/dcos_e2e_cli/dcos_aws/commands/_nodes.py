@@ -8,7 +8,7 @@ import click
 
 from dcos_e2e.node import Node
 
-from ._common import ClusterInstances, InstanceInspectView
+from ._common import ClusterInstances
 
 
 def node_option(command: Callable[..., None]) -> Callable[..., None]:
@@ -62,10 +62,7 @@ def get_node(
     }
 
     for instance in instances:
-        inspect_data = InstanceInspectView(
-            instance=instance,
-            aws_region=aws_region,
-        ).to_dict()
+        inspect_data = cluster_instances.to_dict(node_representation=instance)
         reference = inspect_data['e2e_reference']
         instance_id = inspect_data['ec2_instance_id']
         public_ip_address = inspect_data['public_ip_address']
