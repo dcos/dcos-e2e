@@ -66,7 +66,7 @@ def _validate_port_map(
 def one_master_host_port_map_option(command: Callable[..., None],
                                     ) -> Callable[..., None]:
     """
-    An option decorator for setting the SELinux mode to "enforcing".
+    An option decorator for choosing Docker port mappings.
     """
     function = click.option(
         '--one-master-host-port-map',

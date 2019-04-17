@@ -3,10 +3,9 @@ Tools for creating a DC/OS cluster.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import click
-import docker
 from docker.models.networks import Network
 from docker.types import Mount
 
@@ -52,9 +51,9 @@ from ._common import (
     NODE_TYPE_PUBLIC_AGENT_LABEL_VALUE,
     WORKSPACE_DIR_LABEL_KEY,
     ClusterContainers,
-    docker_client,
     existing_cluster_ids,
 )
+from ._docker_network import docker_network_option
 from ._options import node_transport_option, wait_for_dcos_option
 from ._port_mapping import one_master_host_port_map_option
 from ._volume_options import (
@@ -65,33 +64,6 @@ from ._volume_options import (
 )
 from .doctor import doctor
 from .wait import wait
-
-
-def _validate_docker_network(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> Network:
-    """
-    Validate that a given network name is an existing Docker network name.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-    client = docker_client()
-    try:
-        return client.networks.get(network_id=value)
-    except docker.errors.NotFound:
-        message = (
-            'No such Docker network with the name "{value}".\n'
-            'Docker networks are:\n{networks}'
-        ).format(
-            value=value,
-            networks='\n'.join(
-                [network.name for network in client.networks.list()],
-            ),
-        )
-        raise click.BadParameter(message=message)
 
 
 def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
@@ -173,17 +145,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 @workspace_dir_option
 @variant_option
 @wait_for_dcos_option
-@click.option(
-    '--network',
-    default='bridge',
-    type=str,
-    callback=_validate_docker_network,
-    help=(
-        'The Docker network containers will be connected to.'
-        'It may not be possible to SSH to containers on a custom network on '
-        'macOS. '
-    ),
-)
+@docker_network_option
 @node_transport_option
 @one_master_host_port_map_option
 @verbosity_option
