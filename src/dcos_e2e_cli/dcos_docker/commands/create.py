@@ -56,6 +56,12 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._options import node_transport_option, wait_for_dcos_option
+from ._volume_options import (
+    AGENT_VOLUME_OPTION,
+    MASTER_VOLUME_OPTION,
+    PUBLIC_AGENT_VOLUME_OPTION,
+    VOLUME_OPTION,
+)
 from .doctor import doctor
 from .wait import wait
 
@@ -143,61 +149,6 @@ def _validate_port_map(
     return ports
 
 
-def _validate_volumes(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> List[docker.types.Mount]:
-    """
-    Turn volume definition strings into ``Mount``s that ``docker-py`` can use.
-    """
-    for _ in (ctx, param):
-        pass
-    mounts = []
-    for volume_definition in value:
-        parts = volume_definition.split(':')
-
-        if len(parts) == 1:
-            host_src = None
-            [container_dst] = parts
-            read_only = False
-        elif len(parts) == 2:
-            host_src, container_dst = parts
-            read_only = False
-        elif len(parts) == 3:
-            host_src, container_dst, mode = parts
-            if mode == 'ro':
-                read_only = True
-            elif mode == 'rw':
-                read_only = False
-            else:
-                message = (
-                    'Mode in "{volume_definition}" is "{mode}". '
-                    'If given, the mode must be one of "ro", "rw".'
-                ).format(
-                    volume_definition=volume_definition,
-                    mode=mode,
-                )
-                raise click.BadParameter(message=message)
-        else:
-            message = (
-                '"{volume_definition}" is not a valid volume definition. '
-                'See '
-                'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
-                'for the syntax to use.'
-            ).format(volume_definition=volume_definition)
-            raise click.BadParameter(message=message)
-
-        mount = docker.types.Mount(
-            source=host_src,
-            target=container_dst,
-            type='bind',
-            read_only=read_only,
-        )
-        mounts.append(mount)
-    return mounts
-
-
 def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
     """
     Add an authorized key to all nodes in the given cluster.
@@ -269,56 +220,12 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 @cluster_id_option
 @license_key_option
 @genconf_dir_option
+@VOLUME_OPTION
+@MASTER_VOLUME_OPTION
+@AGENT_VOLUME_OPTION
+@PUBLIC_AGENT_VOLUME_OPTION
 @copy_to_master_option
 @workspace_dir_option
-@click.option(
-    '--custom-volume',
-    type=str,
-    callback=_validate_volumes,
-    help=(
-        'Bind mount a volume on all cluster node containers. '
-        'See '
-        'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
-        'for the syntax to use.'
-    ),
-    multiple=True,
-)
-@click.option(
-    '--custom-master-volume',
-    type=str,
-    callback=_validate_volumes,
-    help=(
-        'Bind mount a volume on all cluster master node containers. '
-        'See '
-        'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
-        'for the syntax to use.'
-    ),
-    multiple=True,
-)
-@click.option(
-    '--custom-agent-volume',
-    type=str,
-    callback=_validate_volumes,
-    help=(
-        'Bind mount a volume on all cluster agent node containers. '
-        'See '
-        'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
-        'for the syntax to use.'
-    ),
-    multiple=True,
-)
-@click.option(
-    '--custom-public-agent-volume',
-    type=str,
-    callback=_validate_volumes,
-    help=(
-        'Bind mount a volume on all cluster public agent node containers. '
-        'See '
-        'https://docs.docker.com/engine/reference/run/#volume-shared-filesystems '  # noqa: E501
-        'for the syntax to use.'
-    ),
-    multiple=True,
-)
 @variant_option
 @wait_for_dcos_option
 @click.option(
