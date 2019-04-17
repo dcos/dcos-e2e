@@ -2,8 +2,7 @@
 Options for using Docker volumes.
 """
 
-from typing import Callable  # noqa: E501
-from typing import Any, List, Union
+from typing import Any, Callable, List, Union
 
 import click
 import docker
