@@ -220,11 +220,11 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 @cluster_id_option
 @license_key_option
 @genconf_dir_option
+@copy_to_master_option
 @VOLUME_OPTION
 @MASTER_VOLUME_OPTION
 @AGENT_VOLUME_OPTION
 @PUBLIC_AGENT_VOLUME_OPTION
-@copy_to_master_option
 @workspace_dir_option
 @variant_option
 @wait_for_dcos_option

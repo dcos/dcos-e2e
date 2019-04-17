@@ -66,6 +66,10 @@ Options:
                                   files for the DC/OS installer. All files from
                                   this directory will be copied to the "genconf"
                                   directory before running the DC/OS installer.
+  --copy-to-master TEXT           Files to copy to master nodes before
+                                  installing DC/OS. This option can be given
+                                  multiple times. Each option should be in the
+                                  format /absolute/local/path:/remote/path.
   --custom-volume TEXT            Bind mount a volume on all cluster node
                                   containers. See https://docs.docker.com/engine
                                   /reference/run/#volume-shared-filesystems for
@@ -83,10 +87,6 @@ Options:
                                   agent node containers. See https://docs.docker
                                   .com/engine/reference/run/#volume-shared-
                                   filesystems for the syntax to use.
-  --copy-to-master TEXT           Files to copy to master nodes before
-                                  installing DC/OS. This option can be given
-                                  multiple times. Each option should be in the
-                                  format /absolute/local/path:/remote/path.
   --workspace-dir PATH            Creating a cluster can use approximately 2 GB
                                   of temporary storage. Set this option to use a
                                   custom "workspace" for this temporary storage.
