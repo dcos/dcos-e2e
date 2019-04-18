@@ -19,6 +19,41 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from .base_classes import ClusterRepresentation
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
+CREATE_HELP = (
+    """
+    Create a DC/OS cluster.
+
+        DC/OS Enterprise
+
+            \b
+            DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
+            For example, enterprise clusters require the following configuration parameters:
+
+            ``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
+
+            \b
+            These can all be set in ``--extra-config``.
+            However, some defaults are provided for all but the license key.
+
+            \b
+            The default superuser username is ``admin``.
+            The default superuser password is ``admin``.
+            The default ``fault_domain_enabled`` is ``false``.
+
+            \b
+            ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
+            This is set to one of the following, in order:
+
+            \b
+            * The ``license_key_contents`` set in ``--extra-config``.
+            * The contents of the path given with ``--license-key``.
+            * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
+
+            \b
+            If none of these are set, ``license_key_contents`` is not given.
+    """  # noqa: E501
+)
+
 
 def create_cluster(
     cluster_backend: ClusterBackend,
