@@ -9,23 +9,18 @@ from typing import Callable, Optional, Union
 
 import click
 
-from .validators import validate_path_is_directory
+from .click_types import PathPath
 
 
 def get_workspace_dir(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
+    value: Optional[Path],
 ) -> Path:
     """
     Get a new workspace directory, within the given directory if one is given.
     """
-    optional_base_path = validate_path_is_directory(
-        ctx=ctx,
-        param=param,
-        value=value,
-    )
-    base_workspace_dir = optional_base_path or Path(tempfile.gettempdir())
+    base_workspace_dir = value or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
     return workspace_dir
@@ -46,7 +41,7 @@ def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     )
     function = click.option(
         '--workspace-dir',
-        type=click.Path(exists=True),
+        type=PathPath(exists=True),
         callback=get_workspace_dir,
         help=help_text,
     )(command)  # type: Callable[..., None]

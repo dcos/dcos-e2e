@@ -175,6 +175,8 @@ def create(
     """
     Create a DC/OS cluster.
     """
+    print(repr(workspace_dir))
+    return
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),

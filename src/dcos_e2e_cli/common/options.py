@@ -10,12 +10,9 @@ from typing import Any, Callable, Dict, Optional, Union
 import click
 import yaml
 
+from .click_types import PathPath
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
-from .validators import (
-    validate_path_is_directory,
-    validate_path_pair,
-    validate_paths_are_directories,
-)
+from .validators import validate_path_pair
 
 
 def _validate_cluster_id(
@@ -199,7 +196,7 @@ def extra_config_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--extra-config',
-        type=click.Path(exists=True),
+        type=PathPath(exists=True),
         callback=_validate_dcos_configuration,
         help=(
             'The path to a file including DC/OS configuration YAML. '
@@ -325,7 +322,12 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--sync-dir',
-        type=click.Path(exists=True),
+        type=PathPath(
+            exists=True,
+            dir_okay=True,
+            file_okay=False,
+            resolve_path=True,
+        ),
         multiple=True,
         help=(
             'The path to a DC/OS checkout. '
@@ -337,7 +339,6 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
             'Use this option multiple times on a DC/OS Enterprise cluster to '
             'sync both DC/OS Enterprise and DC/OS Open Source tests.'
         ),
-        callback=validate_paths_are_directories,
     )(command)  # type: Callable[..., None]
     return function
 
@@ -443,8 +444,7 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--genconf-dir',
-        type=click.Path(exists=True),
-        callback=validate_path_is_directory,
+        type=PathPath(exists=True, file_okay=False, dir_okay=True),
         help=(
             'Path to a directory that contains additional files for the DC/OS '
             'installer. '

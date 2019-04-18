@@ -8,47 +8,6 @@ from typing import Any, List, Optional, Tuple, Union
 import click
 
 
-def validate_path_is_directory(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
-) -> Optional[Path]:
-    """
-    Validate that a path is a directory.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    if value is None:
-        return None
-
-    path = Path(str(value))
-    if not path.is_dir():
-        message = '"{path}" is not a directory.'.format(path=str(path))
-        raise click.BadParameter(message=message)
-
-    return path
-
-
-def validate_paths_are_directories(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    # ``value`` is set to "Any" as the typeshed stub is wrong:
-    # https://github.com/python/typeshed/issues/2615.
-    value: Any,
-) -> Tuple[Path, ...]:
-    """
-    Validate that all paths are directories.
-    """
-    paths = []
-    for item in value:
-        validate_path_is_directory(ctx=ctx, param=param, value=item)
-        paths.append(Path(item))
-    return_value = tuple(item for item in paths)
-    return return_value
-
-
 def validate_path_pair(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
