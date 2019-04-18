@@ -2,7 +2,7 @@
 Helpers for managing Docker network settings.
 """
 
-from typing import Any, Callable, Optional, Union
+from typing import Callable, Optional, Union
 
 import click
 import docker

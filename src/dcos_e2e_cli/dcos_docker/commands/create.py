@@ -11,6 +11,7 @@ from docker.types import Mount
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import create_cluster, get_config
@@ -37,7 +38,6 @@ from dcos_e2e_cli.common.utils import (
     command_path,
     write_key_pair,
 )
-from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
@@ -204,7 +204,6 @@ def create(
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
-    return
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
