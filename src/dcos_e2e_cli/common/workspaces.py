@@ -20,6 +20,10 @@ def get_workspace_dir(
     """
     Get a new workspace directory, within the given directory if one is given.
     """
+    # We "use" variables to satisfy linting tools.
+    for _ in (ctx, param):
+        pass
+
     base_workspace_dir = value or Path(tempfile.gettempdir())
     workspace_dir = base_workspace_dir / uuid.uuid4().hex
     workspace_dir.mkdir(parents=True)
