@@ -6,10 +6,11 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  create     Create a DC/OS cluster.
+  create     Install DC/OS on a provisioned AWS cluster.
   doctor     Diagnose common issues which stop this CLI from working...
   inspect    Show cluster details.
   list       List all clusters.
+  provision  Provision an AWS cluster to install DC/OS.
   run        Run an arbitrary command on a node or multiple nodes.
   send-file  Send a file to a node or multiple nodes.
   sync       Sync files from a DC/OS checkout to master nodes.

@@ -7,7 +7,9 @@ import click
 from .commands.create import create
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
+from .commands.install_dcos import install_dcos
 from .commands.list_clusters import list_clusters
+from .commands.provision import provision
 from .commands.run_command import run
 from .commands.send_file import send_file
 from .commands.sync import sync_code
@@ -24,7 +26,9 @@ def dcos_aws() -> None:
 
 dcos_aws.add_command(create)
 dcos_aws.add_command(doctor)
+dcos_aws.add_command(install_dcos)
 dcos_aws.add_command(list_clusters)
+dcos_aws.add_command(provision)
 dcos_aws.add_command(run)
 dcos_aws.add_command(send_file)
 dcos_aws.add_command(sync_code)
