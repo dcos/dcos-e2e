@@ -19,4 +19,8 @@ class PathPath(click.Path):
         param: Optional[click.core.Parameter],
         ctx: Optional[click.core.Context],
     ) -> Any:
+        """
+        Return a ``Path`` from the string ``click`` would have created with
+        the given options.
+        """
         return Path(super().convert(value=value, param=param, ctx=ctx))

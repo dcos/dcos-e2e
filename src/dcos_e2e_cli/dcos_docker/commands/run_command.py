@@ -59,8 +59,6 @@ def run(
     To use special characters such as single quotes in your command, wrap the
     whole command in double quotes.
     """
-    print(repr(sync_dir))
-    return
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
