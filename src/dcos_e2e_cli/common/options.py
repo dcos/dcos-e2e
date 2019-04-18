@@ -233,7 +233,12 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--license-key',
-        type=click.Path(exists=True),
+        type=PathPath(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            resolve_path=True,
+        ),
         envvar='DCOS_LICENSE_KEY_PATH',
         help=(
             'This is ignored if using open source DC/OS. '

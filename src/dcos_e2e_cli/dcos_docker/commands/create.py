@@ -148,7 +148,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 def create(
     ctx: click.core.Context,
     agents: int,
-    installer: str,
+    installer: Path,
     cluster_id: str,
     docker_storage_driver: str,
     docker_version: DockerVersion,
@@ -156,7 +156,7 @@ def create(
     linux_distribution: str,
     masters: int,
     public_agents: int,
-    license_key: Optional[str],
+    license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     genconf_dir: Optional[Path],
@@ -195,11 +195,9 @@ def create(
         private_key_path=private_key_path,
     )
 
-    installer_path = Path(installer).resolve()
-
     dcos_variant = get_install_variant(
         given_variant=variant,
-        installer_path=installer_path,
+        installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
@@ -270,7 +268,7 @@ def create(
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
-        dcos_installer=installer_path,
+        dcos_installer=installer,
         local_genconf_dir=genconf_dir,
     )
 
