@@ -4,7 +4,7 @@ Tools for creating a DC/OS cluster.
 
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 import boto3
 import click
@@ -51,43 +51,12 @@ from ._common import (
     ClusterInstances,
     existing_cluster_ids,
 )
+from ._custom_tag import custom_tag_option
 from ._options import aws_region_option, linux_distribution_option
+from ._variant import variant_option
+from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
-
-
-def _validate_tags(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
-) -> Dict[str, int]:
-    """
-    Turn tag strings into a Dict.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (ctx, param):
-        pass
-
-    tags = {}  # type: Dict[str, int]
-    for tag_definition in value:
-        parts = tag_definition.split(':')
-
-        if len(parts) != 2:
-            message = (
-                '"{tag_definition}" is not a valid tag. '
-                'Please follow this syntax: <TAG_KEY>:<TAG_VALUE>.'
-            ).format(tag_definition=tag_definition)
-            raise click.BadParameter(message=message)
-
-        tag_key, tag_value = parts
-        if tag_key in tags:
-            message = 'Tag key "{tag_key}" specified multiple times.'.format(
-                tag_key=tag_key,
-            )
-            raise click.BadParameter(message=message)
-
-        tags[tag_key] = tag_value
-    return tags
 
 
 @click.command('create', help=CREATE_HELP)
@@ -95,34 +64,9 @@ def _validate_tags(
     'installer_url',
     type=str,
 )
-@click.option(
-    '--custom-tag',
-    type=str,
-    callback=_validate_tags,
-    help='Add tags to EC2 instances in the format "<TAG_KEY>:<TAG_VALUE>".',
-    multiple=True,
-)
-@click.option(
-    '--variant',
-    type=click.Choice(['oss', 'enterprise']),
-    required=True,
-    help=(
-        'Choose the DC/OS variant. '
-        'If the variant does not match the variant of the given installer '
-        'URL, an error will occur. '
-    ),
-)
-@click.option(
-    '--wait-for-dcos',
-    is_flag=True,
-    help=(
-        'Wait for DC/OS after creating the cluster. '
-        'This is equivalent to using "minidcos aws wait" after this '
-        'command. '
-        '"minidcos aws wait" has various options available and so may be '
-        'more appropriate for your use case.'
-    ),
-)
+@custom_tag_option
+@variant_option
+@wait_for_dcos_option
 @masters_option
 @agents_option
 @extra_config_option
