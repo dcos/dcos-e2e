@@ -43,6 +43,7 @@ from dcos_e2e_cli.common.utils import (
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
+from ._cgroup_mount_option import cgroup_mount_option
 from ._common import (
     CLUSTER_ID_LABEL_KEY,
     NODE_TYPE_AGENT_LABEL_VALUE,
@@ -100,17 +101,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 @docker_version_option
 @linux_distribution_option
 @docker_storage_driver_option
-@click.option(
-    '--mount-sys-fs-cgroup/--no-mount-sys-fs-cgroup',
-    default=True,
-    show_default=True,
-    help=(
-        'Mounting ``/sys/fs/cgroup`` from the host is required to run '
-        'applications which require ``cgroup`` isolation. '
-        'Choose to not mount ``/sys/fs/cgroup`` if it is not available on the '
-        'host.'
-    ),
-)
+@cgroup_mount_option
 @masters_option
 @agents_option
 @public_agents_option
