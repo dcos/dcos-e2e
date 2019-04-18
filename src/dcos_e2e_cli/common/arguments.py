@@ -5,6 +5,7 @@ Click arguments which are common across CLI tools.
 from typing import Callable
 
 import click
+
 from .click_types import PathPath
 
 

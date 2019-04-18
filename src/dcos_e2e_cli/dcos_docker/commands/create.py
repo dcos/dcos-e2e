@@ -11,6 +11,7 @@ from docker.types import Mount
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import installer_argument
@@ -44,7 +45,6 @@ from dcos_e2e_cli.common.workspaces import workspace_dir_option
 from ._common import (
     CLUSTER_ID_LABEL_KEY,
     DOCKER_STORAGE_DRIVERS,
-    LINUX_DISTRIBUTIONS,
     NODE_TYPE_AGENT_LABEL_VALUE,
     NODE_TYPE_LABEL_KEY,
     NODE_TYPE_MASTER_LABEL_VALUE,
@@ -55,6 +55,7 @@ from ._common import (
 )
 from ._docker_network import docker_network_option
 from ._docker_version import docker_version_option
+from ._linux_distribution import linux_distribution_option
 from ._options import node_transport_option, wait_for_dcos_option
 from ._port_mapping import one_master_host_port_map_option
 from ._volume_options import (
@@ -96,13 +97,7 @@ def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
 @click.command('create', help=CREATE_HELP)
 @installer_argument
 @docker_version_option
-@click.option(
-    '--linux-distribution',
-    type=click.Choice(sorted(LINUX_DISTRIBUTIONS.keys())),
-    default='centos-7',
-    show_default=True,
-    help='The Linux distribution to use on the nodes.',
-)
+@linux_distribution_option
 @click.option(
     '--docker-storage-driver',
     type=click.Choice(sorted(DOCKER_STORAGE_DRIVERS.keys())),
@@ -153,7 +148,7 @@ def create(
     docker_storage_driver: str,
     docker_version: DockerVersion,
     extra_config: Dict[str, Any],
-    linux_distribution: str,
+    linux_distribution: Distribution,
     masters: int,
     public_agents: int,
     license_key: Optional[Path],
@@ -211,7 +206,7 @@ def create(
         custom_master_mounts=custom_master_volume,
         custom_agent_mounts=custom_agent_volume,
         custom_public_agent_mounts=custom_public_agent_volume,
-        linux_distribution=LINUX_DISTRIBUTIONS[linux_distribution],
+        linux_distribution=linux_distribution,
         docker_version=docker_version,
         storage_driver=DOCKER_STORAGE_DRIVERS.get(docker_storage_driver),
         docker_container_labels={

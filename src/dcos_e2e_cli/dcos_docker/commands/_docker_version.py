@@ -21,7 +21,7 @@ def _get_docker_version(
     value: str,
 ) -> DockerVersion:
     """
-    Validate that a path is a directory.
+    Get the chosen Docker version.
     """
     # We "use" variables to satisfy linting tools.
     for _ in (ctx, param):

@@ -16,16 +16,9 @@ from docker.models.containers import Container
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.node import Node, Role, Transport
 from dcos_e2e_cli.common.base_classes import ClusterRepresentation
-
-LINUX_DISTRIBUTIONS = {
-    'centos-7': Distribution.CENTOS_7,
-    'coreos': Distribution.COREOS,
-    'ubuntu-16.04': Distribution.UBUNTU_16_04,
-}
 
 DOCKER_STORAGE_DRIVERS = {
     'aufs': DockerStorageDriver.AUFS,
