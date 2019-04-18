@@ -1,0 +1,35 @@
+Usage: minidcos aws provision [OPTIONS]
+
+  Provision an AWS cluster to install DC/OS.
+
+Options:
+  --custom-tag TEXT               Add tags to EC2 instances in the format
+                                  "<TAG_KEY>:<TAG_VALUE>".
+  --masters INTEGER               The number of master nodes.  [default: 1]
+  --agents INTEGER                The number of agent nodes.  [default: 1]
+  --public-agents INTEGER         The number of public agent nodes.  [default:
+                                  1]
+  --aws-region TEXT               The AWS region to use.  [default: us-west-2]
+  --linux-distribution [centos-7|coreos|rhel-7]
+                                  The Linux distribution to use on the nodes.
+                                  [default: centos-7]
+  --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
+                                  of temporary storage. Set this option to use a
+                                  custom "workspace" for this temporary storage.
+                                  See https://docs.python.org/3/library/tempfile
+                                  .html#tempfile.gettempdir for details on the
+                                  temporary directory location if this option is
+                                  not set.
+  --copy-to-master TEXT           Files to copy to master nodes before
+                                  installing DC/OS. This option can be given
+                                  multiple times. Each option should be in the
+                                  format /absolute/local/path:/remote/path.
+  -v, --verbose                   Use verbose output. Use this option multiple
+                                  times for more verbose output.
+  -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
+                                  value "default" to use this cluster for other
+                                  commands without specifying --cluster-id.
+  --enable-selinux-enforcing      With this flag set, SELinux is set to
+                                  enforcing before DC/OS is installed on the
+                                  cluster.
+  -h, --help                      Show this message and exit.

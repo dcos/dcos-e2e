@@ -1,33 +1,25 @@
 """
-Tools for creating a DC/OS cluster.
+Provisioning an AWS cluster to install DC/OS.
 """
 
 import uuid
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import boto3
 import click
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
-from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
+from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster
 from dcos_e2e_cli.common.doctor import get_doctor_message
-from dcos_e2e_cli.common.install import (
-    install_dcos_from_url,
-    run_post_install_steps,
-)
 from dcos_e2e_cli.common.options import (
     agents_option,
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
-    extra_config_option,
-    genconf_dir_option,
-    license_key_option,
     masters_option,
     public_agents_option,
-    security_mode_option,
     verbosity_option,
 )
 from dcos_e2e_cli.common.utils import (
@@ -35,7 +27,6 @@ from dcos_e2e_cli.common.utils import (
     command_path,
     write_key_pair,
 )
-from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
 from ._common import (
@@ -48,62 +39,41 @@ from ._common import (
     NODE_TYPE_TAG_KEY,
     SSH_USER_TAG_KEY,
     WORKSPACE_DIR_TAG_KEY,
-    ClusterInstances,
     existing_cluster_ids,
 )
 from ._custom_tag import custom_tag_option
 from ._options import aws_region_option, linux_distribution_option
-from ._variant import variant_option
-from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
-from .wait import wait
 
 
-@click.command('create', help=CREATE_HELP)
-@click.argument(
-    'installer_url',
-    type=str,
-)
+@click.command('provision')
 @custom_tag_option
-@variant_option
-@wait_for_dcos_option
 @masters_option
 @agents_option
-@extra_config_option
 @public_agents_option
 @aws_region_option
 @linux_distribution_option
 @workspace_dir_option
-@license_key_option
-@genconf_dir_option
-@security_mode_option
 @copy_to_master_option
 @verbosity_option
 @cluster_id_option
 @enable_selinux_enforcing_option
 @click.pass_context
-def create(
+def provision(
     ctx: click.core.Context,
     agents: int,
-    installer_url: str,
-    extra_config: Dict[str, Any],
     masters: int,
     public_agents: int,
-    variant: str,
     workspace_dir: Path,
-    license_key: Optional[Path],
-    security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     aws_region: str,
     linux_distribution: str,
     cluster_id: str,
     enable_selinux_enforcing: bool,
-    genconf_dir: Optional[Path],
     custom_tag: Dict[str, str],
-    wait_for_dcos: bool,
 ) -> None:
     """
-    Create a DC/OS cluster.
+    Provision an AWS cluster to install DC/OS.
     """
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
@@ -126,15 +96,8 @@ def create(
     )
 
     doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
-    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
     doctor_message = get_doctor_message(
         doctor_command_name=doctor_command_name,
-    )
-    dcos_variant = get_install_variant(
-        given_variant=variant,
-        installer_path=None,
-        workspace_dir=workspace_dir,
-        doctor_message=doctor_message,
     )
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
@@ -190,35 +153,3 @@ def create(
                 remote_path=remote_path,
                 sudo=True,
             )
-
-    cluster_instances = ClusterInstances(
-        cluster_id=cluster_id,
-        aws_region=aws_region,
-    )
-
-    dcos_config = get_config(
-        cluster_representation=cluster_instances,
-        extra_config=extra_config,
-        dcos_variant=dcos_variant,
-        security_mode=security_mode,
-        license_key=license_key,
-    )
-
-    install_dcos_from_url(
-        cluster_representation=cluster_instances,
-        dcos_config=dcos_config,
-        dcos_installer_url=installer_url,
-        doctor_message=doctor_message,
-        local_genconf_dir=genconf_dir,
-        ip_detect_path=cluster_backend.ip_detect_path,
-    )
-
-    run_post_install_steps(
-        cluster=cluster,
-        cluster_id=cluster_id,
-        dcos_config=dcos_config,
-        doctor_command_name=doctor_command_name,
-        http_checks=True,
-        wait_command_name=wait_command_name,
-        wait_for_dcos=wait_for_dcos,
-    )
