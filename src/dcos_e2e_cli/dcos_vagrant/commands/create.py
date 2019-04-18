@@ -10,7 +10,7 @@ import click
 
 from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli.common.arguments import installer_argument
-from dcos_e2e_cli.common.create import create_cluster, get_config
+from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
     install_dcos_from_path,
@@ -44,7 +44,7 @@ from .doctor import doctor
 from .wait import wait
 
 
-@click.command('create')
+@click.command('create', help=CREATE_HELP)
 @installer_argument
 @masters_option
 @agents_option
@@ -72,13 +72,13 @@ from .wait import wait
 def create(
     ctx: click.core.Context,
     agents: int,
-    installer: str,
+    installer: Path,
     extra_config: Dict[str, Any],
     masters: int,
     public_agents: int,
     variant: str,
     workspace_dir: Path,
-    license_key: Optional[str],
+    license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     cluster_id: str,
@@ -88,36 +88,7 @@ def create(
 ) -> None:
     """
     Create a DC/OS cluster.
-
-        DC/OS Enterprise
-
-            \b
-            DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
-            For example, enterprise clusters require the following configuration parameters:
-
-            ``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
-
-            \b
-            These can all be set in ``--extra-config``.
-            However, some defaults are provided for all but the license key.
-
-            \b
-            The default superuser username is ``admin``.
-            The default superuser password is ``admin``.
-            The default ``fault_domain_enabled`` is ``false``.
-
-            \b
-            ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
-            This is set to one of the following, in order:
-
-            \b
-            * The ``license_key_contents`` set in ``--extra-config``.
-            * The contents of the path given with ``--license-key``.
-            * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
-
-            \b
-            If none of these are set, ``license_key_contents`` is not given.
-    """  # noqa: E501
+    """
     check_cluster_id_unique(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
@@ -128,11 +99,10 @@ def create(
     doctor_message = get_doctor_message(
         doctor_command_name=doctor_command_name,
     )
-    installer_path = Path(installer).resolve()
 
     dcos_variant = get_install_variant(
         given_variant=variant,
-        installer_path=installer_path,
+        installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
     )
@@ -181,7 +151,7 @@ def create(
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
-        dcos_installer=installer_path,
+        dcos_installer=installer,
         local_genconf_dir=genconf_dir,
     )
 

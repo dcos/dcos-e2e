@@ -5,6 +5,7 @@ Click arguments which are common across CLI tools.
 from typing import Callable
 
 import click
+from .click_types import PathPath
 
 
 def dcos_checkout_dir_argument(command: Callable[..., None],
@@ -40,6 +41,11 @@ def installer_argument(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.argument(
         'installer',
-        type=click.Path(exists=True),
+        type=PathPath(
+            exists=True,
+            dir_okay=False,
+            file_okay=True,
+            resolve_path=True,
+        ),
     )(command)  # type: Callable[..., None]
     return function

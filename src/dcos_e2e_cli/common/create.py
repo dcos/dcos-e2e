@@ -19,6 +19,48 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from .base_classes import ClusterRepresentation
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
+# yapf breaks multi-line noqa, see
+# https://github.com/google/yapf/issues/524.
+# yapf: disable
+CREATE_HELP = (
+    """
+    Create a DC/OS cluster.
+
+        DC/OS Enterprise
+
+            \b
+            DC/OS Enterprise clusters require different configuration variables to DC/OS OSS.
+            For example, enterprise clusters require the following configuration parameters:
+
+            ``superuser_username``, ``superuser_password_hash``, ``fault_domain_enabled``, ``license_key_contents``
+
+            \b
+            These can all be set in ``--extra-config``.
+            However, some defaults are provided for all but the license key.
+
+            \b
+            The default superuser username is ``{default_superuser_username}``.
+            The default superuser password is ``{default_superuser_password}``.
+            The default ``fault_domain_enabled`` is ``false``.
+
+            \b
+            ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
+            This is set to one of the following, in order:
+
+            \b
+            * The ``license_key_contents`` set in ``--extra-config``.
+            * The contents of the path given with ``--license-key``.
+            * The contents of the path set in the ``DCOS_LICENSE_KEY_PATH`` environment variable.
+
+            \b
+            If none of these are set, ``license_key_contents`` is not given.
+    """# noqa: E501,E261
+).format(
+    default_superuser_username=DEFAULT_SUPERUSER_USERNAME,
+    default_superuser_password=DEFAULT_SUPERUSER_PASSWORD,
+)
+# yapf: enable
+
 
 def create_cluster(
     cluster_backend: ClusterBackend,
@@ -57,7 +99,7 @@ def get_config(
     extra_config: Dict[str, Any],
     dcos_variant: DCOSVariant,
     security_mode: Optional[str],
-    license_key: Optional[str],
+    license_key: Optional[Path],
 ) -> Dict[str, Any]:
     """
     Get a DC/OS configuration to use for the given cluster.
@@ -74,7 +116,7 @@ def get_config(
             'fault_domain_enabled': False,
         }
         if license_key is not None:
-            key_contents = Path(license_key).read_text()
+            key_contents = license_key.read_text()
             enterprise_extra_config['license_key_contents'] = key_contents
 
         extra_config = {**enterprise_extra_config, **extra_config}

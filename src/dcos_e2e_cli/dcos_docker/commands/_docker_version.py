@@ -2,7 +2,7 @@
 Docker Version Option
 """
 
-from typing import Callable, Optional, Union
+from typing import Callable, Union
 
 import click
 
@@ -18,7 +18,7 @@ _DOCKER_VERSIONS = {
 def _get_docker_version(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
+    value: str,
 ) -> DockerVersion:
     """
     Validate that a path is a directory.
@@ -27,7 +27,7 @@ def _get_docker_version(
     for _ in (ctx, param):
         pass
 
-    return _DOCKER_VERSIONS[str(value)]
+    return _DOCKER_VERSIONS[value]
 
 
 def docker_version_option(command: Callable[..., None],
