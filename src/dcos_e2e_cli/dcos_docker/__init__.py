@@ -8,6 +8,7 @@ from dcos_e2e_cli.common.commands import download_installer
 
 from .commands.clean import clean
 from .commands.create import create
+from .commands.provision import provision
 from .commands.create_loopback_sidecar import create_loopback_sidecar
 from .commands.destroy import destroy, destroy_list
 from .commands.destroy_loopback_sidecar import destroy_loopback_sidecar
@@ -42,6 +43,7 @@ dcos_docker.add_command(download_installer)
 dcos_docker.add_command(inspect_cluster)
 dcos_docker.add_command(list_clusters)
 dcos_docker.add_command(list_loopback_sidecars)
+dcos_docker.add_command(provision)
 dcos_docker.add_command(run)
 dcos_docker.add_command(setup_mac_network)
 dcos_docker.add_command(send_file)
