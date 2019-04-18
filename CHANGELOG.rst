@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.04.18.0
+------------
+
 * Improve the spinner while waiting for ``minidcos`` commands.
 * Add ``send-file`` commands to ``minidcos`` subcommands.
 * Remove ``--env`` option on ``minidcos docker inspect``.
