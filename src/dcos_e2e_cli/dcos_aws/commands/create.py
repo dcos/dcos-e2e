@@ -147,7 +147,7 @@ def create(
     public_agents: int,
     variant: str,
     workspace_dir: Path,
-    license_key: Optional[str],
+    license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
     aws_region: str,

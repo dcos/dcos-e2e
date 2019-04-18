@@ -99,7 +99,7 @@ def get_config(
     extra_config: Dict[str, Any],
     dcos_variant: DCOSVariant,
     security_mode: Optional[str],
-    license_key: Optional[str],
+    license_key: Optional[Path],
 ) -> Dict[str, Any]:
     """
     Get a DC/OS configuration to use for the given cluster.
@@ -116,7 +116,7 @@ def get_config(
             'fault_domain_enabled': False,
         }
         if license_key is not None:
-            key_contents = Path(license_key).read_text()
+            key_contents = license_key.read_text()
             enterprise_extra_config['license_key_contents'] = key_contents
 
         extra_config = {**enterprise_extra_config, **extra_config}
