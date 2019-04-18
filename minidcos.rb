@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.04.08.1"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.04.18.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -107,14 +107,19 @@ class Minidcos < Formula
     sha256 "5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"
   end
 
-  resource "click-spinner" do
-    url "https://files.pythonhosted.org/packages/4d/c4/e4cc6595266021b549f774a20329188e68b63f06896eba94c1c952027c6e/click-spinner-0.1.8.tar.gz"
-    sha256 "67b5af5e825faf82a4fc6cda77c58359abe716fb1c9bc12cc7bea9a0cae1fc8e"
+  resource "colorama" do
+    url "https://files.pythonhosted.org/packages/e6/76/257b53926889e2835355d74fec73d82662100135293e17d382e2b74d1669/colorama-0.3.9.tar.gz"
+    sha256 "48eb22f4f8461b1df5734a074b57042430fb06e1d61bd1e11b078c0fe6d7a1f1"
   end
 
   resource "cryptography" do
     url "https://files.pythonhosted.org/packages/07/ca/bc827c5e55918ad223d59d299fff92f3563476c3b00d0a9157d9c0217449/cryptography-2.6.1.tar.gz"
     sha256 "26c821cbeb683facb966045e2064303029d572a87ee69ca5a1bf54bf55f93ca6"
+  end
+
+  resource "cursor" do
+    url "https://files.pythonhosted.org/packages/23/0d/bec47260080d5e4b1d88a08b31c6c44b476a9c7509e41b1d84967027d32d/cursor-1.2.0.tar.gz"
+    sha256 "8ee9fe5b925e1001f6ae6c017e93682583d2b4d1ef7130a26cfcdf1651c0032c"
   end
 
   resource "decorator" do
@@ -147,6 +152,11 @@ class Minidcos < Formula
     sha256 "d2d587dde06f99545fb13a383d2cd336a8ff1f359c5839ce3a64c917d10c029f"
   end
 
+  resource "enum34" do
+    url "https://files.pythonhosted.org/packages/bf/3e/31d502c25302814a7c2f1d3959d2a3b3f78e509002ba91aea64993936876/enum34-1.1.6.tar.gz"
+    sha256 "8ad8c4783bf61ded74527bffb48ed9b54166685e4230386a9ed9b1279e2df5b1"
+  end
+
   resource "google-api-python-client" do
     url "https://files.pythonhosted.org/packages/7a/84/ffde3c95d4162cdc8bae710fecc6873cccb05ac33afc3b2c925c74cc0150/google-api-python-client-1.7.8.tar.gz"
     sha256 "06907006ed5ce831018f03af3852d739c0b2489cdacfda6971bcc2075c762858"
@@ -160,6 +170,11 @@ class Minidcos < Formula
   resource "google-auth-httplib2" do
     url "https://files.pythonhosted.org/packages/e7/32/ac7f30b742276b4911a1439c5291abab1b797ccfd30bc923c5ad67892b13/google-auth-httplib2-0.0.3.tar.gz"
     sha256 "098fade613c25b4527b2c08fa42d11f3c2037dda8995d86de0745228e965d445"
+  end
+
+  resource "halo" do
+    url "https://files.pythonhosted.org/packages/d5/14/e2b6180addc38803b8170afb798a06c2e407e79efb8e14591e8820e718d3/halo-0.0.23.tar.gz"
+    sha256 "3e5b9fa098cfe331bc324674b44b6b03af181ef9518c092e6405a4eda6f9d59d"
   end
 
   resource "httplib2" do
@@ -190,6 +205,11 @@ class Minidcos < Formula
   resource "keyring" do
     url "https://files.pythonhosted.org/packages/ee/79/744da3470d832b776a37ccf2b277339f165ff75827606b073dd653b26bba/keyring-16.0.2.tar.gz"
     sha256 "95e4f1d0342d0bf5d137d1d2352d59f7abbebb1507bec1ac26831c411ac23150"
+  end
+
+  resource "log_symbols" do
+    url "https://files.pythonhosted.org/packages/e9/c7/f4f2522e6be49dc4f37f2ad9d39c3f771020c837bfdf14236058c31c9d61/log_symbols-0.0.12.tar.gz"
+    sha256 "722cb7570c1a15ba4981cdaf8ca391ed686967c7de64ec5ed7b1376f0a51821e"
   end
 
   resource "more-itertools" do
@@ -323,8 +343,18 @@ class Minidcos < Formula
   end
 
   resource "six" do
-    url "https://files.pythonhosted.org/packages/dd/bf/4138e7bfb757de47d1f4b6994648ec67a51efe58fa907c1e11e350cddfca/six-1.12.0.tar.gz"
-    sha256 "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"
+    url "https://files.pythonhosted.org/packages/16/d8/bc6316cf98419719bd59c91742194c111b6f2e85abac88e496adefaf7afe/six-1.11.0.tar.gz"
+    sha256 "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9"
+  end
+
+  resource "spinners" do
+    url "https://files.pythonhosted.org/packages/01/3f/156b7faa2cbadd35a504c9ee852db32e07ff5f106bbf288d49b22b061135/spinners-0.0.23.tar.gz"
+    sha256 "f396fea1ee00c0622988d7d2bf2895d26dd6f70850ca2ce94eaca52ca4873560"
+  end
+
+  resource "termcolor" do
+    url "https://files.pythonhosted.org/packages/8a/48/a76be51647d0eb9f10e2a4511bf3ffb8cc1e6b14e9e4fab46173aa79f981/termcolor-1.1.0.tar.gz"
+    sha256 "1d6d69ce66211143803fbc56652b41d73b4a400a2891d7bf7a1cdf4c02de613b"
   end
 
   resource "timeout-decorator" do
