@@ -169,6 +169,7 @@ whitespace
 wildcard
 workflow
 workspace
+workspaces
 xfail
 yaml
 yapf
