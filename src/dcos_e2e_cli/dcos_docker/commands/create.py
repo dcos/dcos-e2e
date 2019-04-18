@@ -10,13 +10,13 @@ from docker.models.networks import Network
 from docker.types import Mount
 
 from dcos_e2e.backends import Docker
-from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
+from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
     install_dcos_from_path,
@@ -68,32 +68,6 @@ from ._volume_options import (
 )
 from .doctor import doctor
 from .wait import wait
-
-
-def _add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:
-    """
-    Add an authorized key to all nodes in the given cluster.
-    """
-    nodes = {
-        *cluster.masters,
-        *cluster.agents,
-        *cluster.public_agents,
-    }
-
-    for node in nodes:
-        node.run(
-            args=['echo', '', '>>', '/root/.ssh/authorized_keys'],
-            shell=True,
-        )
-        node.run(
-            args=[
-                'echo',
-                public_key_path.read_text(),
-                '>>',
-                '/root/.ssh/authorized_keys',
-            ],
-            shell=True,
-        )
 
 
 @click.command('create', help=CREATE_HELP)
@@ -224,7 +198,7 @@ def create(
     private_ssh_key_path.parent.mkdir(parents=True)
     private_key_path.replace(private_ssh_key_path)
 
-    _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
+    add_authorized_key(cluster=cluster, public_key_path=public_key_path)
 
     for node in cluster.masters:
         for path_pair in copy_to_master:
