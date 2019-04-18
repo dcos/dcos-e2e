@@ -1,0 +1,22 @@
+Usage: minidcos vagrant provision [OPTIONS]
+
+  Provision a Vagrant cluster for installing DC/OS.
+
+Options:
+  --masters INTEGER           The number of master nodes.  [default: 1]
+  --agents INTEGER            The number of agent nodes.  [default: 1]
+  --public-agents INTEGER     The number of public agent nodes.  [default: 1]
+  --workspace-dir DIRECTORY   Creating a cluster can use approximately 2 GB of
+                              temporary storage. Set this option to use a custom
+                              "workspace" for this temporary storage. See https:
+                              //docs.python.org/3/library/tempfile.html#tempfile
+                              .gettempdir for details on the temporary directory
+                              location if this option is not set.
+  -c, --cluster-id TEXT       A unique identifier for the cluster. Use the value
+                              "default" to use this cluster for other commands
+                              without specifying --cluster-id.
+  -v, --verbose               Use verbose output. Use this option multiple times
+                              for more verbose output.
+  --enable-selinux-enforcing  With this flag set, SELinux is set to enforcing
+                              before DC/OS is installed on the cluster.
+  -h, --help                  Show this message and exit.
