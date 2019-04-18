@@ -11,7 +11,7 @@ import click
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
-from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster
+from dcos_e2e_cli.common.create import create_cluster
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.options import (
     agents_option,

@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Add new commands to ``minidcos vagrant`` and ``minidcos aws`` to provision a bare cluster (``provision``) and install DC/OS on a bare cluster (``install``).
+
 2019.04.18.0
 ------------
 
