@@ -21,7 +21,7 @@ def node_transport_option(command: Callable[..., None]) -> Callable[..., None]:
     function = click.option(
         '--transport',
         type=click.Choice(sorted(transports.keys())),
-        callback=lambda ctx, param, value: transports[str(value)],
+        callback=lambda ctx, param, value: transports[value],
         default='docker-exec',
         show_default=True,
         envvar='MINIDCOS_DOCKER_TRANSPORT',
