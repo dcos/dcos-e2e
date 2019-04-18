@@ -3,7 +3,7 @@ Validators for CLI options.
 """
 
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Tuple, Union
 
 import click
 

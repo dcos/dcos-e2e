@@ -2,7 +2,7 @@
 Helpers for managing port mapping.
 """
 
-from typing import Any, Callable, Dict, Union
+from typing import Callable, Dict, Tuple, Union
 
 import click
 
@@ -10,7 +10,7 @@ import click
 def _validate_port_map(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
+    value: Tuple[str],
 ) -> Dict[str, int]:
     """
     Turn port map strings into a Dict that ``docker-py`` can use.

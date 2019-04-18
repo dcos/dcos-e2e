@@ -41,7 +41,12 @@ def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     )
     function = click.option(
         '--workspace-dir',
-        type=PathPath(exists=True),
+        type=PathPath(
+            exists=True,
+            dir_okay=True,
+            file_okay=False,
+            resolve_path=True,
+        ),
         callback=get_workspace_dir,
         help=help_text,
     )(command)  # type: Callable[..., None]

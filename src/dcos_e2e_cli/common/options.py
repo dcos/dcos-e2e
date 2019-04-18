@@ -5,7 +5,7 @@ Click options which are common across CLI tools.
 import logging
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import click
 import yaml
@@ -18,7 +18,7 @@ from .validators import validate_path_pair
 def _validate_cluster_id(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
+    value: str,
 ) -> str:
     """
     Validate that a value is a valid cluster ID.
@@ -30,7 +30,7 @@ def _validate_cluster_id(
     # This matches the Docker ID regular expression.
     # This regular expression can be seen by running:
     # > docker run -it --rm --id=' WHAT ? I DUNNO ! ' alpine
-    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', str(value)):
+    if not re.fullmatch('^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', value):
         message = (
             'Invalid cluster id "{value}", only [a-zA-Z0-9][a-zA-Z0-9_.-] '
             'are allowed and the cluster ID cannot be empty.'
@@ -43,7 +43,7 @@ def _validate_cluster_id(
 def _validate_environment_variable(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
+    value: Tuple[str],
 ) -> Dict[str, str]:
     """
     Validate that environment variables are set as expected.
@@ -68,7 +68,7 @@ def _validate_environment_variable(
 def _validate_dcos_configuration(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Union[int, bool, str],
+    value: Optional[Path],
 ) -> Dict[str, Any]:
     """
     Validate that a given value is a file containing a YAML map.
@@ -80,7 +80,7 @@ def _validate_dcos_configuration(
     if value is None:
         return {}
 
-    content = Path(str(value)).read_text()
+    content = value.read_text()
 
     # Ignoring error because of https://github.com/python/typeshed/issues/2886.
     loader = yaml.FullLoader  # type: ignore
@@ -343,10 +343,10 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def set_logging(
+def _set_logging(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[Union[int, bool, str]],
+    value: int,
 ) -> None:
     """
     Set logging level depending on the chosen verbosity.
@@ -381,7 +381,7 @@ def verbosity_option(command: Callable[..., None]) -> Callable[..., None]:
         ),
         count=True,
         expose_value=False,
-        callback=set_logging,
+        callback=_set_logging,
     )(command)  # type: Callable[..., None]
     return function
 
@@ -444,7 +444,12 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--genconf-dir',
-        type=PathPath(exists=True, file_okay=False, dir_okay=True),
+        type=PathPath(
+            exists=True,
+            dir_okay=True,
+            file_okay=False,
+            resolve_path=True,
+        ),
         help=(
             'Path to a directory that contains additional files for the DC/OS '
             'installer. '
