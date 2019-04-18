@@ -24,7 +24,8 @@ from dcos_e2e_cli.common.doctor import (
 )
 from dcos_e2e_cli.common.options import verbosity_option
 
-from ._common import DOCKER_STORAGE_DRIVERS, docker_client
+from ._common import docker_client
+from ._docker_storage_driver import DOCKER_STORAGE_DRIVERS
 
 
 def _check_tmp_free_space() -> CheckLevels:

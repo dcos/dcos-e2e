@@ -49,18 +49,18 @@ Options:
   --linux-distribution [centos-7|coreos|rhel-7]
                                   The Linux distribution to use on the nodes.
                                   [default: centos-7]
-  --workspace-dir PATH            Creating a cluster can use approximately 2 GB
+  --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
                                   of temporary storage. Set this option to use a
                                   custom "workspace" for this temporary storage.
                                   See https://docs.python.org/3/library/tempfile
                                   .html#tempfile.gettempdir for details on the
                                   temporary directory location if this option is
                                   not set.
-  --license-key PATH              This is ignored if using open source DC/OS. If
+  --license-key FILE              This is ignored if using open source DC/OS. If
                                   using DC/OS Enterprise, this defaults to the
                                   value of the `DCOS_LICENSE_KEY_PATH`
                                   environment variable.
-  --genconf-dir PATH              Path to a directory that contains additional
+  --genconf-dir DIRECTORY         Path to a directory that contains additional
                                   files for the DC/OS installer. All files from
                                   this directory will be copied to the "genconf"
                                   directory before running the DC/OS installer.
