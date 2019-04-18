@@ -19,6 +19,9 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 from .base_classes import ClusterRepresentation
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
+# yapf breaks multi-line noqa, see
+# https://github.com/google/yapf/issues/524.
+# yapf: disable
 CREATE_HELP = (
     """
     Create a DC/OS cluster.
@@ -51,11 +54,12 @@ CREATE_HELP = (
 
             \b
             If none of these are set, ``license_key_contents`` is not given.
-    """  # noqa: E501
+    """# noqa: E501,E261
 ).format(
     default_superuser_username=DEFAULT_SUPERUSER_USERNAME,
     default_superuser_password=DEFAULT_SUPERUSER_PASSWORD,
 )
+# yapf: enable
 
 
 def create_cluster(
