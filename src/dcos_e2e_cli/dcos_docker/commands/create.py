@@ -164,10 +164,8 @@ def create(
     doctor_message = get_doctor_message(
         doctor_command_name=doctor_command_name,
     )
-    ssh_keypair_dir = workspace_dir / 'ssh'
-    ssh_keypair_dir.mkdir(parents=True)
-    public_key_path = ssh_keypair_dir / 'id_rsa.pub'
-    private_key_path = ssh_keypair_dir / 'id_rsa'
+    public_key_path = workspace_dir / 'id_rsa.pub'
+    private_key_path = workspace_dir / 'id_rsa'
     write_key_pair(
         public_key_path=public_key_path,
         private_key_path=private_key_path,
@@ -218,6 +216,14 @@ def create(
         doctor_message=doctor_message,
     )
 
+    cluster_containers = ClusterContainers(
+        cluster_id=cluster_id,
+        transport=transport,
+    )
+    private_ssh_key_path = cluster_containers.ssh_key_path
+    private_ssh_key_path.parent.mkdir(parents=True)
+    private_key_path.replace(private_ssh_key_path)
+
     _add_authorized_key(cluster=cluster, public_key_path=public_key_path)
 
     for node in cluster.masters:
@@ -227,11 +233,6 @@ def create(
                 local_path=local_path,
                 remote_path=remote_path,
             )
-
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        transport=transport,
-    )
 
     dcos_config = get_config(
         cluster_representation=cluster_containers,
