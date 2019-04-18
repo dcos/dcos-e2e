@@ -2,7 +2,7 @@
 Helpers for managing Docker network settings.
 """
 
-from typing import Any, Callable, Union
+from typing import Callable, Optional, Union
 
 import click
 import docker
@@ -14,7 +14,7 @@ from ._common import docker_client
 def _validate_docker_network(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
+    value: Optional[Union[int, bool, str]],
 ) -> Network:
     """
     Validate that a given network name is an existing Docker network name.
@@ -42,15 +42,16 @@ def docker_network_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for choosing a Docker network.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--network',
-        default='bridge',
         type=str,
-        callback=_validate_docker_network,
+        default='bridge',
         help=(
             'The Docker network containers will be connected to.'
             'It may not be possible to SSH to containers on a custom network '
             'on macOS. '
         ),
-    )(command)  # type: Callable[..., None]
+        callback=_validate_docker_network,
+    )  # type: Callable[[Callable[..., None]], Network]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
