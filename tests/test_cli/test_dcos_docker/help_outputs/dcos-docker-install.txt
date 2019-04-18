@@ -3,7 +3,7 @@ Usage: minidcos docker install [OPTIONS] INSTALLER
   Install DC/OS on the given Docker cluster.
 
 Options:
-  --genconf-dir PATH              Path to a directory that contains additional
+  --genconf-dir DIRECTORY         Path to a directory that contains additional
                                   files for the DC/OS installer. All files from
                                   this directory will be copied to the "genconf"
                                   directory before running the DC/OS installer.
@@ -17,7 +17,7 @@ Options:
                                   The security mode to use for a DC/OS
                                   Enterprise cluster. This overrides any
                                   security mode set in ``--extra-config``.
-  --license-key PATH              This is ignored if using open source DC/OS. If
+  --license-key FILE              This is ignored if using open source DC/OS. If
                                   using DC/OS Enterprise, this defaults to the
                                   value of the `DCOS_LICENSE_KEY_PATH`
                                   environment variable.
@@ -48,7 +48,7 @@ Options:
                                   chosen transport is "docker-exec", this will
                                   skip HTTP checks and so the cluster may not be
                                   fully ready.
-  --workspace-dir PATH            Creating a cluster can use approximately 2 GB
+  --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
                                   of temporary storage. Set this option to use a
                                   custom "workspace" for this temporary storage.
                                   See https://docs.python.org/3/library/tempfile

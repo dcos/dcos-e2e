@@ -20,6 +20,7 @@ Commands:
   install                   Install DC/OS on the given Docker cluster.
   list                      List all clusters.
   list-loopback-sidecars    List loopback sidecars.
+  provision                 Provision Docker containers to install a DC/OS...
   run                       Run an arbitrary command on a node or multiple...
   send-file                 Send a file to a node or multiple nodes.
   setup-mac-network         Set up a network to connect to nodes on macOS.
