@@ -58,11 +58,11 @@ Options:
   -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
                                   value "default" to use this cluster for other
                                   commands without specifying --cluster-id.
-  --license-key PATH              This is ignored if using open source DC/OS. If
+  --license-key FILE              This is ignored if using open source DC/OS. If
                                   using DC/OS Enterprise, this defaults to the
                                   value of the `DCOS_LICENSE_KEY_PATH`
                                   environment variable.
-  --genconf-dir PATH              Path to a directory that contains additional
+  --genconf-dir DIRECTORY         Path to a directory that contains additional
                                   files for the DC/OS installer. All files from
                                   this directory will be copied to the "genconf"
                                   directory before running the DC/OS installer.
@@ -87,7 +87,7 @@ Options:
                                   agent node containers. See https://docs.docker
                                   .com/engine/reference/run/#volume-shared-
                                   filesystems for the syntax to use.
-  --workspace-dir PATH            Creating a cluster can use approximately 2 GB
+  --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
                                   of temporary storage. Set this option to use a
                                   custom "workspace" for this temporary storage.
                                   See https://docs.python.org/3/library/tempfile

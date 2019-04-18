@@ -16,15 +16,8 @@ from docker.models.containers import Container
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.node import Node, Role, Transport
 from dcos_e2e_cli.common.base_classes import ClusterRepresentation
-
-DOCKER_STORAGE_DRIVERS = {
-    'aufs': DockerStorageDriver.AUFS,
-    'overlay': DockerStorageDriver.OVERLAY,
-    'overlay2': DockerStorageDriver.OVERLAY_2,
-}
 
 CLUSTER_ID_LABEL_KEY = 'dcos_e2e.cluster_id'
 SIDECAR_NAME_LABEL_KEY = 'dcos_e2e.sidecar_name'
