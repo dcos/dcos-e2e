@@ -85,6 +85,7 @@ def cluster_variant_available(cluster: Cluster) -> bool:
     Returns:
         Whether the cluster variant is available.
     """
+    import pdb; pdb.set_trace()
     master = next(iter(cluster.masters))
     script = textwrap.dedent(
         """

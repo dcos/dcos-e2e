@@ -16,18 +16,17 @@ from dcos_e2e_cli.common.install import (
 )
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
-    copy_to_master_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
     security_mode_option,
     verbosity_option,
 )
-from dcos_e2e_cli.common.utils import command_path
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
-from ._common import ClusterInstances
+from ._common import ClusterInstances, existing_cluster_ids
 from ._options import aws_region_option
 from ._variant import variant_option
 from ._wait_for_dcos import wait_for_dcos_option
@@ -35,7 +34,7 @@ from .doctor import doctor
 from .wait import wait
 
 
-@click.command('create')
+@click.command('install')
 @click.argument(
     'installer_url',
     type=str,
@@ -48,7 +47,6 @@ from .wait import wait
 @license_key_option
 @genconf_dir_option
 @security_mode_option
-@copy_to_master_option
 @verbosity_option
 @cluster_id_option
 @click.pass_context
@@ -68,6 +66,11 @@ def install_dcos(
     """
     Install DC/OS on a provisioned AWS cluster.
     """
+    check_cluster_id_exists(
+        new_cluster_id=cluster_id,
+        existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
+    )
+
     cluster_instances = ClusterInstances(
         cluster_id=cluster_id,
         aws_region=aws_region,
