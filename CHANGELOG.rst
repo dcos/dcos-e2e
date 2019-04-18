@@ -13,6 +13,7 @@ Next
 * Add ``send-file`` commands to ``minidcos`` subcommands.
 * Remove ``--env`` option on ``minidcos docker inspect``.
 * Custom backends must now specify the base config in the ``ClusterBackend`` rather than the ``ClusterManager``.
+* Add new commands to ``minidcos docker`` to provision a bare cluster (``provision``) and install DC/OS on a bare cluster (``install``).
 
 2019.04.08.1
 ------------
