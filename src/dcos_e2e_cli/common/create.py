@@ -36,8 +36,8 @@ CREATE_HELP = (
             However, some defaults are provided for all but the license key.
 
             \b
-            The default superuser username is ``admin``.
-            The default superuser password is ``admin``.
+            The default superuser username is ``{default_superuser_username}``.
+            The default superuser password is ``{default_superuser_password}``.
             The default ``fault_domain_enabled`` is ``false``.
 
             \b
@@ -52,6 +52,9 @@ CREATE_HELP = (
             \b
             If none of these are set, ``license_key_contents`` is not given.
     """  # noqa: E501
+).format(
+    default_superuser_username=DEFAULT_SUPERUSER_USERNAME,
+    default_superuser_password=DEFAULT_SUPERUSER_PASSWORD,
 )
 
 
