@@ -99,7 +99,6 @@ class ClusterInstances(ClusterRepresentation):
         }
         filters = [cluster_id_tag_filter, node_role_filter]
         ec2_instances = set(ec2.instances.filter(Filters=filters))
-        import pdb; pdb.set_trace()
         return ec2_instances
 
     def to_node(self, node_representation: ServiceResource) -> Node:
