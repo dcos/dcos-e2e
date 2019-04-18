@@ -14,7 +14,7 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Transport
-from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster
+from dcos_e2e_cli.common.create import create_cluster
 from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.options import (

@@ -8,7 +8,6 @@ from dcos_e2e_cli.common.commands import download_installer
 
 from .commands.clean import clean
 from .commands.create import create
-from .commands.provision import provision
 from .commands.create_loopback_sidecar import create_loopback_sidecar
 from .commands.destroy import destroy, destroy_list
 from .commands.destroy_loopback_sidecar import destroy_loopback_sidecar
@@ -18,6 +17,7 @@ from .commands.install_dcos import install_dcos
 from .commands.list_clusters import list_clusters
 from .commands.list_loopback_sidecars import list_loopback_sidecars
 from .commands.mac_network import destroy_mac_network, setup_mac_network
+from .commands.provision import provision
 from .commands.run_command import run
 from .commands.send_file import send_file
 from .commands.sync import sync_code
