@@ -37,7 +37,7 @@ def _validate_cluster_id(
         ).format(value=value)
         raise click.BadParameter(message)
 
-    return str(value)
+    return value
 
 
 def _validate_environment_variable(

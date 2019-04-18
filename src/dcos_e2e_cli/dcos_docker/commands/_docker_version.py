@@ -27,7 +27,7 @@ def _get_docker_version(
     for _ in (ctx, param):
         pass
 
-    return _DOCKER_VERSIONS[str(value)]
+    return _DOCKER_VERSIONS[value]
 
 
 def docker_version_option(command: Callable[..., None],
