@@ -17,6 +17,7 @@ Commands:
   doctor                    Diagnose common issues which stop this CLI from...
   download-installer        Download a DC/OS Open Source installer.
   inspect                   Show cluster details.
+  install                   Install DC/OS on the given Docker cluster.
   list                      List all clusters.
   list-loopback-sidecars    List loopback sidecars.
   run                       Run an arbitrary command on a node or multiple...
