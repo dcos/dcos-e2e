@@ -46,7 +46,7 @@ class Output(Enum):
         LOG_AND_CAPTURE: Log output at the debug level. If the code returns a
             ``subprocess.CompletedProcess``, the stdout and stderr will be
             contained in the return value. However, they will be merged into
-            stderr.
+            stdout.
         CAPTURE: Capture stdout and stderr. If the code returns a
             ``subprocess.CompletedProcess``, the stdout and stderr will be
             contained in the return value.

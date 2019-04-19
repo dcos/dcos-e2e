@@ -688,6 +688,10 @@ class TestOutput:
     Tests for the ``output`` parameter of ``Node.run``.
     """
 
+    @pytest.fixture(autouse=True)
+    def configure_logging(self, caplog: LogCaptureFixture) -> None:
+        caplog.set_level(logging.DEBUG, logger='dcos_e2e')
+
     def test_default(
         self,
         caplog: LogCaptureFixture,

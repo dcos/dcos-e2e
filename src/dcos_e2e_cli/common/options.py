@@ -373,7 +373,12 @@ def _set_logging(
         2: logging.DEBUG,
         3: logging.NOTSET,
     }
-    logging.basicConfig(level=logging.NOTSET)
+    logging.basicConfig(level=logging.DEBUG)
+
+    # Disable debug output from `docker` and `urllib3` libraries
+    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARN)
+    logging.getLogger('docker').setLevel(logging.WARN)
+
     # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(verbosity_level or 0)])
 
