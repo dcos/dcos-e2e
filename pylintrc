@@ -81,9 +81,6 @@ disable=line-too-long,
         locally-disabled,
         # Let flake8 handle unused imports
         unused-import,
-        # This creates errors with typing.py
-        # see https://github.com/PyCQA/pylint/issues/1212
-        invalid-sequence-index,
         # Let isort deal with sorting
         ungrouped-imports,
         wrong-import-order,
