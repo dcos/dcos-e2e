@@ -265,7 +265,7 @@ class TestCreate:
         assert result.exit_code == 2
         expected_error = (
             'Error: Invalid value for "INSTALLER": '
-            'Path "/not/a/path" does not exist.'
+            'File "/not/a/path" does not exist.'
         )
         assert expected_error in result.output
 
@@ -295,7 +295,7 @@ class TestCreate:
             Usage: minidcos docker create [OPTIONS] INSTALLER
             Try "minidcos docker create -h" for help.
 
-            Error: Invalid value for "--extra-config": Path "{path}" does not exist.
+            Error: Invalid value for "--extra-config": File "{path}" does not exist.
             """,# noqa: E501,E261
         ).format(path=invalid_path)
         # yapf: enable
@@ -422,7 +422,7 @@ class TestCreate:
         assert result.exit_code == 2
         expected_error = (
             'Error: Invalid value for "--genconf-dir": '
-            'Path "non-existing" does not exist.'
+            'Directory "non-existing" does not exist.'
         )
         assert expected_error in result.output
 
@@ -452,7 +452,7 @@ class TestCreate:
         assert result.exit_code == 2
         expected_error = (
             'Error: Invalid value for "--genconf-dir": '
-            '"{path}" is not a directory.'
+            'Directory "{path}" is a file.'
         ).format(path=str(genconf_file))
         assert expected_error in result.output
 
@@ -475,7 +475,7 @@ class TestCreate:
         assert result.exit_code == 2
         expected_error = (
             'Error: Invalid value for "--workspace-dir": '
-            'Path "non-existing" does not exist.'
+            'Directory "non-existing" does not exist.'
         )
         assert expected_error in result.output
 
@@ -505,7 +505,7 @@ class TestCreate:
         assert result.exit_code == 2
         expected_error = (
             'Error: Invalid value for "--workspace-dir": '
-            '"{path}" is not a directory.'
+            'Directory "{path}" is a file.'
         ).format(path=str(workspace_file))
         assert expected_error in result.output
 

@@ -163,10 +163,10 @@ def superuser_username_option(command: Callable[..., None],
         '--superuser-username',
         type=str,
         default=DEFAULT_SUPERUSER_USERNAME,
+        show_default=True,
         help=(
             'The superuser username is needed only on DC/OS Enterprise '
             'clusters. '
-            'By default, on a DC/OS Enterprise cluster, `admin` is used.'
         ),
     )(command)  # type: Callable[..., None]
     return function
@@ -181,10 +181,10 @@ def superuser_password_option(command: Callable[..., None],
         '--superuser-password',
         type=str,
         default=DEFAULT_SUPERUSER_PASSWORD,
+        show_default=True,
         help=(
             'The superuser password is needed only on DC/OS Enterprise '
             'clusters. '
-            'By default, on a DC/OS Enterprise cluster, `admin` is used.'
         ),
     )(command)  # type: Callable[..., None]
     return function
@@ -196,7 +196,12 @@ def extra_config_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--extra-config',
-        type=PathPath(exists=True),
+        type=PathPath(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            resolve_path=True,
+        ),
         callback=_validate_dcos_configuration,
         help=(
             'The path to a file including DC/OS configuration YAML. '

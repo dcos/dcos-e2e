@@ -11,7 +11,7 @@ Options:
                                   wait" after this command. "minidcos aws wait"
                                   has various options available and so may be
                                   more appropriate for your use case.
-  --extra-config PATH             The path to a file including DC/OS
+  --extra-config FILE             The path to a file including DC/OS
                                   configuration YAML. The contents of this file
                                   will be added to add to a default
                                   configuration.
