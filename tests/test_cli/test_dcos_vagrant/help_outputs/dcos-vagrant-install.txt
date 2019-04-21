@@ -3,7 +3,7 @@ Usage: minidcos vagrant install [OPTIONS] INSTALLER
   Install DC/OS on a provisioned Vagrant cluster.
 
 Options:
-  --extra-config PATH             The path to a file including DC/OS
+  --extra-config FILE             The path to a file including DC/OS
                                   configuration YAML. The contents of this file
                                   will be added to add to a default
                                   configuration.

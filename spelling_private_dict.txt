@@ -120,6 +120,7 @@ stderr
 stdout
 str
 subcommand
+subcommands
 submodules
 subnet
 subpackages
