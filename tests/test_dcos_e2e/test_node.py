@@ -690,6 +690,10 @@ class TestOutput:
 
     @pytest.fixture(autouse=True)
     def configure_logging(self, caplog: LogCaptureFixture) -> None:
+        """
+        Set the ``caplog`` logging level to ``DEBUG`` so it captures any log
+        messages produced by ``dcos_e2e`` library.
+        """
         caplog.set_level(logging.DEBUG, logger='dcos_e2e')
 
     def test_default(
