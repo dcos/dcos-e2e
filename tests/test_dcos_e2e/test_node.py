@@ -798,7 +798,9 @@ class TestOutput:
         result_stdout = result.stdout.strip().decode()
         assert set(result_stdout.split('\n')) == expected_messages
 
-        first_log, second_log = caplog.records
+        # Ignore the first message which is the command being logged by ``run``
+        # method call.
+        _, first_log, second_log = caplog.records
         assert first_log.levelno == logging.DEBUG
         assert second_log.levelno == logging.DEBUG
 
@@ -820,7 +822,9 @@ class TestOutput:
         args = ['head', '-c', '100', '/bin/cat']
         dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
         # We do not test the output, but we at least test its length for now.
-        [log] = caplog.records
+        # Ignore the first message which is the command being logged by ``run``
+        # method call.
+        [_, log] = caplog.records
         assert len(log.message) >= 100
 
     def test_not_utf_8_capture(

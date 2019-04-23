@@ -2,6 +2,7 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import logging
 import subprocess
 import tarfile
 import uuid
@@ -14,6 +15,9 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 import yaml
 
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Role(Enum):
@@ -486,6 +490,12 @@ class Node:
             Output.LOG_AND_CAPTURE: True,
             Output.NO_CAPTURE: False,
         }[output]
+
+        if log_output_live:
+            LOGGER.debug('Running command {cmd} on a node {node}'.format(
+                cmd=args,
+                node=str(self),
+            ))
 
         return node_transport.run(
             args=args,
