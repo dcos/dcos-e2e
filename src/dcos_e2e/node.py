@@ -491,10 +491,11 @@ class Node:
         }[output]
 
         if log_output_live:
-            LOGGER.debug('Running command {cmd} on a node {node}'.format(
-                cmd=args,
+            log_msg = 'Running command `{cmd}` on a node `{node}`'.format(
+                cmd=' '.join(args),
                 node=str(self),
-            ))
+            )
+            LOGGER.debug(log_msg)
 
         return node_transport.run(
             args=args,

@@ -151,7 +151,8 @@ class Cluster(ContextDecorator):
         reading the CA certificate used by certain checks.
         """
         for node in self.masters:
-            LOGGER.debug('Running a poststart check on `{}`'.format(str(node)))
+            log_msg = 'Running a poststart check on `{}`'.format(str(node))
+            LOGGER.debug(log_msg)
             node.run(
                 args=[
                     'sudo',

@@ -794,15 +794,25 @@ class TestOutput:
         # stderr is merged into stdout.
         # This is not ideal but for now it is the case.
         # The order is not necessarily preserved.
+        expected_command = (
+            'Running command `/bin/sh -c echo {stdout_message} && >&2 echo '
+            '{stderr_message}` on a node `{node}`'.format(
+                stdout_message=stdout_message,
+                stderr_message=stderr_message,
+                node=str(dcos_node),
+            )
+        )
         expected_messages = set([stdout_message, stderr_message])
         result_stdout = result.stdout.strip().decode()
         assert set(result_stdout.split('\n')) == expected_messages
 
         # Ignore the first message which is the command being logged by ``run``
         # method call.
-        _, first_log, second_log = caplog.records
+        command_log, first_log, second_log = caplog.records
         assert first_log.levelno == logging.DEBUG
         assert second_log.levelno == logging.DEBUG
+
+        assert command_log.message == expected_command
 
         messages = set([first_log.message, second_log.message])
         assert messages == expected_messages
@@ -824,8 +834,15 @@ class TestOutput:
         # We do not test the output, but we at least test its length for now.
         # Ignore the first message which is the command being logged by ``run``
         # method call.
-        [_, log] = caplog.records
+        [command_log, log] = caplog.records
         assert len(log.message) >= 100
+
+        expected_command = (
+            'Running command `head -c 100 /bin/cat` on a node `{node}`'.format(
+                node=str(dcos_node),
+            )
+        )
+        assert command_log.message == expected_command
 
     def test_not_utf_8_capture(
         self,
