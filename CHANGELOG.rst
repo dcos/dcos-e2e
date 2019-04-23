@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.04.23.0
+------------
+
 * The library no longer configures logger handler. Applications using ``dcos_e2e`` library that were relying on logging being printed to stdout should configure ``logging`` on its own.
 
 2019.04.18.2
