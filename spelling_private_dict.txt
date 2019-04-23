@@ -19,6 +19,7 @@ bootstrap
 breakpoint
 bytestring
 calledprocesserror
+caplog
 centos
 cgroup
 cgroups
