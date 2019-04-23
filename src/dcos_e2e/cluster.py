@@ -22,7 +22,6 @@ from .base_classes import ClusterBackend
 from .exceptions import DCOSTimeoutError
 from .node import Node, Output, Transport
 
-
 LOGGER = logging.getLogger(__name__)
 
 

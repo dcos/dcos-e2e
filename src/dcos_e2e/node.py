@@ -16,7 +16,6 @@ import yaml
 
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
 
-
 LOGGER = logging.getLogger(__name__)
 
 
