@@ -3,6 +3,7 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import json
+import logging
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -20,6 +21,8 @@ from .base_classes import ClusterManager  # noqa: F401
 from .base_classes import ClusterBackend
 from .exceptions import DCOSTimeoutError
 from .node import Node, Output, Transport
+
+LOGGER = logging.getLogger(__name__)
 
 
 @retry(
@@ -148,6 +151,8 @@ class Cluster(ContextDecorator):
         reading the CA certificate used by certain checks.
         """
         for node in self.masters:
+            log_msg = 'Running a poststart check on `{}`'.format(str(node))
+            LOGGER.debug(log_msg)
             node.run(
                 args=[
                     'sudo',
@@ -164,7 +169,7 @@ class Cluster(ContextDecorator):
                     '--diag',
                 ],
                 # Keep in mind this must be run as privileged user.
-                output=Output.LOG_AND_CAPTURE,
+                output=Output.NO_CAPTURE,
                 shell=True,
             )
 
