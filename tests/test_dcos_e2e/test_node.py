@@ -807,10 +807,9 @@ class TestOutput:
 
         expected_command = (
             'Running command `/bin/sh -c >&2 echo {message}` on a node `{node}`'
-            .format(
-                message=message,
-                node=str(dcos_node),
-            )
+        ).format(
+            message=message,
+            node=str(dcos_node),
         )
 
         assert result.stderr.strip().decode() == message
@@ -886,7 +885,8 @@ class TestOutput:
         assert captured.err.strip() == stderr_message
 
     @pytest.mark.parametrize(
-        'output', [Output.LOG_AND_CAPTURE, Output.CAPTURE]
+        'output',
+        [Output.LOG_AND_CAPTURE, Output.CAPTURE],
     )
     def test_errors(
         self,
