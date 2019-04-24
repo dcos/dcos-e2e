@@ -713,15 +713,7 @@ class TestOutput:
         assert result.stdout.strip().decode() == stdout_message
         assert result.stderr.strip().decode() == stderr_message
 
-        args_log, result_log = caplog.records
-
-        assert args_log.levelno == logging.WARNING
-        assert stdout_message in args_log.message
-        assert stderr_message in args_log.message
-        assert 'echo' in args_log.message
-
-        assert result_log.levelno == logging.WARNING
-        assert result_log.message == stderr_message
+        assert caplog.records == []
 
     @pytest.mark.parametrize(
         'stdout_message',
@@ -751,71 +743,81 @@ class TestOutput:
         assert result.stdout.strip().decode() == stdout_message
         assert result.stderr.strip().decode() == stderr_message
 
-        args_log, result_log = caplog.records
-
-        assert args_log.levelno == logging.WARNING
-        assert stdout_message in args_log.message
-        assert stderr_message in args_log.message
-        assert 'echo' in args_log.message
-
-        assert result_log.levelno == logging.WARNING
-        assert result_log.message == stderr_message
+        assert caplog.records == []
 
     @pytest.mark.parametrize(
-        'stdout_message',
+        'message',
         [uuid.uuid4().hex, 'å'],
         ids=['ascii', 'unicode'],
     )
-    @pytest.mark.parametrize(
-        'stderr_message',
-        [uuid.uuid4().hex, 'å'],
-        ids=['ascii', 'unicode'],
-    )
-    def test_log_and_capture(
+    def test_log_and_capture_stdout(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
-        stdout_message: str,
-        stderr_message: str,
+        message: str,
     ) -> None:
         """
-        When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
-        in the output as stdout.
-
-        stdout and stderr are logged.
+        TODO
         """
-        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        args = ['echo', message]
         result = dcos_node.run(
             args=args,
             shell=True,
             output=Output.LOG_AND_CAPTURE,
         )
 
-        # stderr is merged into stdout.
-        # This is not ideal but for now it is the case.
-        # The order is not necessarily preserved.
         expected_command = (
-            'Running command `/bin/sh -c echo {stdout_message} && >&2 echo '
-            '{stderr_message}` on a node `{node}`'.format(
-                stdout_message=stdout_message,
-                stderr_message=stderr_message,
+            'Running command `/bin/sh -c echo {message}` on a node `{node}`'.format(
+                message=message,
                 node=str(dcos_node),
             )
         )
-        expected_messages = set([stdout_message, stderr_message])
-        result_stdout = result.stdout.strip().decode()
-        assert set(result_stdout.split('\n')) == expected_messages
+
+        assert result.stdout.strip().decode() == message
 
         # Ignore the first message which is the command being logged by ``run``
         # method call.
-        command_log, first_log, second_log = caplog.records
+        command_log, first_log = caplog.records
         assert first_log.levelno == logging.DEBUG
-        assert second_log.levelno == logging.DEBUG
 
         assert command_log.message == expected_command
+        assert message == first_log.message
 
-        messages = set([first_log.message, second_log.message])
-        assert messages == expected_messages
+    @pytest.mark.parametrize(
+        'message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    def test_log_and_capture_stderr(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+        message: str,
+    ) -> None:
+        """
+        TODO
+        """
+        args = ['>&2', 'echo', message]
+        result = dcos_node.run(
+            args=args,
+            shell=True,
+            output=Output.LOG_AND_CAPTURE,
+        )
+
+        expected_command = (
+            'Running command `/bin/sh -c >&2 echo {message}` on a node `{node}`'.format(
+                message=message,
+                node=str(dcos_node),
+            )
+        )
+
+        assert result.stderr.strip().decode() == message
+
+        command_log, first_log = caplog.records
+        assert first_log.levelno == logging.WARN
+
+        assert command_log.message == expected_command
+        assert message == first_log.message
 
     def test_not_utf_8_log_and_capture(
         self,
@@ -858,10 +860,9 @@ class TestOutput:
         # It also is not so long that it will kill our terminal.
         args = ['head', '-c', '100', '/bin/cat']
         args = ['>&2'] + args
-        dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
-        _, result_log = caplog.records
-        # We do not test the output, but we at least test its length for now.
-        assert len(result_log.message) >= 100
+        result =dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
+        assert caplog.records == []
+        assert len(result.stderr) >= 100
 
     def test_no_capture(
         self,
@@ -882,7 +883,7 @@ class TestOutput:
         assert captured.out.strip() == stdout_message
         assert captured.err.strip() == stderr_message
 
-    @pytest.mark.parametrize('output', list(Output))
+    @pytest.mark.parametrize('output', [Output.LOG_AND_CAPTURE, Output.CAPTURE])
     def test_errors(
         self,
         caplog: LogCaptureFixture,
@@ -890,13 +891,11 @@ class TestOutput:
         output: Output,
     ) -> None:
         """
-        Errors are always logged at the error level.
+        The ``stderr`` of a failed command is available in the CalledProcessError.
         """
         args = ['rm', 'does_not_exist']
-        output = Output.CAPTURE
-        with pytest.raises(subprocess.CalledProcessError):
+        with pytest.raises(subprocess.CalledProcessError) as excinfo:
             dcos_node.run(args=args, shell=True, output=output)
-        [record] = caplog.records
-        assert record.levelno == logging.ERROR
-        expected_message = 'No such file or directory'
-        assert expected_message in record.message
+        expected_message = b'No such file or directory'
+        assert expected_message in excinfo.value.stderr
+

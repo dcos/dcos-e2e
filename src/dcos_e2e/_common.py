@@ -62,8 +62,8 @@ def run_subprocess(
     # It is hard to log output of both stdout and stderr live unless we
     # combine them.
     # See http://stackoverflow.com/a/18423003.
-    if log_output_live:
-        process_stderr = STDOUT
+    # if log_output_live:
+    #   process_stderr = STDOUT
 
     with Popen(
         args=args,
@@ -72,22 +72,67 @@ def run_subprocess(
         stderr=process_stderr,
         env=env,
     ) as process:
+        
+        class LineLogger:
+            
+            def __init__(self, logger):
+                self.buffer = b''
+                self.logger = logger
+
+            def log(self, data: bytes) -> None:
+                self.buffer += data
+
+                lines = self.buffer.split(b'\n')
+                self.buffer = lines.pop()
+
+                for line in lines:
+                    self.logger(_safe_decode(line))
+
+            def flush(self):
+                if len(self.buffer) > 0:
+                    self.logger(_safe_decode(self.buffer))
+                    self.buffer = b''
+
+
         try:
-            if log_output_live:
-                stdout = b''
-                stderr = b''
-                for line in process.stdout:
-                    log_message = _safe_decode(line.rstrip())
-                    LOGGER.debug(log_message)
-                    stdout += line
-                # stderr/stdout are not readable anymore which usually means
-                # that the child process has exited. However, the child
-                # process has not been wait()ed for yet, i.e. it has not yet
-                # been reaped. That is, its exit status is unknown. Read its
-                # exit status.
-                process.wait()
+            stdout_list = []
+            stderr_list = []
+
+            if pipe_output:
+                fds_map = {
+                    process.stdout.fileno(): (LineLogger(LOGGER.debug), stdout_list),
+                    process.stderr.fileno(): (LineLogger(LOGGER.warning), stderr_list),
+                }
+                fds = list(fds_map.keys())
+
+                while fds:
+                    import select
+                    import os
+                    ret = select.select(fds, [], [])
+
+                    for fd in ret[0]:
+                        (logger, lines) = fds_map[fd]
+                        buff = os.read(fd, 8192)
+                        if buff:
+                            lines.append(buff)
+                            if log_output_live:
+                                logger.log(buff)
+                        else:
+                            fds.remove(fd)
+                            logger.flush()
+
+            # stderr/stdout are not readable anymore which usually means
+            # that the child process has exited. However, the child
+            # process has not been wait()ed for yet, i.e. it has not yet
+            # been reaped. That is, its exit status is unknown. Read its
+            # exit status.
+            process.wait()
+
+            if pipe_output:
+                stdout = b''.join(stdout_list)
+                stderr = b''.join(stderr_list)
             else:
-                stdout, stderr = process.communicate()
+                stdout = stderr = None
         except Exception:  # pragma: no cover
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
@@ -100,15 +145,6 @@ def run_subprocess(
                 # If the process cannot terminate cleanly, we just kill it.
                 process.kill()
             raise
-        if stderr:
-            if process.returncode == 0:
-                log = LOGGER.warning
-                log(repr(args))
-            else:
-                log = LOGGER.error
-            for line in stderr.rstrip().split(b'\n'):
-                log_message = _safe_decode(line.rstrip())
-                log(log_message)
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
                 returncode=process.returncode,
@@ -117,3 +153,8 @@ def run_subprocess(
                 stderr=stderr,
             )
     return CompletedProcess(args, process.returncode, stdout, stderr)
+
+# def stderr_to_lines(stderr: bytes) -> Generator[str]:
+#    return [_safe_decode(line.rstrip())
+#           for line in stderr.rstrip().split(b'\n')]
+
