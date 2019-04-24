@@ -20,9 +20,9 @@ def node_option(command: Callable[..., None]) -> Callable[..., None]:
         help=(
             'A reference to a particular node to run the command on. '
             'This can be one of: '
-            'The node\'s public IP address, '
-            'The node\'s private IP address, '
-            'the node\'s EC2 instance ID, '
+            "The node's public IP address, "
+            "The node's private IP address, "
+            "the node's EC2 instance ID, "
             'a reference in the format "<role>_<number>". '
             'These details be seen with ``minidcos aws inspect``.'
         ),
