@@ -25,6 +25,24 @@ def _safe_decode(output_bytes: bytes) -> str:
             errors='backslashreplace',
         )
 
+class _LineLogger:
+    def __init__(self, logger):
+        self.buffer = b''
+        self.logger = logger
+
+    def log(self, data: bytes) -> None:
+        self.buffer += data
+
+        lines = self.buffer.split(b'\n')
+        self.buffer = lines.pop()
+
+        for line in lines:
+            self.logger(_safe_decode(line))
+
+    def flush(self):
+        if len(self.buffer) > 0:
+            self.logger(_safe_decode(self.buffer))
+            self.buffer = b''
 
 def run_subprocess(
     args: List[str],
@@ -73,25 +91,6 @@ def run_subprocess(
         env=env,
     ) as process:
         
-        class LineLogger:
-            
-            def __init__(self, logger):
-                self.buffer = b''
-                self.logger = logger
-
-            def log(self, data: bytes) -> None:
-                self.buffer += data
-
-                lines = self.buffer.split(b'\n')
-                self.buffer = lines.pop()
-
-                for line in lines:
-                    self.logger(_safe_decode(line))
-
-            def flush(self):
-                if len(self.buffer) > 0:
-                    self.logger(_safe_decode(self.buffer))
-                    self.buffer = b''
 
 
         try:
@@ -100,8 +99,8 @@ def run_subprocess(
 
             if pipe_output:
                 fds_map = {
-                    process.stdout.fileno(): (LineLogger(LOGGER.debug), stdout_list),
-                    process.stderr.fileno(): (LineLogger(LOGGER.warning), stderr_list),
+                    process.stdout.fileno(): (_LineLogger(LOGGER.debug), stdout_list),
+                    process.stderr.fileno(): (_LineLogger(LOGGER.warning), stderr_list),
                 }
                 fds = list(fds_map.keys())
 
