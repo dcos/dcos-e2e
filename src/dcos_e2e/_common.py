@@ -3,11 +3,11 @@ Common utilities for end to end tests.
 """
 
 import logging
-import subprocess
-from subprocess import PIPE, STDOUT, CompletedProcess, Popen
-from typing import Dict, List, Optional, Union
-import select
 import os
+import select
+import subprocess
+from subprocess import PIPE, CompletedProcess, Popen
+from typing import Dict, List, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ def _safe_decode(output_bytes: bytes) -> str:
             encoding='ascii',
             errors='backslashreplace',
         )
+
 
 class _LineLogger:
     """
@@ -49,6 +50,7 @@ class _LineLogger:
         if len(self.buffer) > 0:
             self.logger(_safe_decode(self.buffer))
             self.buffer = b''
+
 
 def run_subprocess(
     args: List[str],

@@ -767,10 +767,10 @@ class TestOutput:
         )
 
         expected_command = (
-            'Running command `/bin/sh -c echo {message}` on a node `{node}`'.format(
-                message=message,
-                node=str(dcos_node),
-            )
+            'Running command `/bin/sh -c echo {message}` on a node `{node}`'
+        ).format(
+            message=message,
+            node=str(dcos_node),
         )
 
         assert result.stdout.strip().decode() == message
@@ -805,7 +805,8 @@ class TestOutput:
         )
 
         expected_command = (
-            'Running command `/bin/sh -c >&2 echo {message}` on a node `{node}`'.format(
+            'Running command `/bin/sh -c >&2 echo {message}` on a node `{node}`'
+            .format(
                 message=message,
                 node=str(dcos_node),
             )
@@ -860,7 +861,7 @@ class TestOutput:
         # It also is not so long that it will kill our terminal.
         args = ['head', '-c', '100', '/bin/cat']
         args = ['>&2'] + args
-        result =dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
+        result = dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
         assert caplog.records == []
         assert len(result.stderr) >= 100
 
@@ -883,7 +884,10 @@ class TestOutput:
         assert captured.out.strip() == stdout_message
         assert captured.err.strip() == stderr_message
 
-    @pytest.mark.parametrize('output', [Output.LOG_AND_CAPTURE, Output.CAPTURE])
+    @pytest.mark.parametrize(
+        'output',
+        [Output.LOG_AND_CAPTURE, Output.CAPTURE],
+    )
     def test_errors(
         self,
         caplog: LogCaptureFixture,
@@ -898,4 +902,3 @@ class TestOutput:
             dcos_node.run(args=args, shell=True, output=output)
         expected_message = b'No such file or directory'
         assert expected_message in excinfo.value.stderr
-
