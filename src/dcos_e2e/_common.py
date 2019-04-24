@@ -85,6 +85,8 @@ def run_subprocess(
 
     stdout_list = []  # type: List[bytes]
     stderr_list = []  # type: List[bytes]
+    stdout_logger = _LineLogger(LOGGER.debug)
+    stderr_logger = _LineLogger(LOGGER.warning)
 
     import sarge
     import datetime
@@ -99,11 +101,11 @@ def run_subprocess(
             if stdout_line:
                 stdout_list.append(stdout_line)
                 if log_output_live:
-                    LOGGER.debug(_safe_decode(stdout_line))
+                    stdout_logger.log(stdout_line)
             if stderr_line:
                 stderr_list.append(stderr_line)
                 if log_output_live:
-                    LOGGER.warning(_safe_decode(stderr_line))
+                    stderr_logger.log(stderr_line)
             for command in process.commands:
                 command.poll()
             time.sleep(0.05)
