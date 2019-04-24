@@ -113,11 +113,11 @@ def run_subprocess(
                     for file_descriptor in ret[0]:
                         logger = logger_map[file_descriptor]
                         lines = line_map[file_descriptor]
-                        buff = os.read(file_descriptor, 8192)
-                        if buff:
-                            lines.append(buff)
+                        line_buffer = os.read(file_descriptor, 8192)
+                        if line_buffer:
+                            lines.append(line_buffer)
                             if log_output_live:
-                                logger.log(buff)
+                                logger.log(line_buffer)
                         else:
                             file_descriptors.remove(file_descriptor)
                             logger.flush()
