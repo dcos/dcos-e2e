@@ -93,20 +93,20 @@ def run_subprocess(
         stderr=process_stderr,
         env=env,
     ) as process:
-        logger_map = {
-            process.stdout.fileno(): _LineLogger(LOGGER.debug),
-            process.stderr.fileno(): _LineLogger(LOGGER.warning),
-        }
-
-        line_map = {
-            process.stdout.fileno(): stdout_list,
-            process.stderr.fileno(): stderr_list,
-        }
-
-        file_descriptors = list(line_map.keys())
 
         try:
             if pipe_output:
+                logger_map = {
+                    process.stdout.fileno(): _LineLogger(LOGGER.debug),
+                    process.stderr.fileno(): _LineLogger(LOGGER.warning),
+                }
+
+                line_map = {
+                    process.stdout.fileno(): stdout_list,
+                    process.stderr.fileno(): stderr_list,
+                }
+
+                file_descriptors = list(line_map.keys())
                 while file_descriptors:
                     ret = select.select(file_descriptors, [], [])
 
