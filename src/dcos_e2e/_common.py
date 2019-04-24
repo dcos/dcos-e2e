@@ -89,7 +89,7 @@ def run_subprocess(
     import sarge
     import datetime
     import time
-    process = sarge.capture_both(args, env=env, stdout=sarge.Capture(), async_=True)
+    process = sarge.capture_both(args, cwd=cwd, stdout=sarge.Capture(), async_=True)
     while process.commands[-1].returncode is None:
         # print(process.commands)
         # print('here' + str(datetime.datetime.now()))
@@ -103,8 +103,10 @@ def run_subprocess(
             stderr_list.append(stderr_line)
             if log_output_live:
                 LOGGER.warning(stderr_line)
-        process.commands[0].poll()
+        process.commands[-1].poll()
         time.sleep(0.05)
+
+    process.commands[-1].wait()
 
     stdout = b''.join(stdout_list) if pipe_output else None
     stderr = b''.join(stderr_list) if pipe_output else None
