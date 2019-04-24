@@ -89,7 +89,7 @@ def run_subprocess(
     import sarge
     import datetime
     import time
-    process = sarge.capture_both(args, stdout=sarge.Capture(), async_=True)
+    process = sarge.capture_both(args, env=env, stdout=sarge.Capture(), async_=True)
     while process.commands[-1].returncode is None:
         # print(process.commands)
         # print('here' + str(datetime.datetime.now()))
