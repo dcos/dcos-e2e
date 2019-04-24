@@ -86,7 +86,6 @@ def run_subprocess(
     stdout_list = []  # type: List[bytes]
     stderr_list = []  # type: List[bytes]
 
-
     with Popen(
         args=args,
         cwd=cwd,
@@ -96,17 +95,24 @@ def run_subprocess(
     ) as process:
         try:
             if pipe_output:
-                fds_map = {
-                    process.stdout.fileno(): (_LineLogger(LOGGER.debug), stdout_list),
-                    process.stderr.fileno(): (_LineLogger(LOGGER.warning), stderr_list),
+                logger_map = {
+                    process.stdout.fileno(): _LineLogger(LOGGER.debug),
+                    process.stderr.fileno(): _LineLogger(LOGGER.warning),
                 }
-                fds = list(fds_map.keys())
+
+                line_map = {
+                    process.stdout.fileno(): stdout_list,
+                    process.stderr.fileno(): stderr_list,
+                }
+
+                fds = list(line_map.keys())
 
                 while fds:
                     ret = select.select(fds, [], [])
 
                     for fd in ret[0]:
-                        (logger, lines) = fds_map[fd]
+                        logger = logger_map[fd]
+                        lines = line_map[fd]
                         buff = os.read(fd, 8192)
                         if buff:
                             lines.append(buff)
