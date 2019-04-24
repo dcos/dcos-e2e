@@ -89,24 +89,29 @@ def run_subprocess(
     import sarge
     import datetime
     import time
-    process = sarge.capture_both(args, cwd=cwd, stdout=sarge.Capture(), async_=True)
-    while process.commands[-1].returncode is None:
-        # print(process.commands)
-        # print('here' + str(datetime.datetime.now()))
-        stdout_line = process.stdout.readline()
-        stderr_line = process.stderr.readline()
-        if stdout_line:
-            stdout_list.append(stdout_line)
-            if log_output_live:
-                LOGGER.debug(stdout_line)
-        if stderr_line:
-            stderr_list.append(stderr_line)
-            if log_output_live:
-                LOGGER.warning(stderr_line)
-        process.commands[-1].poll()
-        time.sleep(0.05)
+    if pipe_output:
+        process = sarge.capture_both(args, cwd=cwd, env=env, async_=True)
+        while process.commands[-1].returncode is None:
+            # print(process.commands)
+            # print('here' + str(datetime.datetime.now()))
+            stdout_line = process.stdout.read()
+            stderr_line = process.stderr.read()
+            if stdout_line:
+                stdout_list.append(stdout_line)
+                if log_output_live:
+                    LOGGER.debug(_safe_decode(stdout_line))
+            if stderr_line:
+                stderr_list.append(stderr_line)
+                if log_output_live:
+                    LOGGER.warning(_safe_decode(stderr_line))
+            for command in process.commands:
+                command.poll()
+            time.sleep(0.05)
+    else:
+        process = sarge.run(args, cwd=cwd, env=env, async_=True)
 
-    process.commands[-1].wait()
+    for command in process.commands:
+        command.wait()
 
     stdout = b''.join(stdout_list) if pipe_output else None
     stderr = b''.join(stderr_list) if pipe_output else None
