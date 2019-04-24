@@ -93,33 +93,33 @@ def run_subprocess(
         stderr=process_stderr,
         env=env,
     ) as process:
+        logger_map = {
+            process.stdout.fileno(): _LineLogger(LOGGER.debug),
+            process.stderr.fileno(): _LineLogger(LOGGER.warning),
+        }
+
+        line_map = {
+            process.stdout.fileno(): stdout_list,
+            process.stderr.fileno(): stderr_list,
+        }
+
+        file_descriptors = list(line_map.keys())
+
         try:
             if pipe_output:
-                logger_map = {
-                    process.stdout.fileno(): _LineLogger(LOGGER.debug),
-                    process.stderr.fileno(): _LineLogger(LOGGER.warning),
-                }
+                while file_descriptors:
+                    ret = select.select(file_descriptors, [], [])
 
-                line_map = {
-                    process.stdout.fileno(): stdout_list,
-                    process.stderr.fileno(): stderr_list,
-                }
-
-                fds = list(line_map.keys())
-
-                while fds:
-                    ret = select.select(fds, [], [])
-
-                    for fd in ret[0]:
-                        logger = logger_map[fd]
-                        lines = line_map[fd]
-                        buff = os.read(fd, 8192)
+                    for file_descriptor in ret[0]:
+                        logger = logger_map[file_descriptor]
+                        lines = line_map[file_descriptor]
+                        buff = os.read(file_descriptor, 8192)
                         if buff:
                             lines.append(buff)
                             if log_output_live:
                                 logger.log(buff)
                         else:
-                            fds.remove(fd)
+                            file_descriptors.remove(file_descriptor)
                             logger.flush()
 
             # stderr/stdout are not readable anymore which usually means
