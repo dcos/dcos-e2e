@@ -2,13 +2,9 @@
 Common utilities for end to end tests.
 """
 
-import datetime
 import logging
-import os
-import select
 import subprocess
-import time
-from subprocess import PIPE, STDOUT, CompletedProcess, Popen
+from subprocess import PIPE, CompletedProcess
 from typing import Dict, List, Optional, Union
 
 import sarge
@@ -30,6 +26,7 @@ def _safe_decode(output_bytes: bytes) -> str:
             encoding='ascii',
             errors='backslashreplace',
         )
+
 
 class _LineLogger:
     """
@@ -53,6 +50,7 @@ class _LineLogger:
         if len(self.buffer) > 0:
             self.logger(_safe_decode(self.buffer))
             self.buffer = b''
+
 
 def run_subprocess(
     args: List[str],
@@ -84,8 +82,8 @@ def run_subprocess(
         subprocess.CalledProcessError: See :py:func:`subprocess.run`.
         Exception: An exception was raised in getting the output from the call.
     """
-    process_stdout = PIPE if pipe_output else None
-    process_stderr = PIPE if pipe_output else None
+    PIPE if pipe_output else None
+    PIPE if pipe_output else None
 
     stdout_list = []  # type: List[bytes]
     stderr_list = []  # type: List[bytes]
