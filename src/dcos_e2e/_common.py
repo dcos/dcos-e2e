@@ -89,14 +89,13 @@ def run_subprocess(
     import sarge
     import datetime
     import time
-    process = sarge.capture_both(args, cwd=cwd, env=env, stdout=sarge.Capture(), async_=True)
+    process = sarge.capture_both(args, stdout=sarge.Capture(), async_=True)
     while process.commands[-1].returncode is None:
         # print(process.commands)
         # print('here' + str(datetime.datetime.now()))
         stdout_line = process.stdout.readline()
         stderr_line = process.stderr.readline()
         if stdout_line:
-            # import pdb; pdb.set_trace()
             stdout_list.append(stdout_line)
             if log_output_live:
                 LOGGER.debug(stdout_line)
