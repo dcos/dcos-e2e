@@ -6,6 +6,8 @@ import logging
 import subprocess
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
+import select
+import os
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,7 +28,11 @@ def _safe_decode(output_bytes: bytes) -> str:
         )
 
 class _LineLogger:
-    def __init__(self, logger):
+    """
+    XXX
+    """
+
+    def __init__(self, logger) -> None:
         self.buffer = b''
         self.logger = logger
 
@@ -39,7 +45,7 @@ class _LineLogger:
         for line in lines:
             self.logger(_safe_decode(line))
 
-    def flush(self):
+    def flush(self) -> None:
         if len(self.buffer) > 0:
             self.logger(_safe_decode(self.buffer))
             self.buffer = b''
@@ -77,11 +83,9 @@ def run_subprocess(
     process_stdout = PIPE if pipe_output else None
     process_stderr = PIPE if pipe_output else None
 
-    # It is hard to log output of both stdout and stderr live unless we
-    # combine them.
-    # See http://stackoverflow.com/a/18423003.
-    # if log_output_live:
-    #   process_stderr = STDOUT
+    stdout_list = []  # type: List[bytes]
+    stderr_list = []  # type: List[bytes]
+
 
     with Popen(
         args=args,
@@ -90,13 +94,7 @@ def run_subprocess(
         stderr=process_stderr,
         env=env,
     ) as process:
-        
-
-
         try:
-            stdout_list = []
-            stderr_list = []
-
             if pipe_output:
                 fds_map = {
                     process.stdout.fileno(): (_LineLogger(LOGGER.debug), stdout_list),
@@ -105,8 +103,6 @@ def run_subprocess(
                 fds = list(fds_map.keys())
 
                 while fds:
-                    import select
-                    import os
                     ret = select.select(fds, [], [])
 
                     for fd in ret[0]:
@@ -127,11 +123,8 @@ def run_subprocess(
             # exit status.
             process.wait()
 
-            if pipe_output:
-                stdout = b''.join(stdout_list)
-                stderr = b''.join(stderr_list)
-            else:
-                stdout = stderr = None
+            stdout = b''.join(stdout_list) if pipe_output else None
+            stderr = b''.join(stderr_list) if pipe_output else None
         except Exception:  # pragma: no cover
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
