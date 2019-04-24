@@ -86,68 +86,100 @@ def run_subprocess(
     stdout_list = []  # type: List[bytes]
     stderr_list = []  # type: List[bytes]
 
-    with Popen(
-        args=args,
-        cwd=cwd,
-        stdout=process_stdout,
-        stderr=process_stderr,
-        env=env,
-    ) as process:
-        logger_map = {
-            process.stdout.fileno(): _LineLogger(LOGGER.debug),
-            process.stderr.fileno(): _LineLogger(LOGGER.warning),
-        }
+    import sarge
+    import datetime
+    import time
+    process = sarge.capture_both(args, cwd=cwd, env=env, stdout=sarge.Capture(), async_=True)
+    while process.commands[-1].returncode is None:
+        # print(process.commands)
+        # print('here' + str(datetime.datetime.now()))
+        stdout_line = process.stdout.readline()
+        stderr_line = process.stderr.readline()
+        if stdout_line:
+            # import pdb; pdb.set_trace()
+            stdout_list.append(stdout_line)
+            if log_output_live:
+                LOGGER.debug(stdout_line)
+        if stderr_line:
+            stderr_list.append(stderr_line)
+            if log_output_live:
+                LOGGER.warning(stderr_line)
+        process.commands[0].poll()
+        time.sleep(0.05)
 
-        line_map = {
-            process.stdout.fileno(): stdout_list,
-            process.stderr.fileno(): stderr_list,
-        }
-
-        file_descriptors = list(line_map.keys())
-
-        try:
-            if pipe_output:
-                while file_descriptors:
-                    ret = select.select(file_descriptors, [], [])
-
-                    for file_descriptor in ret[0]:
-                        logger = logger_map[file_descriptor]
-                        lines = line_map[file_descriptor]
-                        line_buffer = os.read(file_descriptor, 8192)
-                        if line_buffer:
-                            lines.append(line_buffer)
-                            if log_output_live:
-                                logger.log(line_buffer)
-                        else:
-                            file_descriptors.remove(file_descriptor)
-                            logger.flush()
-
-            # stderr/stdout are not readable anymore which usually means
-            # that the child process has exited. However, the child
-            # process has not been wait()ed for yet, i.e. it has not yet
-            # been reaped. That is, its exit status is unknown. Read its
-            # exit status.
-            process.wait()
-
-            stdout = b''.join(stdout_list) if pipe_output else None
-            stderr = b''.join(stderr_list) if pipe_output else None
-        except Exception:  # pragma: no cover
-            # We clean up if there is an error while getting the output.
-            # This may not happen while running tests so we ignore coverage.
-
-            # Attempt to give the subprocess(es) a chance to terminate.
-            process.terminate()
-            try:
-                process.wait(1)
-            except subprocess.TimeoutExpired:
-                # If the process cannot terminate cleanly, we just kill it.
-                process.kill()
-            raise
-        if process.returncode != 0:
-            raise subprocess.CalledProcessError(
-                returncode=process.returncode,
-                cmd=args,
-                output=stdout,
-                stderr=stderr,
-            )
+    stdout = b''.join(stdout_list) if pipe_output else None
+    stderr = b''.join(stderr_list) if pipe_output else None
+    if process.returncode != 0:
+        raise subprocess.CalledProcessError(
+            returncode=process.returncode,
+            cmd=args,
+            output=stdout,
+            stderr=stderr,
+        )
     return CompletedProcess(args, process.returncode, stdout, stderr)
+
+    # with Popen(
+    #     args=args,
+    #     cwd=cwd,
+    #     stdout=process_stdout,
+    #     stderr=process_stderr,
+    #     env=env,
+    # ) as process:
+    #     logger_map = {
+    #         process.stdout.fileno(): _LineLogger(LOGGER.debug),
+    #         process.stderr.fileno(): _LineLogger(LOGGER.warning),
+    #     }
+    #
+    #     line_map = {
+    #         process.stdout.fileno(): stdout_list,
+    #         process.stderr.fileno(): stderr_list,
+    #     }
+    #
+    #     file_descriptors = list(line_map.keys())
+    #
+    #     try:
+    #         if pipe_output:
+    #             while file_descriptors:
+    #                 ret = select.select(file_descriptors, [], [])
+    #
+    #                 for file_descriptor in ret[0]:
+    #                     logger = logger_map[file_descriptor]
+    #                     lines = line_map[file_descriptor]
+    #                     line_buffer = os.read(file_descriptor, 8192)
+    #                     if line_buffer:
+    #                         lines.append(line_buffer)
+    #                         if log_output_live:
+    #                             logger.log(line_buffer)
+    #                     else:
+    #                         file_descriptors.remove(file_descriptor)
+    #                         logger.flush()
+    #
+    #         # stderr/stdout are not readable anymore which usually means
+    #         # that the child process has exited. However, the child
+    #         # process has not been wait()ed for yet, i.e. it has not yet
+    #         # been reaped. That is, its exit status is unknown. Read its
+    #         # exit status.
+    #         process.wait()
+    #
+    #         stdout = b''.join(stdout_list) if pipe_output else None
+    #         stderr = b''.join(stderr_list) if pipe_output else None
+    #     except Exception:  # pragma: no cover
+    #         # We clean up if there is an error while getting the output.
+    #         # This may not happen while running tests so we ignore coverage.
+    #
+    #         # Attempt to give the subprocess(es) a chance to terminate.
+    #         process.terminate()
+    #         try:
+    #             process.wait(1)
+    #         except subprocess.TimeoutExpired:
+    #             # If the process cannot terminate cleanly, we just kill it.
+    #             process.kill()
+    #         raise
+    #     if process.returncode != 0:
+    #         raise subprocess.CalledProcessError(
+    #             returncode=process.returncode,
+    #             cmd=args,
+    #             output=stdout,
+    #             stderr=stderr,
+    #         )
+    # return CompletedProcess(args, process.returncode, stdout, stderr)
