@@ -151,8 +151,3 @@ def run_subprocess(
                 stderr=stderr,
             )
     return CompletedProcess(args, process.returncode, stdout, stderr)
-
-# def stderr_to_lines(stderr: bytes) -> Generator[str]:
-#    return [_safe_decode(line.rstrip())
-#           for line in stderr.rstrip().split(b'\n')]
-
