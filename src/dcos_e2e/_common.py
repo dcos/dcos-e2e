@@ -2,12 +2,16 @@
 Common utilities for end to end tests.
 """
 
+import datetime
 import logging
+import os
+import select
 import subprocess
+import time
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen
 from typing import Dict, List, Optional, Union
-import select
-import os
+
+import sarge
 
 LOGGER = logging.getLogger(__name__)
 
@@ -88,32 +92,32 @@ def run_subprocess(
     stdout_logger = _LineLogger(LOGGER.debug)
     stderr_logger = _LineLogger(LOGGER.warning)
 
-    import sarge
-    import datetime
-    import time
+    def _read_output(process):
+        stdout_line = process.stdout.read()
+        stderr_line = process.stderr.read()
+        if stdout_line:
+            stdout_list.append(stdout_line)
+            if log_output_live:
+                stdout_logger.log(stdout_line)
+        if stderr_line:
+            stderr_list.append(stderr_line)
+            if log_output_live:
+                stderr_logger.log(stderr_line)
+
     if pipe_output:
         process = sarge.capture_both(args, cwd=cwd, env=env, async_=True)
         while all(command.returncode is None for command in process.commands):
-            # print(process.commands)
-            # print('here' + str(datetime.datetime.now()))
-            stdout_line = process.stdout.read()
-            stderr_line = process.stderr.read()
-            if stdout_line:
-                stdout_list.append(stdout_line)
-                if log_output_live:
-                    stdout_logger.log(stdout_line)
-            if stderr_line:
-                stderr_list.append(stderr_line)
-                if log_output_live:
-                    stderr_logger.log(stderr_line)
+            _read_output(process=process)
             for command in process.commands:
                 command.poll()
-            time.sleep(0.05)
+
+        _read_output(process=process)
         stdout_logger.flush()
         stderr_logger.flush()
     else:
         process = sarge.run(args, cwd=cwd, env=env, async_=True)
 
+    process.wait()
     for command in process.commands:
         command.wait()
 
