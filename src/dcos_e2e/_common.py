@@ -7,7 +7,7 @@ import os
 import select
 import subprocess
 from subprocess import PIPE, CompletedProcess, Popen
-from typing import Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,23 +33,23 @@ class _LineLogger:
     A logger which logs full lines.
     """
 
-    def __init__(self, logger) -> None:
-        self.buffer = b''
-        self.logger = logger
+    def __init__(self, logger: Callable[[str], None]) -> None:
+        self._buffer = b''
+        self._logger = logger
 
     def log(self, data: bytes) -> None:
-        self.buffer += data
+        self._buffer += data
 
-        lines = self.buffer.split(b'\n')
-        self.buffer = lines.pop()
+        lines = self._buffer.split(b'\n')
+        self._buffer = lines.pop()
 
         for line in lines:
-            self.logger(_safe_decode(line))
+            self._logger(_safe_decode(line))
 
     def flush(self) -> None:
-        if len(self.buffer) > 0:
-            self.logger(_safe_decode(self.buffer))
-            self.buffer = b''
+        if len(self._buffer) > 0:
+            self._logger(_safe_decode(self._buffer))
+            self._buffer = b''
 
 
 def run_subprocess(
