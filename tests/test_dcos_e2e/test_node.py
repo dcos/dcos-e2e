@@ -775,8 +775,6 @@ class TestOutput:
 
         assert result.stdout.strip().decode() == message
 
-        # Ignore the first message which is the command being logged by ``run``
-        # method call.
         command_log, first_log = caplog.records
         assert first_log.levelno == logging.DEBUG
 
@@ -834,8 +832,6 @@ class TestOutput:
         args = ['head', '-c', '100', '/bin/cat']
         dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
         # We do not test the output, but we at least test its length for now.
-        # Ignore the first message which is the command being logged by ``run``
-        # method call.
         [command_log, log] = caplog.records
         assert len(log.message) >= 100
 
