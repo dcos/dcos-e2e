@@ -168,6 +168,8 @@ class Cluster(ContextDecorator):
                     '/opt/mesosphere/bin/3dt',
                     '--diag',
                 ],
+                # We capture output because else we would see a lot of output
+                # in a normal cluster start up, for example during tests.
                 output=Output.CAPTURE,
                 shell=True,
             )
@@ -259,10 +261,14 @@ class Cluster(ContextDecorator):
             # Creating the "albert" user will error if the user already exists.
             # Therefore, we delete the user.
             # This command returns a 0 exit code even if the user is not found.
-            any_master.run(args=delete_user_args)
+            any_master.run(
+                args=delete_user_args,
+                output=Output.LOG_AND_CAPTURE,
+            )
             any_master.run(
                 args=create_user_args,
                 shell=True,
+                output=Output.LOG_AND_CAPTURE,
             )
             credentials = CI_CREDENTIALS
 
@@ -281,7 +287,10 @@ class Cluster(ContextDecorator):
             # Only the first user can log in with SSO, before granting others
             # access.
             # Therefore, we delete the user who was created to wait for DC/OS.
-            any_master.run(args=delete_user_args)
+            any_master.run(
+                args=delete_user_args,
+                output=Output.LOG_AND_CAPTURE,
+            )
 
         wait_for_dcos_oss_until_timeout()
 
