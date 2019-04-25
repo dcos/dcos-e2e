@@ -757,7 +757,7 @@ class TestOutput:
         message: str,
     ) -> None:
         """
-        TODO
+        When using ``Output.LOG_AND_CAPTURE``, stdout is logged and captured.
         """
         args = ['echo', message]
         result = dcos_node.run(
@@ -795,7 +795,7 @@ class TestOutput:
         message: str,
     ) -> None:
         """
-        TODO
+        When using ``Output.LOG_AND_CAPTURE``, stderr is logged and captured.
         """
         args = ['>&2', 'echo', message]
         result = dcos_node.run(
@@ -805,11 +805,10 @@ class TestOutput:
         )
 
         expected_command = (
-            'Running command `/bin/sh -c >&2 echo {message}` on a node `{node}`'
-            .format(
-                message=message,
-                node=str(dcos_node),
-            )
+            'Running command `/bin/sh -c echo {message}` on a node `{node}`'
+        ).format(
+            message=message,
+            node=str(dcos_node),
         )
 
         assert result.stderr.strip().decode() == message
