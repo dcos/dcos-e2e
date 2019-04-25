@@ -5,14 +5,9 @@ Common utilities for end to end tests.
 import logging
 import subprocess
 from subprocess import CompletedProcess
-from typing import Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import sarge
-import os
-import select
-import subprocess
-from subprocess import PIPE, CompletedProcess, Popen
-from typing import Callable, Dict, List, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,7 +50,6 @@ class _LineLogger:
         if self._buffer:
             self._logger(_safe_decode(self._buffer))
             self._buffer = b''
-
 
 
 def run_subprocess(
