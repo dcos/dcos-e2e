@@ -894,7 +894,8 @@ class TestOutput:
         output: Output,
     ) -> None:
         """
-        The ``stderr`` of a failed command is available in the CalledProcessError.
+        The ``stderr`` of a failed command is available in the raised
+        ``subprocess.CalledProcessError``.
         """
         args = ['rm', 'does_not_exist']
         with pytest.raises(subprocess.CalledProcessError) as excinfo:
