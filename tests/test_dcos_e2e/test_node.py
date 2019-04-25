@@ -803,7 +803,8 @@ class TestOutput:
         )
 
         expected_command = (
-            'Running command `/bin/sh -c echo {message}` on a node `{node}`'
+            'Running command `/bin/sh -c >&2 echo {message}` on a node '
+            '`{node}`'
         ).format(
             message=message,
             node=str(dcos_node),
