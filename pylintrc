@@ -78,6 +78,7 @@ disable=line-too-long,
         too-many-arguments,
         too-many-statements,
         too-many-instance-attributes,
+        too-many-nested-blocks,
         locally-disabled,
         # Let flake8 handle unused imports
         unused-import,

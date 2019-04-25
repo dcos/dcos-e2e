@@ -11,6 +11,8 @@ Next
 
 * The ``wait_for_dcos_oss`` and ``wait_for_dcos_ee`` methods no longer log output of node poststart check command run.
 * The ``Node.run`` method logs the command that is going to execute with ``debug`` level if ``output`` is configured to ``LOG_AND_CAPTURE``.
+* The ``Node.run`` method no longer logs ``stderr`` when ``Output.CAPTURE`` is used.
+* The ``Node.run`` method no longer merges ``stderr`` into ``stdout`` when ``Output.LOG_AND_CAPTURE`` is used.
 
 2019.04.23.0
 ------------

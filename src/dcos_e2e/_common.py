@@ -3,9 +3,11 @@ Common utilities for end to end tests.
 """
 
 import logging
+import os
+import select
 import subprocess
-from subprocess import PIPE, STDOUT, CompletedProcess, Popen
-from typing import Dict, List, Optional, Union
+from subprocess import PIPE, CompletedProcess, Popen
+from typing import Callable, Dict, List, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,6 +28,30 @@ def _safe_decode(output_bytes: bytes) -> str:
         )
 
 
+class _LineLogger:
+    """
+    A logger which logs full lines.
+    """
+
+    def __init__(self, logger: Callable[[str], None]) -> None:
+        self._buffer = b''
+        self._logger = logger
+
+    def log(self, data: bytes) -> None:
+        self._buffer += data
+
+        lines = self._buffer.split(b'\n')
+        self._buffer = lines.pop()
+
+        for line in lines:
+            self._logger(_safe_decode(line))
+
+    def flush(self) -> None:
+        if self._buffer:
+            self._logger(_safe_decode(self._buffer))
+            self._buffer = b''
+
+
 def run_subprocess(
     args: List[str],
     log_output_live: bool,
@@ -38,8 +64,7 @@ def run_subprocess(
 
     Args:
         args: See :py:func:`subprocess.run`.
-        log_output_live: If `True`, log output live. If `True`, stderr is
-            merged into stdout in the return value.
+        log_output_live: If `True`, log output live.
         cwd: See :py:func:`subprocess.run`.
         env: See :py:func:`subprocess.run`.
         pipe_output: If ``True``, pipes are opened to stdout and stderr.
@@ -59,11 +84,8 @@ def run_subprocess(
     process_stdout = PIPE if pipe_output else None
     process_stderr = PIPE if pipe_output else None
 
-    # It is hard to log output of both stdout and stderr live unless we
-    # combine them.
-    # See http://stackoverflow.com/a/18423003.
-    if log_output_live:
-        process_stderr = STDOUT
+    stdout_list = []  # type: List[bytes]
+    stderr_list = []  # type: List[bytes]
 
     with Popen(
         args=args,
@@ -72,22 +94,44 @@ def run_subprocess(
         stderr=process_stderr,
         env=env,
     ) as process:
+
         try:
-            if log_output_live:
-                stdout = b''
-                stderr = b''
-                for line in process.stdout:
-                    log_message = _safe_decode(line.rstrip())
-                    LOGGER.debug(log_message)
-                    stdout += line
-                # stderr/stdout are not readable anymore which usually means
-                # that the child process has exited. However, the child
-                # process has not been wait()ed for yet, i.e. it has not yet
-                # been reaped. That is, its exit status is unknown. Read its
-                # exit status.
-                process.wait()
-            else:
-                stdout, stderr = process.communicate()
+            if pipe_output:
+                logger_map = {
+                    process.stdout.fileno(): _LineLogger(LOGGER.debug),
+                    process.stderr.fileno(): _LineLogger(LOGGER.warning),
+                }
+
+                line_map = {
+                    process.stdout.fileno(): stdout_list,
+                    process.stderr.fileno(): stderr_list,
+                }
+
+                file_descriptors = list(line_map.keys())
+                while file_descriptors:
+                    ret = select.select(file_descriptors, [], [])
+
+                    for file_descriptor in ret[0]:
+                        logger = logger_map[file_descriptor]
+                        lines = line_map[file_descriptor]
+                        line_buffer = os.read(file_descriptor, 8192)
+                        if line_buffer:
+                            lines.append(line_buffer)
+                            if log_output_live:
+                                logger.log(line_buffer)
+                        else:
+                            file_descriptors.remove(file_descriptor)
+                            logger.flush()
+
+            # stderr/stdout are not readable anymore which usually means
+            # that the child process has exited. However, the child
+            # process has not been wait()ed for yet, i.e. it has not yet
+            # been reaped. That is, its exit status is unknown. Read its
+            # exit status.
+            process.wait()
+
+            stdout = b''.join(stdout_list) if pipe_output else None
+            stderr = b''.join(stderr_list) if pipe_output else None
         except Exception:  # pragma: no cover
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
@@ -100,15 +144,6 @@ def run_subprocess(
                 # If the process cannot terminate cleanly, we just kill it.
                 process.kill()
             raise
-        if stderr:
-            if process.returncode == 0:
-                log = LOGGER.warning
-                log(repr(args))
-            else:
-                log = LOGGER.error
-            for line in stderr.rstrip().split(b'\n'):
-                log_message = _safe_decode(line.rstrip())
-                log(log_message)
         if process.returncode != 0:
             raise subprocess.CalledProcessError(
                 returncode=process.returncode,
