@@ -4,6 +4,7 @@ Common utilities for end to end tests.
 
 import logging
 import subprocess
+import time
 from subprocess import CompletedProcess
 from typing import Callable, Dict, List, Optional, Union
 
@@ -104,6 +105,7 @@ def run_subprocess(
             _read_output(process=process)
             for command in process.commands:
                 command.poll()
+            time.sleep(0.05)
 
         _read_output(process=process)
         stdout_logger.flush()
