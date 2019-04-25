@@ -168,8 +168,7 @@ class Cluster(ContextDecorator):
                     '/opt/mesosphere/bin/3dt',
                     '--diag',
                 ],
-                # Keep in mind this must be run as privileged user.
-                output=Output.NO_CAPTURE,
+                output=Output.CAPTURE,
                 shell=True,
             )
 
