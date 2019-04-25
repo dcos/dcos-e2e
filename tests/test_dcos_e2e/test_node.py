@@ -757,7 +757,7 @@ class TestOutput:
         message: str,
     ) -> None:
         """
-        TODO
+        When using ``Output.LOG_AND_CAPTURE``, stdout is logged and captured.
         """
         args = ['echo', message]
         result = dcos_node.run(
@@ -767,17 +767,14 @@ class TestOutput:
         )
 
         expected_command = (
-            'Running command `/bin/sh -c echo {message}` on a node `{node}`'.
-            format(
-                message=message,
-                node=str(dcos_node),
-            )
+            'Running command `/bin/sh -c echo {message}` on a node `{node}`'
+        ).format(
+            message=message,
+            node=str(dcos_node),
         )
 
         assert result.stdout.strip().decode() == message
 
-        # Ignore the first message which is the command being logged by ``run``
-        # method call.
         command_log, first_log = caplog.records
         assert first_log.levelno == logging.DEBUG
 
@@ -796,7 +793,7 @@ class TestOutput:
         message: str,
     ) -> None:
         """
-        TODO
+        When using ``Output.LOG_AND_CAPTURE``, stderr is logged and captured.
         """
         args = ['>&2', 'echo', message]
         result = dcos_node.run(
@@ -806,7 +803,8 @@ class TestOutput:
         )
 
         expected_command = (
-            'Running command `/bin/sh -c >&2 echo {message}` on a node `{node}`'
+            'Running command `/bin/sh -c >&2 echo {message}` on a node '
+            '`{node}`'
         ).format(
             message=message,
             node=str(dcos_node),
@@ -835,8 +833,6 @@ class TestOutput:
         args = ['head', '-c', '100', '/bin/cat']
         dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
         # We do not test the output, but we at least test its length for now.
-        # Ignore the first message which is the command being logged by ``run``
-        # method call.
         [command_log, log] = caplog.records
         assert len(log.message) >= 100
 
@@ -888,14 +884,10 @@ class TestOutput:
         'output',
         [Output.LOG_AND_CAPTURE, Output.CAPTURE],
     )
-    def test_errors(
-        self,
-        caplog: LogCaptureFixture,
-        dcos_node: Node,
-        output: Output,
-    ) -> None:
+    def test_errors(self, dcos_node: Node, output: Output) -> None:
         """
-        The ``stderr`` of a failed command is available in the CalledProcessError.
+        The ``stderr`` of a failed command is available in the raised
+        ``subprocess.CalledProcessError``.
         """
         args = ['rm', 'does_not_exist']
         with pytest.raises(subprocess.CalledProcessError) as excinfo:
