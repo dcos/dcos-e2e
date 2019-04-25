@@ -30,7 +30,7 @@ def _safe_decode(output_bytes: bytes) -> str:
 
 class _LineLogger:
     """
-    XXX
+    A logger which logs full lines.
     """
 
     def __init__(self, logger) -> None:
@@ -64,8 +64,7 @@ def run_subprocess(
 
     Args:
         args: See :py:func:`subprocess.run`.
-        log_output_live: If `True`, log output live. If `True`, stderr is
-            merged into stdout in the return value.
+        log_output_live: If `True`, log output live.
         cwd: See :py:func:`subprocess.run`.
         env: See :py:func:`subprocess.run`.
         pipe_output: If ``True``, pipes are opened to stdout and stderr.
