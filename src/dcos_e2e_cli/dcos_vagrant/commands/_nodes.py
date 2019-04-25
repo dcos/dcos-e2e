@@ -20,8 +20,8 @@ def node_option(command: Callable[..., None]) -> Callable[..., None]:
         help=(
             'A reference to a particular node to run the command on. '
             'This can be one of: '
-            'The node\'s IP address, '
-            'the node\'s VM name, '
+            "The node's IP address, "
+            "the node's VM name, "
             'a reference in the format "<role>_<number>". '
             'These details be seen with ``minidcos vagrant inspect``.'
         ),

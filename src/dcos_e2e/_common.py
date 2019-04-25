@@ -8,6 +8,11 @@ from subprocess import CompletedProcess
 from typing import Dict, List, Optional, Union
 
 import sarge
+import os
+import select
+import subprocess
+from subprocess import PIPE, CompletedProcess, Popen
+from typing import Callable, Dict, List, Optional, Union
 
 LOGGER = logging.getLogger(__name__)
 
@@ -30,26 +35,27 @@ def _safe_decode(output_bytes: bytes) -> str:
 
 class _LineLogger:
     """
-    XXX
+    A logger which logs full lines.
     """
 
-    def __init__(self, logger) -> None:
-        self.buffer = b''
-        self.logger = logger
+    def __init__(self, logger: Callable[[str], None]) -> None:
+        self._buffer = b''
+        self._logger = logger
 
     def log(self, data: bytes) -> None:
-        self.buffer += data
+        self._buffer += data
 
-        lines = self.buffer.split(b'\n')
-        self.buffer = lines.pop()
+        lines = self._buffer.split(b'\n')
+        self._buffer = lines.pop()
 
         for line in lines:
-            self.logger(_safe_decode(line))
+            self._logger(_safe_decode(line))
 
     def flush(self) -> None:
-        if len(self.buffer) > 0:
-            self.logger(_safe_decode(self.buffer))
-            self.buffer = b''
+        if self._buffer:
+            self._logger(_safe_decode(self._buffer))
+            self._buffer = b''
+
 
 
 def run_subprocess(
@@ -86,9 +92,9 @@ def run_subprocess(
     stdout_logger = _LineLogger(LOGGER.debug)
     stderr_logger = _LineLogger(LOGGER.warning)
 
-    def _read_output(process):
-        stdout_line = process.stdout.read()
-        stderr_line = process.stderr.read()
+    def _read_output(process: sarge.Pipeline) -> None:
+        stdout_line = process.stdout.read(block=False)
+        stderr_line = process.stderr.read(block=False)
         if stdout_line:
             stdout_list.append(stdout_line)
             if log_output_live:

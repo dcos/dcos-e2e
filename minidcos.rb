@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.04.23.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.04.25.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -128,8 +128,8 @@ class Minidcos < Formula
   end
 
   resource "docker" do
-    url "https://files.pythonhosted.org/packages/55/ca/d8ab1ffe1e08641f4593ea971be15a632392fe78dc6f30d22d250f2d775e/docker-3.7.1.tar.gz"
-    sha256 "d2c14d2cc7d54818897cc6f3cf73923c4e7dfe12f08f7bddda9dbea7fa82ea36"
+    url "https://files.pythonhosted.org/packages/4b/79/4206ea568bd0d134cd7cb6022dd60bea06ffdb8b5564288ca428fd3aeb0d/docker-3.7.2.tar.gz"
+    sha256 "c456ded5420af5860441219ff8e51cdec531d65f4a9e948ccd4133e063b72f50"
   end
 
   resource "docker-pycreds" do
@@ -178,8 +178,8 @@ class Minidcos < Formula
   end
 
   resource "httplib2" do
-    url "https://files.pythonhosted.org/packages/75/d0/f213003c9deec99fb4f46e54580b93a3b121c487d9d6d888fc12267eb2a2/httplib2-0.12.1.tar.gz"
-    sha256 "4ba6b8fd77d0038769bf3c33c9a96a6f752bc4cdf739701fdcaf210121f399d4"
+    url "https://files.pythonhosted.org/packages/67/33/29779c5aaeac796679a37bf798b3c2adbfaae7dbf13e966b0ab9c3aa06c0/httplib2-0.12.3.tar.gz"
+    sha256 "a18121c7c72a56689efbf1aef990139ad940fee1e64c6f2458831736cd593600"
   end
 
   resource "idna" do
@@ -263,8 +263,8 @@ class Minidcos < Formula
   end
 
   resource "pyasn1-modules" do
-    url "https://files.pythonhosted.org/packages/bd/a5/ef7bf693e8a8f015386c9167483199f54f8a8ec01d1c737e05524f16e792/pyasn1-modules-0.2.4.tar.gz"
-    sha256 "a52090e8c5841ebbf08ae455146792d9ef3e8445b21055d3a3b7ed9c712b7c7c"
+    url "https://files.pythonhosted.org/packages/ec/0b/69620cb04a016e4a1e8e352e8a42717862129b574b3479adb2358a1f12f7/pyasn1-modules-0.2.5.tar.gz"
+    sha256 "ef721f68f7951fab9b0404d42590f479e30d9005daccb1699b0a51bb4177db96"
   end
 
   resource "pycparser" do

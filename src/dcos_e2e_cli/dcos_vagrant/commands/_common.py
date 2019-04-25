@@ -121,7 +121,7 @@ def existing_cluster_ids() -> Set[str]:
     """
     Return the IDs of existing clusters.
     """
-    return set(vm_names_by_cluster().keys())
+    return set(vm_names_by_cluster(running_only=True).keys())
 
 
 class ClusterVMs(ClusterRepresentation):
@@ -202,7 +202,7 @@ class ClusterVMs(ClusterRepresentation):
         """
         Return VirtualBox and Vagrant names of VMs in this cluster.
         """
-        return vm_names_by_cluster()[self._cluster_id]
+        return vm_names_by_cluster(running_only=True)[self._cluster_id]
 
     @property
     def cluster(self) -> Cluster:
@@ -282,9 +282,9 @@ class ClusterVMs(ClusterRepresentation):
         ]
 
         # We ignore files such as .DS_Store files.
-        [vagrant_root] = [
-            item for item in vagrant_root_parent.iterdir() if item.is_dir()
-        ]
+        [
+            vagrant_root,
+        ] = [item for item in vagrant_root_parent.iterdir() if item.is_dir()]
 
         # We import Vagrant here instead of at the top of the file because, if
         # the Vagrant executable is not found, a warning is logged.
