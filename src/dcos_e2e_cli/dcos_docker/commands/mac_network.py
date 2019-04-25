@@ -251,7 +251,7 @@ def destroy_mac_network() -> None:
     """
     _destroy_mac_network_containers()
     message = (
-        'The containers used to allow access to Docker for Mac\'s internal '
+        "The containers used to allow access to Docker for Mac's internal "
         'networks have been removed.'
         '\n'
         '\n'

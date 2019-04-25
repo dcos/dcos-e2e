@@ -273,9 +273,7 @@ def _check_memory() -> CheckLevels:
         'a lot of memory.\n'
         'A four node cluster seems to work well on a machine with 9 GB '
         'of memory available to Docker.'
-    ).format(
-        memory=docker_memory / 1024 / 1024 / 1024,
-    )
+    ).format(memory=docker_memory / 1024 / 1024 / 1024)
     mac_message = (
         '\n'
         'To dedicate more memory to Docker for Mac, go to '
@@ -453,7 +451,7 @@ def _check_can_mount_in_docker() -> CheckLevels:
                 'Some functionality may be affected by this, for example '
                 'extracting the DC/OS installer on a node.'
                 '\n'
-                'This issue is likely because the host\'s version of systemd '
+                "This issue is likely because the host's version of systemd "
                 'is greater than version 232, which causes the following '
                 'known issue: '
                 'https://github.com/opencontainers/runc/issues/1175.'
