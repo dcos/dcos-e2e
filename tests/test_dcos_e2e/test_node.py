@@ -887,12 +887,7 @@ class TestOutput:
         'output',
         [Output.LOG_AND_CAPTURE, Output.CAPTURE],
     )
-    def test_errors(
-        self,
-        caplog: LogCaptureFixture,
-        dcos_node: Node,
-        output: Output,
-    ) -> None:
+    def test_errors(self, dcos_node: Node, output: Output) -> None:
         """
         The ``stderr`` of a failed command is available in the raised
         ``subprocess.CalledProcessError``.

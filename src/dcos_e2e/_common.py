@@ -47,7 +47,7 @@ class _LineLogger:
             self._logger(_safe_decode(line))
 
     def flush(self) -> None:
-        if len(self._buffer) > 0:
+        if self._buffer:
             self._logger(_safe_decode(self._buffer))
             self._buffer = b''
 
