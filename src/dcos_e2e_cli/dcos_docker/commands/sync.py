@@ -26,7 +26,7 @@ from ._options import node_transport_option
 @verbosity_option
 def sync_code(
     cluster_id: str,
-    dcos_checkout_dir: str,
+    dcos_checkout_dir: Path,
     transport: Transport,
 ) -> None:
     """
@@ -43,6 +43,6 @@ def sync_code(
     cluster = cluster_containers.cluster
     sync_code_to_masters(
         cluster=cluster,
-        dcos_checkout_dir=Path(dcos_checkout_dir),
+        dcos_checkout_dir=dcos_checkout_dir,
         sudo=False,
     )
