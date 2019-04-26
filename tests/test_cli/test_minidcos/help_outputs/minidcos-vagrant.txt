@@ -1,0 +1,23 @@
+Usage: minidcos vagrant [OPTIONS] COMMAND [ARGS]...
+
+  Manage DC/OS clusters on Vagrant.
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  clean               Remove VMs created by this tool.
+  create              Create a DC/OS cluster.
+  destroy             Destroy a cluster.
+  destroy-list        Destroy clusters.
+  doctor              Diagnose common issues which stop this CLI from working...
+  download-installer  Download a DC/OS Open Source installer.
+  inspect             Show cluster details.
+  install             Install DC/OS on a provisioned Vagrant cluster.
+  list                List all clusters.
+  provision           Provision a Vagrant cluster for installing DC/OS.
+  run                 Run an arbitrary command on a node or multiple nodes.
+  send-file           Send a file to a node or multiple nodes.
+  sync                Sync files from a DC/OS checkout to master nodes.
+  wait                Wait for DC/OS to start.
+  web                 Open the browser at the web UI.

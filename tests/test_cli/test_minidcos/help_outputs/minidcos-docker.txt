@@ -1,0 +1,29 @@
+Usage: minidcos docker [OPTIONS] COMMAND [ARGS]...
+
+  Manage DC/OS clusters on Docker.
+
+Options:
+  -h, --help  Show this message and exit.
+
+Commands:
+  clean                     Remove containers, volumes and networks created
+                            by...
+  create                    Create a DC/OS cluster.
+  create-loopback-sidecar   Create a loopback sidecar.
+  destroy                   Destroy a cluster.
+  destroy-list              Destroy clusters.
+  destroy-loopback-sidecar  Destroy a loopback sidecar.
+  destroy-mac-network       Destroy containers created by "minidcos docker...
+  doctor                    Diagnose common issues which stop this CLI from...
+  download-installer        Download a DC/OS Open Source installer.
+  inspect                   Show cluster details.
+  install                   Install DC/OS on the given Docker cluster.
+  list                      List all clusters.
+  list-loopback-sidecars    List loopback sidecars.
+  provision                 Provision Docker containers to install a DC/OS...
+  run                       Run an arbitrary command on a node or multiple...
+  send-file                 Send a file to a node or multiple nodes.
+  setup-mac-network         Set up a network to connect to nodes on macOS.
+  sync                      Sync files from a DC/OS checkout to master nodes.
+  wait                      Wait for DC/OS to start.
+  web                       Open the browser at the web UI.
