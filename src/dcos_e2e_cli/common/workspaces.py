@@ -8,8 +8,7 @@ from pathlib import Path
 from typing import Callable, Optional, Union
 
 import click
-
-from .click_types import PathPath
+import click_pathlib
 
 
 def get_workspace_dir(
@@ -45,7 +44,7 @@ def workspace_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     )
     function = click.option(
         '--workspace-dir',
-        type=PathPath(
+        type=click_pathlib.Path(
             exists=True,
             dir_okay=True,
             file_okay=False,

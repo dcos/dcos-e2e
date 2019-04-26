@@ -23,7 +23,7 @@ from ._common import ClusterVMs, existing_cluster_ids
 @verbosity_option
 def sync_code(
     cluster_id: str,
-    dcos_checkout_dir: str,
+    dcos_checkout_dir: Path,
 ) -> None:
     """
     Sync files from a DC/OS checkout to master nodes.
@@ -36,6 +36,6 @@ def sync_code(
     cluster = cluster_vms.cluster
     sync_code_to_masters(
         cluster=cluster,
-        dcos_checkout_dir=Path(dcos_checkout_dir),
+        dcos_checkout_dir=dcos_checkout_dir,
         sudo=True,
     )
