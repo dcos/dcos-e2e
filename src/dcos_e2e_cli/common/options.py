@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import click
+import click_pathlib
 import yaml
 
-from .click_types import PathPath
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 from .validators import validate_path_pair
 
@@ -196,7 +196,7 @@ def extra_config_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--extra-config',
-        type=PathPath(
+        type=click_pathlib.Path(
             exists=True,
             file_okay=True,
             dir_okay=False,
@@ -238,7 +238,7 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--license-key',
-        type=PathPath(
+        type=click_pathlib.Path(
             exists=True,
             file_okay=True,
             dir_okay=False,
@@ -332,7 +332,7 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--sync-dir',
-        type=PathPath(
+        type=click_pathlib.Path(
             exists=True,
             dir_okay=True,
             file_okay=False,
@@ -459,7 +459,7 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     function = click.option(
         '--genconf-dir',
-        type=PathPath(
+        type=click_pathlib.Path(
             exists=True,
             dir_okay=True,
             file_okay=False,
