@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* ``minidcos docker clean`` will no longer clean up containers which are started from now on by the tooling to create a custom macOS network.
+
 2019.04.25.0
 ------------
 
