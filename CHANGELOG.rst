@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Remove use of ``select`` which is not supported on Windows.
+
 2019.04.25.0
 ------------
 

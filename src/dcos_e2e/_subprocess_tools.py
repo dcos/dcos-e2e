@@ -99,23 +99,34 @@ def run_subprocess(
             if log_output_live:
                 stderr_logger.log(stderr_line)
 
-    if pipe_output:
-        process = sarge.capture_both(args, cwd=cwd, env=env, async_=True)
-        while all(command.returncode is None for command in process.commands):
+    try:
+        if pipe_output:
+            process = sarge.capture_both(args, cwd=cwd, env=env, async_=True)
+            while all(command.returncode is None for command in process.commands):
+                _read_output(process=process)
+                process.poll_all()
+                time.sleep(0.05)
+
             _read_output(process=process)
-            for command in process.commands:
-                command.poll()
-            time.sleep(0.05)
+        else:
+            process = sarge.run(args, cwd=cwd, env=env, async_=True)
 
-        _read_output(process=process)
-    else:
-        process = sarge.run(args, cwd=cwd, env=env, async_=True)
+        stdout_logger.flush()
+        stderr_logger.flush()
+        process.wait()
+    except Exception:  # pragma: no cover
+        for popen_process in process.processes:
+            # We clean up if there is an error while getting the output.
+            # This may not happen while running tests so we ignore coverage.
 
-    stdout_logger.flush()
-    stderr_logger.flush()
-    process.wait()
-    for command in process.commands:
-        command.wait()
+            # Attempt to give the subprocess(es) a chance to terminate.
+            popen_process.terminate()
+            try:
+                popen_process.wait(1)
+            except subprocess.TimeoutExpired:
+                # If the process cannot terminate cleanly, we just kill it.
+                popen_process.kill()
+            raise
 
     stdout = b''.join(stdout_list) if pipe_output else None
     stderr = b''.join(stderr_list) if pipe_output else None
