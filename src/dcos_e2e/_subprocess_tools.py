@@ -1,5 +1,5 @@
 """
-Common utilities for end to end tests.
+Utilities for running subprocesses.
 """
 
 import logging
