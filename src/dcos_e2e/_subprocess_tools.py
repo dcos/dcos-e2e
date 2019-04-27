@@ -3,11 +3,12 @@ Utilities for running subprocesses.
 """
 
 import logging
-import os
-import select
 import subprocess
-from subprocess import PIPE, CompletedProcess, Popen
+import time
+from subprocess import CompletedProcess
 from typing import Callable, Dict, List, Optional, Union
+
+import sarge
 
 LOGGER = logging.getLogger(__name__)
 
@@ -81,74 +82,66 @@ def run_subprocess(
         subprocess.CalledProcessError: See :py:func:`subprocess.run`.
         Exception: An exception was raised in getting the output from the call.
     """
-    process_stdout = PIPE if pipe_output else None
-    process_stderr = PIPE if pipe_output else None
-
     stdout_list = []  # type: List[bytes]
     stderr_list = []  # type: List[bytes]
+    stdout_logger = _LineLogger(LOGGER.debug)
+    stderr_logger = _LineLogger(LOGGER.warning)
 
-    with Popen(
-        args=args,
-        cwd=cwd,
-        stdout=process_stdout,
-        stderr=process_stderr,
-        env=env,
-    ) as process:
+    def _read_output(process: sarge.Pipeline) -> None:
+        stdout_line = process.stdout.read(block=False)
+        stderr_line = process.stderr.read(block=False)
+        if stdout_line:
+            stdout_list.append(stdout_line)
+            if log_output_live:
+                stdout_logger.log(stdout_line)
+        if stderr_line:
+            stderr_list.append(stderr_line)
+            if log_output_live:
+                stderr_logger.log(stderr_line)
 
-        try:
-            if pipe_output:
-                logger_map = {
-                    process.stdout.fileno(): _LineLogger(LOGGER.debug),
-                    process.stderr.fileno(): _LineLogger(LOGGER.warning),
-                }
+    try:
+        if pipe_output:
+            process = sarge.capture_both(args, cwd=cwd, env=env, async_=True)
+            while all(
+                command.returncode is None for command in process.commands
+            ):
+                _read_output(process=process)
+                process.poll_all()
+                time.sleep(0.05)
 
-                line_map = {
-                    process.stdout.fileno(): stdout_list,
-                    process.stderr.fileno(): stderr_list,
-                }
+            _read_output(process=process)
+        else:
+            process = sarge.run(args, cwd=cwd, env=env, async_=True)
 
-                file_descriptors = list(line_map.keys())
-                while file_descriptors:
-                    ret = select.select(file_descriptors, [], [])
-
-                    for file_descriptor in ret[0]:
-                        logger = logger_map[file_descriptor]
-                        lines = line_map[file_descriptor]
-                        line_buffer = os.read(file_descriptor, 8192)
-                        if line_buffer:
-                            lines.append(line_buffer)
-                            if log_output_live:
-                                logger.log(line_buffer)
-                        else:
-                            file_descriptors.remove(file_descriptor)
-                            logger.flush()
-
-            # stderr/stdout are not readable anymore which usually means
-            # that the child process has exited. However, the child
-            # process has not been wait()ed for yet, i.e. it has not yet
-            # been reaped. That is, its exit status is unknown. Read its
-            # exit status.
-            process.wait()
-
-            stdout = b''.join(stdout_list) if pipe_output else None
-            stderr = b''.join(stderr_list) if pipe_output else None
-        except Exception:  # pragma: no cover
+        stdout_logger.flush()
+        stderr_logger.flush()
+        # stderr/stdout are not readable anymore which usually means
+        # that the child process has exited. However, the child
+        # process has not been wait()ed for yet, i.e. it has not yet
+        # been reaped. That is, its exit status is unknown. Read its
+        # exit status
+        process.wait()
+    except Exception:  # pragma: no cover pylint: disable=broad-except
+        for popen_process in process.processes:
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
 
             # Attempt to give the subprocess(es) a chance to terminate.
-            process.terminate()
+            popen_process.terminate()
             try:
-                process.wait(1)
+                popen_process.wait(1)
             except subprocess.TimeoutExpired:
                 # If the process cannot terminate cleanly, we just kill it.
-                process.kill()
+                popen_process.kill()
             raise
-        if process.returncode != 0:
-            raise subprocess.CalledProcessError(
-                returncode=process.returncode,
-                cmd=args,
-                output=stdout,
-                stderr=stderr,
-            )
+
+    stdout = b''.join(stdout_list) if pipe_output else None
+    stderr = b''.join(stderr_list) if pipe_output else None
+    if process.returncode != 0:
+        raise subprocess.CalledProcessError(
+            returncode=process.returncode,
+            cmd=args,
+            output=stdout,
+            stderr=stderr,
+        )
     return CompletedProcess(args, process.returncode, stdout, stderr)
