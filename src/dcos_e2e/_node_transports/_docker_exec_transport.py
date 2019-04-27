@@ -11,8 +11,8 @@ from typing import Any, Dict, List
 import docker
 from docker.models.containers import Container
 
-from dcos_e2e._common import run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
+from dcos_e2e._subprocess_tools import run_subprocess
 
 
 def _compose_docker_command(
