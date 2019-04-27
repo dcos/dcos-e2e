@@ -23,9 +23,12 @@ def _compose_docker_command(
     public_ip_address: IPv4Address,
 ) -> List[str]:
     """
-    Return a command to run ``args`` on a node using ``docker exec``. We do not
-    use ``docker-py`` because ``stdout`` and ``stderr`` cannot be separated in
-    ``docker-py`` https://github.com/docker/docker-py/issues/704.
+    Return a command to run ``args`` on a node using ``docker exec``.
+
+    We use this rather than using ``docker`` via Python for a few reasons.
+    In particular, we would need something like ``dockerpty`` in order to
+    support interaction.
+    We also would need to match the ``Popen`` interface for asynchronous use.
 
     Args:
         args: The command to run on a node.
@@ -40,7 +43,7 @@ def _compose_docker_command(
     Returns:
         The full ``docker exec`` command to be run.
     """
-    container = _get_container_from_ip_address(public_ip_address)
+    container = _container_from_ip_address(ip_address=public_ip_address)
 
     docker_exec_args = [
         'docker',
@@ -178,7 +181,7 @@ class DockerExecTransport(NodeTransport):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
         """
-        container = _get_container_from_ip_address(public_ip_address)
+        container = _container_from_ip_address(ip_address=public_ip_address)
         args = [
             'docker',
             'cp',
@@ -192,7 +195,7 @@ class DockerExecTransport(NodeTransport):
         )
 
 
-def _get_container_from_ip_address(ip_address: IPv4Address) -> Container:
+def _container_from_ip_address(ip_address: IPv4Address) -> Container:
     """
     Return the ``Container`` with the given ``ip_address``.
     """
