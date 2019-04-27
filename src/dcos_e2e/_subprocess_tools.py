@@ -108,11 +108,11 @@ def run_subprocess(
             time.sleep(0.05)
 
         _read_output(process=process)
-        stdout_logger.flush()
-        stderr_logger.flush()
     else:
         process = sarge.run(args, cwd=cwd, env=env, async_=True)
 
+    stdout_logger.flush()
+    stderr_logger.flush()
     process.wait()
     for command in process.commands:
         command.wait()
