@@ -102,7 +102,9 @@ def run_subprocess(
     try:
         if pipe_output:
             process = sarge.capture_both(args, cwd=cwd, env=env, async_=True)
-            while all(command.returncode is None for command in process.commands):
+            while all(
+                command.returncode is None for command in process.commands
+            ):
                 _read_output(process=process)
                 process.poll_all()
                 time.sleep(0.05)
@@ -113,8 +115,13 @@ def run_subprocess(
 
         stdout_logger.flush()
         stderr_logger.flush()
+        # stderr/stdout are not readable anymore which usually means
+        # that the child process has exited. However, the child
+        # process has not been wait()ed for yet, i.e. it has not yet
+        # been reaped. That is, its exit status is unknown. Read its
+        # exit status
         process.wait()
-    except Exception:  # pragma: no cover
+    except Exception:  # pragma: no cover pylint: disable=broad-except
         for popen_process in process.processes:
             # We clean up if there is an error while getting the output.
             # This may not happen while running tests so we ignore coverage.
