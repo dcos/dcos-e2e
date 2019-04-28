@@ -167,6 +167,7 @@ def create(
         master_ec2_instance_tags=master_tags,
         agent_ec2_instance_tags=agent_tags,
         public_agent_ec2_instance_tags=public_agent_tags,
+        aws_cloudformation_stack_name=cluster_id,
     )
 
     cluster = create_cluster(

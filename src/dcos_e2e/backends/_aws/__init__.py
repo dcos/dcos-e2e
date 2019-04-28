@@ -280,11 +280,11 @@ class AWSCluster(ClusterManager):
 
         # Create the AWS stack from the DcosCloudformationLauncher.
         # Update ``cluster_info`` with the AWS SSH key information.
-        self.cluster_info = self.launcher.create()
+        cluster_create_info = self.launcher.create()
 
         # Store the generated AWS SSH key to the file system.
         self._ssh_key_path = self._path / 'id_rsa'
-        private_key = self.cluster_info['ssh_private_key']
+        private_key = cluster_create_info['ssh_private_key']
         self._ssh_key_path.write_bytes(private_key.encode())
         self._ssh_key_path.chmod(mode=stat.S_IRUSR)
 
@@ -334,6 +334,7 @@ class AWSCluster(ClusterManager):
                 } for key, value in node_tags.items()
             ]
 
+            import pdb; pdb.set_trace()
             ec2.create_tags(Resources=instance_ids, Tags=ec2_tags)
 
     def install_dcos_from_url(
