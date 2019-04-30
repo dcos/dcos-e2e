@@ -378,6 +378,7 @@ def _set_logging(
     # Disable debug output from `docker` and `urllib3` libraries
     logging.getLogger('urllib3.connectionpool').setLevel(logging.WARN)
     logging.getLogger('docker').setLevel(logging.WARN)
+    logging.getLogger('sarge').setLevel(logging.WARN)
 
     # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(verbosity_level or 0)])
