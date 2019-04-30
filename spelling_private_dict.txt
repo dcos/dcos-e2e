@@ -127,6 +127,7 @@ submodules
 subnet
 subpackages
 subprocess
+subprocesses
 sudo
 symlink
 sys
