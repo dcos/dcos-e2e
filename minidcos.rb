@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.04.29.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.04.30.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -108,8 +108,8 @@ class Minidcos < Formula
   end
 
   resource "click-pathlib" do
-    url "https://files.pythonhosted.org/packages/df/7c/641fe61c754129f982f4d87bd133cccd52bf233a66783c5c5b422220248e/click%20pathlib-2019.4.26.2.tar.gz"
-    sha256 "12a56d4167a1ad95b0a9810780defda7f12c8eecb7882db467ea45f0b14839fa"
+    url "https://files.pythonhosted.org/packages/c8/8c/cafb4eef88aee325a9e12f9f51be3a203629cc907ab27ac283a52f9eab44/click-pathlib-2019.4.30.2.tar.gz"
+    sha256 "a7e82cee61d103f46f588fc9c0421617fe760dc081c2a62f6f8822b1e4a9d8b9"
   end
 
   resource "colorama" do
