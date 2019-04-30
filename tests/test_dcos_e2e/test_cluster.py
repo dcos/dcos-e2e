@@ -257,7 +257,7 @@ class TestInstallDcosFromPathLogging:
         log_records: List[logging.LogRecord],
     ) -> bool:
         """
-        Return whether a particular error is logged as a DEBUG message.
+        Return whether a particular error is logged as a WARNING message.
 
         This is prone to being broken as it checks for a string in the DC/OS
         repository.
@@ -266,12 +266,12 @@ class TestInstallDcosFromPathLogging:
             log_records: Messages logged from the logger.
 
         Returns:
-            Whether a particular error is logged as a DEBUG message.
+            Whether a particular error is logged as a WARNING message.
         """
         message = 'Must have 1, 3, 5, 7, or 9 masters'
         debug_messages = set(
             filter(
-                lambda record: record.levelno == logging.DEBUG,
+                lambda record: record.levelno == logging.WARNING,
                 log_records,
             ),
         )
