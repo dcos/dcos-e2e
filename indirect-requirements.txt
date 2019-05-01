@@ -31,7 +31,7 @@ jeepney==0.3.1
 # Homebrew installation uses "--no-binary".
 # To avoid https://github.com/pypa/pip/issues/6222 we use "--no-use-pep-517".
 # However, using this is not possible with some packages which then # show
-errors similar to:
+# errors similar to:
 #
 # > Disabling PEP 517 processing is invalid: project specifies a build backend
 # > of setuptools.build_meta in pyproject.toml
