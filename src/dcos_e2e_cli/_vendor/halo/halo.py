@@ -11,7 +11,7 @@ import threading
 import time
 
 import cursor
-from log_symbols.symbols import LogSymbols
+from ..log_symbols.symbols import LogSymbols
 from spinners.spinners import Spinners
 
 from ..halo._utils import (colored_frame, decode_utf_8_text, get_environment,
