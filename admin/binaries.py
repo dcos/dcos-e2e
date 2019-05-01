@@ -51,20 +51,6 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
         'install',
         '.',
         '&&',
-        # PyInstaller is not compatible with enum34.
-        # We have one requirement which depends on enum34 -
-        # py_log_symbols 0.0.12.
-        # We use an unreleased version of py_log_symbols which does not
-        # require enum34 and then we uninstall enum34.
-        'pip',
-        'install',
-        'git+https://github.com/manrajgrover/py-log-symbols',
-        '&&',
-        'pip',
-        'uninstall',
-        '--yes',
-        'enum34',
-        '&&',
         'python',
         'admin/create_pyinstaller_binaries.py',
     ]

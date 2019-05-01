@@ -14,9 +14,9 @@ from typing import Union
 
 import click
 import docker
-from halo import Halo
 
 from dcos_e2e.backends import Docker
+from dcos_e2e_cli._vendor.halo import Halo
 
 from ._common import docker_client
 
@@ -80,7 +80,7 @@ def _validate_ovpn_file_does_not_exist(
     return path
 
 
-@Halo(enabled=sys.stdout.isatty())
+@Halo(enabled=sys.stdout.isatty())  # type: ignore
 def _create_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
@@ -167,7 +167,7 @@ def _create_mac_network(configuration_dst: Path) -> None:
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
 
-@Halo(enabled=sys.stdout.isatty())
+@Halo(enabled=sys.stdout.isatty())  # type: ignore
 def _destroy_mac_network_containers() -> None:
     """
     Destroy containers created by ``minidcos docker setup-mac-network``.
