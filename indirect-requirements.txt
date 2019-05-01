@@ -30,14 +30,14 @@ entrypoints==0.2.3
 jeepney==0.3.1
 # Homebrew installation uses "--no-binary".
 # To avoid https://github.com/pypa/pip/issues/6222 we use "--no-use-pep-517".
-# However, using these together is not possible with modern ``python-dateutil``
-# as that shows the error:
+# However, using this is not possible with some packages which then show
+# errors similar to:
 #
 # > Disabling PEP 517 processing is invalid: project specifies a build backend
 # > of setuptools.build_meta in pyproject.toml
 #
-# Therefore we pin an older ``python-dateutil`` and ``attrs``.
+# Therefore we pin older versions of multiple libraries - versions just before
+# they get ``pyproject.toml``s:
 python-dateutil==2.7.5
 attrs==18.2.0
-# Required by halo
-six==1.11.0
+ptyprocess==0.5.2
