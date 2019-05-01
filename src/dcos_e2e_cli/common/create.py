@@ -72,7 +72,7 @@ def create_cluster(
     """
     Create a cluster.
     """
-    spinner = halo.Halo(enabled=sys.stdout.isatty())
+    spinner = halo.Halo(enabled=sys.stdout.isatty())  # type: ignore
     spinner.start(text='Creating cluster')
     try:
         cluster = Cluster(

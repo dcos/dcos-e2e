@@ -68,7 +68,7 @@ def wait_for_dcos(
         'To resolve that, run this command again.'
     )
 
-    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
     spinner.start(text='Waiting for DC/OS variant')
     _wait_for_variant(cluster=cluster)
     dcos_variant = get_cluster_variant(cluster=cluster)

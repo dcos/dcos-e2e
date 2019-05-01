@@ -16,7 +16,7 @@ from ._common import ClusterContainers, existing_cluster_ids
 from ._options import node_transport_option
 
 
-@Halo(enabled=sys.stdout.isatty())
+@Halo(enabled=sys.stdout.isatty())  # type: ignore
 def _destroy_cluster(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.

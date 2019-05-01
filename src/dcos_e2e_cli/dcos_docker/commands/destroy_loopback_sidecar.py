@@ -27,5 +27,5 @@ def destroy_loopback_sidecar(name: str) -> None:
         raise click.BadParameter(message)
 
     [loopback_sidecar] = loopback_sidecars
-    with Halo(enabled=sys.stdout.isatty()):
+    with Halo(enabled=sys.stdout.isatty()):  # type: ignore
         DockerLoopbackVolume.destroy(container=loopback_sidecar)
