@@ -9,11 +9,11 @@ from subprocess import CalledProcessError
 from typing import Any, Dict, Optional
 
 import click
-import halo
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
+from dcos_e2e_cli._vendor import halo
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
 
 from .base_classes import ClusterRepresentation

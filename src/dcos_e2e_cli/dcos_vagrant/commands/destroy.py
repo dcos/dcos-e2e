@@ -6,8 +6,8 @@ import sys
 from typing import List
 
 import click
-from halo import Halo
 
+from dcos_e2e_cli._vendor.halo import Halo
 from dcos_e2e_cli.common.options import existing_cluster_id_option
 from dcos_e2e_cli.common.utils import check_cluster_id_exists
 
