@@ -14,13 +14,15 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e_cli.common.create import create_cluster
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.options import (
-    agents_option,
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
+    verbosity_option,
+)
+from dcos_e2e_cli.common.options.cluster_size import (
+    agents_option,
     masters_option,
     public_agents_option,
-    verbosity_option,
 )
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,

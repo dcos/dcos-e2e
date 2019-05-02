@@ -13,11 +13,13 @@ from dcos_e2e_cli.common.nodes import get_nodes
 from dcos_e2e_cli.common.options import (
     dcos_login_pw_option,
     dcos_login_uname_option,
-    environment_variables_option,
     existing_cluster_id_option,
     sync_dir_run_option,
     test_env_run_option,
     verbosity_option,
+)
+from dcos_e2e_cli.common.options.environment_variables import (
+    environment_variables_option,
 )
 from dcos_e2e_cli.common.run_command import run_command
 from dcos_e2e_cli.common.sync import sync_code_to_masters

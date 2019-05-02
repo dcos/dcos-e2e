@@ -52,6 +52,6 @@ def docker_network_option(command: Callable[..., None]) -> Callable[..., None]:
             'on macOS. '
         ),
         callback=_validate_docker_network,
-    )  # type: Callable[[Callable[..., None]], Network]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
     function = click_option_function(command)  # type: Callable[..., None]
     return function

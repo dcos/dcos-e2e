@@ -5,14 +5,18 @@ Click options which are common across CLI tools.
 import logging
 import re
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 import click
 import click_pathlib
+import urllib3
 import yaml
 
-from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
-from .validators import validate_path_pair
+from ..credentials import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
+)
+from ..validators import validate_path_pair
 
 
 def _validate_cluster_id(
@@ -38,31 +42,6 @@ def _validate_cluster_id(
         raise click.BadParameter(message)
 
     return value
-
-
-def _validate_environment_variable(
-    ctx: click.core.Context,
-    param: Union[click.core.Option, click.core.Parameter],
-    value: Tuple[str],
-) -> Dict[str, str]:
-    """
-    Validate that environment variables are set as expected.
-    """
-    # We "use" variables to satisfy linting tools.
-    for _ in (param, ctx):
-        pass
-
-    env = {}
-    for definition in value:
-        try:
-            key, val = definition.split(sep='=', maxsplit=1)
-        except ValueError:
-            message = (
-                '"{definition}" does not match the format "<KEY>=<VALUE>".'
-            ).format(definition=definition)
-            raise click.BadParameter(message=message)
-        env[key] = val
-    return env
 
 
 def _validate_dcos_configuration(
@@ -95,63 +74,6 @@ def _validate_dcos_configuration(
         message = '"{content}" is not valid YAML'.format(content=content)
 
     raise click.BadParameter(message=message)
-
-
-def masters_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for the number of masters.
-    """
-    function = click.option(
-        '--masters',
-        type=click.INT,
-        default=1,
-        show_default=True,
-        help='The number of master nodes.',
-    )(command)  # type: Callable[..., None]
-    return function
-
-
-def agents_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for the number of agents.
-    """
-    function = click.option(
-        '--agents',
-        type=click.INT,
-        default=1,
-        show_default=True,
-        help='The number of agent nodes.',
-    )(command)  # type: Callable[..., None]
-    return function
-
-
-def public_agents_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for the number of agents.
-    """
-    function = click.option(
-        '--public-agents',
-        type=click.INT,
-        default=1,
-        show_default=True,
-        help='The number of public agent nodes.',
-    )(command)  # type: Callable[..., None]
-    return function
-
-
-def environment_variables_option(command: Callable[..., None],
-                                 ) -> Callable[..., None]:
-    """
-    An option decorator for setting environment variables.
-    """
-    function = click.option(
-        '--env',
-        type=str,
-        callback=_validate_environment_variable,
-        multiple=True,
-        help='Set environment variables in the format "<KEY>=<VALUE>"',
-    )(command)  # type: Callable[..., None]
-    return function
 
 
 def superuser_username_option(command: Callable[..., None],
@@ -274,7 +196,7 @@ def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
     A decorator for setting files to copy to master nodes before installing
     DC/OS.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--copy-to-master',
         type=str,
         callback=validate_path_pair,
@@ -285,7 +207,8 @@ def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
             'Each option should be in the format '
             '/absolute/local/path:/remote/path.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 
@@ -380,6 +303,9 @@ def _set_logging(
     logging.getLogger('docker').setLevel(logging.WARN)
     logging.getLogger('sarge').setLevel(logging.WARN)
 
+    # These warnings are overwhelming and not useful.
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(verbosity_level or 0)])
 
@@ -458,7 +384,7 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for a custom "genconf" directory.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--genconf-dir',
         type=click_pathlib.Path(
             exists=True,
@@ -472,7 +398,8 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
             'All files from this directory will be copied to the "genconf" '
             'directory before running the DC/OS installer.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 

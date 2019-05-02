@@ -11,12 +11,14 @@ from dcos_e2e.backends import Vagrant
 from dcos_e2e_cli.common.create import create_cluster
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.options import (
-    agents_option,
     cluster_id_option,
     enable_selinux_enforcing_option,
+    verbosity_option,
+)
+from dcos_e2e_cli.common.options.cluster_size import (
+    agents_option,
     masters_option,
     public_agents_option,
-    verbosity_option,
 )
 from dcos_e2e_cli.common.utils import check_cluster_id_unique, command_path
 from dcos_e2e_cli.common.workspaces import workspace_dir_option

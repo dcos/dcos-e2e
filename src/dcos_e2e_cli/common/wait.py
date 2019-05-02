@@ -5,7 +5,6 @@ Tools for waiting for DC/OS.
 import sys
 
 import click
-import urllib3
 from retry import retry
 
 from dcos_e2e.cluster import Cluster
@@ -52,7 +51,6 @@ def wait_for_dcos(
             connection to the cluster.
         doctor_command_name: A ``doctor`` command to advise a user to use.
     """
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     message = (
         'A cluster may take some time to be ready.\n'
         'The amount of time it takes to start a cluster depends on a variety '
