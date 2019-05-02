@@ -222,4 +222,3 @@ class ClusterInstances(ClusterRepresentation):
         This is not yet implemented, see:
         https://jira.mesosphere.com/browse/DCOS_OSS-5042
         """
-        
