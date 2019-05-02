@@ -17,10 +17,7 @@ from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.create import create_cluster
 from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
-from dcos_e2e_cli.common.options import (
-    cluster_id_option,
-    verbosity_option,
-)
+from dcos_e2e_cli.common.options import cluster_id_option, verbosity_option
 from dcos_e2e_cli.common.options.cluster_size import (
     agents_option,
     masters_option,
