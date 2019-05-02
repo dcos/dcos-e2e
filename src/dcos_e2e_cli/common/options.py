@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import click
+import urllib3
 import click_pathlib
 import yaml
 
@@ -379,6 +380,9 @@ def _set_logging(
     logging.getLogger('urllib3.connectionpool').setLevel(logging.WARN)
     logging.getLogger('docker').setLevel(logging.WARN)
     logging.getLogger('sarge').setLevel(logging.WARN)
+
+    # These warnings are overwhelming and not useful.
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(verbosity_level or 0)])
