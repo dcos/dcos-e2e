@@ -8,8 +8,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from shutil import rmtree
 from tempfile import gettempdir
-from typing import Optional  # noqa: F401
-from typing import Any, Dict, Iterable, Set, Tuple, Type
+from typing import Any, Dict, Iterable, Optional, Set, Tuple, Type
 
 import boto3
 
@@ -225,7 +224,6 @@ class AWSCluster(ClusterManager):
 
         self.cluster_backend = cluster_backend
         self.dcos_launcher = None  # type: Optional[AbstractLauncher]
-        self.cluster_info = {}  # type: Dict[str, Any]
 
         aws_distros = {
             Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
@@ -279,12 +277,12 @@ class AWSCluster(ClusterManager):
         )
 
         # Create the AWS stack from the DcosCloudformationLauncher.
-        # Update ``cluster_info`` with the AWS SSH key information.
-        self.cluster_info = self.launcher.create()
+        # Get the AWS SSH key information from this.
+        cluster_create_info = self.launcher.create()
+        private_key = cluster_create_info['ssh_private_key']
 
         # Store the generated AWS SSH key to the file system.
         self._ssh_key_path = self._path / 'id_rsa'
-        private_key = self.cluster_info['ssh_private_key']
         self._ssh_key_path.write_bytes(private_key.encode())
         self._ssh_key_path.chmod(mode=stat.S_IRUSR)
 
