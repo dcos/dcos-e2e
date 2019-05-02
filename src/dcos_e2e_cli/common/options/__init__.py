@@ -12,8 +12,8 @@ import urllib3
 import click_pathlib
 import yaml
 
-from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
-from .validators import validate_path_pair
+from ..credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
+from ..validators import validate_path_pair
 
 
 def _validate_cluster_id(
