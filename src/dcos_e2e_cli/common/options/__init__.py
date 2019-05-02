@@ -384,7 +384,7 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for a custom "genconf" directory.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--genconf-dir',
         type=click_pathlib.Path(
             exists=True,
@@ -398,7 +398,8 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
             'All files from this directory will be copied to the "genconf" '
             'directory before running the DC/OS installer.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 
