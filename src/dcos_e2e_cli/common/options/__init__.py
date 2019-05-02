@@ -8,11 +8,14 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import click
-import urllib3
 import click_pathlib
+import urllib3
 import yaml
 
-from ..credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
+from ..credentials import (
+    DEFAULT_SUPERUSER_PASSWORD,
+    DEFAULT_SUPERUSER_USERNAME,
+)
 from ..validators import validate_path_pair
 
 
@@ -96,7 +99,6 @@ def _validate_dcos_configuration(
         message = '"{content}" is not valid YAML'.format(content=content)
 
     raise click.BadParameter(message=message)
-
 
 
 def environment_variables_option(command: Callable[..., None],
