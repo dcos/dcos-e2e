@@ -8,11 +8,12 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 import click
+import urllib3
 import click_pathlib
 import yaml
 
-from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
-from .validators import validate_path_pair
+from ..credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
+from ..validators import validate_path_pair
 
 
 def _validate_cluster_id(
@@ -96,47 +97,6 @@ def _validate_dcos_configuration(
 
     raise click.BadParameter(message=message)
 
-
-def masters_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for the number of masters.
-    """
-    function = click.option(
-        '--masters',
-        type=click.INT,
-        default=1,
-        show_default=True,
-        help='The number of master nodes.',
-    )(command)  # type: Callable[..., None]
-    return function
-
-
-def agents_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for the number of agents.
-    """
-    function = click.option(
-        '--agents',
-        type=click.INT,
-        default=1,
-        show_default=True,
-        help='The number of agent nodes.',
-    )(command)  # type: Callable[..., None]
-    return function
-
-
-def public_agents_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for the number of agents.
-    """
-    function = click.option(
-        '--public-agents',
-        type=click.INT,
-        default=1,
-        show_default=True,
-        help='The number of public agent nodes.',
-    )(command)  # type: Callable[..., None]
-    return function
 
 
 def environment_variables_option(command: Callable[..., None],
@@ -274,7 +234,7 @@ def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
     A decorator for setting files to copy to master nodes before installing
     DC/OS.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--copy-to-master',
         type=str,
         callback=validate_path_pair,
@@ -285,7 +245,8 @@ def copy_to_master_option(command: Callable[..., None]) -> Callable[..., None]:
             'Each option should be in the format '
             '/absolute/local/path:/remote/path.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 
@@ -379,6 +340,9 @@ def _set_logging(
     logging.getLogger('urllib3.connectionpool').setLevel(logging.WARN)
     logging.getLogger('docker').setLevel(logging.WARN)
     logging.getLogger('sarge').setLevel(logging.WARN)
+
+    # These warnings are overwhelming and not useful.
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     # Disable logging calls of the given severity level or below.
     logging.disable(verbosity_map[int(verbosity_level or 0)])
