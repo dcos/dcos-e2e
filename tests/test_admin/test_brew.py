@@ -74,7 +74,7 @@ def test_brew(tmp_path: Path) -> None:
     mounts = [archive_mount, homebrew_file_mount]
     client.images.pull(repository=linuxbrew_image, tag='latest')
     command_list = [
-        'brew install python && pip install --upgrade pip &&'
+        'brew install python && pip3 install --upgrade pip &&'
         'brew',
         'install',
         container_homebrew_file_path,
