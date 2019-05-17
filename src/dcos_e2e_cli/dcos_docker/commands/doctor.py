@@ -453,8 +453,8 @@ def _check_can_mount_in_docker() -> CheckLevels:
                 '\n'
                 "This issue is likely because the host's version of systemd "
                 'is greater than version 232, which causes the following '
-                'known issue: '
-                'https://github.com/opencontainers/runc/issues/1175.'
+                'known the issue described at '
+                'https://github.com/opencontainers/runc/issues/1175 .'
                 '\n'
                 'Newer versions of Docker, work well with new versions of '
                 'systemd. '
