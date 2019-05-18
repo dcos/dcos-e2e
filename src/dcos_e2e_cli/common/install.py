@@ -20,7 +20,7 @@ from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
 
 def install_dcos_from_path(
-    cluster_representation: ClusterRepresentation,
+    cluster: Cluster,
     ip_detect_path: Path,
     dcos_config: Dict[str, Any],
     local_genconf_dir: Optional[Path],
@@ -31,7 +31,7 @@ def install_dcos_from_path(
     Install DC/OS on a cluster from a path.
 
     Args:
-        cluster_representation: A representation of the cluster.
+        cluster: The cluster to install DC/OS on.
         ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
         local_genconf_dir: A directory of files to copy from the host to the
             installer node before installing DC/OS.
@@ -50,7 +50,6 @@ def install_dcos_from_path(
 
     spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
     spinner.start('Installing DC/OS')
-    cluster = cluster_representation.cluster
 
     try:
         cluster.install_dcos_from_path(
@@ -66,14 +65,17 @@ def install_dcos_from_path(
         click.echo(click.style('Full error:', fg='yellow'))
         click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
         click.echo(doctor_message)
-        cluster_representation.destroy()
+        try:
+            cluster.destroy()
+        except NotImplementedError:
+            pass
         sys.exit(exc.returncode)
 
     spinner.succeed()
 
 
 def install_dcos_from_url(
-    cluster_representation: ClusterRepresentation,
+    cluster: Cluster,
     ip_detect_path: Path,
     dcos_config: Dict[str, Any],
     local_genconf_dir: Optional[Path],
@@ -84,7 +86,7 @@ def install_dcos_from_url(
     Install DC/OS on a cluster from a url.
 
     Args:
-        cluster_representation: A representation of the cluster.
+        cluster: The cluster to install DC/OS on.
         ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
         local_genconf_dir: A directory of files to copy from the host to the
             installer node before installing DC/OS.
@@ -103,7 +105,7 @@ def install_dcos_from_url(
 
     spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
     spinner.start('Installing DC/OS')
-    cluster = cluster_representation.cluster
+
     try:
         cluster.install_dcos_from_url(
             dcos_installer=dcos_installer_url,
@@ -118,7 +120,10 @@ def install_dcos_from_url(
         click.echo(click.style('Full error:', fg='yellow'))
         click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
         click.echo(doctor_message)
-        cluster_representation.destroy()
+        try:
+            cluster.destroy()
+        except NotImplementedError:
+            pass
         sys.exit(exc.returncode)
 
     spinner.succeed()

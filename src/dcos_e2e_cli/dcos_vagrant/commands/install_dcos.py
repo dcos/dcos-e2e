@@ -85,8 +85,10 @@ def install_dcos(
         license_key=license_key,
     )
 
+    cluster = cluster_vms.cluster
+
     install_dcos_from_path(
-        cluster_representation=cluster_vms,
+        cluster=cluster,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
@@ -95,7 +97,7 @@ def install_dcos(
     )
 
     run_post_install_steps(
-        cluster=cluster_vms.cluster,
+        cluster=cluster,
         cluster_id=cluster_id,
         dcos_config=dcos_config,
         doctor_command_name=doctor_command_name,
