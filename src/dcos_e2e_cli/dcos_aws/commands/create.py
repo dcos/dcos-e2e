@@ -208,6 +208,7 @@ def create(
 
     install_dcos_from_url(
         cluster=cluster,
+        cluster_representation=cluster_instances,
         dcos_config=dcos_config,
         dcos_installer_url=installer_url,
         doctor_message=doctor_message,

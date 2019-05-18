@@ -21,6 +21,7 @@ from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
 def install_dcos_from_path(
     cluster: Cluster,
+    cluster_representation: ClusterRepresentation,
     ip_detect_path: Path,
     dcos_config: Dict[str, Any],
     local_genconf_dir: Optional[Path],
@@ -32,6 +33,7 @@ def install_dcos_from_path(
 
     Args:
         cluster: The cluster to install DC/OS on.
+        cluster_representation: A representation of the cluster.
         ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
         local_genconf_dir: A directory of files to copy from the host to the
             installer node before installing DC/OS.
@@ -51,6 +53,11 @@ def install_dcos_from_path(
     spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
     spinner.start('Installing DC/OS')
 
+    # We allow a cluster to be passed in rather than just inferring it from
+    # ``cluster_representation`` in case the ``cluster`` has a more efficient
+    # installation method than a ``Cluster.from_nodes``.
+    # However, if the cluster is a ``Cluster.from_nodes``, ``destroy`` will not
+    # work and therefore we use ``cluster_representation.destroy`` instead.
     try:
         cluster.install_dcos_from_path(
             dcos_installer=dcos_installer,
@@ -68,7 +75,7 @@ def install_dcos_from_path(
         try:
             cluster.destroy()
         except NotImplementedError:
-            pass
+            cluster_representation.destroy()
         sys.exit(exc.returncode)
 
     spinner.succeed()
@@ -76,6 +83,7 @@ def install_dcos_from_path(
 
 def install_dcos_from_url(
     cluster: Cluster,
+    cluster_representation: ClusterRepresentation,
     ip_detect_path: Path,
     dcos_config: Dict[str, Any],
     local_genconf_dir: Optional[Path],
@@ -87,6 +95,7 @@ def install_dcos_from_url(
 
     Args:
         cluster: The cluster to install DC/OS on.
+        cluster_representation: A representation of the cluster.
         ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
         local_genconf_dir: A directory of files to copy from the host to the
             installer node before installing DC/OS.
@@ -106,6 +115,11 @@ def install_dcos_from_url(
     spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
     spinner.start('Installing DC/OS')
 
+    # We allow a cluster to be passed in rather than just inferring it from
+    # ``cluster_representation`` in case the ``cluster`` has a more efficient
+    # installation method than a ``Cluster.from_nodes``.
+    # However, if the cluster is a ``Cluster.from_nodes``, ``destroy`` will not
+    # work and therefore we use ``cluster_representation.destroy`` instead.
     try:
         cluster.install_dcos_from_url(
             dcos_installer=dcos_installer_url,
@@ -123,7 +137,7 @@ def install_dcos_from_url(
         try:
             cluster.destroy()
         except NotImplementedError:
-            pass
+            cluster_representation.destroy()
         sys.exit(exc.returncode)
 
     spinner.succeed()

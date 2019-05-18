@@ -220,6 +220,7 @@ def create(
 
     install_dcos_from_path(
         cluster=cluster,
+        cluster_representation=cluster_containers,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
