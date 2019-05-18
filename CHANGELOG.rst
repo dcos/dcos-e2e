@@ -6,14 +6,7 @@ Changelog
 Next
 ----
 
-2019.05.03.0
-------------
-
-2019.05.01.0
-------------
-
-2019.04.30.0
-------------
+* Allow the use of a ``MINIDCOS_NODE_DOCKER_VERSION`` environment variable to set the version of Docker inside ``minidcos docker`` nodes.
 
 2019.04.29.0
 ------------
