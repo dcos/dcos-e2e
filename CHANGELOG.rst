@@ -8,6 +8,7 @@ Next
 
 * Improve efficiency of installing DC/OS with ``create`` on ``minidcos docker``
   and ``minidcos aws``.
+* Allow the use of a ``MINIDCOS_NODE_DOCKER_VERSION`` environment variable to set the version of Docker inside ``minidcos docker`` nodes.
 
 2019.04.29.0
 ------------
