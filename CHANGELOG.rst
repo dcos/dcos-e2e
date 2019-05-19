@@ -6,14 +6,8 @@ Changelog
 Next
 ----
 
-2019.05.03.0
-------------
-
-2019.05.01.0
-------------
-
-2019.04.30.0
-------------
+* Improve efficiency of installing DC/OS with ``create`` on ``minidcos docker``
+  and ``minidcos aws``.
 
 2019.04.29.0
 ------------
