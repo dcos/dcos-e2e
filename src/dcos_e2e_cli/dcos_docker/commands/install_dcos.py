@@ -100,6 +100,7 @@ def install_dcos(
     )
 
     install_dcos_from_path(
+        cluster=cluster,
         cluster_representation=cluster_containers,
         dcos_config=dcos_config,
         ip_detect_path=ip_detect_path,
