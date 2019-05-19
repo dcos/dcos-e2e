@@ -58,6 +58,9 @@ def install_dcos_from_path(
     # installation method than a ``Cluster.from_nodes``.
     # However, if the cluster is a ``Cluster.from_nodes``, ``destroy`` will not
     # work and therefore we use ``cluster_representation.destroy`` instead.
+    #
+    # We do not always use ``cluster_representation.destroy`` because the AWS
+    # backend does not support this.
     try:
         cluster.install_dcos_from_path(
             dcos_installer=dcos_installer,
@@ -120,6 +123,9 @@ def install_dcos_from_url(
     # installation method than a ``Cluster.from_nodes``.
     # However, if the cluster is a ``Cluster.from_nodes``, ``destroy`` will not
     # work and therefore we use ``cluster_representation.destroy`` instead.
+    #
+    # We do not always use ``cluster_representation.destroy`` because the AWS
+    # backend does not support this.
     try:
         cluster.install_dcos_from_url(
             dcos_installer=dcos_installer_url,
