@@ -7,6 +7,7 @@ Next
 ----
 
 * Fix issue with ``minidcos vagrant`` which prevented node access via SSH.
+* Change ``minidcos`` default credentials for DC/OS Enterprise clusters from ``admin/admin`` to ``bootstrapuser/deleteme``.
 
 2019.05.23.0
 ------------
