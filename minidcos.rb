@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.05.03.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.05.23.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -278,8 +278,8 @@ class Minidcos < Formula
   end
 
   resource "pluggy" do
-    url "https://files.pythonhosted.org/packages/a7/8c/55c629849c64e665258d8976322dfdad171fa2f57117590662d8a67618a4/pluggy-0.9.0.tar.gz"
-    sha256 "19ecf9ce9db2fce065a7a0586e07cfb4ac8614fe96edf628a264b1c70116cf8f"
+    url "https://files.pythonhosted.org/packages/0d/a1/862ab336e8128fde20981d2c1aa8506693412daf5083b1911d539412676b/pluggy-0.11.0.tar.gz"
+    sha256 "25a1bc1d148c9a640211872b4ff859878d422bccb59c9965e04eed468a0aa180"
   end
 
   resource "prompt_toolkit" do
@@ -313,8 +313,8 @@ class Minidcos < Formula
   end
 
   resource "Pygments" do
-    url "https://files.pythonhosted.org/packages/64/69/413708eaf3a64a6abb8972644e0f20891a55e621c6759e2c3f3891e05d63/Pygments-2.3.1.tar.gz"
-    sha256 "5ffada19f6203563680669ee7f53b64dabbeb100eb51b61996085e99c03b284a"
+    url "https://files.pythonhosted.org/packages/1d/55/55cd82a72af652d71eb14f318e2d12d2fd14ded43d6fd105e50ed395198c/Pygments-2.4.0.tar.gz"
+    sha256 "31cba6ffb739f099a85e243eff8cb717089fdd3c7300767d9fc34cb8e1b065f5"
   end
 
   resource "PyJWT" do

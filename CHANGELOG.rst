@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.05.23.0
+------------
+
 * Download a file or directory from a ``Node``.
 * Improve efficiency of installing DC/OS with ``create`` on ``minidcos docker``
   and ``minidcos aws``.
