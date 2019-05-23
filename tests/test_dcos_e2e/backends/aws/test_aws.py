@@ -120,7 +120,7 @@ class TestRunIntegrationTest:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
 
@@ -136,7 +136,7 @@ class TestRunIntegrationTest:
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
 
 
@@ -229,7 +229,7 @@ class TestDCOSInstallation:
                 dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
 
@@ -251,7 +251,7 @@ class TestDCOSInstallation:
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -284,7 +284,7 @@ class TestDCOSInstallation:
             cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=ip_detect_file,
             )
             cluster.wait_for_dcos_oss()
@@ -325,7 +325,7 @@ class TestDCOSInstallation:
             cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
                     (ip_detect_file, Path('/genconf/ip-detect')),

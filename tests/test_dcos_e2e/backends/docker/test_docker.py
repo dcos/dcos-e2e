@@ -21,7 +21,7 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Node, Transport
+from dcos_e2e.node import Node, Output, Transport
 
 
 @retry(
@@ -145,6 +145,7 @@ class TestDockerBackend:
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
 

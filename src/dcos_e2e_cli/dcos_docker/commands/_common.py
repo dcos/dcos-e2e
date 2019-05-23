@@ -101,7 +101,11 @@ class ClusterContainers(ClusterRepresentation):
         Return the ``Node`` that is represented by a given ``container``.
         """
         container = node_representation
-        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
+        networks = container.attrs['NetworkSettings']['Networks']
+        network_name = 'bridge'
+        if len(networks) != 1:
+            [network_name] = list(networks.keys() - set(['bridge']))
+        address = IPv4Address(networks[network_name]['IPAddress'])
         return Node(
             public_ip_address=address,
             private_ip_address=address,

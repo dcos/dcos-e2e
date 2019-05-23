@@ -3,7 +3,7 @@ Validators for CLI options.
 """
 
 from pathlib import Path
-from typing import Any, List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import click
 
@@ -11,7 +11,7 @@ import click
 def validate_path_pair(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
+    value: Optional[Tuple[str]],
 ) -> List[Tuple[Path, Path]]:
     """
     Validate a pair of paths expected to be in the format:

@@ -136,6 +136,119 @@ class TestStringRepresentation:
         assert string == str(dcos_node)
 
 
+class TestDownloadFile:
+    """
+    Tests for ``Node.download_file``.
+    """
+
+    def test_file_to_directory(
+        self,
+        dcos_node: Node,
+        tmp_path: Path,
+    ) -> None:
+        """
+        It is possible to download a file from a node to a directory path.
+        """
+        content = str(uuid.uuid4())
+        random = uuid.uuid4().hex
+        local_file_name = 'local_file_{random}.txt'.format(random=random)
+        remote_file_name = 'remote_file_{random}.txt'.format(random=random)
+        remote_file_path = Path('/etc/') / remote_file_name
+        local_file = tmp_path / local_file_name
+        local_file.write_text(content)
+        dcos_node.send_file(
+            local_path=local_file,
+            remote_path=remote_file_path,
+        )
+        dcos_node.download_file(
+            remote_path=remote_file_path,
+            local_path=tmp_path,
+        )
+        downloaded_file = tmp_path / remote_file_name
+        assert downloaded_file.read_text() == content
+
+    def test_file_to_file(
+        self,
+        dcos_node: Node,
+        tmp_path: Path,
+    ) -> None:
+        """
+        It is possible to download a file from a node to a file path.
+        """
+        content = str(uuid.uuid4())
+        random = uuid.uuid4().hex
+        local_file_name = 'local_file_{random}.txt'.format(random=random)
+        remote_file_name = 'remote_file_{random}.txt'.format(random=random)
+        remote_file_path = Path('/etc/') / remote_file_name
+        downloaded_file_name = 'downloaded_file_{random}.txt'.format(
+            random=random,
+        )
+        downloaded_file_path = tmp_path / downloaded_file_name
+        local_file = tmp_path / local_file_name
+        local_file.write_text(content)
+        dcos_node.send_file(
+            local_path=local_file,
+            remote_path=remote_file_path,
+        )
+        dcos_node.download_file(
+            remote_path=remote_file_path,
+            local_path=downloaded_file_path,
+        )
+        assert downloaded_file_path.read_text() == content
+
+    def test_remote_file_does_not_exist(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        Downloading a file raises a ``ValueError`` if the remote file path does
+        not exist.
+        """
+        random = uuid.uuid4().hex
+        remote_file_path = Path('/etc/') / random
+        message = (
+            'Failed to download file from remote location "{location}". '
+            'File does not exist.'
+        ).format(location=remote_file_path)
+        with pytest.raises(ValueError) as exc:
+            dcos_node.download_file(
+                remote_path=remote_file_path,
+                local_path=Path('./blub'),
+            )
+        assert str(exc.value) == message
+
+    def test_local_file_already_exists(
+        self,
+        dcos_node: Node,
+        tmp_path: Path,
+    ) -> None:
+        """
+        Downloading a file raises a ``ValueError`` if the local file path
+        already exists.
+        """
+        content = str(uuid.uuid4())
+        random = uuid.uuid4().hex
+        local_file_name = 'local_file_{random}.txt'.format(random=random)
+        local_file_path = tmp_path / local_file_name
+        local_file_path.write_text(content)
+        remote_file_name = 'remote_file_{random}.txt'.format(random=random)
+        remote_file_path = Path('/etc/') / remote_file_name
+        dcos_node.send_file(
+            local_path=local_file_path,
+            remote_path=remote_file_path,
+        )
+        message = (
+            'Failed to download a file to "{file}". '
+            'A file already exists in that location.'
+        ).format(file=local_file_path)
+        with pytest.raises(ValueError) as exc:
+            dcos_node.download_file(
+                remote_path=remote_file_path,
+                local_path=local_file_path,
+            )
+        assert str(exc.value) == message
+
+
 class TestSendFile:
     """
     Tests for ``Node.send_file``.
@@ -688,6 +801,14 @@ class TestOutput:
     Tests for the ``output`` parameter of ``Node.run``.
     """
 
+    @pytest.fixture(autouse=True)
+    def configure_logging(self, caplog: LogCaptureFixture) -> None:
+        """
+        Set the ``caplog`` logging level to ``DEBUG`` so it captures any log
+        messages produced by ``dcos_e2e`` library.
+        """
+        caplog.set_level(logging.DEBUG, logger='dcos_e2e')
+
     def test_default(
         self,
         caplog: LogCaptureFixture,
@@ -705,15 +826,7 @@ class TestOutput:
         assert result.stdout.strip().decode() == stdout_message
         assert result.stderr.strip().decode() == stderr_message
 
-        args_log, result_log = caplog.records
-
-        assert args_log.levelno == logging.WARNING
-        assert stdout_message in args_log.message
-        assert stderr_message in args_log.message
-        assert 'echo' in args_log.message
-
-        assert result_log.levelno == logging.WARNING
-        assert result_log.message == stderr_message
+        assert caplog.records == []
 
     @pytest.mark.parametrize(
         'stdout_message',
@@ -743,59 +856,80 @@ class TestOutput:
         assert result.stdout.strip().decode() == stdout_message
         assert result.stderr.strip().decode() == stderr_message
 
-        args_log, result_log = caplog.records
-
-        assert args_log.levelno == logging.WARNING
-        assert stdout_message in args_log.message
-        assert stderr_message in args_log.message
-        assert 'echo' in args_log.message
-
-        assert result_log.levelno == logging.WARNING
-        assert result_log.message == stderr_message
+        assert caplog.records == []
 
     @pytest.mark.parametrize(
-        'stdout_message',
+        'message',
         [uuid.uuid4().hex, 'å'],
         ids=['ascii', 'unicode'],
     )
-    @pytest.mark.parametrize(
-        'stderr_message',
-        [uuid.uuid4().hex, 'å'],
-        ids=['ascii', 'unicode'],
-    )
-    def test_log_and_capture(
+    def test_log_and_capture_stdout(
         self,
         caplog: LogCaptureFixture,
         dcos_node: Node,
-        stdout_message: str,
-        stderr_message: str,
+        message: str,
     ) -> None:
         """
-        When given ``Output.LOG_AND_CAPTURE``, stderr and stdout are captured
-        in the output as stdout.
-
-        stdout and stderr are logged.
+        When using ``Output.LOG_AND_CAPTURE``, stdout is logged and captured.
         """
-        args = ['echo', stdout_message, '&&', '>&2', 'echo', stderr_message]
+        args = ['echo', message]
         result = dcos_node.run(
             args=args,
             shell=True,
             output=Output.LOG_AND_CAPTURE,
         )
 
-        # stderr is merged into stdout.
-        # This is not ideal but for now it is the case.
-        # The order is not necessarily preserved.
-        expected_messages = set([stdout_message, stderr_message])
-        result_stdout = result.stdout.strip().decode()
-        assert set(result_stdout.split('\n')) == expected_messages
+        expected_command = (
+            'Running command `/bin/sh -c echo {message}` on a node `{node}`'
+        ).format(
+            message=message,
+            node=str(dcos_node),
+        )
 
-        first_log, second_log = caplog.records
+        assert result.stdout.strip().decode() == message
+
+        command_log, first_log = caplog.records
         assert first_log.levelno == logging.DEBUG
-        assert second_log.levelno == logging.DEBUG
 
-        messages = set([first_log.message, second_log.message])
-        assert messages == expected_messages
+        assert command_log.message == expected_command
+        assert message == first_log.message
+
+    @pytest.mark.parametrize(
+        'message',
+        [uuid.uuid4().hex, 'å'],
+        ids=['ascii', 'unicode'],
+    )
+    def test_log_and_capture_stderr(
+        self,
+        caplog: LogCaptureFixture,
+        dcos_node: Node,
+        message: str,
+    ) -> None:
+        """
+        When using ``Output.LOG_AND_CAPTURE``, stderr is logged and captured.
+        """
+        args = ['>&2', 'echo', message]
+        result = dcos_node.run(
+            args=args,
+            shell=True,
+            output=Output.LOG_AND_CAPTURE,
+        )
+
+        expected_command = (
+            'Running command `/bin/sh -c >&2 echo {message}` on a node '
+            '`{node}`'
+        ).format(
+            message=message,
+            node=str(dcos_node),
+        )
+
+        assert result.stderr.strip().decode() == message
+
+        command_log, first_log = caplog.records
+        assert first_log.levelno == logging.WARN
+
+        assert command_log.message == expected_command
+        assert message == first_log.message
 
     def test_not_utf_8_log_and_capture(
         self,
@@ -812,8 +946,15 @@ class TestOutput:
         args = ['head', '-c', '100', '/bin/cat']
         dcos_node.run(args=args, output=Output.LOG_AND_CAPTURE)
         # We do not test the output, but we at least test its length for now.
-        [log] = caplog.records
+        [command_log, log] = caplog.records
         assert len(log.message) >= 100
+
+        expected_command = (
+            'Running command `head -c 100 /bin/cat` on a node `{node}`'.format(
+                node=str(dcos_node),
+            )
+        )
+        assert command_log.message == expected_command
 
     def test_not_utf_8_capture(
         self,
@@ -829,10 +970,9 @@ class TestOutput:
         # It also is not so long that it will kill our terminal.
         args = ['head', '-c', '100', '/bin/cat']
         args = ['>&2'] + args
-        dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
-        _, result_log = caplog.records
-        # We do not test the output, but we at least test its length for now.
-        assert len(result_log.message) >= 100
+        result = dcos_node.run(args=args, output=Output.CAPTURE, shell=True)
+        assert caplog.records == []
+        assert len(result.stderr) >= 100
 
     def test_no_capture(
         self,
@@ -853,21 +993,17 @@ class TestOutput:
         assert captured.out.strip() == stdout_message
         assert captured.err.strip() == stderr_message
 
-    @pytest.mark.parametrize('output', list(Output))
-    def test_errors(
-        self,
-        caplog: LogCaptureFixture,
-        dcos_node: Node,
-        output: Output,
-    ) -> None:
+    @pytest.mark.parametrize(
+        'output',
+        [Output.LOG_AND_CAPTURE, Output.CAPTURE],
+    )
+    def test_errors(self, dcos_node: Node, output: Output) -> None:
         """
-        Errors are always logged at the error level.
+        The ``stderr`` of a failed command is available in the raised
+        ``subprocess.CalledProcessError``.
         """
         args = ['rm', 'does_not_exist']
-        output = Output.CAPTURE
-        with pytest.raises(subprocess.CalledProcessError):
+        with pytest.raises(subprocess.CalledProcessError) as excinfo:
             dcos_node.run(args=args, shell=True, output=output)
-        [record] = caplog.records
-        assert record.levelno == logging.ERROR
-        expected_message = 'No such file or directory'
-        assert expected_message in record.message
+        expected_message = b'No such file or directory'
+        assert expected_message in excinfo.value.stderr

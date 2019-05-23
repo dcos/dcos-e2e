@@ -14,20 +14,16 @@ from typing import Union
 
 import click
 import docker
-from halo import Halo
 
 from dcos_e2e.backends import Docker
+from dcos_e2e_cli._vendor.halo import Halo
 
 from ._common import docker_client
 
-# We start these names with "vpn" to avoid a conflict with
-# "minidcos docker clean".
-_PROXY_CONTAINER_NAME = 'vpn-{container_name_prefix}-proxy'.format(
-    container_name_prefix=Docker().container_name_prefix,
-)
-_OPENVPN_CONTAINER_NAME = 'vpn-{container_name_prefix}-openvpn'.format(
-    container_name_prefix=Docker().container_name_prefix,
-)
+# These names cannot include the standard container name prefix else they
+# conflict with "minidcos docker clean".
+_PROXY_CONTAINER_NAME = 'vpn-proxy'
+_OPENVPN_CONTAINER_NAME = 'vpn-openvpn'
 
 
 def _validate_ovpn_file_does_not_exist(
@@ -84,7 +80,7 @@ def _validate_ovpn_file_does_not_exist(
     return path
 
 
-@Halo(enabled=sys.stdout.isatty())
+@Halo(enabled=sys.stdout.isatty())  # type: ignore
 def _create_mac_network(configuration_dst: Path) -> None:
     """
     Set up a network to connect to nodes on macOS.
@@ -171,7 +167,7 @@ def _create_mac_network(configuration_dst: Path) -> None:
     copy(src=str(configuration_src), dst=str(configuration_dst))
 
 
-@Halo(enabled=sys.stdout.isatty())
+@Halo(enabled=sys.stdout.isatty())  # type: ignore
 def _destroy_mac_network_containers() -> None:
     """
     Destroy containers created by ``minidcos docker setup-mac-network``.
@@ -251,7 +247,7 @@ def destroy_mac_network() -> None:
     """
     _destroy_mac_network_containers()
     message = (
-        'The containers used to allow access to Docker for Mac\'s internal '
+        "The containers used to allow access to Docker for Mac's internal "
         'networks have been removed.'
         '\n'
         '\n'

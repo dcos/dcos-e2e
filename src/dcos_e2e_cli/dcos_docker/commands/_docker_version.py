@@ -39,8 +39,13 @@ def docker_version_option(command: Callable[..., None],
         '--docker-version',
         type=click.Choice(sorted(_DOCKER_VERSIONS.keys())),
         default='1.13.1',
+        envvar='MINIDCOS_NODE_DOCKER_VERSION',
         show_default=True,
-        help='The Docker version to install on the nodes.',
+        help=(
+            'The Docker version to install on the nodes. '
+            'This can be provided by setting the '
+            '`MINIDCOS_NODE_DOCKER_VERSION` environment variable.'
+        ),
         callback=_get_docker_version,
     )(command)  # type: Callable[..., None]
     return function

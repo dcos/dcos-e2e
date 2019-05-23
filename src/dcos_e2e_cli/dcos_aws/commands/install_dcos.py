@@ -97,7 +97,9 @@ def install_dcos(
     )
 
     cluster_backend = AWS()
+    cluster = cluster_instances.cluster
     install_dcos_from_url(
+        cluster=cluster,
         cluster_representation=cluster_instances,
         dcos_config=dcos_config,
         dcos_installer_url=installer_url,
@@ -107,7 +109,7 @@ def install_dcos(
     )
 
     run_post_install_steps(
-        cluster=cluster_instances.cluster,
+        cluster=cluster,
         cluster_id=cluster_id,
         dcos_config=dcos_config,
         doctor_command_name=doctor_command_name,

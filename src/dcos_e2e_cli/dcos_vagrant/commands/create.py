@@ -17,18 +17,20 @@ from dcos_e2e_cli.common.install import (
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
-    agents_option,
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
-    masters_option,
-    public_agents_option,
     security_mode_option,
     variant_option,
     verbosity_option,
+)
+from dcos_e2e_cli.common.options.cluster_size import (
+    agents_option,
+    masters_option,
+    public_agents_option,
 )
 from dcos_e2e_cli.common.utils import check_cluster_id_unique, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
@@ -140,6 +142,7 @@ def create(
     )
 
     install_dcos_from_path(
+        cluster=cluster,
         cluster_representation=cluster_vms,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,

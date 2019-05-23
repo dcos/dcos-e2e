@@ -11,8 +11,8 @@ from typing import Any, Dict, List
 import docker
 from docker.models.containers import Container
 
-from dcos_e2e._common import run_subprocess
 from dcos_e2e._node_transports._base_classes import NodeTransport
+from dcos_e2e._subprocess_tools import run_subprocess
 
 
 def _compose_docker_command(
@@ -23,9 +23,12 @@ def _compose_docker_command(
     public_ip_address: IPv4Address,
 ) -> List[str]:
     """
-    Return a command to run ``args`` on a node using ``docker exec``. We do not
-    use ``docker-py`` because ``stdout`` and ``stderr`` cannot be separated in
-    ``docker-py`` https://github.com/docker/docker-py/issues/704.
+    Return a command to run ``args`` on a node using ``docker exec``.
+
+    We use this rather than using ``docker`` via Python for a few reasons.
+    In particular, we would need something like ``dockerpty`` in order to
+    support interaction.
+    We also would need to match the ``Popen`` interface for asynchronous use.
 
     Args:
         args: The command to run on a node.
@@ -40,7 +43,7 @@ def _compose_docker_command(
     Returns:
         The full ``docker exec`` command to be run.
     """
-    container = _get_container_from_ip_address(public_ip_address)
+    container = _container_from_ip_address(ip_address=public_ip_address)
 
     docker_exec_args = [
         'docker',
@@ -178,7 +181,7 @@ class DockerExecTransport(NodeTransport):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
         """
-        container = _get_container_from_ip_address(public_ip_address)
+        container = _container_from_ip_address(ip_address=public_ip_address)
         args = [
             'docker',
             'cp',
@@ -191,8 +194,40 @@ class DockerExecTransport(NodeTransport):
             pipe_output=True,
         )
 
+    def download_file(
+        self,
+        remote_path: Path,
+        local_path: Path,
+        user: str,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> None:
+        """
+        Download a file from this node.
 
-def _get_container_from_ip_address(ip_address: IPv4Address) -> Container:
+        Args:
+            remote_path: The path on the node to download the file from.
+            local_path: The path on the host to download the file to.
+            user: The name of the remote user to send the file.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
+        """
+        container = _container_from_ip_address(ip_address=public_ip_address)
+        args = [
+            'docker',
+            'cp',
+            container.id + ':' + str(remote_path),
+            str(local_path),
+        ]
+        run_subprocess(
+            args=args,
+            log_output_live=False,
+            pipe_output=True,
+        )
+
+
+def _container_from_ip_address(ip_address: IPv4Address) -> Container:
     """
     Return the ``Container`` with the given ``ip_address``.
     """

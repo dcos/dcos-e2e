@@ -29,7 +29,7 @@ Usage: minidcos vagrant create [OPTIONS] INSTALLER
 Options:
   --masters INTEGER               The number of master nodes.  [default: 1]
   --agents INTEGER                The number of agent nodes.  [default: 1]
-  --extra-config PATH             The path to a file including DC/OS
+  --extra-config FILE             The path to a file including DC/OS
                                   configuration YAML. The contents of this file
                                   will be added to add to a default
                                   configuration.

@@ -2,6 +2,7 @@
 Helpers for creating and interacting with clusters on Docker.
 """
 
+import logging
 import socket
 import stat
 import subprocess
@@ -19,7 +20,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from docker.types import Mount
 
-from dcos_e2e._common import get_logger, run_subprocess
+from dcos_e2e._subprocess_tools import run_subprocess
 from dcos_e2e.base_classes import ClusterBackend, ClusterManager
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
@@ -30,7 +31,7 @@ from dcos_e2e.node import Node, Output, Transport
 from ._containers import start_dcos_container
 from ._docker_build import build_docker_image
 
-LOGGER = get_logger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def _write_key_pair(public_key_path: Path, private_key_path: Path) -> None:

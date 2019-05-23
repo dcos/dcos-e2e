@@ -81,8 +81,8 @@ contents of the directory supplied through the command line option ``--genconf-d
     $ docker network create custom-bridge
     $ mkdir custom-genconf
     $ mv ip-detect custom-genconf/ip-detect
-    $ minidcos docker create /path/to/dcos_generate_config.sh
-        --network custom-bridge
+    $ minidcos docker create /path/to/dcos_generate_config.sh \
+        --network custom-bridge \
         --genconf-dir ./custom-genconf
 
 The custom Docker network is not cleaned up by the :ref:`dcos-docker-cli:minidcos docker` CLI.

@@ -5,9 +5,9 @@ Tools for destroying sidecar containers.
 import sys
 
 import click
-from halo import Halo
 
 from dcos_e2e.docker_utils import DockerLoopbackVolume
+from dcos_e2e_cli._vendor.halo import Halo
 
 from ._loopback_sidecars import loopback_sidecars_by_name
 
@@ -27,5 +27,5 @@ def destroy_loopback_sidecar(name: str) -> None:
         raise click.BadParameter(message)
 
     [loopback_sidecar] = loopback_sidecars
-    with Halo(enabled=sys.stdout.isatty()):
+    with Halo(enabled=sys.stdout.isatty()):  # type: ignore
         DockerLoopbackVolume.destroy(container=loopback_sidecar)

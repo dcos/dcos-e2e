@@ -6,6 +6,36 @@ Changelog
 Next
 ----
 
+2019.05.23.0
+------------
+
+* Download a file or directory from a ``Node``.
+* Improve efficiency of installing DC/OS with ``create`` on ``minidcos docker``
+  and ``minidcos aws``.
+* Allow the use of a ``MINIDCOS_NODE_DOCKER_VERSION`` environment variable to set the version of Docker inside ``minidcos docker`` nodes.
+
+2019.04.29.0
+------------
+
+* Remove use of ``select`` which is not supported on Windows.
+* ``minidcos docker clean`` will no longer clean up containers which are started from now on by the tooling to create a custom macOS network.
+
+2019.04.25.0
+------------
+
+2019.04.23.1
+------------
+
+* The ``wait_for_dcos_oss`` and ``wait_for_dcos_ee`` methods no longer log output of node poststart check command run.
+* The ``Node.run`` method logs the command that is going to execute with ``debug`` level if ``output`` is configured to ``LOG_AND_CAPTURE``.
+* The ``Node.run`` method no longer logs ``stderr`` when ``Output.CAPTURE`` is used.
+* The ``Node.run`` method no longer merges ``stderr`` into ``stdout`` when ``Output.LOG_AND_CAPTURE`` is used.
+
+2019.04.23.0
+------------
+
+* The library no longer configures logger handler. Applications using ``dcos_e2e`` library that were relying on logging being printed to stdout should configure ``logging`` on its own.
+
 2019.04.18.2
 ------------
 

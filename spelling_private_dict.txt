@@ -19,6 +19,7 @@ bootstrap
 breakpoint
 bytestring
 calledprocesserror
+caplog
 centos
 cgroup
 cgroups
@@ -39,6 +40,7 @@ dict
 diff
 dir
 dockerfile
+dockerpty
 drf
 dulwich
 enum
@@ -120,10 +122,12 @@ stderr
 stdout
 str
 subcommand
+subcommands
 submodules
 subnet
 subpackages
 subprocess
+subprocesses
 sudo
 symlink
 sys

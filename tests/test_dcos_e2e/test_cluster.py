@@ -230,6 +230,7 @@ class TestCopyFiles:
                 files_to_copy_to_genconf_dir=[
                     (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
             cat_result = master.run(
@@ -244,12 +245,20 @@ class TestInstallDcosFromPathLogging:
     ``Cluster``.
     """
 
+    @pytest.fixture(autouse=True)
+    def configure_logging(self, caplog: LogCaptureFixture) -> None:
+        """
+        Set the ``caplog`` logging level to ``DEBUG`` so it captures any log
+        messages produced by ``dcos_e2e`` library.
+        """
+        caplog.set_level(logging.DEBUG, logger='dcos_e2e')
+
     def _two_masters_error_logged(
         self,
         log_records: List[logging.LogRecord],
     ) -> bool:
         """
-        Return whether a particular error is logged as a DEBUG message.
+        Return whether a particular error is logged as a WARNING message.
 
         This is prone to being broken as it checks for a string in the DC/OS
         repository.
@@ -258,12 +267,12 @@ class TestInstallDcosFromPathLogging:
             log_records: Messages logged from the logger.
 
         Returns:
-            Whether a particular error is logged as a DEBUG message.
+            Whether a particular error is logged as a WARNING message.
         """
         message = 'Must have 1, 3, 5, 7, or 9 masters'
         debug_messages = set(
             filter(
-                lambda record: record.levelno == logging.DEBUG,
+                lambda record: record.levelno == logging.WARNING,
                 log_records,
             ),
         )

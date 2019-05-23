@@ -11,7 +11,6 @@ from shutil import rmtree
 from typing import Optional
 
 import click
-from halo import Halo
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Output
@@ -19,6 +18,7 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
     get_dcos_installer_details,
 )
+from dcos_e2e_cli._vendor.halo import Halo
 
 
 def get_install_variant(
@@ -47,7 +47,7 @@ def get_install_variant(
     """
     if given_variant == 'auto':
         assert installer_path is not None
-        spinner = Halo(enabled=sys.stdout.isatty())
+        spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
         spinner.start(text='Determining DC/OS variant')
         try:
             details = get_dcos_installer_details(

@@ -9,7 +9,7 @@ from dcos_e2e.backends import Docker
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import Role
+from dcos_e2e.node import Output, Role
 
 
 class TestAdvancedInstallationMethod:
@@ -36,6 +36,7 @@ class TestAdvancedInstallationMethod:
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
+                        output=Output.LOG_AND_CAPTURE,
                     )
             cluster.wait_for_dcos_oss()
 
@@ -58,6 +59,7 @@ class TestAdvancedInstallationMethod:
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
+                        output=Output.LOG_AND_CAPTURE,
                     )
             cluster.wait_for_dcos_oss()
 
@@ -104,6 +106,7 @@ class TestCopyFiles:
                     (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
                 role=Role.MASTER,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
             cat_result = master.run(

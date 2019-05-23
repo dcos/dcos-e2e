@@ -5,13 +5,12 @@ Tools for waiting for DC/OS.
 import sys
 
 import click
-import urllib3
-from halo import Halo
 from retry import retry
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+from dcos_e2e_cli._vendor.halo import Halo
 from dcos_e2e_cli.common.variants import (
     cluster_variant_available,
     get_cluster_variant,
@@ -52,7 +51,6 @@ def wait_for_dcos(
             connection to the cluster.
         doctor_command_name: A ``doctor`` command to advise a user to use.
     """
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     message = (
         'A cluster may take some time to be ready.\n'
         'The amount of time it takes to start a cluster depends on a variety '
@@ -68,7 +66,7 @@ def wait_for_dcos(
         'To resolve that, run this command again.'
     )
 
-    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
     spinner.start(text='Waiting for DC/OS variant')
     _wait_for_variant(cluster=cluster)
     dcos_variant = get_cluster_variant(cluster=cluster)

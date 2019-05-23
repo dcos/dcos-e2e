@@ -2,6 +2,7 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import logging
 import subprocess
 import tarfile
 import uuid
@@ -14,6 +15,8 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 import yaml
 
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Role(Enum):
@@ -46,7 +49,7 @@ class Output(Enum):
         LOG_AND_CAPTURE: Log output at the debug level. If the code returns a
             ``subprocess.CompletedProcess``, the stdout and stderr will be
             contained in the return value. However, they will be merged into
-            stderr.
+            stdout.
         CAPTURE: Capture stdout and stderr. If the code returns a
             ``subprocess.CompletedProcess``, the stdout and stderr will be
             contained in the return value.
@@ -487,6 +490,13 @@ class Node:
             Output.NO_CAPTURE: False,
         }[output]
 
+        if log_output_live:
+            log_msg = 'Running command `{cmd}` on a node `{node}`'.format(
+                cmd=' '.join(args),
+                node=str(self),
+            )
+            LOGGER.debug(log_msg)
+
         return node_transport.run(
             args=args,
             user=user,
@@ -673,4 +683,61 @@ class Node:
             user=user,
             transport=transport,
             sudo=sudo,
+        )
+
+    def download_file(
+        self,
+        remote_path: Path,
+        local_path: Path,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        Download a file from this node.
+
+        Args:
+            remote_path: The path on the node to download the file from.
+            local_path: The path on the host to download the file to.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+
+        Raises:
+            ValueError: The ``remote_path`` does not exist. The ``local_path``
+                is an existing file.
+        """
+        transport = transport or self.default_transport
+        user = self.default_user
+        transport = self.default_transport
+        try:
+            self.run(
+                args=['test', '-e', str(remote_path)],
+                user=user,
+                transport=transport,
+                sudo=False,
+            )
+        except subprocess.CalledProcessError:
+            message = (
+                'Failed to download file from remote location "{location}". '
+                'File does not exist.'
+            ).format(location=remote_path)
+            raise ValueError(message)
+
+        if local_path.exists() and local_path.is_file():
+            message = (
+                'Failed to download a file to "{file}". '
+                'A file already exists in that location.'
+            ).format(file=local_path)
+            raise ValueError(message)
+
+        if local_path.exists() and local_path.is_dir():
+            download_file_path = local_path / remote_path.name
+        else:
+            download_file_path = local_path
+
+        node_transport = self._get_node_transport(transport=transport)
+        node_transport.download_file(
+            remote_path=remote_path,
+            local_path=download_file_path,
+            user=user,
+            ssh_key_path=self._ssh_key_path,
+            public_ip_address=self.public_ip_address,
         )

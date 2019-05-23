@@ -3,6 +3,7 @@ DC/OS Cluster management tools. Independent of back ends.
 """
 
 import json
+import logging
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
@@ -20,6 +21,8 @@ from .base_classes import ClusterManager  # noqa: F401
 from .base_classes import ClusterBackend
 from .exceptions import DCOSTimeoutError
 from .node import Node, Output, Transport
+
+LOGGER = logging.getLogger(__name__)
 
 
 @retry(
@@ -148,6 +151,8 @@ class Cluster(ContextDecorator):
         reading the CA certificate used by certain checks.
         """
         for node in self.masters:
+            log_msg = 'Running a poststart check on `{}`'.format(str(node))
+            LOGGER.debug(log_msg)
             node.run(
                 args=[
                     'sudo',
@@ -163,8 +168,9 @@ class Cluster(ContextDecorator):
                     '/opt/mesosphere/bin/3dt',
                     '--diag',
                 ],
-                # Keep in mind this must be run as privileged user.
-                output=Output.LOG_AND_CAPTURE,
+                # We capture output because else we would see a lot of output
+                # in a normal cluster start up, for example during tests.
+                output=Output.CAPTURE,
                 shell=True,
             )
 
@@ -255,10 +261,14 @@ class Cluster(ContextDecorator):
             # Creating the "albert" user will error if the user already exists.
             # Therefore, we delete the user.
             # This command returns a 0 exit code even if the user is not found.
-            any_master.run(args=delete_user_args)
+            any_master.run(
+                args=delete_user_args,
+                output=Output.LOG_AND_CAPTURE,
+            )
             any_master.run(
                 args=create_user_args,
                 shell=True,
+                output=Output.LOG_AND_CAPTURE,
             )
             credentials = CI_CREDENTIALS
 
@@ -277,7 +287,10 @@ class Cluster(ContextDecorator):
             # Only the first user can log in with SSO, before granting others
             # access.
             # Therefore, we delete the user who was created to wait for DC/OS.
-            any_master.run(args=delete_user_args)
+            any_master.run(
+                args=delete_user_args,
+                output=Output.LOG_AND_CAPTURE,
+            )
 
         wait_for_dcos_oss_until_timeout()
 

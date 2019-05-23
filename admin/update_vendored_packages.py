@@ -81,12 +81,35 @@ def _get_requirements() -> List[_Requirement]:
         git_reference='eed084208813c9bf0cf4ff753da85fe11909a7bb',
     )
 
+    # We vendor Halo because at the time of writing log_symbols 0.0.12 is the
+    # latest released version of that dependency. We want to use a more recent
+    # version which does not depend on enum34 which is incompatible with being
+    # installed from source in modern Pythons.
+    # Without this, Homebrew and PyInstaller do not work.
+    halo = _Requirement(
+        target_directory=dcos_cli_target_directory,
+        package_name='halo',
+        install_directories=['halo'],
+        https_address='https://github.com/manrajgrover/halo',
+        git_reference='0ac5149dea965b27b09f0776df9095ebf013fb4d',
+    )
+
+    py_log_symbols = _Requirement(
+        target_directory=dcos_cli_target_directory,
+        package_name='log_symbols',
+        install_directories=['log_symbols'],
+        https_address='https://github.com/ManrajGrover/py-log-symbols',
+        git_reference='620b41a4cd8e7d4e33c2479b6f391ddbcbe63383',
+    )
+
     requirements = [
         dcos_installer_tools,
         dcos_launch,
         test_utils,
         vertigo_e2e,
         vertigo_cli,
+        halo,
+        py_log_symbols,
     ]
 
     return requirements

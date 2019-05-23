@@ -94,3 +94,24 @@ class NodeTransport(abc.ABC):
                 the node as the ``user`` user.
             public_ip_address: The public IP address of the node.
         """
+
+    @abc.abstractmethod
+    def download_file(
+        self,
+        remote_path: Path,
+        local_path: Path,
+        user: str,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> None:
+        """
+        Download a file from this node.
+
+        Args:
+            remote_path: The path on the node to download the file from.
+            local_path: The path on the host to download the file to.
+            user: The name of the remote user to download the file.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
+        """

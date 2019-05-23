@@ -21,6 +21,13 @@ Reboot
 DC/OS nodes cannot be rebooted.
 The cluster cannot survive a system reboot.
 
+Resources UI
+~~~~~~~~~~~~
+
+The DC/OS web UI Resources tab shows resources available to each DC/OS node.
+On a :ref:`dcos-docker-cli:minidcos docker` cluster, resources are not specific to one node.
+That means, if the cluster has 16 GB memory available in total, the web UI will show that each node has 16 GB memory available.
+
 Marathon-LB
 ~~~~~~~~~~~
 

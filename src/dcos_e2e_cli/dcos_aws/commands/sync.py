@@ -25,7 +25,7 @@ from ._options import aws_region_option
 @verbosity_option
 def sync_code(
     cluster_id: str,
-    dcos_checkout_dir: str,
+    dcos_checkout_dir: Path,
     aws_region: str,
 ) -> None:
     """
@@ -42,6 +42,6 @@ def sync_code(
     cluster = cluster_instances.cluster
     sync_code_to_masters(
         cluster=cluster,
-        dcos_checkout_dir=Path(dcos_checkout_dir),
+        dcos_checkout_dir=dcos_checkout_dir,
         sudo=True,
     )

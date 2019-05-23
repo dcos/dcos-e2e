@@ -9,7 +9,7 @@ Options:
                                   directory before running the DC/OS installer.
   -c, --cluster-id TEXT           The ID of the cluster to use.  [default:
                                   default]
-  --extra-config PATH             The path to a file including DC/OS
+  --extra-config FILE             The path to a file including DC/OS
                                   configuration YAML. The contents of this file
                                   will be added to add to a default
                                   configuration.
