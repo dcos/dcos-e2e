@@ -230,6 +230,7 @@ class TestCopyFiles:
                 files_to_copy_to_genconf_dir=[
                     (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
             cat_result = master.run(
