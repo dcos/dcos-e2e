@@ -135,6 +135,7 @@ class TestStringRepresentation:
         )
         assert string == str(dcos_node)
 
+
 class TestDownloadFile:
     """
     Tests for ``Node.download_file``.
@@ -179,7 +180,9 @@ class TestDownloadFile:
         local_file_name = 'local_file_{random}.txt'.format(random=random)
         remote_file_name = 'remote_file_{random}.txt'.format(random=random)
         remote_file_path = Path('/etc/') / remote_file_name
-        downloaded_file_name = 'downloaded_file_{random}.txt'.format(random=random)
+        downloaded_file_name = 'downloaded_file_{random}.txt'.format(
+            random=random,
+        )
         downloaded_file_path = tmp_path / downloaded_file_name
         local_file = tmp_path / local_file_name
         local_file.write_text(content)
