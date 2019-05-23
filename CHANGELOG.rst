@@ -6,6 +6,7 @@ Changelog
 Next
 ----
 
+* Download a file or directory from a ``Node``.
 * Improve efficiency of installing DC/OS with ``create`` on ``minidcos docker``
   and ``minidcos aws``.
 * Allow the use of a ``MINIDCOS_NODE_DOCKER_VERSION`` environment variable to set the version of Docker inside ``minidcos docker`` nodes.
