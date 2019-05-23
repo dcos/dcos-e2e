@@ -3,7 +3,6 @@ Abstract base classes for making CLIs.
 """
 
 import abc
-from pathlib import Path
 from typing import Any, Dict, Set
 
 from dcos_e2e.cluster import Cluster
