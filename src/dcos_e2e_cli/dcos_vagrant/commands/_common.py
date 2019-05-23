@@ -143,11 +143,14 @@ class ClusterVMs(ClusterRepresentation):
         vm_name = node_representation
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
+        client = self.vagrant_client()
+        ssh_key_path = Path(client.keyfile(vm_name=vm_name))
+        ssh_user = str(client.user(vm_name=vm_name))
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_user=self.ssh_default_user,
-            ssh_key_path=self.ssh_key_path,
+            default_user=ssh_user,
+            ssh_key_path=ssh_key_path,
         )
 
     def to_dict(self, node_representation: str) -> Dict[str, str]:
@@ -171,31 +174,17 @@ class ClusterVMs(ClusterRepresentation):
             [_ip_from_vm_name(vm_name=name) for name in role_names],
         )
         index = sorted_ips.index(ip_address)
+        client = self.vagrant_client()
+        ssh_user = str(client.user(vm_name=vm_name))
+        ssh_key_path = Path(client.keyfile(vm_name=vm_name))
 
         return {
             'e2e_reference': '{role}_{index}'.format(role=role, index=index),
             'vm_name': vm_name,
             'ip_address': str(ip_address),
+            'ssh_user': ssh_user,
+            'ssh_key': str(ssh_key_path),
         }
-
-    @property
-    def ssh_default_user(self) -> str:
-        """
-        A user which can be used to SSH to any node using
-        ``self.ssh_key_path``.
-        """
-        vm_name = next(iter(self.masters))
-        client = self.vagrant_client()
-        return str(client.user(vm_name=vm_name))
-
-    @property
-    def ssh_key_path(self) -> Path:
-        """
-        A key which can be used to SSH to any node.
-        """
-        vm_name = next(iter(self.masters))
-        client = self.vagrant_client()
-        return Path(client.keyfile(vm_name=vm_name))
 
     @functools.lru_cache()
     def _vm_names(self) -> Set[str]:

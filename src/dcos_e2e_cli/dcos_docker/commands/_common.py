@@ -109,7 +109,7 @@ class ClusterContainers(ClusterRepresentation):
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_user=self.ssh_default_user,
+            default_user=self._ssh_default_user,
             ssh_key_path=self.ssh_key_path,
             default_transport=self._transport,
         )
@@ -139,10 +139,12 @@ class ClusterContainers(ClusterRepresentation):
             'docker_container_name': container.name,
             'docker_container_id': container.id,
             'ip_address': container_ip,
+            'ssh_user': self._ssh_default_user,
+            'ssh_key': str(self.ssh_key_path),
         }
 
     @property
-    def ssh_default_user(self) -> str:
+    def _ssh_default_user(self) -> str:
         """
         A user which can be used to SSH to any node using
         ``self.ssh_key_path``.

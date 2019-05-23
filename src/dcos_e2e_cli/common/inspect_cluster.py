@@ -47,8 +47,6 @@ def show_cluster_details(
         'Cluster ID': cluster_id,
         'Web UI': web_ui,
         'Nodes': nodes,
-        'SSH Default User': cluster_representation.ssh_default_user,
-        'SSH key': str(cluster_representation.ssh_key_path),
         'DC/OS Variant': variant_name,
     }  # type: Dict[str, Any]
     click.echo(
