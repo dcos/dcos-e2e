@@ -203,11 +203,11 @@ class DockerExecTransport(NodeTransport):
         public_ip_address: IPv4Address,
     ) -> None:
         """
-        Copy a file to this node.
+        Download a file from this node.
 
         Args:
-            remote_path: The path on the node to place the file.
-            local_path: The path on the host of the file to send.
+            remote_path: The path on the node to download the file from.
+            local_path: The path on the host to download the file to.
             user: The name of the remote user to send the file.
             ssh_key_path: The path to an SSH key which can be used to SSH to
                 the node as the ``user`` user.

@@ -108,7 +108,7 @@ class NodeTransport(abc.ABC):
         Download a file from this node.
 
         Args:
-            remote_path: The path of the file on the node to download.
+            remote_path: The path on the node to download the file from.
             local_path: The path on the host to download the file to.
             user: The name of the remote user to download the file.
             ssh_key_path: The path to an SSH key which can be used to SSH to

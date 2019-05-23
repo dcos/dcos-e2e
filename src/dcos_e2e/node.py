@@ -695,8 +695,8 @@ class Node:
         Download a file from this node.
 
         Args:
-            local_path: The path on the host of the file to send.
-            remote_path: The path on the node to place the file.
+            remote_path: The path on the node to download the file from.
+            local_path: The path on the host to download the file to.
             transport: The transport to use for communicating with nodes. If
                 ``None``, the ``Node``'s ``default_transport`` is used.
 

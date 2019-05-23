@@ -30,7 +30,7 @@ from dcos_e2e.node import Node, Output, Transport
 # Set TEST_ONE_TRANSPORT=1 to run these tests with just one transport.
 # This can be useful during development for transport-agnostic testing.
 _TRANSPORTS = [
-    Transport.SSH,
+    Transport.DOCKER_EXEC,
 ] if os.getenv('TEST_ONE_TRANSPORT') == '1' else list(Transport)
 
 
@@ -146,7 +146,7 @@ class TestDownloadFile:
         tmp_path: Path,
     ) -> None:
         """
-        It is possible to download a file from a node as the default user.
+        It is possible to download a file from a node to a directory path.
         """
         content = str(uuid.uuid4())
         random = uuid.uuid4().hex
@@ -171,6 +171,9 @@ class TestDownloadFile:
         dcos_node: Node,
         tmp_path: Path,
     ) -> None:
+        """
+        It is possible to download a file from a node to a file path.
+        """
         content = str(uuid.uuid4())
         random = uuid.uuid4().hex
         local_file_name = 'local_file_{random}.txt'.format(random=random)
@@ -194,6 +197,10 @@ class TestDownloadFile:
         self,
         dcos_node: Node,
     ) -> None:
+        """
+        Downloading a file raises a ``ValueError`` if the remote file path does
+        not exist.
+        """
         random = uuid.uuid4().hex
         remote_file_path = Path('/etc/') / random
         message = (
@@ -212,6 +219,10 @@ class TestDownloadFile:
         dcos_node: Node,
         tmp_path: Path,
     ) -> None:
+        """
+        Downloading a file raises a ``ValueError`` if the local file path
+        already exists.
+        """
         content = str(uuid.uuid4())
         random = uuid.uuid4().hex
         local_file_name = 'local_file_{random}.txt'.format(random=random)
