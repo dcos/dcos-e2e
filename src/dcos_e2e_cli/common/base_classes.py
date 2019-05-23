@@ -29,24 +29,9 @@ class ClusterRepresentation(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def ssh_default_user(self) -> str:
-        """
-        A user which can be used to SSH to any node using
-        ``self.ssh_key_path``.
-        """
-
-    @property
-    @abc.abstractmethod
     def base_config(self) -> Dict[str, Any]:
         """
         Return a base configuration for installing DC/OS OSS.
-        """
-
-    @property
-    @abc.abstractmethod
-    def ssh_key_path(self) -> Path:
-        """
-        A key which can be used to SSH to any node.
         """
 
     @property
