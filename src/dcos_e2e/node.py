@@ -684,3 +684,47 @@ class Node:
             transport=transport,
             sudo=sudo,
         )
+
+    def download_file(
+        self,
+        remote_path: Path,
+        local_path: Path,
+    ) -> None:
+        """
+        Copy a file to this node.
+
+        Args:
+            local_path: The path on the host of the file to send.
+            remote_path: The path on the node to place the file.
+        """
+        user = self.default_user
+        transport = self.default_transport
+        try:
+            self.run(
+                args=['test', '-e', str(remote_path)],
+                user=user,
+                transport=transport,
+                sudo=False,
+            )
+        except subprocess.CalledProcessError:
+            message = (
+                'Failed to download file from remote location "{location}". '
+                'File does not exist.'
+            ).format(location=remote_path)
+            raise ValueError(message)
+
+        if local_path.exists() and local_path.is_file():
+            message = (
+                'Failed to download a file to "{file}". '
+                'A file already exists in that location.'
+            ).format(file=local_path)
+            raise ValueError(message)
+
+        node_transport = self._get_node_transport(transport=transport)
+        node_transport.download_file(
+            remote_path=remote_path,
+            local_path=local_path,
+            user=user,
+            ssh_key_path=self._ssh_key_path,
+            public_ip_address=self.public_ip_address,
+        )
