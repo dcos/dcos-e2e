@@ -689,14 +689,22 @@ class Node:
         self,
         remote_path: Path,
         local_path: Path,
+        transport: Optional[Transport] = None,
     ) -> None:
         """
-        Copy a file to this node.
+        Download a file from this node.
 
         Args:
             local_path: The path on the host of the file to send.
             remote_path: The path on the node to place the file.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+
+        Raises:
+            ValueError: The ``remote_path`` does not exist. The ``local_path``
+                is an existing file.
         """
+        transport = transport or self.default_transport
         user = self.default_user
         transport = self.default_transport
         try:
@@ -720,10 +728,15 @@ class Node:
             ).format(file=local_path)
             raise ValueError(message)
 
+        if local_path.exists() and local_path.is_dir():
+            download_file_path = local_path / remote_path.name
+        else:
+            download_file_path = local_path
+
         node_transport = self._get_node_transport(transport=transport)
         node_transport.download_file(
             remote_path=remote_path,
-            local_path=local_path,
+            local_path=download_file_path,
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,

@@ -30,7 +30,7 @@ from dcos_e2e.node import Node, Output, Transport
 # Set TEST_ONE_TRANSPORT=1 to run these tests with just one transport.
 # This can be useful during development for transport-agnostic testing.
 _TRANSPORTS = [
-    Transport.DOCKER_EXEC,
+    Transport.SSH,
 ] if os.getenv('TEST_ONE_TRANSPORT') == '1' else list(Transport)
 
 
