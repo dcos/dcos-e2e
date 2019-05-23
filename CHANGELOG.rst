@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Fix issue with ``minidcos vagrant`` which prevented node access via SSH.
+
 2019.05.23.0
 ------------
 
