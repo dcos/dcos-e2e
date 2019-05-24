@@ -50,7 +50,9 @@ def _state_from_vm_name(vm_name: str) -> str:
     return info['VMState']
 
 
-@functools.lru_cache()
+# We do not cache the results of this function.
+# This is because the VM names may change during one command - a ``create``
+# command.
 def vm_names_by_cluster(running_only: bool = False) -> Dict[str, Set[str]]:
     """
     Return a mapping of Cluster IDs to the names of VMs in those clusters.
