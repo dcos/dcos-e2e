@@ -13,8 +13,8 @@ Usage: minidcos aws create [OPTIONS] INSTALLER_URL
                   These can all be set in ``--extra-config``.
                   However, some defaults are provided for all but the license key.
 
-                  The default superuser username is ``admin``.
-                  The default superuser password is ``admin``.
+                  The default superuser username is ``bootstrapuser``.
+                  The default superuser password is ``deleteme``.
                   The default ``fault_domain_enabled`` is ``false``.
 
                   ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.

@@ -8,9 +8,9 @@ Usage: minidcos vagrant run [OPTIONS] NODE_ARGS...
 Options:
   -c, --cluster-id TEXT    The ID of the cluster to use.  [default: default]
   --dcos-login-uname TEXT  The username to set the ``DCOS_LOGIN_UNAME``
-                           environment variable to.  [default: admin]
+                           environment variable to.  [default: bootstrapuser]
   --dcos-login-pw TEXT     The password to set the ``DCOS_LOGIN_PW`` environment
-                           variable to.  [default: admin]
+                           variable to.  [default: deleteme]
   --sync-dir DIRECTORY     The path to a DC/OS checkout. Part of this checkout
                            will be synced to all master nodes before the command
                            is run. The bootstrap directory is synced if the

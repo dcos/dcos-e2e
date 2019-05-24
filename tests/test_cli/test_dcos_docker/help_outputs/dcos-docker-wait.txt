@@ -6,9 +6,9 @@ Options:
   -c, --cluster-id TEXT          The ID of the cluster to use.  [default:
                                  default]
   --superuser-username TEXT      The superuser username is needed only on DC/OS
-                                 Enterprise clusters.   [default: admin]
+                                 Enterprise clusters.   [default: bootstrapuser]
   --superuser-password TEXT      The superuser password is needed only on DC/OS
-                                 Enterprise clusters.   [default: admin]
+                                 Enterprise clusters.   [default: deleteme]
   --skip-http-checks             Do not wait for checks which require an HTTP
                                  connection to the cluster. If this flag is
                                  used, this command may return before DC/OS is
