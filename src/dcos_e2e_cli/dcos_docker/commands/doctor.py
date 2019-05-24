@@ -4,6 +4,7 @@ Checks for showing up common sources of errors with the Docker backend.
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
@@ -395,8 +396,67 @@ def _check_systemd() -> CheckLevels:
                 '``--no-mount-sys-fs-cgroup``. '
                 'Some applications will not work on the launched cluster.'
             )
-            error(message=message)
+            warn(message=message)
             return CheckLevels.WARNING
+        raise
+
+    container.stop()
+    container.remove(v=True)
+
+    return CheckLevels.NONE
+
+
+def _check_mount_var() -> CheckLevels:
+    """
+    Check that `/private/var/folders` can be mounted.
+    """
+    client = docker_client()
+    tiny_image = 'luca3m/sleep'
+    var_mount = docker.types.Mount(
+        source='/private/var/folders',
+        target='/var',
+        read_only=True,
+        type='bind',
+    )
+    try:
+        container = client.containers.run(
+            image=tiny_image,
+            mounts=[var_mount],
+            detach=True,
+        )
+    except docker.errors.APIError as exc:
+        expected = (
+            'bind mount source path does not exist: /private/var/folders'
+        )
+        expected_docker_machine = (
+            'bind source path does not exist: /private/var/folders'
+        )
+        if expected in str(exc) or expected_docker_machine in str(exc):
+            message = (
+                'There was an error mounting "/private/var/folders" '
+                'from the host into a Docker container. '
+                'This is required for multiple operations.'
+            )
+
+            operating_system_info = client.info()['OperatingSystem']
+            boot2docker = bool('Boot2Docker' in operating_system_info)
+            if boot2docker:
+                message += (
+                    '\n'
+                    'It appears that you are using Boot2Docker or '
+                    'docker-machine and this might be the cause of the '
+                    'problem. '
+                    'These are known to be incompatible with DC/OS E2E and '
+                    'minidcos.'
+                )
+            if sys.platform == 'darwin':
+                message += (
+                    '\n'
+                    'Consider upgrading to Docker for Mac. '
+                    'See https://docs.docker.com/docker-for-mac/install/.'
+                )
+            error(message=message)
+            return CheckLevels.ERROR
         raise
 
     container.stop()
@@ -485,9 +545,9 @@ def doctor() -> None:
     Diagnose common issues which stop this CLI from working correctly.
     """
     check_functions_no_cluster = [
-        check_1_9_sed,
         _check_docker_root_free_space,
         _check_docker_supports_mounts,
+        _check_mount_var,
         _check_memory,
         _check_mount_tmp,
         _check_networking,
@@ -495,6 +555,7 @@ def doctor() -> None:
         check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
+        check_1_9_sed,
         _check_systemd,
     ]
 
