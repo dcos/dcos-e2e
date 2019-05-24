@@ -5,9 +5,9 @@ Usage: minidcos aws wait [OPTIONS]
 Options:
   -c, --cluster-id TEXT      The ID of the cluster to use.  [default: default]
   --superuser-username TEXT  The superuser username is needed only on DC/OS
-                             Enterprise clusters.   [default: admin]
+                             Enterprise clusters.   [default: bootstrapuser]
   --superuser-password TEXT  The superuser password is needed only on DC/OS
-                             Enterprise clusters.   [default: admin]
+                             Enterprise clusters.   [default: deleteme]
   -v, --verbose              Use verbose output. Use this option multiple times
                              for more verbose output.
   --aws-region TEXT          The AWS region to use.  [default: us-west-2]

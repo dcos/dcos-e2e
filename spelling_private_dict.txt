@@ -16,6 +16,7 @@ backends
 badparameter
 bilal
 bootstrap
+bootstrapuser
 breakpoint
 bytestring
 calledprocesserror
@@ -36,6 +37,7 @@ dangoor
 dc
 dcos
 debian
+deleteme
 dict
 diff
 dir
