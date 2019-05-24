@@ -74,6 +74,8 @@ def install_dcos_from_path(
         click.echo('Error installing DC/OS.', err=True)
         click.echo(click.style('Full error:', fg='yellow'))
         click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
+        stderr = exc.stderr.decode()
+        click.echo(click.style(textwrap.indent(stderr, '  '), fg='red'))
         click.echo(doctor_message)
         try:
             cluster.destroy()
@@ -139,6 +141,8 @@ def install_dcos_from_url(
         click.echo('Error installing DC/OS.', err=True)
         click.echo(click.style('Full error:', fg='yellow'))
         click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
+        stderr = exc.stderr.decode()
+        click.echo(click.style(textwrap.indent(stderr, '  '), fg='red'))
         click.echo(doctor_message)
         try:
             cluster.destroy()
