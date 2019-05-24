@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.05.24.1
+------------
+
 * Add a ``minidcos docker doctor`` check which fails when using ``Boot2Docker``.
 
 2019.05.24.0
