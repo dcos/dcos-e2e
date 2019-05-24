@@ -426,9 +426,9 @@ def _check_mount_var() -> CheckLevels:
             detach=True,
         )
     except docker.errors.APIError as exc:
-        expected = (
-            'bind mount source path does not exist: {source}'
-        ).format(source=source)
+        expected = 'bind mount source path does not exist: {source}'.format(
+            source=source,
+        )
         expected_docker_machine = (
             'bind source path does not exist: {source}'
         ).format(source=source)
