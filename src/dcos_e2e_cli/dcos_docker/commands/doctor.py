@@ -380,7 +380,10 @@ def _check_systemd() -> CheckLevels:
         expected = (
             'bind mount source path does not exist: /sys/fs/cgroup/systemd"'
         )
-        if expected in str(exc):
+        expected_docker_machine = (
+            'bind source path does not exist: /sys/fs/cgroup/systemd"'
+        )
+        if expected in str(exc) or expected_docker_machine in str(exc):
             message = (
                 'Launching various applications requires ``/sys/fs/cgroup`` '
                 'to be mounted from the host. '
