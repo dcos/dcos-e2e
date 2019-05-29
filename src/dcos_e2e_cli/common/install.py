@@ -50,7 +50,7 @@ def install_dcos_from_path(
             relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
-    spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
+    spinner = Halo(enabled=sys.stdout.isatty())
     spinner.start('Installing DC/OS')
 
     # We allow a cluster to be passed in rather than just inferring it from
@@ -117,7 +117,7 @@ def install_dcos_from_url(
             relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
-    spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
+    spinner = Halo(enabled=sys.stdout.isatty())
     spinner.start('Installing DC/OS')
 
     # We allow a cluster to be passed in rather than just inferring it from

@@ -47,7 +47,7 @@ def get_install_variant(
     """
     if given_variant == 'auto':
         assert installer_path is not None
-        spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
+        spinner = Halo(enabled=sys.stdout.isatty())
         spinner.start(text='Determining DC/OS variant')
         try:
             details = get_dcos_installer_details(
