@@ -126,6 +126,7 @@ class VagrantCluster(ClusterManager):
                 vm_names.append(name)
 
         vagrant_env = {
+            'HOME': os.environ['HOME'],
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(vm_names),
             'VM_DESCRIPTION': cluster_backend.virtualbox_description,

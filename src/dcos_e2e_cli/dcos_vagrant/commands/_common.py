@@ -65,7 +65,7 @@ def vm_names_by_cluster(running_only: bool = False) -> Dict[str, Set[str]]:
     lines = [line for line in lines if line]
     result = defaultdict(set)  # type: Dict[str, Set[str]]
     for line in lines:
-        vm_name_in_quotes, _ = line.split(' ')
+        vm_name_in_quotes, _ = line.rsplit(' ', 1)
         vm_name = vm_name_in_quotes[1:-1]
         state = _state_from_vm_name(vm_name=vm_name)
         description = _description_from_vm_name(vm_name=vm_name)
@@ -262,6 +262,7 @@ class ClusterVMs(ClusterRepresentation):
         description = _description_from_vm_name(vm_name=one_vm_name)
 
         vagrant_env = {
+            'HOME': os.environ['HOME'],
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(list(vm_names)),
             'VM_DESCRIPTION': description,
