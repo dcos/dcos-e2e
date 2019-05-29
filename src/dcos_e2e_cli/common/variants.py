@@ -11,6 +11,7 @@ from shutil import rmtree
 from typing import Optional
 
 import click
+from halo import Halo
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Output
@@ -18,7 +19,6 @@ from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
     get_dcos_installer_details,
 )
-from dcos_e2e_cli._vendor.halo import Halo
 
 
 def get_install_variant(

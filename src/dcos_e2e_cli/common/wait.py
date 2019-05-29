@@ -5,12 +5,12 @@ Tools for waiting for DC/OS.
 import sys
 
 import click
+from halo import Halo
 from retry import retry
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli._vendor.halo import Halo
 from dcos_e2e_cli.common.variants import (
     cluster_variant_available,
     get_cluster_variant,

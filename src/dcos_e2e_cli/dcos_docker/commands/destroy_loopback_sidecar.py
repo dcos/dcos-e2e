@@ -5,9 +5,9 @@ Tools for destroying sidecar containers.
 import sys
 
 import click
+from halo import Halo
 
 from dcos_e2e.docker_utils import DockerLoopbackVolume
-from dcos_e2e_cli._vendor.halo import Halo
 
 from ._loopback_sidecars import loopback_sidecars_by_name
 

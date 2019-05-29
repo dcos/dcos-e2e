@@ -40,4 +40,6 @@ jeepney==0.3.1
 # they get ``pyproject.toml``s:
 python-dateutil==2.7.5
 attrs==18.2.0
-ptyprocess==0.5.2
+# `halo` requires `log-symbols` and we need a newer log-symbols
+# than it specifies in order to support Python 3.6+.
+log-symbols==0.0.13

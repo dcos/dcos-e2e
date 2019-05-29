@@ -14,9 +14,9 @@ from typing import Union
 
 import click
 import docker
+from halo import Halo
 
 from dcos_e2e.backends import Docker
-from dcos_e2e_cli._vendor.halo import Halo
 
 from ._common import docker_client
 
