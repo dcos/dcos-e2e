@@ -229,7 +229,6 @@ class Node:
             '&&',
             'bash',
             str(remote_dcos_installer),
-            '--offline',
             '-v',
             '--genconf',
         ]
