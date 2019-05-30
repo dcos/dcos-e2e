@@ -35,6 +35,7 @@ def _docker_service_file(
         DockerVersion.v1_11_2: '/usr/bin/docker daemon',
         DockerVersion.v1_13_1: '/usr/bin/docker daemon',
         DockerVersion.v17_12_1_ce: '/usr/bin/dockerd',
+        DockerVersion.v18_06_3_ce: '/usr/bin/dockerd',
     }[docker_version]
 
     docker_cmd = (
