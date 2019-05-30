@@ -47,7 +47,7 @@ class TestEnterpriseIntegrationTests:
                     **config,
                 },
                 ip_detect_path=cluster_backend.ip_detect_path,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
@@ -136,7 +136,7 @@ class TestCopyFiles:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
@@ -221,7 +221,7 @@ class TestCopyFiles:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
@@ -296,7 +296,7 @@ class TestCopyFiles:
                 ip_detect_path=cluster_backend.ip_detect_path,
                 role=Role.MASTER,
                 files_to_copy_to_genconf_dir=[(cert_dir_on_host, genconf)],
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
 
             cluster.wait_for_dcos_ee(
@@ -343,7 +343,7 @@ class TestSSLDisabled:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -392,7 +392,7 @@ class TestWaitForDCOS:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             (master, ) = cluster.masters
