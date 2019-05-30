@@ -9,6 +9,8 @@ Vagrant.configure(2) do |config|
 
   vm_description = ENV['VM_DESCRIPTION'].to_s
   vm_names_string = ENV['VM_NAMES'].to_s
+  vm_memory = ENV['VM_MEMORY'].to_i
+
   node_names = vm_names_string.split(',')
   node_names.each do |node_name|
     config.vm.define node_name.to_sym do |machine|
@@ -18,7 +20,7 @@ Vagrant.configure(2) do |config|
 
       machine.vm.provider 'virtualbox' do |v, override|
         v.cpus = 2
-        v.memory = 2048
+        v.memory = vm_memory
         v.name = node_name
         v.customize ["modifyvm", :id, "--description", vm_description]
       end

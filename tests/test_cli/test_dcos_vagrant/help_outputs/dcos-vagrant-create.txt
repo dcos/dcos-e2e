@@ -71,6 +71,8 @@ Options:
                                   commands without specifying --cluster-id.
   -v, --verbose                   Use verbose output. Use this option multiple
                                   times for more verbose output.
+  --vm-memory-mb INTEGER          The amount of memory to give each VM.
+                                  [default: 2048]
   --enable-selinux-enforcing      With this flag set, SELinux is set to
                                   enforcing before DC/OS is installed on the
                                   cluster.

@@ -19,4 +19,6 @@ Options:
                               for more verbose output.
   --enable-selinux-enforcing  With this flag set, SELinux is set to enforcing
                               before DC/OS is installed on the cluster.
+  --vm-memory-mb INTEGER      The amount of memory to give each VM.  [default:
+                              2048]
   -h, --help                  Show this message and exit.
