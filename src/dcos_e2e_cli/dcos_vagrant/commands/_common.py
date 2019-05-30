@@ -266,6 +266,7 @@ class ClusterVMs(ClusterRepresentation):
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(list(vm_names)),
             'VM_DESCRIPTION': description,
+            'VM_MEMORY': '4096',
         }
 
         [vagrant_root_parent] = [

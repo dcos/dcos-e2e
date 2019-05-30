@@ -42,6 +42,7 @@ from ._common import (
     ClusterVMs,
     existing_cluster_ids,
 )
+from ._options import vm_memory_mb_option
 from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
@@ -61,6 +62,7 @@ from .wait import wait
 @copy_to_master_option
 @cluster_id_option
 @verbosity_option
+@vm_memory_mb_option
 @enable_selinux_enforcing_option
 @wait_for_dcos_option
 @click.pass_context
@@ -80,6 +82,7 @@ def create(
     enable_selinux_enforcing: bool,
     genconf_dir: Optional[Path],
     wait_for_dcos: bool,
+    vm_memory_mb: int,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -109,6 +112,7 @@ def create(
     cluster_backend = Vagrant(
         workspace_dir=workspace_dir,
         virtualbox_description=json.dumps(obj=description),
+        vm_memory_mb=vm_memory_mb,
     )
 
     cluster = create_cluster(
