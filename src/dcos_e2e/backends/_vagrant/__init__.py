@@ -24,7 +24,7 @@ class Vagrant(ClusterBackend):
         self,
         virtualbox_description: str = '',
         workspace_dir: Optional[Path] = None,
-        vm_memory_mb: int = 4096,
+        vm_memory_mb: int = 2048,
     ) -> None:
         """
         Create a configuration for a Vagrant cluster backend.
