@@ -55,9 +55,9 @@ from ._common import (
 )
 from ._custom_tag import custom_tag_option
 from ._options import (
-    aws_region_option,
     aws_instance_type_option,
-    linux_distribution_option
+    aws_region_option,
+    linux_distribution_option,
 )
 from ._variant import variant_option
 from ._wait_for_dcos import wait_for_dcos_option

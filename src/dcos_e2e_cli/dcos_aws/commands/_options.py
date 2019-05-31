@@ -9,22 +9,8 @@ import click
 from ._common import LINUX_DISTRIBUTIONS
 
 
-def aws_region_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for AWS regions.
-    """
-    function = click.option(
-        '--aws-region',
-        type=str,
-        default='us-west-2',
-        show_default=True,
-        help='The AWS region to use.',
-    )(command)  # type: Callable[..., None]
-    return function
-
-
 def aws_instance_type_option(
-    command: Callable[..., None]
+    command: Callable[..., None],
 ) -> Callable[..., None]:
     """
     An option decorator for AWS instance types.
@@ -35,6 +21,20 @@ def aws_instance_type_option(
         default='m4.large',
         show_default=True,
         help='The AWS instance type to use.',
+    )(command)  # type: Callable[..., None]
+    return function
+
+
+def aws_region_option(command: Callable[..., None]) -> Callable[..., None]:
+    """
+    An option decorator for AWS regions.
+    """
+    function = click.option(
+        '--aws-region',
+        type=str,
+        default='us-west-2',
+        show_default=True,
+        help='The AWS region to use.',
     )(command)  # type: Callable[..., None]
     return function
 
