@@ -76,6 +76,7 @@ def test_brew(tmp_path: Path) -> None:
     command_list = [
         'brew',
         'install',
+        '-v',
         container_homebrew_file_path,
         '&&',
         'minidcos',
