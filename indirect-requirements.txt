@@ -21,22 +21,3 @@ azure-datalake-store==0.0.40
 azure-mgmt-network==2.2.1
 azure-mgmt-resource==2.0.0
 azure-monitor==0.3.1
-# Various requirements require entrypoints and jeepney.
-# New versions of these packages depend on flit.
-# flit has an issue when interacting with Homebrew:
-# https://github.com/takluyver/flit/issues/245.
-# To avoid this issue, we pin an older version of entrypoints.
-entrypoints==0.2.3
-jeepney==0.3.1
-# Homebrew installation uses "--no-binary".
-# To avoid https://github.com/pypa/pip/issues/6222 we use "--no-use-pep-517".
-# However, using this is not possible with some packages which then show
-# errors similar to:
-#
-# > Disabling PEP 517 processing is invalid: project specifies a build backend
-# > of setuptools.build_meta in pyproject.toml
-#
-# Therefore we pin older versions of multiple libraries - versions just before
-# they get ``pyproject.toml``s:
-python-dateutil==2.7.5
-attrs==18.2.0
