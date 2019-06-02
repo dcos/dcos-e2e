@@ -17,8 +17,4 @@ class {class_name} < Formula
     ENV["PIP_USE_PEP517"] = "false"
     virtualenv_install_with_resources
   end
-
-  test do
-      system "#{{bin}}/dcos_docker", "--help"
-  end
 end
