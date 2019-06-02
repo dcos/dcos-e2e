@@ -10,6 +10,11 @@ class {class_name} < Formula
 {resource_stanzas}
 
   def install
+    # Ideally this whole section would be "virtualenv_install_with_resources".
+    # However, we work around https://github.com/Homebrew/brew/issues/6200 -
+    # that Homebrew uses `--no-binary :all:` which is incompatible with some
+    # modern versions of `pip` which suffer the bug
+    # https://github.com/pypa/pip/issues/6222.
     wanted = %w[python python@2 python2 python3 python@3 pypy pypy3].select {{ |py| needs_python?(py) }}
     raise FormulaAmbiguousPythonError, self if wanted.size > 1
 
