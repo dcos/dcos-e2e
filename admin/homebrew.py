@@ -74,39 +74,12 @@ def get_homebrew_formula(
     resource_stanzas = str(result.stdout.decode())
     homepage_url = 'http://minidcos.readthedocs.io/en/latest/'
 
-    pattern = dedent(
-        """\
-        class {class_name} < Formula
-          include Language::Python::Virtualenv
-
-          url "{archive_url}"
-          head "{head_url}"
-          homepage "{homepage_url}"
-          depends_on "python3"
-          depends_on "pkg-config"
-
-        {resource_stanzas}
-
-          def install
-            # Without this we hit various issues including
-            # https://github.com/takluyver/flit/issues/245.
-            # All of these issues are caught by CI so it is safe to remove this
-            # and then run CI.
-            ENV["PIP_USE_PEP517"] = "false"
-            virtualenv_install_with_resources
-          end
-
-          test do
-              system "#{{bin}}/dcos_docker", "--help"
-          end
-        end
-        """,
-    )
-
     class_name = _get_class_name(
         homebrew_recipe_filename=homebrew_recipe_filename,
     )
-    return pattern.format(
+    homebrew_template_file = Path(__file__).parent / 'homebrew_template.rb'
+    homebrew_template = homebrew_template_file.read_text()
+    return homebrew_template.format(
         class_name=class_name,
         resource_stanzas=resource_stanzas,
         archive_url=archive_url,
