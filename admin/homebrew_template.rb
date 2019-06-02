@@ -10,11 +10,20 @@ class {class_name} < Formula
 {resource_stanzas}
 
   def install
-    # Without this we hit various issues including
-    # https://github.com/takluyver/flit/issues/245.
-    # All of these issues are caught by CI so it is safe to remove this
-    # and then run CI.
-    ENV["PIP_USE_PEP517"] = "false"
-    virtualenv_install_with_resources
+    wanted = %w[python python@2 python2 python3 python@3 pypy pypy3].select {{ |py| needs_python?(py) }}
+    raise FormulaAmbiguousPythonError, self if wanted.size > 1
+
+    python = wanted.first || "python2.7"
+    python = "python3" if python == "python"
+    venv = virtualenv_create(libexec, python.delete("@"))
+    venv.instance_variable_get(:@formula).system venv.instance_variable_get(:@venv_root)/"bin/pip", "install",
+                    "-v", "--no-deps",
+                    "--ignore-installed",
+                    "--upgrade",
+                    "--force-reinstall",
+                    "pip<19"
+    venv.pip_install resources
+    venv.pip_install_and_link buildpath
+    venv
   end
 end

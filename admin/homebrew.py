@@ -52,7 +52,8 @@ def get_homebrew_formula(
     """
     Return the contents of a Homebrew formula for the CLIs.
     """
-    repository_root = Path(__file__).parent.parent
+    parent = Path(__file__).parent
+    repository_root = parent.parent
     indirect_requires = _get_dependencies(
         requirements_file=repository_root / 'indirect-requirements.txt',
     )
@@ -65,6 +66,13 @@ def get_homebrew_formula(
 
     first = requirements[0]
 
+    # This command runs on a host which we do not control the OS of.
+    # We want our recipe to install on Homebrew (macOS) and Linuxbrew (Linux).
+    # Some packages have OS-specific dependencies.
+    # Our recipe will include the dependencies for our requirements for the OS
+    # that this command runs on.
+    # Some of those dependencies may error if installed on the "wrong"
+    # platform.
     args = ['poet', first]
     for requirement in requirements[1:]:
         args.append('--also')
@@ -77,7 +85,7 @@ def get_homebrew_formula(
     class_name = _get_class_name(
         homebrew_recipe_filename=homebrew_recipe_filename,
     )
-    homebrew_template_file = Path(__file__).parent / 'homebrew_template.rb'
+    homebrew_template_file = parent / 'homebrew_template.rb'
     homebrew_template = homebrew_template_file.read_text()
     return homebrew_template.format(
         class_name=class_name,
