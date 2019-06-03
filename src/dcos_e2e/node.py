@@ -2,6 +2,7 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import json
 import logging
 import subprocess
 import tarfile
@@ -12,7 +13,7 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-import json
+import yaml
 
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
 from .exceptions import DCOSNotInstalledError
@@ -50,6 +51,19 @@ class DCOSBuildInfo:
         commit: str,
         variant: DCOSVariant,
     ) -> None:
+        """
+        DC/OS build info object.
+
+        Args:
+            version: A version of DC/OS.
+            commit: A commit hash of DC/OS.
+            variant: A DC/OS variant.
+
+        Attributes:
+            version: A version of DC/OS.
+            commit: A commit hash of DC/OS.
+            variant: A DC/OS variant.
+        """
         self.version = version
         self.commit = commit
         self.variant = variant
