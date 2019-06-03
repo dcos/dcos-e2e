@@ -297,6 +297,15 @@ class Test112:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.12')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
 
 
 class Test113:
@@ -320,6 +329,15 @@ class Test113:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.13')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -359,6 +377,6 @@ class Test113:
                 *cluster.public_agents,
             }:
                 build = node.dcos_build_info()
-                assert build.version.startswith('1.12')
+                assert build.version.startswith('1.13')
                 assert build.commit
                 assert build.variant == DCOSVariant.ENTERPRISE
