@@ -17,7 +17,7 @@ def vm_memory_mb_option(command: Callable[..., None]) -> Callable[..., None]:
     function = click.option(
         '--vm-memory-mb',
         type=click.INT,
-        default=backend.vagrant_memory_mb,
+        default=backend.vm_memory_mb,
         show_default=True,
         help='The amount of memory to give each VM.',
     )(command)  # type: Callable[..., None]

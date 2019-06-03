@@ -6,6 +6,7 @@ from typing import Callable
 
 import click
 
+from dcos_e2e.backends import Docker
 from dcos_e2e.node import Transport
 
 

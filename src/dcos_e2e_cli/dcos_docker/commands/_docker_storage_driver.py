@@ -36,12 +36,6 @@ def docker_storage_driver_option(command: Callable[..., None],
     """
     Option for choosing the Docker storage driver to use inside the container.
     """
-    backend_default = Docker().transport
-    [default_option] = [
-        transport for transport in transports if
-        transports[transport] == backend_default
-    ]
-
     function = click.option(
         '--docker-storage-driver',
         type=click.Choice(sorted(DOCKER_STORAGE_DRIVERS.keys())),
