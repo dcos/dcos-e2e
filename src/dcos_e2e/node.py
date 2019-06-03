@@ -812,6 +812,26 @@ class Node:
             transport=transport,
         )
         build_info = json.loads(result.stdout.decode())
+
+        # Work around ``dcos-variant`` missing before DC/OS 1.12.
+        if 'dcos-variant' not in build_info:
+            full_config_remote_path = Path(
+                '/opt/mesosphere/etc/expanded.config.full.json',
+            )
+            get_bootstrap_config_args = [
+                'cat',
+                str(full_config_remote_path),
+            ]
+            result = self.run(
+                args=get_bootstrap_config_args,
+                transport=transport,
+            )
+            full_config = json.loads(result.stdout.decode())
+            if 'security' in full_config:
+                build_info['dcos-variant'] = 'enterprise'
+            else:
+                build_info['dcos-variant'] = 'open'
+
         variant_map = {
             'open': DCOSVariant.OSS,
             'enterprise': DCOSVariant.ENTERPRISE,
