@@ -12,7 +12,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Output
+from dcos_e2e.node import DCOSVariant, Output
 
 
 class Test19:
@@ -41,7 +41,10 @@ class Test19:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.9')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.9')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -77,7 +80,10 @@ class Test19:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.9')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.9')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
 
 
 class Test110:
@@ -106,7 +112,10 @@ class Test110:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.10')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.10')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -145,7 +154,10 @@ class Test110:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.10')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.10')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
 
 
 class Test111:
@@ -174,7 +186,10 @@ class Test111:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.11')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.11')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -213,7 +228,10 @@ class Test111:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.11')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.11')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
 
 
 class Test112:
@@ -242,7 +260,10 @@ class Test112:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.12')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.12')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -337,4 +358,7 @@ class Test113:
                 *cluster.agents,
                 *cluster.public_agents,
             }:
-                assert node.dcos_version().startswith('1.12')
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.12')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
