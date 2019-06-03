@@ -99,6 +99,22 @@ def enterprise_1_12_installer() -> Path:
 
 
 @pytest.fixture(scope='session')
+def oss_1_13_installer() -> Path:
+    """
+    Return the path to an installer for DC/OS OSS 1.13.
+    """
+    return Path('/tmp/dcos_generate_config_1_13.sh')
+
+
+@pytest.fixture(scope='session')
+def enterprise_1_13_installer() -> Path:
+    """
+    Return the path to an installer for DC/OS Enterprise 1.13.
+    """
+    return Path('/tmp/dcos_generate_config_1_13.ee.sh')
+
+
+@pytest.fixture(scope='session')
 def oss_installer_url() -> str:
     """
     Return the url to an installer for DC/OS OSS.
