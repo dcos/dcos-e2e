@@ -36,6 +36,12 @@ class Test19:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.9')
 
     def test_enterprise(
         self,
@@ -66,6 +72,12 @@ class Test19:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.9')
 
 
 class Test110:
@@ -89,6 +101,12 @@ class Test110:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.10')
 
     def test_enterprise(
         self,
@@ -122,6 +140,12 @@ class Test110:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.10')
 
 
 class Test111:
@@ -145,6 +169,12 @@ class Test111:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.11')
 
     def test_enterprise(
         self,
@@ -178,6 +208,12 @@ class Test111:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.11')
 
 
 class Test112:
@@ -201,6 +237,12 @@ class Test112:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.12')
 
     def test_enterprise(
         self,
@@ -290,3 +332,9 @@ class Test113:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                assert node.dcos_version().startswith('1.12')
