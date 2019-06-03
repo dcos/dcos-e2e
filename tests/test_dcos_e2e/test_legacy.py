@@ -32,7 +32,7 @@ class Test19:
             cluster.install_dcos_from_path(
                 dcos_installer=oss_1_9_installer,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -59,7 +59,7 @@ class Test19:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -85,7 +85,7 @@ class Test110:
             cluster.install_dcos_from_path(
                 dcos_installer=oss_1_10_installer,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -115,7 +115,7 @@ class Test110:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -141,7 +141,7 @@ class Test111:
             cluster.install_dcos_from_path(
                 dcos_installer=oss_1_11_installer,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -171,7 +171,7 @@ class Test111:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -197,7 +197,7 @@ class Test112:
             cluster.install_dcos_from_path(
                 dcos_installer=oss_1_12_installer,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -227,7 +227,7 @@ class Test112:
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
