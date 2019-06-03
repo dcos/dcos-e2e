@@ -381,6 +381,188 @@ class Node:
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
 
+    def _upgrade_dcos_from_node_path(
+        self,
+        remote_dcos_installer: Path,
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+        user: Optional[str],
+        output: Output,
+        transport: Optional[Transport],
+    ) -> None:
+        """
+        XXX
+
+        Args:
+            remote_dcos_installer: The path on the node to an installer to
+                be installed on the node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            output: What happens with stdout and stderr.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+        """
+        tempdir = Path(gettempdir())
+
+        remote_genconf_dir = 'genconf'
+        remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
+
+        self.send_file(
+            local_path=ip_detect_path,
+            remote_path=remote_genconf_path / 'ip-detect',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        serve_dir_path = remote_genconf_path / 'serve'
+        dcos_config = {
+            **dcos_config,
+            **{
+                'bootstrap_url':
+                'file://{serve_dir_path}'.format(
+                    serve_dir_path=serve_dir_path,
+                ),
+            },
+        }
+        config_yaml = yaml.dump(data=dcos_config)
+        config_file_path = tempdir / 'config.yaml'
+        Path(config_file_path).write_text(data=config_yaml)
+
+        self.send_file(
+            local_path=config_file_path,
+            remote_path=remote_genconf_path / 'config.yaml',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = remote_genconf_path / relative_installer_path
+            self.send_file(
+                local_path=host_path,
+                remote_path=destination_path,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
+
+        genconf_args = [
+            'cd',
+            str(remote_dcos_installer.parent),
+            '&&',
+            'bash',
+            str(remote_dcos_installer),
+            '-v',
+            '--generate-node-upgrade-script',
+            self.dcos_build_info().version,
+        ]
+
+        self.run(
+            args=genconf_args,
+            output=output,
+            shell=True,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        self.run(
+            args=['rm', str(remote_dcos_installer)],
+            output=output,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        setup_args = [
+            'cd',
+            str(remote_dcos_installer.parent),
+            '&&',
+            'bash',
+            'genconf/serve/dcos_node_upgrade.sh',
+        ]
+
+        self.run(
+            args=setup_args,
+            shell=True,
+            output=output,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+    def upgrade_dcos_from_path(
+        self,
+        dcos_installer: Path,
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        user: Optional[str] = None,
+        output: Output = Output.CAPTURE,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        XXX
+
+        Args:
+            dcos_installer: The path to an installer to be installed on the
+                node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            output: What happens with stdout and stderr.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+        """
+        workspace_dir = Path('/dcos-upgrade-dir')
+        node_installer_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+            output=Output.CAPTURE,
+        )
+        node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
+        self.send_file(
+            local_path=dcos_installer,
+            remote_path=node_dcos_installer,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+        self._upgrade_dcos_from_node_path(
+            remote_dcos_installer=node_dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            user=user,
+            role=role,
+            output=output,
+            transport=transport,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
+
+        # TODO(tweidner): Think about cleaning up the workspace_dir
+
     def install_dcos_from_url(
         self,
         dcos_installer: str,
