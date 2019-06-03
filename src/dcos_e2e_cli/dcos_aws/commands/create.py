@@ -77,8 +77,8 @@ from .wait import wait
 @agents_option
 @extra_config_option
 @public_agents_option
-@aws_region_option
 @aws_instance_type_option
+@aws_region_option
 @linux_distribution_option
 @workspace_dir_option
 @license_key_option
@@ -101,8 +101,8 @@ def create(
     license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    aws_region: str,
     aws_instance_type: str,
+    aws_region: str,
     linux_distribution: str,
     cluster_id: str,
     enable_selinux_enforcing: bool,
