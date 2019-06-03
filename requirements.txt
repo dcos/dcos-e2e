@@ -13,6 +13,8 @@ paramiko==2.4.2
 passlib==1.7.1
 # We use an old version of ``pytest`` because ``admin/custom_linters.py`` has
 # not yet been updated to support a new version.
+# ``pytest --collect-only`` regressed - see
+# https://github.com/pytest-dev/pytest/issues/5383.
 pytest==4.3.1
 python-vagrant==0.5.15
 requests==2.21.0
