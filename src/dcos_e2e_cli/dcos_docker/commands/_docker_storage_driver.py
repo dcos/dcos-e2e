@@ -12,6 +12,7 @@ DOCKER_STORAGE_DRIVERS = {
     'aufs': DockerStorageDriver.AUFS,
     'overlay': DockerStorageDriver.OVERLAY,
     'overlay2': DockerStorageDriver.OVERLAY_2,
+    'auto': None,
 }
 
 
@@ -27,8 +28,6 @@ def _get_docker_storage_driver(
     for _ in (ctx, param):
         pass
 
-    if value is None:
-        return None
     return DOCKER_STORAGE_DRIVERS[value]
 
 
@@ -37,11 +36,17 @@ def docker_storage_driver_option(command: Callable[..., None],
     """
     Option for choosing the Docker storage driver to use inside the container.
     """
+    backend_default = Docker().transport
+    [default_option] = [
+        transport for transport in transports if
+        transports[transport] == backend_default
+    ]
+
     function = click.option(
         '--docker-storage-driver',
         type=click.Choice(sorted(DOCKER_STORAGE_DRIVERS.keys())),
-        default=None,
-        show_default=False,
+        default='auto',
+        show_default=True,
         help=(
             'The storage driver to use for Docker in Docker. '
             "By default this uses the host's driver."
