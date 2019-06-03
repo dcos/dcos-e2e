@@ -12,9 +12,10 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-import yaml
+import json
 
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
+from .exceptions import DCOSNotInstalledError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +28,31 @@ class Role(Enum):
     MASTER = 'master'
     AGENT = 'slave'
     PUBLIC_AGENT = 'slave_public'
+
+
+class DCOSVariant(Enum):
+    """
+    Variant of DC/OS.
+    """
+
+    OSS = 1
+    ENTERPRISE = 2
+
+
+class DCOSBuildInfo:
+    """
+    Build information of DC/OS nodes.
+    """
+
+    def __init__(
+        self,
+        version: str,
+        commit: str,
+        variant: DCOSVariant,
+    ) -> None:
+        self.version = version
+        self.commit = commit
+        self.variant = variant
 
 
 class Transport(Enum):
@@ -739,4 +765,44 @@ class Node:
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
+        )
+
+    def dcos_build_info(
+        self,
+        transport: Optional[Transport] = None,
+    ) -> DCOSBuildInfo:
+        """
+        Download a file from this node.
+
+        Args:
+            remote_path: The path on the node to download the file from.
+
+        Raises:
+            ValueError: The ``remote_path`` does not exist. The ``local_path``
+                is an existing file.
+        """
+        build_info_remote_path = Path('/opt/mesosphere/etc/dcos-version.json')
+
+        try:
+            self.run(
+                args=['test', '-e', str(build_info_remote_path)],
+                transport=transport,
+            )
+        except subprocess.CalledProcessError:
+            raise DCOSNotInstalledError
+
+        get_build_info_args = ['cat', str(build_info_remote_path)]
+        result = self.run(
+            args=get_build_info_args,
+            transport=transport,
+        )
+        build_info = json.loads(result.stdout.decode())
+        variant_map = {
+            'open': DCOSVariant.OSS,
+            'enterprise': DCOSVariant.ENTERPRISE,
+        }
+        return DCOSBuildInfo(
+            version=build_info['version'],
+            commit=build_info['dcos-image-commit'],
+            variant=variant_map[build_info['dcos-variant']],
         )

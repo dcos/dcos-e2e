@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Get DC/OS build information from a ``Node`` object after installation.
+
 2019.06.03.0
 ------------
 
