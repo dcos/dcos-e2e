@@ -58,6 +58,8 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test112::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test112::test_oss
+  - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test113::test_enterprise
+  - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test113::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_node.py
