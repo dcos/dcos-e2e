@@ -21,8 +21,8 @@ def node_transport_option(command: Callable[..., None]) -> Callable[..., None]:
 
     backend_default = Docker().transport
     [default_option] = [
-        transport for transport in transports if
-        transports[transport] == backend_default
+        transport for transport in transports
+        if transports[transport] == backend_default
     ]
 
     function = click.option(

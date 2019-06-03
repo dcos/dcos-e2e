@@ -5,6 +5,7 @@ Common options for ``minidcos aws`` commands.
 from typing import Callable
 
 import click
+
 from dcos_e2e.backends import AWS
 
 from ._common import LINUX_DISTRIBUTIONS
