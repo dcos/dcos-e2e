@@ -4,7 +4,6 @@ Tools for creating Homebrew recipes.
 
 import subprocess
 from pathlib import Path
-from textwrap import dedent
 from typing import List
 
 
