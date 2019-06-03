@@ -21,8 +21,8 @@ from _pytest.fixtures import SubRequest
 from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import Docker
-from dcos_e2e.exceptions import DCOSNotInstalledError
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.exceptions import DCOSNotInstalledError
 from dcos_e2e.node import Node, Output, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
