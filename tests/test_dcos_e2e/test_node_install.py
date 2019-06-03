@@ -21,9 +21,7 @@ class TestAdvancedInstallationMethod:
         """
         It is possible to install DC/OS on a node from a URL.
         """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
+        cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             for nodes, role in (
                 (cluster.masters, Role.MASTER),
@@ -44,9 +42,7 @@ class TestAdvancedInstallationMethod:
         """
         It is possible to install DC/OS on a node from a path.
         """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
+        cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             for nodes, role in (
                 (cluster.masters, Role.MASTER),

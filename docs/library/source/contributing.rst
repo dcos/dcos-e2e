@@ -15,7 +15,7 @@ On Ubuntu, install system requirements:
 
 .. substitution-prompt:: bash
 
-   apt install -y gcc python3-dev
+   apt upgrade -y gcc python3-dev python3.6-dev libssl-dev
 
 Install dependencies in a virtual environment.
 
@@ -250,10 +250,10 @@ Release Process
 
 See :doc:`release-process`.
 
-Updating DC/OS Test Utils and DC/OS Launch
-------------------------------------------
+Updating vendored packages
+--------------------------
 
-`DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
+Various repositories, such as `DC/OS Test Utils <https://github.com/dcos/dcos-test-utils>`__ and `DC/OS Launch <https://github.com/dcos/dcos-launch>`__ are vendored in this repository.
 To update DC/OS Test Utils or DC/OS Launch:
 
 Update the SHAs in ``admin/update_vendored_packages.py``.
@@ -263,6 +263,28 @@ The following creates a commit with changes to the vendored packages:
 .. substitution-prompt:: bash
 
    admin/update_vendored_packages.sh
+
+Upstream Blockers
+-----------------
+
+* We do not use ``packaging-requirements.txt`` for packaging as PyInstaller > 3.4 has not yet been released.
+
+This codebase includes workarounds for various issues.
+These include, at least:
+
+* ``make fix-lint`` uses multiple rounds of reformatting to work around https://github.com/myint/autoflake/issues/8.
+
+* The Homebrew recipe we use downgrades ``pip`` to work around https://github.com/pypa/pip/issues/6222.
+
+* We disable the ``pylint`` issue ``no-value-for-parameter`` to avoid https://github.com/PyCQA/pylint/issues/207.
+
+* We avoid ``yaml.FullLoader`` ``mypy`` issues to avoid https://github.com/python/typeshed/issues/2886.
+
+* We disable ``yapf`` in multiple places to avoid https://github.com/google/yapf/issues/524.
+
+* We ignore a type error to avoid https://github.com/python/mypy/issues/5135.
+
+
 
 .. _Homebrew: https://brew.sh/
 .. _Linuxbrew: http://linuxbrew.sh/
