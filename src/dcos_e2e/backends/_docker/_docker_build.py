@@ -55,6 +55,8 @@ def build_docker_image(
         'https://get.docker.com/builds/Linux/x86_64/docker-1.13.1.tgz',
         DockerVersion.v17_12_1_ce:
         'https://download.docker.com/linux/static/stable/x86_64/docker-17.12.1-ce.tgz',  # noqa: E501
+        DockerVersion.v18_06_3_ce:
+        'https://download.docker.com/linux/static/stable/x86_64/docker-18.06.3-ce.tgz',  # noqa: E501
     }
 
     client.images.build(
