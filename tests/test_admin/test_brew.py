@@ -73,10 +73,15 @@ def test_brew(tmp_path: Path) -> None:
 
     mounts = [archive_mount, homebrew_file_mount]
     client.images.pull(repository=linuxbrew_image, tag='latest')
+    # Locally it is useful to run ``brew install`` with ``-v`` to expose
+    # issues.
+    # However, this produces a log which is too long for Travis CI.
+    #
+    # We see
+    # "The job exceeded the maximum log length, and has been terminated.".
     command_list = [
         'brew',
         'install',
-        '-v',
         container_homebrew_file_path,
         '&&',
         'minidcos',
