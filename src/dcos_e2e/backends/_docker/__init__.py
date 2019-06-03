@@ -572,7 +572,6 @@ class DockerCluster(ClusterManager):
         genconf_args = [
             'bash',
             str(dcos_installer),
-            '--offline',
             '-v',
             '--genconf',
         ]

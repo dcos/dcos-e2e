@@ -9,11 +9,11 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 import click
+from halo import Halo
 
 import dcos_e2e_cli.common.wait
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Output
-from dcos_e2e_cli._vendor.halo import Halo
 
 from .base_classes import ClusterRepresentation
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
@@ -50,7 +50,7 @@ def install_dcos_from_path(
             relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
-    spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
+    spinner = Halo(enabled=sys.stdout.isatty())
     spinner.start('Installing DC/OS')
 
     # We allow a cluster to be passed in rather than just inferring it from
@@ -117,7 +117,7 @@ def install_dcos_from_url(
             relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
-    spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
+    spinner = Halo(enabled=sys.stdout.isatty())
     spinner.start('Installing DC/OS')
 
     # We allow a cluster to be passed in rather than just inferring it from

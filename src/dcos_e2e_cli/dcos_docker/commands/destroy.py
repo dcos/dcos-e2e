@@ -6,9 +6,9 @@ import sys
 from typing import List
 
 import click
+from halo import Halo
 
 from dcos_e2e.node import Transport
-from dcos_e2e_cli._vendor.halo import Halo
 from dcos_e2e_cli.common.options import existing_cluster_id_option
 from dcos_e2e_cli.common.utils import check_cluster_id_exists
 
@@ -16,7 +16,7 @@ from ._common import ClusterContainers, existing_cluster_ids
 from ._options import node_transport_option
 
 
-@Halo(enabled=sys.stdout.isatty())  # type: ignore
+@Halo(enabled=sys.stdout.isatty())
 def _destroy_cluster(cluster_id: str, transport: Transport) -> None:
     """
     Destroy a cluster.

@@ -52,7 +52,8 @@ def get_homebrew_formula(
     """
     Return the contents of a Homebrew formula for the CLIs.
     """
-    repository_root = Path(__file__).parent.parent
+    parent = Path(__file__).parent
+    repository_root = parent.parent
     indirect_requires = _get_dependencies(
         requirements_file=repository_root / 'indirect-requirements.txt',
     )
@@ -65,6 +66,13 @@ def get_homebrew_formula(
 
     first = requirements[0]
 
+    # This command runs on a host which we do not control the OS of.
+    # We want our recipe to install on Homebrew (macOS) and Linuxbrew (Linux).
+    # Some packages have OS-specific dependencies.
+    # Our recipe will include the dependencies for our requirements for the OS
+    # that this command runs on.
+    # Some of those dependencies may error if installed on the "wrong"
+    # platform.
     args = ['poet', first]
     for requirement in requirements[1:]:
         args.append('--also')
@@ -74,39 +82,12 @@ def get_homebrew_formula(
     resource_stanzas = str(result.stdout.decode())
     homepage_url = 'http://minidcos.readthedocs.io/en/latest/'
 
-    pattern = dedent(
-        """\
-        class {class_name} < Formula
-          include Language::Python::Virtualenv
-
-          url "{archive_url}"
-          head "{head_url}"
-          homepage "{homepage_url}"
-          depends_on "python3"
-          depends_on "pkg-config"
-
-        {resource_stanzas}
-
-          def install
-            # Without this we hit various issues including
-            # https://github.com/takluyver/flit/issues/245.
-            # All of these issues are caught by CI so it is safe to remove this
-            # and then run CI.
-            ENV["PIP_USE_PEP517"] = "false"
-            virtualenv_install_with_resources
-          end
-
-          test do
-              system "#{{bin}}/dcos_docker", "--help"
-          end
-        end
-        """,
-    )
-
     class_name = _get_class_name(
         homebrew_recipe_filename=homebrew_recipe_filename,
     )
-    return pattern.format(
+    homebrew_template_file = parent / 'homebrew_template.rb'
+    homebrew_template = homebrew_template_file.read_text()
+    return homebrew_template.format(
         class_name=class_name,
         resource_stanzas=resource_stanzas,
         archive_url=archive_url,
