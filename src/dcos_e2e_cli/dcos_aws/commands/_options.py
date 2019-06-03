@@ -16,10 +16,11 @@ def aws_instance_type_option(command: Callable[..., None],
     """
     An option decorator for AWS instance types.
     """
+    default_instance_type = AWS().aws_instance_type
     function = click.option(
         '--aws-instance-type',
         type=str,
-        default='m4.large',
+        default=default_instance_type,
         show_default=True,
         help='The AWS instance type to use.',
     )(command)  # type: Callable[..., None]
