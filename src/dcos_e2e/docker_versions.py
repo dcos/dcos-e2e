@@ -18,3 +18,4 @@ class DockerVersion(Enum):
     v1_11_2 = 1
     v1_13_1 = 2
     v17_12_1_ce = 3
+    v18_06_3_ce = 4

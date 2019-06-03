@@ -137,9 +137,7 @@ class TestDockerBackend:
         """
         It is possible to install DC/OS on a cluster with a Docker backend.
         """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
+        cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
@@ -169,13 +167,14 @@ class TestDockerVersion:
             '1.11.2': DockerVersion.v1_11_2,
             '1.13.1': DockerVersion.v1_13_1,
             '17.12.1-ce': DockerVersion.v17_12_1_ce,
+            '18.06.3-ce': DockerVersion.v18_06_3_ce,
         }
 
         return docker_versions[result.stdout.decode().strip()]
 
     def test_default(self) -> None:
         """
-        By default, the Docker version is 1.13.1.
+        By default, the Docker version is 18.06.3.
         """
         with Cluster(
             cluster_backend=Docker(),
@@ -186,7 +185,7 @@ class TestDockerVersion:
             (master, ) = cluster.masters
             docker_version = self._get_docker_version(node=master)
 
-        assert docker_version == DockerVersion.v1_13_1
+        assert docker_version == DockerVersion.v18_06_3_ce
 
     @pytest.mark.parametrize('docker_version', list(DockerVersion))
     def test_custom_version(self, docker_version: DockerVersion) -> None:
