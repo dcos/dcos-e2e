@@ -68,6 +68,7 @@ before_install:
 - sudo modprobe aufs
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
+- pip uninstall -y six
 install:
 - travis_retry pip install --upgrade --editable .[dev]
 cache: pip
