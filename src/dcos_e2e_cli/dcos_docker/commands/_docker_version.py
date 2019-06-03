@@ -12,6 +12,7 @@ _DOCKER_VERSIONS = {
     '1.11.2': DockerVersion.v1_11_2,
     '1.13.1': DockerVersion.v1_13_1,
     '17.12.1-ce': DockerVersion.v17_12_1_ce,
+    '18.06.3-ce': DockerVersion.v18_06_3_ce,
 }
 
 
@@ -38,7 +39,7 @@ def docker_version_option(command: Callable[..., None],
     function = click.option(
         '--docker-version',
         type=click.Choice(sorted(_DOCKER_VERSIONS.keys())),
-        default='1.13.1',
+        default='18.06.3-ce',
         envvar='MINIDCOS_NODE_DOCKER_VERSION',
         show_default=True,
         help=(

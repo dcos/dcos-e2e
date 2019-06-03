@@ -2,6 +2,7 @@
 Tools for managing DC/OS cluster nodes.
 """
 
+import json
 import logging
 import subprocess
 import tarfile
@@ -15,6 +16,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 import yaml
 
 from ._node_transports import DockerExecTransport, NodeTransport, SSHTransport
+from .exceptions import DCOSNotInstalledError
 
 LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +29,44 @@ class Role(Enum):
     MASTER = 'master'
     AGENT = 'slave'
     PUBLIC_AGENT = 'slave_public'
+
+
+class DCOSVariant(Enum):
+    """
+    Variant of DC/OS.
+    """
+
+    OSS = 1
+    ENTERPRISE = 2
+
+
+class DCOSBuildInfo:
+    """
+    Build information of DC/OS nodes.
+    """
+
+    def __init__(
+        self,
+        version: str,
+        commit: str,
+        variant: DCOSVariant,
+    ) -> None:
+        """
+        DC/OS build info object.
+
+        Args:
+            version: A version of DC/OS.
+            commit: A commit hash of DC/OS.
+            variant: A DC/OS variant.
+
+        Attributes:
+            version: A version of DC/OS.
+            commit: A commit hash of DC/OS.
+            variant: A DC/OS variant.
+        """
+        self.version = version
+        self.commit = commit
+        self.variant = variant
 
 
 class Transport(Enum):
@@ -739,4 +779,65 @@ class Node:
             user=user,
             ssh_key_path=self._ssh_key_path,
             public_ip_address=self.public_ip_address,
+        )
+
+    def dcos_build_info(
+        self,
+        transport: Optional[Transport] = None,
+    ) -> DCOSBuildInfo:
+        """
+        Download a file from this node.
+
+        Args:
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+
+        Raises:
+            DCOSNotInstalledError: The DC/OS build information is not available
+                because DC/OS is not installed on the ``Node``.
+        """
+        build_info_remote_path = Path('/opt/mesosphere/etc/dcos-version.json')
+
+        try:
+            self.run(
+                args=['test', '-e', str(build_info_remote_path)],
+                transport=transport,
+            )
+        except subprocess.CalledProcessError:
+            raise DCOSNotInstalledError
+
+        get_build_info_args = ['cat', str(build_info_remote_path)]
+        result = self.run(
+            args=get_build_info_args,
+            transport=transport,
+        )
+        build_info = json.loads(result.stdout.decode())
+
+        # Work around ``dcos-variant`` missing before DC/OS 1.12.
+        if 'dcos-variant' not in build_info:
+            full_config_remote_path = Path(
+                '/opt/mesosphere/etc/expanded.config.full.json',
+            )
+            get_bootstrap_config_args = [
+                'cat',
+                str(full_config_remote_path),
+            ]
+            result = self.run(
+                args=get_bootstrap_config_args,
+                transport=transport,
+            )
+            full_config = json.loads(result.stdout.decode())
+            if 'security' in full_config:
+                build_info['dcos-variant'] = 'enterprise'
+            else:
+                build_info['dcos-variant'] = 'open'
+
+        variant_map = {
+            'open': DCOSVariant.OSS,
+            'enterprise': DCOSVariant.ENTERPRISE,
+        }
+        return DCOSBuildInfo(
+            version=build_info['version'],
+            commit=build_info['dcos-image-commit'],
+            variant=variant_map[build_info['dcos-variant']],
         )

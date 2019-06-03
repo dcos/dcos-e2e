@@ -21,6 +21,7 @@ breakpoint
 bytestring
 calledprocesserror
 caplog
+ce
 centos
 cgroup
 cgroups

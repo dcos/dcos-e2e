@@ -54,7 +54,11 @@ from ._common import (
     existing_cluster_ids,
 )
 from ._custom_tag import custom_tag_option
-from ._options import aws_region_option, linux_distribution_option
+from ._options import (
+    aws_instance_type_option,
+    aws_region_option,
+    linux_distribution_option,
+)
 from ._variant import variant_option
 from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
@@ -73,6 +77,7 @@ from .wait import wait
 @agents_option
 @extra_config_option
 @public_agents_option
+@aws_instance_type_option
 @aws_region_option
 @linux_distribution_option
 @workspace_dir_option
@@ -96,6 +101,7 @@ def create(
     license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
+    aws_instance_type: str,
     aws_region: str,
     linux_distribution: str,
     cluster_id: str,
@@ -163,6 +169,7 @@ def create(
     cluster_backend = AWS(
         aws_key_pair=(key_name, private_key_path),
         workspace_dir=workspace_dir,
+        aws_instance_type=aws_instance_type,
         aws_region=aws_region,
         linux_distribution=distribution,
         ec2_instance_tags=cluster_tags,

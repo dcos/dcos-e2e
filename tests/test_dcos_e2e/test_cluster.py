@@ -17,7 +17,7 @@ from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Output
+from dcos_e2e.node import DCOSVariant, Output
 
 
 class TestIntegrationTests:
@@ -362,7 +362,6 @@ class TestClusterFromNodes:
             agents=1,
             public_agents=1,
         )
-
         (master, ) = cluster.masters
         (agent, ) = cluster.agents
         (public_agent, ) = cluster.public_agents
@@ -444,14 +443,21 @@ class TestClusterFromNodes:
                 agents=original_cluster.agents,
                 public_agents=original_cluster.public_agents,
             )
-
             cluster.install_dcos_from_path(
                 dcos_installer=oss_installer,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
-
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.14')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
 
 class TestDestroyNode:

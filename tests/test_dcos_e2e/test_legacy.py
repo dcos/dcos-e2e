@@ -12,7 +12,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Output
+from dcos_e2e.node import DCOSVariant, Output
 
 
 class Test19:
@@ -36,6 +36,15 @@ class Test19:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.9')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -66,6 +75,15 @@ class Test19:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.9')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
 
 
 class Test110:
@@ -89,6 +107,15 @@ class Test110:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.10')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -122,6 +149,15 @@ class Test110:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.10')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
 
 
 class Test111:
@@ -145,6 +181,15 @@ class Test111:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.11')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -178,6 +223,15 @@ class Test111:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.11')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
 
 
 class Test112:
@@ -201,6 +255,15 @@ class Test112:
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.12')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
 
     def test_enterprise(
         self,
@@ -234,3 +297,86 @@ class Test112:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.12')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE
+
+
+class Test113:
+    """
+    Tests for running DC/OS 1.13.
+    """
+
+    def test_oss(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_1_13_installer: Path,
+    ) -> None:
+        """
+        An open source DC/OS 1.13 cluster can be started.
+        """
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            cluster.install_dcos_from_path(
+                dcos_installer=oss_1_13_installer,
+                dcos_config=cluster.base_config,
+                output=Output.LOG_AND_CAPTURE,
+                ip_detect_path=cluster_backend.ip_detect_path,
+            )
+            cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.13')
+                assert build.commit
+                assert build.variant == DCOSVariant.OSS
+
+    def test_enterprise(
+        self,
+        cluster_backend: ClusterBackend,
+        enterprise_1_13_installer: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        A DC/OS Enterprise 1.13 cluster can be started.
+        """
+        superuser_username = str(uuid.uuid4())
+        superuser_password = str(uuid.uuid4())
+        config = {
+            'superuser_username': superuser_username,
+            'superuser_password_hash': sha512_crypt.hash(superuser_password),
+            'fault_domain_enabled': False,
+            'license_key_contents': license_key_contents,
+        }
+
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            cluster.install_dcos_from_path(
+                dcos_installer=enterprise_1_13_installer,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
+                output=Output.LOG_AND_CAPTURE,
+                ip_detect_path=cluster_backend.ip_detect_path,
+            )
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.13')
+                assert build.commit
+                assert build.variant == DCOSVariant.ENTERPRISE

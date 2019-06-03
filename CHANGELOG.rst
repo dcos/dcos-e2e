@@ -6,6 +6,13 @@ Changelog
 Next
 ----
 
+* Get DC/OS build information from a ``Node`` object after installation.
+* Added option to ``minidcos aws create`` and ``minidcos aws provision`` to choose the AWS instance type.
+* Changed the default version of Docker installed on ``minidcos docker`` clusters to ``18.06.3-ce``.
+
+2019.06.03.0
+------------
+
 * Added options to choose the amount of memory given to each VM.
 * Fixed a bug which prevented ``minidcos vagrant`` from working when a VM existed with a space in the name.
 * Fixed a bug which prevented ``minidcos vagrant`` from working in some situations when the ``$HOME`` environment variable is not set.

@@ -22,6 +22,7 @@ from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.exceptions import DCOSNotInstalledError
 from dcos_e2e.node import Node, Output, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
@@ -1007,3 +1008,23 @@ class TestOutput:
             dcos_node.run(args=args, shell=True, output=output)
         expected_message = b'No such file or directory'
         assert expected_message in excinfo.value.stderr
+
+
+class TestDcosBuildInfo:
+    """
+    Tests for ``Node.dcos_build_info``.
+
+    The tests here assume that DC/OS is not already installed.
+    In order to save CI run time, the tests for this method are in
+    ``test_legacy.py``.
+    This allows us to check that the build information is correct for all
+    supported versions of DC/OS.
+    """
+
+    def test_not_installed(self, dcos_node: Node) -> None:
+        """
+        When trying to retrieve the DC/OS version of a cluster which does not
+        have DC/OS installed, a ``DCOSNotInstalledError`` is raised.
+        """
+        with pytest.raises(DCOSNotInstalledError):
+            dcos_node.dcos_build_info()
