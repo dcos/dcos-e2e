@@ -789,11 +789,12 @@ class Node:
         Download a file from this node.
 
         Args:
-            remote_path: The path on the node to download the file from.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
 
         Raises:
-            ValueError: The ``remote_path`` does not exist. The ``local_path``
-                is an existing file.
+            DCOSNotInstalledError: The DC/OS build information is not available
+                because DC/OS is not installed on the ``Node``.
         """
         build_info_remote_path = Path('/opt/mesosphere/etc/dcos-version.json')
 
