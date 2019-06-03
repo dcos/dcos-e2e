@@ -9,9 +9,8 @@ import click
 from ._common import LINUX_DISTRIBUTIONS
 
 
-def aws_instance_type_option(
-    command: Callable[..., None],
-) -> Callable[..., None]:
+def aws_instance_type_option(command: Callable[..., None],
+                             ) -> Callable[..., None]:
     """
     An option decorator for AWS instance types.
     """
