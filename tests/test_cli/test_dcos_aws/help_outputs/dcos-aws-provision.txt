@@ -9,6 +9,8 @@ Options:
   --agents INTEGER                The number of agent nodes.  [default: 1]
   --public-agents INTEGER         The number of public agent nodes.  [default:
                                   1]
+  --aws-instance-type TEXT        The AWS instance type to use.  [default:
+                                  m4.large]
   --aws-region TEXT               The AWS region to use.  [default: us-west-2]
   --linux-distribution [centos-7|coreos|rhel-7]
                                   The Linux distribution to use on the nodes.

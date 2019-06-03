@@ -9,6 +9,21 @@ import click
 from ._common import LINUX_DISTRIBUTIONS
 
 
+def aws_instance_type_option(command: Callable[..., None],
+                             ) -> Callable[..., None]:
+    """
+    An option decorator for AWS instance types.
+    """
+    function = click.option(
+        '--aws-instance-type',
+        type=str,
+        default='m4.large',
+        show_default=True,
+        help='The AWS instance type to use.',
+    )(command)  # type: Callable[..., None]
+    return function
+
+
 def aws_region_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for AWS regions.

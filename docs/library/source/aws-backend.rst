@@ -18,6 +18,12 @@ This is because the installation method employs a bootstrap node that directly d
 The :py:attr:`~dcos_e2e.node.Node.private_ip_address` refers to the internal network of the AWS stack which is also used by DC/OS internally.
 The :py:attr:`~dcos_e2e.node.Node.public_ip_address` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
 
+AWS Instance Types
+------------------
+
+When launching a cluster with Amazon Web Services there are a number of different instance types to choose from using :paramref:`~dcos_e2e.backends.AWS.aws_instance_type`.
+It is recommended to use ``m4.large`` to keep the cost low, but ``m5.2xlarge`` may be required for some services, such as MKE.
+
 AWS Regions
 -----------
 
