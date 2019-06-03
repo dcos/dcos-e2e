@@ -53,14 +53,17 @@ class TestEnterpriseIntegrationTests:
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+
             # No error is raised with a successful command.
+            # We choose a test file which runs very quickly.
+            fast_test_file = 'test_marathon_authn_authz.py'
             cluster.run_integration_tests(
-                pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
+                pytest_command=['pytest', '-vvv', '-s', '-x', fast_test_file],
                 env={
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
 
 
