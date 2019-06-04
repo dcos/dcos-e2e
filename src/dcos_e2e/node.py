@@ -309,8 +309,6 @@ class Node:
             sudo=True,
         )
 
-
-
     def install_dcos_from_path(
         self,
         dcos_installer: Path,
@@ -498,9 +496,7 @@ class Node:
         ]
 
         if role in (Role.AGENT, Role.PUBLIC_AGENT):
-            self.run(
-                args=['rm', '/opt/mesosphere/lib/libltdl.so.7'],
-            )
+            self.run(args=['rm', '/opt/mesosphere/lib/libltdl.so.7'], )
 
         self.run(
             args=setup_args,

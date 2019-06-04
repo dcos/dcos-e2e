@@ -1,9 +1,9 @@
 from pathlib import Path
 
 from dcos_e2e.backends import Docker
+from dcos_e2e.cluster import Cluster
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import DCOSVariant, Output, Role
-from dcos_e2e.cluster import Cluster
 
 
 class TestNodeUpgrade:
