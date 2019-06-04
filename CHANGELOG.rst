@@ -9,6 +9,8 @@ Next
 * Get DC/OS build information from a ``Node`` object after installation.
 * Added option to ``minidcos aws create`` and ``minidcos aws provision`` to choose the AWS instance type.
 * Changed the default version of Docker installed on ``minidcos docker`` clusters to ``18.06.3-ce``.
+* Added ``Node.upgrade_dcos_from_path``.
+* Added ``minidcos docker upgrade``.
 
 2019.06.03.0
 ------------
