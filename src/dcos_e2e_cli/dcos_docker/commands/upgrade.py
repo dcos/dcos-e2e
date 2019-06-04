@@ -42,7 +42,7 @@ def upgrade(cluster_id: str, transport: Transport, installer: Path) -> None:
         for node in nodes:
             node.upgrade_dcos_from_path(
                 dcos_installer=installer,
-                dcos_config=cluster.base_config,
+                dcos_config=cluster_containers.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 role=role,
                 output=Output.LOG_AND_CAPTURE,

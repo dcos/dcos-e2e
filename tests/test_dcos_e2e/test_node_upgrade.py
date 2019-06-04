@@ -16,10 +16,7 @@ class TestNodeUpgrade:
         oss_1_12_installer: Path,
         oss_1_13_installer: Path,
     ) -> None:
-        # TODO(tweidner): Remove this since 18.09 will be the default.
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
+        cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 dcos_installer=oss_1_12_installer,
