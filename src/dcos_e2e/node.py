@@ -4,6 +4,7 @@ Tools for managing DC/OS cluster nodes.
 
 import json
 import logging
+import shlex
 import subprocess
 import tarfile
 import uuid
@@ -11,6 +12,7 @@ from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
+from textwrap import dedent
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
@@ -371,6 +373,253 @@ class Node:
             sudo=True,
         )
         self._install_dcos_from_node_path(
+            remote_dcos_installer=node_dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            user=user,
+            role=role,
+            output=output,
+            transport=transport,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
+
+    def _upgrade_dcos_from_node_path(
+        self,
+        remote_dcos_installer: Path,
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+        user: Optional[str],
+        output: Output,
+        transport: Optional[Transport],
+    ) -> None:
+        """
+        Upgrade DC/OS on this node.
+        This follows the steps in
+        https://docs.mesosphere.com/1.13/installing/production/upgrading/.
+
+        Args:
+            remote_dcos_installer: The path on the node to an installer to
+                be installed on the node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            output: What happens with stdout and stderr.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+
+        Raises:
+            subprocess.CalledProcessError: One of the upgrade process steps
+                exited with a non-zero code.
+        """
+        tempdir = Path(gettempdir())
+
+        remote_genconf_dir = 'genconf'
+        remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
+
+        self.send_file(
+            local_path=ip_detect_path,
+            remote_path=remote_genconf_path / 'ip-detect',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        serve_dir_path = remote_genconf_path / 'serve'
+        dcos_config = {
+            **dcos_config,
+            **{
+                'bootstrap_url':
+                'file://{serve_dir_path}'.format(
+                    serve_dir_path=serve_dir_path,
+                ),
+            },
+        }
+        config_yaml = yaml.dump(data=dcos_config)
+        config_file_path = tempdir / 'config.yaml'
+        Path(config_file_path).write_text(data=config_yaml)
+
+        self.send_file(
+            local_path=config_file_path,
+            remote_path=remote_genconf_path / 'config.yaml',
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        for host_path, installer_path in files_to_copy_to_genconf_dir:
+            relative_installer_path = installer_path.relative_to('/genconf')
+            destination_path = remote_genconf_path / relative_installer_path
+            self.send_file(
+                local_path=host_path,
+                remote_path=destination_path,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
+
+        python_to_find_open_port = dedent(
+            """\
+            import socket
+
+            host = ''
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as new:
+                new.bind((host, 0))
+                new.listen(1)
+                print(int(new.getsockname()[1]))
+            """,
+        )
+
+        try:
+            open_port_result = self.run(
+                args=[
+                    # We source this file to guarantee that we have Python 3 on
+                    # our path as ``python``.
+                    '.',
+                    '/opt/mesosphere/environment.export',
+                    '&&',
+                    'python',
+                    '-c',
+                    shlex.quote(python_to_find_open_port),
+                ],
+                shell=True,
+                output=Output.CAPTURE,
+            )
+        except subprocess.CalledProcessError as exc:
+            # We do not have coverage here - we do not expect to hit it unless
+            # we have made a mistake.
+            LOGGER.error(exc.stderr.decode())
+            raise
+
+        open_port_number = int(open_port_result.stdout.decode())
+
+        genconf_args = [
+            'cd',
+            str(remote_dcos_installer.parent),
+            '&&',
+            'PORT={open_port}'.format(open_port=open_port_number),
+            'bash',
+            str(remote_dcos_installer),
+            '-v',
+            '--generate-node-upgrade-script',
+            self.dcos_build_info().version,
+        ]
+
+        # We do not respect ``output`` here because we need to capture output
+        # for the result.
+        # We cannot just use ``Output.CAPTURE`` because then we will have
+        # silence in the test output and Travis CI will error.
+        output_map = {
+            Output.CAPTURE: Output.CAPTURE,
+            Output.LOG_AND_CAPTURE: Output.LOG_AND_CAPTURE,
+            Output.NO_CAPTURE: Output.LOG_AND_CAPTURE,
+        }
+        result = self.run(
+            args=genconf_args,
+            output=output_map[output],
+            shell=True,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        last_line = result.stdout.decode().split()[-1]
+        upgrade_script_path = Path(last_line.split('file://')[-1])
+
+        self.run(
+            args=['rm', str(remote_dcos_installer)],
+            output=output,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+        setup_args = [
+            'cd',
+            str(remote_dcos_installer.parent),
+            '&&',
+            'bash',
+            str(upgrade_script_path),
+        ]
+
+        if role in (Role.AGENT, Role.PUBLIC_AGENT):
+            self.run(
+                args=['rm', '-f', '/opt/mesosphere/lib/libltdl.so.7'],
+                sudo=True,
+                output=output,
+            )
+
+        self.run(
+            args=setup_args,
+            shell=True,
+            output=output,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+    def upgrade_dcos_from_path(
+        self,
+        dcos_installer: Path,
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        user: Optional[str] = None,
+        output: Output = Output.CAPTURE,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        Upgrade DC/OS on this node.
+        This follows the steps in
+        https://docs.mesosphere.com/1.13/installing/production/upgrading/.
+
+        Args:
+            dcos_installer: The path to an installer to be installed on the
+                node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            output: What happens with stdout and stderr.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+        """
+        # This is unfortunately kept around, wasting space on the node because
+        # it can only be removed when the upgrade is finished, and we do not
+        # block on this.
+        workspace_dir = Path('/dcos-upgrade-dir')
+
+        node_installer_parent = workspace_dir / uuid.uuid4().hex
+        mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
+        self.run(
+            args=mkdir_args,
+            user=user,
+            transport=transport,
+            sudo=True,
+            output=Output.CAPTURE,
+        )
+        node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
+        self.send_file(
+            local_path=dcos_installer,
+            remote_path=node_dcos_installer,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+        self._upgrade_dcos_from_node_path(
             remote_dcos_installer=node_dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,

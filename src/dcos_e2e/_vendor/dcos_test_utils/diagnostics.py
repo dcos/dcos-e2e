@@ -60,7 +60,9 @@ class Diagnostics(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSes
             nodes = {"nodes": ["all"]}
         return self.post('/report/diagnostics/create', json=nodes)
 
-    @retrying.retry(wait_fixed=2000, stop_max_delay=120000,
+    # stop_max_delay set to 20 minutes to provide enough time for bundle to be
+    # created. See DCOS-41819
+    @retrying.retry(wait_fixed=2000, stop_max_delay=1200000,
                     retry_on_result=lambda x: x is False)
     def wait_for_diagnostics_job(self, last_datapoint: dict):
         """

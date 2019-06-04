@@ -351,13 +351,23 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
             return True
 
     # Retry if returncode is False, do not retry on exceptions.
+    # We don't want to infinite retries while waiting for agent endpoints,
+    # when we are retrying on both HTTP 502 and 404 statuses
+    # Added a stop_max_attempt to 60.
     @retrying.retry(wait_fixed=2000,
                     retry_on_result=lambda r: r is False,
-                    retry_on_exception=lambda _: False)
+                    retry_on_exception=lambda _: False,
+                    stop_max_attempt_number=60)
     def _wait_for_srouter_slaves_endpoints(self):
         # Get currently known agents. This request is served straight from
         # Mesos (no AdminRouter-based caching is involved).
         r = self.get('/mesos/master/slaves')
+
+        # If the agent has restarted, the mesos endpoint can give 502
+        # for a brief moment.
+        if r.status_code == 502:
+            return False
+
         assert r.status_code == 200
 
         data = r.json()
@@ -367,16 +377,26 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         slaves_ids = sorted(x['id'] for x in data['slaves'] if x['hostname'] in self.all_slaves)
 
         for slave_id in slaves_ids:
-            # AdminRouter's slave endpoint internally uses cached Mesos
-            # state data. That is, slave IDs of just recently joined
-            # slaves can be unknown here. For those, this endpoint
-            # returns a 404. Retry in this case, until this endpoint
-            # is confirmed to work for all known agents.
+            in_progress_status_codes = (
+                # AdminRouter's slave endpoint internally uses cached Mesos
+                # state data. That is, slave IDs of just recently joined
+                # slaves can be unknown here. For those, this endpoint
+                # returns a 404. Retry in this case, until this endpoint
+                # is confirmed to work for all known agents.
+                404,
+                # During a node restart or a DC/OS upgrade, this
+                # endpoint returns a 502 temporarily, until the agent has
+                # started up and the Mesos agent HTTP server can be reached.
+                502,
+            )
             uri = '/slave/{}/slave%281%29/state'.format(slave_id)
             r = self.get(uri)
-            if r.status_code == 404:
+            if r.status_code in in_progress_status_codes:
                 return False
-            assert r.status_code == 200
+            assert r.status_code == 200, (
+                'Expecting status code 200 for GET request to {uri} but got '
+                '{status_code} with body {content}'
+            ).format(uri=uri, status_code=r.status_code, content=r.content)
             data = r.json()
             assert "id" in data
             assert data["id"] == slave_id
