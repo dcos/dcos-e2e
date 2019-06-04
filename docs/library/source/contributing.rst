@@ -21,7 +21,7 @@ Install dependencies in a virtual environment.
 
 .. substitution-prompt:: bash
 
-    pip3 install --editable .[dev]
+    pip3 install --editable '.[dev]'
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
