@@ -465,8 +465,6 @@ class Node:
             str(remote_dcos_installer),
             '-v',
             '--generate-node-upgrade-script',
-            '--port',
-            '9001',
             self.dcos_build_info().version,
         ]
 
