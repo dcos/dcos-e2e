@@ -71,5 +71,5 @@ def build_docker_image(
         rm=True,
         forcerm=True,
         tag=tag,
-        buildargs={'DOCKER_URL': docker_urls[docker_version]},
+        buildargs={'docker_url': docker_urls[docker_version]},
     )

@@ -393,8 +393,9 @@ class Node:
         transport: Optional[Transport],
     ) -> None:
         """
-        # TODO document this
-        # TODO link to the upgrade documentation that this emulates
+        Upgrade DC/OS on this node.
+        This follows the steps in
+        https://docs.mesosphere.com/1.13/installing/production/upgrading/.
 
         Args:
             remote_dcos_installer: The path on the node to an installer to
@@ -411,6 +412,10 @@ class Node:
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
+
+        Raises:
+            subprocess.CalledProcessError: One of the upgrade process steps
+                exited with a non-zero code.
         """
         tempdir = Path(gettempdir())
 
@@ -484,6 +489,7 @@ class Node:
             )
         except subprocess.CalledProcessError as exc:
             LOGGER.error(exc.stderr.decode())
+            raise
 
         last_line = result.stdout.decode().split()[-1]
         upgrade_script_path = Path(last_line.split('file://')[-1])
@@ -506,13 +512,9 @@ class Node:
 
         if role in (Role.AGENT, Role.PUBLIC_AGENT):
             self.run(
-                args=[
-                    'rm',
-                    '-f',
-                    '/opt/mesosphere/lib/libltdl.so.7',
-                ],
+                args=['rm', '-f', '/opt/mesosphere/lib/libltdl.so.7'],
                 sudo=True,
-                output=Output.LOG_AND_CAPTURE,
+                output=output,
             )
 
         self.run(

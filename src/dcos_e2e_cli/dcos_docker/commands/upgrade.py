@@ -90,3 +90,4 @@ def upgrade(
                 role=role,
                 output=Output.LOG_AND_CAPTURE,
             )
+    # TODO print wait message
