@@ -149,7 +149,7 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
         acknowledge it's successful creation or fails the test.
 
         The wait for application is immediately aborted if Marathon returns
-        nonempty 'lastTaskFailure' field. Otherwise it waits until all the
+        nonempty 'lastTaskFailure' field (if ignore_failed_tasks is set to False). Otherwise it waits until all the
         instances reach tasksRunning and then tasksHealthy state.
 
         Args:
@@ -284,7 +284,7 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
                             "completed in {} seconds.".format(timeout))
 
     @contextlib.contextmanager
-    def deploy_and_cleanup(self, app_definition, timeout=1200, check_health=True, ignore_failed_tasks=False):
+    def deploy_and_cleanup(self, app_definition, timeout=1200, check_health=True, ignore_failed_tasks=True):
         """ This context manager works just like :func:`Marathon.deploy_app` but will always destroy
         the app once the context is left
         """

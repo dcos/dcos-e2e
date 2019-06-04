@@ -12,22 +12,26 @@ import shutil
 import stat
 import subprocess
 import tempfile
-from typing import Optional
+from typing import Optional, List
 
 import requests
 
 log = logging.getLogger(__name__)
 
-DCOS_CLI_URL = os.getenv('DCOS_CLI_URL', 'https://downloads.dcos.io/binaries/cli/linux/x86-64/dcos-1.12/dcos')
+DCOS_CLI_URL = os.getenv('DCOS_CLI_URL', 'https://downloads.dcos.io/cli/releases/binaries/dcos/linux/x86-64/0.8.0/dcos')  # noqa: E501
+CORE_CLI_PLUGIN_URL = os.getenv('CORE_CLI_PLUGIN_URL', 'https://downloads.dcos.io/cli/releases/plugins/dcos-core-cli/linux/x86-64/dcos-core-cli-1.13-patch.4.zip')  # noqa: E501
+EE_CLI_PLUGIN_URL = os.getenv('EE_CLI_PLUGIN_URL', 'https://downloads.mesosphere.io/cli/releases/plugins/dcos-enterprise-cli/linux/x86-64/dcos-enterprise-cli-1.13-patch.0.zip')  # noqa: E501
 
 
-class DcosCli():
+class DcosCli:
     """ This wrapper assists in setting up the CLI and running CLI commands in subprocesses
 
     :param cli_path: path to a binary with executable permissions already set
     :type cli_path: str
     """
-    def __init__(self, cli_path: str):
+    def __init__(self, cli_path: str, core_plugin_url: str, ee_plugin_url: str):
+        self.core_plugin_url = core_plugin_url
+        self.ee_plugin_url = ee_plugin_url
         self.path = os.path.abspath(os.path.expanduser(cli_path))
         updated_env = os.environ.copy()
         # make sure the designated CLI is on top of the PATH
@@ -55,16 +59,18 @@ class DcosCli():
     def new_cli(
         cls,
         download_url: str=DCOS_CLI_URL,
+        core_plugin_url: str=CORE_CLI_PLUGIN_URL,
+        ee_plugin_url: str=EE_CLI_PLUGIN_URL,
         tmpdir: Optional[str]=None
     ):
         """Download and set execute permission for a new dcos-cli binary
 
         :param download_url: URL of the dcos-cli binary to be used.
             If not set, a stable cli will be used.
-        :type download_url: str
+        :param core_plugin_url: URL of the core plugin for the DC/OS CLI
+        :param ee_enterprise_url: URL of the ee plugin for the DC/OS CLI
         :param tmpdir: path to a temporary directory to contain the executable.
             If not set, a temporary directory will be created.
-        :type tmpdir: Optional[str]
         """
         if tmpdir is None:
             tmpdir = tempfile.mkdtemp()
@@ -79,7 +85,7 @@ class DcosCli():
         st = os.stat(dcos_cli_path)
         os.chmod(dcos_cli_path, st.st_mode | stat.S_IEXEC)
 
-        return cls(dcos_cli_path)
+        return cls(dcos_cli_path, core_plugin_url, ee_plugin_url)
 
     @staticmethod
     def clear_cli_dir():
@@ -92,13 +98,12 @@ class DcosCli():
         if os.path.exists(path):
             shutil.rmtree(path)
 
-    def exec_command(self, cmd: str, stdin=None) -> tuple:
+    def exec_command(self, cmd: List[str], stdin=None) -> tuple:
         """Execute CLI command and processes result.
 
         This method expects that process won't block.
 
         :param cmd: Program and arguments
-        :type cmd: str
         :param stdin: File to use for stdin
         :type stdin: File
         :returns: A tuple with stdout and stderr
@@ -150,13 +155,13 @@ class DcosCli():
             username = os.environ['DCOS_LOGIN_UNAME']
         if not password:
             password = os.environ['DCOS_LOGIN_PW']
-        stdout, stderr = self.exec_command(
-            ["dcos", "cluster", "setup", str(url), "--no-check",
-             "--username={}".format(username), "--password={}".format(password)])
-        assert stdout == ''
-        assert stderr == ''
-        self.exec_command(
-            ["dcos", "package", "install", "dcos-enterprise-cli", "--cli", "--yes"])
+        self.exec_command(["dcos", "cluster", "setup", str(url), "--no-check", "--username={}".format(username),
+                           "--password={}".format(password)])
+        if self.core_plugin_url:
+            self.exec_command(['dcos', 'plugin', 'add', '-u', self.core_plugin_url])
+        if self.ee_plugin_url:
+            self.exec_command(['dcos', 'plugin', 'add', '-u', self.ee_plugin_url])
+        self.exec_command(["dcos", "--debug", "package", "install", "dcos-enterprise-cli", "--cli", "--yes"])
 
     def login_enterprise(self, username=None, password=None, provider=None):
         """ Authenticates the CLI with the setup Mesosphere Enterprise DC/OS cluster
@@ -177,8 +182,7 @@ class DcosCli():
         if provider:
             command.append("--provider={}".format(provider))
 
-        _, stderr = self.exec_command(command)
-        assert stderr == ''
+        self.exec_command(command)
 
 
 class DcosCliConfiguration:

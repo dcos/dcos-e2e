@@ -2,6 +2,7 @@
 """
 
 import logging
+import random
 
 from ..dcos_test_utils import helpers
 
@@ -52,7 +53,7 @@ class Cosmos(helpers.RetryCommonHttpErrorsMixin, helpers.ApiClientSession):
             package_name: str
             package_version: str
             options: JSON dict
-            appId: str
+            app_id: str
 
         Returns:
             requests.response object
@@ -65,12 +66,22 @@ class Cosmos(helpers.RetryCommonHttpErrorsMixin, helpers.ApiClientSession):
         package = {
             'packageName': package_name
         }
+
         if package_version is not None:
             package.update({'packageVersion': package_version})
-        if options is not None:
-            package.update({'options': options})
-        if app_id is not None:
-            package.update({'appId': app_id})
+
+        if app_id is None:
+            app_id = '{}-{}'.format(package_name, str(random.randint(0, 1000000)))
+        package.update({'appId': app_id})
+
+        if options is None:
+            options = {}
+        if 'service' not in options:
+            options['service'] = {}
+        if 'name' not in options['service']:
+            options['service']['name'] = app_id
+        package.update({'options': options})
+
         return self._post('/install', package)
 
     def uninstall_package(self, package_name, app_id=None):
