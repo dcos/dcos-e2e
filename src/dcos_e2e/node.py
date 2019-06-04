@@ -467,6 +467,7 @@ class Node:
             'cd',
             str(remote_dcos_installer.parent),
             '&&',
+            'PORT=9004',
             'bash',
             str(remote_dcos_installer),
             '-v',
@@ -481,6 +482,7 @@ class Node:
             transport=transport,
             user=user,
             sudo=True,
+            #env={'PORT': '9001'},
         )
 
         self.run(
