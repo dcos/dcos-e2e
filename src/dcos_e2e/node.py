@@ -473,15 +473,20 @@ class Node:
             self.dcos_build_info().version,
         ]
 
-        self.run(
-            args=genconf_args,
-            output=output,
-            shell=True,
-            transport=transport,
-            user=user,
-            sudo=True,
-            #env={'PORT': '9001'},
-        )
+        try:
+            result = self.run(
+                args=genconf_args,
+                output=Output.CAPTURE,
+                shell=True,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
+        except subprocess.CalledProcessError as exc:
+            LOGGER.error(exc.stderr.decode())
+
+        last_line = result.stdout.decode().split()[-1]
+        upgrade_script_path = Path(last_line.split('file://')[-1])
 
         self.run(
             args=['rm', str(remote_dcos_installer)],
@@ -496,11 +501,19 @@ class Node:
             str(remote_dcos_installer.parent),
             '&&',
             'bash',
-            'genconf/serve/dcos_node_upgrade.sh',
+            str(upgrade_script_path),
         ]
 
         if role in (Role.AGENT, Role.PUBLIC_AGENT):
-            self.run(args=['rm', '/opt/mesosphere/lib/libltdl.so.7'], )
+            self.run(
+                args=[
+                    'rm',
+                    '-f',
+                    '/opt/mesosphere/lib/libltdl.so.7',
+                ],
+                sudo=True,
+                output=Output.LOG_AND_CAPTURE,
+            )
 
         self.run(
             args=setup_args,
