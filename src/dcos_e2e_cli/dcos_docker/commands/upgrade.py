@@ -1,43 +1,27 @@
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 import click
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.node import Output, Role, Transport
 from dcos_e2e_cli.common.arguments import installer_argument
-from dcos_e2e_cli.common.options import (
-    extra_config_option,
-    variant_option,
-    existing_cluster_id_option,
-    verbosity_option,
-)
-from typing import Dict, Any, Optional
-
 from dcos_e2e_cli.common.create import get_config
-from dcos_e2e_cli.common.utils import check_cluster_id_exists
-
-from dcos_e2e_cli.common.workspaces import workspace_dir_option
-from dcos_e2e_cli.common.variants import get_install_variant
-
-from ._common import ClusterContainers, existing_cluster_ids
-from ._options import node_transport_option
-
 from dcos_e2e_cli.common.doctor import get_doctor_message
-
-from dcos_e2e_cli.common.utils import (
-    command_path,
-)
 from dcos_e2e_cli.common.options import (
-    cluster_id_option,
-    copy_to_master_option,
+    existing_cluster_id_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
     verbosity_option,
 )
+from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
+from dcos_e2e_cli.common.variants import get_install_variant
+from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
+from ._common import ClusterContainers, existing_cluster_ids
+from ._options import node_transport_option
 from .doctor import doctor
 
 
