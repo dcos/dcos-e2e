@@ -19,7 +19,7 @@ DOCKER_STORAGE_DRIVERS = {
 def _get_docker_storage_driver(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Optional[str],
+    value: str,
 ) -> Optional[DockerStorageDriver]:
     """
     Get the chosen Docker storage driver.
