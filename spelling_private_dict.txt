@@ -28,6 +28,7 @@ cgroups
 changelog
 ci
 cli
+codebase
 completedprocess
 conf
 config

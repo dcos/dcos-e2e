@@ -4,6 +4,7 @@ Tools for managing DC/OS cluster nodes.
 
 import json
 import logging
+import shlex
 import subprocess
 import tarfile
 import uuid
@@ -476,11 +477,26 @@ class Node:
             """,
         )
 
-        open_port_result = self.run(
-            args=['python', '-c', python_to_find_open_port],
-            shell=True,
-            output=Output.CAPTURE,
-        )
+        try:
+            open_port_result = self.run(
+                args=[
+                    # We source this file to guarantee that we have Python 3 on
+                    # our path as ``python``.
+                    '.',
+                    '/opt/mesosphere/environment.export',
+                    '&&',
+                    'python',
+                    '-c',
+                    shlex.quote(python_to_find_open_port),
+                ],
+                shell=True,
+                output=Output.CAPTURE,
+            )
+        except subprocess.CalledProcessError as exc:
+            # We do not have coverage here - we do not expect to hit it unless
+            # we have made a mistake.
+            LOGGER.error(exc.stderr.decode())
+            raise
 
         open_port_number = int(open_port_result.stdout.decode())
 
@@ -505,7 +521,9 @@ class Node:
                 user=user,
                 sudo=True,
             )
-        except subprocess.CalledProcessError as exc:
+        except subprocess.CalledProcessError as exc:  # pragma: no cover
+            # We do not have coverage here - we do not expect to hit it unless
+            # we have made a mistake.
             LOGGER.error(exc.stderr.decode())
             raise
 
