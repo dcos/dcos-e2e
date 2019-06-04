@@ -309,6 +309,8 @@ class Node:
             sudo=True,
         )
 
+
+
     def install_dcos_from_path(
         self,
         dcos_installer: Path,
@@ -465,6 +467,8 @@ class Node:
             str(remote_dcos_installer),
             '-v',
             '--generate-node-upgrade-script',
+            '--port',
+            '9001',
             self.dcos_build_info().version,
         ]
 
@@ -492,6 +496,11 @@ class Node:
             'bash',
             'genconf/serve/dcos_node_upgrade.sh',
         ]
+
+        if role in (Role.AGENT, Role.PUBLIC_AGENT):
+            self.run(
+                args=['rm', '/opt/mesosphere/lib/libltdl.so.7'],
+            )
 
         self.run(
             args=setup_args,

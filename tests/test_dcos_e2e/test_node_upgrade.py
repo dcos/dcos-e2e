@@ -2,7 +2,7 @@ from pathlib import Path
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.docker_versions import DockerVersion
-from dcos_e2e.node import DCOSVariant, Role
+from dcos_e2e.node import DCOSVariant, Output, Role
 from dcos_e2e.cluster import Cluster
 
 
@@ -39,6 +39,7 @@ class TestNodeUpgrade:
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
+                        output=Output.LOG_AND_CAPTURE,
                     )
 
             cluster.wait_for_dcos_oss()
