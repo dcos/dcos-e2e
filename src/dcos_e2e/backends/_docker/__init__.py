@@ -121,7 +121,7 @@ class Docker(ClusterBackend):
         custom_agent_mounts: Optional[List[Mount]] = None,
         custom_public_agent_mounts: Optional[List[Mount]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
-        docker_version: DockerVersion = DockerVersion.v1_13_1,
+        docker_version: DockerVersion = DockerVersion.v18_06_3_ce,
         storage_driver: Optional[DockerStorageDriver] = None,
         docker_container_labels: Optional[Dict[str, str]] = None,
         docker_master_labels: Optional[Dict[str, str]] = None,

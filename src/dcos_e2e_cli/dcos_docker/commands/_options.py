@@ -6,6 +6,7 @@ from typing import Callable
 
 import click
 
+from dcos_e2e.backends import Docker
 from dcos_e2e.node import Transport
 
 
@@ -18,11 +19,17 @@ def node_transport_option(command: Callable[..., None]) -> Callable[..., None]:
         'docker-exec': Transport.DOCKER_EXEC,
     }
 
+    backend_default = Docker().transport
+    [default_option] = [
+        transport for transport in transports
+        if transports[transport] == backend_default
+    ]
+
     function = click.option(
         '--transport',
         type=click.Choice(sorted(transports.keys())),
         callback=lambda ctx, param, value: transports[value],
-        default='docker-exec',
+        default=default_option,
         show_default=True,
         envvar='MINIDCOS_DOCKER_TRANSPORT',
         help=(

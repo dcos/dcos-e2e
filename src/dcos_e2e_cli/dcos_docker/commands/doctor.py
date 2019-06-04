@@ -524,14 +524,12 @@ def _check_can_mount_in_docker() -> CheckLevels:
                 'systemd. '
                 'To avoid issues caused by this incompatibility, do one of '
                 'the following:'
-                '\n* Set ``systemd.legacy_systemd_cgroup_controller=yes`` as '
+                '\n'
+                '* Set ``systemd.legacy_systemd_cgroup_controller=yes`` as '
                 'a kernel parameter on your host.'
-                '\n* Use versions of Docker newer than 1.13.1 inside the '
-                'DC/OS nodes.'
-                ' To do this in the ``minidcos docker`` CLI, use the '
-                '``--docker-version`` option on ``minidcos docker create``.'
-                ' To do this in the Python library, pass a '
-                '``docker_version`` parameter to the ``Docker`` backend class.'
+                '\n'
+                '* Avoid using the ``--docker-version`` option to choose '
+                'Docker version 1.13.1.'
             )
             warn(message=message)
             return CheckLevels.WARNING

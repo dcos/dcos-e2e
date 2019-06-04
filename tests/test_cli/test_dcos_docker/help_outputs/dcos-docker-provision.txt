@@ -3,18 +3,18 @@ Usage: minidcos docker provision [OPTIONS]
   Provision Docker containers to install a DC/OS cluster.
 
 Options:
-  --docker-version [1.11.2|1.13.1|17.12.1-ce]
+  --docker-version [1.11.2|1.13.1|17.12.1-ce|18.06.3-ce]
                                   The Docker version to install on the nodes.
                                   This can be provided by setting the
                                   `MINIDCOS_NODE_DOCKER_VERSION` environment
-                                  variable.  [default: 1.13.1]
+                                  variable.  [default: 18.06.3-ce]
   --linux-distribution [centos-7|coreos|ubuntu-16.04]
                                   The Linux distribution to use on the nodes.
                                   [default: centos-7]
-  --docker-storage-driver [aufs|overlay|overlay2]
+  --docker-storage-driver [aufs|auto|overlay|overlay2]
                                   The storage driver to use for Docker in
                                   Docker. By default this uses the host's
-                                  driver.
+                                  driver.  [default: auto]
   --mount-sys-fs-cgroup / --no-mount-sys-fs-cgroup
                                   Mounting ``/sys/fs/cgroup`` from the host is
                                   required to run applications which require
