@@ -8,7 +8,6 @@ from textwrap import dedent
 from dcos_e2e.backends import Docker
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Output, Role
 
 
