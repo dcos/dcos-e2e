@@ -512,20 +512,23 @@ class Node:
             self.dcos_build_info().version,
         ]
 
-        try:
-            result = self.run(
-                args=genconf_args,
-                output=Output.CAPTURE,
-                shell=True,
-                transport=transport,
-                user=user,
-                sudo=True,
-            )
-        except subprocess.CalledProcessError as exc:  # pragma: no cover
-            # We do not have coverage here - we do not expect to hit it unless
-            # we have made a mistake.
-            LOGGER.error(exc.stderr.decode())
-            raise
+        # We do not respect ``output`` here because we need to capture output
+        # for the result.
+        # We cannot just use ``Output.CAPTURE`` because then we will have
+        # silence in the test output and Travis CI will error.
+        output_map = {
+            Output.CAPTURE: Output.CAPTURE,
+            Output.LOG_AND_CAPTURE: Output.LOG_AND_CAPTURE,
+            Output.NO_CAPTURE: Output.LOG_AND_CAPTURE,
+        }
+        result = self.run(
+            args=genconf_args,
+            output=output_map[output],
+            shell=True,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
 
         last_line = result.stdout.decode().split()[-1]
         upgrade_script_path = Path(last_line.split('file://')[-1])

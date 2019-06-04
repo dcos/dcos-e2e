@@ -28,6 +28,7 @@ class TestNodeUpgradeFromPath:
                 dcos_installer=oss_1_12_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
 
