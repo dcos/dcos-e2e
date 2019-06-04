@@ -393,7 +393,8 @@ class Node:
         transport: Optional[Transport],
     ) -> None:
         """
-        XXX
+        # TODO document this
+        # TODO link to the upgrade documentation that this emulates
 
         Args:
             remote_dcos_installer: The path on the node to an installer to
@@ -457,6 +458,11 @@ class Node:
                 sudo=True,
             )
 
+        # TODO this will conflict on port 9000 with Metronome
+        # Two changes going forward:
+        # * Change DC/OS to allow customised ports
+        # * As a temporary workaround - stop Marathon here (maybe we have to
+        # manually start it after)
         genconf_args = [
             'cd',
             str(remote_dcos_installer.parent),
