@@ -24,6 +24,7 @@ from dcos_e2e_cli.common.workspaces import workspace_dir_option
 from ._common import ClusterContainers, existing_cluster_ids
 from ._options import node_transport_option, wait_for_dcos_option
 from .doctor import doctor
+from .wait import wait
 
 
 @click.command('upgrade')
