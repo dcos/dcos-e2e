@@ -1,3 +1,7 @@
+"""
+Tests for upgrading DC/OS on nodes.
+"""
+
 from pathlib import Path
 
 from dcos_e2e.backends import Docker

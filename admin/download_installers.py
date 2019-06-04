@@ -161,6 +161,7 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_node_install.py::TestCopyFiles::test_install_from_path_with_genconf_files':  # noqa: E501
     (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_upgrade.py': (OSS_1_12, OSS_1_13),
 }  # type: Dict[str, Tuple]
 
 

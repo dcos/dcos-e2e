@@ -11,6 +11,7 @@ from enum import Enum
 from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
+from textwrap import dedent
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 import yaml
@@ -463,14 +464,31 @@ class Node:
                 sudo=True,
             )
 
-        # TODO this will conflict on port 9000 with Metronome
-        # We pass in PORT=9004 here to work around that.
-        # This should be done with a random open port.
+        python_to_find_open_port = dedent(
+            """\
+            import socket
+
+            host = ''
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as new:
+                new.bind((host, 0))
+                new.listen(1)
+                print(int(new.getsockname()[1]))
+            """,
+        )
+
+        open_port_result = self.run(
+            args=['python', '-c', python_to_find_open_port],
+            shell=True,
+            output=Output.CAPTURE,
+        )
+
+        open_port_number = int(open_port_result.stdout.decode())
+
         genconf_args = [
             'cd',
             str(remote_dcos_installer.parent),
             '&&',
-            'PORT=9004',
+            'PORT={open_port}'.format(open_port=open_port_number),
             'bash',
             str(remote_dcos_installer),
             '-v',
@@ -538,7 +556,9 @@ class Node:
         transport: Optional[Transport] = None,
     ) -> None:
         """
-        XXX
+        Upgrade DC/OS on this node.
+        This follows the steps in
+        https://docs.mesosphere.com/1.13/installing/production/upgrading/.
 
         Args:
             dcos_installer: The path to an installer to be installed on the
@@ -556,7 +576,11 @@ class Node:
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
+        # This is unfortunately kept around, wasting space on the node because
+        # it can only be removed when the upgrade is finished, and we do not
+        # block on this.
         workspace_dir = Path('/dcos-upgrade-dir')
+
         node_installer_parent = workspace_dir / uuid.uuid4().hex
         mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
         self.run(
@@ -584,8 +608,6 @@ class Node:
             transport=transport,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
-
-        # TODO(tweidner): Think about cleaning up the workspace_dir
 
     def install_dcos_from_url(
         self,
