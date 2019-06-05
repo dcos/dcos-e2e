@@ -180,44 +180,17 @@ class Node:
         # See https://github.com/python/mypy/issues/5135.
         return transport_cls()  # type: ignore
 
-    def _install_dcos_from_node_path(
+    def _prepare_installer(
         self,
         remote_dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
-        role: Role,
+        transport: Optional[Transport],
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str],
-        output: Output,
-        transport: Optional[Transport],
     ) -> None:
         """
-        Install DC/OS in a platform-independent way by using
-        the advanced installation method as described at
-        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
-
-        The documentation describes using a "bootstrap" node, so that only
-        one node downloads and extracts the installer.
-        This method is less efficient on a multi-node cluster,
-        as it does not use a bootstrap node.
-        Instead, the installer is extracted on this node, and then DC/OS is
-        installed.
-
-        Args:
-            remote_dcos_installer: The path on the node to an installer to
-                be installed on the node.
-            dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to the ``ip-detect`` script to use for
-                installing DC/OS.
-            role: The desired DC/OS role for the installation.
-            user: The username to communicate as. If ``None`` then the
-                ``default_user`` is used instead.
-            output: What happens with stdout and stderr.
-            transport: The transport to use for communicating with nodes. If
-                ``None``, the ``Node``'s ``default_transport`` is used.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
+        Put files in place for DC/OS to be installed or upgraded.
         """
         tempdir = Path(gettempdir())
 
@@ -264,6 +237,54 @@ class Node:
                 user=user,
                 sudo=True,
             )
+
+    def _install_dcos_from_node_path(
+        self,
+        remote_dcos_installer: Path,
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+        user: Optional[str],
+        output: Output,
+        transport: Optional[Transport],
+    ) -> None:
+        """
+        Install DC/OS in a platform-independent way by using
+        the advanced installation method as described at
+        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+        The documentation describes using a "bootstrap" node, so that only
+        one node downloads and extracts the installer.
+        This method is less efficient on a multi-node cluster,
+        as it does not use a bootstrap node.
+        Instead, the installer is extracted on this node, and then DC/OS is
+        installed.
+
+        Args:
+            remote_dcos_installer: The path on the node to an installer to
+                be installed on the node.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            output: What happens with stdout and stderr.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+        """
+        self._prepare_installer(
+            dcos_config=dcos_config,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            ip_detect_path=ip_detect_path,
+            remote_dcos_installer=remote_dcos_installer,
+            transport=transport,
+            user=user,
+        )
 
         genconf_args = [
             'cd',
@@ -419,51 +440,14 @@ class Node:
             subprocess.CalledProcessError: One of the upgrade process steps
                 exited with a non-zero code.
         """
-        tempdir = Path(gettempdir())
-
-        remote_genconf_dir = 'genconf'
-        remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
-
-        self.send_file(
-            local_path=ip_detect_path,
-            remote_path=remote_genconf_path / 'ip-detect',
+        self._prepare_installer(
+            dcos_config=dcos_config,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            ip_detect_path=ip_detect_path,
+            remote_dcos_installer=remote_dcos_installer,
             transport=transport,
             user=user,
-            sudo=True,
         )
-
-        serve_dir_path = remote_genconf_path / 'serve'
-        dcos_config = {
-            **dcos_config,
-            **{
-                'bootstrap_url':
-                'file://{serve_dir_path}'.format(
-                    serve_dir_path=serve_dir_path,
-                ),
-            },
-        }
-        config_yaml = yaml.dump(data=dcos_config)
-        config_file_path = tempdir / 'config.yaml'
-        Path(config_file_path).write_text(data=config_yaml)
-
-        self.send_file(
-            local_path=config_file_path,
-            remote_path=remote_genconf_path / 'config.yaml',
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-        for host_path, installer_path in files_to_copy_to_genconf_dir:
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = remote_genconf_path / relative_installer_path
-            self.send_file(
-                local_path=host_path,
-                remote_path=destination_path,
-                transport=transport,
-                user=user,
-                sudo=True,
-            )
 
         python_to_find_open_port = dedent(
             """\
@@ -492,7 +476,7 @@ class Node:
                 shell=True,
                 output=Output.CAPTURE,
             )
-        except subprocess.CalledProcessError as exc:
+        except subprocess.CalledProcessError as exc:  # pragma: no cover
             # We do not have coverage here - we do not expect to hit it unless
             # we have made a mistake.
             LOGGER.error(exc.stderr.decode())
