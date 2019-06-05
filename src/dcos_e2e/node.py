@@ -183,6 +183,7 @@ class Node:
     def _prepare_installer(
         self,
         remote_dcos_installer: Path,
+        dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         transport: Optional[Transport],
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
@@ -237,7 +238,6 @@ class Node:
                 sudo=True,
             )
 
-
     def _install_dcos_from_node_path(
         self,
         remote_dcos_installer: Path,
@@ -278,10 +278,11 @@ class Node:
                 the installer node before installing DC/OS.
         """
         self._prepare_installer(
-            remote_dcos_installer=remote_dcos_installer,
-            ip_detect_path=ip_detect_path,
-            transport=transport,
+            dcos_config=dcos_config,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            ip_detect_path=ip_detect_path,
+            remote_dcos_installer=remote_dcos_installer,
+            transport=transport,
             user=user,
         )
 
@@ -440,10 +441,11 @@ class Node:
                 exited with a non-zero code.
         """
         self._prepare_installer(
-            remote_dcos_installer=remote_dcos_installer,
-            ip_detect_path=ip_detect_path,
-            transport=transport,
+            dcos_config=dcos_config,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            ip_detect_path=ip_detect_path,
+            remote_dcos_installer=remote_dcos_installer,
+            transport=transport,
             user=user,
         )
 
