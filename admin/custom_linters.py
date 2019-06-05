@@ -48,7 +48,12 @@ def _tests_from_pattern(ci_pattern: str) -> Set[str]:
     result = subprocess.run(args=args, stdout=subprocess.PIPE)
     output = result.stdout
     for line in output.splitlines():
-        if line and not line.startswith(b'no tests ran in'):
+        valid_line = all([
+            line,
+            line.startswith(b'no tests ran in'),
+            line.startswith(b'collecting ...'),
+        ])
+        if valid_line:
             tests.add(line.decode())
 
     return tests
