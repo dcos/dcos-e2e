@@ -188,6 +188,9 @@ class Node:
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
         user: Optional[str],
     ) -> None:
+        """
+        Put files in place for DC/OS to be installed or upgraded.
+        """
         tempdir = Path(gettempdir())
 
         remote_genconf_dir = 'genconf'
