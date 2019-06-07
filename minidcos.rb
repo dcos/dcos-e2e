@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.03.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.07.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -178,8 +178,8 @@ class Minidcos < Formula
   end
 
   resource "httplib2" do
-    url "https://files.pythonhosted.org/packages/67/33/29779c5aaeac796679a37bf798b3c2adbfaae7dbf13e966b0ab9c3aa06c0/httplib2-0.12.3.tar.gz"
-    sha256 "a18121c7c72a56689efbf1aef990139ad940fee1e64c6f2458831736cd593600"
+    url "https://files.pythonhosted.org/packages/5c/f3/7206894743389a4f727b73e6df4da60c9ee3cbef3f5afd82814592eafa8b/httplib2-0.13.0.tar.gz"
+    sha256 "d1146939d270f1f1eb8cbf8f5aa72ff37d897faccca448582bb1e180aeb4c6b2"
   end
 
   resource "idna" do
@@ -242,11 +242,6 @@ class Minidcos < Formula
     sha256 "0ce32c5d989a1827e3f1148f98b9085ed2370fc939bf524c9c851d8714797298"
   end
 
-  resource "packaging" do
-    url "https://files.pythonhosted.org/packages/16/51/d72654dbbaa4a4ffbf7cb0ecd7d12222979e0a660bf3f42acc47550bf098/packaging-19.0.tar.gz"
-    sha256 "0c98a5d0be38ed775798ece1b9727178c4469d9c3b4ada66e8e6b7849f8732af"
-  end
-
   resource "paramiko" do
     url "https://files.pythonhosted.org/packages/a4/57/86681372e7a8d642718cadeef38ead1c24c4a1af21ae852642bf974e37c7/paramiko-2.4.2.tar.gz"
     sha256 "a8975a7df3560c9f1e2b43dc54ebd40fd00a7017392ca5445ce7df409f900fcb"
@@ -292,14 +287,9 @@ class Minidcos < Formula
     sha256 "0c6100edd16fefd1557da078c7a31e7b7d7a52ce39fdca2bec29d4f7b6e7600c"
   end
 
-  resource "pyparsing" do
-    url "https://files.pythonhosted.org/packages/5d/3a/24d275393f493004aeb15a1beae2b4a3043526e8b692b65b4a9341450ebe/pyparsing-2.4.0.tar.gz"
-    sha256 "1873c03321fc118f4e9746baf201ff990ceb915f433f23b395f5580d1840cb2a"
-  end
-
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/eb/c8/70bdd5e0913b91b30922b401d445228557ff94fd39c37e893d0d1827925a/pytest-4.6.1.tar.gz"
-    sha256 "b68d84c7c01073ddf2a918a7504ab73849d52483d9f1f15f3875487011d09f71"
+    url "https://files.pythonhosted.org/packages/c9/ff/e353dff7987c3a6ccb0cecb1c148c7b276c235f80f7017d181d19e2b4710/pytest-4.3.1.tar.gz"
+    sha256 "592eaa2c33fae68c7d75aacf042efc9f77b27c08a6224a4f59beab8d9a420523"
   end
 
   resource "python-dateutil" do
@@ -343,8 +333,8 @@ class Minidcos < Formula
   end
 
   resource "s3transfer" do
-    url "https://files.pythonhosted.org/packages/43/22/37b9aaf3969628a25b3b921612139ebc5b8dc26cabb9873c356e1ad2ce2e/s3transfer-0.2.0.tar.gz"
-    sha256 "f23d5cb7d862b104401d9021fc82e5fa0e0cf57b7660a1331425aab0c691d021"
+    url "https://files.pythonhosted.org/packages/39/12/150cd55c606ebca6725683642a8e7068cd6af10f837ce5419a9f16b7fb55/s3transfer-0.2.1.tar.gz"
+    sha256 "6efc926738a3cd576c2a79725fed9afde92378aa5c6a957e3af010cb019fac9d"
   end
 
   resource "sarge" do
@@ -395,11 +385,6 @@ class Minidcos < Formula
   resource "urllib3" do
     url "https://files.pythonhosted.org/packages/fd/fa/b21f4f03176463a6cccdb612a5ff71b927e5224e83483012747c12fc5d62/urllib3-1.24.2.tar.gz"
     sha256 "9a247273df709c4fedb38c711e44292304f73f39ab01beda9f6b9fc375669ac3"
-  end
-
-  resource "wcwidth" do
-    url "https://files.pythonhosted.org/packages/55/11/e4a2bb08bb450fdbd42cc709dd40de4ed2c472cf0ccb9e64af22279c5495/wcwidth-0.1.7.tar.gz"
-    sha256 "3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e"
   end
 
   resource "websocket_client" do
