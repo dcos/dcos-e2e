@@ -20,7 +20,7 @@ On Ubuntu, install Python development requirements:
 
 .. substitution-prompt:: bash
 
-   apt install -y gcc python3-dev
+   apt upgrade -y gcc python3-dev python3.6-dev libssl-dev git python3-pip
 
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 

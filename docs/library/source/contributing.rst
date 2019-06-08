@@ -15,7 +15,7 @@ On Ubuntu, install system requirements:
 
 .. substitution-prompt:: bash
 
-   apt upgrade -y gcc python3-dev python3.6-dev libssl-dev
+   apt upgrade -y gcc python3-dev python3.6-dev libssl-dev git python3-pip
 
 Install dependencies in a virtual environment.
 

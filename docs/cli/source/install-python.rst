@@ -18,9 +18,18 @@ On Fedora, install Python development requirements:
 
 On Ubuntu, install Python development requirements:
 
+.. Note: This is duplicated in the library installation section.
+.. This has been tested by using:
+.. $ docker run -it vcatechnology/linux-mint bash
+.. and
+.. $ docker run -it Ubuntu bash
 .. substitution-prompt:: bash
 
-   apt upgrade -y gcc python3-dev python3.6-dev libssl-dev
+   apt update -y && \
+   apt install -y software-properties-common && \
+   apt upgrade -y python3-apt && \
+   add-apt-repository -y ppa:deadsnakes/ppa && \
+   apt upgrade -y gcc python3-dev python3.6-dev libffi-dev libssl-dev git python3-pip
 
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
