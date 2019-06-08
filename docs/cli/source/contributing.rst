@@ -11,13 +11,10 @@ Contributions to this repository must pass tests and linting.
 Install Contribution Dependencies
 ---------------------------------
 
-On Ubuntu, install system requirements:
+.. include:: install-python-build-dependencies.rst
 
-.. substitution-prompt:: bash
-
-   apt upgrade -y gcc python3-dev python3.6-dev libssl-dev git python3-pip
-
-Install dependencies in a virtual environment.
+Install dependencies, preferably in a virtual environment.
+If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
 .. substitution-prompt:: bash
 
