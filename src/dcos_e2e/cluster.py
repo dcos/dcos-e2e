@@ -20,7 +20,7 @@ from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .base_classes import ClusterManager  # noqa: F401
 from .base_classes import ClusterBackend
 from .exceptions import DCOSTimeoutError
-from .node import Node, Output, Transport
+from .node import Node, Output, Role, Transport
 
 LOGGER = logging.getLogger(__name__)
 
@@ -486,6 +486,31 @@ class Cluster(ContextDecorator):
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             output=output,
         )
+
+    def upgrade_dcos_from_path(
+        self,
+        dcos_installer: Path,
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        output: Output = Output.CAPTURE,
+    ) -> None:
+        for nodes, role in (
+            (self.masters, Role.MASTER),
+            (self.agents, Role.AGENT),
+            (self.public_agents, Role.PUBLIC_AGENT),
+        ):
+            for node in nodes:
+                node.upgrade_dcos_from_path(
+                    dcos_installer=dcos_installer,
+                    dcos_config=dcos_config,
+                    ip_detect_path=ip_detect_path,
+                    role=role,
+                    files_to_copy_to_genconf_dir=(
+                        files_to_copy_to_genconf_dir
+                    ),
+                    output=output,
+                )
 
     def install_dcos_from_path(
         self,
