@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 
 import click
 
-from dcos_e2e.backends import Docker
+from dcos_e2e.backends import Vagrant
 from dcos_e2e.node import Output, Transport
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import get_config
@@ -25,8 +25,8 @@ from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
-from ._common import ClusterContainers, existing_cluster_ids
-from ._options import node_transport_option, wait_for_dcos_option
+from ._common import ClusterVMs, existing_cluster_ids
+from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
 
@@ -36,7 +36,6 @@ from .wait import wait
 @verbosity_option
 @extra_config_option
 @variant_option
-@node_transport_option
 @installer_argument
 @workspace_dir_option
 @security_mode_option
@@ -46,7 +45,6 @@ from .wait import wait
 def upgrade(
     ctx: click.core.Context,
     cluster_id: str,
-    transport: Transport,
     extra_config: Dict[str, Any],
     security_mode: Optional[str],
     license_key: Optional[Path],
@@ -66,12 +64,9 @@ def upgrade(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(),
     )
-    cluster_containers = ClusterContainers(
-        cluster_id=cluster_id,
-        transport=transport,
-    )
-    cluster_backend = Docker()
-    cluster = cluster_containers.cluster
+    cluster_vms = ClusterVMs(cluster_id=cluster_id)
+    cluster_backend = Vagrant()
+    cluster = cluster_vms.cluster
     dcos_variant = get_install_variant(
         given_variant=variant,
         installer_path=installer,
@@ -79,7 +74,7 @@ def upgrade(
         doctor_message=doctor_message,
     )
     dcos_config = get_config(
-        cluster_representation=cluster_containers,
+        cluster_representation=cluster_vms,
         extra_config=extra_config,
         dcos_variant=dcos_variant,
         security_mode=security_mode,
@@ -93,14 +88,13 @@ def upgrade(
         output=Output.LOG_AND_CAPTURE,
     )
 
-    http_checks = bool(transport == Transport.SSH)
     wait_command_name = command_path(sibling_ctx=ctx, command=wait)
     run_post_install_steps(
         cluster=cluster,
         cluster_id=cluster_id,
         dcos_config=dcos_config,
         doctor_command_name=doctor_command_name,
-        http_checks=http_checks,
+        http_checks=True,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
     )

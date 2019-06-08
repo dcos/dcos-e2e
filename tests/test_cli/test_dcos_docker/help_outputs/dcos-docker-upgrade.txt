@@ -1,6 +1,6 @@
 Usage: minidcos docker upgrade [OPTIONS] INSTALLER
 
-  Upgrade a cluster to another version of DC/OS.
+  Upgrade a cluster to a given version of DC/OS.
 
 Options:
   -c, --cluster-id TEXT           The ID of the cluster to use.  [default:
