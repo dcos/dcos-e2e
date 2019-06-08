@@ -460,6 +460,56 @@ class TestClusterFromNodes:
                 assert build.variant == DCOSVariant.OSS
 
 
+class TestUpgrade:
+    """
+    Tests for upgrading a cluster.
+    """
+
+    def test_upgrade(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_1_12_installer: Path,
+        oss_1_13_installer: Path,
+    ) -> None:
+        """
+        DC/OS OSS can be upgraded from 1.12 to 1.13.
+        """
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            cluster.install_dcos_from_path(
+                dcos_installer=oss_1_12_installer,
+                dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.LOG_AND_CAPTURE,
+            )
+            cluster.wait_for_dcos_oss()
+
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.12')
+                assert build.variant == DCOSVariant.OSS
+
+            cluster.upgrade_dcos_from_path(
+                dcos_installer=oss_1_13_installer,
+                dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.LOG_AND_CAPTURE,
+            )
+
+            cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.13')
+                assert build.variant == DCOSVariant.OSS
+
+
 class TestDestroyNode:
     """
     Tests for destroying nodes.

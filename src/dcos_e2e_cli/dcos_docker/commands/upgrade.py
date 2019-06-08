@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 import click
 
 from dcos_e2e.backends import Docker
-from dcos_e2e.node import Output, Role, Transport
+from dcos_e2e.node import Output, Transport
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
@@ -85,19 +85,13 @@ def upgrade(
         security_mode=security_mode,
         license_key=license_key,
     )
-    for nodes, role in (
-        (cluster.masters, Role.MASTER),
-        (cluster.agents, Role.AGENT),
-        (cluster.public_agents, Role.PUBLIC_AGENT),
-    ):
-        for node in nodes:
-            node.upgrade_dcos_from_path(
-                dcos_installer=installer,
-                dcos_config=dcos_config,
-                ip_detect_path=cluster_backend.ip_detect_path,
-                role=role,
-                output=Output.LOG_AND_CAPTURE,
-            )
+
+    cluster.upgrade_dcos_from_path(
+        dcos_installer=installer,
+        dcos_config=dcos_config,
+        ip_detect_path=cluster_backend.ip_detect_path,
+        output=Output.LOG_AND_CAPTURE,
+    )
 
     http_checks = bool(transport == Transport.SSH)
     wait_command_name = command_path(sibling_ctx=ctx, command=wait)
