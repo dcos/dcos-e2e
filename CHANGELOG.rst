@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Fix error "No module named 'keyring.util.escape'".
+
 2019.06.07.0
 ------------
 
