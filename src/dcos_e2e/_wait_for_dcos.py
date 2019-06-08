@@ -78,7 +78,7 @@ def wait_for_dcos_oss(
     masters: Set[Node],
     agents: Set[Node],
     public_agents: Set[Node],
-    http_checks: bool = True,
+    http_checks: bool,
 ) -> None:
     """
     Wait until the DC/OS OSS boot process has completed.
@@ -112,7 +112,7 @@ def wait_for_dcos_oss(
         Wait until DC/OS OSS is up or timeout hits.
         """
 
-        _wait_for_node_poststart()
+        _wait_for_node_poststart(masters=masters)
         if not http_checks:
             return
 
@@ -205,7 +205,7 @@ def wait_for_dcos_ee(
     public_agents: Set[Node],
     superuser_username: str,
     superuser_password: str,
-    http_checks: bool = True,
+    http_checks: bool,
 ) -> None:
     """
     Wait until the DC/OS Enterprise boot process has completed.
@@ -240,7 +240,7 @@ def wait_for_dcos_ee(
         Wait until DC/OS Enterprise is up or timeout hits.
         """
 
-        _wait_for_node_poststart()
+        _wait_for_node_poststart(masters=masters)
         if not http_checks:
             return
 
