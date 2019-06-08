@@ -7,6 +7,7 @@ Next
 ----
 
 * Fix error "No module named 'keyring.util.escape'".
+* Added ``Cluster.install_dcos_from_path``.
 
 2019.06.07.0
 ------------
