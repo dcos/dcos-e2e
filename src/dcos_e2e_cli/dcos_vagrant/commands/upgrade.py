@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 import click
 
 from dcos_e2e.backends import Vagrant
-from dcos_e2e.node import Output, Transport
+from dcos_e2e.node import Output
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
