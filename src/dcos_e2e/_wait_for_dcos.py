@@ -5,20 +5,18 @@ Helpers for waiting for DC/OS.
 import json
 import logging
 import subprocess
-from typing import Union
+from typing import Set, Union
 
 import retrying
 import timeout_decorator
 from retry import retry
-
-from dcos_e2e.cluster import Cluster
 
 from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
 from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
 from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .base_classes import ClusterManager  # noqa: F401
 from .exceptions import DCOSTimeoutError
-from .node import Output
+from .node import Node, Output
 
 LOGGER = logging.getLogger(__name__)
 
@@ -41,7 +39,7 @@ def _test_utils_wait_for_dcos(
     exceptions=(subprocess.CalledProcessError),
     delay=10,
 )
-def _wait_for_node_poststart(cluster: Cluster) -> None:
+def _wait_for_node_poststart(masters: Set[Node]) -> None:
     """
     Wait until all DC/OS node-poststart checks are healthy.
 
@@ -51,7 +49,7 @@ def _wait_for_node_poststart(cluster: Cluster) -> None:
     exists on DC/OS 1.9. ``node-poststart`` requires ``sudo`` to allow
     reading the CA certificate used by certain checks.
     """
-    for node in cluster.masters:
+    for node in masters:
         log_msg = 'Running a poststart check on `{}`'.format(str(node))
         LOGGER.debug(log_msg)
         node.run(
@@ -70,28 +68,33 @@ def _wait_for_node_poststart(cluster: Cluster) -> None:
                 '--diag',
             ],
             # We capture output because else we would see a lot of output
-            # in a normal cluster start up, for example during tests.
+            # in a normal start up, for example during tests.
             output=Output.CAPTURE,
             shell=True,
         )
 
 
 def wait_for_dcos_oss(
-    cluster: Cluster,
+    masters: Set[Node],
+    agents: Set[Node],
+    public_agents: Set[Node],
     http_checks: bool = True,
 ) -> None:
     """
     Wait until the DC/OS OSS boot process has completed.
 
     Args:
+        masters: Master nodes in the cluster.
+        agents: Agent nodes in the cluster.
+        public_agents: Public agent nodes in the cluster.
         http_checks: Whether or not to wait for checks which involve HTTP.
             If this is `False`, this function may return before DC/OS is
             fully ready. This is useful in cases where an HTTP connection
-            cannot be made to the cluster. For example, this is useful on
+            cannot be made to the  For example, this is useful on
             macOS without a VPN set up.
 
     Raises:
-        dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
+        dcos_e2e.exceptions.DCOSTimeoutError: Raised if components
             did not become ready within one hour.
     """
 
@@ -114,9 +117,8 @@ def wait_for_dcos_oss(
             return
 
         email = 'albert@bekstil.net'
-        curl_url = ('http://localhost:8101/acs/api/v1/users/{email}').format(
-            email=email,
-        )
+        curl_url = ('http://localhost:8101/acs/api/v1/users/{email}'
+                    ).format(email=email, )
 
         delete_user_args = ['curl', '-X', 'DELETE', curl_url]
 
@@ -135,7 +137,7 @@ def wait_for_dcos_oss(
         # of services through HTTP.
 
         # Since DC/OS uses a Single-Sign-On flow with Identity Providers
-        # outside the cluster for the login and Admin Router only rewrites
+        # outside the for the login and Admin Router only rewrites
         # requests to them, the login endpoint does not provide anything.
 
         # Current solution to guarantee the CLI login:
@@ -154,7 +156,7 @@ def wait_for_dcos_oss(
         # In order to fully replace this method one would need to have
         # DC/OS checks for every HTTP endpoint exposed by Admin Router.
 
-        any_master = next(iter(cluster.masters))
+        any_master = next(iter(masters))
         # We create a user.
         # This allows this function to work even after a user has logged
         # in.
@@ -177,11 +179,9 @@ def wait_for_dcos_oss(
 
         api_session = DcosApiSession(
             dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
-            masters=[str(n.public_ip_address) for n in cluster.masters],
-            slaves=[str(n.public_ip_address) for n in cluster.agents],
-            public_slaves=[
-                str(n.public_ip_address) for n in cluster.public_agents
-            ],
+            masters=[str(n.public_ip_address) for n in masters],
+            slaves=[str(n.public_ip_address) for n in agents],
+            public_slaves=[str(n.public_ip_address) for n in public_agents],
             auth_user=DcosUser(credentials=credentials),
         )
 
@@ -199,7 +199,9 @@ def wait_for_dcos_oss(
 
 
 def wait_for_dcos_ee(
-    cluster: Cluster,
+    masters: Set[Node],
+    agents: Set[Node],
+    public_agents: Set[Node],
     superuser_username: str,
     superuser_password: str,
     http_checks: bool = True,
@@ -208,16 +210,19 @@ def wait_for_dcos_ee(
     Wait until the DC/OS Enterprise boot process has completed.
 
     Args:
+        masters: Master nodes in the cluster.
+        agents: Agent nodes in the cluster.
+        public_agents: Public agent nodes in the cluster.
         superuser_username: Username of the default superuser.
         superuser_password: Password of the default superuser.
         http_checks: Whether or not to wait for checks which involve HTTP.
             If this is `False`, this function may return before DC/OS is
             fully ready. This is useful in cases where an HTTP connection
-            cannot be made to the cluster. For example, this is useful on
+            cannot be made to the  For example, this is useful on
             macOS without a VPN set up.
 
     Raises:
-        dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
+        dcos_e2e.exceptions.DCOSTimeoutError: Raised if components
             did not become ready within one hour.
     """
 
@@ -265,7 +270,7 @@ def wait_for_dcos_ee(
             'password': superuser_password,
         }
 
-        any_master = next(iter(cluster.masters))
+        any_master = next(iter(masters))
         config_result = any_master.run(
             args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
         )
@@ -276,10 +281,10 @@ def wait_for_dcos_ee(
         dcos_url = scheme + str(any_master.public_ip_address)
         enterprise_session = EnterpriseApiSession(  # type: ignore
             dcos_url=dcos_url,
-            masters=[str(n.public_ip_address) for n in cluster.masters],
-            slaves=[str(n.public_ip_address) for n in cluster.agents],
+            masters=[str(n.public_ip_address) for n in masters],
+            slaves=[str(n.public_ip_address) for n in agents],
             public_slaves=[
-                str(n.public_ip_address) for n in cluster.public_agents
+                str(n.public_ip_address) for n in public_agents
             ],
             auth_user=DcosUser(credentials=credentials),
         )

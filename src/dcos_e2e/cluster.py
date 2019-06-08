@@ -10,8 +10,7 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from retry import retry
 
-import _wait_for_dcos
-
+from . import _wait_for_dcos
 from ._existing_cluster import ExistingCluster as _ExistingCluster
 from .base_classes import ClusterManager  # noqa: F401
 from .base_classes import ClusterBackend
@@ -136,7 +135,9 @@ class Cluster(ContextDecorator):
                 did not become ready within one hour.
         """
         _wait_for_dcos.wait_for_dcos_oss(
-            cluster=self,
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
             http_checks=http_checks,
         )
 
@@ -163,7 +164,9 @@ class Cluster(ContextDecorator):
                 did not become ready within one hour.
         """
         _wait_for_dcos.wait_for_dcos_ee(
-            cluster=self,
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
             superuser_username=superuser_username,
             superuser_password=superuser_password,
             http_checks=http_checks,
