@@ -33,3 +33,4 @@ On Ubuntu, install Python development requirements:
    add-apt-repository -y ppa:deadsnakes/ppa && \
    apt update -y && \
    apt upgrade -y gcc python3-dev python3.6-dev libffi-dev libssl-dev git python3-pip
+   pip3 install setuptools
