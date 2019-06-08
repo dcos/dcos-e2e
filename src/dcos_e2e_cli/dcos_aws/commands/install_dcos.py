@@ -11,7 +11,7 @@ from dcos_e2e.backends import AWS
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    install_dcos_from_url,
+    cluster_install_dcos,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
@@ -98,11 +98,11 @@ def install_dcos(
 
     cluster_backend = AWS()
     cluster = cluster_instances.cluster
-    install_dcos_from_url(
+    cluster_install_dcos(
         cluster=cluster,
         cluster_representation=cluster_instances,
         dcos_config=dcos_config,
-        dcos_installer_url=installer_url,
+        dcos_installer=installer_url,
         doctor_message=doctor_message,
         local_genconf_dir=genconf_dir,
         ip_detect_path=cluster_backend.ip_detect_path,

@@ -19,7 +19,7 @@ from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    install_dcos_from_path,
+    cluster_install_dcos,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
@@ -218,7 +218,7 @@ def create(
         license_key=license_key,
     )
 
-    install_dcos_from_path(
+    cluster_install_dcos(
         cluster=cluster,
         cluster_representation=cluster_containers,
         dcos_config=dcos_config,
