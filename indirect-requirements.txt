@@ -15,6 +15,11 @@ keyring==16.0.2
 # Without the following, some users get:
 # The 'secretstorage' distribution was not found and is required by keyring
 SecretStorage==3.1.0
+# Without the following, some users get:
+# ``ModuleNotFoundError: No module named 'keyring.util.escape'``
+#
+# See https://github.com/dcos/dcos-e2e/issues/1643.
+keyrings.alt==3.1.1
 # Requirements from DC/OS Launch
 azure-common==1.1.16
 azure-datalake-store==0.0.40
