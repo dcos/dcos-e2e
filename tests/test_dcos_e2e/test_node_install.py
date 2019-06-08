@@ -16,11 +16,14 @@ class TestAdvancedInstallationMethod:
     Test installing DC/OS on a node.
     """
 
-    def test_install_dcos_from_url(self, oss_installer_url: str) -> None:
+    def test_install_dcos_from_url(
+        self,
+        oss_installer_url: str,
+        cluster_backend: ClusterBackend,
+    ) -> None:
         """
         It is possible to install DC/OS on a node from a URL.
         """
-        cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             for nodes, role in (
                 (cluster.masters, Role.MASTER),

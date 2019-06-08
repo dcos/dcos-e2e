@@ -495,6 +495,20 @@ class Cluster(ContextDecorator):
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
         output: Output = Output.CAPTURE,
     ) -> None:
+        """
+        Update DC/OS from a local installer path.
+
+        Args:
+            dcos_installer: The ``Path`` to an installer to install DC/OS
+                from.
+            dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
+        """
         for nodes, role in (
             (self.masters, Role.MASTER),
             (self.agents, Role.AGENT),
@@ -521,8 +535,10 @@ class Cluster(ContextDecorator):
         output: Output = Output.CAPTURE,
     ) -> None:
         """
+        Install DC/OS from a local installer path.
+
         Args:
-            dcos_installer: The `Path` to an installer to install DC/OS
+            dcos_installer: The ``Path`` to an installer to install DC/OS
                 from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to a ``ip-detect`` script that will be

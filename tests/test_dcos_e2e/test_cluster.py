@@ -474,7 +474,6 @@ class TestUpgrade:
         """
         DC/OS OSS can be upgraded from 1.12 to 1.13.
         """
-        cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
                 dcos_installer=oss_1_12_installer,
@@ -497,7 +496,6 @@ class TestUpgrade:
                 dcos_installer=oss_1_13_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
-                role=role,
                 output=Output.LOG_AND_CAPTURE,
             )
 
