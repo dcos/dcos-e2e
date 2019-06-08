@@ -5,8 +5,9 @@ DC/OS Cluster management tools. Independent of back ends.
 import logging
 import subprocess
 from contextlib import ContextDecorator
+from functools import singledispatch
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 
 from retry import retry
 
@@ -219,7 +220,32 @@ class Cluster(ContextDecorator):
             **self._base_config,
         }
 
-    def install_dcos_from_url(
+    @singledispatch
+    def install_dcos(
+        self,
+        dcos_installer: Union[str, Path],
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        output: Output = Output.CAPTURE,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+    ) -> None:
+        """
+        Installs DC/OS using the DC/OS advanced installation method.
+
+        Args:
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
+        """
+
+    @install_dcos.register
+    def _install_dcos_from_url(
         self,
         dcos_installer: str,
         dcos_config: Dict[str, Any],
@@ -229,19 +255,6 @@ class Cluster(ContextDecorator):
     ) -> None:
         """
         Installs DC/OS using the DC/OS advanced installation method.
-
-        If supported by the cluster backend, this method spins up a persistent
-        bootstrap host that supplies all dedicated DC/OS hosts with the
-        necessary installation files.
-
-        Since the bootstrap host is different from the host initiating the
-        cluster creation passing the ``dcos_installer`` via URL string
-        saves the time of copying the ``dcos_installer`` to the bootstrap host.
-
-        However, some backends may not support using a bootstrap node. For
-        these backends, each node will download and extract the installer.
-        This may be very slow, as the installer is downloaded to
-        and extracted on each node, one at a time.
 
         Args:
             dcos_installer: The URL string to an installer to install DC/OS
@@ -271,7 +284,7 @@ class Cluster(ContextDecorator):
         output: Output = Output.CAPTURE,
     ) -> None:
         """
-        Update DC/OS from a local installer path.
+        Upgrade DC/OS from a local installer path.
 
         Args:
             dcos_installer: The ``Path`` to an installer to install DC/OS
@@ -301,7 +314,8 @@ class Cluster(ContextDecorator):
                     output=output,
                 )
 
-    def install_dcos_from_path(
+    @install_dcos.register
+    def _install_dcos_from_path(
         self,
         dcos_installer: Path,
         dcos_config: Dict[str, Any],

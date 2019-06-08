@@ -38,7 +38,7 @@ class TestIntegrationTests:
         that make tests interfere with one another.
         """
         with Cluster(cluster_backend=cluster_backend) as dcos_cluster:
-            dcos_cluster.install_dcos_from_path(
+            dcos_cluster.install_dcos(
                 dcos_config=dcos_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 dcos_installer=oss_installer,
@@ -183,7 +183,7 @@ class TestCopyFiles:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -223,7 +223,7 @@ class TestCopyFiles:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos_from_url(
+            cluster.install_dcos(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -297,7 +297,7 @@ class TestInstallDcosFromPathLogging:
                 masters=2,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(
+                cluster.install_dcos(
                     dcos_installer=oss_installer,
                     ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,
@@ -321,7 +321,7 @@ class TestInstallDcosFromPathLogging:
                 masters=2,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos_from_path(
+                cluster.install_dcos(
                     dcos_installer=oss_installer,
                     dcos_config=cluster.base_config,
                     ip_detect_path=cluster_backend.ip_detect_path,
@@ -416,7 +416,7 @@ class TestClusterFromNodes:
                 public_agents=original_cluster.public_agents,
             )
 
-            cluster.install_dcos_from_url(
+            cluster.install_dcos(
                 dcos_installer=oss_installer_url,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -443,7 +443,7 @@ class TestClusterFromNodes:
                 agents=original_cluster.agents,
                 public_agents=original_cluster.public_agents,
             )
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_installer,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -475,7 +475,7 @@ class TestUpgrade:
         DC/OS OSS can be upgraded from 1.12 to 1.13.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_1_12_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,

@@ -24,7 +24,7 @@ class TestNodeUpgradeFromPath:
         DC/OS OSS can be upgraded from 1.12 to 1.13.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_1_12_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,

@@ -62,7 +62,7 @@ def install_dcos_from_path(
     # We do not always use ``cluster_representation.destroy`` because the AWS
     # backend does not support this.
     try:
-        cluster.install_dcos_from_path(
+        cluster.install_dcos(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
@@ -129,7 +129,7 @@ def install_dcos_from_url(
     # We do not always use ``cluster_representation.destroy`` because the AWS
     # backend does not support this.
     try:
-        cluster.install_dcos_from_url(
+        cluster.install_dcos(
             dcos_installer=dcos_installer_url,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
