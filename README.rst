@@ -44,7 +44,7 @@ See the `library`_ documentation for more details on these and other features.
 
     cluster_backend = Docker()
     with Cluster(cluster_backend=cluster_backend) as cluster:
-        cluster.install_dcos_from_path(
+        cluster.install_dcos(
             dcos_installer=oss_installer,
             dcos_config={
                 **cluster.base_config,

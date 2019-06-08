@@ -10,7 +10,6 @@ The Docker backend is used to spin up clusters on Docker containers, where each 
 DC/OS Installation
 ------------------
 
-:py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend only support installing DC/OS via :py:meth:`~dcos_e2e.cluster.Cluster.install_dcos_from_path`.
 :py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the Docker backend do not distinguish between :py:attr:`~dcos_e2e.node.Node.public_ip_address` and :py:attr:`~dcos_e2e.node.Node.private_ip_address`.
 
 .. include:: docker-backend-limitations.rst
