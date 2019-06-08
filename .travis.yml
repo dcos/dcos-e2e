@@ -46,6 +46,7 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestDestroyNode
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestUpgrade
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_node_installer_genconf_dir
