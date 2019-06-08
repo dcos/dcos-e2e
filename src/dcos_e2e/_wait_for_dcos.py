@@ -117,8 +117,9 @@ def wait_for_dcos_oss(
             return
 
         email = 'albert@bekstil.net'
-        curl_url = ('http://localhost:8101/acs/api/v1/users/{email}'
-                    ).format(email=email, )
+        curl_url = 'http://localhost:8101/acs/api/v1/users/{email}'.format(
+            email=email,
+        )
 
         delete_user_args = ['curl', '-X', 'DELETE', curl_url]
 
