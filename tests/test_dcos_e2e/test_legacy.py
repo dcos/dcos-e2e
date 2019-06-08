@@ -29,7 +29,7 @@ class Test19:
         An open source DC/OS 1.9 cluster can be started.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_1_9_installer,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,
@@ -62,7 +62,7 @@ class Test19:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_1_9_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -100,7 +100,7 @@ class Test110:
         An open source DC/OS 1.10 cluster can be started.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_1_10_installer,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,
@@ -136,7 +136,7 @@ class Test110:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_1_10_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -174,7 +174,7 @@ class Test111:
         An open source DC/OS 1.11 cluster can be started.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_1_11_installer,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,
@@ -210,7 +210,7 @@ class Test111:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_1_11_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -248,7 +248,7 @@ class Test112:
         An open source DC/OS 1.12 cluster can be started.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_1_12_installer,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,
@@ -284,7 +284,7 @@ class Test112:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_1_12_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -322,7 +322,7 @@ class Test113:
         An open source DC/OS 1.13 cluster can be started.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_1_13_installer,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,
@@ -358,7 +358,7 @@ class Test113:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_1_13_installer,
                 dcos_config={
                     **cluster.base_config,
