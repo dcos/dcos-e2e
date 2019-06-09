@@ -31,7 +31,7 @@ class TestAdvancedInstallationMethod:
                 (cluster.public_agents, Role.PUBLIC_AGENT),
             ):
                 for node in nodes:
-                    node.install_dcos_from_url(
+                    node.install_dcos(
                         dcos_installer=oss_installer_url,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
@@ -52,7 +52,7 @@ class TestAdvancedInstallationMethod:
                 (cluster.public_agents, Role.PUBLIC_AGENT),
             ):
                 for node in nodes:
-                    node.install_dcos_from_path(
+                    node.install_dcos(
                         dcos_installer=oss_installer,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
@@ -94,7 +94,7 @@ class TestCopyFiles:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            master.install_dcos_from_path(
+            master.install_dcos(
                 dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,

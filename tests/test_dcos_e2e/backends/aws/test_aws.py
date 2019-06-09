@@ -249,7 +249,7 @@ class TestDCOSInstallation:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            master.install_dcos_from_url(
+            master.install_dcos(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
