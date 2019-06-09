@@ -10,6 +10,7 @@ Next
 * Added ``Cluster.upgrade_dcos_from_path``.
 * Replaced ``Cluster.install_dcos_from_url`` and ``Cluster.install_dcos_from_path`` with ``Cluster.install_dcos`` which takes a URL or Path.
 * Replaced ``Node.install_dcos_from_url`` and ``Node.install_dcos_from_path`` with ``Node.install_dcos`` which takes a URL or Path.
+* Fix ``minidcos`` ``inspect`` commands for legacy versions of DC/OS.
 
 2019.06.07.0
 ------------
