@@ -290,7 +290,7 @@ class TestCopyFiles:
                 local_path=ca_key_path,
                 remote_path=master_key_path,
             )
-            master.install_dcos_from_path(
+            master.install_dcos(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
