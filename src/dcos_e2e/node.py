@@ -378,7 +378,6 @@ class Node:
                 the installer node before installing DC/OS.
         """
 
-
     @install_dcos.register
     def _install_dcos_from_path(
         self,
