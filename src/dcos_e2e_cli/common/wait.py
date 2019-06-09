@@ -11,10 +11,7 @@ from retry import retry
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
 from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli.common.variants import (
-    cluster_variant_available,
-    get_cluster_variant,
-)
+from dcos_e2e_cli.common.variants import get_cluster_variant
 
 
 @retry(
@@ -27,7 +24,7 @@ def _wait_for_variant(cluster: Cluster) -> None:
     Wait for a particular file to be available on the cluster.
     This means that the cluster variant can be determined.
     """
-    if not cluster_variant_available(cluster=cluster):
+    if get_cluster_variant(cluster) is None:
         raise DCOSTimeoutError
 
 
