@@ -14,7 +14,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
 from textwrap import dedent
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import yaml
 
@@ -336,7 +336,7 @@ class Node:
     @singledispatch
     def install_dcos(
         self,
-        dcos_installer: Path,
+        dcos_installer: Union[str, Path],
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
