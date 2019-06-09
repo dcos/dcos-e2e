@@ -99,6 +99,7 @@ class ExistingClusterManager(ClusterManager):
         Args:
             dcos_installer: The ``Path`` to a local installer or a ``str`` to
                 which is a URL pointing to an installer to install DC/OS from.
+            dcos_config: The DC/OS configuration to use.
             ip_detect_path: The ``ip-detect`` script to use for installing
                 DC/OS.
             output: What happens with stdout and stderr.
