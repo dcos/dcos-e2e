@@ -214,8 +214,8 @@ def wait_for_dcos_ee(
         masters: Master nodes in the cluster.
         agents: Agent nodes in the cluster.
         public_agents: Public agent nodes in the cluster.
-        superuser_username: Username of the default superuser.
-        superuser_password: Password of the default superuser.
+        superuser_username: Username of a user with superuser privileges.
+        superuser_password: Password of a user with superuser privileges.
         http_checks: Whether or not to wait for checks which involve HTTP.
             If this is `False`, this function may return before DC/OS is
             fully ready. This is useful in cases where an HTTP connection
