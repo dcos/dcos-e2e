@@ -11,6 +11,7 @@ Next
 * Replaced ``Cluster.install_dcos_from_url`` and ``Cluster.install_dcos_from_path`` with ``Cluster.install_dcos`` which takes a URL or Path.
 * Replaced ``Node.install_dcos_from_url`` and ``Node.install_dcos_from_path`` with ``Node.install_dcos`` which takes a URL or Path.
 * Fix ``minidcos`` ``inspect`` commands for legacy versions of DC/OS.
+* Renamed ``Cluster.run_integration_tests`` to ``Cluster.run_with_test_environment``.
 
 2019.06.07.0
 ------------

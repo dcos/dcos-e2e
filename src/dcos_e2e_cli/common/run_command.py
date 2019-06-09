@@ -68,10 +68,10 @@ def run_command(
 
     try:
         cluster.run_integration_tests(
-            pytest_command=args,
+            args=args,
             tty=tty,
             env=env,
-            test_host=host,
+            node=host,
             transport=transport,
             output=Output.NO_CAPTURE,
         )

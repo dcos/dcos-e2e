@@ -133,7 +133,7 @@ class TestRunIntegrationTest:
             # We choose a test file which runs very quickly.
             fast_test_file = 'test_marathon_authn_authz.py'
             cluster.run_integration_tests(
-                pytest_command=['pytest', '-vvv', '-s', '-x', fast_test_file],
+                args=['pytest', '-vvv', '-s', '-x', fast_test_file],
                 env={
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,

@@ -347,23 +347,23 @@ class Cluster(ContextDecorator):
 
     def run_integration_tests(
         self,
-        pytest_command: List[str],
+        args: List[str],
         env: Optional[Dict[str, Any]] = None,
         output: Output = Output.CAPTURE,
         tty: bool = False,
-        test_host: Optional[Node] = None,
+        node: Optional[Node] = None,
         transport: Optional[Transport] = None,
     ) -> subprocess.CompletedProcess:
         """
-        Run integration tests on a random master node.
+        Run a command on a node using the Mesosphere test environment.
 
         Args:
-            pytest_command: The ``pytest`` command to run on the node.
+            args: The command to run on the node.
             env: Environment variables to be set on the node before running
-                the `pytest_command`. On enterprise clusters,
-                ``DCOS_LOGIN_UNAME`` and ``DCOS_LOGIN_PW`` must be set.
+                the command. On enterprise clusters, ``DCOS_LOGIN_UNAME`` and
+                ``DCOS_LOGIN_PW`` must be set.
             output: What happens with stdout and stderr.
-            test_host: The node to run the given command on. if not given, an
+            node: The node to run the given command on. if not given, an
                 arbitrary master node is used.
             tty: If ``True``, allocate a pseudo-tty. This means that the users
                 terminal is attached to the streams of the process.
@@ -373,10 +373,10 @@ class Cluster(ContextDecorator):
                 ``None``, the ``Node``'s ``default_transport`` is used.
 
         Returns:
-            The result of the ``pytest`` command.
+            The result of the given command.
 
         Raises:
-            subprocess.CalledProcessError: If the ``pytest`` command fails.
+            subprocess.CalledProcessError: If the command fails.
         """
         args = [
             '.',
@@ -385,7 +385,7 @@ class Cluster(ContextDecorator):
             'cd',
             '/opt/mesosphere/active/dcos-integration-test/',
             '&&',
-            *pytest_command,
+            *args,
         ]
 
         env = env or {}

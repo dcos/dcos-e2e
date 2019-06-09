@@ -52,7 +52,7 @@ class TestRunIntegrationTest:  # pragma: no cover
 
             # No error is raised with a successful command.
             cluster.run_integration_tests(
-                pytest_command=['pytest', '-vvv', '-s', '-x', 'test_units.py'],
+                args=['pytest', '-vvv', '-s', '-x', 'test_units.py'],
                 output=Output.CAPTURE,
             )
 
