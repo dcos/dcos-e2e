@@ -152,8 +152,8 @@ class Cluster(ContextDecorator):
         Wait until the DC/OS Enterprise boot process has completed.
 
         Args:
-            superuser_username: Username of the default superuser.
-            superuser_password: Password of the default superuser.
+            superuser_username: Username of a user with superuser privileges.
+            superuser_password: Password of a user with superuser privileges.
             http_checks: Whether or not to wait for checks which involve HTTP.
                 If this is `False`, this function may return before DC/OS is
                 fully ready. This is useful in cases where an HTTP connection
