@@ -19,5 +19,6 @@ Commands:
   run                 Run an arbitrary command on a node or multiple nodes.
   send-file           Send a file to a node or multiple nodes.
   sync                Sync files from a DC/OS checkout to master nodes.
+  upgrade             Upgrade a cluster to a given version of DC/OS.
   wait                Wait for DC/OS to start.
   web                 Open the browser at the web UI.
