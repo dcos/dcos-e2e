@@ -92,6 +92,7 @@ def install_dcos(
         installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     dcos_config = get_config(

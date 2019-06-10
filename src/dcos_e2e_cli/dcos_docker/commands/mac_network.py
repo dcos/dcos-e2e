@@ -17,6 +17,7 @@ import docker
 from halo import Halo
 
 from dcos_e2e.backends import Docker
+from dcos_e2e_cli.common.options import enable_spinner_option
 
 from ._common import docker_client
 
@@ -214,10 +215,13 @@ def setup_mac_network(
     This creates an OpenVPN configuration file and describes how to use it.
     """
     if force:
-        _destroy_mac_network_containers()
+        _destroy_mac_network_containers(enable_spinner=enable_spinner)
 
     try:
-        _create_mac_network(configuration_dst=configuration_dst)
+        _create_mac_network(
+            configuration_dst=configuration_dst,
+            enable_spinner=enable_spinner,
+        )
     except docker.errors.APIError as exc:
         if exc.status_code == 409:
             message = (
@@ -249,7 +253,8 @@ def setup_mac_network(
 
 
 @click.command('destroy-mac-network')
-def destroy_mac_network() -> None:
+@enable_spinner_option
+def destroy_mac_network(enable_spinner: bool) -> None:
     """
     Destroy containers created by "minidcos docker setup-mac-network".
     """

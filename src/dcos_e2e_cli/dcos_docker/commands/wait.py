@@ -6,6 +6,7 @@ import click
 
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.options import (
+    enable_spinner_option,
     existing_cluster_id_option,
     superuser_password_option,
     superuser_username_option,
@@ -39,6 +40,7 @@ from .doctor import doctor
 )
 @node_transport_option
 @verbosity_option
+@enable_spinner_option
 @click.pass_context
 def wait(
     ctx: click.core.Context,
@@ -47,6 +49,7 @@ def wait(
     superuser_password: str,
     transport: Transport,
     skip_http_checks: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Wait for DC/OS to start.

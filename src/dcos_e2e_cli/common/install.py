@@ -97,6 +97,7 @@ def run_post_install_steps(
     http_checks: bool,
     wait_command_name: str,
     wait_for_dcos: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Wait for DC/OS if wanted, else print a message stating that next you should
@@ -112,6 +113,7 @@ def run_post_install_steps(
         wait_command_name: The name of a ``wait`` command to use after the
             cluster is installed.
         wait_for_dcos: Whether to wait for DC/OS to be installed.
+        enable_spinner: Whether to enable the spinner animation.
     """
     superuser_username = dcos_config.get(
         'superuser_username',
@@ -130,6 +132,7 @@ def run_post_install_steps(
             superuser_password=superuser_password,
             http_checks=http_checks,
             doctor_command_name=doctor_command_name,
+            enable_spinner=enable_spinner,
         )
 
         return

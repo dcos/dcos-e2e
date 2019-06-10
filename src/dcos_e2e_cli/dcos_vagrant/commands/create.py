@@ -17,6 +17,7 @@ from dcos_e2e_cli.common.install import (
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
+    enable_spinner_option,
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
@@ -64,6 +65,7 @@ from .wait import wait
 @verbosity_option
 @vm_memory_mb_option
 @enable_selinux_enforcing_option
+@enable_spinner_option
 @wait_for_dcos_option
 @click.pass_context
 def create(
@@ -83,6 +85,7 @@ def create(
     genconf_dir: Optional[Path],
     wait_for_dcos: bool,
     vm_memory_mb: int,
+    enable_spinner: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -103,6 +106,7 @@ def create(
         installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     description = {
@@ -121,6 +125,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
@@ -153,6 +158,7 @@ def create(
         doctor_message=doctor_message,
         dcos_installer=installer,
         local_genconf_dir=genconf_dir,
+        enable_spinner=enable_spinner,
     )
 
     run_post_install_steps(
@@ -163,4 +169,5 @@ def create(
         http_checks=True,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

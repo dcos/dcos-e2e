@@ -17,7 +17,11 @@ from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.create import create_cluster
 from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
-from dcos_e2e_cli.common.options import cluster_id_option, verbosity_option
+from dcos_e2e_cli.common.options import (
+    cluster_id_option,
+    enable_spinner_option,
+    verbosity_option,
+)
 from dcos_e2e_cli.common.options.cluster_size import (
     agents_option,
     masters_option,
@@ -74,6 +78,7 @@ from .doctor import doctor
 @node_transport_option
 @one_master_host_port_map_option
 @verbosity_option
+@enable_spinner_option
 @click.pass_context
 def provision(
     ctx: click.core.Context,
@@ -93,6 +98,7 @@ def provision(
     network: Network,
     one_master_host_port_map: Dict[str, int],
     mount_sys_fs_cgroup: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Provision Docker containers to install a DC/OS cluster.
@@ -149,6 +155,7 @@ def provision(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     cluster_containers = ClusterContainers(
