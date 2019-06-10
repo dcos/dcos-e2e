@@ -426,21 +426,13 @@ class Node:
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        # This is unfortunately kept around, wasting space on the node because
-        # it can only be removed when the upgrade is finished, and we do not
-        # block on this.
-        workspace_dir = Path('/dcos-upgrade-dir')
-
-        node_installer_parent = workspace_dir / uuid.uuid4().hex
-        mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
-        self.run(
-            args=mkdir_args,
+        workspace_dir = _create_workspace_on_node(
+            node=self,
             user=user,
             transport=transport,
-            sudo=True,
-            output=Output.CAPTURE,
+            output=output,
         )
-        node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
+        node_dcos_installer = workspace_dir / 'dcos_generate_config.sh'
         self.send_file(
             local_path=dcos_installer,
             remote_path=node_dcos_installer,
@@ -995,6 +987,41 @@ def _install_dcos_from_node_path(
     )
 
 
+def _create_workspace_on_node(
+    node: Node,
+    user: Optional[str],
+    transport: Optional[Transport],
+    output: Output,
+) -> Path:
+    """
+    Create a workspace directory on a node to use for installers and related
+    files.
+
+    These are unfortunately kept around, wasting space on the node because
+    they can only be removed when the install or upgrade is finished, and we do
+    not block on this.
+
+    Args:
+        node: The node to create a directory on.
+        user: The username to communicate as. If ``None`` then the
+            ``default_user`` is used instead.
+        output: What happens with stdout and stderr.
+        transport: The transport to use for communicating with nodes. If
+            ``None``, the ``Node``'s ``default_transport`` is used.
+    """
+    workspace_dir = Path('/dcos-install-dir') / uuid.uuid4().hex
+    mkdir_args = ['mkdir', '--parents', str(workspace_dir)]
+    node.run(
+        args=mkdir_args,
+        user=user,
+        transport=transport,
+        sudo=True,
+        output=output,
+    )
+
+    return workspace_dir
+
+
 def _install_dcos_from_path(
     dcos_installer: Path,
     node: Node,
@@ -1039,17 +1066,14 @@ def _install_dcos_from_path(
             the installer node. These are files to copy from the host to
             the installer node before installing DC/OS.
     """
-    workspace_dir = Path('/dcos-install-dir')
-    node_installer_parent = workspace_dir / uuid.uuid4().hex
-    mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
-    node.run(
-        args=mkdir_args,
+    workspace_dir = _create_workspace_on_node(
+        node=node,
         user=user,
         transport=transport,
-        sudo=True,
-        output=Output.CAPTURE,
+        output=output,
     )
-    node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
+
+    node_dcos_installer = workspace_dir / 'dcos_generate_config.sh'
     node.send_file(
         local_path=dcos_installer,
         remote_path=node_dcos_installer,
@@ -1114,16 +1138,13 @@ def _install_dcos_from_url(
             the installer node. These are files to copy from the host to
             the installer node before installing DC/OS.
     """
-    workspace_dir = Path('/dcos-install-dir')
-    node_installer_parent = workspace_dir / uuid.uuid4().hex
-    mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
-    node.run(
-        args=mkdir_args,
+    workspace_dir = _create_workspace_on_node(
+        node=node,
         user=user,
         transport=transport,
-        sudo=True,
+        output=output,
     )
-    node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
+    node_dcos_installer = workspace_dir / 'dcos_generate_config.sh'
     node.run(
         args=[
             'curl',
