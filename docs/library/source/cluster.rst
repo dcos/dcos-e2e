@@ -51,7 +51,7 @@ Upgrading a ``Cluster``
 
 It is possible to upgrade a :py:class:`~dcos_e2e.cluster.Cluster`\ s DC/OS installation.
 
-.. automethod:: dcos_e2e.cluster.Cluster.upgrade_dcos_from_path
+.. automethod:: dcos_e2e.cluster.Cluster.upgrade_dcos
 
 Waiting for DC/OS
 -----------------

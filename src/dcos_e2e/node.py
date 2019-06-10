@@ -260,7 +260,7 @@ class Node:
 
     def upgrade_dcos(
         self,
-        dcos_installer: Path,
+        dcos_installer: Union[str, Path],
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
@@ -275,8 +275,8 @@ class Node:
         https://docs.mesosphere.com/1.13/installing/production/upgrading/.
 
         Args:
-            dcos_installer: The path to an installer to be installed on the
-                node.
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
                 installing DC/OS.
@@ -296,13 +296,23 @@ class Node:
             transport=transport,
             output=output,
         )
-        self.send_file(
-            local_path=dcos_installer,
-            remote_path=node_dcos_installer,
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
+        if isinstance(dcos_installer, str):
+            _download_installer_to_node(
+                node=self,
+                dcos_installer_url=dcos_installer,
+                output=output,
+                transport=transport,
+                user=user,
+                node_path=node_dcos_installer,
+            )
+        else:
+            self.send_file(
+                local_path=dcos_installer,
+                remote_path=node_dcos_installer,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
         _upgrade_dcos_from_node_path(
             node=self,
             remote_dcos_installer=node_dcos_installer,
