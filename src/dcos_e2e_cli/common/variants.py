@@ -2,10 +2,8 @@
 Helpers for managing DC/OS Variants.
 """
 
-import json
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
 from shutil import rmtree
 from typing import Optional
@@ -15,7 +13,6 @@ from halo import Halo
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSNotInstalledError
-from dcos_e2e.node import Output
 from dcos_e2e_cli._vendor.dcos_installer_tools import (
     DCOSVariant,
     get_dcos_installer_details,
