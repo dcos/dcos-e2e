@@ -35,6 +35,7 @@ def get_install_variant(
         workspace_dir: A directory to work in, given that this function uses
             large files.
         doctor_message: The message to show if something goes wrong.
+        enable_spinner: Whether to enable the spinner animation.
 
     Returns:
         The variant of DC/OS to install.
