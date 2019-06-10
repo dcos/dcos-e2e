@@ -428,7 +428,7 @@ def enable_spinner_option(command: Callable[..., None],
     An option decorator for enabling or disabling the spinner.
     """
     click_option_function = click.option(
-        '--show-spinner/--no-show-spinner',
+        '--enable-spinner/--no-enable-spinner',
         default=sys.stdout.isatty(),
         help=(
             'Whether to show a spinner animation. '
