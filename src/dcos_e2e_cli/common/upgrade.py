@@ -11,12 +11,10 @@ from typing import Any, Dict, Optional, Union
 import click
 from halo import Halo
 
-import dcos_e2e_cli.common.wait
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.node import Output
 
 from .base_classes import ClusterRepresentation
-from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
 
 
 def cluster_install_dcos(
