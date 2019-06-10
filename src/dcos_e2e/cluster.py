@@ -11,7 +11,6 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 from retry import retry
 
 from . import _wait_for_dcos
-from ._cluster_manager_install import cluster_manager_install_dcos
 from ._existing_cluster import ExistingCluster as _ExistingCluster
 from .base_classes import ClusterManager  # noqa: F401
 from .base_classes import ClusterBackend
@@ -195,13 +194,21 @@ class Cluster(ContextDecorator):
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
         """
-        cluster_manager_install_dcos(
-            cluster_manager=self._cluster,
+        if isinstance(dcos_installer, str):
+            self._cluster.install_dcos_from_url(
+                dcos_installer=dcos_installer,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+                output=output,
+            )
+            return
+        self._cluster.install_dcos_from_path(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
-            output=output,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
         )
 
     def upgrade_dcos_from_path(
