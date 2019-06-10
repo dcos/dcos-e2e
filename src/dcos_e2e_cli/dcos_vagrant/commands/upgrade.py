@@ -85,7 +85,7 @@ def upgrade(
         license_key=license_key,
     )
 
-    cluster.upgrade_dcos_from_path(
+    cluster.upgrade_dcos(
         dcos_installer=installer,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,

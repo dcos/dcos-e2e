@@ -211,7 +211,7 @@ class Cluster(ContextDecorator):
             output=output,
         )
 
-    def upgrade_dcos_from_path(
+    def upgrade_dcos(
         self,
         dcos_installer: Path,
         dcos_config: Dict[str, Any],
@@ -239,7 +239,7 @@ class Cluster(ContextDecorator):
             (self.public_agents, Role.PUBLIC_AGENT),
         ):
             for node in nodes:
-                node.upgrade_dcos_from_path(
+                node.upgrade_dcos(
                     dcos_installer=dcos_installer,
                     dcos_config=dcos_config,
                     ip_detect_path=ip_detect_path,
