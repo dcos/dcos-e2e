@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.07.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.10.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -212,6 +212,11 @@ class Minidcos < Formula
     sha256 "95e4f1d0342d0bf5d137d1d2352d59f7abbebb1507bec1ac26831c411ac23150"
   end
 
+  resource "keyrings.alt" do
+    url "https://files.pythonhosted.org/packages/62/a4/cfa759dc4a5113d653a1dfdbd61011e88fe7abb7a476c8ca10f37e2a789c/keyrings.alt-3.1.1.tar.gz"
+    sha256 "0bc7b75c7e710a3dd7bc4c3841c71467b24ccbce1b85efb2586bdf0c4713f751"
+  end
+
   resource "log-symbols" do
     url "https://files.pythonhosted.org/packages/ea/a1/930647ae7e444ef45851da5071fc8b98d6d24f7b0ba690874ea69531148a/log_symbols-0.0.13.tar.gz"
     sha256 "ecc2f8f3ee586fd819d8c8696705914761cd8367d1f10597b9b49a0980ab6e55"
@@ -243,8 +248,8 @@ class Minidcos < Formula
   end
 
   resource "paramiko" do
-    url "https://files.pythonhosted.org/packages/a4/57/86681372e7a8d642718cadeef38ead1c24c4a1af21ae852642bf974e37c7/paramiko-2.4.2.tar.gz"
-    sha256 "a8975a7df3560c9f1e2b43dc54ebd40fd00a7017392ca5445ce7df409f900fcb"
+    url "https://files.pythonhosted.org/packages/0e/29/aa6647f283796ff1c46747ee8e69092390116cd86c7c660247ef0d56a146/paramiko-2.5.0.tar.gz"
+    sha256 "9f081281064b5180dc0ef60e256224a280ff16f603a99f3dd4ba6334ebb65f7e"
   end
 
   resource "passlib" do

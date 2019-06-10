@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.06.10.0
+------------
+
 * Fix error "No module named 'keyring.util.escape'".
 * Added ``Cluster.upgrade_dcos`` and ``minidcos`` ``upgrade`` commands.
 * Replaced ``Cluster.install_dcos_from_url`` and ``Cluster.install_dcos_from_path`` with ``Cluster.install_dcos`` which takes a URL or Path.
