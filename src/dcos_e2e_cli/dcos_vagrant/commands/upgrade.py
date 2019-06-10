@@ -22,6 +22,7 @@ from dcos_e2e_cli.common.options import (
     variant_option,
     verbosity_option,
 )
+from dcos_e2e_cli.common.upgrade import cluster_upgrade_dcos
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option

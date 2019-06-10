@@ -1,4 +1,4 @@
-Usage: minidcos vagrant upgrade [OPTIONS] INSTALLER
+Usage: minidcos aws upgrade [OPTIONS] INSTALLER_URL
 
   Upgrade a cluster to a given version of DC/OS.
 
@@ -11,14 +11,10 @@ Options:
                                   configuration YAML. The contents of this file
                                   will be added to add to a default
                                   configuration.
-  --variant [auto|oss|enterprise]
-                                  Choose the DC/OS variant. If the variant does
-                                  not match the variant of the given installer,
-                                  an error will occur. Using "auto" finds the
-                                  variant from the installer. Finding the
-                                  variant from the installer takes some time and
-                                  so using another option is a performance
-                                  optimization.
+  --variant [oss|enterprise]      Choose the DC/OS variant. If the variant does
+                                  not match the variant of the given installer
+                                  URL, an error will occur.   [required]
+  --aws-region TEXT               The AWS region to use.  [default: us-west-2]
   --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
                                   of temporary storage. Set this option to use a
                                   custom "workspace" for this temporary storage.
@@ -31,8 +27,10 @@ Options:
                                   Enterprise cluster. This overrides any
                                   security mode set in ``--extra-config``.
   --wait-for-dcos                 Wait for DC/OS after creating the cluster.
-                                  This is equivalent to using "minidcos vagrant
-                                  wait" after this command.
+                                  This is equivalent to using "minidcos aws
+                                  wait" after this command. "minidcos aws wait"
+                                  has various options available and so may be
+                                  more appropriate for your use case.
   --license-key FILE              This is ignored if using open source DC/OS. If
                                   using DC/OS Enterprise, this defaults to the
                                   value of the `DCOS_LICENSE_KEY_PATH`

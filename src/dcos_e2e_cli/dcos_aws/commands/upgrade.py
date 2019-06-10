@@ -1,5 +1,5 @@
 """
-Tools for installing DC/OS on a provisioned AWS cluster.
+Tools for upgrading a DC/OS cluster.
 """
 
 from pathlib import Path
@@ -10,19 +10,17 @@ import click
 from dcos_e2e.backends import AWS
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
-from dcos_e2e_cli.common.install import (
-    cluster_install_dcos,
-    run_post_install_steps,
-)
+from dcos_e2e_cli.common.install import run_post_install_steps
 from dcos_e2e_cli.common.options import (
-    cluster_id_option,
     enable_spinner_option,
+    existing_cluster_id_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
     security_mode_option,
     verbosity_option,
 )
+from dcos_e2e_cli.common.upgrade import cluster_upgrade_dcos
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
@@ -35,52 +33,51 @@ from .doctor import doctor
 from .wait import wait
 
 
-@click.command('install')
+@click.command('upgrade')
 @click.argument('installer_url', type=str)
-@variant_option
-@wait_for_dcos_option
+@existing_cluster_id_option
+@verbosity_option
 @extra_config_option
+@variant_option
 @aws_region_option
 @workspace_dir_option
-@license_key_option
-@genconf_dir_option
 @security_mode_option
-@verbosity_option
-@cluster_id_option
+@wait_for_dcos_option
+@license_key_option
 @enable_spinner_option
+@genconf_dir_option
 @click.pass_context
-def install_dcos(
+def upgrade(
     ctx: click.core.Context,
-    installer_url: str,
+    cluster_id: str,
+    aws_region: str,
     extra_config: Dict[str, Any],
+    security_mode: Optional[str],
+    license_key: Optional[Path],
     variant: str,
     workspace_dir: Path,
-    license_key: Optional[Path],
-    security_mode: Optional[str],
-    aws_region: str,
-    cluster_id: str,
-    genconf_dir: Optional[Path],
+    installer_url: str,
     wait_for_dcos: bool,
     enable_spinner: bool,
+    genconf_dir: Optional[Path],
 ) -> None:
     """
-    Install DC/OS on a provisioned AWS cluster.
+    Upgrade a cluster to a given version of DC/OS.
     """
+    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
+    doctor_message = get_doctor_message(
+        doctor_command_name=doctor_command_name,
+    )
     check_cluster_id_exists(
         new_cluster_id=cluster_id,
         existing_cluster_ids=existing_cluster_ids(aws_region=aws_region),
     )
-
     cluster_instances = ClusterInstances(
         cluster_id=cluster_id,
         aws_region=aws_region,
     )
-
-    doctor_command_name = command_path(sibling_ctx=ctx, command=doctor)
-    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
-    doctor_message = get_doctor_message(
-        doctor_command_name=doctor_command_name,
-    )
+    cluster_backend = AWS()
+    cluster = cluster_instances.cluster
     dcos_variant = get_install_variant(
         given_variant=variant,
         installer_path=None,
@@ -88,7 +85,6 @@ def install_dcos(
         doctor_message=doctor_message,
         enable_spinner=enable_spinner,
     )
-
     dcos_config = get_config(
         cluster_representation=cluster_instances,
         extra_config=extra_config,
@@ -97,25 +93,25 @@ def install_dcos(
         license_key=license_key,
     )
 
-    cluster_backend = AWS()
-    cluster = cluster_instances.cluster
-    cluster_install_dcos(
+    cluster_upgrade_dcos(
         cluster=cluster,
         cluster_representation=cluster_instances,
-        dcos_config=dcos_config,
         dcos_installer=installer_url,
+        dcos_config=dcos_config,
+        ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         local_genconf_dir=genconf_dir,
-        ip_detect_path=cluster_backend.ip_detect_path,
         enable_spinner=enable_spinner,
     )
 
+    http_checks = True
+    wait_command_name = command_path(sibling_ctx=ctx, command=wait)
     run_post_install_steps(
         cluster=cluster,
         cluster_id=cluster_id,
         dcos_config=dcos_config,
         doctor_command_name=doctor_command_name,
-        http_checks=True,
+        http_checks=http_checks,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
         enable_spinner=enable_spinner,
