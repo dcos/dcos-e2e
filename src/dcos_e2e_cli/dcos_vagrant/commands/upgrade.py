@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional
 import click
 
 from dcos_e2e.backends import Vagrant
-from dcos_e2e.node import Output
 from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
@@ -17,6 +16,7 @@ from dcos_e2e_cli.common.options import (
     enable_spinner_option,
     existing_cluster_id_option,
     extra_config_option,
+    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
@@ -43,6 +43,7 @@ from .wait import wait
 @wait_for_dcos_option
 @license_key_option
 @enable_spinner_option
+@genconf_dir_option
 @click.pass_context
 def upgrade(
     ctx: click.core.Context,
@@ -55,6 +56,7 @@ def upgrade(
     installer: Path,
     wait_for_dcos: bool,
     enable_spinner: bool,
+    genconf_dir: Optional[Path],
 ) -> None:
     """
     Upgrade a cluster to a given version of DC/OS.
@@ -85,11 +87,15 @@ def upgrade(
         license_key=license_key,
     )
 
-    cluster.upgrade_dcos(
+    cluster_upgrade_dcos(
+        cluster=cluster,
+        cluster_representation=cluster_vms,
         dcos_installer=installer,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
-        output=Output.LOG_AND_CAPTURE,
+        doctor_message=doctor_message,
+        local_genconf_dir=genconf_dir,
+        enable_spinner=enable_spinner,
     )
 
     wait_command_name = command_path(sibling_ctx=ctx, command=wait)
