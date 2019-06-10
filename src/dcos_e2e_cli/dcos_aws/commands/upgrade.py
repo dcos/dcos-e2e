@@ -18,7 +18,6 @@ from dcos_e2e_cli.common.options import (
     genconf_dir_option,
     license_key_option,
     security_mode_option,
-    variant_option,
     verbosity_option,
 )
 from dcos_e2e_cli.common.upgrade import cluster_upgrade_dcos
@@ -29,6 +28,7 @@ from dcos_e2e_cli.common.workspaces import workspace_dir_option
 from ._common import ClusterInstances, existing_cluster_ids
 from ._options import aws_region_option
 from ._wait_for_dcos import wait_for_dcos_option
+from ._variant import variant_option
 from .doctor import doctor
 from .wait import wait
 
@@ -56,7 +56,7 @@ def upgrade(
     license_key: Optional[Path],
     variant: str,
     workspace_dir: Path,
-    installer: Path,
+    installer_url: str,
     wait_for_dcos: bool,
     enable_spinner: bool,
     genconf_dir: Optional[Path],
@@ -80,7 +80,7 @@ def upgrade(
     cluster = cluster_instances.cluster
     dcos_variant = get_install_variant(
         given_variant=variant,
-        installer_path=installer,
+        installer_path=None,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
         enable_spinner=enable_spinner,
@@ -96,7 +96,7 @@ def upgrade(
     cluster_upgrade_dcos(
         cluster=cluster,
         cluster_representation=cluster_instances,
-        dcos_installer=installer,
+        dcos_installer=installer_url,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
