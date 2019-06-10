@@ -280,13 +280,12 @@ class Node:
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        workspace_dir = _create_workspace_on_node(
+        node_dcos_installer = _node_installer_path(
             node=self,
             user=user,
             transport=transport,
             output=output,
         )
-        node_dcos_installer = workspace_dir / 'dcos_generate_config.sh'
         self.send_file(
             local_path=dcos_installer,
             remote_path=node_dcos_installer,
@@ -842,7 +841,7 @@ def _install_dcos_from_node_path(
     )
 
 
-def _create_workspace_on_node(
+def _node_installer_path(
     node: Node,
     user: Optional[str],
     transport: Optional[Transport],
@@ -863,6 +862,9 @@ def _create_workspace_on_node(
         output: What happens with stdout and stderr.
         transport: The transport to use for communicating with nodes. If
             ``None``, the ``Node``'s ``default_transport`` is used.
+
+    Returns:
+        A path to put a new DC/OS installer in on the node.
     """
     workspace_dir = Path('/dcos-install-dir') / uuid.uuid4().hex
     mkdir_args = ['mkdir', '--parents', str(workspace_dir)]
@@ -874,7 +876,7 @@ def _create_workspace_on_node(
         output=output,
     )
 
-    return workspace_dir
+    return workspace_dir / 'dcos_generate_config.sh'
 
 
 def _install_dcos_from_path(
@@ -921,14 +923,13 @@ def _install_dcos_from_path(
             the installer node. These are files to copy from the host to
             the installer node before installing DC/OS.
     """
-    workspace_dir = _create_workspace_on_node(
+    node_dcos_installer = _node_installer_path(
         node=node,
         user=user,
         transport=transport,
         output=output,
     )
 
-    node_dcos_installer = workspace_dir / 'dcos_generate_config.sh'
     node.send_file(
         local_path=dcos_installer,
         remote_path=node_dcos_installer,
@@ -993,13 +994,12 @@ def _install_dcos_from_url(
             the installer node. These are files to copy from the host to
             the installer node before installing DC/OS.
     """
-    workspace_dir = _create_workspace_on_node(
+    node_dcos_installer = _node_installer_path(
         node=node,
         user=user,
         transport=transport,
         output=output,
     )
-    node_dcos_installer = workspace_dir / 'dcos_generate_config.sh'
     node.run(
         args=[
             'curl',
