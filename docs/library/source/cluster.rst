@@ -28,13 +28,9 @@ It is assumed that DC/OS is already up and running on the given :py:class:`~dcos
 Installing DC/OS
 ----------------
 
-Some backends support installing DC/OS from a path to an installer.
-Some backends support installing DC/OS from a URL pointing to an installer.
 See :doc:`how to use DC/OS Enterprise <enterprise>` with |project|.
 
-.. automethod:: dcos_e2e.cluster.Cluster.install_dcos_from_path
-
-.. automethod:: dcos_e2e.cluster.Cluster.install_dcos_from_url
+.. automethod:: dcos_e2e.cluster.Cluster.install_dcos
 
 Destroying a ``Cluster``
 ------------------------
@@ -49,6 +45,13 @@ In this case the cluster will be destroyed when exiting the context manager.
         pass
 
 .. automethod:: dcos_e2e.cluster.Cluster.destroy
+
+Upgrading a ``Cluster``
+------------------------
+
+It is possible to upgrade a :py:class:`~dcos_e2e.cluster.Cluster`\ s DC/OS installation.
+
+.. automethod:: dcos_e2e.cluster.Cluster.upgrade_dcos_from_path
 
 Waiting for DC/OS
 -----------------

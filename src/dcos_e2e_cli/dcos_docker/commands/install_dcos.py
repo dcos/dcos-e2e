@@ -13,10 +13,11 @@ from dcos_e2e_cli.common.arguments import installer_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    install_dcos_from_path,
+    cluster_install_dcos,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
+    enable_spinner_option,
     existing_cluster_id_option,
     extra_config_option,
     genconf_dir_option,
@@ -47,6 +48,7 @@ from .wait import wait
 @verbosity_option
 @wait_for_dcos_option
 @workspace_dir_option
+@enable_spinner_option
 @click.pass_context
 def install_dcos(
     ctx: click.core.Context,
@@ -60,6 +62,7 @@ def install_dcos(
     workspace_dir: Path,
     transport: Transport,
     wait_for_dcos: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Install DC/OS on the given Docker cluster.
@@ -89,6 +92,7 @@ def install_dcos(
         installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     dcos_config = get_config(
@@ -99,7 +103,7 @@ def install_dcos(
         license_key=license_key,
     )
 
-    install_dcos_from_path(
+    cluster_install_dcos(
         cluster=cluster,
         cluster_representation=cluster_containers,
         dcos_config=dcos_config,
@@ -107,6 +111,7 @@ def install_dcos(
         doctor_message=doctor_message,
         dcos_installer=installer,
         local_genconf_dir=genconf_dir,
+        enable_spinner=enable_spinner,
     )
 
     run_post_install_steps(
@@ -117,4 +122,5 @@ def install_dcos(
         http_checks=http_checks,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

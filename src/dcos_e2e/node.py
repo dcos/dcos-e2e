@@ -13,7 +13,7 @@ from ipaddress import IPv4Address
 from pathlib import Path
 from tempfile import gettempdir
 from textwrap import dedent
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import yaml
 
@@ -180,161 +180,9 @@ class Node:
         # See https://github.com/python/mypy/issues/5135.
         return transport_cls()  # type: ignore
 
-    def _prepare_installer(
+    def install_dcos(
         self,
-        remote_dcos_installer: Path,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        transport: Optional[Transport],
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-        user: Optional[str],
-    ) -> None:
-        """
-        Put files in place for DC/OS to be installed or upgraded.
-        """
-        tempdir = Path(gettempdir())
-
-        remote_genconf_dir = 'genconf'
-        remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
-
-        self.send_file(
-            local_path=ip_detect_path,
-            remote_path=remote_genconf_path / 'ip-detect',
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-        serve_dir_path = remote_genconf_path / 'serve'
-        dcos_config = {
-            **dcos_config,
-            **{
-                'bootstrap_url':
-                'file://{serve_dir_path}'.format(
-                    serve_dir_path=serve_dir_path,
-                ),
-            },
-        }
-        config_yaml = yaml.dump(data=dcos_config)
-        config_file_path = tempdir / 'config.yaml'
-        Path(config_file_path).write_text(data=config_yaml)
-
-        self.send_file(
-            local_path=config_file_path,
-            remote_path=remote_genconf_path / 'config.yaml',
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-        for host_path, installer_path in files_to_copy_to_genconf_dir:
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = remote_genconf_path / relative_installer_path
-            self.send_file(
-                local_path=host_path,
-                remote_path=destination_path,
-                transport=transport,
-                user=user,
-                sudo=True,
-            )
-
-    def _install_dcos_from_node_path(
-        self,
-        remote_dcos_installer: Path,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        role: Role,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-        user: Optional[str],
-        output: Output,
-        transport: Optional[Transport],
-    ) -> None:
-        """
-        Install DC/OS in a platform-independent way by using
-        the advanced installation method as described at
-        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
-
-        The documentation describes using a "bootstrap" node, so that only
-        one node downloads and extracts the installer.
-        This method is less efficient on a multi-node cluster,
-        as it does not use a bootstrap node.
-        Instead, the installer is extracted on this node, and then DC/OS is
-        installed.
-
-        Args:
-            remote_dcos_installer: The path on the node to an installer to
-                be installed on the node.
-            dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to the ``ip-detect`` script to use for
-                installing DC/OS.
-            role: The desired DC/OS role for the installation.
-            user: The username to communicate as. If ``None`` then the
-                ``default_user`` is used instead.
-            output: What happens with stdout and stderr.
-            transport: The transport to use for communicating with nodes. If
-                ``None``, the ``Node``'s ``default_transport`` is used.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-        """
-        self._prepare_installer(
-            dcos_config=dcos_config,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            ip_detect_path=ip_detect_path,
-            remote_dcos_installer=remote_dcos_installer,
-            transport=transport,
-            user=user,
-        )
-
-        genconf_args = [
-            'cd',
-            str(remote_dcos_installer.parent),
-            '&&',
-            'bash',
-            str(remote_dcos_installer),
-            '-v',
-            '--genconf',
-        ]
-
-        self.run(
-            args=genconf_args,
-            output=output,
-            shell=True,
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-        self.run(
-            args=['rm', str(remote_dcos_installer)],
-            output=output,
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-        setup_args = [
-            'cd',
-            str(remote_dcos_installer.parent),
-            '&&',
-            'bash',
-            'genconf/serve/dcos_install.sh',
-            '--no-block-dcos-setup',
-            role.value,
-        ]
-
-        self.run(
-            args=setup_args,
-            shell=True,
-            output=output,
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-    def install_dcos_from_path(
-        self,
-        dcos_installer: Path,
+        dcos_installer: Union[str, Path],
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
@@ -346,13 +194,13 @@ class Node:
         """
         Install DC/OS in a platform-independent way by using
         the advanced installation method as described at
-        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+        https://docs.mesosphere.com/1.13/installing/production/deploying-dcos/installation/.
 
         The documentation describes using a "bootstrap" node, so that only
         one node downloads and extracts the installer.
         This method is less efficient on a multi-node cluster,
         as it does not use a bootstrap node.
-        Instead, the installer is sent to this node and then extracted on this
+        Instead, the installer is put on this node and then extracted on this
         node, and then DC/OS is installed.
 
         This creates a folder in ``/dcos-install-dir`` on this node which
@@ -360,8 +208,8 @@ class Node:
         the DC/OS installation has finished.
 
         Args:
-            dcos_installer: The path to an installer to be installed on the
-                node.
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
                 installing DC/OS.
@@ -375,33 +223,29 @@ class Node:
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        workspace_dir = Path('/dcos-install-dir')
-        node_installer_parent = workspace_dir / uuid.uuid4().hex
-        mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
-        self.run(
-            args=mkdir_args,
-            user=user,
-            transport=transport,
-            sudo=True,
-            output=Output.CAPTURE,
-        )
-        node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
-        self.send_file(
-            local_path=dcos_installer,
-            remote_path=node_dcos_installer,
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-        self._install_dcos_from_node_path(
-            remote_dcos_installer=node_dcos_installer,
+        if isinstance(dcos_installer, str):
+            _install_dcos_from_url(
+                dcos_installer=dcos_installer,
+                node=self,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                role=role,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+                user=user,
+                output=output,
+                transport=transport,
+            )
+            return
+        _install_dcos_from_path(
+            dcos_installer=dcos_installer,
+            node=self,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
-            user=user,
             role=role,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            user=user,
             output=output,
             transport=transport,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         )
 
     def _upgrade_dcos_from_node_path(
@@ -440,7 +284,8 @@ class Node:
             subprocess.CalledProcessError: One of the upgrade process steps
                 exited with a non-zero code.
         """
-        self._prepare_installer(
+        _prepare_installer(
+            node=self,
             dcos_config=dcos_config,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             ip_detect_path=ip_detect_path,
@@ -612,84 +457,6 @@ class Node:
             output=output,
             transport=transport,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        )
-
-    def install_dcos_from_url(
-        self,
-        dcos_installer: str,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        role: Role,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-        user: Optional[str] = None,
-        output: Output = Output.CAPTURE,
-        transport: Optional[Transport] = None,
-    ) -> None:
-        """
-        Install DC/OS in a platform-independent way by using
-        the advanced installation method as described at
-        https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
-
-        The documentation describes using a "bootstrap" node, so that only
-        one node downloads and extracts the installer.
-        This method is less efficient on a multi-node cluster,
-        as it does not use a bootstrap node.
-        Instead, the installer is downloaded to this node and then extracted on
-        this node, and then DC/OS is installed.
-
-        This creates a folder in ``/dcos-install-dir`` on this node which
-        contains the DC/OS installation files that can be removed safely after
-        the DC/OS installation has finished.
-
-        Args:
-            dcos_installer: The URL to an installer to be installed on the
-                node.
-            dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to the ``ip-detect`` script to use for
-                installing DC/OS.
-            role: The desired DC/OS role for the installation.
-            user: The username to communicate as. If ``None`` then the
-                ``default_user`` is used instead.
-            output: What happens with stdout and stderr.
-            transport: The transport to use for communicating with nodes. If
-                ``None``, the ``Node``'s ``default_transport`` is used.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-
-        """
-        workspace_dir = Path('/dcos-install-dir')
-        node_installer_parent = workspace_dir / uuid.uuid4().hex
-        mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
-        self.run(
-            args=mkdir_args,
-            user=user,
-            transport=transport,
-            sudo=True,
-        )
-        node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
-        self.run(
-            args=[
-                'curl',
-                '-f',
-                dcos_installer,
-                '-o',
-                str(node_dcos_installer),
-            ],
-            output=output,
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-        self._install_dcos_from_node_path(
-            remote_dcos_installer=node_dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            user=user,
-            role=role,
-            output=output,
-            transport=transport,
         )
 
     def run(
@@ -1074,3 +841,310 @@ class Node:
             commit=build_info['dcos-image-commit'],
             variant=variant_map[build_info['dcos-variant']],
         )
+
+
+def _prepare_installer(
+    node: Node,
+    remote_dcos_installer: Path,
+    dcos_config: Dict[str, Any],
+    ip_detect_path: Path,
+    transport: Optional[Transport],
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+    user: Optional[str],
+) -> None:
+    """
+    Put files in place for DC/OS to be installed or upgraded.
+    """
+    tempdir = Path(gettempdir())
+
+    remote_genconf_dir = 'genconf'
+    remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
+
+    node.send_file(
+        local_path=ip_detect_path,
+        remote_path=remote_genconf_path / 'ip-detect',
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+    serve_dir_path = remote_genconf_path / 'serve'
+    bootstrap_url = 'file://{serve_dir_path}'.format(
+        serve_dir_path=serve_dir_path,
+    )
+    extra_config = {'bootstrap_url': bootstrap_url}
+    dcos_config = {**dcos_config, **extra_config}
+    config_yaml = yaml.dump(data=dcos_config)
+    config_file_path = tempdir / 'config.yaml'
+    Path(config_file_path).write_text(data=config_yaml)
+
+    node.send_file(
+        local_path=config_file_path,
+        remote_path=remote_genconf_path / 'config.yaml',
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+    for host_path, installer_path in files_to_copy_to_genconf_dir:
+        relative_installer_path = installer_path.relative_to('/genconf')
+        destination_path = remote_genconf_path / relative_installer_path
+        node.send_file(
+            local_path=host_path,
+            remote_path=destination_path,
+            transport=transport,
+            user=user,
+            sudo=True,
+        )
+
+
+def _install_dcos_from_node_path(
+    node: Node,
+    remote_dcos_installer: Path,
+    dcos_config: Dict[str, Any],
+    ip_detect_path: Path,
+    role: Role,
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+    user: Optional[str],
+    output: Output,
+    transport: Optional[Transport],
+) -> None:
+    """
+    Install DC/OS in a platform-independent way by using
+    the advanced installation method as described at
+    https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+    The documentation describes using a "bootstrap" node, so that only
+    one node downloads and extracts the installer.
+    This method is less efficient on a multi-node cluster,
+    as it does not use a bootstrap node.
+    Instead, the installer is extracted on this node, and then DC/OS is
+    installed.
+
+    Args:
+        remote_dcos_installer: The path on the node to an installer to
+            be installed on the node.
+        node: The node to install DC/OS on.
+        dcos_config: The contents of the DC/OS ``config.yaml``.
+        ip_detect_path: The path to the ``ip-detect`` script to use for
+            installing DC/OS.
+        role: The desired DC/OS role for the installation.
+        user: The username to communicate as. If ``None`` then the
+            ``default_user`` is used instead.
+        output: What happens with stdout and stderr.
+        transport: The transport to use for communicating with nodes. If
+            ``None``, the ``Node``'s ``default_transport`` is used.
+        files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+            the installer node. These are files to copy from the host to
+            the installer node before installing DC/OS.
+    """
+    _prepare_installer(
+        node=node,
+        dcos_config=dcos_config,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        ip_detect_path=ip_detect_path,
+        remote_dcos_installer=remote_dcos_installer,
+        transport=transport,
+        user=user,
+    )
+
+    genconf_args = [
+        'cd',
+        str(remote_dcos_installer.parent),
+        '&&',
+        'bash',
+        str(remote_dcos_installer),
+        '-v',
+        '--genconf',
+    ]
+
+    node.run(
+        args=genconf_args,
+        output=output,
+        shell=True,
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+    node.run(
+        args=['rm', str(remote_dcos_installer)],
+        output=output,
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+    setup_args = [
+        'cd',
+        str(remote_dcos_installer.parent),
+        '&&',
+        'bash',
+        'genconf/serve/dcos_install.sh',
+        '--no-block-dcos-setup',
+        role.value,
+    ]
+
+    node.run(
+        args=setup_args,
+        shell=True,
+        output=output,
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+
+def _install_dcos_from_path(
+    dcos_installer: Path,
+    node: Node,
+    dcos_config: Dict[str, Any],
+    ip_detect_path: Path,
+    role: Role,
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+    user: Optional[str],
+    output: Output,
+    transport: Optional[Transport],
+) -> None:
+    """
+    Install DC/OS in a platform-independent way by using
+    the advanced installation method as described at
+    https://docs.mesosphere.com/1.13/installing/production/deploying-dcos/installation/.
+
+    The documentation describes using a "bootstrap" node, so that only
+    one node downloads and extracts the installer.
+    This method is less efficient on a multi-node cluster,
+    as it does not use a bootstrap node.
+    Instead, the installer is sent to this node and then extracted on this
+    node, and then DC/OS is installed.
+
+    This creates a folder in ``/dcos-install-dir`` on this node which
+    contains the DC/OS installation files that can be removed safely after
+    the DC/OS installation has finished.
+
+    Args:
+        dcos_installer: The ``Path`` to a local installer or a ``str`` to
+            which is a URL pointing to an installer to install DC/OS from.
+        node: The node to install DC/OS on.
+        dcos_config: The contents of the DC/OS ``config.yaml``.
+        ip_detect_path: The path to the ``ip-detect`` script to use for
+            installing DC/OS.
+        role: The desired DC/OS role for the installation.
+        user: The username to communicate as. If ``None`` then the
+            ``default_user`` is used instead.
+        output: What happens with stdout and stderr.
+        transport: The transport to use for communicating with nodes. If
+            ``None``, the ``Node``'s ``default_transport`` is used.
+        files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+            the installer node. These are files to copy from the host to
+            the installer node before installing DC/OS.
+    """
+    workspace_dir = Path('/dcos-install-dir')
+    node_installer_parent = workspace_dir / uuid.uuid4().hex
+    mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
+    node.run(
+        args=mkdir_args,
+        user=user,
+        transport=transport,
+        sudo=True,
+        output=Output.CAPTURE,
+    )
+    node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
+    node.send_file(
+        local_path=dcos_installer,
+        remote_path=node_dcos_installer,
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+    _install_dcos_from_node_path(
+        node=node,
+        remote_dcos_installer=node_dcos_installer,
+        dcos_config=dcos_config,
+        ip_detect_path=ip_detect_path,
+        user=user,
+        role=role,
+        output=output,
+        transport=transport,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+    )
+
+
+def _install_dcos_from_url(
+    dcos_installer: str,
+    node: Node,
+    dcos_config: Dict[str, Any],
+    ip_detect_path: Path,
+    role: Role,
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+    user: Optional[str],
+    output: Output,
+    transport: Optional[Transport],
+) -> None:
+    """
+    Install DC/OS in a platform-independent way by using
+    the advanced installation method as described at
+    https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+
+    The documentation describes using a "bootstrap" node, so that only
+    one node downloads and extracts the installer.
+    This method is less efficient on a multi-node cluster,
+    as it does not use a bootstrap node.
+    Instead, the installer is downloaded to this node and then extracted on
+    this node, and then DC/OS is installed.
+
+    This creates a folder in ``/dcos-install-dir`` on this node which
+    contains the DC/OS installation files that can be removed safely after
+    the DC/OS installation has finished.
+
+    Args:
+        dcos_installer: The URL to an installer to be installed on the
+            node.
+        node: The node to install DC/OS on.
+        dcos_config: The contents of the DC/OS ``config.yaml``.
+        ip_detect_path: The path to the ``ip-detect`` script to use for
+            installing DC/OS.
+        role: The desired DC/OS role for the installation.
+        user: The username to communicate as. If ``None`` then the
+            ``default_user`` is used instead.
+        output: What happens with stdout and stderr.
+        transport: The transport to use for communicating with nodes. If
+            ``None``, the ``Node``'s ``default_transport`` is used.
+        files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+            the installer node. These are files to copy from the host to
+            the installer node before installing DC/OS.
+    """
+    workspace_dir = Path('/dcos-install-dir')
+    node_installer_parent = workspace_dir / uuid.uuid4().hex
+    mkdir_args = ['mkdir', '--parents', str(node_installer_parent)]
+    node.run(
+        args=mkdir_args,
+        user=user,
+        transport=transport,
+        sudo=True,
+    )
+    node_dcos_installer = node_installer_parent / 'dcos_generate_config.sh'
+    node.run(
+        args=[
+            'curl',
+            '-f',
+            dcos_installer,
+            '-o',
+            str(node_dcos_installer),
+        ],
+        output=output,
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+    _install_dcos_from_node_path(
+        node=node,
+        remote_dcos_installer=node_dcos_installer,
+        dcos_config=dcos_config,
+        ip_detect_path=ip_detect_path,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        user=user,
+        role=role,
+        output=output,
+        transport=transport,
+    )

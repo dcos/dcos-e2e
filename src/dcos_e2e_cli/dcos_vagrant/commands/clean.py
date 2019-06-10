@@ -5,7 +5,7 @@ Clean all Docker containers, volumes etc. from using the Docker backend.
 import click
 
 from dcos_e2e_cli._vendor import vertigo_py
-from dcos_e2e_cli.common.options import verbosity_option
+from dcos_e2e_cli.common.options import enable_spinner_option, verbosity_option
 from dcos_e2e_cli.dcos_vagrant.commands.destroy import destroy_cluster
 
 from ._common import vm_names_by_cluster
@@ -19,8 +19,9 @@ from ._common import vm_names_by_cluster
     show_default=True,
     help='Destroy running clusters.',
 )
+@enable_spinner_option
 @verbosity_option
-def clean(destroy_running_clusters: bool) -> None:
+def clean(destroy_running_clusters: bool, enable_spinner: bool) -> None:
     """
     Remove VMs created by this tool.
 
@@ -35,7 +36,10 @@ def clean(destroy_running_clusters: bool) -> None:
 
     if destroy_running_clusters:
         for cluster_id in running_clusters.keys():
-            destroy_cluster(cluster_id=cluster_id)
+            destroy_cluster(
+                cluster_id=cluster_id,
+                enable_spinner=enable_spinner,
+            )
 
     for cluster_id in not_running_cluster_names:
         for vm_name in all_clusters[cluster_id]:

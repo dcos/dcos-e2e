@@ -14,13 +14,14 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    install_dcos_from_url,
+    cluster_install_dcos,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
+    enable_spinner_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
@@ -88,6 +89,7 @@ from .wait import wait
 @verbosity_option
 @cluster_id_option
 @enable_selinux_enforcing_option
+@enable_spinner_option
 @click.pass_context
 def create(
     ctx: click.core.Context,
@@ -109,6 +111,7 @@ def create(
     genconf_dir: Optional[Path],
     custom_tag: Dict[str, str],
     wait_for_dcos: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -143,6 +146,7 @@ def create(
         installer_path=None,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
@@ -184,6 +188,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
@@ -213,12 +218,13 @@ def create(
         license_key=license_key,
     )
 
-    install_dcos_from_url(
+    cluster_install_dcos(
         cluster=cluster,
         cluster_representation=cluster_instances,
         dcos_config=dcos_config,
-        dcos_installer_url=installer_url,
+        dcos_installer=installer_url,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
         local_genconf_dir=genconf_dir,
         ip_detect_path=cluster_backend.ip_detect_path,
     )
@@ -231,4 +237,5 @@ def create(
         http_checks=True,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

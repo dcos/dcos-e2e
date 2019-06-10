@@ -131,4 +131,7 @@ Options:
                                   <HOST_PORT>:<CONTAINER_PORT>
   -v, --verbose                   Use verbose output. Use this option multiple
                                   times for more verbose output.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
   -h, --help                      Show this message and exit.

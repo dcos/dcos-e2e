@@ -2,10 +2,8 @@
 Helpers for managing DC/OS Variants.
 """
 
-import json
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
 from shutil import rmtree
 from typing import Optional
@@ -14,11 +12,9 @@ import click
 from halo import Halo
 
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Output
-from dcos_e2e_cli._vendor.dcos_installer_tools import (
-    DCOSVariant,
-    get_dcos_installer_details,
-)
+from dcos_e2e.exceptions import DCOSNotInstalledError
+from dcos_e2e.node import DCOSVariant
+from dcos_e2e_cli._vendor import dcos_installer_tools as installer_tools
 
 
 def get_install_variant(
@@ -26,6 +22,7 @@ def get_install_variant(
     installer_path: Optional[Path],
     doctor_message: str,
     workspace_dir: Path,
+    enable_spinner: bool,
 ) -> DCOSVariant:
     """
     Get the variant of DC/OS to install.
@@ -47,10 +44,10 @@ def get_install_variant(
     """
     if given_variant == 'auto':
         assert installer_path is not None
-        spinner = Halo(enabled=sys.stdout.isatty())
+        spinner = Halo(enabled=enable_spinner)
         spinner.start(text='Determining DC/OS variant')
         try:
-            details = get_dcos_installer_details(
+            details = installer_tools.get_dcos_installer_details(
                 installer=installer_path,
                 workspace_dir=workspace_dir,
             )
@@ -67,39 +64,16 @@ def get_install_variant(
             sys.exit(1)
 
         spinner.succeed()
-        return details.variant
+        variant_map = {
+            installer_tools.DCOSVariant.ENTERPRISE: DCOSVariant.ENTERPRISE,
+            installer_tools.DCOSVariant.OSS: DCOSVariant.OSS,
+        }
+        return variant_map[details.variant]
 
     return {
         'oss': DCOSVariant.OSS,
         'enterprise': DCOSVariant.ENTERPRISE,
     }[given_variant]
-
-
-def cluster_variant_available(cluster: Cluster) -> bool:
-    """
-    Check whether a cluster's variant can be retrieved.
-
-    Args:
-        cluster: The cluster to check.
-
-    Returns:
-        Whether the cluster variant is available.
-    """
-    master = next(iter(cluster.masters))
-    script = textwrap.dedent(
-        """
-        #!/bin/bash
-        if [ -e /opt/mesosphere/etc/dcos-version.json ]
-        then
-            echo "True"
-        else
-            echo "False"
-        fi
-        """,
-    )
-    version_file_exists = master.run(args=[script], shell=True)
-    output = version_file_exists.stdout.strip().decode()
-    return {'True': True, 'False': False}[output]
 
 
 def get_cluster_variant(cluster: Cluster) -> Optional[DCOSVariant]:
@@ -113,15 +87,8 @@ def get_cluster_variant(cluster: Cluster) -> Optional[DCOSVariant]:
         The variant of DC/OS installed on the given cluster or ``None`` if the
         file required for us to know is not ready.
     """
-    if not cluster_variant_available(cluster=cluster):
-        return None
-
     master = next(iter(cluster.masters))
-    get_version_json_args = ['cat', '/opt/mesosphere/etc/dcos-version.json']
-    result = master.run(args=get_version_json_args, output=Output.CAPTURE)
-    dcos_version = json.loads(result.stdout.decode())
-    given_variant = dcos_version['dcos-variant']
-    return {
-        'open': DCOSVariant.OSS,
-        'enterprise': DCOSVariant.ENTERPRISE,
-    }[given_variant]
+    try:
+        return master.dcos_build_info().variant
+    except DCOSNotInstalledError:
+        return None

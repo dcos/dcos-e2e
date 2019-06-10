@@ -518,7 +518,7 @@ class DockerCluster(ClusterManager):
             public_agents=self.public_agents,
         )
 
-        cluster.install_dcos_from_url(
+        cluster.install_dcos(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
