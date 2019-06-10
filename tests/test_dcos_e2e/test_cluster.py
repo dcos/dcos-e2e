@@ -476,35 +476,6 @@ class TestInstallDCOS:
         )
         return bool(len(debug_messages & matching_messages))
 
-    def test_dcos_installer_wrong_type(
-        self,
-        cluster_backend: ClusterBackend,
-    ) -> None:
-        """
-        If the wrong installer type is given, an error is raised.
-        """
-        expected_error = (
-            'The DC/OS installer must be a URL (`str`) or a path to a '
-            'local DC/OS installer (``pathlib.Path``).'
-        )
-
-        not_str_or_path = 1
-        with pytest.raises(NotImplementedError) as excinfo:
-            with Cluster(
-                masters=1,
-                agents=0,
-                public_agents=0,
-                cluster_backend=cluster_backend,
-            ) as cluster:
-                cluster.install_dcos(  # type: ignore
-                    dcos_installer=not_str_or_path,
-                    ip_detect_path=cluster_backend.ip_detect_path,
-                    dcos_config=cluster.base_config,
-                    output=Output.LOG_AND_CAPTURE,
-                )
-
-        assert str(excinfo.value) == expected_error
-
     def test_live_logging(
         self,
         caplog: LogCaptureFixture,
