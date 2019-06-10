@@ -463,6 +463,7 @@ class TestUpgrade:
                 assert build.version.startswith('1.13')
                 assert build.variant == DCOSVariant.OSS
 
+
 class TestDestroyNode:
     """
     Tests for destroying nodes.
