@@ -27,8 +27,8 @@ from dcos_e2e_cli.common.workspaces import workspace_dir_option
 
 from ._common import ClusterInstances, existing_cluster_ids
 from ._options import aws_region_option
-from ._wait_for_dcos import wait_for_dcos_option
 from ._variant import variant_option
+from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
 

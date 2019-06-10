@@ -11,14 +11,9 @@ Options:
                                   configuration YAML. The contents of this file
                                   will be added to add to a default
                                   configuration.
-  --variant [auto|oss|enterprise]
-                                  Choose the DC/OS variant. If the variant does
-                                  not match the variant of the given installer,
-                                  an error will occur. Using "auto" finds the
-                                  variant from the installer. Finding the
-                                  variant from the installer takes some time and
-                                  so using another option is a performance
-                                  optimization.
+  --variant [oss|enterprise]      Choose the DC/OS variant. If the variant does
+                                  not match the variant of the given installer
+                                  URL, an error will occur.   [required]
   --aws-region TEXT               The AWS region to use.  [default: us-west-2]
   --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
                                   of temporary storage. Set this option to use a
