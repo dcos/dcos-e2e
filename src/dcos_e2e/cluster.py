@@ -196,6 +196,7 @@ class Cluster(ContextDecorator):
             output: What happens with stdout and stderr.
         """
         cluster_manager_install_dcos(
+            cluster_manager=self._cluster,
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,

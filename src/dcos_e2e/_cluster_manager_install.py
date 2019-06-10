@@ -1,3 +1,7 @@
+"""
+Tools for managing a cluster given a ``ClusterManager``.
+"""
+
 from functools import singledispatch
 from pathlib import Path
 from typing import Any, Dict, Iterable, Tuple, Union
