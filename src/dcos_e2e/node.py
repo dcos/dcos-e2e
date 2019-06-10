@@ -181,64 +181,6 @@ class Node:
         # See https://github.com/python/mypy/issues/5135.
         return transport_cls()  # type: ignore
 
-    def _prepare_installer(
-        self,
-        remote_dcos_installer: Path,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        transport: Optional[Transport],
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-        user: Optional[str],
-    ) -> None:
-        """
-        Put files in place for DC/OS to be installed or upgraded.
-        """
-        tempdir = Path(gettempdir())
-
-        remote_genconf_dir = 'genconf'
-        remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
-
-        self.send_file(
-            local_path=ip_detect_path,
-            remote_path=remote_genconf_path / 'ip-detect',
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-        serve_dir_path = remote_genconf_path / 'serve'
-        dcos_config = {
-            **dcos_config,
-            **{
-                'bootstrap_url':
-                'file://{serve_dir_path}'.format(
-                    serve_dir_path=serve_dir_path,
-                ),
-            },
-        }
-        config_yaml = yaml.dump(data=dcos_config)
-        config_file_path = tempdir / 'config.yaml'
-        Path(config_file_path).write_text(data=config_yaml)
-
-        self.send_file(
-            local_path=config_file_path,
-            remote_path=remote_genconf_path / 'config.yaml',
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
-
-        for host_path, installer_path in files_to_copy_to_genconf_dir:
-            relative_installer_path = installer_path.relative_to('/genconf')
-            destination_path = remote_genconf_path / relative_installer_path
-            self.send_file(
-                local_path=host_path,
-                remote_path=destination_path,
-                transport=transport,
-                user=user,
-                sudo=True,
-            )
-
     def _install_dcos_from_node_path(
         self,
         remote_dcos_installer: Path,
@@ -278,7 +220,8 @@ class Node:
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        self._prepare_installer(
+        _prepare_installer(
+            node=self,
             dcos_config=dcos_config,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             ip_detect_path=ip_detect_path,
@@ -487,7 +430,8 @@ class Node:
             subprocess.CalledProcessError: One of the upgrade process steps
                 exited with a non-zero code.
         """
-        self._prepare_installer(
+        _prepare_installer(
+            node=self,
             dcos_config=dcos_config,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             ip_detect_path=ip_detect_path,
@@ -1121,4 +1065,59 @@ class Node:
             version=build_info['version'],
             commit=build_info['dcos-image-commit'],
             variant=variant_map[build_info['dcos-variant']],
+        )
+
+
+def _prepare_installer(
+    node: Node,
+    remote_dcos_installer: Path,
+    dcos_config: Dict[str, Any],
+    ip_detect_path: Path,
+    transport: Optional[Transport],
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
+    user: Optional[str],
+) -> None:
+    """
+    Put files in place for DC/OS to be installed or upgraded.
+    """
+    tempdir = Path(gettempdir())
+
+    remote_genconf_dir = 'genconf'
+    remote_genconf_path = remote_dcos_installer.parent / remote_genconf_dir
+
+    node.send_file(
+        local_path=ip_detect_path,
+        remote_path=remote_genconf_path / 'ip-detect',
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+    serve_dir_path = remote_genconf_path / 'serve'
+    bootstrap_url = 'file://{serve_dir_path}'.format(
+        serve_dir_path=serve_dir_path,
+    )
+    extra_config = {'bootstrap_url': bootstrap_url}
+    dcos_config = {**dcos_config, **extra_config}
+    config_yaml = yaml.dump(data=dcos_config)
+    config_file_path = tempdir / 'config.yaml'
+    Path(config_file_path).write_text(data=config_yaml)
+
+    node.send_file(
+        local_path=config_file_path,
+        remote_path=remote_genconf_path / 'config.yaml',
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+    for host_path, installer_path in files_to_copy_to_genconf_dir:
+        relative_installer_path = installer_path.relative_to('/genconf')
+        destination_path = remote_genconf_path / relative_installer_path
+        node.send_file(
+            local_path=host_path,
+            remote_path=destination_path,
+            transport=transport,
+            user=user,
+            sudo=True,
         )

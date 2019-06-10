@@ -158,7 +158,7 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for passing a license key.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--license-key',
         type=click_pathlib.Path(
             exists=True,
@@ -172,7 +172,8 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
             'If using DC/OS Enterprise, this defaults to the value of the '
             '`DCOS_LICENSE_KEY_PATH` environment variable.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 
@@ -253,7 +254,7 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     A decorator for choosing a DC/OS checkout to sync before running commands.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--sync-dir',
         type=click_pathlib.Path(
             exists=True,
@@ -272,7 +273,8 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
             'Use this option multiple times on a DC/OS Enterprise cluster to '
             'sync both DC/OS Enterprise and DC/OS Open Source tests.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 
