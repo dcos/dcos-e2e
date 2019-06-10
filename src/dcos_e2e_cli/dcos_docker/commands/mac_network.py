@@ -253,7 +253,7 @@ def destroy_mac_network() -> None:
     """
     Destroy containers created by "minidcos docker setup-mac-network".
     """
-    _destroy_mac_network_containers()
+    _destroy_mac_network_containers(enable_spinner=enable_spinner)
     message = (
         "The containers used to allow access to Docker for Mac's internal "
         'networks have been removed.'

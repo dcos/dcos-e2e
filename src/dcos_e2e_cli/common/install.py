@@ -27,6 +27,7 @@ def cluster_install_dcos(
     local_genconf_dir: Optional[Path],
     dcos_installer: Union[Path, str],
     doctor_message: str,
+    enable_spinner: bool,
 ) -> None:
     """
     Install DC/OS on a cluster.
@@ -42,6 +43,7 @@ def cluster_install_dcos(
             URL pointing to an installer.
         doctor_message: A message which instructs the user on which command to
             use if installation fails.
+        enable_spinner: Whether to enable the spinner animation.
     """
     files_to_copy_to_genconf_dir = []
     if local_genconf_dir is not None:
@@ -51,7 +53,7 @@ def cluster_install_dcos(
             relative_path = node_genconf_path / genconf_relative
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
-    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner = Halo(enabled=enable_spinner)
     spinner.start('Installing DC/OS')
 
     # We allow a cluster to be passed in rather than just inferring it from
