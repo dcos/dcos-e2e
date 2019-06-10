@@ -15,9 +15,9 @@ from .commands.install_dcos import install_dcos
 from .commands.list_clusters import list_clusters
 from .commands.provision import provision
 from .commands.run_command import run
-from .commands.upgrade import upgrade
 from .commands.send_file import send_file
 from .commands.sync import sync_code
+from .commands.upgrade import upgrade
 from .commands.wait import wait
 from .commands.web import web
 
