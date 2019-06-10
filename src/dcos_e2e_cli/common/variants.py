@@ -22,6 +22,7 @@ def get_install_variant(
     installer_path: Optional[Path],
     doctor_message: str,
     workspace_dir: Path,
+    enable_spinner: bool,
 ) -> DCOSVariant:
     """
     Get the variant of DC/OS to install.
@@ -43,7 +44,7 @@ def get_install_variant(
     """
     if given_variant == 'auto':
         assert installer_path is not None
-        spinner = Halo(enabled=sys.stdout.isatty())
+        spinner = Halo(enabled=enable_spinner)
         spinner.start(text='Determining DC/OS variant')
         try:
             details = installer_tools.get_dcos_installer_details(

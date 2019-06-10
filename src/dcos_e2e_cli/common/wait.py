@@ -34,6 +34,7 @@ def wait_for_dcos(
     superuser_password: str,
     http_checks: bool,
     doctor_command_name: str,
+    enable_spinner: bool,
 ) -> None:
     """
     Wait for DC/OS to start.
@@ -47,6 +48,7 @@ def wait_for_dcos(
         http_checks: Whether or not to wait for checks which require an HTTP
             connection to the cluster.
         doctor_command_name: A ``doctor`` command to advise a user to use.
+        enable_spinner: Whether to enable the spinner animation.
     """
     message = (
         'A cluster may take some time to be ready.\n'
@@ -63,7 +65,7 @@ def wait_for_dcos(
         'To resolve that, run this command again.'
     )
 
-    spinner = Halo(enabled=sys.stdout.isatty())
+    spinner = Halo(enabled=enable_spinner)
     spinner.start(text='Waiting for DC/OS variant')
     _wait_for_variant(cluster=cluster)
     dcos_variant = get_cluster_variant(cluster=cluster)

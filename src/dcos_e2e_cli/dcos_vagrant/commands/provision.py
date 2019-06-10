@@ -13,6 +13,7 @@ from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
     enable_selinux_enforcing_option,
+    enable_spinner_option,
     verbosity_option,
 )
 from dcos_e2e_cli.common.options.cluster_size import (
@@ -40,6 +41,7 @@ from .doctor import doctor
 @cluster_id_option
 @verbosity_option
 @enable_selinux_enforcing_option
+@enable_spinner_option
 @vm_memory_mb_option
 @click.pass_context
 def provision(
@@ -51,6 +53,7 @@ def provision(
     cluster_id: str,
     enable_selinux_enforcing: bool,
     vm_memory_mb: int,
+    enable_spinner: bool,
 ) -> None:
     """
     Provision a Vagrant cluster for installing DC/OS.
@@ -81,6 +84,7 @@ def provision(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}

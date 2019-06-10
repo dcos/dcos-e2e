@@ -25,6 +25,7 @@ from dcos_e2e_cli.common.install import (
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
+    enable_spinner_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
@@ -98,6 +99,7 @@ from .wait import wait
 @node_transport_option
 @one_master_host_port_map_option
 @verbosity_option
+@enable_spinner_option
 @click.pass_context
 def create(
     ctx: click.core.Context,
@@ -125,6 +127,7 @@ def create(
     network: Network,
     one_master_host_port_map: Dict[str, int],
     mount_sys_fs_cgroup: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -152,6 +155,7 @@ def create(
         installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     # This is useful for some people to identify containers.
@@ -190,6 +194,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     cluster_containers = ClusterContainers(
@@ -226,6 +231,7 @@ def create(
         doctor_message=doctor_message,
         dcos_installer=installer,
         local_genconf_dir=genconf_dir,
+        enable_spinner=enable_spinner,
     )
 
     run_post_install_steps(
@@ -236,4 +242,5 @@ def create(
         http_checks=http_checks,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

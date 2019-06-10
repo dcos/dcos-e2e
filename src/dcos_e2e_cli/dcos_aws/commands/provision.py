@@ -17,6 +17,7 @@ from dcos_e2e_cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
+    enable_spinner_option,
     verbosity_option,
 )
 from dcos_e2e_cli.common.options.cluster_size import (
@@ -65,6 +66,7 @@ from .doctor import doctor
 @verbosity_option
 @cluster_id_option
 @enable_selinux_enforcing_option
+@enable_spinner_option
 @click.pass_context
 def provision(
     ctx: click.core.Context,
@@ -79,6 +81,7 @@ def provision(
     cluster_id: str,
     enable_selinux_enforcing: bool,
     custom_tag: Dict[str, str],
+    enable_spinner: bool,
 ) -> None:
     """
     Provision an AWS cluster to install DC/OS.
@@ -147,6 +150,7 @@ def provision(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}

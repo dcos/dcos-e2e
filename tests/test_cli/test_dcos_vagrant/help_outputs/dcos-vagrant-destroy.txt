@@ -3,5 +3,9 @@ Usage: minidcos vagrant destroy [OPTIONS]
   Destroy a cluster.
 
 Options:
-  -c, --cluster-id TEXT  The ID of the cluster to use.  [default: default]
-  -h, --help             Show this message and exit.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  -c, --cluster-id TEXT           The ID of the cluster to use.  [default:
+                                  default]
+  -h, --help                      Show this message and exit.

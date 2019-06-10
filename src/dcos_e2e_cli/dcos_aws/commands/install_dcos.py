@@ -16,6 +16,7 @@ from dcos_e2e_cli.common.install import (
 )
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
+    enable_spinner_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
@@ -49,6 +50,7 @@ from .wait import wait
 @security_mode_option
 @verbosity_option
 @cluster_id_option
+@enable_spinner_option
 @click.pass_context
 def install_dcos(
     ctx: click.core.Context,
@@ -62,6 +64,7 @@ def install_dcos(
     cluster_id: str,
     genconf_dir: Optional[Path],
     wait_for_dcos: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Install DC/OS on a provisioned AWS cluster.
@@ -86,6 +89,7 @@ def install_dcos(
         installer_path=None,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     dcos_config = get_config(
@@ -106,6 +110,7 @@ def install_dcos(
         doctor_message=doctor_message,
         local_genconf_dir=genconf_dir,
         ip_detect_path=cluster_backend.ip_detect_path,
+        enable_spinner=enable_spinner,
     )
 
     run_post_install_steps(
@@ -116,4 +121,5 @@ def install_dcos(
         http_checks=True,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

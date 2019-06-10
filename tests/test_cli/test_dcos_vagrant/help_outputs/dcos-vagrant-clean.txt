@@ -6,7 +6,10 @@ Usage: minidcos vagrant clean [OPTIONS]
   host is shut down.
 
 Options:
-  --destroy-running-clusters  Destroy running clusters.  [default: False]
-  -v, --verbose               Use verbose output. Use this option multiple times
-                              for more verbose output.
-  -h, --help                  Show this message and exit.
+  --destroy-running-clusters      Destroy running clusters.  [default: False]
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  -v, --verbose                   Use verbose output. Use this option multiple
+                                  times for more verbose output.
+  -h, --help                      Show this message and exit.
