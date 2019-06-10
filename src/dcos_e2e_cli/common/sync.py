@@ -12,7 +12,7 @@ from typing import Callable, Optional
 import click
 
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.node import Node, DCOSVariant
+from dcos_e2e.node import DCOSVariant, Node
 from dcos_e2e_cli.common.variants import get_cluster_variant
 
 SYNC_HELP = (

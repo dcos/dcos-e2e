@@ -11,9 +11,9 @@ from typing import Optional
 import click
 from halo import Halo
 
-from dcos_e2e.node import DCOSVariant
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSNotInstalledError
+from dcos_e2e.node import DCOSVariant
 from dcos_e2e_cli._vendor import dcos_installer_tools as installer_tools
 
 

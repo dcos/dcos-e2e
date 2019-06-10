@@ -477,7 +477,8 @@ class TestInstallDCOS:
         return bool(len(debug_messages & matching_messages))
 
     def test_dcos_installer_wrong_type(
-        self, cluster_backend: ClusterBackend
+        self,
+        cluster_backend: ClusterBackend,
     ) -> None:
         """
         If the wrong installer type is given, an error is raised.
