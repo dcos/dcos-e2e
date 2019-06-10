@@ -402,7 +402,7 @@ class TestUpgrade:
                 assert build.version.startswith('1.12')
                 assert build.variant == DCOSVariant.OSS
 
-            cluster.upgrade_dcos_from_path(
+            cluster.upgrade_dcos(
                 dcos_installer=oss_1_13_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,

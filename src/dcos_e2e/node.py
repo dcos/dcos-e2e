@@ -258,7 +258,7 @@ class Node:
             transport=transport,
         )
 
-    def upgrade_dcos_from_path(
+    def upgrade_dcos(
         self,
         dcos_installer: Path,
         dcos_config: Dict[str, Any],
