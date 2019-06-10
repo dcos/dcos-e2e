@@ -2,8 +2,6 @@
 Tools for destroying sidecar containers.
 """
 
-import sys
-
 import click
 from halo import Halo
 

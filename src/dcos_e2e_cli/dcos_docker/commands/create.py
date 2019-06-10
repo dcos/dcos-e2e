@@ -25,8 +25,8 @@ from dcos_e2e_cli.common.install import (
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
-    extra_config_option,
     enable_spinner_option,
+    extra_config_option,
     genconf_dir_option,
     license_key_option,
     security_mode_option,

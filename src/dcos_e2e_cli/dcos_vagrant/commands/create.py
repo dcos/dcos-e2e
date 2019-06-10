@@ -17,10 +17,10 @@ from dcos_e2e_cli.common.install import (
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
-    enable_spinner_option,
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
+    enable_spinner_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,

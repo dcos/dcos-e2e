@@ -15,9 +15,9 @@ from dcos_e2e_cli.common.create import create_cluster
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
-    enable_spinner_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
+    enable_spinner_option,
     verbosity_option,
 )
 from dcos_e2e_cli.common.options.cluster_size import (

@@ -2,7 +2,6 @@
 Tools for destroying clusters.
 """
 
-import sys
 from typing import List
 
 import click
