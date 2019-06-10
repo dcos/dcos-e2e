@@ -42,7 +42,7 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url
-  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDCOS
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestDestroyNode

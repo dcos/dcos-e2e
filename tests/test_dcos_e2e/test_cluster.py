@@ -239,96 +239,6 @@ class TestCopyFiles:
             assert cat_result.stdout.decode() == ip_detect_contents
 
 
-class TestInstallDcosFromPathLogging:
-    """
-    Tests for logs created when calling `install_dcos_from_path` on
-    ``Cluster``.
-    """
-
-    @pytest.fixture(autouse=True)
-    def configure_logging(self, caplog: LogCaptureFixture) -> None:
-        """
-        Set the ``caplog`` logging level to ``DEBUG`` so it captures any log
-        messages produced by ``dcos_e2e`` library.
-        """
-        caplog.set_level(logging.DEBUG, logger='dcos_e2e')
-
-    def _two_masters_error_logged(
-        self,
-        log_records: List[logging.LogRecord],
-    ) -> bool:
-        """
-        Return whether a particular error is logged as a WARNING message.
-
-        This is prone to being broken as it checks for a string in the DC/OS
-        repository.
-
-        Args:
-            log_records: Messages logged from the logger.
-
-        Returns:
-            Whether a particular error is logged as a WARNING message.
-        """
-        message = 'Must have 1, 3, 5, 7, or 9 masters'
-        debug_messages = set(
-            filter(
-                lambda record: record.levelno == logging.WARNING,
-                log_records,
-            ),
-        )
-        matching_messages = set(
-            filter(lambda record: message in record.getMessage(), log_records),
-        )
-        return bool(len(debug_messages & matching_messages))
-
-    def test_live_logging(
-        self,
-        caplog: LogCaptureFixture,
-        cluster_backend: ClusterBackend,
-        oss_installer: Path,
-    ) -> None:
-        """
-        If ``output`` is given as ``Output.LOG_AND_CAPTURE``, the installation
-        output is logged live.
-        """
-        with pytest.raises(CalledProcessError):
-            # It is not possible to install DC/OS with two master nodes.
-            with Cluster(
-                masters=2,
-                cluster_backend=cluster_backend,
-            ) as cluster:
-                cluster.install_dcos(
-                    dcos_installer=oss_installer,
-                    ip_detect_path=cluster_backend.ip_detect_path,
-                    dcos_config=cluster.base_config,
-                    output=Output.LOG_AND_CAPTURE,
-                )
-
-        assert self._two_masters_error_logged(log_records=caplog.records)
-
-    def test_no_live_logging(
-        self,
-        caplog: LogCaptureFixture,
-        cluster_backend: ClusterBackend,
-        oss_installer: Path,
-    ) -> None:
-        """
-        By default, subprocess output is not logged during DC/OS installation.
-        """
-        with pytest.raises(CalledProcessError):
-            # It is not possible to install DC/OS with two master nodes.
-            with Cluster(
-                masters=2,
-                cluster_backend=cluster_backend,
-            ) as cluster:
-                cluster.install_dcos(
-                    dcos_installer=oss_installer,
-                    dcos_config=cluster.base_config,
-                    ip_detect_path=cluster_backend.ip_detect_path,
-                )
-
-        assert not self._two_masters_error_logged(log_records=caplog.records)
-
 
 class TestMultipleClusters:
     """
@@ -443,6 +353,7 @@ class TestClusterFromNodes:
                 agents=original_cluster.agents,
                 public_agents=original_cluster.public_agents,
             )
+
             cluster.install_dcos(
                 dcos_installer=oss_installer,
                 dcos_config=original_cluster.base_config,
@@ -523,3 +434,122 @@ class TestDestroyNode:
             (agent, ) = cluster.agents
             cluster.destroy_node(node=agent)
             assert not cluster.agents
+
+
+class TestInstallDCOS:
+    """
+    Tests for ``Cluster.install_dcos``.
+    """
+
+    @pytest.fixture(autouse=True)
+    def configure_logging(self, caplog: LogCaptureFixture) -> None:
+        """
+        Set the ``caplog`` logging level to ``DEBUG`` so it captures any log
+        messages produced by ``dcos_e2e`` library.
+        """
+        caplog.set_level(logging.DEBUG, logger='dcos_e2e')
+
+    def _two_masters_error_logged(
+        self,
+        log_records: List[logging.LogRecord],
+    ) -> bool:
+        """
+        Return whether a particular error is logged as a WARNING message.
+
+        This is prone to being broken as it checks for a string in the DC/OS
+        repository.
+
+        Args:
+            log_records: Messages logged from the logger.
+
+        Returns:
+            Whether a particular error is logged as a WARNING message.
+        """
+        message = 'Must have 1, 3, 5, 7, or 9 masters'
+        debug_messages = set(
+            filter(
+                lambda record: record.levelno == logging.WARNING,
+                log_records,
+            ),
+        )
+        matching_messages = set(
+            filter(lambda record: message in record.getMessage(), log_records),
+        )
+        return bool(len(debug_messages & matching_messages))
+
+    def test_dcos_installer_wrong_type(
+        self,
+        cluster_backend: ClusterBackend
+    ) -> None:
+        """
+        If the wrong installer type is given, an error is raised.
+        """
+        expected_error = (
+            'The DC/OS installer must be a URL (`str`) or a path to a '
+            'local DC/OS installer (``pathlib.Path``).'
+        )
+
+        not_str_or_path = 1
+        with pytest.raises(NotImplementedError) as excinfo:
+            with Cluster(
+                masters=1,
+                agents=0,
+                public_agents=0,
+                cluster_backend=cluster_backend,
+            ) as cluster:
+                cluster.install_dcos(
+                    dcos_installer=not_str_or_path,
+                    ip_detect_path=cluster_backend.ip_detect_path,
+                    dcos_config=cluster.base_config,
+                    output=Output.LOG_AND_CAPTURE,
+                )
+
+        assert str(excinfo.value) == expected_error
+
+    def test_live_logging(
+        self,
+        caplog: LogCaptureFixture,
+        cluster_backend: ClusterBackend,
+        oss_installer: Path,
+    ) -> None:
+        """
+        If ``output`` is given as ``Output.LOG_AND_CAPTURE``, the installation
+        output is logged live.
+        """
+        with pytest.raises(CalledProcessError):
+            # It is not possible to install DC/OS with two master nodes.
+            with Cluster(
+                masters=2,
+                cluster_backend=cluster_backend,
+            ) as cluster:
+                cluster.install_dcos(
+                    dcos_installer=oss_installer,
+                    ip_detect_path=cluster_backend.ip_detect_path,
+                    dcos_config=cluster.base_config,
+                    output=Output.LOG_AND_CAPTURE,
+                )
+
+        assert self._two_masters_error_logged(log_records=caplog.records)
+
+    def test_no_live_logging(
+        self,
+        caplog: LogCaptureFixture,
+        cluster_backend: ClusterBackend,
+        oss_installer: Path,
+    ) -> None:
+        """
+        By default, subprocess output is not logged during DC/OS installation.
+        """
+        with pytest.raises(CalledProcessError):
+            # It is not possible to install DC/OS with two master nodes.
+            with Cluster(
+                masters=2,
+                cluster_backend=cluster_backend,
+            ) as cluster:
+                cluster.install_dcos(
+                    dcos_installer=oss_installer,
+                    dcos_config=cluster.base_config,
+                    ip_detect_path=cluster_backend.ip_detect_path,
+                )
+
+        assert not self._two_masters_error_logged(log_records=caplog.records)
