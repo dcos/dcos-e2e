@@ -239,7 +239,6 @@ class TestCopyFiles:
             assert cat_result.stdout.decode() == ip_detect_contents
 
 
-
 class TestMultipleClusters:
     """
     Tests for working with multiple clusters.
@@ -478,8 +477,7 @@ class TestInstallDCOS:
         return bool(len(debug_messages & matching_messages))
 
     def test_dcos_installer_wrong_type(
-        self,
-        cluster_backend: ClusterBackend
+        self, cluster_backend: ClusterBackend
     ) -> None:
         """
         If the wrong installer type is given, an error is raised.
@@ -497,7 +495,7 @@ class TestInstallDCOS:
                 public_agents=0,
                 cluster_backend=cluster_backend,
             ) as cluster:
-                cluster.install_dcos(
+                cluster.install_dcos(  # type: ignore
                     dcos_installer=not_str_or_path,
                     ip_detect_path=cluster_backend.ip_detect_path,
                     dcos_config=cluster.base_config,

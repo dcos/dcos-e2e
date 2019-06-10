@@ -11,12 +11,10 @@ from typing import Optional
 import click
 from halo import Halo
 
+from dcos_e2e.node import DCOSVariant
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSNotInstalledError
-from dcos_e2e_cli._vendor.dcos_installer_tools import (
-    DCOSVariant,
-    get_dcos_installer_details,
-)
+from dcos_e2e_cli._vendor import dcos_installer_tools as installer_tools
 
 
 def get_install_variant(
@@ -48,7 +46,7 @@ def get_install_variant(
         spinner = Halo(enabled=sys.stdout.isatty())
         spinner.start(text='Determining DC/OS variant')
         try:
-            details = get_dcos_installer_details(
+            details = installer_tools.get_dcos_installer_details(
                 installer=installer_path,
                 workspace_dir=workspace_dir,
             )
@@ -65,7 +63,11 @@ def get_install_variant(
             sys.exit(1)
 
         spinner.succeed()
-        return details.variant
+        variant_map = {
+            installer_tools.DCOSVariant.ENTERPRISE: DCOSVariant.ENTERPRISE,
+            installer_tools.DCOSVariant.OSS: DCOSVariant.OSS,
+        }
+        return variant_map[details.variant]
 
     return {
         'oss': DCOSVariant.OSS,
@@ -73,7 +75,7 @@ def get_install_variant(
     }[given_variant]
 
 
-def get_cluster_variant(cluster: Cluster) -> Optional[DCOSVariant]:
+def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
     """
     Get the variant of DC/OS running on a cluster.
 
@@ -85,7 +87,8 @@ def get_cluster_variant(cluster: Cluster) -> Optional[DCOSVariant]:
         file required for us to know is not ready.
     """
     master = next(iter(cluster.masters))
-    try:
-        return master.dcos_build_info().variant
-    except DCOSNotInstalledError:
-        return None
+    return master.dcos_build_info().variant
+    # try:
+    #     return master.dcos_build_info().variant
+    # except DCOSNotInstalledError:
+    #     return None

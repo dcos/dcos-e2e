@@ -695,6 +695,7 @@ class Node:
             dcos_config: The contents of the DC/OS ``config.yaml``.
             ip_detect_path: The path to the ``ip-detect`` script to use for
                 installing DC/OS.
+                node=self,
             role: The desired DC/OS role for the installation.
             user: The username to communicate as. If ``None`` then the
                 ``default_user`` is used instead.
