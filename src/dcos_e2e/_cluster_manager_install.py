@@ -26,6 +26,7 @@ def cluster_manager_install_dcos(
         dcos_installer: The ``Path`` to a local installer or a ``str`` to
             which is a URL pointing to an installer to install DC/OS from.
         dcos_config: The contents of the DC/OS ``config.yaml``.
+        cluster_manager: The cluster manager to install DC/OS with.
         ip_detect_path: The path to a ``ip-detect`` script that will be
             used when installing DC/OS.
         files_to_copy_to_genconf_dir: Pairs of host paths to paths on
@@ -33,11 +34,14 @@ def cluster_manager_install_dcos(
             the installer node before installing DC/OS.
         output: What happens with stdout and stderr.
     """
-    message = (
-        'The DC/OS installer must be a URL (`str`) or a path to a '
-        'local DC/OS installer (``pathlib.Path``).'
+    assert isinstance(dcos_installer, Path)
+    cluster_manager.install_dcos_from_path(
+        dcos_installer=dcos_installer,
+        dcos_config=dcos_config,
+        ip_detect_path=ip_detect_path,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        output=output,
     )
-    raise NotImplementedError(message)
 
 
 @cluster_manager_install_dcos.register
@@ -55,6 +59,7 @@ def _install_dcos_from_url(
     Args:
         dcos_installer: The URL string to an installer to install DC/OS
             from.
+        cluster_manager: The cluster manager to install DC/OS with.
         dcos_config: The contents of the DC/OS ``config.yaml``.
         ip_detect_path: The path to a ``ip-detect`` script that will be
             used when installing DC/OS.
@@ -64,38 +69,6 @@ def _install_dcos_from_url(
         output: What happens with stdout and stderr.
     """
     cluster_manager.install_dcos_from_url(
-        dcos_installer=dcos_installer,
-        dcos_config=dcos_config,
-        ip_detect_path=ip_detect_path,
-        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        output=output,
-    )
-
-
-@cluster_manager_install_dcos.register
-def _install_dcos_from_path(
-    cluster_manager: ClusterManager,
-    dcos_installer: Path,
-    dcos_config: Dict[str, Any],
-    ip_detect_path: Path,
-    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-    output: Output,
-) -> None:
-    """
-    Install DC/OS from a local installer path.
-
-    Args:
-        dcos_installer: The ``Path`` to an installer to install DC/OS
-            from.
-        dcos_config: The DC/OS configuration to use.
-        ip_detect_path: The path to a ``ip-detect`` script that will be
-            used when installing DC/OS.
-        files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-            the installer node. These are files to copy from the host to
-            the installer node before installing DC/OS.
-        output: What happens with stdout and stderr.
-    """
-    cluster_manager.install_dcos_from_path(
         dcos_installer=dcos_installer,
         dcos_config=dcos_config,
         ip_detect_path=ip_detect_path,
