@@ -75,7 +75,7 @@ def get_install_variant(
     }[given_variant]
 
 
-def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
+def get_cluster_variant(cluster: Cluster) -> Optional[DCOSVariant]:
     """
     Get the variant of DC/OS running on a cluster.
 
@@ -87,8 +87,7 @@ def get_cluster_variant(cluster: Cluster) -> DCOSVariant:
         file required for us to know is not ready.
     """
     master = next(iter(cluster.masters))
-    return master.dcos_build_info().variant
-    # try:
-    #     return master.dcos_build_info().variant
-    # except DCOSNotInstalledError:
-    #     return None
+    try:
+        return master.dcos_build_info().variant
+    except DCOSNotInstalledError:
+        return None
