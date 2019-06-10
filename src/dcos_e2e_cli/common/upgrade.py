@@ -17,7 +17,7 @@ from dcos_e2e.node import Output
 from .base_classes import ClusterRepresentation
 
 
-def cluster_install_dcos(
+def cluster_upgrade_dcos(
     cluster: Cluster,
     cluster_representation: ClusterRepresentation,
     ip_detect_path: Path,
@@ -28,14 +28,14 @@ def cluster_install_dcos(
     enable_spinner: bool,
 ) -> None:
     """
-    Install DC/OS on a cluster.
+    Upgrade DC/OS on a cluster.
 
     Args:
-        cluster: The cluster to install DC/OS on.
+        cluster: The cluster to upgrade DC/OS on.
         cluster_representation: A representation of the cluster.
         ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
         local_genconf_dir: A directory of files to copy from the host to the
-            installer node before installing DC/OS.
+            installer node before upgrading DC/OS.
         dcos_config: The DC/OS configuration to use.
         dcos_installer: The ``Path`` to a local DC/OS installer or a ``str``
             URL pointing to an installer.
@@ -52,10 +52,10 @@ def cluster_install_dcos(
             files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
 
     spinner = Halo(enabled=enable_spinner)
-    spinner.start('Installing DC/OS')
+    spinner.start('Upgrading DC/OS')
 
     try:
-        cluster.install_dcos(
+        cluster.upgrade_dcos(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
@@ -64,7 +64,7 @@ def cluster_install_dcos(
         )
     except subprocess.CalledProcessError as exc:
         spinner.stop()
-        click.echo('Error installing DC/OS.', err=True)
+        click.echo('Error upgrading DC/OS.', err=True)
         click.echo(click.style('Full error:', fg='yellow'))
         click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
         stderr = exc.stderr.decode()
