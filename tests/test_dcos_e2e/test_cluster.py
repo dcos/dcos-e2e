@@ -375,14 +375,14 @@ class TestUpgrade:
     Tests for upgrading a cluster.
     """
 
-    def test_upgrade(
+    def test_upgrade_from_path(
         self,
         cluster_backend: ClusterBackend,
         oss_1_12_installer: Path,
         oss_1_13_installer: Path,
     ) -> None:
         """
-        DC/OS OSS can be upgraded from 1.12 to 1.13.
+        DC/OS OSS can be upgraded from 1.12 to 1.13 from a local installer.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos(
@@ -419,6 +419,49 @@ class TestUpgrade:
                 assert build.version.startswith('1.13')
                 assert build.variant == DCOSVariant.OSS
 
+    def test_upgrade_from_url(
+        self,
+        cluster_backend: ClusterBackend,
+        oss_1_12_installer: Path,
+        oss_1_13_installer_url: str,
+    ) -> None:
+        """
+        DC/OS OSS can be upgraded from 1.12 to 1.13 from a URL.
+        """
+        with Cluster(cluster_backend=cluster_backend) as cluster:
+            cluster.install_dcos(
+                dcos_installer=oss_1_12_installer,
+                dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.LOG_AND_CAPTURE,
+            )
+            cluster.wait_for_dcos_oss()
+
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.12')
+                assert build.variant == DCOSVariant.OSS
+
+            cluster.upgrade_dcos(
+                dcos_installer=oss_1_13_installer_url,
+                dcos_config=cluster.base_config,
+                ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.LOG_AND_CAPTURE,
+            )
+
+            cluster.wait_for_dcos_oss()
+            for node in {
+                *cluster.masters,
+                *cluster.agents,
+                *cluster.public_agents,
+            }:
+                build = node.dcos_build_info()
+                assert build.version.startswith('1.13')
+                assert build.variant == DCOSVariant.OSS
 
 class TestDestroyNode:
     """

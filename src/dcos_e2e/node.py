@@ -296,13 +296,23 @@ class Node:
             transport=transport,
             output=output,
         )
-        self.send_file(
-            local_path=dcos_installer,
-            remote_path=node_dcos_installer,
-            transport=transport,
-            user=user,
-            sudo=True,
-        )
+        if isinstance(dcos_installer, str):
+            _download_installer_to_node(
+                node=self,
+                dcos_installer_url=dcos_installer,
+                output=output,
+                transport=transport,
+                user=user,
+                node_path=node_dcos_installer,
+            )
+        else:
+            self.send_file(
+                local_path=dcos_installer,
+                remote_path=node_dcos_installer,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
         _upgrade_dcos_from_node_path(
             node=self,
             remote_dcos_installer=node_dcos_installer,

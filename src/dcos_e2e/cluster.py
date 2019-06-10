@@ -213,7 +213,7 @@ class Cluster(ContextDecorator):
 
     def upgrade_dcos(
         self,
-        dcos_installer: Path,
+        dcos_installer: Union[str, Path],
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output = Output.CAPTURE,
@@ -223,8 +223,8 @@ class Cluster(ContextDecorator):
         Upgrade DC/OS from a local installer path.
 
         Args:
-            dcos_installer: The ``Path`` to an installer to install DC/OS
-                from.
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
             dcos_config: The DC/OS configuration to use.
             ip_detect_path: The path to a ``ip-detect`` script that will be
                 used when installing DC/OS.
