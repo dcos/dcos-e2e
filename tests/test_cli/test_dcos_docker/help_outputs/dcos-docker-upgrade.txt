@@ -54,4 +54,8 @@ Options:
   --enable-spinner / --no-enable-spinner
                                   Whether to show a spinner animation. This
                                   defaults to true if stdout is a TTY.
+  --genconf-dir DIRECTORY         Path to a directory that contains additional
+                                  files for the DC/OS installer. All files from
+                                  this directory will be copied to the "genconf"
+                                  directory before running the DC/OS installer.
   -h, --help                      Show this message and exit.
