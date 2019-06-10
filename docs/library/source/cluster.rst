@@ -46,6 +46,13 @@ In this case the cluster will be destroyed when exiting the context manager.
 
 .. automethod:: dcos_e2e.cluster.Cluster.destroy
 
+Upgrading a ``Cluster``
+------------------------
+
+It is possible to upgrade a :py:class:`~dcos_e2e.cluster.Cluster`\ s DC/OS installation.
+
+.. automethod:: dcos_e2e.cluster.Cluster.upgrade_dcos_from_path
+
 Waiting for DC/OS
 -----------------
 
