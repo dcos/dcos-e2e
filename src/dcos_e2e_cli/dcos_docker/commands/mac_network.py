@@ -80,108 +80,112 @@ def _validate_ovpn_file_does_not_exist(
     return path
 
 
-@Halo(enabled=sys.stdout.isatty())
-def _create_mac_network(configuration_dst: Path) -> None:
+def _create_mac_network(configuration_dst: Path, enable_spinner: bool) -> None:
     """
     Set up a network to connect to nodes on macOS.
 
     This creates an OpenVPN configuration file and describes how to use it.
     """
-    client = docker_client()
-    restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
+    with Halo(enabled=enable_spinner):
+        client = docker_client()
+        restart_policy = {'Name': 'always', 'MaximumRetryCount': 0}
 
-    clone_name = 'docker-mac-network-master'
-    docker_mac_network_clone = Path(__file__).parent / clone_name
-    openvpn_dockerfile = Path(__file__).parent / 'openvpn'
+        clone_name = 'docker-mac-network-master'
+        docker_mac_network_clone = Path(__file__).parent / clone_name
+        openvpn_dockerfile = Path(__file__).parent / 'openvpn'
 
-    tmpdir = TemporaryDirectory()
-    openvpn_build_path = Path(tmpdir.name).resolve()
-    # Use a copy of the clone so that the clone cannot be corrupted for the
-    # next run.
-    rmtree(path=tmpdir.name)
-    copytree(src=str(openvpn_dockerfile), dst=str(openvpn_build_path))
-    docker_mac_network = openvpn_build_path / 'docker-mac-network-master'
-    copytree(src=str(docker_mac_network_clone), dst=str(docker_mac_network))
+        tmpdir = TemporaryDirectory()
+        openvpn_build_path = Path(tmpdir.name).resolve()
+        # Use a copy of the clone so that the clone cannot be corrupted for the
+        # next run.
+        rmtree(path=tmpdir.name)
+        copytree(src=str(openvpn_dockerfile), dst=str(openvpn_build_path))
+        docker_mac_network = openvpn_build_path / 'docker-mac-network-master'
+        copytree(
+            src=str(docker_mac_network_clone),
+            dst=str(docker_mac_network),
+        )
 
-    proxy_image_tag = '{prefix}/proxy'.format(
-        prefix=Docker().container_name_prefix,
-    )
-    client.images.build(
-        path=str(docker_mac_network),
-        rm=True,
-        forcerm=True,
-        tag=proxy_image_tag,
-    )
+        proxy_image_tag = '{prefix}/proxy'.format(
+            prefix=Docker().container_name_prefix,
+        )
+        client.images.build(
+            path=str(docker_mac_network),
+            rm=True,
+            forcerm=True,
+            tag=proxy_image_tag,
+        )
 
-    openvpn_image_tag = '{prefix}/openvpn'.format(
-        prefix=Docker().container_name_prefix,
-    )
-    client.images.build(
-        path=str(openvpn_build_path),
-        rm=True,
-        forcerm=True,
-        tag=openvpn_image_tag,
-    )
+        openvpn_image_tag = '{prefix}/openvpn'.format(
+            prefix=Docker().container_name_prefix,
+        )
+        client.images.build(
+            path=str(openvpn_build_path),
+            rm=True,
+            forcerm=True,
+            tag=openvpn_image_tag,
+        )
 
-    proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
-    proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
+        proxy_command = 'TCP-LISTEN:13194,fork TCP:172.17.0.1:1194'
+        proxy_ports = {'13194/tcp': ('127.0.0.1', '13194')}
 
-    client.containers.run(
-        image=proxy_image_tag,
-        command=proxy_command,
-        ports=proxy_ports,
-        detach=True,
-        restart_policy=restart_policy,
-        name=_PROXY_CONTAINER_NAME,
-    )
+        client.containers.run(
+            image=proxy_image_tag,
+            command=proxy_command,
+            ports=proxy_ports,
+            detach=True,
+            restart_policy=restart_policy,
+            name=_PROXY_CONTAINER_NAME,
+        )
 
-    openvpn_container = client.containers.run(
-        image=openvpn_image_tag,
-        restart_policy=restart_policy,
-        cap_add=['NET_ADMIN'],
-        environment={
-            'dest': 'docker-for-mac.ovpn',
-            'DEBUG': 1,
-        },
-        command='/local/helpers/run.sh',
-        network_mode='host',
-        detach=True,
-        name=_OPENVPN_CONTAINER_NAME,
-    )
+        openvpn_container = client.containers.run(
+            image=openvpn_image_tag,
+            restart_policy=restart_policy,
+            cap_add=['NET_ADMIN'],
+            environment={
+                'dest': 'docker-for-mac.ovpn',
+                'DEBUG': 1,
+            },
+            command='/local/helpers/run.sh',
+            network_mode='host',
+            detach=True,
+            name=_OPENVPN_CONTAINER_NAME,
+        )
 
-    while True:
-        try:
-            raw_stream, _ = openvpn_container.get_archive(
-                path='/local/docker-for-mac.ovpn',
-            )
-        except docker.errors.NotFound:
-            time.sleep(1)
-        else:
-            break
+        while True:
+            try:
+                raw_stream, _ = openvpn_container.get_archive(
+                    path='/local/docker-for-mac.ovpn',
+                )
+            except docker.errors.NotFound:
+                time.sleep(1)
+            else:
+                break
 
-    temporary_extract_dst = Path(TemporaryDirectory().name).resolve()
-    tar_archive = BytesIO(b''.join((i for i in raw_stream)))
-    open_tar = tarfile.open(mode='r:', fileobj=tar_archive)
-    open_tar.extractall(path=str(temporary_extract_dst))
-    configuration_src = temporary_extract_dst / 'docker-for-mac.ovpn'
-    copy(src=str(configuration_src), dst=str(configuration_dst))
+        temporary_extract_dst = Path(TemporaryDirectory().name).resolve()
+        tar_archive = BytesIO(b''.join((i for i in raw_stream)))
+        open_tar = tarfile.open(mode='r:', fileobj=tar_archive)
+        open_tar.extractall(path=str(temporary_extract_dst))
+        configuration_src = temporary_extract_dst / 'docker-for-mac.ovpn'
+        copy(src=str(configuration_src), dst=str(configuration_dst))
 
 
-@Halo(enabled=sys.stdout.isatty())
-def _destroy_mac_network_containers() -> None:
+def _destroy_mac_network_containers(enable_spinner: bool) -> None:
     """
     Destroy containers created by ``minidcos docker setup-mac-network``.
     """
-    client = docker_client()
-    for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
-        try:
-            container = client.containers.get(container_id=name)
-        except docker.errors.NotFound:
-            pass
-        else:
-            container.remove(v=True, force=True)
+    with Halo(enabled=enable_spinner):
+        client = docker_client()
+        for name in (_PROXY_CONTAINER_NAME, _OPENVPN_CONTAINER_NAME):
+            try:
+                container = client.containers.get(container_id=name)
+            except docker.errors.NotFound:
+                pass
+            else:
+                container.remove(v=True, force=True)
 
 
+@click.command('setup-mac-network')
 @click.option(
     '--configuration-dst',
     type=click.Path(exists=False),
@@ -198,8 +202,12 @@ def _destroy_mac_network_containers() -> None:
         'uses of this command.'
     ),
 )
-@click.command('setup-mac-network')
-def setup_mac_network(configuration_dst: Path, force: bool) -> None:
+@enable_spinner_option
+def setup_mac_network(
+    configuration_dst: Path,
+    enable_spinner: bool,
+    force: bool,
+) -> None:
     """
     Set up a network to connect to nodes on macOS.
 

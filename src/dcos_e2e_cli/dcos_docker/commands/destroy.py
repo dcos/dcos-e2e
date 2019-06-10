@@ -29,6 +29,7 @@ def _destroy_cluster(
     Args:
         cluster_id: The ID of the cluster.
         transport: The transport to use for any communication with the cluster.
+        enable_spinner: Whether to enable the spinner animation.
     """
     with Halo(enabled=enable_spinner):
         check_cluster_id_exists(
