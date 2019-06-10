@@ -69,4 +69,5 @@ def wait(
         superuser_password=superuser_password,
         http_checks=http_checks,
         doctor_command_name=doctor_command_name,
+        enable_spinner=enable_spinner,
     )
