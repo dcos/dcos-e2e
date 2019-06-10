@@ -39,6 +39,9 @@ Options:
                                   commands without specifying --cluster-id.
   -v, --verbose                   Use verbose output. Use this option multiple
                                   times for more verbose output.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
   --wait-for-dcos                 Wait for DC/OS after creating the cluster.
                                   This is equivalent to using "minidcos vagrant
                                   wait" after this command.

@@ -5,8 +5,12 @@ Usage: minidcos docker setup-mac-network [OPTIONS]
   This creates an OpenVPN configuration file and describes how to use it.
 
 Options:
-  --force                   Overwrite any files and destroy conflicting
-                            containers from previous uses of this command.
-  --configuration-dst PATH  The location to create an OpenVPN configuration
-                            file.  [default: ~/Documents/docker-for-mac.ovpn]
-  -h, --help                Show this message and exit.
+  --configuration-dst PATH        The location to create an OpenVPN
+                                  configuration file.  [default:
+                                  ~/Documents/docker-for-mac.ovpn]
+  --force                         Overwrite any files and destroy conflicting
+                                  containers from previous uses of this command.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  -h, --help                      Show this message and exit.
