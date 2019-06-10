@@ -4,6 +4,7 @@ Click options which are common across CLI tools.
 
 import logging
 import re
+import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -418,4 +419,21 @@ def enable_selinux_enforcing_option(command: Callable[..., None],
             'installed on the cluster.'
         ),
     )(command)  # type: Callable[..., None]
+    return function
+
+
+def enable_spinner_option(command: Callable[..., None],
+                          ) -> Callable[..., None]:
+    """
+    An option decorator for enabling or disabling the spinner.
+    """
+    click_option_function = click.option(
+        '--show-spinner/--no-show-spinner',
+        default=sys.stdout.isatty(),
+        help=(
+            'Whether to show a spinner animation. '
+            'This defaults to true if stdout is a TTY.'
+        ),
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
