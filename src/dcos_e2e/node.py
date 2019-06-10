@@ -950,6 +950,33 @@ def _install_dcos_from_path(
     )
 
 
+def _download_installer_to_node(
+    node: Node,
+    dcos_installer_url: str,
+    output: Output,
+    transport: Optional[Transport],
+    node_path: Path,
+    user: Optional[str],
+) -> None:
+    """
+    Download a DC/OS installer to a node.
+    """
+    curl_args = [
+        'curl',
+        '-f',
+        dcos_installer_url,
+        '-o',
+        str(node_path),
+    ]
+    node.run(
+        args=curl_args,
+        output=output,
+        transport=transport,
+        user=user,
+        sudo=True,
+    )
+
+
 def _install_dcos_from_url(
     dcos_installer: str,
     node: Node,
@@ -1000,18 +1027,13 @@ def _install_dcos_from_url(
         transport=transport,
         output=output,
     )
-    node.run(
-        args=[
-            'curl',
-            '-f',
-            dcos_installer,
-            '-o',
-            str(node_dcos_installer),
-        ],
+    _download_installer_to_node(
+        node=node,
+        dcos_installer_url=dcos_installer,
         output=output,
         transport=transport,
         user=user,
-        sudo=True,
+        node_path=node_dcos_installer,
     )
     _install_dcos_from_node_path(
         node=node,
@@ -1149,6 +1171,13 @@ def _upgrade_dcos_from_node_path(
         sudo=True,
     )
 
+    if role in (Role.AGENT, Role.PUBLIC_AGENT):
+        node.run(
+            args=['rm', '-f', '/opt/mesosphere/lib/libltdl.so.7'],
+            sudo=True,
+            output=output,
+        )
+
     setup_args = [
         'cd',
         str(remote_dcos_installer.parent),
@@ -1156,13 +1185,6 @@ def _upgrade_dcos_from_node_path(
         'bash',
         str(upgrade_script_path),
     ]
-
-    if role in (Role.AGENT, Role.PUBLIC_AGENT):
-        node.run(
-            args=['rm', '-f', '/opt/mesosphere/lib/libltdl.so.7'],
-            sudo=True,
-            output=output,
-        )
 
     node.run(
         args=setup_args,
