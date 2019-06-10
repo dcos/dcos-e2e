@@ -122,4 +122,5 @@ def install_dcos(
         http_checks=http_checks,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

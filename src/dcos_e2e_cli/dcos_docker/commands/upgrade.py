@@ -14,6 +14,7 @@ from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import run_post_install_steps
 from dcos_e2e_cli.common.options import (
+    enable_spinner_option,
     existing_cluster_id_option,
     extra_config_option,
     license_key_option,
@@ -42,6 +43,7 @@ from .wait import wait
 @security_mode_option
 @wait_for_dcos_option
 @license_key_option
+@enable_spinner_option
 @click.pass_context
 def upgrade(
     ctx: click.core.Context,
@@ -54,6 +56,7 @@ def upgrade(
     workspace_dir: Path,
     installer: Path,
     wait_for_dcos: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Upgrade a cluster to another version of DC/OS.
@@ -104,4 +107,5 @@ def upgrade(
         http_checks=http_checks,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )
