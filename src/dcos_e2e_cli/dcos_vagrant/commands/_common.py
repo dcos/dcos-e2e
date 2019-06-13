@@ -259,14 +259,21 @@ class ClusterVMs(ClusterRepresentation):
         """
         vm_names = self._vm_names()
         one_vm_name = next(iter(vm_names))
-        description = _description_from_vm_name(vm_name=one_vm_name)
+
+        # We are not creating VMs so these have to be set but do not
+        # matter as long as they are valid to use the Vagrantfile.
+        backend = Vagrant()
+        description = backend.virtualbox_description
+        vm_memory_mb = backend.vm_memory_mb
+        vagrant_box_version = backend.vagrant_box_version
 
         vagrant_env = {
             'HOME': os.environ['HOME'],
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(list(vm_names)),
             'VM_DESCRIPTION': description,
-            'VM_MEMORY': '2048',
+            'VM_MEMORY': str(vm_memory_mb),
+            'VAGRAND_BOX_VERSION': vagrant_box_version,
         }
 
         [vagrant_root_parent] = [

@@ -25,6 +25,7 @@ class Vagrant(ClusterBackend):
         virtualbox_description: str = '',
         workspace_dir: Optional[Path] = None,
         vm_memory_mb: int = 2048,
+        vagrant_box_version: str = '~> 0.9.2',
     ) -> None:
         """
         Create a configuration for a Vagrant cluster backend.
@@ -38,6 +39,9 @@ class Vagrant(ClusterBackend):
                 VMs.
             vm_memory_mb: The amount of memory in megabytes allocated to each
                 VM.
+            vagrant_box_version: The Vagrant box version to use. See
+                https://www.vagrantup.com/docs/boxes/versioning.html#version-constraints
+                for version details.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -46,10 +50,14 @@ class Vagrant(ClusterBackend):
                 VMs.
             vm_memory_mb: The amount of memory in megabytes allocated to each
                 VM.
+            vagrant_box_version: The Vagrant box version to use. See
+                https://www.vagrantup.com/docs/boxes/versioning.html#version-constraints
+                for version details.
         """
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.virtualbox_description = virtualbox_description
         self.vm_memory_mb = vm_memory_mb
+        self.vagrant_box_version = vagrant_box_version
 
     @property
     def cluster_cls(self) -> Type['VagrantCluster']:
@@ -137,6 +145,7 @@ class VagrantCluster(ClusterManager):
             'VM_NAMES': ','.join(vm_names),
             'VM_DESCRIPTION': cluster_backend.virtualbox_description,
             'VM_MEMORY': str(cluster_backend.vm_memory_mb),
+            'VAGRANT_BOX_VERSION': str(cluster_backend.vagrant_box_version),
         }
 
         # We import Vagrant here instead of at the top of the file because, if
