@@ -60,7 +60,8 @@ setup(
         'Operating System :: POSIX',
         'Environment :: Web Environment',
         'Programming Language :: Python :: 3.5',
-        'License :: OSI Approved :: Apache License 2.0',
+        'License :: OSI Approved :: Apache Software License',
+        'Development Status :: 5 - Production/Stable',
     ],
     # Avoid dependency links because they are not supported by Read The Docs.
     #
