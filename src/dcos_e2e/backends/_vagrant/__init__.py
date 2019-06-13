@@ -45,7 +45,7 @@ class Vagrant(ClusterBackend):
             vagrant_box_version: The Vagrant box version to use. See
                 https://www.vagrantup.com/docs/boxes/versioning.html#version-constraints
                 for version details.
-            vagrant_box_url: The URL of the Vagrant box version to use.
+            vagrant_box_url: The URL of the Vagrant box to use.
 
         Attributes:
             workspace_dir: The directory in which large temporary files will be
@@ -57,7 +57,7 @@ class Vagrant(ClusterBackend):
             vagrant_box_version: The Vagrant box version to use. See
                 https://www.vagrantup.com/docs/boxes/versioning.html#version-constraints
                 for version details.
-            vagrant_box_url: The URL of the Vagrant box version to use.
+            vagrant_box_url: The URL of the Vagrant box to use.
         """
         self.workspace_dir = workspace_dir or Path(gettempdir())
         self.virtualbox_description = virtualbox_description
