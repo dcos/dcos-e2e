@@ -79,6 +79,13 @@ Options:
   --enable-spinner / --no-enable-spinner
                                   Whether to show a spinner animation. This
                                   defaults to true if stdout is a TTY.
+  --vagrant-box-url TEXT          The URL of the Vagrant box to use.  [default:
+                                  https://downloads.dcos.io/dcos-
+                                  vagrant/metadata.json]
+  --vagrant-box-version TEXT      The version of the Vagrant box to use. See htt
+                                  ps://www.vagrantup.com/docs/boxes/versioning.h
+                                  tml#version-constraints for details.
+                                  [default: ~> 0.9.2]
   --wait-for-dcos                 Wait for DC/OS after creating the cluster.
                                   This is equivalent to using "minidcos vagrant
                                   wait" after this command.

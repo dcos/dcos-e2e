@@ -29,7 +29,11 @@ from ._common import (
     WORKSPACE_DIR_DESCRIPTION_KEY,
     existing_cluster_ids,
 )
-from ._options import vm_memory_mb_option
+from ._options import (
+    vagrant_box_url_option,
+    vagrant_box_version_option,
+    vm_memory_mb_option,
+)
 from .doctor import doctor
 
 
@@ -42,6 +46,8 @@ from .doctor import doctor
 @verbosity_option
 @enable_selinux_enforcing_option
 @enable_spinner_option
+@vagrant_box_url_option
+@vagrant_box_version_option
 @vm_memory_mb_option
 @click.pass_context
 def provision(
@@ -54,6 +60,8 @@ def provision(
     enable_selinux_enforcing: bool,
     vm_memory_mb: int,
     enable_spinner: bool,
+    vagrant_box_url: str,
+    vagrant_box_version: str,
 ) -> None:
     """
     Provision a Vagrant cluster for installing DC/OS.
@@ -76,6 +84,8 @@ def provision(
         workspace_dir=workspace_dir,
         virtualbox_description=json.dumps(obj=description),
         vm_memory_mb=vm_memory_mb,
+        vagrant_box_url=vagrant_box_url,
+        vagrant_box_version=vagrant_box_version,
     )
 
     cluster = create_cluster(

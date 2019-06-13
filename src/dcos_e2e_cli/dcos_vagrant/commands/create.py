@@ -43,7 +43,11 @@ from ._common import (
     ClusterVMs,
     existing_cluster_ids,
 )
-from ._options import vm_memory_mb_option
+from ._options import (
+    vagrant_box_url_option,
+    vagrant_box_version_option,
+    vm_memory_mb_option,
+)
 from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
@@ -66,6 +70,8 @@ from .wait import wait
 @vm_memory_mb_option
 @enable_selinux_enforcing_option
 @enable_spinner_option
+@vagrant_box_url_option
+@vagrant_box_version_option
 @wait_for_dcos_option
 @click.pass_context
 def create(
@@ -86,6 +92,8 @@ def create(
     wait_for_dcos: bool,
     vm_memory_mb: int,
     enable_spinner: bool,
+    vagrant_box_url: str,
+    vagrant_box_version: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -117,6 +125,8 @@ def create(
         workspace_dir=workspace_dir,
         virtualbox_description=json.dumps(obj=description),
         vm_memory_mb=vm_memory_mb,
+        vagrant_box_url=vagrant_box_url,
+        vagrant_box_version=vagrant_box_version,
     )
 
     cluster = create_cluster(
