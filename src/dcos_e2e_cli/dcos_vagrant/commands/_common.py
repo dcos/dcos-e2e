@@ -265,6 +265,7 @@ class ClusterVMs(ClusterRepresentation):
         description = backend.virtualbox_description
         vm_memory_mb = backend.vm_memory_mb
         vagrant_box_version = backend.vagrant_box_version
+        vagrant_box_url = backend.vagrant_box_url
 
         vagrant_env = {
             'HOME': os.environ['HOME'],
@@ -272,7 +273,8 @@ class ClusterVMs(ClusterRepresentation):
             'VM_NAMES': ','.join(list(vm_names)),
             'VM_DESCRIPTION': description,
             'VM_MEMORY': str(vm_memory_mb),
-            'VAGRAND_BOX_VERSION': vagrant_box_version,
+            'VAGRANT_BOX_VERSION': vagrant_box_version,
+            'VAGRANT_BOX_URL': vagrant_box_url,
         }
 
         [vagrant_root_parent] = [
