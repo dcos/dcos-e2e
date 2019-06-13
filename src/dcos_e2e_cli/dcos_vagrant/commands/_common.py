@@ -258,7 +258,6 @@ class ClusterVMs(ClusterRepresentation):
         A Vagrant client attached to this cluster.
         """
         vm_names = self._vm_names()
-        one_vm_name = next(iter(vm_names))
 
         # We are not creating VMs so these have to be set but do not
         # matter as long as they are valid to use the Vagrantfile.
