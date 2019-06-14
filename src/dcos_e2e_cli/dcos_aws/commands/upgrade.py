@@ -3,7 +3,7 @@ Tools for upgrading a DC/OS cluster.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
@@ -15,11 +15,11 @@ from dcos_e2e_cli.common.options import (
     enable_spinner_option,
     existing_cluster_id_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     verbosity_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.upgrade import cluster_upgrade_dcos
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
@@ -59,7 +59,7 @@ def upgrade(
     installer_url: str,
     wait_for_dcos: bool,
     enable_spinner: bool,
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
 ) -> None:
     """
     Upgrade a cluster to a given version of DC/OS.
@@ -100,7 +100,7 @@ def upgrade(
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
         enable_spinner=enable_spinner,
     )
 

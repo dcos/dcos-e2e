@@ -3,7 +3,7 @@ Installing DC/OS on a Docker cluster.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
@@ -20,12 +20,12 @@ from dcos_e2e_cli.common.options import (
     enable_spinner_option,
     existing_cluster_id_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
     verbosity_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
@@ -53,7 +53,7 @@ from .wait import wait
 def install_dcos(
     ctx: click.core.Context,
     cluster_id: str,
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
     installer: Path,
     license_key: Optional[Path],
     extra_config: Dict[str, Any],
@@ -110,7 +110,7 @@ def install_dcos(
         ip_detect_path=ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
         enable_spinner=enable_spinner,
     )
 
