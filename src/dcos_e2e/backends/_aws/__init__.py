@@ -238,8 +238,8 @@ class AWSCluster(ClusterManager):
             'admin_location': cluster_backend.admin_location,
             'aws_region': cluster_backend.aws_region,
             'deployment_name': deployment_name,
-            # Supply a valid URL to the preliminary config.
-            # This is replaced later before the DC/OS installation.
+            # supply a valid url to the preliminary config.
+            # this is replaced later before the dc/os installation.
             'installer_url': 'https://example.com',
             'instance_type': cluster_backend.aws_instance_type,
             'launch_config_version': 1,
@@ -332,8 +332,9 @@ class AWSCluster(ClusterManager):
                 } for key, value in node_tags.items()
             ]
 
-            import pdb; pdb.set_trace()
             ec2.create_tags(Resources=instance_ids, Tags=ec2_tags)
+        import pdb; pdb.set_trace()
+        pass
 
     def install_dcos_from_url(
         self,

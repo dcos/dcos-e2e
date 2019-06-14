@@ -224,3 +224,64 @@ class ClusterInstances(ClusterRepresentation):
         This is not yet implemented, see:
         https://jira.mesosphere.com/browse/DCOS_OSS-5042
         """
+        import boto3
+        from dcos_e2e._vendor.dcos_launch import (
+            config,
+            get_launcher,
+        )
+        cfr = boto3.resource('cloudformation', region_name='us-west-2')
+        aws_distros = {
+            Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
+            Distribution.COREOS: 'coreos',
+            Distribution.RHEL_7: 'rhel-7-dcos-prereqs',
+        }
+        backend = AWS()
+        deployment_name = self._cluster_id
+        masters = len(self.masters)
+        agents = len(self.agents)
+        public_agents = len(self.public_agents)
+
+        # Maybe not right
+        aws_instance_type = backend.aws_instance_type
+
+        launch_config = {
+            'admin_location': backend.admin_location,
+            'aws_region': self._aws_region,
+            'deployment_name': deployment_name,
+            # supply a valid url to the preliminary config.
+            # this is replaced later before the dc/os installation.
+            'installer_url': 'https://example.com',
+            'instance_type': aws_instance_type,
+            'launch_config_version': 1,
+            'num_masters': masters,
+            'num_private_agents': agents,
+            'num_public_agents': public_agents,
+            'os_name': aws_distros[backend.linux_distribution],
+            'platform': 'aws',
+            'provider': 'onprem',
+            'install_prereqs': True,
+            'prereqs_script_filename': 'centos',
+        }
+
+        launch_config['dcos_config'] = backend.base_config
+        validated_launch_config = config.get_validated_config(
+            user_config=launch_config,
+            config_dir=str(self._workspace_dir),
+        )
+        cfr = boto3.resource('cloudformation', region_name='us-west-2')
+        # import pdb; pdb.set_trace()
+        filtered_stacks = cfr.stacks.filter(StackName=self._cluster_id).all()
+        [stack] = list(filtered_stacks)
+        stack_id = stack.stack_id
+        # import pdb; pdb.set_trace()
+        validated_launch_config['stack_id'] = stack_id
+        launcher = get_launcher(
+            config=validated_launch_config,
+        )
+        temp_resources = {}
+        temp_resources.update(launcher.key_helper())
+        temp_resources.update(launcher.zen_helper())
+        validated_launch_config['temp_resources'] = temp_resources
+        launcher.delete()
+        import pdb; pdb.set_trace()
+        pass
