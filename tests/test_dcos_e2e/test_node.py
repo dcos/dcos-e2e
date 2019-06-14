@@ -22,6 +22,7 @@ from _pytest.logging import LogCaptureFixture
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.cluster import Cluster
+from dcos_e2e.exceptions import DCOSNotInstalledError
 from dcos_e2e.node import Node, Output, Transport
 
 # We ignore this error because it conflicts with `pytest` standard usage.
@@ -134,6 +135,119 @@ class TestStringRepresentation:
             private_ip=dcos_node.private_ip_address,
         )
         assert string == str(dcos_node)
+
+
+class TestDownloadFile:
+    """
+    Tests for ``Node.download_file``.
+    """
+
+    def test_file_to_directory(
+        self,
+        dcos_node: Node,
+        tmp_path: Path,
+    ) -> None:
+        """
+        It is possible to download a file from a node to a directory path.
+        """
+        content = str(uuid.uuid4())
+        random = uuid.uuid4().hex
+        local_file_name = 'local_file_{random}.txt'.format(random=random)
+        remote_file_name = 'remote_file_{random}.txt'.format(random=random)
+        remote_file_path = Path('/etc/') / remote_file_name
+        local_file = tmp_path / local_file_name
+        local_file.write_text(content)
+        dcos_node.send_file(
+            local_path=local_file,
+            remote_path=remote_file_path,
+        )
+        dcos_node.download_file(
+            remote_path=remote_file_path,
+            local_path=tmp_path,
+        )
+        downloaded_file = tmp_path / remote_file_name
+        assert downloaded_file.read_text() == content
+
+    def test_file_to_file(
+        self,
+        dcos_node: Node,
+        tmp_path: Path,
+    ) -> None:
+        """
+        It is possible to download a file from a node to a file path.
+        """
+        content = str(uuid.uuid4())
+        random = uuid.uuid4().hex
+        local_file_name = 'local_file_{random}.txt'.format(random=random)
+        remote_file_name = 'remote_file_{random}.txt'.format(random=random)
+        remote_file_path = Path('/etc/') / remote_file_name
+        downloaded_file_name = 'downloaded_file_{random}.txt'.format(
+            random=random,
+        )
+        downloaded_file_path = tmp_path / downloaded_file_name
+        local_file = tmp_path / local_file_name
+        local_file.write_text(content)
+        dcos_node.send_file(
+            local_path=local_file,
+            remote_path=remote_file_path,
+        )
+        dcos_node.download_file(
+            remote_path=remote_file_path,
+            local_path=downloaded_file_path,
+        )
+        assert downloaded_file_path.read_text() == content
+
+    def test_remote_file_does_not_exist(
+        self,
+        dcos_node: Node,
+    ) -> None:
+        """
+        Downloading a file raises a ``ValueError`` if the remote file path does
+        not exist.
+        """
+        random = uuid.uuid4().hex
+        remote_file_path = Path('/etc/') / random
+        message = (
+            'Failed to download file from remote location "{location}". '
+            'File does not exist.'
+        ).format(location=remote_file_path)
+        with pytest.raises(ValueError) as exc:
+            dcos_node.download_file(
+                remote_path=remote_file_path,
+                local_path=Path('./blub'),
+            )
+        assert str(exc.value) == message
+
+    def test_local_file_already_exists(
+        self,
+        dcos_node: Node,
+        tmp_path: Path,
+    ) -> None:
+        """
+        Downloading a file raises a ``ValueError`` if the local file path
+        already exists.
+        """
+        content = str(uuid.uuid4())
+        random = uuid.uuid4().hex
+        local_file_name = 'local_file_{random}.txt'.format(random=random)
+        local_file_path = tmp_path / local_file_name
+        local_file_path.write_text(content)
+        remote_file_name = 'remote_file_{random}.txt'.format(random=random)
+        remote_file_path = Path('/etc/') / remote_file_name
+        dcos_node.send_file(
+            local_path=local_file_path,
+            remote_path=remote_file_path,
+        )
+        message = (
+            'Failed to download a file to "{file}". '
+            'A file already exists in that location.'
+        ).format(file=local_file_path)
+        with pytest.raises(ValueError) as exc:
+            dcos_node.download_file(
+                remote_path=remote_file_path,
+                local_path=local_file_path,
+            )
+        assert str(exc.value) == message
 
 
 class TestSendFile:
@@ -894,3 +1008,23 @@ class TestOutput:
             dcos_node.run(args=args, shell=True, output=output)
         expected_message = b'No such file or directory'
         assert expected_message in excinfo.value.stderr
+
+
+class TestDcosBuildInfo:
+    """
+    Tests for ``Node.dcos_build_info``.
+
+    The tests here assume that DC/OS is not already installed.
+    In order to save CI run time, the tests for this method are in
+    ``test_legacy.py``.
+    This allows us to check that the build information is correct for all
+    supported versions of DC/OS.
+    """
+
+    def test_not_installed(self, dcos_node: Node) -> None:
+        """
+        When trying to retrieve the DC/OS version of a cluster which does not
+        have DC/OS installed, a ``DCOSNotInstalledError`` is raised.
+        """
+        with pytest.raises(DCOSNotInstalledError):
+            dcos_node.dcos_build_info()

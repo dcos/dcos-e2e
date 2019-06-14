@@ -121,7 +121,7 @@ class Docker(ClusterBackend):
         custom_agent_mounts: Optional[List[Mount]] = None,
         custom_public_agent_mounts: Optional[List[Mount]] = None,
         linux_distribution: Distribution = Distribution.CENTOS_7,
-        docker_version: DockerVersion = DockerVersion.v1_13_1,
+        docker_version: DockerVersion = DockerVersion.v18_06_3_ce,
         storage_driver: Optional[DockerStorageDriver] = None,
         docker_container_labels: Optional[Dict[str, str]] = None,
         docker_master_labels: Optional[Dict[str, str]] = None,
@@ -518,7 +518,7 @@ class DockerCluster(ClusterManager):
             public_agents=self.public_agents,
         )
 
-        cluster.install_dcos_from_url(
+        cluster.install_dcos(
             dcos_installer=dcos_installer,
             dcos_config=dcos_config,
             ip_detect_path=ip_detect_path,
@@ -572,7 +572,6 @@ class DockerCluster(ClusterManager):
         genconf_args = [
             'bash',
             str(dcos_installer),
-            '--offline',
             '-v',
             '--genconf',
         ]

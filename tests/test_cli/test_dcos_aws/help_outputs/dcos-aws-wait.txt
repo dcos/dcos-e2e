@@ -3,12 +3,17 @@ Usage: minidcos aws wait [OPTIONS]
   Wait for DC/OS to start.
 
 Options:
-  -c, --cluster-id TEXT      The ID of the cluster to use.  [default: default]
-  --superuser-username TEXT  The superuser username is needed only on DC/OS
-                             Enterprise clusters.   [default: admin]
-  --superuser-password TEXT  The superuser password is needed only on DC/OS
-                             Enterprise clusters.   [default: admin]
-  -v, --verbose              Use verbose output. Use this option multiple times
-                             for more verbose output.
-  --aws-region TEXT          The AWS region to use.  [default: us-west-2]
-  -h, --help                 Show this message and exit.
+  -c, --cluster-id TEXT           The ID of the cluster to use.  [default:
+                                  default]
+  --superuser-username TEXT       The superuser username is needed only on DC/OS
+                                  Enterprise clusters.   [default:
+                                  bootstrapuser]
+  --superuser-password TEXT       The superuser password is needed only on DC/OS
+                                  Enterprise clusters.   [default: deleteme]
+  -v, --verbose                   Use verbose output. Use this option multiple
+                                  times for more verbose output.
+  --aws-region TEXT               The AWS region to use.  [default: us-west-2]
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  -h, --help                      Show this message and exit.

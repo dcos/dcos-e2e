@@ -6,11 +6,52 @@ Changelog
 Next
 ----
 
-2019.05.01.0
+2019.06.10.0
 ------------
 
-2019.04.30.0
+* Fix error "No module named 'keyring.util.escape'".
+* Added ``Cluster.upgrade_dcos`` and ``minidcos`` ``upgrade`` commands.
+* Replaced ``Cluster.install_dcos_from_url`` and ``Cluster.install_dcos_from_path`` with ``Cluster.install_dcos`` which takes a URL or Path.
+* Replaced ``Node.install_dcos_from_url`` and ``Node.install_dcos_from_path`` with ``Node.install_dcos`` which takes a URL or Path.
+* Add options to enable or disable spinner animations in ``minidcos``.
+
+2019.06.07.0
 ------------
+
+* Get DC/OS build information from a ``Node`` object after installation.
+* Added option to ``minidcos aws create`` and ``minidcos aws provision`` to choose the AWS instance type.
+* Changed the default version of Docker installed on ``minidcos docker`` clusters to ``18.06.3-ce``.
+* Added ``Node.upgrade_dcos_from_path``.
+* Added ``minidcos docker upgrade``.
+
+2019.06.03.0
+------------
+
+* Added options to choose the amount of memory given to each VM.
+* Fixed a bug which prevented ``minidcos vagrant`` from working when a VM existed with a space in the name.
+* Fixed a bug which prevented ``minidcos vagrant`` from working in some situations when the ``$HOME`` environment variable is not set.
+
+2019.05.24.1
+------------
+
+* Add a ``minidcos docker doctor`` check which fails when using ``Boot2Docker``.
+
+2019.05.24.0
+------------
+
+2019.05.23.1
+------------
+
+* Fix issue with ``minidcos vagrant`` which prevented node access via SSH.
+* Change ``minidcos`` default credentials for DC/OS Enterprise clusters from ``admin/admin`` to ``bootstrapuser/deleteme``.
+
+2019.05.23.0
+------------
+
+* Download a file or directory from a ``Node``.
+* Improve efficiency of installing DC/OS with ``create`` on ``minidcos docker``
+  and ``minidcos aws``.
+* Allow the use of a ``MINIDCOS_NODE_DOCKER_VERSION`` environment variable to set the version of Docker inside ``minidcos docker`` nodes.
 
 2019.04.29.0
 ------------

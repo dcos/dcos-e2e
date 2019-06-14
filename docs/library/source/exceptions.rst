@@ -3,4 +3,5 @@ Exceptions
 
 The following custom exceptions are defined in |project|.
 
-.. autoclass:: dcos_e2e.exceptions.DCOSTimeoutError
+.. automodule:: dcos_e2e.exceptions
+   :members:

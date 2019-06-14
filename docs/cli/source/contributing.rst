@@ -11,17 +11,14 @@ Contributions to this repository must pass tests and linting.
 Install Contribution Dependencies
 ---------------------------------
 
-On Ubuntu, install system requirements:
+.. include:: install-python-build-dependencies.rst
+
+Install dependencies, preferably in a virtual environment.
+If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
 .. substitution-prompt:: bash
 
-   apt upgrade -y gcc python3-dev python3.6-dev
-
-Install dependencies in a virtual environment.
-
-.. substitution-prompt:: bash
-
-    pip3 install --editable .[dev]
+    pip3 install --editable '.[dev]'
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
@@ -89,6 +86,8 @@ To run the full test suite, set environment variables for DC/OS Enterprise insta
    export EE_1_9_INSTALLER_URL=https://...
    export EE_1_10_INSTALLER_URL=https://...
    export EE_1_11_INSTALLER_URL=https://...
+   export EE_1_12_INSTALLER_URL=https://...
+   export EE_1_13_INSTALLER_URL=https://...
 
 Download dependencies which are used by the tests:
 
@@ -171,6 +170,7 @@ To update these links use the following commands, after setting the following en
 * ``EE_1_10_INSTALLER_URL``
 * ``EE_1_11_INSTALLER_URL``
 * ``EE_1_12_INSTALLER_URL``
+* ``EE_1_13_INSTALLER_URL``
 
 .. substitution-prompt:: bash
 
@@ -179,6 +179,7 @@ To update these links use the following commands, after setting the following en
     travis env set --repo |github-owner|/|github-repository| EE_1_10_INSTALLER_URL $EE_1_10_INSTALLER_URL
     travis env set --repo |github-owner|/|github-repository| EE_1_11_INSTALLER_URL $EE_1_11_INSTALLER_URL
     travis env set --repo |github-owner|/|github-repository| EE_1_12_INSTALLER_URL $EE_1_12_INSTALLER_URL
+    travis env set --repo |github-owner|/|github-repository| EE_1_13_INSTALLER_URL $EE_1_13_INSTALLER_URL
 
 Updating the Amazon Web Services credentials
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

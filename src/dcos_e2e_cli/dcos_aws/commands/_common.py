@@ -112,8 +112,8 @@ class ClusterInstances(ClusterRepresentation):
         return Node(
             public_ip_address=public_ip_address,
             private_ip_address=private_ip_address,
-            default_user=self.ssh_default_user,
-            ssh_key_path=self.ssh_key_path,
+            default_user=self._ssh_default_user,
+            ssh_key_path=self._ssh_key_path,
         )
 
     def to_dict(self, node_representation: ServiceResource) -> Dict[str, str]:
@@ -143,10 +143,12 @@ class ClusterInstances(ClusterRepresentation):
             'ec2_instance_id': instance.id,
             'public_ip_address': public_ip_address,
             'private_ip_address': private_ip_address,
+            'ssh_user': self._ssh_default_user,
+            'ssh_key': str(self._ssh_key_path),
         }
 
     @property
-    def ssh_default_user(self) -> str:
+    def _ssh_default_user(self) -> str:
         """
         A user which can be used to SSH to any node using
         ``self.ssh_key_path``.
@@ -156,7 +158,7 @@ class ClusterInstances(ClusterRepresentation):
         return tag_dict[SSH_USER_TAG_KEY]
 
     @property
-    def ssh_key_path(self) -> Path:
+    def _ssh_key_path(self) -> Path:
         """
         A key which can be used to SSH to any node.
         """

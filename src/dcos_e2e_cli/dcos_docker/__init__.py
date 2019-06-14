@@ -21,6 +21,7 @@ from .commands.provision import provision
 from .commands.run_command import run
 from .commands.send_file import send_file
 from .commands.sync import sync_code
+from .commands.upgrade import upgrade
 from .commands.wait import wait
 from .commands.web import web
 
@@ -52,3 +53,4 @@ dcos_docker.add_command(send_file)
 dcos_docker.add_command(sync_code)
 dcos_docker.add_command(wait)
 dcos_docker.add_command(web)
+dcos_docker.add_command(upgrade)

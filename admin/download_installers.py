@@ -16,35 +16,41 @@ OSS_1_9_INSTALLER_URL = OSS_PATTERN.format(version='1.9')
 OSS_1_10_INSTALLER_URL = OSS_PATTERN.format(version='1.10')
 OSS_1_11_INSTALLER_URL = OSS_PATTERN.format(version='1.11')
 OSS_1_12_INSTALLER_URL = OSS_PATTERN.format(version='1.12')
+OSS_1_13_INSTALLER_URL = OSS_PATTERN.format(version='1.13')
 
 EE_MASTER_INSTALLER_URL = os.environ.get('EE_MASTER_INSTALLER_URL')
 EE_1_9_INSTALLER_URL = os.environ.get('EE_1_9_INSTALLER_URL')
 EE_1_10_INSTALLER_URL = os.environ.get('EE_1_10_INSTALLER_URL')
 EE_1_11_INSTALLER_URL = os.environ.get('EE_1_11_INSTALLER_URL')
 EE_1_12_INSTALLER_URL = os.environ.get('EE_1_12_INSTALLER_URL')
+EE_1_13_INSTALLER_URL = os.environ.get('EE_1_13_INSTALLER_URL')
 
 OSS_MASTER_INSTALLER_PATH = Path('/tmp/dcos_generate_config.sh')
 OSS_1_9_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_9.sh')
 OSS_1_10_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_10.sh')
 OSS_1_11_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_11.sh')
 OSS_1_12_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_12.sh')
+OSS_1_13_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_13.sh')
 
 EE_MASTER_INSTALLER_PATH = Path('/tmp/dcos_generate_config.ee.sh')
 EE_1_9_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_9.ee.sh')
 EE_1_10_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_10.ee.sh')
 EE_1_11_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_11.ee.sh')
 EE_1_12_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_12.ee.sh')
+EE_1_13_INSTALLER_PATH = Path('/tmp/dcos_generate_config_1_13.ee.sh')
 
 OSS_MASTER = (OSS_MASTER_INSTALLER_URL, OSS_MASTER_INSTALLER_PATH)
 OSS_1_9 = (OSS_1_9_INSTALLER_URL, OSS_1_9_INSTALLER_PATH)
 OSS_1_10 = (OSS_1_10_INSTALLER_URL, OSS_1_10_INSTALLER_PATH)
 OSS_1_11 = (OSS_1_11_INSTALLER_URL, OSS_1_11_INSTALLER_PATH)
 OSS_1_12 = (OSS_1_12_INSTALLER_URL, OSS_1_12_INSTALLER_PATH)
+OSS_1_13 = (OSS_1_13_INSTALLER_URL, OSS_1_13_INSTALLER_PATH)
 EE_MASTER = (EE_MASTER_INSTALLER_URL, EE_MASTER_INSTALLER_PATH)
 EE_1_9 = (EE_1_9_INSTALLER_URL, EE_1_9_INSTALLER_PATH)
 EE_1_10 = (EE_1_10_INSTALLER_URL, EE_1_10_INSTALLER_PATH)
 EE_1_11 = (EE_1_11_INSTALLER_URL, EE_1_11_INSTALLER_PATH)
 EE_1_12 = (EE_1_12_INSTALLER_URL, EE_1_12_INSTALLER_PATH)
+EE_1_13 = (EE_1_13_INSTALLER_URL, EE_1_13_INSTALLER_PATH)
 
 
 PATTERNS = {
@@ -107,14 +113,17 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url':  # noqa: E501
     (),
-    'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
-    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_cluster.py::TestInstallDCOS': (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters':
     (),
     'tests/test_dcos_e2e/test_cluster.py::TestDestroyNode':
     (),
+    'tests/test_dcos_e2e/test_cluster.py::TestUpgrade::test_upgrade_from_path':
+    (OSS_1_12, OSS_1_13),
+    'tests/test_dcos_e2e/test_cluster.py::TestUpgrade::test_upgrade_from_url':
+    (OSS_1_12, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
@@ -139,6 +148,10 @@ PATTERNS = {
     (EE_1_12, ),
     'tests/test_dcos_e2e/test_legacy.py::Test112::test_oss':
     (OSS_1_12, ),
+    'tests/test_dcos_e2e/test_legacy.py::Test113::test_enterprise':
+    (EE_1_13, ),
+    'tests/test_dcos_e2e/test_legacy.py::Test113::test_oss':
+    (OSS_1_13, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise':
     (EE_1_9, ),
     'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
@@ -151,6 +164,7 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_node_install.py::TestCopyFiles::test_install_from_path_with_genconf_files':  # noqa: E501
     (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_node_upgrade.py': (OSS_1_12, OSS_1_13),
 }  # type: Dict[str, Tuple]
 
 

@@ -42,10 +42,12 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestClusterSize
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url
-  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestInstallDCOS
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
   - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestDestroyNode
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestUpgrade::test_upgrade_from_path
+  - CI_PATTERN=tests/test_dcos_e2e/test_cluster.py::TestUpgrade::test_upgrade_from_url
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
   - CI_PATTERN=tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_node_installer_genconf_dir
@@ -58,16 +60,20 @@ env:
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test111::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test112::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test112::test_oss
+  - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test113::test_enterprise
+  - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test113::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise
   - CI_PATTERN=tests/test_dcos_e2e/test_legacy.py::Test19::test_oss
   - CI_PATTERN=tests/test_dcos_e2e/test_node.py
   - CI_PATTERN=tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_url
   - CI_PATTERN=tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path
   - CI_PATTERN=tests/test_dcos_e2e/test_node_install.py::TestCopyFiles::test_install_from_path_with_genconf_files
+  - CI_PATTERN=tests/test_dcos_e2e/test_node_upgrade.py
 before_install:
 - sudo modprobe aufs
 - echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
 - travis_retry pip install --upgrade pip setuptools codecov
+- pip uninstall -y six
 install:
 - travis_retry pip install --upgrade --editable .[dev]
 cache: pip

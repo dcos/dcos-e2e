@@ -16,16 +16,19 @@ backends
 badparameter
 bilal
 bootstrap
+bootstrapuser
 breakpoint
 bytestring
 calledprocesserror
 caplog
+ce
 centos
 cgroup
 cgroups
 changelog
 ci
 cli
+codebase
 completedprocess
 conf
 config
@@ -36,6 +39,7 @@ dangoor
 dc
 dcos
 debian
+deleteme
 dict
 diff
 dir

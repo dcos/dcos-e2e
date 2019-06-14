@@ -40,27 +40,30 @@ class TestEnterpriseIntegrationTests:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
                 ip_detect_path=cluster_backend.ip_detect_path,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_ee(
                 superuser_username=superuser_username,
                 superuser_password=superuser_password,
             )
+
             # No error is raised with a successful command.
+            # We choose a test file which runs very quickly.
+            fast_test_file = 'test_marathon_authn_authz.py'
             cluster.run_integration_tests(
-                pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
+                pytest_command=['pytest', '-vvv', '-s', '-x', fast_test_file],
                 env={
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
 
 
@@ -130,13 +133,13 @@ class TestCopyFiles:
                 remote_path=master_key_path,
             )
 
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
@@ -215,13 +218,13 @@ class TestCopyFiles:
                 remote_path=master_key_path,
             )
 
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
             )
@@ -287,7 +290,7 @@ class TestCopyFiles:
                 local_path=ca_key_path,
                 remote_path=master_key_path,
             )
-            master.install_dcos_from_path(
+            master.install_dcos(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -296,7 +299,7 @@ class TestCopyFiles:
                 ip_detect_path=cluster_backend.ip_detect_path,
                 role=Role.MASTER,
                 files_to_copy_to_genconf_dir=[(cert_dir_on_host, genconf)],
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
 
             cluster.wait_for_dcos_ee(
@@ -337,13 +340,13 @@ class TestSSLDisabled:
             agents=0,
             public_agents=0,
         ) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_1_11_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_ee(
@@ -386,13 +389,13 @@ class TestWaitForDCOS:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             (master, ) = cluster.masters

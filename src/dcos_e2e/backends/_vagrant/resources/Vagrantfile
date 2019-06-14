@@ -9,16 +9,20 @@ Vagrant.configure(2) do |config|
 
   vm_description = ENV['VM_DESCRIPTION'].to_s
   vm_names_string = ENV['VM_NAMES'].to_s
+  vagrant_box_version = ENV['VAGRANT_BOX_VERSION'].to_s
+  vagrant_box_url = ENV['VAGRANT_BOX_URL'].to_s
+  vm_memory = ENV['VM_MEMORY'].to_i
+
   node_names = vm_names_string.split(',')
   node_names.each do |node_name|
     config.vm.define node_name.to_sym do |machine|
       machine.vm.box = 'mesosphere/dcos-centos-virtualbox'
-      machine.vm.box_url = 'https://downloads.dcos.io/dcos-vagrant/metadata.json'
-      machine.vm.box_version = '~> 0.9.2'
+      machine.vm.box_url = vagrant_box_url
+      machine.vm.box_version = vagrant_box_version
 
       machine.vm.provider 'virtualbox' do |v, override|
         v.cpus = 2
-        v.memory = 2048
+        v.memory = vm_memory
         v.name = node_name
         v.customize ["modifyvm", :id, "--description", vm_description]
       end

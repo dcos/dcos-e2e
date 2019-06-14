@@ -101,11 +101,15 @@ class ClusterContainers(ClusterRepresentation):
         Return the ``Node`` that is represented by a given ``container``.
         """
         container = node_representation
-        address = IPv4Address(container.attrs['NetworkSettings']['IPAddress'])
+        networks = container.attrs['NetworkSettings']['Networks']
+        network_name = 'bridge'
+        if len(networks) != 1:
+            [network_name] = list(networks.keys() - set(['bridge']))
+        address = IPv4Address(networks[network_name]['IPAddress'])
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_user=self.ssh_default_user,
+            default_user=self._ssh_default_user,
             ssh_key_path=self.ssh_key_path,
             default_transport=self._transport,
         )
@@ -135,10 +139,12 @@ class ClusterContainers(ClusterRepresentation):
             'docker_container_name': container.name,
             'docker_container_id': container.id,
             'ip_address': container_ip,
+            'ssh_user': self._ssh_default_user,
+            'ssh_key': str(self.ssh_key_path),
         }
 
     @property
-    def ssh_default_user(self) -> str:
+    def _ssh_default_user(self) -> str:
         """
         A user which can be used to SSH to any node using
         ``self.ssh_key_path``.

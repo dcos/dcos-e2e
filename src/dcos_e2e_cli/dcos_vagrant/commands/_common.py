@@ -50,7 +50,9 @@ def _state_from_vm_name(vm_name: str) -> str:
     return info['VMState']
 
 
-@functools.lru_cache()
+# We do not cache the results of this function.
+# This is because the VM names may change during one command - a ``create``
+# command.
 def vm_names_by_cluster(running_only: bool = False) -> Dict[str, Set[str]]:
     """
     Return a mapping of Cluster IDs to the names of VMs in those clusters.
@@ -63,7 +65,7 @@ def vm_names_by_cluster(running_only: bool = False) -> Dict[str, Set[str]]:
     lines = [line for line in lines if line]
     result = defaultdict(set)  # type: Dict[str, Set[str]]
     for line in lines:
-        vm_name_in_quotes, _ = line.split(' ')
+        vm_name_in_quotes, _ = line.rsplit(' ', 1)
         vm_name = vm_name_in_quotes[1:-1]
         state = _state_from_vm_name(vm_name=vm_name)
         description = _description_from_vm_name(vm_name=vm_name)
@@ -143,11 +145,14 @@ class ClusterVMs(ClusterRepresentation):
         vm_name = node_representation
         address = _ip_from_vm_name(vm_name=vm_name)
         assert isinstance(address, IPv4Address)
+        client = self.vagrant_client()
+        ssh_key_path = Path(client.keyfile(vm_name=vm_name))
+        ssh_user = str(client.user(vm_name=vm_name))
         return Node(
             public_ip_address=address,
             private_ip_address=address,
-            default_user=self.ssh_default_user,
-            ssh_key_path=self.ssh_key_path,
+            default_user=ssh_user,
+            ssh_key_path=ssh_key_path,
         )
 
     def to_dict(self, node_representation: str) -> Dict[str, str]:
@@ -171,31 +176,17 @@ class ClusterVMs(ClusterRepresentation):
             [_ip_from_vm_name(vm_name=name) for name in role_names],
         )
         index = sorted_ips.index(ip_address)
+        client = self.vagrant_client()
+        ssh_user = str(client.user(vm_name=vm_name))
+        ssh_key_path = Path(client.keyfile(vm_name=vm_name))
 
         return {
             'e2e_reference': '{role}_{index}'.format(role=role, index=index),
             'vm_name': vm_name,
             'ip_address': str(ip_address),
+            'ssh_user': ssh_user,
+            'ssh_key': str(ssh_key_path),
         }
-
-    @property
-    def ssh_default_user(self) -> str:
-        """
-        A user which can be used to SSH to any node using
-        ``self.ssh_key_path``.
-        """
-        vm_name = next(iter(self.masters))
-        client = self.vagrant_client()
-        return str(client.user(vm_name=vm_name))
-
-    @property
-    def ssh_key_path(self) -> Path:
-        """
-        A key which can be used to SSH to any node.
-        """
-        vm_name = next(iter(self.masters))
-        client = self.vagrant_client()
-        return Path(client.keyfile(vm_name=vm_name))
 
     @functools.lru_cache()
     def _vm_names(self) -> Set[str]:
@@ -267,13 +258,23 @@ class ClusterVMs(ClusterRepresentation):
         A Vagrant client attached to this cluster.
         """
         vm_names = self._vm_names()
-        one_vm_name = next(iter(vm_names))
-        description = _description_from_vm_name(vm_name=one_vm_name)
+
+        # We are not creating VMs so these have to be set but do not
+        # matter as long as they are valid to use the Vagrantfile.
+        backend = Vagrant()
+        description = backend.virtualbox_description
+        vm_memory_mb = backend.vm_memory_mb
+        vagrant_box_version = backend.vagrant_box_version
+        vagrant_box_url = backend.vagrant_box_url
 
         vagrant_env = {
+            'HOME': os.environ['HOME'],
             'PATH': os.environ['PATH'],
             'VM_NAMES': ','.join(list(vm_names)),
             'VM_DESCRIPTION': description,
+            'VM_MEMORY': str(vm_memory_mb),
+            'VAGRANT_BOX_VERSION': vagrant_box_version,
+            'VAGRANT_BOX_URL': vagrant_box_url,
         }
 
         [vagrant_root_parent] = [

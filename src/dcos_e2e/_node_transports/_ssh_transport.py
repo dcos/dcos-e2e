@@ -208,3 +208,36 @@ class SSHTransport(NodeTransport):
                     localpath=str(local_path),
                     remotepath=str(remote_path),
                 )
+
+    def download_file(
+        self,
+        remote_path: Path,
+        local_path: Path,
+        user: str,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> None:
+        """
+        Download a file from this node.
+
+        Args:
+            remote_path: The path on the node to download the file from.
+            local_path: The path on the host to download the file to.
+            user: The name of the remote user to send the file.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
+        """
+        with paramiko.SSHClient() as ssh_client:
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(
+                str(public_ip_address),
+                username=user,
+                key_filename=str(ssh_key_path),
+            )
+
+            with ssh_client.open_sftp() as sftp:
+                sftp.get(
+                    remotepath=str(remote_path),
+                    localpath=str(local_path),
+                )

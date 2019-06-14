@@ -8,7 +8,6 @@ from textwrap import dedent
 from dcos_e2e.backends import Docker
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Output, Role
 
 
@@ -17,13 +16,14 @@ class TestAdvancedInstallationMethod:
     Test installing DC/OS on a node.
     """
 
-    def test_install_dcos_from_url(self, oss_installer_url: str) -> None:
+    def test_install_dcos_from_url(
+        self,
+        oss_installer_url: str,
+        cluster_backend: ClusterBackend,
+    ) -> None:
         """
         It is possible to install DC/OS on a node from a URL.
         """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
         with Cluster(cluster_backend=cluster_backend) as cluster:
             for nodes, role in (
                 (cluster.masters, Role.MASTER),
@@ -31,11 +31,12 @@ class TestAdvancedInstallationMethod:
                 (cluster.public_agents, Role.PUBLIC_AGENT),
             ):
                 for node in nodes:
-                    node.install_dcos_from_url(
+                    node.install_dcos(
                         dcos_installer=oss_installer_url,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
+                        output=Output.LOG_AND_CAPTURE,
                     )
             cluster.wait_for_dcos_oss()
 
@@ -43,9 +44,7 @@ class TestAdvancedInstallationMethod:
         """
         It is possible to install DC/OS on a node from a path.
         """
-        # We use a specific version of Docker on the nodes because else we may
-        # hit https://github.com/opencontainers/runc/issues/1175.
-        cluster_backend = Docker(docker_version=DockerVersion.v17_12_1_ce)
+        cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
             for nodes, role in (
                 (cluster.masters, Role.MASTER),
@@ -53,7 +52,7 @@ class TestAdvancedInstallationMethod:
                 (cluster.public_agents, Role.PUBLIC_AGENT),
             ):
                 for node in nodes:
-                    node.install_dcos_from_path(
+                    node.install_dcos(
                         dcos_installer=oss_installer,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
@@ -95,7 +94,7 @@ class TestCopyFiles:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            master.install_dcos_from_path(
+            master.install_dcos(
                 dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -105,6 +104,7 @@ class TestCopyFiles:
                     (ip_detect_file, Path('/genconf/ip-detect')),
                 ],
                 role=Role.MASTER,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
             cat_result = master.run(

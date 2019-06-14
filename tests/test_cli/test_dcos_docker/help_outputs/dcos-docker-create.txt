@@ -13,8 +13,8 @@ Usage: minidcos docker create [OPTIONS] INSTALLER
                   These can all be set in ``--extra-config``.
                   However, some defaults are provided for all but the license key.
 
-                  The default superuser username is ``admin``.
-                  The default superuser password is ``admin``.
+                  The default superuser username is ``bootstrapuser``.
+                  The default superuser password is ``deleteme``.
                   The default ``fault_domain_enabled`` is ``false``.
 
                   ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
@@ -27,16 +27,18 @@ Usage: minidcos docker create [OPTIONS] INSTALLER
                   If none of these are set, ``license_key_contents`` is not given.
 
 Options:
-  --docker-version [1.11.2|1.13.1|17.12.1-ce]
+  --docker-version [1.11.2|1.13.1|17.12.1-ce|18.06.3-ce]
                                   The Docker version to install on the nodes.
-                                  [default: 1.13.1]
+                                  This can be provided by setting the
+                                  `MINIDCOS_NODE_DOCKER_VERSION` environment
+                                  variable.  [default: 18.06.3-ce]
   --linux-distribution [centos-7|coreos|ubuntu-16.04]
                                   The Linux distribution to use on the nodes.
                                   [default: centos-7]
-  --docker-storage-driver [aufs|overlay|overlay2]
+  --docker-storage-driver [aufs|auto|overlay|overlay2]
                                   The storage driver to use for Docker in
                                   Docker. By default this uses the host's
-                                  driver.
+                                  driver.  [default: auto]
   --mount-sys-fs-cgroup / --no-mount-sys-fs-cgroup
                                   Mounting ``/sys/fs/cgroup`` from the host is
                                   required to run applications which require
@@ -129,4 +131,7 @@ Options:
                                   <HOST_PORT>:<CONTAINER_PORT>
   -v, --verbose                   Use verbose output. Use this option multiple
                                   times for more verbose output.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
   -h, --help                      Show this message and exit.

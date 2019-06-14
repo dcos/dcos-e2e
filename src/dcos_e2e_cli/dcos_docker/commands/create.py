@@ -14,19 +14,19 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Transport
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    install_dcos_from_path,
+    cluster_install_dcos,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
+    enable_spinner_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
@@ -37,6 +37,7 @@ from dcos_e2e_cli.common.options.cluster_size import (
     masters_option,
     public_agents_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
@@ -73,7 +74,7 @@ from .wait import wait
 
 
 @click.command('create', help=CREATE_HELP)
-@installer_argument
+@installer_path_argument
 @docker_version_option
 @linux_distribution_option
 @docker_storage_driver_option
@@ -98,6 +99,7 @@ from .wait import wait
 @node_transport_option
 @one_master_host_port_map_option
 @verbosity_option
+@enable_spinner_option
 @click.pass_context
 def create(
     ctx: click.core.Context,
@@ -113,7 +115,7 @@ def create(
     license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
     workspace_dir: Path,
     custom_volume: List[Mount],
     custom_master_volume: List[Mount],
@@ -125,6 +127,7 @@ def create(
     network: Network,
     one_master_host_port_map: Dict[str, int],
     mount_sys_fs_cgroup: bool,
+    enable_spinner: bool,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -152,6 +155,7 @@ def create(
         installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     # This is useful for some people to identify containers.
@@ -190,6 +194,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     cluster_containers = ClusterContainers(
@@ -218,13 +223,15 @@ def create(
         license_key=license_key,
     )
 
-    install_dcos_from_path(
+    cluster_install_dcos(
+        cluster=cluster,
         cluster_representation=cluster_containers,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
+        enable_spinner=enable_spinner,
     )
 
     run_post_install_steps(
@@ -235,4 +242,5 @@ def create(
         http_checks=http_checks,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

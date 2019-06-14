@@ -9,19 +9,19 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 
 from dcos_e2e.backends import Vagrant
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    install_dcos_from_path,
+    cluster_install_dcos,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
+    enable_spinner_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
@@ -32,6 +32,7 @@ from dcos_e2e_cli.common.options.cluster_size import (
     masters_option,
     public_agents_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.utils import check_cluster_id_unique, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
@@ -42,13 +43,18 @@ from ._common import (
     ClusterVMs,
     existing_cluster_ids,
 )
+from ._options import (
+    vagrant_box_url_option,
+    vagrant_box_version_option,
+    vm_memory_mb_option,
+)
 from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
 
 
 @click.command('create', help=CREATE_HELP)
-@installer_argument
+@installer_path_argument
 @masters_option
 @agents_option
 @extra_config_option
@@ -61,7 +67,11 @@ from .wait import wait
 @copy_to_master_option
 @cluster_id_option
 @verbosity_option
+@vm_memory_mb_option
 @enable_selinux_enforcing_option
+@enable_spinner_option
+@vagrant_box_url_option
+@vagrant_box_version_option
 @wait_for_dcos_option
 @click.pass_context
 def create(
@@ -78,8 +88,12 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     cluster_id: str,
     enable_selinux_enforcing: bool,
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
     wait_for_dcos: bool,
+    vm_memory_mb: int,
+    enable_spinner: bool,
+    vagrant_box_url: str,
+    vagrant_box_version: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -100,6 +114,7 @@ def create(
         installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     description = {
@@ -109,6 +124,9 @@ def create(
     cluster_backend = Vagrant(
         workspace_dir=workspace_dir,
         virtualbox_description=json.dumps(obj=description),
+        vm_memory_mb=vm_memory_mb,
+        vagrant_box_url=vagrant_box_url,
+        vagrant_box_version=vagrant_box_version,
     )
 
     cluster = create_cluster(
@@ -117,6 +135,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
@@ -141,13 +160,15 @@ def create(
         license_key=license_key,
     )
 
-    install_dcos_from_path(
+    cluster_install_dcos(
+        cluster=cluster,
         cluster_representation=cluster_vms,
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
+        enable_spinner=enable_spinner,
     )
 
     run_post_install_steps(
@@ -158,4 +179,5 @@ def create(
         http_checks=True,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

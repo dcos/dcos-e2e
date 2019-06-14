@@ -5,16 +5,13 @@ Tools for waiting for DC/OS.
 import sys
 
 import click
+from halo import Halo
 from retry import retry
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSTimeoutError
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
-from dcos_e2e_cli._vendor.halo import Halo
-from dcos_e2e_cli.common.variants import (
-    cluster_variant_available,
-    get_cluster_variant,
-)
+from dcos_e2e.node import DCOSVariant
+from dcos_e2e_cli.common.variants import get_cluster_variant
 
 
 @retry(
@@ -27,7 +24,7 @@ def _wait_for_variant(cluster: Cluster) -> None:
     Wait for a particular file to be available on the cluster.
     This means that the cluster variant can be determined.
     """
-    if not cluster_variant_available(cluster=cluster):
+    if get_cluster_variant(cluster) is None:
         raise DCOSTimeoutError
 
 
@@ -37,6 +34,7 @@ def wait_for_dcos(
     superuser_password: str,
     http_checks: bool,
     doctor_command_name: str,
+    enable_spinner: bool,
 ) -> None:
     """
     Wait for DC/OS to start.
@@ -50,6 +48,7 @@ def wait_for_dcos(
         http_checks: Whether or not to wait for checks which require an HTTP
             connection to the cluster.
         doctor_command_name: A ``doctor`` command to advise a user to use.
+        enable_spinner: Whether to enable the spinner animation.
     """
     message = (
         'A cluster may take some time to be ready.\n'
@@ -66,7 +65,7 @@ def wait_for_dcos(
         'To resolve that, run this command again.'
     )
 
-    spinner = Halo(enabled=sys.stdout.isatty())  # type: ignore
+    spinner = Halo(enabled=enable_spinner)
     spinner.start(text='Waiting for DC/OS variant')
     _wait_for_variant(cluster=cluster)
     dcos_variant = get_cluster_variant(cluster=cluster)

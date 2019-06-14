@@ -1,0 +1,61 @@
+Usage: minidcos docker upgrade [OPTIONS] INSTALLER
+
+  Upgrade a cluster to a given version of DC/OS.
+
+Options:
+  -c, --cluster-id TEXT           The ID of the cluster to use.  [default:
+                                  default]
+  -v, --verbose                   Use verbose output. Use this option multiple
+                                  times for more verbose output.
+  --extra-config FILE             The path to a file including DC/OS
+                                  configuration YAML. The contents of this file
+                                  will be added to add to a default
+                                  configuration.
+  --variant [auto|oss|enterprise]
+                                  Choose the DC/OS variant. If the variant does
+                                  not match the variant of the given installer,
+                                  an error will occur. Using "auto" finds the
+                                  variant from the installer. Finding the
+                                  variant from the installer takes some time and
+                                  so using another option is a performance
+                                  optimization.
+  --transport [docker-exec|ssh]   The communication transport to use. On macOS
+                                  the SSH transport requires IP routing to be
+                                  set up. See "minidcos docker setup-mac-
+                                  network". It also requires the "ssh" command
+                                  to be available. This can be provided by
+                                  setting the `MINIDCOS_DOCKER_TRANSPORT`
+                                  environment variable. When using a TTY,
+                                  different transports may use different line
+                                  endings.  [default: docker-exec]
+  --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
+                                  of temporary storage. Set this option to use a
+                                  custom "workspace" for this temporary storage.
+                                  See https://docs.python.org/3/library/tempfile
+                                  .html#tempfile.gettempdir for details on the
+                                  temporary directory location if this option is
+                                  not set.
+  --security-mode [disabled|permissive|strict]
+                                  The security mode to use for a DC/OS
+                                  Enterprise cluster. This overrides any
+                                  security mode set in ``--extra-config``.
+  --wait-for-dcos                 Wait for DC/OS after creating the cluster.
+                                  This is equivalent to using "minidcos docker
+                                  wait" after this command. "minidcos docker
+                                  wait" has various options available and so may
+                                  be more appropriate for your use case. If the
+                                  chosen transport is "docker-exec", this will
+                                  skip HTTP checks and so the cluster may not be
+                                  fully ready.
+  --license-key FILE              This is ignored if using open source DC/OS. If
+                                  using DC/OS Enterprise, this defaults to the
+                                  value of the `DCOS_LICENSE_KEY_PATH`
+                                  environment variable.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  --genconf-dir DIRECTORY         Path to a directory that contains additional
+                                  files for the DC/OS installer. All files from
+                                  this directory will be copied to the "genconf"
+                                  directory before running the DC/OS installer.
+  -h, --help                      Show this message and exit.

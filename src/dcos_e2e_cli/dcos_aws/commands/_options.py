@@ -6,17 +6,37 @@ from typing import Callable
 
 import click
 
+from dcos_e2e.backends import AWS
+
 from ._common import LINUX_DISTRIBUTIONS
+
+
+def aws_instance_type_option(command: Callable[..., None],
+                             ) -> Callable[..., None]:
+    """
+    An option decorator for AWS instance types.
+    """
+    default_instance_type = AWS().aws_instance_type
+    function = click.option(
+        '--aws-instance-type',
+        type=str,
+        default=default_instance_type,
+        show_default=True,
+        help='The AWS instance type to use.',
+    )(command)  # type: Callable[..., None]
+    return function
 
 
 def aws_region_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for AWS regions.
     """
+    default_region = AWS().aws_region
+
     function = click.option(
         '--aws-region',
         type=str,
-        default='us-west-2',
+        default=default_region,
         show_default=True,
         help='The AWS region to use.',
     )(command)  # type: Callable[..., None]

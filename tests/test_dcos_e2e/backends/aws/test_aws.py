@@ -114,13 +114,13 @@ class TestRunIntegrationTest:
             masters=1,
         ) as cluster:
 
-            cluster.install_dcos_from_url(
+            cluster.install_dcos(
                 dcos_installer=ee_installer_url,
                 dcos_config={
                     **cluster.base_config,
                     **config,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
 
@@ -130,13 +130,15 @@ class TestRunIntegrationTest:
             )
 
             # No error is raised with a successful command.
+            # We choose a test file which runs very quickly.
+            fast_test_file = 'test_marathon_authn_authz.py'
             cluster.run_integration_tests(
-                pytest_command=['pytest', '-vvv', '-s', '-x', 'test_tls.py'],
+                pytest_command=['pytest', '-vvv', '-s', '-x', fast_test_file],
                 env={
                     'DCOS_LOGIN_UNAME': superuser_username,
                     'DCOS_LOGIN_PW': superuser_password,
                 },
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
 
 
@@ -225,11 +227,11 @@ class TestDCOSInstallation:
         """
         cluster_backend = AWS()
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos_from_path(
+            cluster.install_dcos(
                 dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
             )
             cluster.wait_for_dcos_oss()
 
@@ -247,11 +249,11 @@ class TestDCOSInstallation:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            master.install_dcos_from_url(
+            master.install_dcos(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
             )
             cluster.wait_for_dcos_oss()
@@ -281,10 +283,10 @@ class TestDCOSInstallation:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos_from_url(
+            cluster.install_dcos(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=ip_detect_file,
             )
             cluster.wait_for_dcos_oss()
@@ -322,10 +324,10 @@ class TestDCOSInstallation:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos_from_url(
+            cluster.install_dcos(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
-                output=Output.CAPTURE,
+                output=Output.LOG_AND_CAPTURE,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 files_to_copy_to_genconf_dir=[
                     (ip_detect_file, Path('/genconf/ip-detect')),

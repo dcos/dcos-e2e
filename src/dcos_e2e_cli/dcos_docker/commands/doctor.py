@@ -4,6 +4,7 @@ Checks for showing up common sources of errors with the Docker backend.
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from tempfile import gettempdir, gettempprefix
 
@@ -380,7 +381,10 @@ def _check_systemd() -> CheckLevels:
         expected = (
             'bind mount source path does not exist: /sys/fs/cgroup/systemd"'
         )
-        if expected in str(exc):
+        expected_docker_machine = (
+            'bind source path does not exist: /sys/fs/cgroup/systemd"'
+        )
+        if expected in str(exc) or expected_docker_machine in str(exc):
             message = (
                 'Launching various applications requires ``/sys/fs/cgroup`` '
                 'to be mounted from the host. '
@@ -392,8 +396,68 @@ def _check_systemd() -> CheckLevels:
                 '``--no-mount-sys-fs-cgroup``. '
                 'Some applications will not work on the launched cluster.'
             )
-            error(message=message)
+            warn(message=message)
             return CheckLevels.WARNING
+        raise
+
+    container.stop()
+    container.remove(v=True)
+
+    return CheckLevels.NONE
+
+
+def _check_mount_var() -> CheckLevels:
+    """
+    Check that `/var/folders` can be mounted.
+    """
+    source = Path('/var').resolve()
+    client = docker_client()
+    tiny_image = 'luca3m/sleep'
+    var_mount = docker.types.Mount(
+        source=str(source),
+        target='/var',
+        read_only=True,
+        type='bind',
+    )
+    try:
+        container = client.containers.run(
+            image=tiny_image,
+            mounts=[var_mount],
+            detach=True,
+        )
+    except docker.errors.APIError as exc:
+        expected = 'bind mount source path does not exist: {source}'.format(
+            source=source,
+        )
+        expected_docker_machine = (
+            'bind source path does not exist: {source}'
+        ).format(source=source)
+        if expected in str(exc) or expected_docker_machine in str(exc):
+            message = (
+                'There was an error mounting "{source}" '
+                'from the host into a Docker container. '
+                'This is required for multiple operations.'
+            ).format(source=source)
+
+            operating_system_info = client.info()['OperatingSystem']
+            boot2docker = bool('Boot2Docker' in operating_system_info)
+            if boot2docker:
+                message += (
+                    '\n'
+                    'It appears that you are using Boot2Docker or '
+                    'docker-machine and this might be the cause of the '
+                    'problem. '
+                    'These are known to be incompatible with DC/OS E2E and '
+                    'minidcos.'
+                )
+            if sys.platform == 'darwin':
+                message += (
+                    '\n'
+                    'Consider upgrading to Docker for Mac. '
+                    'See https://docs.docker.com/docker-for-mac/install/.'
+                )
+            error(message=message)
+            return CheckLevels.ERROR
         raise
 
     container.stop()
@@ -453,21 +517,19 @@ def _check_can_mount_in_docker() -> CheckLevels:
                 '\n'
                 "This issue is likely because the host's version of systemd "
                 'is greater than version 232, which causes the following '
-                'known issue: '
-                'https://github.com/opencontainers/runc/issues/1175.'
+                'known the issue described at '
+                'https://github.com/opencontainers/runc/issues/1175 .'
                 '\n'
                 'Newer versions of Docker, work well with new versions of '
                 'systemd. '
                 'To avoid issues caused by this incompatibility, do one of '
                 'the following:'
-                '\n* Set ``systemd.legacy_systemd_cgroup_controller=yes`` as '
+                '\n'
+                '* Set ``systemd.legacy_systemd_cgroup_controller=yes`` as '
                 'a kernel parameter on your host.'
-                '\n* Use versions of Docker newer than 1.13.1 inside the '
-                'DC/OS nodes.'
-                ' To do this in the ``minidcos docker`` CLI, use the '
-                '``--docker-version`` option on ``minidcos docker create``.'
-                ' To do this in the Python library, pass a '
-                '``docker_version`` parameter to the ``Docker`` backend class.'
+                '\n'
+                '* Avoid using the ``--docker-version`` option to choose '
+                'Docker version 1.13.1.'
             )
             warn(message=message)
             return CheckLevels.WARNING
@@ -482,9 +544,9 @@ def doctor() -> None:
     Diagnose common issues which stop this CLI from working correctly.
     """
     check_functions_no_cluster = [
-        check_1_9_sed,
         _check_docker_root_free_space,
         _check_docker_supports_mounts,
+        _check_mount_var,
         _check_memory,
         _check_mount_tmp,
         _check_networking,
@@ -492,6 +554,7 @@ def doctor() -> None:
         check_ssh,
         _check_storage_driver,
         _check_tmp_free_space,
+        check_1_9_sed,
         _check_systemd,
     ]
 

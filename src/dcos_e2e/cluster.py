@@ -2,25 +2,19 @@
 DC/OS Cluster management tools. Independent of back ends.
 """
 
-import json
 import logging
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 
-import retrying
-import timeout_decorator
 from retry import retry
 
+from . import _wait_for_dcos
 from ._existing_cluster import ExistingCluster as _ExistingCluster
-from ._vendor.dcos_test_utils.dcos_api import DcosApiSession, DcosUser
-from ._vendor.dcos_test_utils.enterprise import EnterpriseApiSession
-from ._vendor.dcos_test_utils.helpers import CI_CREDENTIALS
 from .base_classes import ClusterManager  # noqa: F401
 from .base_classes import ClusterBackend
-from .exceptions import DCOSTimeoutError
-from .node import Node, Output, Transport
+from .node import Node, Output, Role, Transport
 
 LOGGER = logging.getLogger(__name__)
 
@@ -51,20 +45,6 @@ def _wait_for_ssh(node: Node) -> None:
         output=Output.LOG_AND_CAPTURE,
         shell=True,
     )
-
-
-@retry(exceptions=(retrying.RetryError, ))
-def _test_utils_wait_for_dcos(
-    session: Union[DcosApiSession, EnterpriseApiSession],
-) -> None:
-    """
-    Wait for DC/OS using DC/OS Test Utils.
-
-    DC/OS Test Utils raises its own timeout, a ``retrying.RetryError``.
-    We want to ignore this error and use our own timeouts, so we wrap this in
-    our own retried function.
-    """
-    session.wait_for_dcos()  # type: ignore
 
 
 class Cluster(ContextDecorator):
@@ -136,44 +116,6 @@ class Cluster(ContextDecorator):
             cluster_backend=backend,
         )
 
-    @retry(
-        exceptions=(subprocess.CalledProcessError),
-        delay=10,
-    )
-    def _wait_for_node_poststart(self) -> None:
-        """
-        Wait until all DC/OS node-poststart checks are healthy.
-
-        The execution will differ for different version of DC/OS.
-        ``dcos-check-runner`` only exists on DC/OS 1.12+. ``dcos-diagnostics
-        check node-poststart`` only works on DC/OS 1.10 and 1.11. ``3dt`` only
-        exists on DC/OS 1.9. ``node-poststart`` requires ``sudo`` to allow
-        reading the CA certificate used by certain checks.
-        """
-        for node in self.masters:
-            log_msg = 'Running a poststart check on `{}`'.format(str(node))
-            LOGGER.debug(log_msg)
-            node.run(
-                args=[
-                    'sudo',
-                    '/opt/mesosphere/bin/dcos-check-runner',
-                    'check',
-                    'node-poststart',
-                    '||',
-                    'sudo',
-                    '/opt/mesosphere/bin/dcos-diagnostics',
-                    'check',
-                    'node-poststart',
-                    '||',
-                    '/opt/mesosphere/bin/3dt',
-                    '--diag',
-                ],
-                # We capture output because else we would see a lot of output
-                # in a normal cluster start up, for example during tests.
-                output=Output.CAPTURE,
-                shell=True,
-            )
-
     def wait_for_dcos_oss(
         self,
         http_checks: bool = True,
@@ -192,107 +134,12 @@ class Cluster(ContextDecorator):
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
                 did not become ready within one hour.
         """
-
-        @timeout_decorator.timeout(
-            # We choose a one hour timeout based on experience that the cluster
-            # will almost certainly not start up after this time.
-            #
-            # In the future we may want to increase this or make it
-            # customizable.
-            60 * 60,
-            timeout_exception=DCOSTimeoutError,
+        _wait_for_dcos.wait_for_dcos_oss(
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
+            http_checks=http_checks,
         )
-        def wait_for_dcos_oss_until_timeout() -> None:
-            """
-            Wait until DC/OS OSS is up or timeout hits.
-            """
-
-            self._wait_for_node_poststart()
-            if not http_checks:
-                return
-
-            email = 'albert@bekstil.net'
-            curl_url = ('http://localhost:8101/acs/api/v1/users/{email}'
-                        ).format(email=email)
-
-            delete_user_args = ['curl', '-X', 'DELETE', curl_url]
-
-            create_user_args = [
-                '.',
-                '/opt/mesosphere/environment.export',
-                '&&',
-                'python',
-                '/opt/mesosphere/bin/dcos_add_user.py',
-                email,
-            ]
-
-            # The dcos-diagnostics check is not yet sufficient to determine
-            # when a CLI login would be possible with DC/OS OSS. It only
-            # checks the healthy state of the systemd units, not reachability
-            # of services through HTTP.
-
-            # Since DC/OS uses a Single-Sign-On flow with Identity Providers
-            # outside the cluster for the login and Admin Router only rewrites
-            # requests to them, the login endpoint does not provide anything.
-
-            # Current solution to guarantee the CLI login:
-
-            # Try until one can login successfully with a long lived token
-            # (dirty hack in dcos-test-utils wait_for_dcos). This is to avoid
-            # having to simulate a browser that does the SSO flow.
-
-            # Suggestion for replacing this with a DC/OS check for CLI login:
-
-            # Determine and wait for all dependencies of the SSO OAuth login
-            # inside of DC/OS. This should include Admin Router, ZooKeeper and
-            # the DC/OS OAuth login service. Note that this may only guarantee
-            # that the login could work, however not that is actually works.
-
-            # In order to fully replace this method one would need to have
-            # DC/OS checks for every HTTP endpoint exposed by Admin Router.
-
-            any_master = next(iter(self.masters))
-            # We create a user.
-            # This allows this function to work even after a user has logged
-            # in.
-            # In particular, we need the "albert" user to exist, or for no
-            # users to exist, for the DC/OS Test Utils API session to work.
-            #
-            # Creating the "albert" user will error if the user already exists.
-            # Therefore, we delete the user.
-            # This command returns a 0 exit code even if the user is not found.
-            any_master.run(
-                args=delete_user_args,
-                output=Output.LOG_AND_CAPTURE,
-            )
-            any_master.run(
-                args=create_user_args,
-                shell=True,
-                output=Output.LOG_AND_CAPTURE,
-            )
-            credentials = CI_CREDENTIALS
-
-            api_session = DcosApiSession(
-                dcos_url='http://{ip}'.format(ip=any_master.public_ip_address),
-                masters=[str(n.public_ip_address) for n in self.masters],
-                slaves=[str(n.public_ip_address) for n in self.agents],
-                public_slaves=[
-                    str(n.public_ip_address) for n in self.public_agents
-                ],
-                auth_user=DcosUser(credentials=credentials),
-            )
-
-            _test_utils_wait_for_dcos(session=api_session)
-
-            # Only the first user can log in with SSO, before granting others
-            # access.
-            # Therefore, we delete the user who was created to wait for DC/OS.
-            any_master.run(
-                args=delete_user_args,
-                output=Output.LOG_AND_CAPTURE,
-            )
-
-        wait_for_dcos_oss_until_timeout()
 
     def wait_for_dcos_ee(
         self,
@@ -304,8 +151,8 @@ class Cluster(ContextDecorator):
         Wait until the DC/OS Enterprise boot process has completed.
 
         Args:
-            superuser_username: Username of the default superuser.
-            superuser_password: Password of the default superuser.
+            superuser_username: Username of a user with superuser privileges.
+            superuser_password: Password of a user with superuser privileges.
             http_checks: Whether or not to wait for checks which involve HTTP.
                 If this is `False`, this function may return before DC/OS is
                 fully ready. This is useful in cases where an HTTP connection
@@ -316,86 +163,92 @@ class Cluster(ContextDecorator):
             dcos_e2e.exceptions.DCOSTimeoutError: Raised if cluster components
                 did not become ready within one hour.
         """
-
-        @timeout_decorator.timeout(
-            # will almost certainly not start up after this time.
-            #
-            # In the future we may want to increase this or make it
-            # customizable.
-            60 * 60,
-            timeout_exception=DCOSTimeoutError,
+        _wait_for_dcos.wait_for_dcos_ee(
+            masters=self.masters,
+            agents=self.agents,
+            public_agents=self.public_agents,
+            superuser_username=superuser_username,
+            superuser_password=superuser_password,
+            http_checks=http_checks,
         )
-        def wait_for_dcos_ee_until_timeout() -> None:
-            """
-            Wait until DC/OS Enterprise is up or timeout hits.
-            """
 
-            self._wait_for_node_poststart()
-            if not http_checks:
-                return
+    def install_dcos(
+        self,
+        dcos_installer: Union[str, Path],
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        output: Output = Output.CAPTURE,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+    ) -> None:
+        """
+        Installs DC/OS using the DC/OS advanced installation method.
 
-            # The dcos-diagnostics check is not yet sufficient to determine
-            # when a CLI login would be possible with Enterprise DC/OS. It only
-            # checks the healthy state of the systemd units, not reachability
-            # of services through HTTP.
-
-            # In the case of Enterprise DC/OS this method uses dcos-test-utils
-            # and superuser credentials to perform a superuser login that
-            # assure authenticating via CLI is working.
-
-            # Suggestion for replacing this with a DC/OS check for CLI login:
-
-            # In Enterprise DC/OS this could be replace by polling the login
-            # endpoint with random login credentials until it returns 401. In
-            # that case the guarantees would be the same as with the OSS
-            # suggestion.
-
-            # The progress on a partial replacement can be followed here:
-            # https://jira.mesosphere.com/browse/DCOS_OSS-1313
-
-            # In order to fully replace this method one would need to have
-            # DC/OS checks for every HTTP endpoint exposed by Admin Router.
-
-            credentials = {
-                'uid': superuser_username,
-                'password': superuser_password,
-            }
-
-            any_master = next(iter(self.masters))
-            config_result = any_master.run(
-                args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
+        Args:
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
+        """
+        if isinstance(dcos_installer, str):
+            self._cluster.install_dcos_from_url(
+                dcos_installer=dcos_installer,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+                output=output,
             )
-            config = json.loads(config_result.stdout.decode())
-            ssl_enabled = config['ssl_enabled']
+            return
+        self._cluster.install_dcos_from_path(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
 
-            scheme = 'https://' if ssl_enabled else 'http://'
-            dcos_url = scheme + str(any_master.public_ip_address)
-            enterprise_session = EnterpriseApiSession(  # type: ignore
-                dcos_url=dcos_url,
-                masters=[str(n.public_ip_address) for n in self.masters],
-                slaves=[str(n.public_ip_address) for n in self.agents],
-                public_slaves=[
-                    str(n.public_ip_address) for n in self.public_agents
-                ],
-                auth_user=DcosUser(credentials=credentials),
-            )
+    def upgrade_dcos(
+        self,
+        dcos_installer: Union[str, Path],
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        output: Output = Output.CAPTURE,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+    ) -> None:
+        """
+        Upgrade DC/OS from a local installer path.
 
-            if ssl_enabled:
-                response = enterprise_session.get(
-                    # Avoid hitting a RetryError in the get function.
-                    # Waiting a year is considered equivalent to an
-                    # infinite timeout.
-                    '/ca/dcos-ca.crt',
-                    retry_timeout=60 * 60 * 24 * 365,
-                    verify=False,
+        Args:
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
+            dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
+        """
+        for nodes, role in (
+            (self.masters, Role.MASTER),
+            (self.agents, Role.AGENT),
+            (self.public_agents, Role.PUBLIC_AGENT),
+        ):
+            for node in nodes:
+                node.upgrade_dcos(
+                    dcos_installer=dcos_installer,
+                    dcos_config=dcos_config,
+                    ip_detect_path=ip_detect_path,
+                    role=role,
+                    files_to_copy_to_genconf_dir=(
+                        files_to_copy_to_genconf_dir
+                    ),
+                    output=output,
                 )
-                response.raise_for_status()
-                # This is already done in enterprise_session.wait_for_dcos()
-                enterprise_session.set_ca_cert()
-
-            _test_utils_wait_for_dcos(session=enterprise_session)
-
-        wait_for_dcos_ee_until_timeout()
 
     def __enter__(self) -> 'Cluster':
         """
@@ -443,77 +296,6 @@ class Cluster(ContextDecorator):
             **config,
             **self._base_config,
         }
-
-    def install_dcos_from_url(
-        self,
-        dcos_installer: str,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        output: Output = Output.CAPTURE,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-    ) -> None:
-        """
-        Installs DC/OS using the DC/OS advanced installation method.
-
-        If supported by the cluster backend, this method spins up a persistent
-        bootstrap host that supplies all dedicated DC/OS hosts with the
-        necessary installation files.
-
-        Since the bootstrap host is different from the host initiating the
-        cluster creation passing the ``dcos_installer`` via URL string
-        saves the time of copying the ``dcos_installer`` to the bootstrap host.
-
-        However, some backends may not support using a bootstrap node. For
-        these backends, each node will download and extract the installer.
-        This may be very slow, as the installer is downloaded to
-        and extracted on each node, one at a time.
-
-        Args:
-            dcos_installer: The URL string to an installer to install DC/OS
-                from.
-            dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to a ``ip-detect`` script that will be
-                used when installing DC/OS.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-            output: What happens with stdout and stderr.
-        """
-        self._cluster.install_dcos_from_url(
-            dcos_installer=dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            output=output,
-        )
-
-    def install_dcos_from_path(
-        self,
-        dcos_installer: Path,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-        output: Output = Output.CAPTURE,
-    ) -> None:
-        """
-        Args:
-            dcos_installer: The `Path` to an installer to install DC/OS
-                from.
-            dcos_config: The DC/OS configuration to use.
-            ip_detect_path: The path to a ``ip-detect`` script that will be
-                used when installing DC/OS.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-            output: What happens with stdout and stderr.
-        """
-        self._cluster.install_dcos_from_path(
-            dcos_installer=dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            output=output,
-        )
 
     def run_integration_tests(
         self,

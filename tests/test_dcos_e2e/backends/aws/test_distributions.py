@@ -59,7 +59,7 @@ def _oss_distribution_test(
         agents=0,
         public_agents=0,
     ) as cluster:
-        cluster.install_dcos_from_url(
+        cluster.install_dcos(
             dcos_installer=oss_installer_url,
             dcos_config=cluster.base_config,
             output=Output.CAPTURE,
@@ -100,7 +100,7 @@ def _enterprise_distribution_test(
         agents=0,
         public_agents=0,
     ) as cluster:
-        cluster.install_dcos_from_url(
+        cluster.install_dcos(
             dcos_installer=ee_installer_url,
             dcos_config={
                 **cluster.base_config,

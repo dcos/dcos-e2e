@@ -194,6 +194,38 @@ class DockerExecTransport(NodeTransport):
             pipe_output=True,
         )
 
+    def download_file(
+        self,
+        remote_path: Path,
+        local_path: Path,
+        user: str,
+        ssh_key_path: Path,
+        public_ip_address: IPv4Address,
+    ) -> None:
+        """
+        Download a file from this node.
+
+        Args:
+            remote_path: The path on the node to download the file from.
+            local_path: The path on the host to download the file to.
+            user: The name of the remote user to send the file.
+            ssh_key_path: The path to an SSH key which can be used to SSH to
+                the node as the ``user`` user.
+            public_ip_address: The public IP address of the node.
+        """
+        container = _container_from_ip_address(ip_address=public_ip_address)
+        args = [
+            'docker',
+            'cp',
+            container.id + ':' + str(remote_path),
+            str(local_path),
+        ]
+        run_subprocess(
+            args=args,
+            log_output_live=False,
+            pipe_output=True,
+        )
+
 
 def _container_from_ip_address(ip_address: IPv4Address) -> Container:
     """

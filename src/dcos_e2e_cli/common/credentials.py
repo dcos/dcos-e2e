@@ -6,8 +6,8 @@ from pathlib import Path
 
 from dcos_e2e.cluster import Cluster
 
-DEFAULT_SUPERUSER_USERNAME = 'admin'
-DEFAULT_SUPERUSER_PASSWORD = 'admin'
+DEFAULT_SUPERUSER_USERNAME = 'bootstrapuser'
+DEFAULT_SUPERUSER_PASSWORD = 'deleteme'
 
 
 def add_authorized_key(cluster: Cluster, public_key_path: Path) -> None:

@@ -13,8 +13,8 @@ Usage: minidcos aws create [OPTIONS] INSTALLER_URL
                   These can all be set in ``--extra-config``.
                   However, some defaults are provided for all but the license key.
 
-                  The default superuser username is ``admin``.
-                  The default superuser password is ``admin``.
+                  The default superuser username is ``bootstrapuser``.
+                  The default superuser password is ``deleteme``.
                   The default ``fault_domain_enabled`` is ``false``.
 
                   ``license_key_contents`` must be set for DC/OS Enterprise 1.11 and above.
@@ -45,6 +45,8 @@ Options:
                                   configuration.
   --public-agents INTEGER         The number of public agent nodes.  [default:
                                   1]
+  --aws-instance-type TEXT        The AWS instance type to use.  [default:
+                                  m4.large]
   --aws-region TEXT               The AWS region to use.  [default: us-west-2]
   --linux-distribution [centos-7|coreos|rhel-7]
                                   The Linux distribution to use on the nodes.
@@ -80,4 +82,7 @@ Options:
   --enable-selinux-enforcing      With this flag set, SELinux is set to
                                   enforcing before DC/OS is installed on the
                                   cluster.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
   -h, --help                      Show this message and exit.

@@ -10,13 +10,15 @@ The AWS backend is used to spin up clusters using EC2 instances on Amazon Web Se
 DC/OS Installation
 ------------------
 
-:py:class:`~dcos_e2e.cluster.Cluster`\ s created by the :py:class:`~dcos_e2e.backends.AWS` backend only support installing DC/OS via :py:meth:`~dcos_e2e.cluster.Cluster.install_dcos_from_url`.
-
-This is because the installation method employs a bootstrap node that directly downloads the :paramref:`~dcos_e2e.cluster.Cluster.install_dcos_from_url.dcos_installer` from the specified URL.
-
 :py:class:`~dcos_e2e.node.Node`\ s of :py:class:`~dcos_e2e.cluster.Cluster`\ s created by the :py:class:`~dcos_e2e.backends.AWS` backend distinguish between :py:attr:`~dcos_e2e.node.Node.public_ip_address` and :py:attr:`~dcos_e2e.node.Node.private_ip_address`.
 The :py:attr:`~dcos_e2e.node.Node.private_ip_address` refers to the internal network of the AWS stack which is also used by DC/OS internally.
 The :py:attr:`~dcos_e2e.node.Node.public_ip_address` allows for reaching AWS EC2 instances from the outside e.g. from the ``dcos-e2e`` testing environment.
+
+AWS Instance Types
+------------------
+
+When launching a cluster with Amazon Web Services there are a number of different instance types to choose from using :paramref:`~dcos_e2e.backends.AWS.aws_instance_type`.
+It is recommended to use ``m4.large`` to keep the cost low, but ``m5.2xlarge`` may be required for some services, such as MKE.
 
 AWS Regions
 -----------
