@@ -3,22 +3,35 @@ Usage: minidcos vagrant provision [OPTIONS]
   Provision a Vagrant cluster for installing DC/OS.
 
 Options:
-  --masters INTEGER           The number of master nodes.  [default: 1]
-  --agents INTEGER            The number of agent nodes.  [default: 1]
-  --public-agents INTEGER     The number of public agent nodes.  [default: 1]
-  --workspace-dir DIRECTORY   Creating a cluster can use approximately 2 GB of
-                              temporary storage. Set this option to use a custom
-                              "workspace" for this temporary storage. See https:
-                              //docs.python.org/3/library/tempfile.html#tempfile
-                              .gettempdir for details on the temporary directory
-                              location if this option is not set.
-  -c, --cluster-id TEXT       A unique identifier for the cluster. Use the value
-                              "default" to use this cluster for other commands
-                              without specifying --cluster-id.
-  -v, --verbose               Use verbose output. Use this option multiple times
-                              for more verbose output.
-  --enable-selinux-enforcing  With this flag set, SELinux is set to enforcing
-                              before DC/OS is installed on the cluster.
-  --vm-memory-mb INTEGER      The amount of memory to give each VM.  [default:
-                              2048]
-  -h, --help                  Show this message and exit.
+  --masters INTEGER               The number of master nodes.  [default: 1]
+  --agents INTEGER                The number of agent nodes.  [default: 1]
+  --public-agents INTEGER         The number of public agent nodes.  [default:
+                                  1]
+  --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB
+                                  of temporary storage. Set this option to use a
+                                  custom "workspace" for this temporary storage.
+                                  See https://docs.python.org/3/library/tempfile
+                                  .html#tempfile.gettempdir for details on the
+                                  temporary directory location if this option is
+                                  not set.
+  -c, --cluster-id TEXT           A unique identifier for the cluster. Use the
+                                  value "default" to use this cluster for other
+                                  commands without specifying --cluster-id.
+  -v, --verbose                   Use verbose output. Use this option multiple
+                                  times for more verbose output.
+  --enable-selinux-enforcing      With this flag set, SELinux is set to
+                                  enforcing before DC/OS is installed on the
+                                  cluster.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  --vagrant-box-url TEXT          The URL of the Vagrant box to use.  [default:
+                                  https://downloads.dcos.io/dcos-
+                                  vagrant/metadata.json]
+  --vagrant-box-version TEXT      The version of the Vagrant box to use. See htt
+                                  ps://www.vagrantup.com/docs/boxes/versioning.h
+                                  tml#version-constraints for details.
+                                  [default: ~> 0.9.2]
+  --vm-memory-mb INTEGER          The amount of memory to give each VM.
+                                  [default: 2048]
+  -h, --help                      Show this message and exit.

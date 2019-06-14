@@ -3,4 +3,7 @@ Usage: minidcos docker destroy-loopback-sidecar [OPTIONS] NAME
   Destroy a loopback sidecar.
 
 Options:
-  -h, --help  Show this message and exit.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  -h, --help                      Show this message and exit.

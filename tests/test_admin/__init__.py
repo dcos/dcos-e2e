@@ -1,0 +1,3 @@
+"""
+Tests for admin scripts.
+"""

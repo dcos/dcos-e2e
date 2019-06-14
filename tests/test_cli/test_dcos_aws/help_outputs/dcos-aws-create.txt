@@ -82,4 +82,7 @@ Options:
   --enable-selinux-enforcing      With this flag set, SELinux is set to
                                   enforcing before DC/OS is installed on the
                                   cluster.
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
   -h, --help                      Show this message and exit.

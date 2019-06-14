@@ -20,6 +20,7 @@ from dcos_e2e_cli.common.options import (
     cluster_id_option,
     copy_to_master_option,
     enable_selinux_enforcing_option,
+    enable_spinner_option,
     extra_config_option,
     genconf_dir_option,
     license_key_option,
@@ -42,7 +43,11 @@ from ._common import (
     ClusterVMs,
     existing_cluster_ids,
 )
-from ._options import vm_memory_mb_option
+from ._options import (
+    vagrant_box_url_option,
+    vagrant_box_version_option,
+    vm_memory_mb_option,
+)
 from ._wait_for_dcos import wait_for_dcos_option
 from .doctor import doctor
 from .wait import wait
@@ -64,6 +69,9 @@ from .wait import wait
 @verbosity_option
 @vm_memory_mb_option
 @enable_selinux_enforcing_option
+@enable_spinner_option
+@vagrant_box_url_option
+@vagrant_box_version_option
 @wait_for_dcos_option
 @click.pass_context
 def create(
@@ -83,6 +91,9 @@ def create(
     genconf_dir: Optional[Path],
     wait_for_dcos: bool,
     vm_memory_mb: int,
+    enable_spinner: bool,
+    vagrant_box_url: str,
+    vagrant_box_version: str,
 ) -> None:
     """
     Create a DC/OS cluster.
@@ -103,6 +114,7 @@ def create(
         installer_path=installer,
         workspace_dir=workspace_dir,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     description = {
@@ -113,6 +125,8 @@ def create(
         workspace_dir=workspace_dir,
         virtualbox_description=json.dumps(obj=description),
         vm_memory_mb=vm_memory_mb,
+        vagrant_box_url=vagrant_box_url,
+        vagrant_box_version=vagrant_box_version,
     )
 
     cluster = create_cluster(
@@ -121,6 +135,7 @@ def create(
         agents=agents,
         public_agents=public_agents,
         doctor_message=doctor_message,
+        enable_spinner=enable_spinner,
     )
 
     nodes = {*cluster.masters, *cluster.agents, *cluster.public_agents}
@@ -153,6 +168,7 @@ def create(
         doctor_message=doctor_message,
         dcos_installer=installer,
         local_genconf_dir=genconf_dir,
+        enable_spinner=enable_spinner,
     )
 
     run_post_install_steps(
@@ -163,4 +179,5 @@ def create(
         http_checks=True,
         wait_command_name=wait_command_name,
         wait_for_dcos=wait_for_dcos,
+        enable_spinner=enable_spinner,
     )

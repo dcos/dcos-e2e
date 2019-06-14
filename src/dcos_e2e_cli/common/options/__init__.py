@@ -4,6 +4,7 @@ Click options which are common across CLI tools.
 
 import logging
 import re
+import sys
 from pathlib import Path
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -158,7 +159,7 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     An option decorator for passing a license key.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--license-key',
         type=click_pathlib.Path(
             exists=True,
@@ -172,7 +173,8 @@ def license_key_option(command: Callable[..., None]) -> Callable[..., None]:
             'If using DC/OS Enterprise, this defaults to the value of the '
             '`DCOS_LICENSE_KEY_PATH` environment variable.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 
@@ -253,7 +255,7 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     A decorator for choosing a DC/OS checkout to sync before running commands.
     """
-    function = click.option(
+    click_option_function = click.option(
         '--sync-dir',
         type=click_pathlib.Path(
             exists=True,
@@ -272,7 +274,8 @@ def sync_dir_run_option(command: Callable[..., None]) -> Callable[..., None]:
             'Use this option multiple times on a DC/OS Enterprise cluster to '
             'sync both DC/OS Enterprise and DC/OS Open Source tests.'
         ),
-    )(command)  # type: Callable[..., None]
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function
 
 
@@ -416,4 +419,21 @@ def enable_selinux_enforcing_option(command: Callable[..., None],
             'installed on the cluster.'
         ),
     )(command)  # type: Callable[..., None]
+    return function
+
+
+def enable_spinner_option(command: Callable[..., None],
+                          ) -> Callable[..., None]:
+    """
+    An option decorator for enabling or disabling the spinner.
+    """
+    click_option_function = click.option(
+        '--enable-spinner/--no-enable-spinner',
+        default=sys.stdout.isatty(),
+        help=(
+            'Whether to show a spinner animation. '
+            'This defaults to true if stdout is a TTY.'
+        ),
+    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
+    function = click_option_function(command)  # type: Callable[..., None]
     return function

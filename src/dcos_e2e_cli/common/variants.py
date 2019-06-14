@@ -2,10 +2,8 @@
 Helpers for managing DC/OS Variants.
 """
 
-import json
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
 from shutil import rmtree
 from typing import Optional
@@ -15,11 +13,8 @@ from halo import Halo
 
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.exceptions import DCOSNotInstalledError
-from dcos_e2e.node import Output
-from dcos_e2e_cli._vendor.dcos_installer_tools import (
-    DCOSVariant,
-    get_dcos_installer_details,
-)
+from dcos_e2e.node import DCOSVariant
+from dcos_e2e_cli._vendor import dcos_installer_tools as installer_tools
 
 
 def get_install_variant(
@@ -27,6 +22,7 @@ def get_install_variant(
     installer_path: Optional[Path],
     doctor_message: str,
     workspace_dir: Path,
+    enable_spinner: bool,
 ) -> DCOSVariant:
     """
     Get the variant of DC/OS to install.
@@ -39,6 +35,7 @@ def get_install_variant(
         workspace_dir: A directory to work in, given that this function uses
             large files.
         doctor_message: The message to show if something goes wrong.
+        enable_spinner: Whether to enable the spinner animation.
 
     Returns:
         The variant of DC/OS to install.
@@ -48,10 +45,10 @@ def get_install_variant(
     """
     if given_variant == 'auto':
         assert installer_path is not None
-        spinner = Halo(enabled=sys.stdout.isatty())
+        spinner = Halo(enabled=enable_spinner)
         spinner.start(text='Determining DC/OS variant')
         try:
-            details = get_dcos_installer_details(
+            details = installer_tools.get_dcos_installer_details(
                 installer=installer_path,
                 workspace_dir=workspace_dir,
             )
@@ -68,7 +65,11 @@ def get_install_variant(
             sys.exit(1)
 
         spinner.succeed()
-        return details.variant
+        variant_map = {
+            installer_tools.DCOSVariant.ENTERPRISE: DCOSVariant.ENTERPRISE,
+            installer_tools.DCOSVariant.OSS: DCOSVariant.OSS,
+        }
+        return variant_map[details.variant]
 
     return {
         'oss': DCOSVariant.OSS,

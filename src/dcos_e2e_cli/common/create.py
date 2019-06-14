@@ -14,7 +14,7 @@ from passlib.hash import sha512_crypt
 
 from dcos_e2e.base_classes import ClusterBackend
 from dcos_e2e.cluster import Cluster
-from dcos_e2e_cli._vendor.dcos_installer_tools import DCOSVariant
+from dcos_e2e.node import DCOSVariant
 
 from .base_classes import ClusterRepresentation
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
@@ -68,11 +68,23 @@ def create_cluster(
     agents: int,
     public_agents: int,
     doctor_message: str,
+    enable_spinner: bool,
 ) -> Cluster:
     """
     Create a cluster.
+
+    Args:
+        cluster_backend: The cluster backend to use.
+        masters: The number of master nodes to create.
+        agents: The number of agent nodes to create.
+        public_agents: The number of public agent nodes to create.
+        doctor_message: A message to show pointing users to a doctor command.
+        enable_spinner: Whether to enable the spinner animation.
+
+    Returns:
+        A new cluster.
     """
-    spinner = halo.Halo(enabled=sys.stdout.isatty())
+    spinner = halo.Halo(enabled=enable_spinner)
     spinner.start(text='Creating cluster')
     try:
         cluster = Cluster(

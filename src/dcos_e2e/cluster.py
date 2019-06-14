@@ -5,7 +5,6 @@ DC/OS Cluster management tools. Independent of back ends.
 import logging
 import subprocess
 from contextlib import ContextDecorator
-from functools import singledispatch
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
 
@@ -173,6 +172,84 @@ class Cluster(ContextDecorator):
             http_checks=http_checks,
         )
 
+    def install_dcos(
+        self,
+        dcos_installer: Union[str, Path],
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        output: Output = Output.CAPTURE,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+    ) -> None:
+        """
+        Installs DC/OS using the DC/OS advanced installation method.
+
+        Args:
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
+        """
+        if isinstance(dcos_installer, str):
+            self._cluster.install_dcos_from_url(
+                dcos_installer=dcos_installer,
+                dcos_config=dcos_config,
+                ip_detect_path=ip_detect_path,
+                files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+                output=output,
+            )
+            return
+        self._cluster.install_dcos_from_path(
+            dcos_installer=dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            output=output,
+        )
+
+    def upgrade_dcos(
+        self,
+        dcos_installer: Union[str, Path],
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        output: Output = Output.CAPTURE,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+    ) -> None:
+        """
+        Upgrade DC/OS from a local installer path.
+
+        Args:
+            dcos_installer: The ``Path`` to a local installer or a ``str`` to
+                which is a URL pointing to an installer to install DC/OS from.
+            dcos_config: The DC/OS configuration to use.
+            ip_detect_path: The path to a ``ip-detect`` script that will be
+                used when installing DC/OS.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+            output: What happens with stdout and stderr.
+        """
+        for nodes, role in (
+            (self.masters, Role.MASTER),
+            (self.agents, Role.AGENT),
+            (self.public_agents, Role.PUBLIC_AGENT),
+        ):
+            for node in nodes:
+                node.upgrade_dcos(
+                    dcos_installer=dcos_installer,
+                    dcos_config=dcos_config,
+                    ip_detect_path=ip_detect_path,
+                    role=role,
+                    files_to_copy_to_genconf_dir=(
+                        files_to_copy_to_genconf_dir
+                    ),
+                    output=output,
+                )
+
     def __enter__(self) -> 'Cluster':
         """
         Enter a context manager.
@@ -219,131 +296,6 @@ class Cluster(ContextDecorator):
             **config,
             **self._base_config,
         }
-
-    @singledispatch
-    def install_dcos(
-        self,
-        dcos_installer: Union[str, Path],
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        output: Output = Output.CAPTURE,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-    ) -> None:
-        """
-        Installs DC/OS using the DC/OS advanced installation method.
-
-        Args:
-            dcos_installer: The ``Path`` to a local installer or a ``str`` to
-                which is a URL pointing to an installer to install DC/OS from.
-            dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to a ``ip-detect`` script that will be
-                used when installing DC/OS.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-            output: What happens with stdout and stderr.
-        """
-
-    @install_dcos.register
-    def _install_dcos_from_url(
-        self,
-        dcos_installer: str,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        output: Output = Output.CAPTURE,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-    ) -> None:
-        """
-        Installs DC/OS using the DC/OS advanced installation method.
-
-        Args:
-            dcos_installer: The URL string to an installer to install DC/OS
-                from.
-            dcos_config: The contents of the DC/OS ``config.yaml``.
-            ip_detect_path: The path to a ``ip-detect`` script that will be
-                used when installing DC/OS.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-            output: What happens with stdout and stderr.
-        """
-        self._cluster.install_dcos_from_url(
-            dcos_installer=dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            output=output,
-        )
-
-    def upgrade_dcos_from_path(
-        self,
-        dcos_installer: Path,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-        output: Output = Output.CAPTURE,
-    ) -> None:
-        """
-        Upgrade DC/OS from a local installer path.
-
-        Args:
-            dcos_installer: The ``Path`` to an installer to install DC/OS
-                from.
-            dcos_config: The DC/OS configuration to use.
-            ip_detect_path: The path to a ``ip-detect`` script that will be
-                used when installing DC/OS.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-            output: What happens with stdout and stderr.
-        """
-        for nodes, role in (
-            (self.masters, Role.MASTER),
-            (self.agents, Role.AGENT),
-            (self.public_agents, Role.PUBLIC_AGENT),
-        ):
-            for node in nodes:
-                node.upgrade_dcos_from_path(
-                    dcos_installer=dcos_installer,
-                    dcos_config=dcos_config,
-                    ip_detect_path=ip_detect_path,
-                    role=role,
-                    files_to_copy_to_genconf_dir=(
-                        files_to_copy_to_genconf_dir
-                    ),
-                    output=output,
-                )
-
-    @install_dcos.register
-    def _install_dcos_from_path(
-        self,
-        dcos_installer: Path,
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
-        output: Output = Output.CAPTURE,
-    ) -> None:
-        """
-        Install DC/OS from a local installer path.
-
-        Args:
-            dcos_installer: The ``Path`` to an installer to install DC/OS
-                from.
-            dcos_config: The DC/OS configuration to use.
-            ip_detect_path: The path to a ``ip-detect`` script that will be
-                used when installing DC/OS.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-            output: What happens with stdout and stderr.
-        """
-        self._cluster.install_dcos_from_path(
-            dcos_installer=dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-            output=output,
-        )
 
     def run_integration_tests(
         self,

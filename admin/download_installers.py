@@ -113,15 +113,17 @@ PATTERNS = {
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url':  # noqa: E501
     (),
-    'tests/test_dcos_e2e/test_cluster.py::TestInstallDcosFromPathLogging':
-    (OSS_MASTER, ),
+    'tests/test_dcos_e2e/test_cluster.py::TestInstallDCOS': (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests':
     (OSS_MASTER, ),
     'tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters':
     (),
     'tests/test_dcos_e2e/test_cluster.py::TestDestroyNode':
     (),
-    'tests/test_dcos_e2e/test_cluster.py::TestUpgrade': (OSS_1_12, OSS_1_13),
+    'tests/test_dcos_e2e/test_cluster.py::TestUpgrade::test_upgrade_from_path':
+    (OSS_1_12, OSS_1_13),
+    'tests/test_dcos_e2e/test_cluster.py::TestUpgrade::test_upgrade_from_url':
+    (OSS_1_12, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer':  # noqa: E501
