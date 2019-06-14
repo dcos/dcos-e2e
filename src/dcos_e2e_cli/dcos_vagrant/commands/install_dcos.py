@@ -3,7 +3,7 @@ Install DC/OS on a provisioned Vagrant cluster.
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import click
 
@@ -19,12 +19,12 @@ from dcos_e2e_cli.common.options import (
     cluster_id_option,
     enable_spinner_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
     verbosity_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.utils import command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
@@ -57,7 +57,7 @@ def install_dcos(
     license_key: Optional[Path],
     security_mode: Optional[str],
     cluster_id: str,
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
     wait_for_dcos: bool,
     enable_spinner: bool,
 ) -> None:
@@ -98,7 +98,7 @@ def install_dcos(
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
         enable_spinner=enable_spinner,
     )
 

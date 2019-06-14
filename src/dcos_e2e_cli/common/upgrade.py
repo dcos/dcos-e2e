@@ -6,7 +6,7 @@ import subprocess
 import sys
 import textwrap
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Iterable, Tuple, Union
 
 import click
 from halo import Halo
@@ -22,7 +22,7 @@ def cluster_upgrade_dcos(
     cluster_representation: ClusterRepresentation,
     ip_detect_path: Path,
     dcos_config: Dict[str, Any],
-    local_genconf_dir: Optional[Path],
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     dcos_installer: Union[Path, str],
     doctor_message: str,
     enable_spinner: bool,
@@ -34,7 +34,8 @@ def cluster_upgrade_dcos(
         cluster: The cluster to upgrade DC/OS on.
         cluster_representation: A representation of the cluster.
         ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
-        local_genconf_dir: A directory of files to copy from the host to the
+        files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+            installer node. These are files to copy from the host to the
             installer node before upgrading DC/OS.
         dcos_config: The DC/OS configuration to use.
         dcos_installer: The ``Path`` to a local DC/OS installer or a ``str``
@@ -43,14 +44,6 @@ def cluster_upgrade_dcos(
             use if installation fails.
         enable_spinner: Whether to enable the spinner animation.
     """
-    files_to_copy_to_genconf_dir = []
-    if local_genconf_dir is not None:
-        node_genconf_path = Path('/genconf')
-        for genconf_file in local_genconf_dir.glob('*'):
-            genconf_relative = genconf_file.relative_to(local_genconf_dir)
-            relative_path = node_genconf_path / genconf_relative
-            files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
-
     spinner = Halo(enabled=enable_spinner)
     spinner.start('Upgrading DC/OS')
 

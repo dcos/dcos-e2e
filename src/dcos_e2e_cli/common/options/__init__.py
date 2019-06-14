@@ -383,29 +383,6 @@ def existing_cluster_id_option(command: Callable[..., None],
     return function
 
 
-def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
-    """
-    An option decorator for a custom "genconf" directory.
-    """
-    click_option_function = click.option(
-        '--genconf-dir',
-        type=click_pathlib.Path(
-            exists=True,
-            dir_okay=True,
-            file_okay=False,
-            resolve_path=True,
-        ),
-        help=(
-            'Path to a directory that contains additional files for the DC/OS '
-            'installer. '
-            'All files from this directory will be copied to the "genconf" '
-            'directory before running the DC/OS installer.'
-        ),
-    )  # type: Callable[[Callable[..., None]], Callable[..., None]]
-    function = click_option_function(command)  # type: Callable[..., None]
-    return function
-
-
 def enable_selinux_enforcing_option(command: Callable[..., None],
                                     ) -> Callable[..., None]:
     """
