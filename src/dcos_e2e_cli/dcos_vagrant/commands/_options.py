@@ -24,7 +24,7 @@ def vm_memory_mb_option(command: Callable[..., None]) -> Callable[..., None]:
     return function
 
 
-def vagrant_box_url_option(command: Callable[..., None]
+def vagrant_box_url_option(command: Callable[..., None],
                            ) -> Callable[..., None]:
     """
     An option decorator for the Vagrant Box URL to use.
@@ -40,7 +40,7 @@ def vagrant_box_url_option(command: Callable[..., None]
     return function
 
 
-def vagrant_box_version_option(command: Callable[..., None]
+def vagrant_box_version_option(command: Callable[..., None],
                                ) -> Callable[..., None]:
     """
     An option decorator for the Vagrant Box version to use.
