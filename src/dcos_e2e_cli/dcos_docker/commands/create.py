@@ -14,7 +14,7 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Transport
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
@@ -74,7 +74,7 @@ from .wait import wait
 
 
 @click.command('create', help=CREATE_HELP)
-@installer_argument
+@installer_path_argument
 @docker_version_option
 @linux_distribution_option
 @docker_storage_driver_option

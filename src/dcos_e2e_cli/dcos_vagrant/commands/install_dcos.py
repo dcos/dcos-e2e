@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 
 from dcos_e2e.backends import Vagrant
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
@@ -36,7 +36,7 @@ from .wait import wait
 
 
 @click.command('install')
-@installer_argument
+@installer_path_argument
 @extra_config_option
 @workspace_dir_option
 @variant_option

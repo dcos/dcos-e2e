@@ -11,6 +11,7 @@ import click
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
+from dcos_e2e_cli.common.arguments import installer_url_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
@@ -67,10 +68,7 @@ from .wait import wait
 
 
 @click.command('create', help=CREATE_HELP)
-@click.argument(
-    'installer_url',
-    type=str,
-)
+@installer_url_argument
 @custom_tag_option
 @variant_option
 @wait_for_dcos_option

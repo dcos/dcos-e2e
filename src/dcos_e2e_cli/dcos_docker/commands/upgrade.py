@@ -9,7 +9,7 @@ import click
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.node import Transport
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import run_post_install_steps
@@ -40,7 +40,7 @@ from .wait import wait
 @extra_config_option
 @variant_option
 @node_transport_option
-@installer_argument
+@installer_path_argument
 @workspace_dir_option
 @security_mode_option
 @wait_for_dcos_option

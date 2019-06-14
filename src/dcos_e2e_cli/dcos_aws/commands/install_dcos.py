@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 
 from dcos_e2e.backends import AWS
+from dcos_e2e_cli.common.arguments import installer_url_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
@@ -36,7 +37,7 @@ from .wait import wait
 
 
 @click.command('install')
-@click.argument('installer_url', type=str)
+@installer_url_argument
 @variant_option
 @wait_for_dcos_option
 @extra_config_option

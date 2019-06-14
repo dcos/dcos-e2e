@@ -9,7 +9,7 @@ import click
 
 from dcos_e2e.backends import Docker
 from dcos_e2e.node import Transport
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
@@ -38,7 +38,7 @@ from .wait import wait
 
 @click.command('install')
 @genconf_dir_option
-@installer_argument
+@installer_path_argument
 @existing_cluster_id_option
 @extra_config_option
 @security_mode_option
