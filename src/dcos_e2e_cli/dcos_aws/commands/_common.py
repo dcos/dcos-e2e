@@ -12,8 +12,8 @@ from dcos_e2e.backends import AWS
 from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
-from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 from dcos_e2e_cli._vendor.dcos_launch import config, get_launcher
+from dcos_e2e_cli.common.base_classes import ClusterRepresentation
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
@@ -271,13 +271,11 @@ class ClusterInstances(ClusterRepresentation):
         stack_id = stack.stack_id
         # import pdb; pdb.set_trace()
         validated_launch_config['stack_id'] = stack_id
-        launcher = get_launcher(
-            config=validated_launch_config,
-        )
+        launcher = get_launcher(config=validated_launch_config, )
         temp_resources = {}
         temp_resources.update(launcher.key_helper())
         temp_resources.update(launcher.zen_helper())
         validated_launch_config['temp_resources'] = temp_resources
         launcher.delete()
-        import pdb; pdb.set_trace()
-        pass
+        import pdb
+        pdb.set_trace()

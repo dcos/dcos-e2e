@@ -7,6 +7,7 @@ Options:
 
 Commands:
   create     Create a DC/OS cluster.
+  destroy    Destroy a cluster.
   doctor     Diagnose common issues which stop this CLI from working...
   inspect    Show cluster details.
   install    Install DC/OS on a provisioned AWS cluster.
