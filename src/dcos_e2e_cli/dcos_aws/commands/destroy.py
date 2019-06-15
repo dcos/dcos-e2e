@@ -29,6 +29,7 @@ def destroy_cluster(
     Args:
         cluster_id: The ID of the cluster.
         enable_spinner: Whether to enable the spinner animation.
+        aws_region: The region the cluster is in.
     """
     with Halo(enabled=enable_spinner):
         check_cluster_id_exists(
