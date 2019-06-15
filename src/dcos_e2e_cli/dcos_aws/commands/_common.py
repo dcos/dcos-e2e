@@ -56,7 +56,8 @@ def existing_cluster_ids(aws_region: str) -> Set[str]:
     """
     ec2 = boto3.resource('ec2', region_name=aws_region)
     ec2_filter = {'Name': 'tag:' + CLUSTER_ID_TAG_KEY, 'Values': ['*']}
-    ec2_instances = ec2.instances.filter(Filters=[ec2_filter])
+    state_filter = {'Name': 'instance-state-name', 'Values': ['running']}
+    ec2_instances = ec2.instances.filter(Filters=[ec2_filter, state_filter])
 
     cluster_ids = set()  # type: Set[str]
     for instance in ec2_instances:
@@ -98,10 +99,7 @@ class ClusterInstances(ClusterRepresentation):
             'Name': 'tag:' + NODE_TYPE_TAG_KEY,
             'Values': [node_types[role]],
         }
-        state_filter = {
-            'Name': 'instance-state-name',
-            'Values': ['running'],
-        }
+        state_filter = {'Name': 'instance-state-name', 'Values': ['running']}
         filters = [cluster_id_tag_filter, node_role_filter, state_filter]
         ec2_instances = set(ec2.instances.filter(Filters=filters))
         return ec2_instances
