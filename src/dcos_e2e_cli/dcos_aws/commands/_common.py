@@ -13,6 +13,7 @@ from dcos_e2e.cluster import Cluster
 from dcos_e2e.distributions import Distribution
 from dcos_e2e.node import Node, Role
 from dcos_e2e_cli.common.base_classes import ClusterRepresentation
+from dcos_e2e_cli._vendor.dcos_launch import config, get_launcher
 
 CLUSTER_ID_TAG_KEY = 'dcos_e2e.cluster_id'
 KEY_NAME_TAG_KEY = 'dcos_e2e.key_name'
@@ -224,11 +225,6 @@ class ClusterInstances(ClusterRepresentation):
         This is not yet implemented, see:
         https://jira.mesosphere.com/browse/DCOS_OSS-5042
         """
-        import boto3
-        from dcos_e2e._vendor.dcos_launch import (
-            config,
-            get_launcher,
-        )
         cfr = boto3.resource('cloudformation', region_name='us-west-2')
         aws_distros = {
             Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
