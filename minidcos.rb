@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.10.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.15.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -68,13 +68,13 @@ class Minidcos < Formula
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/6f/5a/0cfdef6f69a32287f11d92fa6054c49b2c98e0e4412a0a9181544d0fd7ef/boto3-1.9.123.tar.gz"
-    sha256 "2e527686a72ff5fed8275e897df63fadbdca6d4d47f651d898dee89ba9b9eb4d"
+    url "https://files.pythonhosted.org/packages/d5/44/43b3e08cdd01a72ffd38c1da9176ad72d69ba5dc2ee1e900faf7437ab288/boto3-1.9.167.tar.gz"
+    sha256 "60bbb64ca5ff05ec3aecca582e33b516e774c739fa9e9591c1e3db512e81bc49"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/c1/88/8811cf71a9a45c1ba4c54e8bccb5c863b905e6765af40354b441b62fb2f6/botocore-1.12.123.tar.gz"
-    sha256 "7982ab3b3da1f7f2f23f0a12fbd34fe8efc514b53bbe61b536a61884a51db25c"
+    url "https://files.pythonhosted.org/packages/5d/fe/908eb433da20377860ced579c3027b7543596b456f809228c229fc8b0381/botocore-1.12.167.tar.gz"
+    sha256 "d3424b05a13ac38efe225a2f75a72d3f949513980f737001ae9279edd81b1b31"
   end
 
   resource "cachetools" do
@@ -83,8 +83,8 @@ class Minidcos < Formula
   end
 
   resource "Cerberus" do
-    url "https://files.pythonhosted.org/packages/90/31/e30784a1f9a4b46875cfed1c9f806c188e2181e7ba3b568e81e7b0bc5718/Cerberus-1.2.tar.gz"
-    sha256 "f5c2e048fb15ecb3c088d192164316093fcfa602a74b3386eefb2983aa7e800a"
+    url "https://files.pythonhosted.org/packages/c9/0e/f78e23b778c2234972d364d0f8bea2de0a09f450f65d3f05ce091dd0f104/Cerberus-1.3.1.tar.gz"
+    sha256 "0be48fc0dc84f83202a5309c0aa17cd5393e70731a1698a50d118b762fbe6875"
   end
 
   resource "certifi" do
@@ -108,8 +108,8 @@ class Minidcos < Formula
   end
 
   resource "click-pathlib" do
-    url "https://files.pythonhosted.org/packages/c8/8c/cafb4eef88aee325a9e12f9f51be3a203629cc907ab27ac283a52f9eab44/click-pathlib-2019.4.30.2.tar.gz"
-    sha256 "a7e82cee61d103f46f588fc9c0421617fe760dc081c2a62f6f8822b1e4a9d8b9"
+    url "https://files.pythonhosted.org/packages/2c/14/6e4a9e9efc10ff0e8566c6f05b5c166c59fb13873bf25e76422a83c45fba/click-pathlib-2019.6.13.1.tar.gz"
+    sha256 "a62babe7a52c34d00f64cc199442cebf68ccc067443e93a22e5ca3ee99785e6b"
   end
 
   resource "colorama" do
@@ -118,8 +118,8 @@ class Minidcos < Formula
   end
 
   resource "cryptography" do
-    url "https://files.pythonhosted.org/packages/07/ca/bc827c5e55918ad223d59d299fff92f3563476c3b00d0a9157d9c0217449/cryptography-2.6.1.tar.gz"
-    sha256 "26c821cbeb683facb966045e2064303029d572a87ee69ca5a1bf54bf55f93ca6"
+    url "https://files.pythonhosted.org/packages/c2/95/f43d02315f4ec074219c6e3124a87eba1d2d12196c2767fadfdc07a83884/cryptography-2.7.tar.gz"
+    sha256 "e6347742ac8f35ded4a46ff835c60e68c22a536a8ae5c4422966d06946b6d4c6"
   end
 
   resource "cursor" do
@@ -133,13 +133,8 @@ class Minidcos < Formula
   end
 
   resource "docker" do
-    url "https://files.pythonhosted.org/packages/4b/79/4206ea568bd0d134cd7cb6022dd60bea06ffdb8b5564288ca428fd3aeb0d/docker-3.7.2.tar.gz"
-    sha256 "c456ded5420af5860441219ff8e51cdec531d65f4a9e948ccd4133e063b72f50"
-  end
-
-  resource "docker-pycreds" do
-    url "https://files.pythonhosted.org/packages/c5/e6/d1f6c00b7221e2d7c4b470132c931325c8b22c51ca62417e300f5ce16009/docker-pycreds-0.4.0.tar.gz"
-    sha256 "6ce3270bcaf404cc4c3e27e4b6c70d3521deae82fb508767870fdbf772d584d4"
+    url "https://files.pythonhosted.org/packages/1b/c4/ec26a9c1245e96adc29f08bd67c8e17ef6c2b880b75c437b6ff10a58bd72/docker-4.0.1.tar.gz"
+    sha256 "f61c37d721b489b7d55ef631b241be2d6a5884c3ffe63dc8f7dd9a3c3cd60489"
   end
 
   resource "docopt" do
@@ -158,8 +153,8 @@ class Minidcos < Formula
   end
 
   resource "google-api-python-client" do
-    url "https://files.pythonhosted.org/packages/7a/84/ffde3c95d4162cdc8bae710fecc6873cccb05ac33afc3b2c925c74cc0150/google-api-python-client-1.7.8.tar.gz"
-    sha256 "06907006ed5ce831018f03af3852d739c0b2489cdacfda6971bcc2075c762858"
+    url "https://files.pythonhosted.org/packages/5b/ba/c4e47e2fdd945145ddb10db06dd29af19b01f6e6d7452348b9bf10375ee9/google-api-python-client-1.7.9.tar.gz"
+    sha256 "048da0d68564380ee23b449e5a67d4666af1b3b536d2fb0a02cee1ad540fa5ec"
   end
 
   resource "google-auth" do
@@ -173,8 +168,8 @@ class Minidcos < Formula
   end
 
   resource "halo" do
-    url "https://files.pythonhosted.org/packages/09/80/68a00ee9ec15e50e25b208850ae0efa62b7302ac0bf87c82d1a870e70a85/halo-0.0.25.tar.gz"
-    sha256 "b26cc94d8999dbaf6354bea9a5b1b32d691ad3abe92b368757de44a1180d43eb"
+    url "https://files.pythonhosted.org/packages/a7/23/3961d7ecabcd56412716b22faf3963b6d9aed137a6995dd625869043eff1/halo-0.0.26.tar.gz"
+    sha256 "73c3f168a03f854ae4fabcc1d3bb69bbc41110e8abb91eb42390fc9876901a9e"
   end
 
   resource "httplib2" do
@@ -188,8 +183,8 @@ class Minidcos < Formula
   end
 
   resource "importlib-metadata" do
-    url "https://files.pythonhosted.org/packages/0e/e0/9b28879fb8e2b7062279ef50b489a9e3b49d850df068d90571a4881905ee/importlib_metadata-0.17.tar.gz"
-    sha256 "a9f185022cfa69e9ca5f7eabfd5a58b689894cb78a11e3c8c89398a8ccbb8e7f"
+    url "https://files.pythonhosted.org/packages/fd/5c/9caf9fe3d92afc3c0296c97b0fd72cacfcaf20e8b2c42306840914e052fa/importlib_metadata-0.18.tar.gz"
+    sha256 "cb6ee23b46173539939964df59d3d72c3e0c1b5d54b84f1d8a7e912fe43612db"
   end
 
   resource "isodate" do
@@ -228,8 +223,8 @@ class Minidcos < Formula
   end
 
   resource "msrest" do
-    url "https://files.pythonhosted.org/packages/0b/ec/437da5296f540830eb7fe0d0d06e4f3f4d97b82ef369b637dec76bf20f3e/msrest-0.6.6.tar.gz"
-    sha256 "947e9155fb55bda98340e99c15e4115a268ff69aee0007aaa54b7bf05018029b"
+    url "https://files.pythonhosted.org/packages/b5/81/d8db26695224ef4fd60d167a8b4d52257efa2a79f8135247a6768f620c58/msrest-0.6.7.tar.gz"
+    sha256 "05538c68251eb0c81bd2010524d8ff36d4266ec0669338fbdcecfd23c733231c"
   end
 
   resource "msrestazure" do
@@ -245,6 +240,11 @@ class Minidcos < Formula
   resource "oauthlib" do
     url "https://files.pythonhosted.org/packages/ec/90/882f43232719f2ebfbdbe8b7c57fc9642a25b3df30cb70a3701ea22622de/oauthlib-3.0.1.tar.gz"
     sha256 "0ce32c5d989a1827e3f1148f98b9085ed2370fc939bf524c9c851d8714797298"
+  end
+
+  resource "packaging" do
+    url "https://files.pythonhosted.org/packages/16/51/d72654dbbaa4a4ffbf7cb0ecd7d12222979e0a660bf3f42acc47550bf098/packaging-19.0.tar.gz"
+    sha256 "0c98a5d0be38ed775798ece1b9727178c4469d9c3b4ada66e8e6b7849f8732af"
   end
 
   resource "paramiko" do
@@ -292,9 +292,14 @@ class Minidcos < Formula
     sha256 "0c6100edd16fefd1557da078c7a31e7b7d7a52ce39fdca2bec29d4f7b6e7600c"
   end
 
+  resource "pyparsing" do
+    url "https://files.pythonhosted.org/packages/5d/3a/24d275393f493004aeb15a1beae2b4a3043526e8b692b65b4a9341450ebe/pyparsing-2.4.0.tar.gz"
+    sha256 "1873c03321fc118f4e9746baf201ff990ceb915f433f23b395f5580d1840cb2a"
+  end
+
   resource "pytest" do
-    url "https://files.pythonhosted.org/packages/c9/ff/e353dff7987c3a6ccb0cecb1c148c7b276c235f80f7017d181d19e2b4710/pytest-4.3.1.tar.gz"
-    sha256 "592eaa2c33fae68c7d75aacf042efc9f77b27c08a6224a4f59beab8d9a420523"
+    url "https://files.pythonhosted.org/packages/80/0f/6e9c66f70c16dff5b31a1493fea55ecd5b8fc138fe6a21c21365c33b5d62/pytest-4.6.3.tar.gz"
+    sha256 "4a784f1d4f2ef198fe9b7aef793e9fa1a3b2f84e822d9b3a64a181293a572d45"
   end
 
   resource "python-dateutil" do
@@ -308,13 +313,13 @@ class Minidcos < Formula
   end
 
   resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/9f/2c/9417b5c774792634834e730932745bc09a7d36754ca00acf1ccd1ac2594d/PyYAML-5.1.tar.gz"
-    sha256 "436bc774ecf7c103814098159fbb84c2715d25980175292c648f2da143909f95"
+    url "https://files.pythonhosted.org/packages/a3/65/837fefac7475963d1eccf4aa684c23b95aa6c1d033a2c5965ccb11e22623/PyYAML-5.1.1.tar.gz"
+    sha256 "b4bb4d3f5e232425e25dda21c070ce05168a786ac9eda43768ab7f3ac2770955"
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/52/2c/514e4ac25da2b08ca5a464c50463682126385c4272c18193876e91f4bc38/requests-2.21.0.tar.gz"
-    sha256 "502a824f31acdacb3a35b6690b5fbf0bc41d63a24a45c4004352b0242707598e"
+    url "https://files.pythonhosted.org/packages/01/62/ddcf76d1d19885e8579acb1b1df26a852b03472c0e46d2b959a714c90608/requests-2.22.0.tar.gz"
+    sha256 "11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4"
   end
 
   resource "requests-oauthlib" do
@@ -378,8 +383,8 @@ class Minidcos < Formula
   end
 
   resource "tqdm" do
-    url "https://files.pythonhosted.org/packages/80/9b/f3036a9a11c250eb51d38acf94d1d7c33a0d4da8a8931bfdf15e12d505b1/tqdm-4.31.1.tar.gz"
-    sha256 "e22977e3ebe961f72362f6ddfb9197cc531c9737aaf5f607ef09740c849ecd05"
+    url "https://files.pythonhosted.org/packages/36/64/071ce46cbb8cd02e5fa88cc6abf31e51724db858a5ffb3f56dc1c6311f3a/tqdm-4.32.1.tar.gz"
+    sha256 "0a860bf2683fdbb4812fe539a6c22ea3f1777843ea985cb8c3807db448a0f7ab"
   end
 
   resource "uritemplate" do
@@ -388,8 +393,13 @@ class Minidcos < Formula
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/fd/fa/b21f4f03176463a6cccdb612a5ff71b927e5224e83483012747c12fc5d62/urllib3-1.24.2.tar.gz"
-    sha256 "9a247273df709c4fedb38c711e44292304f73f39ab01beda9f6b9fc375669ac3"
+    url "https://files.pythonhosted.org/packages/4c/13/2386233f7ee40aa8444b47f7463338f3cbdf00c316627558784e3f542f07/urllib3-1.25.3.tar.gz"
+    sha256 "dbe59173209418ae49d485b87d1681aefa36252ee85884c31346debd19463232"
+  end
+
+  resource "wcwidth" do
+    url "https://files.pythonhosted.org/packages/55/11/e4a2bb08bb450fdbd42cc709dd40de4ed2c472cf0ccb9e64af22279c5495/wcwidth-0.1.7.tar.gz"
+    sha256 "3df37372226d6e63e1b1e1eda15c594bca98a22d33a23832a90998faa96bc65e"
   end
 
   resource "websocket_client" do
