@@ -260,12 +260,16 @@ class ClusterInstances(ClusterRepresentation):
         filtered_stacks = stack_filter.all()
         [stack] = list(filtered_stacks)
         stack_id = stack.stack_id
+        launcher = get_launcher(  # type: ignore
+            config=validated_launch_config,
+        )
         # This matches what happens in
         # ``dcos_launch.aws.DcosCloudformationLauncher.create``.
-        launcher = get_launcher(config=validated_launch_config)
         launcher.config['stack_id'] = stack_id
-        temp_resources = {}
-        temp_resources.update(launcher.key_helper())
-        temp_resources.update(launcher.zen_helper())
-        launcher.config['temp_resources'] = temp_resources
+        key_helper_details = launcher.key_helper()  #
+        zen_helper_details = launcher.zen_helper()
+        launcher.config['temp_resources'] = {
+            **key_helper_details,
+            **zen_helper_details,
+        }
         launcher.delete()
