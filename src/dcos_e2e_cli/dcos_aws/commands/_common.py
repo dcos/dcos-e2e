@@ -224,12 +224,6 @@ class ClusterInstances(ClusterRepresentation):
         """
         Destroy this cluster.
         """
-        cfr = boto3.resource('cloudformation', region_name='us-west-2')
-        aws_distros = {
-            Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
-            Distribution.COREOS: 'coreos',
-            Distribution.RHEL_7: 'rhel-7-dcos-prereqs',
-        }
         backend = AWS()
         deployment_name = self._cluster_id
         masters = len(self.masters)
@@ -249,11 +243,8 @@ class ClusterInstances(ClusterRepresentation):
             'num_masters': masters,
             'num_private_agents': agents,
             'num_public_agents': public_agents,
-            # 'os_name': aws_distros[backend.linux_distribution],
             'platform': 'aws',
             'provider': 'onprem',
-            # 'install_prereqs': True,
-            # 'prereqs_script_filename': 'centos',
         }
 
         launch_config['dcos_config'] = backend.base_config
@@ -271,11 +262,10 @@ class ClusterInstances(ClusterRepresentation):
         stack_id = stack.stack_id
         # This matches what happens in
         # ``dcos_launch.aws.DcosCloudformationLauncher.create``.
-        validated_launch_config['stack_id'] = stack_id
+        launcher = get_launcher(config=validated_launch_config)
+        launcher.config['stack_id'] = stack_id
         temp_resources = {}
         temp_resources.update(launcher.key_helper())
         temp_resources.update(launcher.zen_helper())
-        validated_launch_config['temp_resources'] = temp_resources
-        launcher = get_launcher(config=validated_launch_config)
-        # launcher.delete()
-        import pdb; pdb.set_trace()
+        launcher.config['temp_resources'] = temp_resources
+        launcher.delete()

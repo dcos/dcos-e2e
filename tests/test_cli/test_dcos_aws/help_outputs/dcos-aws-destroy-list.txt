@@ -1,14 +1,14 @@
-Usage: minidcos aws destroy [OPTIONS]
+Usage: minidcos aws destroy-list [OPTIONS] [CLUSTER_IDS]...
 
-  Destroy a cluster.
+  Destroy clusters.
+
+  To destroy all clusters, run ``minidcos aws destroy $(minidcos aws list)``.
 
 Options:
+  --aws-region TEXT               The AWS region to use.  [default: us-west-2]
   --enable-spinner / --no-enable-spinner
                                   Whether to show a spinner animation. This
                                   defaults to true if stdout is a TTY.
-  --aws-region TEXT               The AWS region to use.  [default: us-west-2]
   -v, --verbose                   Use verbose output. Use this option multiple
                                   times for more verbose output.
-  -c, --cluster-id TEXT           The ID of the cluster to use.  [default:
-                                  default]
   -h, --help                      Show this message and exit.
