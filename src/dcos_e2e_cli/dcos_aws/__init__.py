@@ -5,8 +5,7 @@ A CLI for controlling DC/OS clusters on AWS.
 import click
 
 from .commands.create import create
-from .commands.destroy import destroy
-from .commands.destroy import destroy_list
+from .commands.destroy import destroy, destroy_list
 from .commands.doctor import doctor
 from .commands.inspect_cluster import inspect_cluster
 from .commands.install_dcos import install_dcos

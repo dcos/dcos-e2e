@@ -6,7 +6,7 @@ Changelog
 Next
 ----
 
-* Add ``minidcos aws destroy`` commands.
+* Add ``minidcos aws destroy`` and ``minidcos aws destroy-list`` commands.
 
 2019.06.10.0
 ------------
