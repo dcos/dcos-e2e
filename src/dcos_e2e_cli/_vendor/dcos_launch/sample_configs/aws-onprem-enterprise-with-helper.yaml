@@ -1,0 +1,24 @@
+---
+launch_config_version: 1
+deployment_name: dcos-onprem-with-new-stack
+installer_url: https://downloads.mesosphere.com/dcos-enterprise/testing/master/dcos_generate_config.ee.sh
+platform: aws
+provider: onprem
+aws_region: us-west-2
+os_name: cent-os-7-dcos-prereqs
+instance_type: m4.xlarge
+bootstrap_instance_type: m4.xlarge
+dcos_config:
+  cluster_name: My Awesome DC/OS
+  resolvers:
+    - 8.8.4.4
+    - 8.8.8.8
+  dns_search: mesos
+  master_discovery: static
+  exhibitor_storage_backend: static
+num_masters: 1
+num_private_agents: 1
+num_public_agents: 1
+ssh_user: centos
+key_helper: true
+dcos_version: 1.12
