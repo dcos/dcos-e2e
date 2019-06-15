@@ -221,9 +221,6 @@ class ClusterInstances(ClusterRepresentation):
     def destroy(self) -> None:
         """
         Destroy this cluster.
-
-        This is not yet implemented, see:
-        https://jira.mesosphere.com/browse/DCOS_OSS-5042
         """
         cfr = boto3.resource('cloudformation', region_name='us-west-2')
         aws_distros = {
