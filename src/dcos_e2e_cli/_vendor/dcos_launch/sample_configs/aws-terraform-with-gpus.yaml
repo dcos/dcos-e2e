@@ -1,0 +1,18 @@
+---
+launch_config_version: 1
+platform: aws
+provider: terraform
+dcos-enterprise: False
+key_helper: true
+terraform_config:
+  # for more fields, see https://github.com/dcos/terraform-dcos/tree/master/aws
+  owner: "infinity"
+  num_of_masters: 1
+  num_of_private_agents: 2
+  num_of_public_agents: 1
+  num_of_gpu_agents: 1
+  aws_gpu_agent_instance_type: g2.2xlarge
+  aws_gpu_ami: ami-9b5d97fb
+  aws_region: us-west-2
+  # You can find your available aws profiles by running "maws ls". Write your credentials for a profile by running "eval $(maws li <chosen aws profile>)"
+  aws_profile: your_aws_profile
