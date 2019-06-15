@@ -54,9 +54,6 @@ def cluster_install_dcos(
     # installation method than a ``Cluster.from_nodes``.
     # However, if the cluster is a ``Cluster.from_nodes``, ``destroy`` will not
     # work and therefore we use ``cluster_representation.destroy`` instead.
-    #
-    # We do not always use ``cluster_representation.destroy`` because the AWS
-    # backend does not support this.
     try:
         cluster.install_dcos(
             dcos_installer=dcos_installer,
@@ -73,10 +70,7 @@ def cluster_install_dcos(
         stderr = exc.stderr.decode()
         click.echo(click.style(textwrap.indent(stderr, '  '), fg='red'))
         click.echo(doctor_message)
-        try:
-            cluster.destroy()
-        except NotImplementedError:
-            cluster_representation.destroy()
+        cluster_representation.destroy()
         sys.exit(exc.returncode)
 
     spinner.succeed()
