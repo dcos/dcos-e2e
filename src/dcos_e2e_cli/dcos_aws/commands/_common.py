@@ -98,7 +98,11 @@ class ClusterInstances(ClusterRepresentation):
             'Name': 'tag:' + NODE_TYPE_TAG_KEY,
             'Values': [node_types[role]],
         }
-        filters = [cluster_id_tag_filter, node_role_filter]
+        state_filter = {
+            'Name': 'instance-state-name',
+            'Values': ['running'],
+        }
+        filters = [cluster_id_tag_filter, node_role_filter, state_filter]
         ec2_instances = set(ec2.instances.filter(Filters=filters))
         return ec2_instances
 
@@ -241,8 +245,8 @@ class ClusterInstances(ClusterRepresentation):
             'admin_location': backend.admin_location,
             'aws_region': self._aws_region,
             'deployment_name': deployment_name,
-            # supply a valid url to the preliminary config.
-            # this is replaced later before the dc/os installation.
+            # Supply a valid URL to the preliminary config.
+            # This is replaced later before the DC/OS installation.
             'installer_url': 'https://example.com',
             'instance_type': aws_instance_type,
             'launch_config_version': 1,
@@ -261,14 +265,14 @@ class ClusterInstances(ClusterRepresentation):
             user_config=launch_config,
             config_dir=str(self._workspace_dir),
         )
-        cfr = boto3.resource('cloudformation', region_name='us-west-2')
+        cfr = boto3.resource('cloudformation', region_name=self._aws_region)
         # import pdb; pdb.set_trace()
         filtered_stacks = cfr.stacks.filter(StackName=self._cluster_id).all()
         [stack] = list(filtered_stacks)
         stack_id = stack.stack_id
         # import pdb; pdb.set_trace()
         validated_launch_config['stack_id'] = stack_id
-        launcher = get_launcher(config=validated_launch_config, )
+        launcher = get_launcher(config=validated_launch_config)
         temp_resources = {}
         temp_resources.update(launcher.key_helper())
         temp_resources.update(launcher.zen_helper())
