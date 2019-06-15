@@ -238,26 +238,24 @@ class ClusterInstances(ClusterRepresentation):
         agents = len(self.agents)
         public_agents = len(self.public_agents)
 
-        # Maybe not right
+        # We need this to be set but not necessarily correct.
         aws_instance_type = backend.aws_instance_type
 
         launch_config = {
             'admin_location': backend.admin_location,
             'aws_region': self._aws_region,
             'deployment_name': deployment_name,
-            # Supply a valid URL to the preliminary config.
-            # This is replaced later before the DC/OS installation.
             'installer_url': 'https://example.com',
             'instance_type': aws_instance_type,
             'launch_config_version': 1,
             'num_masters': masters,
             'num_private_agents': agents,
             'num_public_agents': public_agents,
-            'os_name': aws_distros[backend.linux_distribution],
+            # 'os_name': aws_distros[backend.linux_distribution],
             'platform': 'aws',
             'provider': 'onprem',
-            'install_prereqs': True,
-            'prereqs_script_filename': 'centos',
+            # 'install_prereqs': True,
+            # 'prereqs_script_filename': 'centos',
         }
 
         launch_config['dcos_config'] = backend.base_config
@@ -273,7 +271,6 @@ class ClusterInstances(ClusterRepresentation):
         filtered_stacks = stack_filter.all()
         [stack] = list(filtered_stacks)
         stack_id = stack.stack_id
-        launcher = get_launcher(config=validated_launch_config)
         # This matches what happens in
         # ``dcos_launch.aws.DcosCloudformationLauncher.create``.
         validated_launch_config['stack_id'] = stack_id
@@ -281,5 +278,6 @@ class ClusterInstances(ClusterRepresentation):
         temp_resources.update(launcher.key_helper())
         temp_resources.update(launcher.zen_helper())
         validated_launch_config['temp_resources'] = temp_resources
-        launcher.delete()
+        launcher = get_launcher(config=validated_launch_config)
+        # launcher.delete()
         import pdb; pdb.set_trace()
