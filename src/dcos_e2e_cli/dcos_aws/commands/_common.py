@@ -265,18 +265,21 @@ class ClusterInstances(ClusterRepresentation):
             user_config=launch_config,
             config_dir=str(self._workspace_dir),
         )
-        cfr = boto3.resource('cloudformation', region_name=self._aws_region)
-        # import pdb; pdb.set_trace()
-        filtered_stacks = cfr.stacks.filter(StackName=self._cluster_id).all()
+        cloudformation = boto3.resource(
+            'cloudformation',
+            region_name=self._aws_region,
+        )
+        stack_filter = cloudformation.stacks.filter(StackName=self._cluster_id)
+        filtered_stacks = stack_filter.all()
         [stack] = list(filtered_stacks)
         stack_id = stack.stack_id
-        # import pdb; pdb.set_trace()
-        validated_launch_config['stack_id'] = stack_id
         launcher = get_launcher(config=validated_launch_config)
+        # This matches what happens in
+        # ``dcos_launch.aws.DcosCloudformationLauncher.create``.
+        validated_launch_config['stack_id'] = stack_id
         temp_resources = {}
         temp_resources.update(launcher.key_helper())
         temp_resources.update(launcher.zen_helper())
         validated_launch_config['temp_resources'] = temp_resources
         launcher.delete()
-        import pdb
-        pdb.set_trace()
+        import pdb; pdb.set_trace()
