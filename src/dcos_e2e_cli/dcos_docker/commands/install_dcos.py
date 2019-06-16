@@ -110,7 +110,7 @@ def install_dcos(
         ip_detect_path=ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        files_to_copy_to_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         enable_spinner=enable_spinner,
     )
 

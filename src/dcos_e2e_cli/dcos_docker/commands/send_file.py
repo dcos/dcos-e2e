@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Tuple
 
 import click
+import click_pathlib
 
 from dcos_e2e.node import Transport
 from dcos_e2e_cli.common.nodes import get_nodes
@@ -26,16 +27,16 @@ from .inspect_cluster import inspect_cluster
 @node_transport_option
 @node_option
 @verbosity_option
-@click.argument('source', type=click.Path(exists=True))
-@click.argument('destination')
+@click.argument('source', type=click_pathlib.Path(exists=True))
+@click.argument('destination', type=click_pathlib.Path())
 @click.pass_context
 def send_file(
     ctx: click.core.Context,
     cluster_id: str,
     node: Tuple[str],
     transport: Transport,
-    source: str,
-    destination: str,
+    source: Path,
+    destination: Path,
 ) -> None:
     """
     Send a file to a node or multiple nodes.
@@ -64,8 +65,8 @@ def send_file(
 
     for host in hosts:
         host.send_file(
-            local_path=Path(source),
-            remote_path=Path(destination),
+            local_path=source,
+            remote_path=destination,
             transport=transport,
             sudo=False,
         )

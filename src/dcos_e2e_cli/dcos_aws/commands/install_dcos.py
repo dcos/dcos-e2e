@@ -106,7 +106,7 @@ def install_dcos(
         dcos_config=dcos_config,
         dcos_installer=installer_url,
         doctor_message=doctor_message,
-        files_to_copy_to_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         ip_detect_path=cluster_backend.ip_detect_path,
         enable_spinner=enable_spinner,
     )
