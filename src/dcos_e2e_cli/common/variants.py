@@ -90,9 +90,6 @@ def get_cluster_variant(cluster: Cluster) -> Optional[DCOSVariant]:
     """
     master = next(iter(cluster.masters))
     try:
-        variant = master.dcos_build_info().variant
-        variant_retrieved = True
+        return master.dcos_build_info().variant
     except DCOSNotInstalledError:
-        variant_retrieved = False
-
-    return variant if variant_retrieved else None
+        return None
