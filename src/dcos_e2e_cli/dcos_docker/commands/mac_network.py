@@ -9,10 +9,10 @@ from io import BytesIO
 from pathlib import Path
 from shutil import copy, copytree, rmtree
 from tempfile import TemporaryDirectory
-from typing import Any  # noqa: F401
 from typing import Union
 
 import click
+import click_pathlib
 import docker
 from halo import Halo
 
@@ -30,14 +30,14 @@ _OPENVPN_CONTAINER_NAME = 'vpn-openvpn'
 def _validate_ovpn_file_does_not_exist(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
+    value: Path,
 ) -> Path:
     """
     If the given file path exists already, show an error message explaining how
     to use the file as an OpenVPN configuration.
     """
     force = bool('force' in ctx.params)
-    path = Path(value).expanduser()
+    path = value.expanduser()
     if path.is_dir():
         path = path / 'docker-for-mac.ovpn'
 
@@ -189,7 +189,7 @@ def _destroy_mac_network_containers(enable_spinner: bool) -> None:
 @click.command('setup-mac-network')
 @click.option(
     '--configuration-dst',
-    type=click.Path(exists=False),
+    type=click_pathlib.Path(exists=False),
     default='~/Documents/docker-for-mac.ovpn',
     callback=_validate_ovpn_file_does_not_exist,
     show_default=True,

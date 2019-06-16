@@ -115,7 +115,7 @@ def create(
     license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     workspace_dir: Path,
     custom_volume: List[Mount],
     custom_master_volume: List[Mount],
@@ -230,7 +230,7 @@ def create(
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        files_to_copy_to_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         enable_spinner=enable_spinner,
     )
 

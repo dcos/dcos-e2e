@@ -57,7 +57,7 @@ def upgrade(
     installer: Path,
     wait_for_dcos: bool,
     enable_spinner: bool,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
 ) -> None:
     """
     Upgrade a cluster to a given version of DC/OS.
@@ -95,7 +95,7 @@ def upgrade(
         dcos_config=dcos_config,
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
-        files_to_copy_to_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         enable_spinner=enable_spinner,
     )
 

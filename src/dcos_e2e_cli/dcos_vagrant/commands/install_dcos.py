@@ -57,7 +57,7 @@ def install_dcos(
     license_key: Optional[Path],
     security_mode: Optional[str],
     cluster_id: str,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     wait_for_dcos: bool,
     enable_spinner: bool,
 ) -> None:
@@ -98,7 +98,7 @@ def install_dcos(
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        files_to_copy_to_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         enable_spinner=enable_spinner,
     )
 

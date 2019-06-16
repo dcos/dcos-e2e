@@ -88,7 +88,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     cluster_id: str,
     enable_selinux_enforcing: bool,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     wait_for_dcos: bool,
     vm_memory_mb: int,
     enable_spinner: bool,
@@ -167,7 +167,7 @@ def create(
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        files_to_copy_to_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         enable_spinner=enable_spinner,
     )
 

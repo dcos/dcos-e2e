@@ -53,7 +53,7 @@ from .wait import wait
 def install_dcos(
     ctx: click.core.Context,
     cluster_id: str,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     installer: Path,
     license_key: Optional[Path],
     extra_config: Dict[str, Any],
@@ -110,7 +110,7 @@ def install_dcos(
         ip_detect_path=ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        files_to_copy_to_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
         enable_spinner=enable_spinner,
     )
 
