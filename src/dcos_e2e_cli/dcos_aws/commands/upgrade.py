@@ -59,7 +59,7 @@ def upgrade(
     installer_url: str,
     wait_for_dcos: bool,
     enable_spinner: bool,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
 ) -> None:
     """
     Upgrade a cluster to a given version of DC/OS.

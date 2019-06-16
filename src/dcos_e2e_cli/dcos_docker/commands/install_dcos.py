@@ -53,7 +53,7 @@ from .wait import wait
 def install_dcos(
     ctx: click.core.Context,
     cluster_id: str,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     installer: Path,
     license_key: Optional[Path],
     extra_config: Dict[str, Any],

@@ -115,7 +115,7 @@ def create(
     license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     workspace_dir: Path,
     custom_volume: List[Mount],
     custom_master_volume: List[Mount],

@@ -38,6 +38,7 @@ def genconf_dir_option(command: Callable[..., None]) -> Callable[..., None]:
     """
     click_option_function = click.option(
         '--genconf-dir',
+        'files_to_copy_to_genconf_dir',
         type=click_pathlib.Path(
             exists=True,
             dir_okay=True,

@@ -57,7 +57,7 @@ def install_dcos(
     license_key: Optional[Path],
     security_mode: Optional[str],
     cluster_id: str,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     wait_for_dcos: bool,
     enable_spinner: bool,
 ) -> None:

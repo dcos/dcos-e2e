@@ -106,7 +106,7 @@ def create(
     linux_distribution: str,
     cluster_id: str,
     enable_selinux_enforcing: bool,
-    genconf_dir: List[Tuple[Path, Path]],
+    files_to_copy_to_genconf_dir: List[Tuple[Path, Path]],
     custom_tag: Dict[str, str],
     wait_for_dcos: bool,
     enable_spinner: bool,
