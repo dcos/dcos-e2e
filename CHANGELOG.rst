@@ -8,6 +8,11 @@ Next
 
 * Renamed ``Cluster.run_integration_tests`` to ``Cluster.run_with_test_environment``.
 
+2019.06.15.0
+------------
+
+* Add ``minidcos aws destroy`` and ``minidcos aws destroy-list`` commands.
+
 2019.06.10.0
 ------------
 

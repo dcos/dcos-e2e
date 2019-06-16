@@ -1,0 +1,14 @@
+Usage: minidcos aws destroy [OPTIONS]
+
+  Destroy a cluster.
+
+Options:
+  --enable-spinner / --no-enable-spinner
+                                  Whether to show a spinner animation. This
+                                  defaults to true if stdout is a TTY.
+  --aws-region TEXT               The AWS region to use.  [default: us-west-2]
+  -v, --verbose                   Use verbose output. Use this option multiple
+                                  times for more verbose output.
+  -c, --cluster-id TEXT           The ID of the cluster to use.  [default:
+                                  default]
+  -h, --help                      Show this message and exit.

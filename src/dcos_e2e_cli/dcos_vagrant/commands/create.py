@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import click
 
 from dcos_e2e.backends import Vagrant
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
@@ -22,7 +22,6 @@ from dcos_e2e_cli.common.options import (
     enable_selinux_enforcing_option,
     enable_spinner_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
@@ -33,6 +32,7 @@ from dcos_e2e_cli.common.options.cluster_size import (
     masters_option,
     public_agents_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.utils import check_cluster_id_unique, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
@@ -54,7 +54,7 @@ from .wait import wait
 
 
 @click.command('create', help=CREATE_HELP)
-@installer_argument
+@installer_path_argument
 @masters_option
 @agents_option
 @extra_config_option
@@ -88,7 +88,7 @@ def create(
     copy_to_master: List[Tuple[Path, Path]],
     cluster_id: str,
     enable_selinux_enforcing: bool,
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
     wait_for_dcos: bool,
     vm_memory_mb: int,
     enable_spinner: bool,
@@ -167,7 +167,7 @@ def create(
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
         enable_spinner=enable_spinner,
     )
 

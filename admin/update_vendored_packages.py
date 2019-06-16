@@ -49,15 +49,28 @@ def _get_requirements() -> List[_Requirement]:
         git_reference='693f2a81403b38b2dd77740fc350345ddab9dfcc',
     )
 
-    # We are temporarily using a DC/OS Test Utils branch other than ``master``
-    # while we wait for https://github.com/dcos/dcos-test-utils/pull/91 to be
-    # merged.
     test_utils = _Requirement(
         target_directory=dcos_e2e_target_directory,
         package_name='dcos_test_utils',
         install_directories=['dcos_test_utils', 'pytest_dcos'],
         https_address='https://github.com/dcos/dcos-test-utils',
-        git_reference='29851a0e771537892b8c71031ae11a3b7316f3de',
+        git_reference='810defcc9829221643bbb35c321c25e03ddb8027',
+    )
+
+    dcos_launch_cli = _Requirement(
+        target_directory=dcos_cli_target_directory,
+        package_name='dcos_launch',
+        install_directories=['dcos_launch'],
+        https_address='https://github.com/dcos/dcos-launch',
+        git_reference='693f2a81403b38b2dd77740fc350345ddab9dfcc',
+    )
+
+    test_utils_cli = _Requirement(
+        target_directory=dcos_cli_target_directory,
+        package_name='dcos_test_utils',
+        install_directories=['dcos_test_utils', 'pytest_dcos'],
+        https_address='https://github.com/dcos/dcos-test-utils',
+        git_reference='810defcc9829221643bbb35c321c25e03ddb8027',
     )
 
     vertigo_e2e = _Requirement(
@@ -88,6 +101,8 @@ def _get_requirements() -> List[_Requirement]:
         dcos_installer_tools,
         dcos_launch,
         test_utils,
+        dcos_launch_cli,
+        test_utils_cli,
         vertigo_e2e,
         vertigo_cli,
     ]

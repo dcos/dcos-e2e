@@ -20,6 +20,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
    # Get onto a node
    $ minidcos aws run bash
    [master-0]# exit
+   $ minidcos aws destroy
 
 Each of these and more are described in detail below.
 
@@ -116,7 +117,33 @@ For example, to use :ref:`dcos-aws-cli:run` to run ``bash`` to get on to an arbi
 Destroying Clusters
 -------------------
 
-Destroying clusters is not currently supported.
+There are two commands which can be used to destroy clusters.
+These are :ref:`dcos-aws-cli:destroy` and :ref:`dcos-aws-cli:destroy-list`.
+
+Either destroy a cluster with :ref:`dcos-aws-cli:destroy`:
+
+.. substitution-prompt:: bash $,# auto
+
+   $ minidcos aws destroy
+   default
+   $ minidcos aws destroy --cluster-id pr_4033_strict
+   pr_4033_strict
+
+or use :ref:`dcos-aws-cli:destroy-list` to destroy multiple clusters:
+
+.. substitution-prompt:: bash $,# auto
+
+   $ minidcos aws destroy-list pr_4033_strict pr_4019_permissive
+   pr_4033_strict
+   pr_4019_permissive
+
+To destroy all clusters, run the following command:
+
+.. substitution-prompt:: bash $,# auto
+
+   $ minidcos aws destroy-list $(dcos-aws list)
+   pr_4033_strict
+   pr_4019_permissive
 
 Running Integration Tests
 -------------------------

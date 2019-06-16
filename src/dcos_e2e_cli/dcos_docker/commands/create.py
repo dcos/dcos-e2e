@@ -14,7 +14,7 @@ from dcos_e2e.distributions import Distribution
 from dcos_e2e.docker_storage_drivers import DockerStorageDriver
 from dcos_e2e.docker_versions import DockerVersion
 from dcos_e2e.node import Transport
-from dcos_e2e_cli.common.arguments import installer_argument
+from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.credentials import add_authorized_key
 from dcos_e2e_cli.common.doctor import get_doctor_message
@@ -27,7 +27,6 @@ from dcos_e2e_cli.common.options import (
     copy_to_master_option,
     enable_spinner_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     variant_option,
@@ -38,6 +37,7 @@ from dcos_e2e_cli.common.options.cluster_size import (
     masters_option,
     public_agents_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
@@ -74,7 +74,7 @@ from .wait import wait
 
 
 @click.command('create', help=CREATE_HELP)
-@installer_argument
+@installer_path_argument
 @docker_version_option
 @linux_distribution_option
 @docker_storage_driver_option
@@ -115,7 +115,7 @@ def create(
     license_key: Optional[Path],
     security_mode: Optional[str],
     copy_to_master: List[Tuple[Path, Path]],
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
     workspace_dir: Path,
     custom_volume: List[Mount],
     custom_master_volume: List[Mount],
@@ -230,7 +230,7 @@ def create(
         ip_detect_path=cluster_backend.ip_detect_path,
         doctor_message=doctor_message,
         dcos_installer=installer,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
         enable_spinner=enable_spinner,
     )
 

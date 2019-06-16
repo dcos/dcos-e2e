@@ -11,6 +11,7 @@ import click
 
 from dcos_e2e.backends import AWS
 from dcos_e2e.distributions import Distribution
+from dcos_e2e_cli.common.arguments import installer_url_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
@@ -23,7 +24,6 @@ from dcos_e2e_cli.common.options import (
     enable_selinux_enforcing_option,
     enable_spinner_option,
     extra_config_option,
-    genconf_dir_option,
     license_key_option,
     security_mode_option,
     verbosity_option,
@@ -33,6 +33,7 @@ from dcos_e2e_cli.common.options.cluster_size import (
     masters_option,
     public_agents_option,
 )
+from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
 from dcos_e2e_cli.common.utils import (
     check_cluster_id_unique,
     command_path,
@@ -67,10 +68,7 @@ from .wait import wait
 
 
 @click.command('create', help=CREATE_HELP)
-@click.argument(
-    'installer_url',
-    type=str,
-)
+@installer_url_argument
 @custom_tag_option
 @variant_option
 @wait_for_dcos_option
@@ -108,7 +106,7 @@ def create(
     linux_distribution: str,
     cluster_id: str,
     enable_selinux_enforcing: bool,
-    genconf_dir: Optional[Path],
+    genconf_dir: List[Tuple[Path, Path]],
     custom_tag: Dict[str, str],
     wait_for_dcos: bool,
     enable_spinner: bool,
@@ -180,6 +178,7 @@ def create(
         master_ec2_instance_tags=master_tags,
         agent_ec2_instance_tags=agent_tags,
         public_agent_ec2_instance_tags=public_agent_tags,
+        aws_cloudformation_stack_name=cluster_id,
     )
 
     cluster = create_cluster(
@@ -225,7 +224,7 @@ def create(
         dcos_installer=installer_url,
         doctor_message=doctor_message,
         enable_spinner=enable_spinner,
-        local_genconf_dir=genconf_dir,
+        files_to_copy_to_genconf_dir=genconf_dir,
         ip_detect_path=cluster_backend.ip_detect_path,
     )
 

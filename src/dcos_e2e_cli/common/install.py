@@ -6,7 +6,7 @@ import subprocess
 import sys
 import textwrap
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Iterable, Tuple, Union
 
 import click
 from halo import Halo
@@ -24,7 +24,7 @@ def cluster_install_dcos(
     cluster_representation: ClusterRepresentation,
     ip_detect_path: Path,
     dcos_config: Dict[str, Any],
-    local_genconf_dir: Optional[Path],
+    files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
     dcos_installer: Union[Path, str],
     doctor_message: str,
     enable_spinner: bool,
@@ -36,8 +36,9 @@ def cluster_install_dcos(
         cluster: The cluster to install DC/OS on.
         cluster_representation: A representation of the cluster.
         ip_detect_path: The ``ip-detect`` script to use for installing DC/OS.
-        local_genconf_dir: A directory of files to copy from the host to the
-            installer node before installing DC/OS.
+        files_to_copy_to_genconf_dir: Pairs of host paths to paths on the
+            installer node. These are files to copy from the host to the
+            installer node before upgrading DC/OS.
         dcos_config: The DC/OS configuration to use.
         dcos_installer: The ``Path`` to a local DC/OS installer or a ``str``
             URL pointing to an installer.
@@ -45,14 +46,6 @@ def cluster_install_dcos(
             use if installation fails.
         enable_spinner: Whether to enable the spinner animation.
     """
-    files_to_copy_to_genconf_dir = []
-    if local_genconf_dir is not None:
-        node_genconf_path = Path('/genconf')
-        for genconf_file in local_genconf_dir.glob('*'):
-            genconf_relative = genconf_file.relative_to(local_genconf_dir)
-            relative_path = node_genconf_path / genconf_relative
-            files_to_copy_to_genconf_dir.append((genconf_file, relative_path))
-
     spinner = Halo(enabled=enable_spinner)
     spinner.start('Installing DC/OS')
 
@@ -61,9 +54,6 @@ def cluster_install_dcos(
     # installation method than a ``Cluster.from_nodes``.
     # However, if the cluster is a ``Cluster.from_nodes``, ``destroy`` will not
     # work and therefore we use ``cluster_representation.destroy`` instead.
-    #
-    # We do not always use ``cluster_representation.destroy`` because the AWS
-    # backend does not support this.
     try:
         cluster.install_dcos(
             dcos_installer=dcos_installer,
@@ -80,10 +70,7 @@ def cluster_install_dcos(
         stderr = exc.stderr.decode()
         click.echo(click.style(textwrap.indent(stderr, '  '), fg='red'))
         click.echo(doctor_message)
-        try:
-            cluster.destroy()
-        except NotImplementedError:
-            cluster_representation.destroy()
+        cluster_representation.destroy()
         sys.exit(exc.returncode)
 
     spinner.succeed()
