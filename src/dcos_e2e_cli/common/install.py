@@ -4,7 +4,6 @@ Helpers for installing DC/OS.
 
 import subprocess
 import sys
-import textwrap
 from pathlib import Path
 from typing import Any, Dict, Iterable, Tuple, Union
 
@@ -17,6 +16,7 @@ from dcos_e2e.node import Output
 
 from .base_classes import ClusterRepresentation
 from .credentials import DEFAULT_SUPERUSER_PASSWORD, DEFAULT_SUPERUSER_USERNAME
+from .error_handling import show_calledprocess_error
 
 
 def cluster_install_dcos(
@@ -65,10 +65,7 @@ def cluster_install_dcos(
     except subprocess.CalledProcessError as exc:
         spinner.stop()
         click.echo('Error installing DC/OS.', err=True)
-        click.echo(click.style('Full error:', fg='yellow'))
-        click.echo(click.style(textwrap.indent(str(exc), '  '), fg='yellow'))
-        stderr = exc.stderr.decode()
-        click.echo(click.style(textwrap.indent(stderr, '  '), fg='red'))
+        show_calledprocess_error(exc=exc)
         click.echo(doctor_message)
         cluster_representation.destroy()
         sys.exit(exc.returncode)
