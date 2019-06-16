@@ -40,10 +40,10 @@ The following example shows how to use DC/OS Enterprise with |project|.
             superuser_password=superuser_password,
         )
 
-        cluster.run_integration_tests(
+        cluster.run_with_test_environment(
             env={
                 'DCOS_LOGIN_UNAME': superuser_username,
                 'DCOS_LOGIN_PW': superuser_password,
             }
-            pytest_command=['pytest', '-k', 'tls'],
+            args=['pytest', '-k', 'tls'],
         )

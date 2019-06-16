@@ -67,11 +67,11 @@ def run_command(
         return
 
     try:
-        cluster.run_integration_tests(
-            pytest_command=args,
+        cluster.run_with_test_environment(
+            args=args,
             tty=tty,
             env=env,
-            test_host=host,
+            node=host,
             transport=transport,
             output=Output.NO_CAPTURE,
         )

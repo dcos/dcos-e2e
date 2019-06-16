@@ -58,7 +58,7 @@ See the `library`_ documentation for more details on these and other features.
         result = master.run(args=['echo', '1'])
         print(result.stdout)
         cluster.wait_for_dcos_oss()
-        cluster.run_integration_tests(pytest_command=['pytest', '-x', 'test_tls.py'])
+        cluster.run_with_test_environment(args=['pytest', '-x', 'test_tls.py'])
 
 miniDC/OS CLI
 -------------

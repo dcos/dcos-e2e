@@ -71,16 +71,16 @@ class TestIntegrationTests:
         """
         # No error is raised with a successful command.
         pytest_command = ['pytest', '-vvv', '-s', '-x', 'test_auth.py']
-        cluster.run_integration_tests(
-            pytest_command=pytest_command,
+        cluster.run_with_test_environment(
+            args=pytest_command,
             output=Output.CAPTURE,
         )
 
         # An error is raised with an unsuccessful command.
         with pytest.raises(CalledProcessError) as excinfo:
             pytest_command = ['pytest', 'test_no_such_file.py']
-            result = cluster.run_integration_tests(
-                pytest_command=pytest_command,
+            result = cluster.run_with_test_environment(
+                args=pytest_command,
                 output=Output.CAPTURE,
             )
             # This result will not be printed if the test passes, but it
@@ -98,7 +98,7 @@ class TestIntegrationTests:
         """
         (master, ) = cluster.masters
         command = ['/opt/mesosphere/bin/detect_ip']
-        result = cluster.run_integration_tests(pytest_command=command).stdout
+        result = cluster.run_with_test_environment(args=command).stdout
         assert str(master.public_ip_address).encode() == result.strip()
 
     def test_custom_node(self, cluster: Cluster) -> None:
@@ -107,11 +107,8 @@ class TestIntegrationTests:
         """
         (agent, ) = cluster.agents
         command = ['/opt/mesosphere/bin/detect_ip']
-        result = cluster.run_integration_tests(
-            pytest_command=command,
-            test_host=agent,
-        ).stdout
-        assert str(agent.public_ip_address).encode() == result.strip()
+        result = cluster.run_with_test_environment(args=command, node=agent)
+        assert str(agent.public_ip_address).encode() == result.stdout.strip()
 
 
 class TestClusterSize:
