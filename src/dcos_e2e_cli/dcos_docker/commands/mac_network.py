@@ -27,16 +27,17 @@ _PROXY_CONTAINER_NAME = 'vpn-proxy'
 _OPENVPN_CONTAINER_NAME = 'vpn-openvpn'
 
 
-def _validate_ovpn_file_does_not_exist(
+def _get_ovpn_file_destination(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
     value: Path,
 ) -> Path:
     """
-    If the given file path exists already, show an error message explaining how
-    to use the file as an OpenVPN configuration.
+    Get OVPN file destination.
     """
-    force = bool('force' in ctx.params)
+    for _ in (ctx, param):
+        pass
+
     path = value.expanduser()
     if path.is_dir():
         path = path / 'docker-for-mac.ovpn'
@@ -45,37 +46,6 @@ def _validate_ovpn_file_does_not_exist(
         message = '"{value}" does not have the suffix ".ovpn".'.format(
             value=value,
         )
-        raise click.BadParameter(message=message)
-
-    for _ in (ctx, param):
-        pass
-
-    profile_name = path.name[:-len('.ovpn')]
-
-    message = (
-        '"{value}" already exists so no new OpenVPN configuration was '
-        'created.'
-        '\n'
-        '\n'
-        'To use {value}:'
-        '\n'
-        '1. Install an OpenVPN client such as Tunnelblick '
-        '(https://tunnelblick.net/downloads.html) '
-        'or Shimo (https://www.shimovpn.com).'
-        '\n'
-        '2. Run "open {value}".'
-        '\n'
-        '3. In your OpenVPN client, connect to the new "{profile_name}" '
-        'profile.'
-        '\n'
-        '4. Run "minidcos docker doctor" to confirm that everything is '
-        'working.'
-    ).format(
-        value=value,
-        profile_name=profile_name,
-    )
-
-    if path.exists() and not force:
         raise click.BadParameter(message=message)
 
     return path
@@ -191,7 +161,7 @@ def _destroy_mac_network_containers(enable_spinner: bool) -> None:
     '--configuration-dst',
     type=click_pathlib.Path(exists=False),
     default='~/Documents/docker-for-mac.ovpn',
-    callback=_validate_ovpn_file_does_not_exist,
+    callback=_get_ovpn_file_destination,
     show_default=True,
     help='The location to create an OpenVPN configuration file.',
 )
@@ -214,6 +184,41 @@ def setup_mac_network(
 
     This creates an OpenVPN configuration file and describes how to use it.
     """
+    profile_name = configuration_dst.with_suffix('')
+
+    configuration_instructions = (
+        '1. Install an OpenVPN client such as Tunnelblick '
+        '(https://tunnelblick.net/downloads.html) '
+        'or Shimo (https://www.shimovpn.com).'
+        '\n'
+        '2. Run "open {configuration_dst}".'
+        '\n'
+        '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
+        'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
+        '\n'
+        '4. In your OpenVPN client, connect to the new "{profile_name}" '
+        'profile.'
+        '\n'
+        '5. Run "minidcos docker doctor" to confirm that everything is '
+        'working.'
+    ).format(
+        configuration_dst=configuration_dst,
+        profile_name=profile_name,
+    )
+
+    if configuration_dst.exists() and not force:
+        already_exists_message = (
+            '"{configuration_dst}" already exists so no new OpenVPN '
+            'configuration was created.'
+            '\n'
+            '\n'
+            'To use {configuration_dst}:'
+            '\n'
+        ).format(
+            configuration_dst=configuration_dst
+        ) + configuration_instructions
+        raise click.BadParameter(message=already_exists_message)
+
     if force:
         _destroy_mac_network_containers(enable_spinner=enable_spinner)
 
@@ -232,24 +237,7 @@ def setup_mac_network(
             sys.exit(1)
         raise
 
-    message = (
-        '1. Install an OpenVPN client such as Tunnelblick '
-        '(https://tunnelblick.net/downloads.html) '
-        'or Shimo (https://www.shimovpn.com).'
-        '\n'
-        '2. Run "open {configuration_dst}".'
-        '\n'
-        '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
-        'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
-        '\n'
-        '4. In your OpenVPN client, connect to the new "docker-for-mac" '
-        'profile.'
-        '\n'
-        '5. Run "minidcos docker doctor" to confirm that everything is '
-        'working.'
-    ).format(configuration_dst=configuration_dst)
-
-    click.echo(message=message)
+    click.echo(message=configuration_instructions)
 
 
 @click.command('destroy-mac-network')
