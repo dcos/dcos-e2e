@@ -67,7 +67,7 @@ def run_command(
         return
 
     try:
-        cluster.run_integration_tests(
+        cluster.run_with_test_environment(
             args=args,
             tty=tty,
             env=env,

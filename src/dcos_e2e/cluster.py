@@ -297,7 +297,7 @@ class Cluster(ContextDecorator):
             **self._base_config,
         }
 
-    def run_integration_tests(
+    def run_with_test_environment(
         self,
         args: List[str],
         env: Optional[Dict[str, Any]] = None,
@@ -348,7 +348,7 @@ class Cluster(ContextDecorator):
             )
 
         # Tests are run on a random master node if no node is given.
-        test_host = test_host or next(iter(self.masters))
+        node = node or next(iter(self.masters))
 
         environment_variables = {
             # This is needed for 1.9 (and below?)
@@ -356,14 +356,14 @@ class Cluster(ContextDecorator):
             'MASTER_HOSTS': ip_addresses(self.masters),
             'SLAVE_HOSTS': ip_addresses(self.agents),
             'PUBLIC_SLAVE_HOSTS': ip_addresses(self.public_agents),
-            'DCOS_DNS_ADDRESS': 'http://' + str(test_host.private_ip_address),
+            'DCOS_DNS_ADDRESS': 'http://' + str(node.private_ip_address),
             # This is only used by DC/OS 1.9 integration tests
             'DCOS_NUM_MASTERS': len(self.masters),
             'DCOS_NUM_AGENTS': len(self.agents) + len(self.public_agents),
             **env,
         }
 
-        return test_host.run(
+        return node.run(
             args=args,
             output=output,
             env=environment_variables,

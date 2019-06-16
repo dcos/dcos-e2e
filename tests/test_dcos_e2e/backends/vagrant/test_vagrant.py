@@ -51,7 +51,7 @@ class TestRunIntegrationTest:  # pragma: no cover
             cluster.wait_for_dcos_oss()
 
             # No error is raised with a successful command.
-            cluster.run_integration_tests(
+            cluster.run_with_test_environment(
                 args=['pytest', '-vvv', '-s', '-x', 'test_units.py'],
                 output=Output.CAPTURE,
             )

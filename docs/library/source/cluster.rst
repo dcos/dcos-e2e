@@ -73,6 +73,6 @@ See :doc:`how to run tests on DC/OS Enterprise <enterprise>`.
 .. code:: python
 
     with Cluster(backend=Docker()):
-        cluster.run_integration_tests(pytest_command=['pytest', '-k', 'mesos'])
+        cluster.run_with_test_environment(args=['pytest', '-k', 'mesos'])
 
-.. automethod:: dcos_e2e.cluster.Cluster.run_integration_tests
+.. automethod:: dcos_e2e.cluster.Cluster.run_with_test_environment

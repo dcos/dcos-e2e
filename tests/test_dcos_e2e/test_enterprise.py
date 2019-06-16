@@ -57,7 +57,7 @@ class TestEnterpriseIntegrationTests:
             # No error is raised with a successful command.
             # We choose a test file which runs very quickly.
             fast_test_file = 'test_marathon_authn_authz.py'
-            cluster.run_integration_tests(
+            cluster.run_with_test_environment(
                 args=['pytest', '-vvv', '-s', '-x', fast_test_file],
                 env={
                     'DCOS_LOGIN_UNAME': superuser_username,
