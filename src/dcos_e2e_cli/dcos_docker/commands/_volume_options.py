@@ -2,7 +2,7 @@
 Options for using Docker volumes.
 """
 
-from typing import Any, Callable, List, Union
+from typing import Callable, List, Union
 
 import click
 import docker
@@ -11,7 +11,7 @@ import docker
 def _validate_volumes(
     ctx: click.core.Context,
     param: Union[click.core.Option, click.core.Parameter],
-    value: Any,
+    value: str,
 ) -> List[docker.types.Mount]:
     """
     Turn volume definition strings into ``Mount``s that ``docker-py`` can use.
