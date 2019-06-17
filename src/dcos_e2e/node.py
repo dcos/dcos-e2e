@@ -258,9 +258,77 @@ class Node:
             transport=transport,
         )
 
-    def upgrade_dcos(
+    def upgrade_dcos_from_url(
         self,
-        dcos_installer: Union[str, Path],
+        dcos_installer: str,
+        dcos_config: Dict[str, Any],
+        ip_detect_path: Path,
+        role: Role,
+        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        user: Optional[str] = None,
+        output: Output = Output.CAPTURE,
+        transport: Optional[Transport] = None,
+    ) -> None:
+        """
+        Upgrade DC/OS on this node.
+        This follows the steps in
+        https://docs.mesosphere.com/1.13/installing/production/upgrading/.
+
+        Args:
+            dcos_installer: A URL pointing to an installer to install DC/OS
+                from.
+            dcos_config: The contents of the DC/OS ``config.yaml``.
+            ip_detect_path: The path to the ``ip-detect`` script to use for
+                installing DC/OS.
+            role: The desired DC/OS role for the installation.
+            user: The username to communicate as. If ``None`` then the
+                ``default_user`` is used instead.
+            output: What happens with stdout and stderr.
+            transport: The transport to use for communicating with nodes. If
+                ``None``, the ``Node``'s ``default_transport`` is used.
+            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
+                the installer node. These are files to copy from the host to
+                the installer node before installing DC/OS.
+        """
+        node_dcos_installer = _node_installer_path(
+            node=self,
+            user=user,
+            transport=transport,
+            output=output,
+        )
+        if isinstance(dcos_installer, str):
+            _download_installer_to_node(
+                node=self,
+                dcos_installer_url=dcos_installer,
+                output=output,
+                transport=transport,
+                user=user,
+                node_path=node_dcos_installer,
+            )
+        else:
+            self.send_file(
+                local_path=dcos_installer,
+                remote_path=node_dcos_installer,
+                transport=transport,
+                user=user,
+                sudo=True,
+            )
+        _upgrade_dcos_from_node_path(
+            node=self,
+            remote_dcos_installer=node_dcos_installer,
+            dcos_config=dcos_config,
+            ip_detect_path=ip_detect_path,
+            user=user,
+            role=role,
+            output=output,
+            transport=transport,
+            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+        )
+
+
+    def upgrade_dcos_from_path(
+        self,
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         role: Role,
