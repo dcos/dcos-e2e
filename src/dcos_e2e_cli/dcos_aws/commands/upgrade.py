@@ -20,7 +20,7 @@ from dcos_e2e_cli.common.options import (
     verbosity_option,
 )
 from dcos_e2e_cli.common.options.genconf_dir import genconf_dir_option
-from dcos_e2e_cli.common.upgrade import cluster_upgrade_dcos
+from dcos_e2e_cli.common.upgrade import cluster_upgrade_dcos_from_url
 from dcos_e2e_cli.common.utils import check_cluster_id_exists, command_path
 from dcos_e2e_cli.common.variants import get_install_variant
 from dcos_e2e_cli.common.workspaces import workspace_dir_option
@@ -93,7 +93,7 @@ def upgrade(
         license_key=license_key,
     )
 
-    cluster_upgrade_dcos(
+    cluster_upgrade_dcos_from_url(
         cluster=cluster,
         cluster_representation=cluster_instances,
         dcos_installer=installer_url,

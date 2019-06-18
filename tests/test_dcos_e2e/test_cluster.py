@@ -322,7 +322,7 @@ class TestClusterFromNodes:
                 public_agents=original_cluster.public_agents,
             )
 
-            cluster.install_dcos_from_path(
+            cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=original_cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -399,7 +399,7 @@ class TestUpgrade:
                 assert build.version.startswith('1.12')
                 assert build.variant == DCOSVariant.OSS
 
-            cluster.upgrade_dcos(
+            cluster.upgrade_dcos_from_path(
                 dcos_installer=oss_1_13_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -443,7 +443,7 @@ class TestUpgrade:
                 assert build.version.startswith('1.12')
                 assert build.variant == DCOSVariant.OSS
 
-            cluster.upgrade_dcos(
+            cluster.upgrade_dcos_from_url(
                 dcos_installer=oss_1_13_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,

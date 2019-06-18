@@ -70,7 +70,7 @@ def cluster_upgrade_dcos_from_url(
     ip_detect_path: Path,
     dcos_config: Dict[str, Any],
     files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-    dcos_installer: Path,
+    dcos_installer: str,
     doctor_message: str,
     enable_spinner: bool,
 ) -> None:
