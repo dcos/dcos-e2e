@@ -215,7 +215,7 @@ def setup_mac_network(
             'To use {configuration_dst}:'
             '\n'
         ).format(
-            configuration_dst=configuration_dst
+            configuration_dst=configuration_dst,
         ) + configuration_instructions
         raise click.BadParameter(message=already_exists_message)
 
