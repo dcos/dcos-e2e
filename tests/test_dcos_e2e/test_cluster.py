@@ -220,7 +220,7 @@ class TestCopyFiles:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos_from_path(
+            cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,

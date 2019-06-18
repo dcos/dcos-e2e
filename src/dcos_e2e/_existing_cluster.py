@@ -85,45 +85,6 @@ class ExistingClusterManager(ClusterManager):
         self._agents = cluster_backend.agents
         self._public_agents = cluster_backend.public_agents
 
-    def _install_dcos(
-        self,
-        dcos_installer: Union[str, Path],
-        dcos_config: Dict[str, Any],
-        ip_detect_path: Path,
-        output: Output,
-        files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]],
-    ) -> None:
-        """
-        Install DC/OS with a bootstrap node.
-
-        Args:
-            dcos_installer: The ``Path`` to a local installer or a ``str`` to
-                which is a URL pointing to an installer to install DC/OS from.
-            dcos_config: The DC/OS configuration to use.
-            ip_detect_path: The ``ip-detect`` script to use for installing
-                DC/OS.
-            output: What happens with stdout and stderr.
-            files_to_copy_to_genconf_dir: Pairs of host paths to paths on
-                the installer node. These are files to copy from the host to
-                the installer node before installing DC/OS.
-        """
-        for nodes, role in (
-            (self.masters, Role.MASTER),
-            (self.agents, Role.AGENT),
-            (self.public_agents, Role.PUBLIC_AGENT),
-        ):
-            for node in nodes:
-                node.install_dcos(
-                    dcos_installer=dcos_installer,
-                    dcos_config=dcos_config,
-                    ip_detect_path=ip_detect_path,
-                    files_to_copy_to_genconf_dir=(
-                        files_to_copy_to_genconf_dir
-                    ),
-                    role=role,
-                    output=output,
-                )
-
     def install_dcos_from_url(
         self,
         dcos_installer: str,
@@ -146,13 +107,22 @@ class ExistingClusterManager(ClusterManager):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        self._install_dcos(
-            dcos_installer=dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            output=output,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        )
+        for nodes, role in (
+            (self.masters, Role.MASTER),
+            (self.agents, Role.AGENT),
+            (self.public_agents, Role.PUBLIC_AGENT),
+        ):
+            for node in nodes:
+                node.install_dcos_from_url(
+                    dcos_installer=dcos_installer,
+                    dcos_config=dcos_config,
+                    ip_detect_path=ip_detect_path,
+                    files_to_copy_to_genconf_dir=(
+                        files_to_copy_to_genconf_dir
+                    ),
+                    role=role,
+                    output=output,
+                )
 
     def install_dcos_from_path(
         self,
@@ -175,13 +145,22 @@ class ExistingClusterManager(ClusterManager):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
         """
-        self._install_dcos(
-            dcos_installer=dcos_installer,
-            dcos_config=dcos_config,
-            ip_detect_path=ip_detect_path,
-            output=output,
-            files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
-        )
+        for nodes, role in (
+            (self.masters, Role.MASTER),
+            (self.agents, Role.AGENT),
+            (self.public_agents, Role.PUBLIC_AGENT),
+        ):
+            for node in nodes:
+                node.install_dcos_from_path(
+                    dcos_installer=dcos_installer,
+                    dcos_config=dcos_config,
+                    ip_detect_path=ip_detect_path,
+                    files_to_copy_to_genconf_dir=(
+                        files_to_copy_to_genconf_dir
+                    ),
+                    role=role,
+                    output=output,
+                )
 
     @property
     def masters(self) -> Set[Node]:

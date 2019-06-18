@@ -114,7 +114,7 @@ class TestRunIntegrationTest:
             masters=1,
         ) as cluster:
 
-            cluster.install_dcos_from_path(
+            cluster.install_dcos_from_url(
                 dcos_installer=ee_installer_url,
                 dcos_config={
                     **cluster.base_config,
