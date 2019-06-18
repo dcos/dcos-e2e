@@ -249,7 +249,7 @@ class TestDCOSInstallation:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            master.install_dcos_from_path(
+            master.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
@@ -283,7 +283,7 @@ class TestDCOSInstallation:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos_from_path(
+            cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,
