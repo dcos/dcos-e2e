@@ -139,7 +139,7 @@ class TestDockerBackend:
         """
         cluster_backend = Docker()
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos(
+            cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,

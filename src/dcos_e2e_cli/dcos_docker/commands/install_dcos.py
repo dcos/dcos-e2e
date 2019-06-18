@@ -13,7 +13,7 @@ from dcos_e2e_cli.common.arguments import installer_path_argument
 from dcos_e2e_cli.common.create import get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    cluster_install_dcos,
+    cluster_install_dcos_from_path,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
@@ -103,7 +103,7 @@ def install_dcos(
         license_key=license_key,
     )
 
-    cluster_install_dcos(
+    cluster_install_dcos_from_path(
         cluster=cluster,
         cluster_representation=cluster_containers,
         dcos_config=dcos_config,

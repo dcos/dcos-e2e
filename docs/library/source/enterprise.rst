@@ -27,7 +27,7 @@ The following example shows how to use DC/OS Enterprise with |project|.
     }
 
     with Cluster(cluster_backend=Docker()) as cluster:
-        cluster.install_dcos(
+        cluster.install_dcos_from_path(
             dcos_installer=ee_installer,
             dcos_config={
                 **cluster.base_config,

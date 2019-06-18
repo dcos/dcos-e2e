@@ -114,7 +114,7 @@ class TestRunIntegrationTest:
             masters=1,
         ) as cluster:
 
-            cluster.install_dcos(
+            cluster.install_dcos_from_url(
                 dcos_installer=ee_installer_url,
                 dcos_config={
                     **cluster.base_config,
@@ -227,7 +227,7 @@ class TestDCOSInstallation:
         """
         cluster_backend = AWS()
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos(
+            cluster.install_dcos_from_path(
                 dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
@@ -249,7 +249,7 @@ class TestDCOSInstallation:
             public_agents=0,
         ) as cluster:
             (master, ) = cluster.masters
-            master.install_dcos(
+            master.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 role=Role.MASTER,
@@ -283,7 +283,7 @@ class TestDCOSInstallation:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos(
+            cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,
@@ -324,7 +324,7 @@ class TestDCOSInstallation:
             ).format(ip_address=master.private_ip_address)
             ip_detect_file.write_text(ip_detect_contents)
 
-            cluster.install_dcos(
+            cluster.install_dcos_from_url(
                 dcos_installer=oss_installer_url,
                 dcos_config=cluster.base_config,
                 output=Output.LOG_AND_CAPTURE,

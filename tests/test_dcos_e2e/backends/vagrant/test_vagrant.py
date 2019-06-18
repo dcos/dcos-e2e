@@ -41,7 +41,7 @@ class TestRunIntegrationTest:  # pragma: no cover
             agents=1,
             public_agents=1,
         ) as cluster:
-            cluster.install_dcos(
+            cluster.install_dcos_from_path(
                 dcos_installer=oss_installer,
                 dcos_config=cluster.base_config,
                 output=Output.CAPTURE,

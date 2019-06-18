@@ -15,7 +15,7 @@ from dcos_e2e_cli.common.arguments import installer_url_argument
 from dcos_e2e_cli.common.create import CREATE_HELP, create_cluster, get_config
 from dcos_e2e_cli.common.doctor import get_doctor_message
 from dcos_e2e_cli.common.install import (
-    cluster_install_dcos,
+    cluster_install_dcos_from_url,
     run_post_install_steps,
 )
 from dcos_e2e_cli.common.options import (
@@ -217,7 +217,7 @@ def create(
         license_key=license_key,
     )
 
-    cluster_install_dcos(
+    cluster_install_dcos_from_url(
         cluster=cluster,
         cluster_representation=cluster_instances,
         dcos_config=dcos_config,
