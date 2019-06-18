@@ -655,15 +655,13 @@ class TestSetupMacNetwork():
             ],
             catch_exceptions=False,
         )
-        # yapf breaks multi-line noqa, see
-        # https://github.com/google/yapf/issues/524.
-        # yapf: disable
+
         expected_error = dedent(
             """\
             Usage: minidcos docker setup-mac-network [OPTIONS]
 
-            Error: Invalid value for "--configuration-dst": "{value}" does not have the suffix ".ovpn".
-            """,# noqa: E501,E261
+            Error: Invalid value: "{value}" does not have the suffix ".ovpn".
+            """,
         ).format(
             value=str(configuration_file),
         )
@@ -696,7 +694,7 @@ class TestSetupMacNetwork():
             """\
             Usage: minidcos docker setup-mac-network [OPTIONS]
 
-            Error: Invalid value for "--configuration-dst": "{value}" already exists so no new OpenVPN configuration was created.
+            Error: Invalid value: "{value}" already exists so no new OpenVPN configuration was created.
 
             To use {value}:
             1. Install an OpenVPN client such as Tunnelblick (https://tunnelblick.net/downloads.html) or Shimo (https://www.shimovpn.com).
