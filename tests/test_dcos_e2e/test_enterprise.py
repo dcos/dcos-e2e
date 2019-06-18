@@ -40,7 +40,7 @@ class TestEnterpriseIntegrationTests:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos(
+            cluster.install_dcos_from_path(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -133,7 +133,7 @@ class TestCopyFiles:
                 remote_path=master_key_path,
             )
 
-            cluster.install_dcos(
+            cluster.install_dcos_from_path(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -218,7 +218,7 @@ class TestCopyFiles:
                 remote_path=master_key_path,
             )
 
-            cluster.install_dcos(
+            cluster.install_dcos_from_path(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -290,7 +290,7 @@ class TestCopyFiles:
                 local_path=ca_key_path,
                 remote_path=master_key_path,
             )
-            master.install_dcos(
+            master.install_dcos_from_path(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -340,7 +340,7 @@ class TestSSLDisabled:
             agents=0,
             public_agents=0,
         ) as cluster:
-            cluster.install_dcos(
+            cluster.install_dcos_from_path(
                 dcos_installer=enterprise_1_11_installer,
                 dcos_config={
                     **cluster.base_config,
@@ -389,7 +389,7 @@ class TestWaitForDCOS:
         }
 
         with Cluster(cluster_backend=cluster_backend) as cluster:
-            cluster.install_dcos(
+            cluster.install_dcos_from_path(
                 dcos_installer=enterprise_installer,
                 dcos_config={
                     **cluster.base_config,

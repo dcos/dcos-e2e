@@ -6,7 +6,7 @@ import logging
 import subprocess
 from contextlib import ContextDecorator
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 from retry import retry
 
@@ -204,7 +204,7 @@ class Cluster(ContextDecorator):
 
     def install_dcos_from_path(
         self,
-        dcos_installer: Union[str, Path],
+        dcos_installer: Path,
         dcos_config: Dict[str, Any],
         ip_detect_path: Path,
         output: Output = Output.CAPTURE,
