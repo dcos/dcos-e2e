@@ -27,7 +27,7 @@ In this example we will use a open source DC/OS installer downloaded to :file:`/
 
    oss_installer = Path('/tmp/dcos_generate_config.sh')
 
-   cluster.install_dcos(
+   cluster.install_dcos_from_path(
        dcos_installer=oss_installer,
        dcos_config={
             **cluster.base_config,

@@ -30,7 +30,9 @@ Installing DC/OS
 
 See :doc:`how to use DC/OS Enterprise <enterprise>` with |project|.
 
-.. automethod:: dcos_e2e.cluster.Cluster.install_dcos
+.. automethod:: dcos_e2e.cluster.Cluster.install_dcos_from_path
+
+.. automethod:: dcos_e2e.cluster.Cluster.install_dcos_from_url
 
 Destroying a ``Cluster``
 ------------------------
@@ -51,7 +53,9 @@ Upgrading a ``Cluster``
 
 It is possible to upgrade a :py:class:`~dcos_e2e.cluster.Cluster`\ s DC/OS installation.
 
-.. automethod:: dcos_e2e.cluster.Cluster.upgrade_dcos
+.. automethod:: dcos_e2e.cluster.Cluster.upgrade_dcos_from_path
+
+.. automethod:: dcos_e2e.cluster.Cluster.upgrade_dcos_from_url
 
 Waiting for DC/OS
 -----------------
