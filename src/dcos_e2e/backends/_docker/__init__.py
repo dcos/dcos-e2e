@@ -604,6 +604,20 @@ class DockerCluster(ClusterManager):
             pipe_output=capture_output,
         )
 
+        from threading import Thread
+        class MyThread(Thread):
+            def run(self):
+                self.err = None
+                try:
+                    Thread.run(self)
+                except subprocess.CalledProcessError as err:
+                    LOGGER.error(err.stdout)
+                    LOGGER.error(err.stderr)
+                    self.err = err
+                except Exception as e:
+                    self.err = e
+
+        threads = []
         for role, nodes in [
             ('master', self.masters),
             ('slave', self.agents),
@@ -617,12 +631,15 @@ class DockerCluster(ClusterManager):
             ]
 
             for node in nodes:
-                try:
-                    node.run(args=dcos_install_args)
-                except subprocess.CalledProcessError as ex:  # pragma: no cover
-                    LOGGER.error(ex.stdout)
-                    LOGGER.error(ex.stderr)
-                    raise
+                t = MyThread(target=node.run, kwargs={'args': dcos_install_args})
+                threads.append(t)
+                t.start()
+        
+        for t in threads:
+            t.join()
+            if t.err is not None:
+                raise t.err
+
 
     def destroy_node(self, node: Node) -> None:
         """
