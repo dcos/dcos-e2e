@@ -184,7 +184,7 @@ def setup_mac_network(
 
     This creates an OpenVPN configuration file and describes how to use it.
     """
-    profile_name = configuration_dst.with_suffix('')
+    profile_name = configuration_dst.with_suffix('').name
 
     configuration_instructions = (
         '1. Install an OpenVPN client such as Tunnelblick '
@@ -193,7 +193,7 @@ def setup_mac_network(
         '\n'
         '2. Run "open {configuration_dst}".'
         '\n'
-        '3. If your OpenVPN client is Shimo, edit the new "docker-for-mac" '
+        '3. If your OpenVPN client is Shimo, edit the new "{profile_name}" '
         'profile\'s Advanced settings to deselect "Send all traffic over VPN".'
         '\n'
         '4. In your OpenVPN client, connect to the new "{profile_name}" '
@@ -215,7 +215,7 @@ def setup_mac_network(
             'To use {configuration_dst}:'
             '\n'
         ).format(
-            configuration_dst=configuration_dst
+            configuration_dst=configuration_dst,
         ) + configuration_instructions
         raise click.BadParameter(message=already_exists_message)
 

@@ -676,7 +676,8 @@ class TestSetupMacNetwork():
         If a configuration file already exists at the given location, an error
         is shown.
         """
-        configuration_file = tmp_path / 'example.ovpn'
+        profile_name = uuid.uuid4().hex
+        configuration_file = tmp_path / Path(profile_name).with_suffix('.ovpn')
         configuration_file.write_text('example')
         runner = CliRunner()
         result = runner.invoke(
@@ -696,16 +697,18 @@ class TestSetupMacNetwork():
             """\
             Usage: minidcos docker setup-mac-network [OPTIONS]
 
-            Error: Invalid value for "--configuration-dst": "{value}" already exists so no new OpenVPN configuration was created.
+            Error: Invalid value: "{configuration_dst}" already exists so no new OpenVPN configuration was created.
 
-            To use {value}:
+            To use {configuration_dst}:
             1. Install an OpenVPN client such as Tunnelblick (https://tunnelblick.net/downloads.html) or Shimo (https://www.shimovpn.com).
-            2. Run "open {value}".
-            3. In your OpenVPN client, connect to the new "example" profile.
-            4. Run "minidcos docker doctor" to confirm that everything is working.
+            2. Run "open {configuration_dst}".
+            3. If your OpenVPN client is Shimo, edit the new "{profile_name}" profile's Advanced settings to deselect "Send all traffic over VPN".
+            4. In your OpenVPN client, connect to the new "{profile_name}" profile.
+            5. Run "minidcos docker doctor" to confirm that everything is working.
             """,# noqa: E501,E261
         ).format(
-            value=str(configuration_file),
+            configuration_dst=str(configuration_file),
+            profile_name=profile_name,
         )
         # yapf: enable
         assert result.exit_code == 2
