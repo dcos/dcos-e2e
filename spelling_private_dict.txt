@@ -66,6 +66,7 @@ invalidversion
 ip
 isolator
 journalctl
+journald
 keyring
 lastResort
 linters
