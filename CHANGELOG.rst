@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.06.19.0
+------------
+
 * Renamed ``Cluster.run_integration_tests``\ 's ``test_host`` parameter to ``node``.
 * Renamed ``Cluster.run_integration_tests``\ 's ``pytest_command`` parameter to ``args``.
 * Renamed ``Cluster.run_integration_tests`` to ``Cluster.run_with_test_environment``.

@@ -1,7 +1,7 @@
 class Minidcos < Formula
   include Language::Python::Virtualenv
 
-  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.15.0"
+  url "https://codeload.github.com/dcos/dcos-e2e/legacy.tar.gz/2019.06.19.0"
   head "https://github.com/dcos/dcos-e2e.git"
   homepage "http://minidcos.readthedocs.io/en/latest/"
   depends_on "python3"
@@ -88,8 +88,8 @@ class Minidcos < Formula
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/06/b8/d1ea38513c22e8c906275d135818fee16ad8495985956a9b7e2bb21942a1/certifi-2019.3.9.tar.gz"
-    sha256 "b26104d6835d1f5e49452a26eb2ff87fe7090b89dfcaee5ea2212697e1e1d7ae"
+    url "https://files.pythonhosted.org/packages/c5/67/5d0548226bcc34468e23a0333978f0e23d28d0b3f0c71a151aef9c3f7680/certifi-2019.6.16.tar.gz"
+    sha256 "945e3ba63a0b9f577b1395204e13c3a231f9bc0223888be653286534e5873695"
   end
 
   resource "cffi" do
