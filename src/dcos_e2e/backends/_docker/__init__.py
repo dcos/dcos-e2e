@@ -418,11 +418,17 @@ class DockerCluster(ClusterManager):
         # If ``/run/log/journal`` is writable the files are saved to disk.
         # ``journald`` uses at most 15% of available space, capped at 4.0 GB
         # per node for logs.
-        # For many of our tests this is not enough.
+        # For many of our tests this (~200 MB) is not enough.
         # We therefore give it space on disk, so that we can store up to
         # 4.0 GB of logs per node.
-        # 
-        log_mount = Mount(source=None, target='/run/log/journal')
+        #
+        # To see the space available, run:
+        # ``systemctl status systemd-journald -l``.
+        log_mount = Mount(
+            source=None,
+            target='/run/log/journal',
+            read_only=False,
+        )
 
         base_agent_mounts = [
             certs_mount,
