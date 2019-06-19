@@ -10,6 +10,7 @@ Next
 * Renamed ``Cluster.run_integration_tests``\ 's ``pytest_command`` parameter to ``args``.
 * Renamed ``Cluster.run_integration_tests`` to ``Cluster.run_with_test_environment``.
 * Split ``Cluster`` and ``Node`` ``upgrade`` and ``install_dcos`` functions into ``*_dcos_from_[path|url]`` functions.
+* Enable larger log sizes and lower memory uses by moving ``Docker`` backend logs to the host disk.
 
 2019.06.15.0
 ------------
