@@ -677,7 +677,8 @@ class TestSetupMacNetwork():
         is shown.
         """
         profile_name = uuid.uuid4().hex
-        configuration_file = tmp_path / Path(profile_name).with_suffix('.ovpn')
+        configuration_filename = str(Path(profile_name).with_suffix('.ovpn'))
+        configuration_file = tmp_path / configuration_filename
         configuration_file.write_text('example')
         runner = CliRunner()
         result = runner.invoke(
