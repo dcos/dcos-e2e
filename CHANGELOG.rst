@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Fix issue which prevented CoreOS nodes starting on Docker.
+
 2019.06.19.0
 ------------
 
