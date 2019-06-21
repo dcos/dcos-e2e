@@ -188,17 +188,8 @@ def start_dcos_container(
         ['rm', '-f', '/run/nologin', '||', 'true'],
         ['systemctl', 'start', 'sshd'],
         # Work around https://jira.mesosphere.com/browse/DCOS_OSS-1361.
+        ['systemd-tmpfiles', '--create', '--prefix', '/var/log/journal'],
         ['systemd-tmpfiles', '--create', '--prefix', '/run/log/journal'],
-        # We work on the assumption that ``/var/log/journal`` does not exist.
-        # If it does exist then ``journald`` will use it to write logs to.
-        # Our setup is configured to use ``/run/log/journal`` in particular
-        # because that is a mount from the host.
-        #
-        # This allows us to use the available disk space, rather than the
-        # available memory, to write logs to.
-        #
-        # This means that we can store more logs and save memory.
-        ['test', '!', '-e', '/var/log/journal'],
     ]:
         exit_code, output = container.exec_run(cmd=cmd)
         assert exit_code == 0, ' '.join(cmd) + ': ' + output.decode()

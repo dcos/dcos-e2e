@@ -412,10 +412,11 @@ class DockerCluster(ClusterManager):
         var_lib_docker_mount = Mount(source=None, target='/var/lib/docker')
         opt_mount = Mount(source=None, target='/opt')
         mesos_slave_mount = Mount(source=None, target='/var/lib/mesos/slave')
-        # By default systemd-journald uses the ``storage=auto`` setting which
-        # tries to write journal logs under ``/var/log/journal``. If
-        # that directory is not created ``/run/log/journal`` is used instead.
-        # If ``/run/log/journal`` is writable the files are saved to disk.
+        # By default systemd-journald uses the ``Storage=auto`` setting which
+        # writes journal logs under ``/run/log/journal`` in memory
+        # and persists them to ``/var/log/journal``.
+        # If ``/var/log/journal`` exists and is writable the files are saved
+        # there.
         # ``journald`` uses at most 15% of available space, capped at 4.0 GB
         # per node for logs.
         # For many of our tests this (~200 MB) is not enough.
@@ -424,11 +425,21 @@ class DockerCluster(ClusterManager):
         #
         # To see the space available, run:
         # ``systemctl status systemd-journald -l``.
-        log_mount = Mount(
+        #
+        # We add file-system mounts here for ``/var/log/journal`` and
+        # ``/run/log/journal`` to save all journal logs to disk on the host
+        # file-system in order to free up memory of each E2E node.
+        run_log_journal_mount = Mount(
             source=None,
             target='/run/log/journal',
             read_only=False,
         )
+        var_log_journal_mount = Mount(
+            source=None,
+            target='/var/log/journal',
+            read_only=False,
+        )
+
 
         base_agent_mounts = [
             certs_mount,
@@ -436,7 +447,8 @@ class DockerCluster(ClusterManager):
             var_lib_docker_mount,
             opt_mount,
             mesos_slave_mount,
-            log_mount,
+            var_log_journal_mount,
+            run_log_journal_mount,
         ]
 
         agent_mounts = [
@@ -446,7 +458,8 @@ class DockerCluster(ClusterManager):
         ]
 
         master_mounts = [
-            log_mount,
+            var_log_journal_mount,
+            run_log_journal_mount,
             certs_mount,
             bootstrap_genconf_mount,
             var_lib_docker_mount,
