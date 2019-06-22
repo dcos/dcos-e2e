@@ -440,7 +440,6 @@ class DockerCluster(ClusterManager):
             read_only=False,
         )
 
-
         base_agent_mounts = [
             certs_mount,
             bootstrap_genconf_mount,
