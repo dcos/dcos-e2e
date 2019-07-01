@@ -276,8 +276,6 @@ These include, at least:
 
 * We disable the ``pylint`` issue ``no-value-for-parameter`` to avoid https://github.com/PyCQA/pylint/issues/207.
 
-* We avoid ``yaml.FullLoader`` ``mypy`` issues to avoid https://github.com/python/typeshed/issues/2886.
-
 * We disable ``yapf`` in multiple places to avoid https://github.com/google/yapf/issues/524.
 
 * We ignore a type error to avoid https://github.com/python/mypy/issues/5135.
