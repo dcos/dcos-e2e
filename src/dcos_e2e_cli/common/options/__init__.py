@@ -62,11 +62,8 @@ def _validate_dcos_configuration(
 
     content = value.read_text()
 
-    # Ignoring error because of https://github.com/python/typeshed/issues/2886.
-    loader = yaml.FullLoader  # type: ignore
-
     try:
-        return dict(yaml.load(content, Loader=loader) or {})
+        return dict(yaml.load(content, Loader=yaml.FullLoader) or {})
     except ValueError:
         message = '"{content}" is not a valid DC/OS configuration'.format(
             content=content,
