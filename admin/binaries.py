@@ -34,22 +34,9 @@ def make_linux_binaries(repo_root: Path) -> Set[Path]:
     )
 
     cmd_in_container = [
-        # This includes a few hacks.
-        # Those work around linked issues.
-        # When those issues are resolved, we can use:
-        # pip install .[packaging]
-        #
-        # We use an unreleased PyInstaller version.
-        # This is so that we can get a fix which should be in the next
-        # PyInstaller release after PyInstaller 3.4.
-        # See https://github.com/pyinstaller/pyinstaller/issues/3507.
-        'pip3',
-        'install',
-        'git+https://github.com/pyinstaller/pyinstaller',
-        '&&',
         'pip',
         'install',
-        '.',
+        '.[packaging]',
         '&&',
         'python',
         'admin/create_pyinstaller_binaries.py',
