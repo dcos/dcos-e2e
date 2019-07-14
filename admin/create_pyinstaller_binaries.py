@@ -34,7 +34,7 @@ def is_editable() -> bool:
     return False
 
 
-def require_editable(editable: bool) -> None:
+def require_not_editable(editable: bool) -> None:
     """
     Require the package to have been installed not in editable mode.
     """
@@ -144,7 +144,7 @@ def create_binaries(accept_editable: bool) -> None:
     """
     editable = is_editable()
     if not accept_editable:
-        require_editable(editable=editable)
+        require_not_editable(editable=editable)
     repo_root = Path(__file__).resolve().parent.parent
     script_dir = repo_root / 'bin'
     scripts = set(script_dir.iterdir())

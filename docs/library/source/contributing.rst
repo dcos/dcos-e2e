@@ -265,8 +265,6 @@ The following creates a commit with changes to the vendored packages:
 Upstream Blockers
 -----------------
 
-* We do not use ``packaging-requirements.txt`` for packaging as PyInstaller > 3.4 has not yet been released.
-
 This codebase includes workarounds for various issues.
 These include, at least:
 

@@ -1,7 +1,1 @@
-# At the time of writing the latest PyInstaller release does not include a fix
-# which we depend on.
-# The error we see is https://github.com/pyinstaller/pyinstaller/issues/3507.
-#
-# The release of PyInstaller after 3.4 should fix this issue.
-# For now, in ``admin/binaries.py``, we install PyInstaller from ``git``.
-PyInstaller==3.4
+PyInstaller==3.5
