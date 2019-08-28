@@ -9,6 +9,9 @@ Next
 2019.08.28.0
 ------------
 
+2019.08.28.0
+------------
+
 * Fix issue which prevented CoreOS nodes starting on Docker.
 
 2019.06.19.0
