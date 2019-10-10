@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2019.10.10.0
+------------
+
 * Bump ``dcos-test-utils`` dependency.
 
 2019.08.28.0
