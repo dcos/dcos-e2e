@@ -8,6 +8,7 @@ This is tested via the test_dcos_diagnostics.py module in the dcos-integration-t
 import datetime
 import logging
 import os
+import uuid
 
 import retrying
 
@@ -34,18 +35,21 @@ class Diagnostics(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSes
     :type all_slaves: list
     :param session: Session object to bootstrap this session with
     :type session: requets.Session
+    :type use_legacy_api: bool if true then legacy API is used
     """
     def __init__(
             self,
             default_url: helpers.Url,
             masters: list,
             all_slaves: list,
-            session=None):
+            session=None,
+            use_legacy_api=False):
         super().__init__(default_url)
         if session is not None:
             self.session = session
         self.masters = masters
         self.all_slaves = all_slaves
+        self.use_legacy_api = use_legacy_api
 
     def start_diagnostics_job(self, nodes: dict=None):
         """ POSTs to the endpoint that triggers diagnostics report creation
@@ -56,6 +60,14 @@ class Diagnostics(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSes
         :returns: Response from diagnostics service
         :rtype: requests.Response
         """
+        if self.use_legacy_api:
+            return self._legacy_start_diagnostics_job(nodes)
+        return self._start_diagnostics_job()
+
+    def _start_diagnostics_job(self):
+        return self.put('/diagnostics/' + str(uuid.uuid1()))
+
+    def _legacy_start_diagnostics_job(self, nodes: dict = None):
         if nodes is None:
             nodes = {"nodes": ["all"]}
         return self.post('/report/diagnostics/create', json=nodes)
@@ -65,6 +77,26 @@ class Diagnostics(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSes
     @retrying.retry(wait_fixed=2000, stop_max_delay=1200000,
                     retry_on_result=lambda x: x is False)
     def wait_for_diagnostics_job(self, last_datapoint: dict):
+        """
+        initial value of last_datapoint should be
+        last_datapoint = {
+            'time': None,
+            'value': 0
+        }
+        """
+        if self.use_legacy_api:
+            return self._legacy_wait_for_diagnostics_job(last_datapoint)
+        return self._wait_for_diagnostics_job()
+
+    def _wait_for_diagnostics_job(self):
+        session_response = self.get('/diagnostics')
+        response = check_json(session_response)
+        for bundle in response:
+            if bundle['status'] in {'Unknown', 'Started', 'InProgress'}:
+                return False
+        return True
+
+    def _legacy_wait_for_diagnostics_job(self, last_datapoint: dict):
         """
         initial value of last_datapoint should be
         last_datapoint = {
@@ -102,6 +134,15 @@ class Diagnostics(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSes
         :returns: list of report filenames
         :rtype: list
         """
+        if self.use_legacy_api:
+            return self._legacy_get_diagnostics_reports()
+        return self._get_diagnostics_reports()
+
+    def _get_diagnostics_reports(self) -> list:
+        response = check_json(self.get('/diagnostics'))
+        return [bundle['id'] for bundle in response if bundle['status'] != 'Deleted']
+
+    def _legacy_get_diagnostics_reports(self) -> list:
         response = check_json(self.get('/report/diagnostics/list/all'))
 
         def _at_least_one_item(bundle):
@@ -120,7 +161,7 @@ class Diagnostics(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSes
         """
         return self.get_diagnostics_reports()
 
-    def download_diagnostics_reports(self, diagnostics_bundles, download_directory=None):
+    def download_diagnostics_reports(self, diagnostics_bundles, download_directory=None, master=None):
         """ Given diagnostics bundle names, this method will download them
 
         Args:
@@ -129,11 +170,36 @@ class Diagnostics(ARNodeApiClientMixin, RetryCommonHttpErrorsMixin, ApiClientSes
         """
         if download_directory is None:
             download_directory = os.path.join(os.path.expanduser('~'))
+        if master is None:
+            master = self.masters[0]
+        if self.use_legacy_api:
+            return self._legacy_download_diagnostics_reports(diagnostics_bundles, download_directory, master)
+        return self._download_diagnostics_reports(diagnostics_bundles, download_directory, master)
+
+    def _download_diagnostics_reports(self, diagnostics_bundles, download_directory, master):
         for bundle in diagnostics_bundles:
             log.info('Downloading {}'.format(bundle))
-            for master_node in self.masters:
-                r = self.get(os.path.join('/report/diagnostics/serve', bundle), stream=True, node=master_node)
-                bundle_path = os.path.join(download_directory, bundle)
-                with open(bundle_path, 'wb') as f:
-                    for chunk in r.iter_content(1024):
-                        f.write(chunk)
+            r = self.get(os.path.join('/diagnostics/', bundle, 'file'), stream=True, node=master)
+            bundle_path = os.path.join(download_directory, bundle)
+            with open(bundle_path, 'wb') as f:
+                for chunk in r.iter_content(1024):
+                    f.write(chunk)
+
+    def _legacy_download_diagnostics_reports(self, diagnostics_bundles, download_directory, master):
+        for bundle in diagnostics_bundles:
+            log.info('Downloading {}'.format(bundle))
+            r = self.get(os.path.join('/report/diagnostics/serve', bundle), stream=True, node=master)
+            bundle_path = os.path.join(download_directory, bundle)
+            with open(bundle_path, 'wb') as f:
+                for chunk in r.iter_content(1024):
+                    f.write(chunk)
+
+    def delete_bundle(self, diagnostics_bundle: str):
+        """ Given diagnostics bundle name, this method will delete it
+
+        Args:
+            diagnostics_bundles (str): bundle name to delete. Item of result of self.get_diagnostics_reports
+        """
+        if self.use_legacy_api:
+            self.post('/report/diagnostics/delete/' + diagnostics_bundle)
+        self.delete('/diagnostics/' + diagnostics_bundle)
