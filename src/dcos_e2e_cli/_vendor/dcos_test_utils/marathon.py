@@ -242,7 +242,7 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
             log.info('Pod destroyed')
             return True
 
-        r = self.delete('/v2/pods' + pod_id)
+        r = self.delete('/v2/pods' + pod_id, params=FORCE_PARAMS)
         assert r.ok, 'status_code: {} content: {}'.format(r.status_code, r.content)
 
         try:
