@@ -302,37 +302,6 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
             log.info(msg.format(r.status_code))
             return False
 
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
-    def _wait_for_dcos_history_data(self):
-        ro = self.get('/dcos-history-service/history/last')
-        # resp_code >= 500 -> backend is still down probably
-        if ro.status_code <= 500:
-            json = ro.json()
-            # We have observed cases of the returned JSON being '{}'.
-            if 'slaves' in json:
-                # The json['slaves'] is an array of dicts that must be
-                # mapped to set of hostnames so it can be compared with
-                # all_slaves.
-                # if an agent was removed, it may linger in the history data
-                # so simply check that at least the number agents we expect are present
-                if len(json['slaves']) >= len(self.all_slaves):
-                    return True
-                slaves_from_history_service = set(
-                    map(lambda x: x['hostname'], json['slaves']))
-                log.info('Still waiting for agents to join. Expected: {}, present: {}'.format(
-                    self.all_slaves, slaves_from_history_service))
-                return False
-
-            log.info(
-                'Data on the number of slaves from DC/OS History is not yet '
-                'available'
-            )
-
-        msg = "Waiting for DC/OS History, resp code is: {}"
-        log.info(msg.format(ro.status_code))
-        return False
 
     @retrying.retry(wait_fixed=1000,
                     retry_on_result=lambda ret: ret is False,
@@ -472,7 +441,6 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         self._wait_for_slaves_to_join()
         self._wait_for_dcos_history_up()
         self._wait_for_srouter_slaves_endpoints()
-        self._wait_for_dcos_history_data()
         self._wait_for_metronome()
         self._wait_for_all_healthy_services()
 
