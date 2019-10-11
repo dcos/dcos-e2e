@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Update vendored ``dcos-test-utils`` dependency.
+
 2019.10.10.0
 ------------
 
