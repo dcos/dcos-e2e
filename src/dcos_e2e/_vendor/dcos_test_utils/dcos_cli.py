@@ -150,13 +150,14 @@ class DcosCli():
             username = os.environ['DCOS_LOGIN_UNAME']
         if not password:
             password = os.environ['DCOS_LOGIN_PW']
-        stdout, stderr = self.exec_command(
-            ["dcos", "cluster", "setup", str(url), "--no-check",
-             "--username={}".format(username), "--password={}".format(password)])
-        assert stdout == ''
-        assert stderr == ''
-        self.exec_command(
-            ["dcos", "package", "install", "dcos-enterprise-cli", "--cli", "--yes"])
+        self.exec_command(["dcos", "cluster", "setup", str(url), "--no-check", "--username={}".format(username),
+                           "--password={}".format(password)])
+        if self.core_plugin_url:
+            self.exec_command(['dcos', 'plugin', 'add', '-u', self.core_plugin_url])
+        if self.ee_plugin_url:
+            self.exec_command(['dcos', 'plugin', 'add', '-u', self.ee_plugin_url])
+        else:
+            self.exec_command(["dcos", "--debug", "package", "install", "dcos-enterprise-cli", "--cli", "--yes"])
 
     def login_enterprise(self, username=None, password=None, provider=None):
         """ Authenticates the CLI with the setup Mesosphere Enterprise DC/OS cluster
