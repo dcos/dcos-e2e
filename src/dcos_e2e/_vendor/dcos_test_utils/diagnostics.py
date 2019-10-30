@@ -12,7 +12,7 @@ import uuid
 
 import retrying
 
-from dcos_test_utils import helpers
+from ..dcos_test_utils import helpers
 
 from dcos_test_utils.helpers import (
     ARNodeApiClientMixin,
