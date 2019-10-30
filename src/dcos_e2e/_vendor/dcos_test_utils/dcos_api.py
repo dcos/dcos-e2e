@@ -14,7 +14,7 @@ from typing import List, Optional
 import requests
 import retrying
 
-from ..dcos_test_utils import (
+from dcos_test_utils import (
     diagnostics,
     jobs,
     marathon,
@@ -291,52 +291,6 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
     @retrying.retry(wait_fixed=1000,
                     retry_on_result=lambda ret: ret is False,
                     retry_on_exception=lambda x: False)
-    def _wait_for_dcos_history_up(self):
-        r = self.get('/dcos-history-service/ping')
-        # resp_code >= 500 -> backend is still down probably
-        if r.status_code <= 500:
-            log.info("DC/OS History is probably up")
-            return True
-        else:
-            msg = "Waiting for DC/OS History, resp code is: {}"
-            log.info(msg.format(r.status_code))
-            return False
-
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
-    def _wait_for_dcos_history_data(self):
-        ro = self.get('/dcos-history-service/history/last')
-        # resp_code >= 500 -> backend is still down probably
-        if ro.status_code <= 500:
-            json = ro.json()
-            # We have observed cases of the returned JSON being '{}'.
-            if 'slaves' in json:
-                # The json['slaves'] is an array of dicts that must be
-                # mapped to set of hostnames so it can be compared with
-                # all_slaves.
-                # if an agent was removed, it may linger in the history data
-                # so simply check that at least the number agents we expect are present
-                if len(json['slaves']) >= len(self.all_slaves):
-                    return True
-                slaves_from_history_service = set(
-                    map(lambda x: x['hostname'], json['slaves']))
-                log.info('Still waiting for agents to join. Expected: {}, present: {}'.format(
-                    self.all_slaves, slaves_from_history_service))
-                return False
-
-            log.info(
-                'Data on the number of slaves from DC/OS History is not yet '
-                'available'
-            )
-
-        msg = "Waiting for DC/OS History, resp code is: {}"
-        log.info(msg.format(ro.status_code))
-        return False
-
-    @retrying.retry(wait_fixed=1000,
-                    retry_on_result=lambda ret: ret is False,
-                    retry_on_exception=lambda x: False)
     def _wait_for_adminrouter_up(self):
         try:
             # Yeah, we can also put it in retry_on_exception, but
@@ -351,13 +305,23 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
             return True
 
     # Retry if returncode is False, do not retry on exceptions.
+    # We don't want to infinite retries while waiting for agent endpoints,
+    # when we are retrying on both HTTP 502 and 404 statuses
+    # Added a stop_max_attempt to 60.
     @retrying.retry(wait_fixed=2000,
                     retry_on_result=lambda r: r is False,
-                    retry_on_exception=lambda _: False)
+                    retry_on_exception=lambda _: False,
+                    stop_max_attempt_number=60)
     def _wait_for_srouter_slaves_endpoints(self):
         # Get currently known agents. This request is served straight from
         # Mesos (no AdminRouter-based caching is involved).
         r = self.get('/mesos/master/slaves')
+
+        # If the agent has restarted, the mesos endpoint can give 502
+        # for a brief moment.
+        if r.status_code == 502:
+            return False
+
         assert r.status_code == 200
 
         data = r.json()
@@ -367,16 +331,30 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         slaves_ids = sorted(x['id'] for x in data['slaves'] if x['hostname'] in self.all_slaves)
 
         for slave_id in slaves_ids:
-            # AdminRouter's slave endpoint internally uses cached Mesos
-            # state data. That is, slave IDs of just recently joined
-            # slaves can be unknown here. For those, this endpoint
-            # returns a 404. Retry in this case, until this endpoint
-            # is confirmed to work for all known agents.
+            in_progress_status_codes = (
+                # AdminRouter's slave endpoint internally uses cached Mesos
+                # state data. That is, slave IDs of just recently joined
+                # slaves can be unknown here. For those, this endpoint
+                # returns a 404. Retry in this case, until this endpoint
+                # is confirmed to work for all known agents.
+                404,
+                # During a node restart or a DC/OS upgrade, this
+                # endpoint returns a 502 temporarily, until the agent has
+                # started up and the Mesos agent HTTP server can be reached.
+                502,
+                # We have seen this endpoint return 503 with body
+                # b'Agent has not finished recovery' on a cluster which
+                # later became healthy.
+                503,
+            )
             uri = '/slave/{}/slave%281%29/state'.format(slave_id)
             r = self.get(uri)
-            if r.status_code == 404:
+            if r.status_code in in_progress_status_codes:
                 return False
-            assert r.status_code == 200
+            assert r.status_code == 200, (
+                'Expecting status code 200 for GET request to {uri} but got '
+                '{status_code} with body {content}'
+            ).format(uri=uri, status_code=r.status_code, content=r.content)
             data = r.json()
             assert "id" in data
             assert data["id"] == slave_id
@@ -450,9 +428,7 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         self._wait_for_marathon_up()
         self._wait_for_zk_quorum()
         self._wait_for_slaves_to_join()
-        self._wait_for_dcos_history_up()
         self._wait_for_srouter_slaves_endpoints()
-        self._wait_for_dcos_history_data()
         self._wait_for_metronome()
         self._wait_for_all_healthy_services()
 
@@ -636,6 +612,53 @@ class DcosApiSession(helpers.ARNodeApiClientMixin, helpers.RetryCommonHttpErrors
         r = self.get(
             '/agent/{}/files/download'.format(slave_id),
             params={'path': self.mesos_sandbox_directory(slave_id, framework_id, task_id) + '/' + filename}
+        )
+        r.raise_for_status()
+        return r.text
+
+    def mesos_pod_sandbox_directory(self, slave_id: str, framework_id: str, executor_id: str, task_id: str) -> str:
+        """ Gets the mesos sandbox directory for a specific task in a pod which is currently running
+
+        :param slave_id: slave ID to pull sandbox from
+        :type slave_id: str
+        :param framework_id: framework_id to pull sandbox from
+        :type frameowork_id: str
+        :param executor_id: executor ID to pull directory sandbox from
+        :type executor_id: str
+        :param task_id: task ID to pull directory sandbox from
+        :type task_id: str
+
+        :returns: the directory of the sandbox
+        :rtype: str
+        """
+        return '{}/tasks/{}'.format(self.mesos_sandbox_directory(slave_id, framework_id, executor_id), task_id)
+
+    def mesos_pod_sandbox_file(
+            self,
+            slave_id: str,
+            framework_id: str,
+            executor_id: str,
+            task_id: str,
+            filename: str) -> str:
+        """ Gets a specific file from a currently-running pod's task sandbox and returns the text content
+
+        :param slave_id: ID of the slave running the task
+        :type slave_id: str
+        :param framework_id: ID of the framework of the task
+        :type framework_id: str
+        :param executor_id: ID of the executor
+        :type executor_id: str
+        :param task_id: ID of the task
+        :type task_id: str
+        :param filename: filename in the sandbox
+        :type filename: str
+
+        :returns: sandbox text contents
+        """
+        r = self.get(
+            '/agent/{}/files/download'.format(slave_id),
+            params={'path': self.mesos_pod_sandbox_directory(
+                slave_id, framework_id, executor_id, task_id) + '/' + filename}
         )
         r.raise_for_status()
         return r.text

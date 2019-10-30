@@ -5,7 +5,7 @@ import logging
 import retrying
 import requests
 
-from ..dcos_test_utils import helpers
+from dcos_test_utils import helpers
 
 REQUIRED_HEADERS = {'Accept': 'application/json, text/plain, */*'}
 log = logging.getLogger(__name__)
@@ -97,9 +97,10 @@ class Jobs(helpers.RetryCommonHttpErrorsMixin, helpers.ApiClientSession):
                     log.info('Job run {} finished.'.format(r_id))
                     return True
                 else:
-                    raise requests.HTTPError(
+                    log.warning(
                         'Waiting for job run {} to be finished, but history for that job run is not available'
-                        .format(r_id), response=rc)
+                        .format(r_id))
+                    return False
             else:
                 raise requests.HTTPError(
                     'Waiting for job run {} to be finished, but getting HTTP status code {}'
