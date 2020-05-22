@@ -97,6 +97,8 @@ class BotoWrapper:
         region = self.region if region is None else region
         return self.session.resource(service_name=name, region_name=region)
 
+    @retry(wait_exponential_multiplier=1000, wait_exponential_max=20 * 60 * 1000,
+           retry_on_exception=retry_on_rate_limiting)
     def create_key_pair(self, key_name):
         """Returns private key of newly generated pair
         """
@@ -116,7 +118,7 @@ class BotoWrapper:
                 yield from getattr(self.resource(service, region['id']), resource_name).all()
             except ClientError as e:
                 if e.response['Error']['Code'] == 'UnauthorizedOperation':
-                    log.error("Failed getting resources ({}) for region {} with exception: {}".format(
+                    log.debug("Failed getting resources ({}) for region {} with exception: {}".format(
                         resource_name, self.region, repr(e)))
                 else:
                     raise e
@@ -608,6 +610,7 @@ OS_SSH_INFO = {
     'cent-os-7-dcos-prereqs': SSH_INFO['centos'],
     'cent-os-7.4-with-docker-selinux-disabled': SSH_INFO['centos'],
     'cent-os-7.4-with-docker-selinux-enforcing': SSH_INFO['centos'],
+    'cent-os-8.0-with-docker-selinux-permissive': SSH_INFO['centos'],
     'coreos': SSH_INFO['coreos'],
     'debian-8': SSH_INFO['debian'],
     'rhel-7-dcos-prereqs': SSH_INFO['rhel'],
@@ -660,23 +663,14 @@ OS_AMIS = {
                                                  'us-east-2': 'ami-07f48e9948906d95d',
                                                  'us-west-1': 'ami-0b1320a3d397fa07a',
                                                  'us-west-2': 'ami-0116dcbe0583de7ca'},
+    # https://github.com/dcos/dcos-images/blob/master/centos/8.0/aws/DCOS-1.14.0-beta/docker-18.09.1-ce/selinux_permissive/dcos_images.yaml # noqa
+    'cent-os-8.0-with-docker-selinux-permissive': {'us-east-1': 'ami-0c298469d9dcbba34',
+                                                   'us-west-2': 'ami-0009a3f7859e07083'},
     'cent-os-7.4-with-docker-selinux-enforcing': CENTOS_74_WITH_DOCKER_SELINUX_ENFORCING,
-    # cent-os-7-dcos-prereqs runs centos 7.5. Taken from https://github.com/dcos/dcos-images/blob/master/centos/7.5/aws/DCOS-1.12.1/docker-1.13.1.git8633870/selinux_enabled_enforcing/dcos_images.yaml # noqa
-    'cent-os-7-dcos-prereqs': {'ap-northeast-1': 'ami-0b8a854edb213199d',
-                               'ap-northeast-2': 'ami-03db367713fbf07e3',
-                               'ap-south-1': 'ami-03688e38766104c42',
-                               'ap-southeast-1': 'ami-0ada39146fd39153b',
-                               'ap-southeast-2': 'ami-0850c9e538cddd8a6',
-                               'ca-central-1': 'ami-095e91779dac74403',
-                               'eu-central-1': 'ami-042c2f48a8a94d149',
-                               'eu-west-1': 'ami-05c3dccf215f7f449',
-                               'eu-west-2': 'ami-0dfeb4a6692d3883d',
-                               'eu-west-3': 'ami-03827d7a70fe9a119',
-                               'sa-east-1': 'ami-0d8b4f3dd8864a28a',
-                               'us-east-1': 'ami-02d110db811ab3fa0',
-                               'us-east-2': 'ami-0f66ae03534e52102',
-                               'us-west-1': 'ami-06d11d00d50d021b1',
-                               'us-west-2': 'ami-09f6aac63acde5a2f'},
+    # cent-os-7-dcos-prereqs (CentOS 7.5) uses manually built AMIs for now, see DCOS-51289.
+    # All regions except us-west-2 & us-east-1 have been disabled.
+    'cent-os-7-dcos-prereqs': {'us-east-1': 'ami-006219aba10688d0b',
+                               'us-west-2': 'ami-03daaf0b90fc7c71b'},
     'coreos': {'ap-northeast-1': 'ami-884835ee',
                'ap-southeast-1': 'ami-b9c280c5',
                'ap-southeast-2': 'ami-04be7b66',

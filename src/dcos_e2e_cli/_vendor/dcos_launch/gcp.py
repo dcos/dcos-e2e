@@ -12,7 +12,7 @@ from googleapiclient.errors import HttpError
 log = logging.getLogger(__name__)
 
 
-def get_credentials(env) -> tuple:
+def get_credentials(env=None) -> tuple:
     path = None
     if env is None:
         env = os.environ.copy()
