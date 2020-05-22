@@ -46,7 +46,7 @@ def _get_requirements() -> List[_Requirement]:
         package_name='dcos_launch',
         install_directories=['dcos_launch'],
         https_address='https://github.com/dcos/dcos-launch',
-        git_reference='693f2a81403b38b2dd77740fc350345ddab9dfcc',
+        git_reference='5df9c68a5a5f41a5bf201b961eb54140ac324635',
     )
 
     test_utils = _Requirement(
@@ -54,7 +54,7 @@ def _get_requirements() -> List[_Requirement]:
         package_name='dcos_test_utils',
         install_directories=['dcos_test_utils', 'pytest_dcos'],
         https_address='https://github.com/dcos/dcos-test-utils',
-        git_reference='9a9cafdd509bc9b8c76ab5e9f59849e7f3ace765',
+        git_reference='0957dc87e05d8b14c42e188de6a9e926839716c6',
     )
 
     dcos_launch_cli = _Requirement(
@@ -62,7 +62,7 @@ def _get_requirements() -> List[_Requirement]:
         package_name='dcos_launch',
         install_directories=['dcos_launch'],
         https_address='https://github.com/dcos/dcos-launch',
-        git_reference='693f2a81403b38b2dd77740fc350345ddab9dfcc',
+        git_reference='5df9c68a5a5f41a5bf201b961eb54140ac324635',
     )
 
     test_utils_cli = _Requirement(
@@ -70,7 +70,7 @@ def _get_requirements() -> List[_Requirement]:
         package_name='dcos_test_utils',
         install_directories=['dcos_test_utils', 'pytest_dcos'],
         https_address='https://github.com/dcos/dcos-test-utils',
-        git_reference='9a9cafdd509bc9b8c76ab5e9f59849e7f3ace765',
+        git_reference='0957dc87e05d8b14c42e188de6a9e926839716c6',
     )
 
     vertigo_e2e = _Requirement(
@@ -94,7 +94,7 @@ def _get_requirements() -> List[_Requirement]:
         package_name='dcos_installer_tools',
         install_directories=['dcos_installer_tools'],
         https_address='https://github.com/adamtheturtle/dcos-installer-tools',
-        git_reference='eed084208813c9bf0cf4ff753da85fe11909a7bb',
+        git_reference='8550cf77f0f8e9878ad4d6ec9980f675b656d966',
     )
 
     requirements = [
