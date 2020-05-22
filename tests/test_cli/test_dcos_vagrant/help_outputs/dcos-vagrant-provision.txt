@@ -31,7 +31,7 @@ Options:
   --vagrant-box-version TEXT      The version of the Vagrant box to use. See htt
                                   ps://www.vagrantup.com/docs/boxes/versioning.h
                                   tml#version-constraints for details.
-                                  [default: ~> 0.9.2]
+                                  [default: ~> 0.10]
   --vm-memory-mb INTEGER          The amount of memory to give each VM.
                                   [default: 2048]
   -h, --help                      Show this message and exit.

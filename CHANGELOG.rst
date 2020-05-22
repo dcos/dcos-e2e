@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Changed the default version of ``dcos-vagrant-box`` to ``0.10``.
+
 2019.10.11.0
 ------------
 
