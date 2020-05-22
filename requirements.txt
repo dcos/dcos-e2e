@@ -21,7 +21,8 @@ semver==2.8.1
 # We use >= rather than == because Homebrew PyPI poet
 # https://github.com/tdsmith/homebrew-pypi-poet/blob/master/poet/poet.py
 # does not pin setuptools.
-setuptools>=41.0.1
+# Use <45 for https://github.com/pypa/setuptools/issues/1963
+setuptools>=41.0.1,<45
 timeout-decorator==0.4.1
 tqdm==4.32.2
 urllib3==1.25.3
