@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+2020.05.26.0
+------------
+
 * Changed the default version of ``dcos-vagrant-box`` to ``0.10``.
 * Updated dependencies.
 * Drop support for RHEL in ``minidcos aws``.
