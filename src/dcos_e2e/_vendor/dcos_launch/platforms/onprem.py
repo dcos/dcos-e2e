@@ -169,7 +169,7 @@ def do_genconf(
 def curl(download_url: str, out_path: str) -> list:
     """ returns a robust curl command in list form
     """
-    return ['curl', '-fLsSv', '--retry', '20', '-Y', '100000', '-y', '60',
+    return ['curl', '-fLsSv', '--retry', '20', '-Y', '100000', '-y', '90',
             '--create-dirs', '-o', out_path, download_url]
 
 

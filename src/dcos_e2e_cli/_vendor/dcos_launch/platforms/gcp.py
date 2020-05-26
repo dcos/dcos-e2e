@@ -251,7 +251,7 @@ class GcpWrapper:
                 zone = None
                 for r in deployment.get_resources()['resources']:
                     if r['type'] == 'compute.v1.instanceGroupManager':
-                        zone = r.get('properties', dict).get('zone')
+                        zone = r.get('properties', {}).get('zone')
                 if zone is None:
                     yield deployment
                 else:

@@ -4,6 +4,7 @@ Test DC/OS on all supported distributions on Amazon Web Services.
 
 import uuid
 
+import pytest
 from passlib.hash import sha512_crypt
 
 from dcos_e2e.backends import AWS
@@ -165,6 +166,7 @@ class TestCentos7:
         assert node_distribution == Distribution.CENTOS_7
 
 
+@pytest.mark.xfail(reason='dcos_launch does not have working RHEL image')
 class TestRHEL7:
     """
     Tests for the Red Hat Enterprise Linux 7 distribution option.

@@ -25,7 +25,7 @@ class Vagrant(ClusterBackend):
         virtualbox_description: str = '',
         workspace_dir: Optional[Path] = None,
         vm_memory_mb: int = 2048,
-        vagrant_box_version: str = '~> 0.9.2',
+        vagrant_box_version: str = '~> 0.10',
         vagrant_box_url: str = (
             'https://downloads.dcos.io/dcos-vagrant/metadata.json'
         ),

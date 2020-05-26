@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 
 import docker
+import pytest
 from docker.types import Mount
 from dulwich.repo import Repo
 
@@ -15,6 +16,7 @@ from admin.homebrew import get_homebrew_formula
 LOGGER = logging.getLogger(__name__)
 
 
+@pytest.mark.xfail(reason='https://jira.d2iq.com/browse/DCOS_OSS-5962')
 def test_brew(tmp_path: Path) -> None:
     """
     It is possible to create a Homebrew formula and to install this with

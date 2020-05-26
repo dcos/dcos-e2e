@@ -142,7 +142,7 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
             return self.check_app_instances(app_id, app_instances, check_health, ignore_failed_tasks)
         wait()
 
-    def deploy_app(self, app_definition, check_health=True, ignore_failed_tasks=False, timeout=1200):
+    def deploy_app(self, app_definition, check_health=True, ignore_failed_tasks=False, timeout=180):
         """Deploy an app to marathon
 
         This function deploys an an application and then waits for marathon to
@@ -176,7 +176,7 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
             raise Exception("Application deployment failed - operation was not "
                             "completed in {} seconds.".format(timeout))
 
-    def deploy_pod(self, pod_definition, timeout=1200):
+    def deploy_pod(self, pod_definition, timeout=180):
         """Deploy a pod to marathon
 
         This function deploys an a pod and then waits for marathon to
@@ -284,7 +284,7 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
                             "completed in {} seconds.".format(timeout))
 
     @contextlib.contextmanager
-    def deploy_and_cleanup(self, app_definition, timeout=1200, check_health=True, ignore_failed_tasks=True):
+    def deploy_and_cleanup(self, app_definition, timeout=180, check_health=True, ignore_failed_tasks=True):
         """ This context manager works just like :func:`Marathon.deploy_app` but will always destroy
         the app once the context is left
         """
@@ -295,7 +295,7 @@ class Marathon(RetryCommonHttpErrorsMixin, ApiClientSession):
             self.destroy_app(app_definition['id'], timeout)
 
     @contextlib.contextmanager
-    def deploy_pod_and_cleanup(self, pod_definition, timeout=1200):
+    def deploy_pod_and_cleanup(self, pod_definition, timeout=180):
         """ This context manager works just like :func:`Marathon.deploy_pod` but will always destroy
         the app once the context is left
         """
