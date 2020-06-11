@@ -213,7 +213,7 @@ class ClusterVMs(ClusterRepresentation):
         # the library.
         # Instead, we should set different Virtualbox descriptions for
         # different node types.
-        # see https://jira.mesosphere.com/browse/DCOS_OSS-3851.
+        # see https://jira.d2iq.com/browse/DCOS_OSS-3851.
         vm_names = self._vm_names()
         return set(name for name in vm_names if '-master-' in name)
 

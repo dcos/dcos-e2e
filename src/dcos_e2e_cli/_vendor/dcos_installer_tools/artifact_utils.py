@@ -69,7 +69,7 @@ def get_dcos_installer_details(
     if ' ' in str(installer):
         message = (
             'No spaces allowed in path to the installer. '
-            'See https://jira.mesosphere.com/browse/DCOS_OSS-4429.'
+            'See https://jira.d2iq.com/browse/DCOS_OSS-4429.'
         )
         raise ValueError(message)
 

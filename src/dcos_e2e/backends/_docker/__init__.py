@@ -259,7 +259,7 @@ class Docker(ClusterBackend):
         #
         # This has a problem - some hosts do not have systemd, and therefore
         # ``/sys/fs/cgroup`` is not available, and a mount error is shown.
-        # See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for details.
+        # See https://jira.d2iq.com/browse/DCOS_OSS-4475 for details.
         cgroup_mount = Mount(
             source='/sys/fs/cgroup',
             target='/sys/fs/cgroup',

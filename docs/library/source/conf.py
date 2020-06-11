@@ -112,7 +112,7 @@ spelling_word_list_filename = '../../../spelling_private_dict.txt'
 autodoc_member_order = 'bysource'
 
 extlinks = {
-    'issue': ('https://jira.mesosphere.com/browse/%s', 'issue '),
+    'issue': ('https://jira.d2iq.com/browse/%s', 'issue '),
 }
 
 rst_epilog = """

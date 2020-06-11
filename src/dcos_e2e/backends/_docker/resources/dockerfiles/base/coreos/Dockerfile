@@ -1,7 +1,7 @@
 FROM quay.io/shift/coreos:stable-1298.7.0
 
 # This works around a systemd bug.
-# See https://jira.mesosphere.com/browse/DCOS_OSS-1240
+# See https://jira.d2iq.com/browse/DCOS_OSS-1240
 RUN echo '[Unit]' >> /lib/systemd/system/systemd-journald-init.service
 RUN echo 'Description=Initialize /run/log/journal ACLs' >> /lib/systemd/system/systemd-journald-init.service
 RUN echo 'After=systemd-journald.service' >> /lib/systemd/system/systemd-journald-init.service

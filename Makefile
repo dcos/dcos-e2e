@@ -53,7 +53,7 @@ open-docs:
 	python -c 'import os, webbrowser; webbrowser.open("file://" + os.path.abspath("docs/cli/build/html/index.html"))'
 
 # We pull Docker images before the tests start to catch any flakiness early.
-# See https://jira.mesosphere.com/browse/DCOS_OSS-2120 for details of
+# See https://jira.d2iq.com/browse/DCOS_OSS-2120 for details of
 # flakiness.
 .PHONY: pull-images
 pull-images:

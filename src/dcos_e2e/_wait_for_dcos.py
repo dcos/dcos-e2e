@@ -261,7 +261,7 @@ def wait_for_dcos_ee(
         # suggestion.
 
         # The progress on a partial replacement can be followed here:
-        # https://jira.mesosphere.com/browse/DCOS_OSS-1313
+        # https://jira.d2iq.com/browse/DCOS_OSS-1313
 
         # In order to fully replace this method one would need to have
         # DC/OS checks for every HTTP endpoint exposed by Admin Router.

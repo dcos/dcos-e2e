@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Updated ``google-api-python-client`` to ``v1.7.12``.
+
 2020.05.26.0
 ------------
 
