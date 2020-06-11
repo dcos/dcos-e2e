@@ -4,8 +4,8 @@ dcoscli==0.6.1
 doc8==0.8.0
 dulwich==0.19.11
 flake8-commas==2.0.0
-flake8-quotes==2.0.1
-flake8==3.7.7
+flake8-quotes==3.2.0
+flake8==3.8.3
 homebrew-pypi-poet==0.10.0
 isort==4.3.21
 mypy==0.711
@@ -23,7 +23,7 @@ sphinx==2.1.2
 sphinx-autodoc-typehints==1.6.0
 sphinx-click==2.2.0
 sphinx-paramlinks==0.3.7
-Sphinx-Substitution-Extensions==2019.6.15.0
+Sphinx-Substitution-Extensions==2020.5.23.0
 sphinxcontrib-spelling==4.3.0
 vendorize==0.2.1
 vulture==1.0

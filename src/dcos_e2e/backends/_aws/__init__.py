@@ -110,7 +110,7 @@ class AWS(ClusterBackend):
                 Distribution.RHEL_7,
                 Distribution.COREOS,
                 # Support for Ubuntu is blocked on
-                # https://jira.mesosphere.com/browse/DCOS_OSS-3876.
+                # https://jira.d2iq.com/browse/DCOS_OSS-3876.
             ],
         )
 
@@ -208,7 +208,7 @@ class AWSCluster(ClusterManager):
             True,
             # There is a bug hit when using ``install_prereqs`` with some
             # distributions.
-            # See https://jira.mesosphere.com/browse/DCOS-40894.
+            # See https://jira.d2iq.com/browse/DCOS-40894.
             Distribution.CENTOS_7:
             False,
             Distribution.RHEL_7:
@@ -431,7 +431,7 @@ class AWSCluster(ClusterManager):
         # Deletion only works if valid AWS credentials are present. This
         # a problem if temporary credentials become invalid before
         # destroying a cluster because the generated AWS KeyPair persists.
-        # https://jira.mesosphere.com/browse/DCOS-21893
+        # https://jira.d2iq.com/browse/DCOS-21893
         self.launcher.delete()
 
         rmtree(path=str(self._path), ignore_errors=True)

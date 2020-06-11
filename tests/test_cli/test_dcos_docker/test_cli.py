@@ -358,11 +358,11 @@ class TestCreate:
         # https://github.com/google/yapf/issues/524.
         # yapf: disable
         expected_message = dedent(
-           """\
-           Usage: minidcos docker create [OPTIONS] INSTALLER
+            """\
+            Usage: minidcos docker create [OPTIONS] INSTALLER
 
-           Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
-            """,# noqa: E501,E261
+            Error: Invalid value for "--extra-config": "example" is not a valid DC/OS configuration
+            """,  # noqa: E501
         )
         # yapf: enable
         assert result.output == expected_message
@@ -394,11 +394,11 @@ class TestCreate:
         # https://github.com/google/yapf/issues/524.
         # yapf: disable
         expected_message = dedent(
-           """\
+            """\
             Usage: minidcos docker create [OPTIONS] INSTALLER
 
             Error: Invalid value for "-c" / "--cluster-id": Invalid cluster id "{cluster_id}", only [a-zA-Z0-9][a-zA-Z0-9_.-] are allowed and the cluster ID cannot be empty.
-            """,# noqa: E501,E261
+            """,  # noqa: E501
         ).format(cluster_id=invalid_id)
         # yapf: enable
         assert result.output == expected_message

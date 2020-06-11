@@ -256,7 +256,7 @@ def do_postflight(client: ssh_client.AsyncSshClient):
     """Runs a script that will check if DC/OS is operational without needing to authenticate
 
     It waits 20mins+ for the cluster poststart checks to succeed.
-    See https://jira.mesosphere.com/browse/DCOS-41568.
+    See https://jira.d2iq.com/browse/DCOS-41568.
     """
     postflight_script = """
 function run_command_until_success() {

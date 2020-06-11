@@ -360,7 +360,7 @@ def _check_systemd() -> CheckLevels:
     """
     Check that the host supports systemd.
 
-    See https://jira.mesosphere.com/browse/DCOS_OSS-4475 for removing the need
+    See https://jira.d2iq.com/browse/DCOS_OSS-4475 for removing the need
     for this.
     """
     client = docker_client()

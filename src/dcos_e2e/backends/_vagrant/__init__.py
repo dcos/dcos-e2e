@@ -86,7 +86,7 @@ class Vagrant(ClusterBackend):
         """
         Return a base configuration for installing DC/OS OSS.
         """
-        # See https://jira.mesosphere.com/browse/DCOS_OSS-2501
+        # See https://jira.d2iq.com/browse/DCOS_OSS-2501
         # for removing "check_time: 'false'".
         return {
             'check_time': 'false',

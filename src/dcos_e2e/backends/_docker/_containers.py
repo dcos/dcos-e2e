@@ -96,7 +96,7 @@ def start_dcos_container(
     In this container, start Docker and `sshd`.
 
     Run Mesos without `systemd` support. This is not supported by DC/OS.
-    See https://jira.mesosphere.com/browse/DCOS_OSS-1131.
+    See https://jira.d2iq.com/browse/DCOS_OSS-1131.
 
     Args:
         container_base_name: The start of the container name.
@@ -187,7 +187,7 @@ def start_dcos_container(
         '/bin/bash -c "{cmd}"'.format(cmd=' '.join(echo_key)),
         ['rm', '-f', '/run/nologin', '||', 'true'],
         ['systemctl', 'start', 'sshd'],
-        # Work around https://jira.mesosphere.com/browse/DCOS_OSS-1361.
+        # Work around https://jira.d2iq.com/browse/DCOS_OSS-1361.
         ['systemd-tmpfiles', '--create', '--prefix', '/var/log/journal'],
         ['systemd-tmpfiles', '--create', '--prefix', '/run/log/journal'],
     ]:
