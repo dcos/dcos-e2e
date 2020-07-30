@@ -15,6 +15,7 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
     Return the directory including a Dockerfile to use for the base OS image.
     """
     dcos_docker_distros = {
+        Distribution.CENTOS_8: 'centos-8',
         Distribution.CENTOS_7: 'centos-7',
         Distribution.COREOS: 'coreos',
         Distribution.UBUNTU_16_04: 'ubuntu-xenial',

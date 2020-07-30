@@ -10,6 +10,7 @@ from dcos_e2e.distributions import Distribution
 
 _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
+    'centos-8': Distribution.CENTOS_8,
     'coreos': Distribution.COREOS,
     'ubuntu-16.04': Distribution.UBUNTU_16_04,
 }
