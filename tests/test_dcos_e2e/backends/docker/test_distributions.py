@@ -30,6 +30,7 @@ def _get_node_distribution(node: Node) -> Distribution:
 
     distributions = {
         ('"centos"', '"7"'): Distribution.CENTOS_7,
+        ('"centos"', '"8"'): Distribution.CENTOS_8,
         ('coreos', '1298.7.0'): Distribution.COREOS,
         ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
     }
@@ -61,7 +62,7 @@ def _oss_distribution_test(
         cluster.install_dcos_from_path(
             dcos_installer=oss_installer,
             dcos_config=cluster.base_config,
-            output=Output.CAPTURE,
+            output=Output.LOG_AND_CAPTURE,
             ip_detect_path=cluster_backend.ip_detect_path,
         )
         cluster.wait_for_dcos_oss()
@@ -106,7 +107,7 @@ def _enterprise_distribution_test(
                 **config,
             },
             ip_detect_path=cluster_backend.ip_detect_path,
-            output=Output.CAPTURE,
+            output=Output.LOG_AND_CAPTURE,
         )
         cluster.wait_for_dcos_ee(
             superuser_username=superuser_username,
@@ -153,6 +154,38 @@ class TestCentos7:
             node_distribution = _get_node_distribution(node=master)
 
         assert node_distribution == Distribution.CENTOS_7
+
+
+class TestCentos8:
+    """
+    Tests for the CentOS 8 distribution option.
+    """
+
+    def test_oss(
+        self,
+        oss_installer: Path,
+    ) -> None:
+        """
+        DC/OS OSS can start up on CentOS 8.
+        """
+        _oss_distribution_test(
+            distribution=Distribution.CENTOS_8,
+            oss_installer=oss_installer,
+        )
+
+    def test_enterprise(
+        self,
+        enterprise_installer: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on CentOS 8.
+        """
+        _enterprise_distribution_test(
+            distribution=Distribution.CENTOS_8,
+            enterprise_installer=enterprise_installer,
+            license_key_contents=license_key_contents,
+        )
 
 
 class TestCoreOS:

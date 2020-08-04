@@ -91,6 +91,10 @@ PATTERNS = {
     (),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7':
     (),
+    'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos8::test_enterprise':  # noqa: E501
+    (EE_MASTER, ),
+    'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos8::test_oss':  # noqa: E501
+    (OSS_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise':  # noqa: E501
     (EE_MASTER, ),
     'tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss':  # noqa: E501
