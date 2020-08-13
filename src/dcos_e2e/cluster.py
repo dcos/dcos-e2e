@@ -22,7 +22,7 @@ LOGGER = logging.getLogger(__name__)
 @retry(
     exceptions=(subprocess.CalledProcessError),
     tries=5,
-    delay=1,
+    delay=2,
 )
 def _wait_for_ssh(node: Node) -> None:
     """

@@ -12,6 +12,7 @@ _LINUX_DISTRIBUTIONS = {
     'centos-7': Distribution.CENTOS_7,
     'centos-8': Distribution.CENTOS_8,
     'coreos': Distribution.COREOS,
+    'flatcar': Distribution.FLATCAR,
     'ubuntu-16.04': Distribution.UBUNTU_16_04,
 }
 

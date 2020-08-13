@@ -18,6 +18,7 @@ def _base_dockerfile(linux_distribution: Distribution) -> Path:
         Distribution.CENTOS_8: 'centos-8',
         Distribution.CENTOS_7: 'centos-7',
         Distribution.COREOS: 'coreos',
+        Distribution.FLATCAR: 'flatcar',
         Distribution.UBUNTU_16_04: 'ubuntu-xenial',
     }
 

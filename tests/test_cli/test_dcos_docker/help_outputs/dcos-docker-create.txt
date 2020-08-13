@@ -32,7 +32,7 @@ Options:
                                   This can be provided by setting the
                                   `MINIDCOS_NODE_DOCKER_VERSION` environment
                                   variable.  [default: 18.06.3-ce]
-  --linux-distribution [centos-7|centos-8|coreos|ubuntu-16.04]
+  --linux-distribution [centos-7|centos-8|coreos|flatcar|ubuntu-16.04]
                                   The Linux distribution to use on the nodes.
                                   [default: centos-7]
   --docker-storage-driver [aufs|auto|overlay|overlay2]

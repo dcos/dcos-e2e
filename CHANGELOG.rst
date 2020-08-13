@@ -7,7 +7,7 @@ Next
 ----
 
 * Updated ``google-api-python-client`` to ``v1.7.12``.
-* Added support for CentOS 8 when using Docker.
+* Added support for CentOS 8 and Flatcar when using Docker.
 
 2020.05.26.0
 ------------

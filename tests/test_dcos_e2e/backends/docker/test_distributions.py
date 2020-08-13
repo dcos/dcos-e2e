@@ -32,6 +32,7 @@ def _get_node_distribution(node: Node) -> Distribution:
         ('"centos"', '"7"'): Distribution.CENTOS_7,
         ('"centos"', '"8"'): Distribution.CENTOS_8,
         ('coreos', '1298.7.0'): Distribution.COREOS,
+        ('flatcar', '2512.2.1'): Distribution.FLATCAR,
         ('ubuntu', '"16.04"'): Distribution.UBUNTU_16_04,
     }
 
@@ -59,15 +60,19 @@ def _oss_distribution_test(
         agents=0,
         public_agents=0,
     ) as cluster:
-        cluster.install_dcos_from_path(
-            dcos_installer=oss_installer,
-            dcos_config=cluster.base_config,
-            output=Output.LOG_AND_CAPTURE,
-            ip_detect_path=cluster_backend.ip_detect_path,
-        )
-        cluster.wait_for_dcos_oss()
         (master, ) = cluster.masters
-        node_distribution = _get_node_distribution(node=master)
+        try:
+            cluster.install_dcos_from_path(
+                dcos_installer=oss_installer,
+                dcos_config=cluster.base_config,
+                output=Output.LOG_AND_CAPTURE,
+                ip_detect_path=cluster_backend.ip_detect_path,
+            )
+            cluster.wait_for_dcos_oss()
+            node_distribution = _get_node_distribution(node=master)
+        except Exception:
+            master.run(['journalctl'], output=Output.LOG_AND_CAPTURE)
+            raise
 
     assert node_distribution == distribution
 
@@ -100,21 +105,25 @@ def _enterprise_distribution_test(
         agents=0,
         public_agents=0,
     ) as cluster:
-        cluster.install_dcos_from_path(
-            dcos_installer=enterprise_installer,
-            dcos_config={
-                **cluster.base_config,
-                **config,
-            },
-            ip_detect_path=cluster_backend.ip_detect_path,
-            output=Output.LOG_AND_CAPTURE,
-        )
-        cluster.wait_for_dcos_ee(
-            superuser_username=superuser_username,
-            superuser_password=superuser_password,
-        )
         (master, ) = cluster.masters
-        node_distribution = _get_node_distribution(node=master)
+        try:
+            cluster.install_dcos_from_path(
+                dcos_installer=enterprise_installer,
+                dcos_config={
+                    **cluster.base_config,
+                    **config,
+                },
+                ip_detect_path=cluster_backend.ip_detect_path,
+                output=Output.LOG_AND_CAPTURE,
+            )
+            cluster.wait_for_dcos_ee(
+                superuser_username=superuser_username,
+                superuser_password=superuser_password,
+            )
+            node_distribution = _get_node_distribution(node=master)
+        except Exception:
+            master.run(['journalctl'], output=Output.LOG_AND_CAPTURE)
+            raise
 
     assert node_distribution == distribution
 
@@ -215,6 +224,38 @@ class TestCoreOS:
         """
         _enterprise_distribution_test(
             distribution=Distribution.COREOS,
+            enterprise_installer=enterprise_installer,
+            license_key_contents=license_key_contents,
+        )
+
+
+class TestFlatcar:
+    """
+    Tests for the Flatcar distribution option.
+    """
+
+    def test_oss(
+        self,
+        oss_installer: Path,
+    ) -> None:
+        """
+        DC/OS OSS can start up on Flatcar.
+        """
+        _oss_distribution_test(
+            distribution=Distribution.FLATCAR,
+            oss_installer=oss_installer,
+        )
+
+    def test_enterprise(
+        self,
+        enterprise_installer: Path,
+        license_key_contents: str,
+    ) -> None:
+        """
+        DC/OS Enterprise can start up on Flatcar.
+        """
+        _enterprise_distribution_test(
+            distribution=Distribution.FLATCAR,
             enterprise_installer=enterprise_installer,
             license_key_contents=license_key_contents,
         )
