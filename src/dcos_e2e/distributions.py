@@ -17,3 +17,4 @@ class Distribution(Enum):
     UBUNTU_16_04 = 3
     RHEL_7 = 4
     CENTOS_8 = 5
+    FLATCAR = 6
