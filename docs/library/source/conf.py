@@ -68,7 +68,7 @@ html_sidebars = {
 htmlhelp_basename = 'DCOSE2Edoc'
 autoclass_content = 'init'
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.5', None),
+    'python': ('https://docs.python.org/3.6', None),
     'docker': ('http://docker-py.readthedocs.io/en/stable', None),
 }
 nitpicky = True

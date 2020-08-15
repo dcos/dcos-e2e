@@ -8,7 +8,7 @@ addons:
     - enchant
 language: python
 python:
-- '3.5'
+- '3.6'
 env:
   matrix:
   - CI_PATTERN=''
