@@ -14,7 +14,7 @@ Outcomes
 Prerequisites
 -------------
 
-* ``python3`` on your ``PATH`` set to Python 3.5+.
+* ``python3`` on your ``PATH`` set to Python 3.6+.
 * Docker available and set up for your user.
 * ``virtualenv``.
 * Push access to this repository.

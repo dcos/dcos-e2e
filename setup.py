@@ -59,7 +59,7 @@ setup(
     classifiers=[
         'Operating System :: POSIX',
         'Environment :: Web Environment',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'License :: OSI Approved :: Apache Software License',
         'Development Status :: 5 - Production/Stable',
     ],

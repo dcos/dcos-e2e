@@ -1,6 +1,6 @@
 .. Note: This is duplicated in the library documentation.
 
-Requires Python 3.5.2+.
+Requires Python 3.6+.
 To avoid interfering with your system's Python, we recommend using a `virtualenv <https://virtualenv.pypa.io/en/stable/>`_.
 
 Check the Python version:
