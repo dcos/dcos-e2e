@@ -6,6 +6,9 @@ Changelog
 Next
 ----
 
+* Drop support for Python 3.5 and DC/OS 1.9 - 1.11.
+  These versions may continue to work, but will no longer be tested.
+
 2020.08.14.0
 ------------
 
