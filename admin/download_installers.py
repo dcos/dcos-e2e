@@ -156,14 +156,6 @@ PATTERNS = {
     (EE_1_11, ),
     'tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS':
     (EE_MASTER, ),
-    'tests/test_dcos_e2e/test_legacy.py::Test110::test_enterprise':
-    (EE_1_10, ),
-    'tests/test_dcos_e2e/test_legacy.py::Test110::test_oss':
-    (OSS_1_10, ),
-    'tests/test_dcos_e2e/test_legacy.py::Test111::test_enterprise':
-    (EE_1_11, ),
-    'tests/test_dcos_e2e/test_legacy.py::Test111::test_oss':
-    (OSS_1_11, ),
     'tests/test_dcos_e2e/test_legacy.py::Test112::test_enterprise':
     (EE_1_12, ),
     'tests/test_dcos_e2e/test_legacy.py::Test112::test_oss':
@@ -172,10 +164,6 @@ PATTERNS = {
     (EE_1_13, ),
     'tests/test_dcos_e2e/test_legacy.py::Test113::test_oss':
     (OSS_1_13, ),
-    'tests/test_dcos_e2e/test_legacy.py::Test19::test_enterprise':
-    (EE_1_9, ),
-    'tests/test_dcos_e2e/test_legacy.py::Test19::test_oss':
-    (OSS_1_9, ),
     'tests/test_dcos_e2e/test_legacy.py::Test20::test_enterprise':
     (EE_2_0, ),
     'tests/test_dcos_e2e/test_legacy.py::Test20::test_oss':
