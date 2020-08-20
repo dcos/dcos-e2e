@@ -115,6 +115,38 @@ def enterprise_1_13_installer() -> Path:
 
 
 @pytest.fixture(scope='session')
+def oss_2_0_installer() -> Path:
+    """
+    Return the path to an installer for DC/OS OSS 2.0.
+    """
+    return Path('/tmp/dcos_generate_config_2_0.sh')
+
+
+@pytest.fixture(scope='session')
+def enterprise_2_0_installer() -> Path:
+    """
+    Return the path to an installer for DC/OS Enterprise 2.0.
+    """
+    return Path('/tmp/dcos_generate_config_2_0.ee.sh')
+
+
+@pytest.fixture(scope='session')
+def oss_2_1_installer() -> Path:
+    """
+    Return the path to an installer for DC/OS OSS 2.1.
+    """
+    return Path('/tmp/dcos_generate_config_2_1.sh')
+
+
+@pytest.fixture(scope='session')
+def enterprise_2_1_installer() -> Path:
+    """
+    Return the path to an installer for DC/OS Enterprise 2.1.
+    """
+    return Path('/tmp/dcos_generate_config_2_1.ee.sh')
+
+
+@pytest.fixture(scope='session')
 def oss_installer_url() -> str:
     """
     Return the url to an installer for DC/OS OSS.
