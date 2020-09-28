@@ -108,7 +108,6 @@ class AWS(ClusterBackend):
             [
                 Distribution.CENTOS_7,
                 Distribution.RHEL_7,
-                Distribution.COREOS,
                 # Support for Ubuntu is blocked on
                 # https://jira.d2iq.com/browse/DCOS_OSS-3876.
             ],
@@ -199,13 +198,10 @@ class AWSCluster(ClusterManager):
 
         ssh_user = {
             Distribution.CENTOS_7: 'centos',
-            Distribution.COREOS: 'core',
             Distribution.RHEL_7: 'ec2-user',
         }
 
         install_prereqs = {
-            Distribution.COREOS:
-            True,
             # There is a bug hit when using ``install_prereqs`` with some
             # distributions.
             # See https://jira.d2iq.com/browse/DCOS-40894.
@@ -217,7 +213,6 @@ class AWSCluster(ClusterManager):
 
         prereqs_script_filename = {
             Distribution.CENTOS_7: 'install_prereqs.sh',
-            Distribution.COREOS: 'run_coreos_prereqs.sh',
             Distribution.RHEL_7: 'install_prereqs.sh',
         }[cluster_backend.linux_distribution]
         self._default_user = ssh_user[cluster_backend.linux_distribution]
@@ -227,7 +222,6 @@ class AWSCluster(ClusterManager):
 
         aws_distros = {
             Distribution.CENTOS_7: 'cent-os-7-dcos-prereqs',
-            Distribution.COREOS: 'coreos',
             Distribution.RHEL_7: 'rhel-7-dcos-prereqs',
         }
 

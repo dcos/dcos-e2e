@@ -148,7 +148,6 @@ def create(
     )
     ssh_user = {
         Distribution.CENTOS_7: 'centos',
-        Distribution.COREOS: 'core',
         Distribution.UBUNTU_16_04: 'ubuntu',
         Distribution.RHEL_7: 'ec2-user',
     }
