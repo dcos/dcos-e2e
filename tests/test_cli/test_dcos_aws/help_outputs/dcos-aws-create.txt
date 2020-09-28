@@ -48,7 +48,7 @@ Options:
   --aws-instance-type TEXT        The AWS instance type to use.  [default:
                                   m4.large]
   --aws-region TEXT               The AWS region to use.  [default: us-west-2]
-  --linux-distribution [centos-7|coreos]
+  --linux-distribution [centos-7]
                                   The Linux distribution to use on the nodes.
                                   [default: centos-7]
   --workspace-dir DIRECTORY       Creating a cluster can use approximately 2 GB

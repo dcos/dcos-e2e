@@ -59,7 +59,7 @@ class TestUnsupported:
 
     def test_linux_distribution_ubuntu(self) -> None:
         """
-        The AWS backend does not support the COREOS Linux distribution.
+        The AWS backend does not support the Ubuntu Linux distribution.
         """
         with pytest.raises(NotImplementedError) as excinfo:
             AWS(linux_distribution=Distribution.UBUNTU_16_04)
