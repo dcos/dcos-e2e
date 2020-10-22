@@ -239,6 +239,7 @@ class Cluster(ContextDecorator):
         ip_detect_path: Path,
         output: Output = Output.CAPTURE,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        skip_checks: bool = False,
     ) -> None:
         """
         Upgrade DC/OS.
@@ -253,6 +254,7 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
+            skip_checks: Set the skip_checks flag to the upgrade script.
         """
         for nodes, role in (
             (self.masters, Role.MASTER),
@@ -269,6 +271,7 @@ class Cluster(ContextDecorator):
                         files_to_copy_to_genconf_dir
                     ),
                     output=output,
+                    skip_checks=skip_checks,
                 )
 
     def upgrade_dcos_from_path(
@@ -278,6 +281,7 @@ class Cluster(ContextDecorator):
         ip_detect_path: Path,
         output: Output = Output.CAPTURE,
         files_to_copy_to_genconf_dir: Iterable[Tuple[Path, Path]] = (),
+        skip_checks: bool = False,
     ) -> None:
         """
         Upgrade DC/OS.
@@ -292,6 +296,7 @@ class Cluster(ContextDecorator):
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
             output: What happens with stdout and stderr.
+            skip_checks: Set the skip_checks flag to the upgrade script.
         """
         for nodes, role in (
             (self.masters, Role.MASTER),
@@ -308,6 +313,7 @@ class Cluster(ContextDecorator):
                         files_to_copy_to_genconf_dir
                     ),
                     output=output,
+                    skip_checks=skip_checks,
                 )
 
     def __enter__(self) -> 'Cluster':
