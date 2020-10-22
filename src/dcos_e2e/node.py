@@ -327,6 +327,7 @@ class Node:
         user: Optional[str] = None,
         output: Output = Output.CAPTURE,
         transport: Optional[Transport] = None,
+        skip_checks: bool = False,
     ) -> None:
         """
         Upgrade DC/OS on this node.
@@ -348,6 +349,7 @@ class Node:
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
+            skip_checks: Set the skip_checks flag to the upgrade script.
         """
         node_dcos_installer = _node_installer_path(
             node=self,
@@ -373,6 +375,7 @@ class Node:
             output=output,
             transport=transport,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            skip_checks=skip_checks,
         )
 
     def upgrade_dcos_from_path(
@@ -385,6 +388,7 @@ class Node:
         user: Optional[str] = None,
         output: Output = Output.CAPTURE,
         transport: Optional[Transport] = None,
+        skip_checks: bool = False,
     ) -> None:
         """
         Upgrade DC/OS on this node.
@@ -406,6 +410,7 @@ class Node:
             files_to_copy_to_genconf_dir: Pairs of host paths to paths on
                 the installer node. These are files to copy from the host to
                 the installer node before installing DC/OS.
+            skip_checks: Set the skip_checks flag to the upgrade script.
         """
         node_dcos_installer = _node_installer_path(
             node=self,
@@ -430,6 +435,7 @@ class Node:
             output=output,
             transport=transport,
             files_to_copy_to_genconf_dir=files_to_copy_to_genconf_dir,
+            skip_checks=skip_checks,
         )
 
     def run(
@@ -1043,6 +1049,7 @@ def _upgrade_dcos_from_node_path(
     user: Optional[str],
     output: Output,
     transport: Optional[Transport],
+    skip_checks: bool = False,
 ) -> None:
     """
     Upgrade DC/OS on this node.
@@ -1065,6 +1072,7 @@ def _upgrade_dcos_from_node_path(
         files_to_copy_to_genconf_dir: Pairs of host paths to paths on
             the installer node. These are files to copy from the host to
             the installer node before installing DC/OS.
+        skip_checks: Set the skip_checks flag to the upgrade script.
 
     Raises:
         subprocess.CalledProcessError: One of the upgrade process steps
@@ -1169,7 +1177,11 @@ def _upgrade_dcos_from_node_path(
         '&&',
         'bash',
         str(upgrade_script_path),
+        '--verbose',
     ]
+
+    if skip_checks:
+        setup_args.append('--skip-checks')
 
     node.run(
         args=setup_args,
