@@ -1177,6 +1177,7 @@ def _upgrade_dcos_from_node_path(
         '&&',
         'bash',
         str(upgrade_script_path),
+        '--verbose',
     ]
 
     if skip_checks:
