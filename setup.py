@@ -41,7 +41,7 @@ setup(
     version=versioneer.get_version(),  # type: ignore
     cmdclass=versioneer.get_cmdclass(),  # type: ignore
     author='Adam Dangoor',
-    author_email='adangoor@mesosphere.com',
+    author_email='adamdangoor@gmail.com',
     description='Test helpers for testing DC/OS end to end.',
     long_description=LONG_DESCRIPTION,
     packages=find_packages(where='src'),

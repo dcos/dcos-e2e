@@ -41,7 +41,7 @@ Accessing cluster nodes
 -----------------------
 
 SSH can be used to access cluster nodes for the purpose of debugging if :paramref:`~dcos_e2e.backends.AWS.workspace_dir` is set.
-The AWS backend generates a SSH key file ``id_rsa`` in a cluster-specific sub-directory under the :paramref:`~dcos_e2e.backends.AWS.workspace_dir` directory. The sub-directory is named after the unique cluster ID generated during cluster creation. The cluster ID is prefixed with ``dcos-e2e-`` and can be found through the DC/OS UI in the upper left corner or through the CCM UI when using `maws`_ with a Mesosphere AWS account.
+The AWS backend generates a SSH key file ``id_rsa`` in a cluster-specific sub-directory under the :paramref:`~dcos_e2e.backends.AWS.workspace_dir` directory. The sub-directory is named after the unique cluster ID generated during cluster creation. The cluster ID is prefixed with ``dcos-e2e-`` and can be found through the DC/OS UI in the upper left corner or through the CCM UI when using `maws`_ with a D2iQ AWS account.
 Adding this key to the ``ssh-agent`` or manually providing it via the ``-i`` flag after changing its file permissions to ``400`` will allow for connecting to the cluster via the ``ssh`` command.
 The SSH user depends on the :paramref:`~dcos_e2e.backends.AWS.linux_distribution` given to the :py:class:`~dcos_e2e.backends.AWS` backend.
 For :py:obj:`~dcos_e2e.distributions.Distribution.CENTOS_7` that is ``centos``.

@@ -36,7 +36,7 @@ To create a cluster you first need the link to a DC/OS installer.
 
 These can be found on `the releases page <https://dcos.io/releases/>`__.
 
-`DC/OS Enterprise <https://mesosphere.com/product/>`__ is also supported.
+`DC/OS Enterprise <https://d2iq.com/products/dcos>`__ is also supported.
 Ask your sales representative for installers.
 
 Creating a cluster is possible with the :ref:`dcos-aws-cli:create` command.
@@ -169,13 +169,13 @@ Viewing the Web UI
 To view the web UI of your cluster, use the :ref:`dcos-aws-cli:web` command.
 To see the web UI URL of your cluster, use the :ref:`dcos-aws-cli:inspect` command.
 
-Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
+Before viewing the UI, you may first need to `configure your browser to trust your DC/OS CA <https://docs.d2iq.com/mesosphere/dcos/2.1/security/ent/tls-ssl/ca-trust-browser/>`_, or choose to override the browser protection.
 
 Using a Custom CA Certificate
 -----------------------------
 
 On DC/OS Enterprise clusters, it is possible to use a custom CA certificate.
-See `the Custom CA certificate documentation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom>`_ for details.
+See `the Custom CA certificate documentation <https://docs.d2iq.com/mesosphere/dcos/2.1/security/ent/tls-ssl/ca-custom/>`_ for details.
 It is possible to use :ref:`dcos-aws-cli:create` to create a cluster with a custom CA certificate.
 
 #. Create or obtain the necessary files:
@@ -211,7 +211,7 @@ It is possible to use :ref:`dcos-aws-cli:create` to create a cluster with a cust
 
 #. Verify that everything has worked.
 
-   See `Verify installation <https://docs.mesosphere.com/1.11/security/ent/tls-ssl/ca-custom/#verify-installation>`_ for steps to verify that the DC/OS Enterprise cluster was installed properly with the custom CA certificate.
+   See `Verify installation <https://docs.d2iq.com/mesosphere/dcos/2.1/security/ent/tls-ssl/ca-custom/#verify-installation>`_ for steps to verify that the DC/OS Enterprise cluster was installed properly with the custom CA certificate.
 
 CLI Reference
 -------------
