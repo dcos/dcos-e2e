@@ -146,7 +146,7 @@ Rotating license keys
 ~~~~~~~~~~~~~~~~~~~~~
 
 DC/OS Enterprise requires a license key.
-Mesosphere uses license keys internally for testing, and these expire regularly.
+D2iQ uses license keys internally for testing, and these expire regularly.
 A license key is encrypted and used by the Travis CI tests.
 
 To update this link use the following command, after setting the ``LICENSE_KEY_CONTENTS`` environment variable.
@@ -241,7 +241,7 @@ Version Policy
 
 This repository aims to work with DC/OS OSS and DC/OS Enterprise ``master`` branches.
 These are moving targets.
-For this reason, `CalVer <http://calver.org/>`__ is used as a date at which the repository is last known to have worked with DC/OS OSS and DC/OS Enterprise is the main versioning use.
+For this reason, `CalVer <https://calver.org/>`__ is used as a date at which the repository is last known to have worked with DC/OS OSS and DC/OS Enterprise is the main versioning use.
 
 Release Process
 ---------------

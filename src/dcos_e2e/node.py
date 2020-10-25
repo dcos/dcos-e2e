@@ -194,7 +194,7 @@ class Node:
         """
         Install DC/OS in a platform-independent way by using
         the advanced installation method as described at
-        https://docs.mesosphere.com/1.13/installing/production/deploying-dcos/installation/.
+        https://docs.d2iq.com/mesosphere/dcos/2.1/installing/production/deploying-dcos/installation/.
 
         The documentation describes using a "bootstrap" node, so that only
         one node downloads and extracts the installer.
@@ -263,7 +263,7 @@ class Node:
         """
         Install DC/OS in a platform-independent way by using
         the advanced installation method as described at
-        https://docs.mesosphere.com/1.13/installing/production/deploying-dcos/installation/.
+        https://docs.d2iq.com/mesosphere/dcos/2.1/installing/production/deploying-dcos/installation/.
 
         The documentation describes using a "bootstrap" node, so that only
         one node downloads and extracts the installer.
@@ -331,7 +331,7 @@ class Node:
         """
         Upgrade DC/OS on this node.
         This follows the steps in
-        https://docs.mesosphere.com/1.13/installing/production/upgrading/.
+        https://docs.d2iq.com/mesosphere/dcos/2.1/installing/production/upgrading/.
 
         Args:
             dcos_installer: A URL pointing to an installer to install DC/OS
@@ -389,7 +389,7 @@ class Node:
         """
         Upgrade DC/OS on this node.
         This follows the steps in
-        https://docs.mesosphere.com/1.13/installing/production/upgrading/.
+        https://docs.d2iq.com/mesosphere/dcos/2.1/installing/production/upgrading/.
 
         Args:
             dcos_installer: The ``Path`` to a local installer to upgrade DC/OS
@@ -885,7 +885,7 @@ def _install_dcos_from_node_path(
     """
     Install DC/OS in a platform-independent way by using
     the advanced installation method as described at
-    https://docs.mesosphere.com/1.11/installing/oss/custom/advanced/.
+    https://docs.d2iq.com/mesosphere/dcos/2.1/installing/production/.
 
     The documentation describes using a "bootstrap" node, so that only
     one node downloads and extracts the installer.
@@ -1047,7 +1047,7 @@ def _upgrade_dcos_from_node_path(
     """
     Upgrade DC/OS on this node.
     This follows the steps in
-    https://docs.mesosphere.com/1.13/installing/production/upgrading/.
+    https://docs.d2iq.com/mesosphere/dcos/2.1/installing/production/upgrading/.
 
     Args:
         remote_dcos_installer: The path on the node to an installer to

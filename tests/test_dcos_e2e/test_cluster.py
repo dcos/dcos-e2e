@@ -362,7 +362,7 @@ class TestClusterFromNodes:
                 *cluster.public_agents,
             }:
                 build = node.dcos_build_info()
-                assert build.version.startswith('2.2')
+                assert build.version.startswith('2.')
                 assert build.commit
                 assert build.variant == DCOSVariant.OSS
 
