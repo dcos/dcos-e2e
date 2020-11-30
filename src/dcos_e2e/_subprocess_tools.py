@@ -87,9 +87,9 @@ def run_subprocess(
     stdout_logger = _LineLogger(LOGGER.debug)
     stderr_logger = _LineLogger(LOGGER.warning)
 
-    def _read_output(process: sarge.Pipeline) -> None:
-        stdout_line = process.stdout.read(block=False)
-        stderr_line = process.stderr.read(block=False)
+    def _read_output(process: sarge.Pipeline, block: bool) -> None:
+        stdout_line = process.stdout.read(block=block)
+        stderr_line = process.stderr.read(block=block)
         if stdout_line:
             stdout_list.append(stdout_line)
             if log_output_live:
@@ -105,11 +105,12 @@ def run_subprocess(
             while all(
                 command.returncode is None for command in process.commands
             ):
-                _read_output(process=process)
+                _read_output(process=process, block=False)
                 process.poll_all()
                 time.sleep(0.05)
 
-            _read_output(process=process)
+            # block on final read to ensure all data read.
+            _read_output(process=process, block=True)
         else:
             process = sarge.run(args, cwd=cwd, env=env, async_=True)
 
