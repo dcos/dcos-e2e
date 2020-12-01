@@ -21,6 +21,10 @@ from dcos_e2e.node import Node, Output
     os.environ.get('TRAVIS') == 'true',
     reason='It is not possible to run VirtualBox on Travis CI',
 )
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') == 'true',
+    reason='It is not possible to run VirtualBox on GitHub Actions',
+)
 class TestRunIntegrationTest:  # pragma: no cover
     """
     Tests for functionality specific to the Vagrant backend.
@@ -106,6 +110,10 @@ def _get_vm_from_node(node: Node) -> str:  # pragma: no cover
 @pytest.mark.skipif(
     os.environ.get('TRAVIS') == 'true',
     reason='It is not possible to run VirtualBox on Travis CI',
+)
+@pytest.mark.skipif(
+    os.environ.get('GITHUB_ACTIONS') == 'true',
+    reason='It is not possible to run VirtualBox on GitHub Actions',
 )
 class TestVMDescription:  # pragma: no cover
     """

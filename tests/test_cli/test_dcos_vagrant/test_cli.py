@@ -66,6 +66,10 @@ class TestDoctor:
         os.environ.get('TRAVIS') == 'true',
         reason='It is not possible to run VirtualBox on Travis CI',
     )
+    @pytest.mark.skipif(
+        os.environ.get('GITHUB_ACTIONS') == 'true',
+        reason='It is not possible to run VirtualBox on GitHub Actions',
+    )
     def test_doctor(self) -> None:  # pragma: no cover
         """
         No exception is raised by the ``doctor`` subcommand.

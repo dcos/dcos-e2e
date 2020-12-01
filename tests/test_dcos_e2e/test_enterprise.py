@@ -2,7 +2,6 @@
 5ests for using the test harness with a DC/OS Enterprise cluster.
 """
 
-import json
 import subprocess
 import uuid
 from pathlib import Path
@@ -309,59 +308,6 @@ class TestCopyFiles:
             master_url = 'https://' + str(master.public_ip_address)
             response = requests.get(master_url, verify=str(cert_path))
             response.raise_for_status()
-
-
-class TestSSLDisabled:
-    """
-    Tests for clusters with SSL disabled.
-    """
-
-    def test_wait_for_dcos_ee(
-        self,
-        cluster_backend: ClusterBackend,
-        enterprise_1_11_installer: Path,
-        license_key_contents: str,
-    ) -> None:
-        """
-        A cluster can start up with SSL disabled.
-        """
-        superuser_username = str(uuid.uuid4())
-        superuser_password = str(uuid.uuid4())
-        config = {
-            'superuser_username': superuser_username,
-            'superuser_password_hash': sha512_crypt.hash(superuser_password),
-            'fault_domain_enabled': False,
-            'license_key_contents': license_key_contents,
-            'security': 'disabled',
-        }
-
-        with Cluster(
-            cluster_backend=cluster_backend,
-            agents=0,
-            public_agents=0,
-        ) as cluster:
-            cluster.install_dcos_from_path(
-                dcos_installer=enterprise_1_11_installer,
-                dcos_config={
-                    **cluster.base_config,
-                    **config,
-                },
-                output=Output.LOG_AND_CAPTURE,
-                ip_detect_path=cluster_backend.ip_detect_path,
-            )
-            cluster.wait_for_dcos_ee(
-                superuser_username=superuser_username,
-                superuser_password=superuser_password,
-            )
-
-            # On 1.11 with security mode disabled, SSL is disabled.
-            any_master = next(iter(cluster.masters))
-            config_result = any_master.run(
-                args=['cat', '/opt/mesosphere/etc/bootstrap-config.json'],
-            )
-            config = json.loads(config_result.stdout.decode())
-            ssl_enabled = config['ssl_enabled']
-            assert not ssl_enabled
 
 
 class TestWaitForDCOS:
