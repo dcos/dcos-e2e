@@ -1,0 +1,81 @@
+name: dcos-e2e-test
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ci-pattern:
+        - ''
+        - tests/test_admin/test_brew.py
+        - tests/test_admin/test_binaries.py
+        - tests/test_cli
+        - tests/test_dcos_e2e/backends/aws/test_aws.py::TestDefaults
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos7
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos8::test_enterprise
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCentos8::test_oss
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_enterprise
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestCoreOS::test_oss
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestFlatcar::test_enterprise
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestFlatcar::test_oss
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_oss
+        - tests/test_dcos_e2e/backends/docker/test_distributions.py::TestUbuntu1604::test_enterprise
+        - tests/test_dcos_e2e/backends/docker/test_docker.py
+        - tests/test_dcos_e2e/backends/vagrant
+        - tests/test_dcos_e2e/test_cluster.py::TestClusterFromNodes
+        - tests/test_dcos_e2e/test_cluster.py::TestClusterSize
+        - tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_path
+        - tests/test_dcos_e2e/test_cluster.py::TestCopyFiles::test_install_cluster_from_url
+        - tests/test_dcos_e2e/test_cluster.py::TestInstallDCOS
+        - tests/test_dcos_e2e/test_cluster.py::TestIntegrationTests
+        - tests/test_dcos_e2e/test_cluster.py::TestMultipleClusters
+        - tests/test_dcos_e2e/test_cluster.py::TestDestroyNode
+        - tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_installer
+        - tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_files_to_installer
+        - tests/test_dcos_e2e/test_enterprise.py::TestCopyFiles::test_copy_directory_to_node_installer_genconf_dir
+        - tests/test_dcos_e2e/test_enterprise.py::TestEnterpriseIntegrationTests
+        - tests/test_dcos_e2e/test_enterprise.py::TestWaitForDCOS
+        - tests/test_dcos_e2e/test_legacy.py::Test113::test_enterprise
+        - tests/test_dcos_e2e/test_legacy.py::Test113::test_oss
+        - tests/test_dcos_e2e/test_legacy.py::Test20::test_enterprise
+        - tests/test_dcos_e2e/test_legacy.py::Test20::test_oss
+        - tests/test_dcos_e2e/test_legacy.py::Test21::test_enterprise
+        - tests/test_dcos_e2e/test_legacy.py::Test21::test_oss
+        - tests/test_dcos_e2e/test_node.py
+        - tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_url
+        - tests/test_dcos_e2e/test_node_install.py::TestAdvancedInstallationMethod::test_install_dcos_from_path
+        - tests/test_dcos_e2e/test_node_install.py::TestCopyFiles::test_install_from_path_with_genconf_files
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+    - name: Install dependencies
+      run: |
+        sudo modprobe ip6_tables
+        echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
+        pip install --upgrade setuptools codecov
+        pip uninstall -y six
+        pip install --upgrade --editable .[dev]
+      env:
+        LICENSE_KEY_CONTENTS: ${{ secrets.LICENSE_KEY_CONTENTS }}
+    - name: Download installers
+      run: |
+        python admin/download_installers.py
+      env:
+        CI_PATTERN: ${{ matrix.ci-pattern }}
+        EE_1_13_INSTALLER_URL: ${{ secrets.EE_1_13_INSTALLER_URL }}
+        EE_2_0_INSTALLER_URL: ${{ secrets.EE_2_0_INSTALLER_URL }}
+        EE_2_1_INSTALLER_URL: ${{ secrets.EE_2_1_INSTALLER_URL }}
+        EE_MASTER_INSTALLER_URL: ${{ secrets.EE_MASTER_INSTALLER_URL }}
+    - name: Test with pytest
+      run: |
+        python admin/run_script.py
+      env:
+        CI_PATTERN: ${{ matrix.ci-pattern }}
+        EE_1_13_INSTALLER_URL: ${{ secrets.EE_1_13_INSTALLER_URL }}
+        EE_2_0_INSTALLER_URL: ${{ secrets.EE_2_0_INSTALLER_URL }}
+        EE_2_1_INSTALLER_URL: ${{ secrets.EE_2_1_INSTALLER_URL }}
+        EE_MASTER_INSTALLER_URL: ${{ secrets.EE_MASTER_INSTALLER_URL }}

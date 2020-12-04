@@ -16,22 +16,36 @@ import yaml
 from admin.download_installers import PATTERNS
 
 
-def _travis_ci_patterns() -> Set[str]:
+def _ci_file_patterns() -> Set[str]:
     """
-    Return the CI patterns given in the ``.travis.yml`` file.
+    Return the CI patterns given in the ``.travis.yml`` and
+    ``dcos-e2e-test.yml`` files.
     """
-    travis_file = Path(__file__).parent.parent / '.travis.yml'
+    base = Path(__file__).parent.parent
+    ci_patterns = set()  # type: Set[str]
+
+    travis_file = base / '.travis.yml'
     travis_contents = travis_file.read_text()
     travis_dict = yaml.load(travis_contents, Loader=yaml.FullLoader)
     travis_matrix = travis_dict['env']['matrix']
 
-    ci_patterns = set()  # type: Set[str]
     for matrix_item in travis_matrix:
         key, value = matrix_item.split('=')
         assert key == 'CI_PATTERN'
         assert value not in ci_patterns
         # Special case for running no tests.
         if value != "''":
+            ci_patterns.add(value)
+
+    actions_file = base / '.github' / 'workflows' / 'dcos-e2e-test.yml'
+    actions_contents = actions_file.read_text()
+    actions_dict = yaml.load(actions_contents, Loader=yaml.FullLoader)
+    actions_matrix = actions_dict['jobs']['build']['strategy']['matrix']
+
+    for value in actions_matrix['ci-pattern']:
+        assert value not in ci_patterns
+        # Special case for running no tests.
+        if value != '':
             ci_patterns.add(value)
 
     return ci_patterns
@@ -54,20 +68,20 @@ def _tests_from_pattern(ci_pattern: str) -> Set[str]:
 
 def test_ci_patterns_match() -> None:
     """
-    The patterns in ``.travis.yml`` must match the patterns in
+    The patterns in CI matrices must match the patterns in
     ``admin/download_installers.py``.
     """
-    ci_patterns = _travis_ci_patterns()
+    ci_patterns = _ci_file_patterns()
     assert ci_patterns - PATTERNS.keys() == set()
     assert PATTERNS.keys() - ci_patterns == set()
 
 
 def test_ci_patterns_valid() -> None:
     """
-    All of the CI patterns in ``.travis.yml`` match at least one test in the
+    All of the CI patterns in matrices match at least one test in the
     test suite.
     """
-    ci_patterns = _travis_ci_patterns()
+    ci_patterns = _ci_file_patterns()
 
     for ci_pattern in ci_patterns:
         collect_only_result = pytest.main(['--collect-only', ci_pattern])
@@ -84,7 +98,7 @@ def test_tests_collected_once() -> None:
 
     This does not necessarily mean that they are run - they may be skipped.
     """
-    ci_patterns = _travis_ci_patterns()
+    ci_patterns = _ci_file_patterns()
     tests_to_patterns = defaultdict(list)  # type: Mapping[str, List]
     for pattern in ci_patterns:
         tests = _tests_from_pattern(ci_pattern=pattern)

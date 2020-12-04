@@ -6,7 +6,7 @@ Changelog
 Next
 ----
 
-* Drop support for Python 3.5 and DC/OS 1.9 - 1.11.
+* Drop support for Python 3.5 and DC/OS 1.9 - 1.12.
   These versions may continue to work, but will no longer be tested.
 * Drop support for CoreOS on AWS
 * Use blocking read to ensure final data is read from subprocess.

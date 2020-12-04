@@ -155,12 +155,12 @@ def oss_installer_url() -> str:
 
 
 @pytest.fixture(scope='session')
-def oss_1_13_installer_url() -> str:
+def oss_2_1_installer_url() -> str:
     """
-    Return the url to an installer for DC/OS OSS 1.13.
+    Return the url to an installer for DC/OS OSS 2.1.
     """
     return (
-        'https://downloads.dcos.io/dcos/stable/1.13.0/dcos_generate_config.sh'
+        'https://downloads.dcos.io/dcos/stable/2.1.2/dcos_generate_config.sh'
     )
 
 

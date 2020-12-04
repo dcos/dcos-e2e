@@ -375,15 +375,15 @@ class TestUpgrade:
     def test_upgrade_from_path(
         self,
         cluster_backend: ClusterBackend,
-        oss_1_12_installer: Path,
-        oss_1_13_installer: Path,
+        oss_2_0_installer: Path,
+        oss_2_1_installer: Path,
     ) -> None:
         """
-        DC/OS OSS can be upgraded from 1.12 to 1.13 from a local installer.
+        DC/OS OSS can be upgraded from 2.0 to 2.1 from a local installer.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=oss_1_12_installer,
+                dcos_installer=oss_2_0_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 output=Output.LOG_AND_CAPTURE,
@@ -396,11 +396,11 @@ class TestUpgrade:
                 *cluster.public_agents,
             }:
                 build = node.dcos_build_info()
-                assert build.version.startswith('1.12')
+                assert build.version.startswith('2.0')
                 assert build.variant == DCOSVariant.OSS
 
             cluster.upgrade_dcos_from_path(
-                dcos_installer=oss_1_13_installer,
+                dcos_installer=oss_2_1_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 output=Output.LOG_AND_CAPTURE,
@@ -413,21 +413,21 @@ class TestUpgrade:
                 *cluster.public_agents,
             }:
                 build = node.dcos_build_info()
-                assert build.version.startswith('1.13')
+                assert build.version.startswith('2.1')
                 assert build.variant == DCOSVariant.OSS
 
     def test_upgrade_from_url(
         self,
         cluster_backend: ClusterBackend,
-        oss_1_12_installer: Path,
-        oss_1_13_installer_url: str,
+        oss_2_0_installer: Path,
+        oss_2_1_installer_url: str,
     ) -> None:
         """
-        DC/OS OSS can be upgraded from 1.12 to 1.13 from a URL.
+        DC/OS OSS can be upgraded from 2.0 to 2.1 from a URL.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=oss_1_12_installer,
+                dcos_installer=oss_2_0_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 output=Output.LOG_AND_CAPTURE,
@@ -440,11 +440,11 @@ class TestUpgrade:
                 *cluster.public_agents,
             }:
                 build = node.dcos_build_info()
-                assert build.version.startswith('1.12')
+                assert build.version.startswith('2.0')
                 assert build.variant == DCOSVariant.OSS
 
             cluster.upgrade_dcos_from_url(
-                dcos_installer=oss_1_13_installer_url,
+                dcos_installer=oss_2_1_installer_url,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 output=Output.LOG_AND_CAPTURE,
@@ -457,7 +457,7 @@ class TestUpgrade:
                 *cluster.public_agents,
             }:
                 build = node.dcos_build_info()
-                assert build.version.startswith('1.13')
+                assert build.version.startswith('2.1')
                 assert build.variant == DCOSVariant.OSS
 
 

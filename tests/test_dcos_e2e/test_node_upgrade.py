@@ -16,16 +16,16 @@ class TestNodeUpgradeFromPath:
 
     def test_node_upgrade(
         self,
-        oss_1_12_installer: Path,
-        oss_1_13_installer: Path,
+        oss_2_0_installer: Path,
+        oss_2_1_installer: Path,
         cluster_backend: ClusterBackend,
     ) -> None:
         """
-        DC/OS OSS can be upgraded from 1.12 to 1.13.
+        DC/OS OSS can be upgraded from 2.0 to 2.1.
         """
         with Cluster(cluster_backend=cluster_backend) as cluster:
             cluster.install_dcos_from_path(
-                dcos_installer=oss_1_12_installer,
+                dcos_installer=oss_2_0_installer,
                 dcos_config=cluster.base_config,
                 ip_detect_path=cluster_backend.ip_detect_path,
                 output=Output.LOG_AND_CAPTURE,
@@ -39,10 +39,10 @@ class TestNodeUpgradeFromPath:
             ):
                 for node in nodes:
                     build = node.dcos_build_info()
-                    assert build.version.startswith('1.12')
+                    assert build.version.startswith('2.0')
                     assert build.variant == DCOSVariant.OSS
                     node.upgrade_dcos_from_path(
-                        dcos_installer=oss_1_13_installer,
+                        dcos_installer=oss_2_1_installer,
                         dcos_config=cluster.base_config,
                         ip_detect_path=cluster_backend.ip_detect_path,
                         role=role,
@@ -56,5 +56,5 @@ class TestNodeUpgradeFromPath:
                 *cluster.public_agents,
             }:
                 build = node.dcos_build_info()
-                assert build.version.startswith('1.13')
+                assert build.version.startswith('2.1')
                 assert build.variant == DCOSVariant.OSS
