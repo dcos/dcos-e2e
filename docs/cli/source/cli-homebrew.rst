@@ -19,4 +19,4 @@ To upgrade from an older version, run the following command:
     brew upgrade https://raw.githubusercontent.com/|github-owner|/|github-repository|/master/|brewfile-stem|.rb
 
 .. _Homebrew: https://brew.sh
-.. _Linuxbrew: https://linuxbrew.sh
+.. _Linuxbrew: https://docs.brew.sh/Homebrew-on-Linux

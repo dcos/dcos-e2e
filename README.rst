@@ -100,7 +100,7 @@ See the full `miniDC/OS`_ documentation for information on other CLI tools provi
    :target: http://minidcos.readthedocs.io/en/latest/?badge=latest
    :alt: CLI Documentation Status
 .. _Homebrew: https://brew.sh
-.. _Linuxbrew: https://linuxbrew.sh
+.. _Linuxbrew: https://docs.brew.sh/Homebrew-on-Linux
 .. _miniDC/OS: https://minidcos.readthedocs.io/en/latest/
 .. _minidcos docker CLI: https://minidcos.readthedocs.io/en/latest/dcos-docker-cli.html
 .. _library: https://dcos-e2e.readthedocs.io/en/latest/
