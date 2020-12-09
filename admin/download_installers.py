@@ -193,6 +193,5 @@ def download_installers(test_pattern: str) -> None:
 
 
 if __name__ == '__main__':
-    CI_PATTERN = os.environ.get('CI_PATTERN')
-    if CI_PATTERN:
-        download_installers(test_pattern=CI_PATTERN)
+    CI_PATTERN = os.environ['CI_PATTERN']
+    download_installers(test_pattern=CI_PATTERN)

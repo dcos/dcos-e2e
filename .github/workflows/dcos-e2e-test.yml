@@ -1,5 +1,9 @@
 name: dcos-e2e-test
-on: [push]
+on:
+  # run on PR open or update, and weekly at 7:42pm on Sunday
+  pull_request:
+  schedule:
+  - cron: '42 19 * * 0'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -7,7 +11,6 @@ jobs:
       fail-fast: false
       matrix:
         ci-pattern:
-        - ''
         - tests/test_admin/test_brew.py
         - tests/test_admin/test_binaries.py
         - tests/test_cli
