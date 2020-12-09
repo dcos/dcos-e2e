@@ -17,6 +17,7 @@ class TestDockerLoopbackVolume:
         A block device is created which is accessible to multiple containers.
         """
         client = docker.from_env(version='auto')
+        client.images.pull('centos:7')
         container = client.containers.create(
             privileged=True,
             detach=True,
