@@ -33,9 +33,7 @@ def _ci_file_patterns() -> Set[str]:
         key, value = matrix_item.split('=')
         assert key == 'CI_PATTERN'
         assert value not in ci_patterns
-        # Special case for running no tests.
-        if value != "''":
-            ci_patterns.add(value)
+        ci_patterns.add(value)
 
     actions_file = base / '.github' / 'workflows' / 'dcos-e2e-test.yml'
     actions_contents = actions_file.read_text()
@@ -44,9 +42,7 @@ def _ci_file_patterns() -> Set[str]:
 
     for value in actions_matrix['ci-pattern']:
         assert value not in ci_patterns
-        # Special case for running no tests.
-        if value != '':
-            ci_patterns.add(value)
+        ci_patterns.add(value)
 
     return ci_patterns
 

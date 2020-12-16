@@ -135,9 +135,8 @@ Ask Adam Dangoor if you are unsure who to ask for help from.
 CI
 --
 
-Linting and some tests are run on Travis CI.
-See ``.travis.yml`` for details on the limitations.
-To check if a new change works on CI, unfortunately it is necessary to change ``.travis.yml`` to run the desired tests.
+Linting and some tests are run on GitHub Actions and Travis CI.
+See ``.github/workflows`` and ``.travis.yml`` for details.
 
 Most of the CLI functionality is not covered by automated tests.
 Changes should take this into consideration.
@@ -196,8 +195,6 @@ To update the credentials use the following commands, after setting the followin
 
     travis env set --repo |github-owner|/|github-repository| AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
     travis env set --repo |github-owner|/|github-repository| AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
-
-Currently credentials are taken from the OneLogin Secure Notes note ``dcos-e2e integration testing AWS credentials``.
 
 Parallel builders
 ~~~~~~~~~~~~~~~~~
