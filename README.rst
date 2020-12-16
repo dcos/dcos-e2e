@@ -1,3 +1,5 @@
+|Actions build status|
+
 |Build Status|
 
 |codecov|
@@ -89,6 +91,7 @@ Other CLI tools include ``minidcos aws`` and ``minidcos vagrant``.
 
 See the full `miniDC/OS`_ documentation for information on other CLI tools provided by |project|.
 
+.. |Actions build status| image:: https://github.com/dcos/dcos-e2e/workflows/dcos-e2e-test/badge.svg
 .. |Build Status| image:: https://travis-ci.org/dcos/dcos-e2e.svg?branch=master
    :target: https://travis-ci.org/dcos/dcos-e2e
 .. |codecov| image:: https://codecov.io/gh/dcos/dcos-e2e/branch/master/graph/badge.svg
