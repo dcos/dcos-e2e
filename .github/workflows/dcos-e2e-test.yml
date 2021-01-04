@@ -60,7 +60,7 @@ jobs:
       run: |
         sudo modprobe ip6_tables
         echo $LICENSE_KEY_CONTENTS > /tmp/license-key.txt
-        pip install --upgrade setuptools codecov
+        pip install --upgrade 'pip<20.3' setuptools codecov
         pip uninstall -y six
         pip install --upgrade --editable .[dev]
       env:
