@@ -8,7 +8,8 @@ The :ref:`dcos-docker-cli:minidcos docker` CLI allows you to create, manage and 
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    # Fix issues shown by minidcos docker doctor
    $ minidcos docker doctor
@@ -62,7 +63,8 @@ Therefore, in order for DC/OS to operate on a custom network a custom ``ip-detec
 
 The following IP detect script works for any custom Docker network:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
     #!/bin/bash -e
     if [ -f /sbin/ip ]; then
@@ -75,7 +77,8 @@ The following IP detect script works for any custom Docker network:
 The :ref:`dcos-docker-cli:create` command supports overwriting the default ``genconf`` directory with the
 contents of the directory supplied through the command line option ``--genconf-dir``.
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
     # Create ip-detect as mentioned above
     $ docker network create custom-bridge
@@ -99,7 +102,8 @@ Ask your sales representative for DC/OS Enterprise installers.
 
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker create /path/to/dcos_generate_config.ee.sh \
         --license-key /path/to/license.txt \
@@ -131,7 +135,8 @@ Running commands on a cluster node using :ref:`dcos-docker-cli:run`
 
 It is possible to run the following to run a command on an arbitrary master node.
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker run systemctl list-units
 
@@ -161,13 +166,15 @@ To do this, you can use any of the ways of :ref:`running-commands`.
 
 For example, to use :ref:`dcos-docker-cli:run` to run ``bash`` to get on to an arbitrary master node:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker run example bash
 
 or, similarly, to use ``docker exec`` to get on to a specific node:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ eval $(minidcos docker inspect --env)
    $ docker exec -it $MASTER_0 bash
@@ -182,7 +189,8 @@ These are :ref:`dcos-docker-cli:destroy` and :ref:`dcos-docker-cli:destroy-list`
 
 Either destroy a cluster with :ref:`dcos-docker-cli:destroy`:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker destroy
    default
@@ -191,7 +199,8 @@ Either destroy a cluster with :ref:`dcos-docker-cli:destroy`:
 
 or use :ref:`dcos-docker-cli:destroy-list` to destroy multiple clusters:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker destroy-list pr_4033_strict pr_4019_permissive
    pr_4033_strict
@@ -199,7 +208,8 @@ or use :ref:`dcos-docker-cli:destroy-list` to destroy multiple clusters:
 
 To destroy all clusters, run the following command:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker destroy-list $(minidcos docker list)
    pr_4033_strict
@@ -214,7 +224,8 @@ The :ref:`dcos-docker-cli:run` command is useful for running integration tests.
 
 To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker create ./dcos_generate_config.sh
    $ minidcos docker wait
@@ -241,7 +252,8 @@ The web UI is served by master nodes on port ``80``.
 To view the web UI on macOS without setting up IP routing, use the ``--one-master-host-port-map`` option on the :ref:`dcos-docker-cli:create` command to forward port ``80`` to your host.
 For example:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker create ./dcos_generate_config.sh --one-master-host-port-map 70:80
    $ minidcos docker wait
@@ -275,7 +287,8 @@ It is possible to use :ref:`dcos-docker-cli:create` to create a cluster with a c
 
 #. Create a cluster.
 
-   .. substitution-prompt:: bash $,# auto
+   .. prompt:: bash $,# auto
+      :substitutions:
 
       $ minidcos docker create \
           /path/to/dcos_generate_config.ee.sh \
@@ -298,7 +311,8 @@ This will provide all containers with a unformatted block device, mounted as a l
 All containers have access to this loopback device.
 Therefore, care must be taken that only a single container has write-access to it.
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos docker create-loopback-sidecar sidecar1
    /dev/loop0

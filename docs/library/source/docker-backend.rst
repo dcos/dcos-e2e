@@ -23,7 +23,8 @@ Cleaning Up and Fixing "Out of Space" Errors
 If a test is interrupted, it can leave behind containers, volumes and files.
 To remove these, run the following:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     minidcos docker clean
 

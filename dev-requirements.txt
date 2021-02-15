@@ -12,18 +12,18 @@ mypy==0.711
 pip-check-reqs==2.1.1
 py==1.8.0
 pydocstyle==3.0.0
-pyenchant==2.0.0
+pyenchant==3.2.0
 pygithub==1.43.7
 pylint==2.3.1
 pyroma==2.5
 pytest-cov==2.7.1  # Measure code coverage
 pytest-timeout==1.3.3
 requests-mock==1.6.0
-sphinx==2.1.2
+sphinx==2.4.4
 sphinx-autodoc-typehints==1.6.0
-sphinx-click==2.2.0
+sphinx-click==2.5.0
 sphinx-paramlinks==0.3.7
-Sphinx-Substitution-Extensions==2020.5.23.0
+Sphinx-Substitution-Extensions==2020.9.30.0
 sphinxcontrib-spelling==4.3.0
 vendorize==0.2.1
 vulture==1.0
