@@ -8,13 +8,15 @@ Check the Python version:
 .. This has been tested by using:
 .. $ docker run -it fedora bash
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
    python3 --version
 
 On Fedora, install Python development requirements:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
    dnf install -y git python3-devel
 
@@ -25,7 +27,8 @@ On Ubuntu, install Python development requirements:
 .. and
 .. $ docker run -it ubuntu bash
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
    apt update -y && \
    apt install -y software-properties-common && \

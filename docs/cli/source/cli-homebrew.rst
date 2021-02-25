@@ -4,7 +4,8 @@ Homebrew or Linuxbrew
 Install `Homebrew`_ (macOS) or `Linuxbrew`_ (Linux).
 Then install the latest stable version:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     brew install python
     brew postinstall python
@@ -12,7 +13,8 @@ Then install the latest stable version:
 
 To upgrade from an older version, run the following command:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     brew install python
     brew postinstall python

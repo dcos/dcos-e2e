@@ -16,39 +16,45 @@ Install Contribution Dependencies
 Install dependencies, preferably in a virtual environment.
 If you are not in a virtualenv, you may have to use ``sudo`` before the following command, or ``--user`` after ``install``.
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     pip3 install --editable '.[dev]'
 
 Optionally install the following tools for linting and interacting with Travis CI:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     gem install travis --no-rdoc --no-ri
 
 Spell checking requires ``enchant``.
 This can be installed on macOS, for example, with `Homebrew`_:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     brew install enchant
 
 and on Ubuntu with ``apt``:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     apt install -y enchant
 
 Linting Bash requires `shellcheck`_:
 This can be installed on macOS, for example, with `Homebrew`_:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     brew install shellcheck
 
 and on Ubuntu with ``apt``:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     apt-get install -y shellcheck
 
@@ -59,19 +65,22 @@ Linting
 
 Run lint tools:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     make lint
 
 These can be run in parallel with:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
    make lint --jobs --output-sync=target
 
 To fix some lint errors, run the following:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     make fix-lint
 
@@ -80,7 +89,8 @@ Tests for this package
 
 To run the full test suite, set environment variables for DC/OS Enterprise installer URLs:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
    export EE_MASTER_INSTALLER_URL=https://...
    export EE_1_9_INSTALLER_URL=https://...
@@ -91,26 +101,30 @@ To run the full test suite, set environment variables for DC/OS Enterprise insta
 
 Download dependencies which are used by the tests:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
    python admin/download_installers.py
 
 A license key is required for some tests:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     cp /path/to/license-key.txt /tmp/license-key.txt
 
 Run ``pytest``:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     pytest
 
 To run the tests concurrently, use `pytest-xdist <https://github.com/pytest-dev/pytest-xdist>`__.
 For example:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     pytest -n 2
 
@@ -119,7 +133,8 @@ Documentation
 
 Run the following commands to build and open the documentation:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     make docs
     make open-docs
@@ -153,7 +168,8 @@ We do not use `encrypted secret files <https://docs.travis-ci.com/user/encryptin
 
 We do not add an encrypted environment variable to ``.travis.yml`` because the license is too large.
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     travis env set --repo |github-owner|/|github-repository| LICENSE_KEY_CONTENTS $LICENSE_KEY_CONTENTS
 
@@ -171,7 +187,8 @@ To update these links use the following commands, after setting the following en
 * ``EE_1_12_INSTALLER_URL``
 * ``EE_1_13_INSTALLER_URL``
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     travis env set --repo |github-owner|/|github-repository| EE_MASTER_INSTALLER_URL $EE_MASTER_INSTALLER_URL
     travis env set --repo |github-owner|/|github-repository| EE_1_9_INSTALLER_URL $EE_1_9_INSTALLER_URL
@@ -190,7 +207,8 @@ To update the credentials use the following commands, after setting the followin
 * ``AWS_ACCESS_KEY_ID``
 * ``AWS_SECRET_ACCESS_KEY``
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
     travis env set --repo |github-owner|/|github-repository| AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID
     travis env set --repo |github-owner|/|github-repository| AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY
@@ -254,7 +272,8 @@ Update the SHAs in ``admin/update_vendored_packages.py``.
 
 The following creates a commit with changes to the vendored packages:
 
-.. substitution-prompt:: bash
+.. prompt:: bash
+   :substitutions:
 
    python admin/update_vendored_packages.py
 

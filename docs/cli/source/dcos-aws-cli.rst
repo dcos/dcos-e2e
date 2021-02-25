@@ -8,7 +8,8 @@ The :ref:`dcos-aws-cli:minidcos aws` CLI allows you to create and manage open so
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    # Fix issues shown by minidcos aws doctor
    $ minidcos aws doctor
@@ -59,7 +60,8 @@ Ask your sales representative for DC/OS Enterprise installers.
 
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos aws create $DCOS_ENTERPRISE_URL \
         --variant enterprise \
@@ -90,7 +92,8 @@ Running commands on a cluster node using :ref:`dcos-aws-cli:run`
 
 It is possible to run the following to run a command on an arbitrary master node.
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos aws run systemctl list-units
 
@@ -110,7 +113,8 @@ To do this, you can use any of the ways of :ref:`running-commands`.
 
 For example, to use :ref:`dcos-aws-cli:run` to run ``bash`` to get on to an arbitrary master node:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos aws run bash
 
@@ -122,7 +126,8 @@ These are :ref:`dcos-aws-cli:destroy` and :ref:`dcos-aws-cli:destroy-list`.
 
 Either destroy a cluster with :ref:`dcos-aws-cli:destroy`:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos aws destroy
    default
@@ -131,7 +136,8 @@ Either destroy a cluster with :ref:`dcos-aws-cli:destroy`:
 
 or use :ref:`dcos-aws-cli:destroy-list` to destroy multiple clusters:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos aws destroy-list pr_4033_strict pr_4019_permissive
    pr_4033_strict
@@ -139,7 +145,8 @@ or use :ref:`dcos-aws-cli:destroy-list` to destroy multiple clusters:
 
 To destroy all clusters, run the following command:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos aws destroy-list $(dcos-aws list)
    pr_4033_strict
@@ -152,7 +159,8 @@ The :ref:`dcos-aws-cli:run` command is useful for running integration tests.
 
 To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos aws create \
         --variant oss \
@@ -199,7 +207,8 @@ It is possible to use :ref:`dcos-aws-cli:create` to create a cluster with a cust
 
 #. Create a cluster.
 
-   .. substitution-prompt:: bash $,# auto
+   .. prompt:: bash $,# auto
+      :substitutions:
 
       $ minidcos aws create \
           $DCOS_ENTERPRISE_URL \

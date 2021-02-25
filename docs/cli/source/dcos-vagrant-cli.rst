@@ -8,7 +8,8 @@ The :ref:`dcos-vagrant-cli:minidcos vagrant` CLI allows you to create, manage an
 A typical CLI workflow for open source DC/OS may look like the following.
 Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    # Fix issues shown by minidcos vagrant doctor
    $ minidcos vagrant doctor
@@ -59,7 +60,8 @@ Ask your sales representative for DC/OS Enterprise installers.
 
 For, example, run the following to create a DC/OS Enterprise cluster in strict mode:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos vagrant create /path/to/dcos_generate_config.ee.sh \
         --license-key /path/to/license.txt \
@@ -89,7 +91,8 @@ Running commands on a cluster node using :ref:`dcos-vagrant-cli:run`
 
 It is possible to run the following to run a command on an arbitrary master node.
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos vagrant run systemctl list-units
 
@@ -109,7 +112,8 @@ To do this, you can use any of the ways of :ref:`running-commands`.
 
 For example, to use :ref:`dcos-vagrant-cli:run` to run ``bash`` to get on to an arbitrary master node:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos vagrant run bash
 
@@ -121,7 +125,8 @@ These are :ref:`dcos-vagrant-cli:destroy` and :ref:`dcos-vagrant-cli:destroy-lis
 
 Either destroy a cluster with :ref:`dcos-vagrant-cli:destroy`:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos vagrant destroy
    default
@@ -130,7 +135,8 @@ Either destroy a cluster with :ref:`dcos-vagrant-cli:destroy`:
 
 or use :ref:`dcos-vagrant-cli:destroy-list` to destroy multiple clusters:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos vagrant destroy-list pr_4033_strict pr_4019_permissive
    pr_4033_strict
@@ -138,7 +144,8 @@ or use :ref:`dcos-vagrant-cli:destroy-list` to destroy multiple clusters:
 
 To destroy all clusters, run the following command:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos vagrant destroy-list $(dcos-vagrant list)
    pr_4033_strict
@@ -151,7 +158,8 @@ The :ref:`dcos-vagrant-cli:run` command is useful for running integration tests.
 
 To run integration tests which are developed in the a DC/OS checkout at :file:`/path/to/dcos`, you can use the following workflow:
 
-.. substitution-prompt:: bash $,# auto
+.. prompt:: bash $,# auto
+   :substitutions:
 
    $ minidcos vagrant create ./dcos_generate_config.sh
    $ minidcos vagrant wait
@@ -196,7 +204,8 @@ It is possible to use :ref:`dcos-vagrant-cli:create` to create a cluster with a 
 
 #. Create a cluster.
 
-   .. substitution-prompt:: bash $,# auto
+   .. prompt:: bash $,# auto
+      :substitutions:
 
       $ minidcos vagrant create \
           /path/to/dcos_generate_config.ee.sh \
