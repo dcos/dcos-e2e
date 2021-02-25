@@ -6,6 +6,8 @@ Changelog
 Next
 ----
 
+* Fix docs generation.
+
 2020.12.18.0
 ------------
 
