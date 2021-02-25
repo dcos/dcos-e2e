@@ -12,4 +12,4 @@ source release/bin/activate
 # Use pip with older, more forgiving dependency resolution
 pip install --upgrade 'pip<20.3'
 pip install --editable '.[dev]'
-python admin/release.py "${GITHUB_TOKEN}" "${GITHUB_OWNER}"
+PYTHONPATH=${PWD} python admin/release.py "${GITHUB_TOKEN}" "${GITHUB_OWNER}"
