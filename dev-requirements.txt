@@ -11,7 +11,7 @@ isort==4.3.21
 mypy==0.711
 pip<20.3
 pip-check-reqs==2.1.1
-py==1.8.0
+py==1.10.0
 pydocstyle==3.0.0
 pyenchant==3.2.0
 pygithub==1.43.7
