@@ -236,6 +236,13 @@ def setup_mac_network(
             click.echo(message, err=True)
             sys.exit(1)
         raise
+    except docker.errors.BuildError as exc:
+        message = 'Error: There was a problem building a Docker image:\n'
+        click.echo(message, err=True)
+        for line in exc.build_log:
+            if 'stream' in line:
+                click.echo('   ' + line['stream'].strip(), err=True)
+        sys.exit(1)
 
     click.echo(message=configuration_instructions)
 
