@@ -13,6 +13,7 @@ Install the CLI (see :doc:`install-cli`),  then create and manage a cluster:
 
    # Fix issues shown by minidcos vagrant doctor
    $ minidcos vagrant doctor
+   $ minidcos vagrant download-installer
    $ minidcos vagrant create ./dcos_generate_config.sh --agents 0
    default
    $ minidcos vagrant wait
