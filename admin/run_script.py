@@ -4,8 +4,6 @@ Run tests and linters on CI.
 
 import os
 import sys
-from typing import Dict  # noqa: F401
-
 import pytest
 
 
