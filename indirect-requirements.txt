@@ -14,7 +14,7 @@ msrestazure==0.4.34
 keyring==16.0.2
 # Without the following, some users get:
 # The 'secretstorage' distribution was not found and is required by keyring
-SecretStorage==3.1.0
+SecretStorage==3.3.1
 # Without the following, some users get:
 # ``ModuleNotFoundError: No module named 'keyring.util.escape'``
 #

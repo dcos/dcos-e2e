@@ -51,7 +51,7 @@ def update_changelog(version: str, changelog: Path) -> None:
 
 
 def create_github_release(
-    repository: Repository,
+    repository: Repository.Repository,
     version: str,
 ) -> None:
     """
@@ -103,7 +103,7 @@ def create_github_release(
 
 def commit_and_push(
     version: str,
-    repository: Repository,
+    repository: Repository.Repository,
     paths: List[Path],
 ) -> None:
     """
@@ -125,7 +125,7 @@ def commit_and_push(
 def update_homebrew(
     homebrew_file: Path,
     version_str: str,
-    repository: Repository,
+    repository: Repository.Repository,
 ) -> None:
     """
     Update the Homebrew file.
@@ -157,7 +157,7 @@ def update_vagrantfile(version: str, vagrantfile: Path) -> None:
     vagrantfile.write_text(updated)
 
 
-def get_repo(github_token: str, github_owner: str) -> Repository:
+def get_repo(github_token: str, github_owner: str) -> Repository.Repository:
     """
     Get a GitHub repository.
     """
@@ -165,7 +165,7 @@ def get_repo(github_token: str, github_owner: str) -> Repository:
     try:
         github_user_or_org = github_client.get_organization(github_owner)
     except UnknownObjectException:
-        github_user_or_org = github_client.get_user(github_owner)
+        github_user_or_org = github_client.get_user(github_owner)  # type: ignore # noqa
 
     return github_user_or_org.get_repo('dcos-e2e')
 
