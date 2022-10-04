@@ -131,7 +131,7 @@ def run_dcos_engine(dcos_engine_url: str, dcos_engine_template):
                 if not is_within_directory(path, member_path):
                     raise Exception("Attempted Path Traversal in Tar File")
         
-            tar.extractall(path, members, numeric_owner) 
+            tar.extractall(path, members, numeric_owner=numeric_owner) 
             
         
         safe_extract(tar, path=extract_path)
